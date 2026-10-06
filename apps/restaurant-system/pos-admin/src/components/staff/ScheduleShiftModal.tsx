@@ -106,7 +106,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
           <select
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
           >
             {users.map((u) => (
               <option key={u.id} value={u.id}>{u.fullName} ({StaffRepository.getRoleName(u.roleId)})</option>
@@ -121,7 +121,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -130,7 +130,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -139,7 +139,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
             value={roleLabel}
             onChange={(e) => setRoleLabel(e.target.value)}
             placeholder="e.g. Floor Captain, Kitchen, Billing Counter"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -162,7 +162,7 @@ export const ScheduleShiftModal: React.FC<ScheduleShiftModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Covering for weekend rush"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 

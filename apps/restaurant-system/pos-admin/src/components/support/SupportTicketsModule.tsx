@@ -96,7 +96,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
   if (!cloudReady) {
     return (
       <div className="max-w-3xl mx-auto space-y-3">
-        <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Help & Support</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Help & Support</h1>
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
           Support tickets go to the JAMANVAAR team over the internet. {cloudSetupHint()}
         </div>
@@ -136,7 +136,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
     <div className="max-w-4xl mx-auto space-y-5">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Help & Support</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Help & Support</h1>
           <p className="text-xs sm:text-sm text-[#4A5568] mt-0.5">Tell the JAMANVAAR team what is wrong. They reply here, and you can add screenshots.</p>
         </div>
         <button type="button" onClick={() => setCreating(true)} className="inline-flex items-center gap-2 rounded-xl bg-jaman-navy px-4 py-2.5 text-sm font-bold text-white">
@@ -151,7 +151,7 @@ export const SupportTicketsModule: React.FC<Props> = ({ showToast }) => {
           <div className="p-6 text-sm text-slate-500">Loading…</div>
         ) : tickets && tickets.length === 0 ? (
           <div className="p-8 text-center">
-            <LifeBuoy className="w-8 h-8 mx-auto text-slate-400" />
+            <LifeBuoy className="w-8 h-8 mx-auto text-slate-500" />
             <p className="mt-2 text-sm font-bold text-jaman-navy">No tickets yet</p>
             <p className="text-xs text-slate-500">If something is not working, raise a ticket and we will help.</p>
           </div>
@@ -208,7 +208,7 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
       <button type="button" onClick={onCancel} className="inline-flex items-center gap-1 text-xs font-bold text-slate-600">
         <ArrowLeft className="w-3.5 h-3.5" /> Back to tickets
       </button>
-      <h1 className="text-2xl font-black text-jaman-navy tracking-tight">New support ticket</h1>
+      <h1 className="text-2xl font-bold text-jaman-navy tracking-tight">New support ticket</h1>
       {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</div>}
 
       <label className="block text-xs font-bold text-slate-700">
@@ -316,7 +316,7 @@ function TicketView({ ticket, onBack, onChanged, showToast }: { ticket: SupportT
       </button>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">{ticket.subject}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">{ticket.subject}</h1>
           <p className="text-xs text-slate-500">{ticketNo(ticket.number)} · {CATEGORY_LABEL[ticket.category]} · opened {when(ticket.createdAt)}</p>
         </div>
         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${STATUS_STYLE[ticket.status]}`}>{STATUS_LABEL[ticket.status]}</span>
@@ -324,7 +324,7 @@ function TicketView({ ticket, onBack, onChanged, showToast }: { ticket: SupportT
       <p className="rounded-2xl border border-jaman-border bg-white p-4 text-sm whitespace-pre-wrap">{ticket.description}</p>
 
       <div className="rounded-2xl border border-jaman-border bg-white p-4 space-y-2">
-        <h2 className="text-sm font-extrabold text-jaman-navy">Attachments</h2>
+        <h2 className="text-sm font-bold text-jaman-navy">Attachments</h2>
         {ticket.attachments.length === 0 ? (
           <p className="text-xs text-slate-500">None yet.</p>
         ) : (
@@ -347,7 +347,7 @@ function TicketView({ ticket, onBack, onChanged, showToast }: { ticket: SupportT
       </div>
 
       <div className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
-        <h2 className="text-sm font-extrabold text-jaman-navy">Conversation</h2>
+        <h2 className="text-sm font-bold text-jaman-navy">Conversation</h2>
         {timeline.map((t) =>
           'event' in t ? (
             <p key={t.id} className="text-xs text-slate-500">

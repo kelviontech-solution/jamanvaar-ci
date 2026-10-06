@@ -148,7 +148,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             <p className="text-xs font-bold text-emerald-800">
               {staffToEdit ? 'New PIN issued.' : 'Staff member created.'} This PIN is shown only once — note it down now.
             </p>
-            <div className="text-3xl font-black tracking-[0.3em] text-jaman-navy font-mono">{issuedPin}</div>
+            <div className="text-3xl font-bold tracking-[0.3em] text-jaman-navy font-mono">{issuedPin}</div>
             <button
               type="button"
               onClick={handleCopyPin}
@@ -183,7 +183,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             value={fullName}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="Employee's full name"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -196,7 +196,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. amitdave"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -204,7 +204,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             <select
               value={roleId}
               onChange={(e) => setRoleId(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             >
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -223,7 +223,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. +91 98250 12345"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -233,7 +233,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="staff@example.com"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -248,7 +248,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             value={hourlyPay}
             onChange={(e) => setHourlyPay(e.target.value)}
             placeholder="e.g. 120"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
           />
           <p className="text-[11px] text-slate-500 mt-1">Used only for the labour cost report. Kept on this computer; it is never sent to POS, Captain or KDS.</p>
         </div>
@@ -267,7 +267,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             <button
               type="button"
               onClick={handleResetPin}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-jaman-saffron hover:text-[#EA580C] cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:text-[#EA580C] cursor-pointer shrink-0"
               title="Issue a new PIN for this staff member"
             >
               <KeyRound className="w-3.5 h-3.5" />
@@ -288,7 +288,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {staffToEdit ? 'Save Changes' : 'Create Staff Member & Issue PIN'}
           </button>

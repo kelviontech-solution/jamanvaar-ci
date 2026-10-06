@@ -163,7 +163,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Ramesh Patel"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -179,7 +179,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. 9876543210"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron disabled:opacity-60"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand disabled:opacity-60"
             />
           </div>
         </div>
@@ -196,7 +196,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. ramesh.patel@gmail.com"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -210,7 +210,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="e.g. Satellite Towers, Bodakdev"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -219,14 +219,14 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Calendar className="w-3.5 h-3.5 text-slate-500" />
               <span>Date of Birth (Birthday)</span>
             </label>
             <input
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -239,7 +239,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               type="date"
               value={anniversary}
               onChange={(e) => setAnniversary(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -252,7 +252,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               type="number"
               value={loyaltyPoints}
               onChange={(e) => setLoyaltyPoints(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-black text-amber-800 focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-800 focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -269,13 +269,13 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
                 type="button"
                 key={tag}
                 onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 rounded-xl text-xs font-black transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                   selectedTags.includes(tag)
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-ivory border border-jaman-border text-slate-600 hover:bg-slate-100'
                 }`}
               >
-                {tag === 'VIP' ? '⭐ VIP' : tag}
+                {tag === 'VIP' ? 'VIP' : tag}
               </button>
             ))}
           </div>
@@ -292,28 +292,28 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Strict Jain (no onion/garlic), prefers table 12 by the window, mild spices."
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl p-2.5 text-xs font-medium focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl p-2.5 text-xs font-medium focus:outline-none focus:border-brand"
           />
         </div>
 
         {/* Lifetime Order Summary if editing */}
         {customerToEdit && (
           <div className="bg-jaman-cream p-3.5 rounded-2xl border border-jaman-border space-y-2">
-            <span className="text-[10px] font-black uppercase text-slate-500 block">
+            <span className="text-[11px] font-bold uppercase text-slate-500 block">
               LIFETIME DINING INTELLIGENCE:
             </span>
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
               <div className="bg-white p-2 rounded-xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block font-bold">Total Spent</span>
-                <strong className="font-mono text-emerald-700 font-black">{formatINR(customerToEdit.totalSpend || totalSpent)}</strong>
+                <span className="text-[11px] text-slate-500 block font-bold">Total Spent</span>
+                <strong className="tabular-nums text-emerald-700 font-bold">{formatINR(customerToEdit.totalSpend || totalSpent)}</strong>
               </div>
               <div className="bg-white p-2 rounded-xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block font-bold">Visits / Orders</span>
-                <strong className="font-mono text-jaman-navy font-black">{customerToEdit.totalVisits || customerOrders.length} visits</strong>
+                <span className="text-[11px] text-slate-500 block font-bold">Visits / Orders</span>
+                <strong className="tabular-nums text-jaman-navy font-bold">{customerToEdit.totalVisits || customerOrders.length} visits</strong>
               </div>
               <div className="bg-white p-2 rounded-xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block font-bold">Avg Order Value</span>
-                <strong className="font-mono text-blue-700 font-black">
+                <span className="text-[11px] text-slate-500 block font-bold">Avg Order Value</span>
+                <strong className="font-mono text-blue-700 font-bold">
                   {formatINR(
                     Math.round(
                       (customerToEdit.totalSpend || totalSpent) /
@@ -338,7 +338,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             {customerToEdit ? 'Save Changes' : 'Register Customer'}
           </button>

@@ -152,12 +152,12 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4 py-1">
         <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl flex justify-between text-xs">
           <div>
-            <span className="text-slate-400 font-bold block">Current Stock:</span>
-            <span className="font-bold text-sm text-jaman-navy font-mono">{item.currentStock} {item.unit}</span>
+            <span className="text-slate-500 font-bold block">Current Stock:</span>
+            <span className="font-bold text-sm text-jaman-navy tabular-nums">{item.currentStock} {item.unit}</span>
           </div>
           <div className="text-right">
-            <span className="text-slate-400 font-bold block">Unit Cost:</span>
-            <span className="font-bold text-sm text-emerald-700 font-mono">₹{item.costPerUnit}/{item.unit}</span>
+            <span className="text-slate-500 font-bold block">Unit Cost:</span>
+            <span className="font-bold text-sm text-emerald-700 tabular-nums">₹{item.costPerUnit}/{item.unit}</span>
           </div>
         </div>
 
@@ -166,7 +166,7 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
           <select
             value={reasonCode}
             onChange={(e) => setReasonCode(e.target.value as WastageReasonCode)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
           >
             {WASTAGE_REASONS.map((r) => (
               <option key={r.code} value={r.code}>{r.label}</option>
@@ -183,7 +183,7 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
             required
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -200,7 +200,7 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="e.g. Tray slipped during plating"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -218,7 +218,7 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
               </button>
             </div>
           ) : (
-            <label className="flex items-center gap-2 w-fit px-3 py-2 bg-jaman-ivory border border-dashed border-jaman-border rounded-xl text-xs font-bold text-slate-500 hover:border-jaman-saffron hover:text-jaman-saffron cursor-pointer transition-colors">
+            <label className="flex items-center gap-2 w-fit px-3 py-2 bg-jaman-ivory border border-dashed border-jaman-border rounded-xl text-xs font-bold text-slate-500 hover:border-brand hover:text-brand cursor-pointer transition-colors">
               <Camera className="w-3.5 h-3.5" />
               <span>Attach a photo</span>
               <input

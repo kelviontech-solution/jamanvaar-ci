@@ -103,7 +103,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="e.g. Rohan Mehta"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -113,7 +113,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               placeholder="e.g. 98765 43210"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -134,7 +134,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -144,7 +144,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               min="1"
               value={guestCount}
               onChange={(e) => setGuestCount(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -155,7 +155,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             <select
               value={tableId}
               onChange={(e) => setTableId(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             >
               <option value="">No preference — assign at arrival</option>
               {tables.map((t) => (
@@ -170,7 +170,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               min="0"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -182,7 +182,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             value={specialRequests}
             onChange={(e) => setSpecialRequests(e.target.value)}
             placeholder="e.g. Birthday cake, window seating, high chair needed"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 

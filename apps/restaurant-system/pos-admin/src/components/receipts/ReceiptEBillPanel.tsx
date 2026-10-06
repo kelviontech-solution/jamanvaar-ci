@@ -114,12 +114,12 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   {config.logoUrl ? (
                     <img src={config.logoUrl} alt="Receipt logo" className="w-full h-full object-contain" />
                   ) : (
-                    <span className="text-[11px] text-[#8C9BAE] text-center px-1">No logo</span>
+                    <span className="text-[11px] text-[#64748B] text-center px-1">No logo</span>
                   )}
                 </div>
                 <div className="flex-1 space-y-2">
                   <div
-                    className="border-2 border-dashed rounded-xl p-2.5 text-center cursor-pointer border-[#D4CBBF] bg-jaman-ivory hover:border-jaman-saffron hover:bg-[#FFF4ED]/30 transition-colors"
+                    className="border-2 border-dashed rounded-xl p-2.5 text-center cursor-pointer border-[#D4CBBF] bg-jaman-ivory hover:border-brand hover:bg-brand/[0.07]/30 transition-colors"
                     onClick={() => document.getElementById('receipt-logo-upload-input')?.click()}
                   >
                     <input
@@ -139,7 +139,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                         reader.readAsDataURL(file);
                       }}
                     />
-                    <span className="text-[11px] font-bold text-jaman-navy">📁 Click to upload a logo (PNG/JPG, under 2MB)</span>
+                    <span className="text-[11px] font-bold text-jaman-navy">Click to upload a logo (PNG/JPG, under 2MB)</span>
                   </div>
                   <input
                     type="url"
@@ -158,7 +158,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                 type="button"
                 onClick={() => setConfig({ ...config, paperSize: '80mm' })}
                 className={`p-3 rounded-xl border text-center font-bold text-xs ${
-                  config.paperSize === '80mm' ? 'bg-jaman-navy text-white border-jaman-navy' : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
+                  config.paperSize === '80mm' ? 'bg-brand/[0.09] text-brand border-brand/40 font-semibold' : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
                 }`}
               >
                 80mm Standard POS
@@ -167,7 +167,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                 type="button"
                 onClick={() => setConfig({ ...config, paperSize: '58mm' })}
                 className={`p-3 rounded-xl border text-center font-bold text-xs ${
-                  config.paperSize === '58mm' ? 'bg-jaman-navy text-white border-jaman-navy' : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
+                  config.paperSize === '58mm' ? 'bg-brand/[0.09] text-brand border-brand/40 font-semibold' : 'bg-jaman-ivory border-jaman-border text-jaman-navy'
                 }`}
               >
                 58mm Compact POS
@@ -177,7 +177,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   type="checkbox"
                   checked={config.showTaxBreakup}
                   onChange={(e) => setConfig({ ...config, showTaxBreakup: e.target.checked })}
-                  className="rounded text-jaman-saffron"
+                  className="rounded text-brand"
                 />
                 Tax Breakup (GST)
               </label>
@@ -186,7 +186,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   type="checkbox"
                   checked={config.enableEmail}
                   onChange={(e) => setConfig({ ...config, enableEmail: e.target.checked })}
-                  className="rounded text-jaman-saffron"
+                  className="rounded text-brand"
                 />
                 Email Bill (PDF)
               </label>
@@ -198,7 +198,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   type="checkbox"
                   checked={config.showCashWatermark === true}
                   onChange={(e) => setConfig({ ...config, showCashWatermark: e.target.checked })}
-                  className="rounded text-jaman-saffron mt-0.5"
+                  className="rounded text-brand mt-0.5"
                 />
                 <span>
                   Mark cash bills with a faint diagonal watermark (off by default)
@@ -255,17 +255,17 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
       <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm">
         <div className="p-4 bg-jaman-ivory border-b border-jaman-border font-bold text-sm text-jaman-navy flex items-center justify-between">
           <span>Digital E-Bill Transmission Audit Log</span>
-          <span className="text-xs text-[#8C9BAE] font-normal">{records.length} records</span>
+          <span className="text-xs text-[#64748B] font-normal">{records.length} records</span>
         </div>
 
         {records.length === 0 ? (
-          <p className="text-xs text-[#8C9BAE] p-6 text-center">
+          <p className="text-xs text-[#64748B] p-6 text-center">
             No digital receipts dispatched yet. Dispatched WhatsApp & SMS e-bills will appear here with masked privacy numbers.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#8C9BAE] uppercase font-bold">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#64748B] uppercase font-bold">
                 <tr>
                   <th className="py-3 px-4">Order / Token</th>
                   <th className="py-3 px-4">Channel</th>
@@ -280,9 +280,9 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                     <td className="py-3 px-4 font-bold text-jaman-navy">
                       {rec.orderNumber} (#{rec.tokenNumber})
                     </td>
-                    <td className="py-3 px-4 font-semibold text-jaman-saffron">{rec.deliveryMethod}</td>
+                    <td className="py-3 px-4 font-semibold text-brand">{rec.deliveryMethod}</td>
                     <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{rec.recipient}</td>
-                    <td className="py-3 px-4 text-[#8C9BAE]">{formatTime(rec.createdAt)}</td>
+                    <td className="py-3 px-4 text-[#64748B]">{formatTime(rec.createdAt)}</td>
                     <td className="py-3 px-4">
                       <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700">{rec.deliveryStatus}</span>
                     </td>

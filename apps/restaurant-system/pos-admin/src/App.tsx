@@ -691,10 +691,10 @@ export default function PosAdminApp() {
           heroDescription="Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions."
           heroImages={APP_HERO_IMAGES.ADMIN}
           capabilities={[
-            { label: 'Restaurant Management', icon: 'zap' },
-            { label: 'Reports & Analytics', icon: 'printer' },
+            { label: 'Restaurant Management', icon: 'dashboard' },
+            { label: 'Reports & Analytics', icon: 'chart' },
             { label: 'Menu Management', icon: 'table' },
-            { label: 'Inventory & Staff', icon: 'cloud' }
+            { label: 'Inventory & Staff', icon: 'package' }
           ]}
           footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
         >
@@ -744,7 +744,7 @@ export default function PosAdminApp() {
                       setAuthError('');
                     }}
                     placeholder="e.g. JM9876543210"
-                    className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
+                    className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                   />
                   <p className="text-[11px] text-slate-500 mt-1.5">
                     Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button).
@@ -757,7 +757,7 @@ export default function PosAdminApp() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
-                      className="text-[11px] text-jaman-saffron hover:underline font-bold"
+                      className="text-xs text-[#B8500C] hover:underline font-semibold"
                     >
                       {showPassword ? 'Hide Password' : 'Show Password'}
                     </button>
@@ -771,7 +771,7 @@ export default function PosAdminApp() {
                         setAuthError('');
                       }}
                       placeholder="Enter owner password"
-                      className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
+                      className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                     />
                   </div>
                 </div>
@@ -795,7 +795,7 @@ export default function PosAdminApp() {
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded accent-jaman-saffron"
+                      className="rounded accent-brand"
                     />
                     <span>Remember this device</span>
                   </label>
@@ -806,7 +806,7 @@ export default function PosAdminApp() {
                       setPasswordResetNotice(false);
                       setAuthScreenState('FORGOT');
                     }}
-                    className="font-bold text-jaman-saffron hover:underline cursor-pointer"
+                    className="font-semibold text-[#B8500C] hover:underline cursor-pointer"
                   >
                     Forgot password?
                   </button>
@@ -815,7 +815,7 @@ export default function PosAdminApp() {
                 <button
                   type="submit"
                   disabled={loginBusy}
-                  className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
+                  className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-50 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
                 >
                   {loginBusy ? 'Signing In…' : 'Sign In to Admin'}
                 </button>
@@ -843,7 +843,7 @@ export default function PosAdminApp() {
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                   <span>FIRST-TIME DEVICE ACTIVATION</span>
                 </div>
-                <h3 className="text-base font-black text-jaman-navy pt-1">
+                <h3 className="text-base font-bold text-jaman-navy pt-1">
                   Activate Restaurant Admin Console
                 </h3>
                 <p className="text-xs text-slate-500 max-w-xs mx-auto">
@@ -863,7 +863,7 @@ export default function PosAdminApp() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500 font-medium">Device Role:</span>
-                    <span className="font-bold text-jaman-saffron">POS_ADMIN (Management Console)</span>
+                    <span className="font-bold text-brand">POS_ADMIN (Management Console)</span>
                   </div>
                 </div>
               )}
@@ -883,7 +883,7 @@ export default function PosAdminApp() {
                     placeholder="JMV-XXXX-XXXX-XXXX"
                     autoFocus
                     required
-                    className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-center font-mono font-bold tracking-wider text-jaman-navy focus:outline-hidden transition-colors"
+                    className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-center font-mono font-bold tracking-wider text-jaman-navy focus:outline-hidden transition-colors"
                   />
                 </div>
 
@@ -897,7 +897,7 @@ export default function PosAdminApp() {
                 <button
                   type="submit"
                   disabled={activationBusy || !activationKeyInput.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2"
+                  className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
                 >
                   {activationBusy ? 'Activating Terminal…' : 'Activate & Enter Portal'}
                 </button>
@@ -981,7 +981,7 @@ export default function PosAdminApp() {
                     onClick={() => toggleSection(grp.section)}
                     className="w-full flex items-center justify-between px-3 py-0.5 cursor-pointer group/section"
                   >
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover/section:text-slate-600 font-mono">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover/section:text-slate-600 font-mono">
                       {grp.section}
                     </span>
                     <ChevronDown
@@ -995,10 +995,10 @@ export default function PosAdminApp() {
                       const isSelected = activeTab === nav.id;
 
                       let badgeCount = 0;
-                      let badgeColor = 'bg-jaman-saffron text-white';
+                      let badgeColor = 'bg-brand text-white';
                       if (nav.id === 'LIVE_KDS' && pendingKotsCount > 0) {
                         badgeCount = pendingKotsCount;
-                        badgeColor = 'bg-jaman-saffron text-white shadow-2xs';
+                        badgeColor = 'bg-brand text-white shadow-2xs';
                       } else if (nav.id === 'INVENTORY' && lowStockCount > 0) {
                         badgeCount = lowStockCount;
                         badgeColor = 'bg-amber-600 text-white shadow-2xs';
@@ -1016,25 +1016,19 @@ export default function PosAdminApp() {
                           key={nav.id}
                           onClick={() => { setActiveTab(nav.id as PosAdminTab); setNavOpen(false); }}
                           title={isLockedPro ? 'Not included in your current plan — tap to see what it offers' : undefined}
-                          className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-xs sm:text-[13px] transition-all duration-150 cursor-pointer ${
+                          aria-current={isSelected ? 'page' : undefined}
+                          className={`group relative w-full min-h-[46px] flex items-center justify-between px-3.5 py-2.5 rounded-2xl border font-medium text-[13px] transition-colors duration-150 cursor-pointer ${
                             isSelected
-                              ? 'bg-jaman-navy text-white shadow-xs'
+                              ? 'bg-brand/[0.08] border-brand/40 text-brand font-semibold'
                               : isLockedPro
-                              ? 'text-[#94A3B8] hover:bg-white/60'
-                              : 'text-[#4A5568] hover:bg-white hover:text-jaman-navy'
+                              ? 'border-transparent text-[#94A3B8] hover:bg-brand/[0.04]'
+                              : 'border-transparent text-slate-700 hover:bg-brand/[0.05] hover:text-jaman-navy'
                           }`}
                         >
-                          {isSelected && (
-                            <span
-                              className="absolute left-0 top-2 bottom-2 w-1 bg-jaman-saffron rounded-r-full"
-                              aria-hidden="true"
-                            />
-                          )}
-
-                          <div className={`flex items-center gap-2.5 min-w-0 pl-1 ${isLockedPro ? 'opacity-60' : ''}`}>
+                          <div className={`flex items-center gap-3 min-w-0 ${isLockedPro ? 'opacity-60' : ''}`}>
                             <Icon
-                              className={`w-4 h-4 shrink-0 transition-colors ${
-                                isSelected ? 'text-jaman-saffron' : isLockedPro ? 'text-slate-400' : 'text-slate-400 group-hover:text-jaman-navy'
+                              className={`w-5 h-5 shrink-0 transition-colors duration-150 ${
+                                isSelected ? 'text-brand' : isLockedPro ? 'text-slate-500' : 'text-slate-500 group-hover:text-jaman-navy'
                               }`}
                             />
                             <span className="truncate">{nav.label}</span>
@@ -1043,7 +1037,7 @@ export default function PosAdminApp() {
                           <div className="flex items-center gap-1.5 shrink-0">
                             {nav.id === 'QR_ORDERING' && qrKnown && (
                               <span
-                                className={`flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black rounded-md uppercase ${
+                                className={`flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold rounded-md uppercase ${
                                   !qrLocked
                                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                     : 'bg-amber-100 text-amber-800 border border-amber-200'
@@ -1055,7 +1049,7 @@ export default function PosAdminApp() {
                             )}
                             {badgeCount > 0 && (
                               <span
-                                className={`px-1.5 py-0.5 text-[10px] font-black rounded-full min-w-5 text-center ${badgeColor}`}
+                                className={`px-1.5 py-0.5 text-[11px] font-bold rounded-full min-w-5 text-center ${badgeColor}`}
                               >
                                 {badgeCount}
                               </span>
@@ -1073,7 +1067,7 @@ export default function PosAdminApp() {
 
             {/* The header actions that do not fit a phone's header live here on small screens */}
             <div className="sm:hidden mt-4 pt-3 border-t border-[#EAE3D6] grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#FFF4ED] border border-[#FDBA74]/60 text-jaman-saffron text-xs font-bold cursor-pointer">EOD Report</button>
+              <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-brand/[0.07] border border-brand/30 text-brand text-xs font-bold cursor-pointer">EOD Report</button>
               <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>
               <button type="button" onClick={() => { setNavOpen(false); handleOpenAssistant(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold cursor-pointer">Assistant</button>
               <button type="button" onClick={() => { setNavOpen(false); handleAdminLogout(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-rose-700 text-xs font-bold cursor-pointer">Log out</button>
@@ -1081,7 +1075,7 @@ export default function PosAdminApp() {
           </aside>
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
-          <main className="flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
+          <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'DASHBOARD' && (
               <RestaurantDashboard
@@ -1288,11 +1282,11 @@ export default function PosAdminApp() {
             {activeTab === 'KIOSKS' && (
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Kiosk Terminal Control</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Terminal Control</h1>
                   <p className="text-sm text-[#4A5568] mt-1">Manage self-ordering stations, lockdown states, and maintenance modes.</p>
                 </div>
                 {kiosks.length === 0 && (
-                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-xs text-[#8C9BAE]">
+                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-xs text-[#64748B]">
                     No Kiosk Terminals yet. A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network.
                   </div>
                 )}
@@ -1305,11 +1299,11 @@ export default function PosAdminApp() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs bg-jaman-ivory p-3 rounded-xl border border-jaman-border">
                         <div>
-                          <span className="text-[#8C9BAE]">Pending changes:</span>
-                          <div className="font-semibold text-jaman-navy font-mono">{k.pendingSyncCount}</div>
+                          <span className="text-[#64748B]">Pending changes:</span>
+                          <div className="font-semibold text-jaman-navy tabular-nums">{k.pendingSyncCount}</div>
                         </div>
                         <div>
-                          <span className="text-[#8C9BAE]">App version:</span>
+                          <span className="text-[#64748B]">App version:</span>
                           <div className="font-semibold text-jaman-navy font-mono">{k.appVersion ?? '—'}</div>
                         </div>
                       </div>
@@ -1343,7 +1337,7 @@ export default function PosAdminApp() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Offers & Promo Coupons</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Offers & Promo Coupons</h1>
                     <p className="text-sm text-[#4A5568] mt-1">Manage customer discounts and threshold promotions.</p>
                   </div>
                   <Button variant="accent" size="sm" onClick={() => setIsAddCouponModalOpen(true)}>
@@ -1356,7 +1350,7 @@ export default function PosAdminApp() {
                     <div key={c.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-lg font-black text-jaman-saffron bg-jaman-saffron/10 px-3 py-1 rounded-xl border border-jaman-saffron/20">
+                          <span className="font-mono text-lg font-bold text-brand bg-brand/10 px-3 py-1 rounded-xl border border-brand/20">
                             {c.code}
                           </span>
                           <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
@@ -1364,7 +1358,7 @@ export default function PosAdminApp() {
                           </span>
                         </div>
                         <p className="text-sm font-semibold text-jaman-navy mt-3">{c.description}</p>
-                        <div className="text-xs text-[#8C9BAE] mt-2 space-y-1">
+                        <div className="text-xs text-[#64748B] mt-2 space-y-1">
                           <div>Min Order Value: ₹{c.minOrderValue}</div>
                           <div>Times Used: {c.usageCount}{c.usageLimit ? ` / ${c.usageLimit}` : ' (unlimited)'}</div>
                         </div>
@@ -1695,7 +1689,7 @@ export default function PosAdminApp() {
           <Modal
             isOpen={isBulkPriceModalOpen}
             onClose={() => setIsBulkPriceModalOpen(false)}
-            title="⚡ Quick Bulk Menu Price Adjustment"
+            title="Quick Bulk Menu Price Adjustment"
             maxWidth="md"
           >
             <div className="space-y-4 py-1">
@@ -1714,9 +1708,9 @@ export default function PosAdminApp() {
                       <button
                         key={pct}
                         onClick={() => setBulkPercent(pct)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                           bulkPercent === pct
-                            ? 'bg-jaman-saffron text-white shadow-xs'
+                            ? 'bg-brand text-white shadow-xs'
                             : 'bg-jaman-ivory border border-slate-200 text-jaman-navy'
                         }`}
                       >
@@ -1748,7 +1742,7 @@ export default function PosAdminApp() {
                 </Button>
                 <button
                   onClick={handleApplyBulkPrice}
-                  className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+                  className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
                 >
                   Apply {bulkPercent > 0 ? `+${bulkPercent}%` : `${bulkPercent}%`} to {menuItems.length} Dishes
                 </button>
@@ -1810,15 +1804,14 @@ export default function PosAdminApp() {
           >
             <div className="space-y-4 py-2">
               {/* Feature Hero Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-jaman-navy to-[#163E5E] text-white shadow-md relative overflow-hidden">
-                <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 w-28 h-28 bg-jaman-saffron/20 rounded-full blur-2xl pointer-events-none" />
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-jaman-saffron text-white">
+              <div className="p-4 rounded-2xl bg-jaman-navy text-white shadow-md relative overflow-hidden">
+                                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-brand text-white">
                     <Sparkles className="w-3 h-3" /> PRO Exclusive Feature
                   </span>
-                  <span className="text-[11px] font-mono text-slate-300">₹7,000 / month</span>
+                  <span className="text-[11px] tabular-nums text-slate-300">₹7,000 / month</span>
                 </div>
-                <h3 className="text-lg font-black text-white tracking-tight">
+                <h3 className="text-lg font-bold text-white tracking-tight">
                   Unlock Intelligent Restaurant Operations
                 </h3>
                 <p className="text-xs text-slate-300 mt-1 leading-relaxed">
@@ -1828,12 +1821,12 @@ export default function PosAdminApp() {
 
               {/* Benefits Checklist */}
               <div className="space-y-2">
-                <div className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   What you get with PRO Plan
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-jaman-saffron">
+                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-brand">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
@@ -1898,7 +1891,7 @@ export default function PosAdminApp() {
                     setActiveTab('SETTINGS');
                     setToastMessage('Navigate to Subscription Plans to upgrade to JAMANVAAR PRO.');
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#c9570f] text-white text-xs font-black shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  className="px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <span>Upgrade to PRO (₹7,000)</span>
                   <ArrowRight className="w-4 h-4" />

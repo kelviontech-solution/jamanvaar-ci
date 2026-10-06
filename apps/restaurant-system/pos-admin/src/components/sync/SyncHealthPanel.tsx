@@ -67,12 +67,12 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Sync &amp; Devices</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Sync &amp; Devices</h1>
         <p className="text-sm text-[#4A5568] mt-1">Whether every terminal is in step with the cloud, and what needs your review.</p>
       </div>
 
-      <div className="bg-white border border-jaman-border rounded-3xl p-5">
-        <h2 className="text-base font-extrabold text-jaman-navy mb-3">This device: connection &amp; diagnostics</h2>
+      <div className="bg-white border border-jaman-border rounded-2xl p-5">
+        <h2 className="text-base font-bold text-jaman-navy mb-3">This device: connection &amp; diagnostics</h2>
         <ConnectionPanel appVersion={typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'} showToast={showToast} />
       </div>
 
@@ -100,7 +100,7 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
               type="button"
               disabled={publishing}
               onClick={() => void publish()}
-              className="bg-jaman-saffron text-white font-bold text-sm px-4 py-2 rounded-lg disabled:opacity-60"
+              className="bg-brand text-white font-bold text-sm px-4 py-2 rounded-lg disabled:opacity-60"
             >
               {publishing ? 'Publishing…' : 'Publish menu'}
             </button>
@@ -116,16 +116,16 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-[#8C9BAE]">
+                <tr className="text-left text-xs text-[#64748B]">
                   <th className="py-2 pr-4">Device</th><th className="pr-4">Status</th><th className="pr-4">Pending</th><th className="pr-4">Menu</th><th className="pr-4">Version</th><th>Problem</th>
                 </tr>
               </thead>
               <tbody>
                 {devices.map((d) => (
                   <tr key={d.id} className="border-t border-jaman-border">
-                    <td className="py-2 pr-4 font-semibold text-jaman-navy">{d.name ?? d.type}<span className="ml-2 text-xs text-[#8C9BAE]">{d.type}</span></td>
+                    <td className="py-2 pr-4 font-semibold text-jaman-navy">{d.name ?? d.type}<span className="ml-2 text-xs text-[#64748B]">{d.type}</span></td>
                     <td className={`pr-4 font-semibold ${HEALTH_STYLE[d.health] ?? ''}`}>{d.health.replace('_', ' ')}</td>
-                    <td className="pr-4 font-mono">{d.pendingSyncCount ?? 0}</td>
+                    <td className="pr-4 tabular-nums">{d.pendingSyncCount ?? 0}</td>
                     <td className="pr-4">{d.menuStatus === 'behind' ? <span className="text-amber-700 font-semibold">behind (v{d.menuVersion ?? 0})</span> : d.menuStatus === 'current' ? 'up to date' : '—'}</td>
                     <td className="pr-4 font-mono">{d.appVersion ?? '—'}</td>
                     <td className="text-rose-700 text-xs">{d.syncError ?? ''}</td>
@@ -140,7 +140,7 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
       <section className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold text-jaman-navy">Needs review ({issues.length})</h2>
-          <button type="button" onClick={() => void load()} className="text-xs font-semibold text-jaman-saffron">Refresh</button>
+          <button type="button" onClick={() => void load()} className="text-xs font-semibold text-brand">Refresh</button>
         </div>
         {issues.length === 0 ? (
           <p className="text-sm text-emerald-700 font-semibold">Nothing to review. All synced data is consistent.</p>
@@ -154,7 +154,7 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
             ))}
           </ul>
         )}
-        <p className="text-xs text-[#8C9BAE] mt-3">These are reported, never repaired automatically: payments and stock are reviewed by a person.</p>
+        <p className="text-xs text-[#64748B] mt-3">These are reported, never repaired automatically: payments and stock are reviewed by a person.</p>
       </section>
     </div>
   );

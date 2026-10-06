@@ -217,17 +217,17 @@ export function OnlinePaymentsPanel() {
           </div>
           <div className="flex items-center justify-between text-xs border-t border-jaman-border pt-2">
             <span className="font-bold text-jaman-navy">= Net Payable after holds</span>
-            <span className="font-black text-jaman-navy">{rupees(payoutSummary.netPayable)}</span>
+            <span className="font-bold text-jaman-navy">{rupees(payoutSummary.netPayable)}</span>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#8C9BAE]">Already paid to your bank</span>
+            <span className="text-[#64748B]">Already paid to your bank</span>
             <span className="font-bold text-green-700">{rupees(payoutSummary.paidPayout)}</span>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#8C9BAE]">Pending (not yet transferred)</span>
+            <span className="text-[#64748B]">Pending (not yet transferred)</span>
             <span className="font-bold text-amber-700">{rupees(payoutSummary.pendingPayout)}</span>
           </div>
-          <div className="text-[10px] text-[#8C9BAE] pt-1">
+          <div className="text-[11px] text-[#64748B] pt-1">
             Razorpay Route is pending, so Jamanvaar collects payments on your behalf and pays your net amount to your bank by manual
             transfer once verified — this is not money already in your account.
           </div>
@@ -245,7 +245,7 @@ export function OnlinePaymentsPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-left text-[#8C9BAE]">
+              <tr className="text-left text-[#64748B]">
                 <th className="py-1.5 pr-3">Business date</th>
                 <th className="py-1.5 pr-3">Net amount</th>
                 <th className="py-1.5 pr-3">Payout status</th>
@@ -276,14 +276,14 @@ export function OnlinePaymentsPanel() {
       )}
 
       {rows === null && !error ? (
-        <p className="text-xs text-[#8C9BAE]">Loading…</p>
+        <p className="text-xs text-[#64748B]">Loading…</p>
       ) : rows === null ? null : rows.length === 0 ? (
-        <p className="text-xs text-[#8C9BAE]">No online payments yet.</p>
+        <p className="text-xs text-[#64748B]">No online payments yet.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="text-left text-[#8C9BAE]">
+              <tr className="text-left text-[#64748B]">
                 <th className="py-1.5 pr-3">Order</th>
                 <th className="py-1.5 pr-3">Amount</th>
                 <th className="py-1.5 pr-3">Customer payment</th>
@@ -373,7 +373,7 @@ export function OnlinePaymentsPanel() {
             <div className="flex justify-between"><span>Held for refund review</span><strong>{rupees(statement.heldPayable)}</strong></div>
             {statement.unallocatedCollection > 0 && <div className="flex justify-between"><span>Historical collection needing split review</span><strong>{rupees(statement.unallocatedCollection)}</strong></div>}
             <div className="flex justify-between border-t border-jaman-border pt-1"><span className="font-bold text-jaman-navy">Net Payable after holds (before payouts)</span><strong>{rupees(statement.netPayableToRestaurant)}</strong></div>
-            <div className="text-[10px] text-[#8C9BAE] pt-1">{statement.settlementNote} Day = calendar day in India time.</div>
+            <div className="text-[11px] text-[#64748B] pt-1">{statement.settlementNote} Day = calendar day in India time.</div>
           </div>
         )}
       </div>

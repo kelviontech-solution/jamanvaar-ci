@@ -114,7 +114,7 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
         {/* Header */}
         <div className="p-5 border-b border-jaman-border bg-jaman-ivory flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-brand/[0.07] text-brand flex items-center justify-center shadow-xs">
               <Palette className="w-5 h-5" />
             </div>
             <div>
@@ -138,7 +138,7 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
               }}
               className="px-3 py-1.5 bg-white border border-jaman-border hover:bg-slate-50 text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
             >
-              <Eye className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Eye className="w-3.5 h-3.5 text-slate-500" />
               <span>Full Preview</span>
             </button>
             <button
@@ -163,13 +163,13 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
                   onClick={() => onSelectTheme(theme.id)}
                   className={`rounded-2xl border-2 transition-all p-4 flex flex-col justify-between cursor-pointer relative ${
                     isSelected
-                      ? 'border-jaman-saffron bg-[#FFFDFB] shadow-md ring-2 ring-jaman-saffron/20'
+                      ? 'border-brand bg-[#FFFDFB] shadow-md ring-2 ring-brand/20'
                       : 'border-jaman-border bg-white hover:border-slate-300 hover:shadow-xs'
                   }`}
                 >
                   {/* Selected Badge */}
                   {isSelected && (
-                    <div className="absolute top-3 right-3 bg-jaman-saffron text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                    <div className="absolute top-3 right-3 bg-brand text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
                       <Check className="w-3 h-3 stroke-[3]" />
                       <span>ACTIVE</span>
                     </div>
@@ -249,7 +249,7 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
                     <div className="space-y-1 pt-1">
                       {theme.highlights.map((h, i) => (
                         <div key={i} className="flex items-center gap-1.5 text-[10px] text-slate-600">
-                          <div className="w-1 h-1 rounded-full bg-jaman-saffron" />
+                          <div className="w-1 h-1 rounded-full bg-brand" />
                           <span>{h}</span>
                         </div>
                       ))}
@@ -280,10 +280,10 @@ export const ReportDesignSelectorModal: React.FC<ReportDesignSelectorModalProps>
                       className={`flex-1 py-1.5 font-bold text-xs rounded-xl shadow-2xs transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-emerald-600 text-white'
-                          : 'bg-jaman-saffron hover:bg-[#EA580C] text-white'
+                          : 'bg-brand hover:bg-[#EA580C] text-white'
                       }`}
                     >
-                      {isSelected ? '✓ Selected' : 'Use Design'}
+                      {isSelected ? 'Selected' : 'Use Design'}
                     </button>
                   </div>
                 </div>

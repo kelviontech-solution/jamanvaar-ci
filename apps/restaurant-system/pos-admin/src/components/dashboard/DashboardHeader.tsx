@@ -43,22 +43,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {/* Title & Operational Mission Subtitle */}
       <div>
         <div className="flex items-center gap-2.5">
-          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+          <h1 className="text-2xl font-bold text-jaman-navy tracking-tight">
             Restaurant Operations
           </h1>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]/50">
-            <Sparkles className="w-3 h-3" />
-            Live Command Center
-          </span>
         </div>
-        <p className="text-xs sm:text-sm text-[#5A6878] mt-1 font-medium">
-          Monitor today's sales, orders, cash flow, and restaurant activity.
-          {dateRangeLabel && (
-            <span className="ml-2 text-slate-400 font-normal">
-              • Showing: <span className="font-semibold text-jaman-navy">{dateRangeLabel}</span>
-            </span>
-          )}
-        </p>
+        {dateRangeLabel && (
+          <p className="text-sm text-slate-500 mt-0.5">{dateRangeLabel}</p>
+        )}
       </div>
 
       {/* Right Controls: Period Selector & Quick Refresh */}
@@ -74,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 onClick={() => onFilterChange(period)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   isSelected
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'text-[#4A5568] hover:bg-[#F8F6F0] hover:text-jaman-navy'
                 }`}
               >
@@ -92,7 +83,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             title="Refresh dashboard metrics"
             className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-jaman-cream text-jaman-navy border border-jaman-border rounded-xl text-xs font-bold shadow-xs hover:border-[#D8D1C3] transition-all cursor-pointer active:scale-95"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-jaman-saffron ${isSpinning ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-brand ${isSpinning ? 'animate-spin' : ''}`} />
             <span className="hidden lg:inline">Refresh</span>
           </button>
         )}

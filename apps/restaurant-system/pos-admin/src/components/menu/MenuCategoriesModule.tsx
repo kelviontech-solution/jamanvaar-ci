@@ -56,7 +56,7 @@ function InlinePrice({ item, onSaved }: { item: MenuItem; onSaved: (message: str
   };
   if (!editing) {
     return (
-      <button type="button" onClick={start} title="Click to change the price" className="font-mono font-black text-sm text-emerald-800 shrink-0 rounded-md px-1.5 -mr-1.5 hover:bg-emerald-50 cursor-text">
+      <button type="button" onClick={start} title="Click to change the price" className="tabular-nums font-bold text-sm text-emerald-800 shrink-0 rounded-md px-1.5 -mr-1.5 hover:bg-emerald-50 cursor-text">
         ₹{item.price}
       </button>
     );
@@ -73,9 +73,9 @@ function InlinePrice({ item, onSaved }: { item: MenuItem; onSaved: (message: str
         onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditing(false); }}
         onBlur={save}
         aria-label={`New price for ${item.name}`}
-        className="w-20 text-right font-mono font-black text-sm text-emerald-900 border border-emerald-400 rounded-md px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+        className="w-20 text-right font-mono font-bold text-sm text-emerald-900 border border-emerald-400 rounded-md px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-300"
       />
-      {error && <span className="text-[10px] text-rose-600 font-bold">{error}</span>}
+      {error && <span className="text-[11px] text-rose-600 font-bold">{error}</span>}
     </span>
   );
 }
@@ -265,8 +265,8 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Menu & Catalog Manager</h1>
-            <span className="bg-orange-50 text-jaman-saffron font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
+            <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Menu & Catalog Manager</h1>
+            <span className="bg-orange-50 text-brand font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
               {menuItems.length} ITEMS
             </span>
           </div>
@@ -276,7 +276,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => onOpenItemModal(null)}
-            className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Dish</span>
@@ -294,7 +294,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             onClick={onOpenPrebuiltMenuModal}
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <span>🍕 Load 14 Templates</span>
+            <span>Load 14 Templates</span>
           </button>
 
           <button
@@ -303,7 +303,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             title="Load a full default starter menu in one click"
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
           >
-            <Wand2 className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Wand2 className="w-3.5 h-3.5 text-slate-500" />
             <span>{loadingDefaults ? 'Loading…' : 'Load Default Items'}</span>
           </button>
 
@@ -313,7 +313,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             title="Upload a menu CSV (download the template first if you need the columns)"
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <Upload className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Upload className="w-3.5 h-3.5 text-slate-500" />
             <span>Upload CSV</span>
           </button>
           <button
@@ -321,7 +321,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             title="Download a CSV template (or your current menu, if you have one)"
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <Download className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Download CSV Template</span>
           </button>
 
@@ -329,7 +329,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             onClick={onOpenBulkPriceModal}
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <Percent className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Percent className="w-3.5 h-3.5 text-slate-500" />
             <span>Bulk Price Adjust</span>
           </button>
 
@@ -338,7 +338,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
             title="Remove dishes that appear more than once"
           >
-            <Copy className="w-3.5 h-3.5 text-jaman-saffron" />
+            <Copy className="w-3.5 h-3.5 text-slate-500" />
             <span>Remove Duplicates</span>
           </button>
         </div>
@@ -349,18 +349,18 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Dish Search Input */}
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={menuSearch}
               onChange={(e) => setMenuSearch(e.target.value)}
               placeholder="Search dish by name, description, SKU or tag..."
-              className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-4 py-2 text-xs font-bold text-jaman-navy placeholder:text-slate-400 focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-4 py-2 text-xs font-bold text-jaman-navy placeholder:text-slate-500 focus:outline-none focus:border-brand"
             />
             {menuSearch && (
               <button
                 onClick={() => setMenuSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 text-xs font-bold"
               >
                 ×
               </button>
@@ -371,8 +371,8 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           <div className="flex items-center gap-1 bg-jaman-cream p-1 rounded-xl border border-jaman-border self-start sm:self-auto shrink-0 text-xs">
             {[
               { id: 'ALL', label: 'All Diets' },
-              { id: 'VEG', label: '🟢 Veg' },
-              { id: 'NON_VEG', label: '🔴 Non-Veg' }
+              { id: 'VEG', label: 'Veg' },
+              { id: 'NON_VEG', label: 'Non-Veg' }
             ].map((d) => (
               <button
                 key={d.id}
@@ -380,7 +380,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                 onClick={() => setDietaryFilter(d.id)}
                 className={`px-3 py-1.5 rounded-lg font-bold transition-all text-xs cursor-pointer ${
                   dietaryFilter === d.id
-                    ? 'bg-white text-jaman-navy shadow-2xs font-black'
+                    ? 'bg-white text-jaman-navy shadow-2xs font-bold'
                     : 'text-slate-600 hover:text-jaman-navy'
                 }`}
               >
@@ -397,7 +397,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             onClick={() => setSelectedCategoryFilter('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               selectedCategoryFilter === 'ALL'
-                ? 'bg-jaman-navy text-white shadow-xs'
+                ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                 : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
             }`}
           >
@@ -410,12 +410,12 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                 onClick={() => setSelectedCategoryFilter(c.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                   selectedCategoryFilter === c.id
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
                 }`}
               >
                 <span>{c.name}{c.qrVisible === false ? ' (hidden from QR)' : ''}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                <span className={`text-[11px] px-1.5 py-0.2 rounded-md ${
                   selectedCategoryFilter === c.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                 }`}>
                   {menuItems.filter(m => m.categoryId === c.id).length}
@@ -433,7 +433,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             <button
               type="button"
               onClick={() => onOpenCategoryModal(categories.find((c: Category) => c.id === selectedCategoryFilter))}
-              className="font-bold text-jaman-saffron hover:underline cursor-pointer"
+              className="font-bold text-brand hover:underline cursor-pointer"
             >
               Edit this category
             </button>
@@ -445,12 +445,12 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       {menuItems.length === 0 ? (
         // BUG-013/014: a brand-new restaurant's menu is genuinely empty now (no demo seed),
         // and this used to show nothing but "No menu dishes found…" with no way forward.
-        <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-jaman-border shadow-2xs space-y-4 max-w-xl mx-auto my-6">
-          <div className="w-14 h-14 bg-orange-50 text-jaman-saffron rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-2xl p-12 text-center border border-dashed border-jaman-border shadow-2xs space-y-4 max-w-xl mx-auto my-6">
+          <div className="w-14 h-14 bg-orange-50 text-brand rounded-2xl flex items-center justify-center mx-auto">
             <UtensilsCrossed className="w-7 h-7" />
           </div>
           <div>
-            <h3 className="font-black text-base text-jaman-navy">This restaurant has no menu yet</h3>
+            <h3 className="font-bold text-base text-jaman-navy">This restaurant has no menu yet</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
               Upload a menu CSV, load a default starter menu in one click, or add dishes one at a time.
             </p>
@@ -458,7 +458,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             <button
               onClick={() => csvInputRef.current?.click()}
-              className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5"
             >
               <Upload className="w-3.5 h-3.5" />
               Upload CSV
@@ -468,14 +468,14 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               disabled={loadingDefaults}
               className="px-4 py-2 bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
             >
-              <Wand2 className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Wand2 className="w-3.5 h-3.5 text-slate-500" />
               {loadingDefaults ? 'Loading…' : 'Load Default Items'}
             </button>
             <button
               onClick={handleDownloadCsvTemplate}
               className="px-4 py-2 bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5"
             >
-              <Download className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Download className="w-3.5 h-3.5 text-slate-500" />
               Download Template
             </button>
             <button
@@ -487,11 +487,11 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           </div>
         </div>
       ) : filteredMenuItems.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
-          <div className="w-12 h-12 bg-orange-50 text-jaman-saffron rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-2xl p-12 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto my-6">
+          <div className="w-12 h-12 bg-orange-50 text-brand rounded-2xl flex items-center justify-center mx-auto">
             <UtensilsCrossed className="w-6 h-6" />
           </div>
-          <h3 className="font-black text-base text-jaman-navy">No Dishes Match Filters</h3>
+          <h3 className="font-bold text-base text-jaman-navy">No Dishes Match Filters</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             No menu dishes found matching the current search, category, or dietary filter.
           </p>
@@ -508,7 +508,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             </button>
             <button
               onClick={() => onOpenItemModal(null)}
-              className="px-4 py-2 bg-jaman-saffron text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+              className="px-4 py-2 bg-brand text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
             >
               + Add New Dish
             </button>
@@ -530,7 +530,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                     (e.target as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg';
                   }}
                 />
-                <span className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-md text-[10px] font-mono font-black text-jaman-navy shadow-2xs">
+                <span className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-jaman-navy shadow-2xs">
                   {item.sku}
                 </span>
 
@@ -553,7 +553,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-start justify-between gap-1">
-                    <h4 className="font-extrabold text-sm text-jaman-navy leading-tight group-hover:text-jaman-saffron transition-colors">
+                    <h4 className="font-bold text-sm text-jaman-navy leading-tight group-hover:text-brand transition-colors">
                       {item.name}
                     </h4>
                     <InlinePrice item={item} onSaved={(msg) => showToast(msg)} />
@@ -569,27 +569,27 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                       db.notify();
                       showToast(`${item.name} is now ${item.isAvailable ? 'IN STOCK' : 'OUT OF STOCK (86)'}`);
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       item.isAvailable
                         ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80 hover:bg-emerald-100'
                         : 'bg-rose-50 text-rose-800 border border-rose-200/80 hover:bg-rose-100'
                     }`}
                   >
-                    {item.isAvailable ? '✓ In Stock' : '🚫 86 Out'}
+                    {item.isAvailable ? 'In Stock' : '86 Out'}
                   </button>
 
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onOpenItemModal(item)}
                       title="Edit Dish"
-                      className="p-1.5 hover:bg-[#FFF4ED] rounded-lg text-slate-400 hover:text-jaman-saffron transition-colors cursor-pointer"
+                      className="p-1.5 hover:bg-brand/[0.07] rounded-lg text-slate-500 hover:text-brand transition-colors cursor-pointer"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteDish(item)}
                       title="Delete Dish"
-                      className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                      className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -606,8 +606,8 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-jaman-navy tracking-tight">Combos & Meal Deals</h2>
-              <span className="bg-orange-50 text-jaman-saffron font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
+              <h2 className="text-lg font-bold text-jaman-navy tracking-tight">Combos & Meal Deals</h2>
+              <span className="bg-orange-50 text-brand font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
                 {combos.length} ACTIVE
               </span>
             </div>
@@ -626,11 +626,11 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         </div>
 
         {combos.length === 0 ? (
-          <div className="bg-white rounded-3xl p-10 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto">
-            <div className="w-12 h-12 bg-orange-50 text-jaman-saffron rounded-2xl flex items-center justify-center mx-auto">
+          <div className="bg-white rounded-2xl p-10 text-center border border-jaman-border shadow-2xs space-y-3 max-w-lg mx-auto">
+            <div className="w-12 h-12 bg-orange-50 text-brand rounded-2xl flex items-center justify-center mx-auto">
               <Package className="w-6 h-6" />
             </div>
-            <h3 className="font-black text-sm text-jaman-navy">No Combos Yet</h3>
+            <h3 className="font-bold text-sm text-jaman-navy">No Combos Yet</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Bundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.
             </p>
@@ -653,18 +653,18 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-extrabold text-sm text-jaman-navy">{combo.name}</h4>
+                    <h4 className="font-bold text-sm text-jaman-navy">{combo.name}</h4>
                     {combo.featured && (
-                      <span className="shrink-0 flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                      <span className="shrink-0 flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-bold px-1.5 py-0.5 rounded-md">
                         <Sparkles className="w-2.5 h-2.5" /> Featured
                       </span>
                     )}
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{combo.description}</p>
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="font-mono font-black text-lg text-emerald-800">₹{combo.basePrice}</span>
+                    <span className="tabular-nums font-bold text-lg text-emerald-800">₹{combo.basePrice}</span>
                     {combo.originalPrice > combo.basePrice && (
-                      <span className="text-xs text-slate-400 line-through">₹{combo.originalPrice}</span>
+                      <span className="text-xs text-slate-500 line-through">₹{combo.originalPrice}</span>
                     )}
                   </div>
                   <div className="text-[11px] text-slate-500 mt-1">
@@ -681,7 +681,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                       ComboRepository.toggleAvailability(combo.id);
                       showToast(`${combo.name} is now ${combo.isAvailable ? 'paused' : 'active'}`);
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       combo.isAvailable
                         ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80 hover:bg-emerald-100'
                         : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
@@ -697,14 +697,14 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                         setIsComboModalOpen(true);
                       }}
                       title="Edit Combo"
-                      className="p-1.5 hover:bg-[#FFF4ED] rounded-lg text-slate-400 hover:text-jaman-saffron transition-colors cursor-pointer"
+                      className="p-1.5 hover:bg-brand/[0.07] rounded-lg text-slate-500 hover:text-brand transition-colors cursor-pointer"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteCombo(combo)}
                       title="Delete Combo"
-                      className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                      className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

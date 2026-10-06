@@ -124,7 +124,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
             disabled={!!recipeToEdit}
             value={menuItemId}
             onChange={(e) => setMenuItemId(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron disabled:opacity-70"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand disabled:opacity-70"
           >
             {menuItems.map((m) => (
               <option key={m.id} value={m.id}>
@@ -141,7 +141,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
             <button
               type="button"
               onClick={handleAddIngredient}
-              className="px-2.5 py-1 bg-[#FFF4ED] border border-[#FDBA74] text-jaman-saffron font-bold text-xs rounded-lg flex items-center gap-1 hover:bg-[#FFE8D6]"
+              className="px-2.5 py-1 bg-brand/[0.07] border border-brand/30 text-brand font-bold text-xs rounded-lg flex items-center gap-1 hover:bg-[#FFE8D6]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Raw Ingredient</span>
@@ -149,7 +149,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           </div>
 
           {ingredients.length === 0 ? (
-            <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl text-center text-xs text-slate-400">
+            <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl text-center text-xs text-slate-500">
               No ingredients added yet. Click "+ Add Raw Ingredient" above to build the recipe formula.
             </div>
           ) : (
@@ -198,11 +198,11 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs">
             <div>
               <span className="text-emerald-800 font-bold">Estimated Cost of Ingredients:</span>
-              <span className="font-mono font-black text-emerald-950 ml-2">₹{calculatedCost.toFixed(2)}</span>
+              <span className="tabular-nums font-bold text-emerald-950 ml-2">₹{calculatedCost.toFixed(2)}</span>
             </div>
             <div>
               <span className="text-emerald-800 font-bold">Dish Selling Price:</span>
-              <span className="font-mono font-black text-jaman-navy ml-2">₹{selectedDish.price}</span>
+              <span className="tabular-nums font-bold text-jaman-navy ml-2">₹{selectedDish.price}</span>
             </div>
           </div>
         )}
@@ -220,7 +220,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           <button
             type="submit"
             disabled={ingredients.length === 0}
-            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
+            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 disabled:opacity-50"
           >
             Save Recipe Formula
           </button>

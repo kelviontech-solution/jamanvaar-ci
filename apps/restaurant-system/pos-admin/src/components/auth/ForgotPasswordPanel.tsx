@@ -27,7 +27,7 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
   const [maskedEmail, setMaskedEmail] = useState('');
 
   const fail = (err: unknown, fallback: string) => setError(err instanceof CloudApiError ? err.message : fallback);
-  const inputClass = 'w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors';
+  const inputClass = 'w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors';
 
   const sendCode = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -71,7 +71,7 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
           <KeyRound className="w-3.5 h-3.5 text-amber-600" />
           <span>FORGOT PASSWORD</span>
         </div>
-        <h3 className="text-base font-black text-jaman-navy pt-1">Reset your password</h3>
+        <h3 className="text-base font-bold text-jaman-navy pt-1">Reset your password</h3>
         <p className="text-xs text-slate-500 max-w-xs mx-auto">
           {step === 'RESTAURANT_ID' ? "Enter your Restaurant ID. We'll email a 6-digit code to your recovery email." : 'Enter the code from your email and choose a new password.'}
         </p>
@@ -94,7 +94,7 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
               <span>{error}</span>
             </div>
           )}
-          <button type="submit" disabled={busy || !restaurantCode.trim()} className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
+          <button type="submit" disabled={busy || !restaurantCode.trim()} className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
             {busy ? 'Sending…' : 'Email me a code'}
           </button>
         </form>
@@ -124,10 +124,10 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
               <span>{error}</span>
             </div>
           )}
-          <button type="submit" disabled={busy || otp.length !== 6} className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
+          <button type="submit" disabled={busy || otp.length !== 6} className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
             {busy ? 'Saving…' : 'Set new password'}
           </button>
-          <button type="button" disabled={busy} onClick={() => void sendCode()} className="w-full py-2 text-center text-xs font-bold text-jaman-saffron hover:underline cursor-pointer">
+          <button type="button" disabled={busy} onClick={() => void sendCode()} className="w-full py-2 text-center text-xs font-bold text-brand hover:underline cursor-pointer">
             Send a new code
           </button>
         </form>

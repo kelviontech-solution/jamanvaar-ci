@@ -26,7 +26,7 @@ export const FeedbackPanel: React.FC<{ orders: Order[] }> = ({ orders }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Customer Experience & Feedback</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Customer Experience & Feedback</h1>
         <p className="text-sm text-[#4A5568] mt-1">
           Real-time ratings, service speed impressions, and customer reviews submitted via the kiosk.
         </p>
@@ -67,15 +67,15 @@ export const FeedbackPanel: React.FC<{ orders: Order[] }> = ({ orders }) => {
                   ))}
                 </div>
                 <span className="text-xs font-bold text-jaman-navy">{fb.rating} Stars</span>
-                <span className="text-xs text-[#8C9BAE]">• {fb.kioskId}</span>
+                <span className="text-xs text-[#64748B]">• {fb.kioskId}</span>
               </div>
-              <span className="text-xs text-[#8C9BAE]">{formatTime(fb.createdAt)}</span>
+              <span className="text-xs text-[#64748B]">{formatTime(fb.createdAt)}</span>
             </div>
 
             <div className="flex flex-wrap gap-1.5">
               {fb.tags.map((tg: string) => (
                 <span key={tg} className="bg-jaman-ivory border border-jaman-border px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-jaman-navy">
-                  ✓ {tg}
+                  {tg}
                 </span>
               ))}
             </div>

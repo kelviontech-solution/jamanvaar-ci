@@ -25,7 +25,7 @@ export const ActivateOwnerPanel: React.FC<Props> = ({ defaultRestaurantCode = ''
   const [error, setError] = useState('');
 
   const inputClass =
-    'w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-all';
+    'w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-all';
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +52,8 @@ export const ActivateOwnerPanel: React.FC<Props> = ({ defaultRestaurantCode = ''
   return (
     <form onSubmit={submit} className="space-y-3.5 pt-2">
       <div className="flex items-center gap-2">
-        <KeyRound className="w-4 h-4 text-jaman-saffron" />
-        <h3 className="text-sm font-black text-jaman-navy">Activate your owner account</h3>
+        <KeyRound className="w-4 h-4 text-slate-500" />
+        <h3 className="text-sm font-bold text-jaman-navy">Activate your owner account</h3>
       </div>
       <p className="text-xs text-slate-500">
         Use the details from your JAMANVAAR welcome email. The invitation token works once and expires on the date shown in that email.
@@ -90,7 +90,7 @@ export const ActivateOwnerPanel: React.FC<Props> = ({ defaultRestaurantCode = ''
       <button
         type="submit"
         disabled={busy}
-        className="w-full py-3.5 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all"
+        className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-50 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all"
       >
         {busy ? 'Activating…' : 'Activate Account'}
       </button>

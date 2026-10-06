@@ -8,6 +8,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        // One orange family for the Admin: accent / active text (DEFAULT, 4.7:1 on white),
+        // then deeper for hover and pressed. Tints come from opacity (brand/[0.08], brand/40).
+        brand: { DEFAULT: '#BF540F', hover: '#A9480C', press: '#933E0A' },
         jaman: {
           navy: '#0B253A',
           deepNavy: '#0B2B39',

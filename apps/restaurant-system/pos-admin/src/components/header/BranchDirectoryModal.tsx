@@ -39,7 +39,7 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
           this is a read-only directory, not a way to view another branch's live orders or menu from here.
         </p>
 
-        {loading && <div className="text-xs text-slate-400 py-6 text-center">Loading branches…</div>}
+        {loading && <div className="text-xs text-slate-500 py-6 text-center">Loading branches…</div>}
 
         {!loading && error && (
           <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl px-3 py-2">
@@ -48,7 +48,7 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
         )}
 
         {!loading && !error && branches.length === 0 && (
-          <div className="text-xs text-slate-400 py-6 text-center">
+          <div className="text-xs text-slate-500 py-6 text-center">
             No other branches found. Ask Super Admin to add one for this restaurant.
           </div>
         )}
@@ -58,13 +58,13 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
             {branches.map((b) => (
               <div key={b.id} className="flex items-center justify-between p-3 bg-jaman-ivory border border-jaman-border rounded-xl">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-brand/[0.07] text-brand flex items-center justify-center shrink-0">
                     <Building2 className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-sm text-jaman-navy truncate">{b.name}</span>
-                      <span className="text-[10px] font-mono text-slate-400">{b.code}</span>
+                      <span className="text-[11px] font-mono text-slate-500">{b.code}</span>
                     </div>
                     {b.address && <div className="text-[11px] text-slate-500 truncate">{b.address}</div>}
                   </div>
@@ -77,7 +77,7 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
                     <UsersIcon className="w-3.5 h-3.5" />{b._count.users}
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${
                       b.status === 'ACTIVE'
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : 'bg-slate-100 text-slate-500 border-slate-200'

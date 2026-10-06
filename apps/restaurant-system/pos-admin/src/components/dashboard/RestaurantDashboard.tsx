@@ -7,6 +7,7 @@ import { TopDishesLeaderboard } from './TopDishesLeaderboard';
 import { NeedsAttentionSection } from './NeedsAttentionSection';
 import { OnboardingChecklistCard, OnboardingChecklistItem } from './OnboardingChecklistCard';
 import { TopItemStat } from '@jamanvaar/business';
+import { Receipt } from 'lucide-react';
 
 interface RestaurantDashboardProps {
   dashFilter: DashboardPeriod;
@@ -80,7 +81,7 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
   const { summary, dateRange } = dashPeriodReport;
 
   return (
-    <div className="space-y-6 sm:space-y-7 max-w-7xl mx-auto pb-8">
+    <div className="jv-stagger space-y-6 sm:space-y-7 max-w-7xl mx-auto pb-8">
       {/* 1. Header: Operations Mission, Period Selector & Refresh */}
       <DashboardHeader
         currentFilter={dashFilter}
@@ -102,22 +103,22 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({
       {summary.ordersCount === 0 && (
         <div className="bg-white border border-[#E6DEC9] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0 border border-[#FDBA74]/40">
-              <span className="text-lg">☀️</span>
+            <div className="w-10 h-10 rounded-xl bg-brand/[0.07] text-brand flex items-center justify-center shrink-0 border border-brand/30">
+              <Receipt className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-black text-jaman-navy">No sales recorded yet for {dateRange.label.toLowerCase()}</h4>
-              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-                Your live revenue velocity curve, top ranking dishes, and collections will automatically populate here as orders are placed at POS terminals, captain handhelds, or table QR codes.
+              <h4 className="text-sm font-semibold text-jaman-navy">No sales yet for {dateRange.label.toLowerCase()}</h4>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Sales, collections and top dishes will appear here as orders come in from the POS, Captain and QR menu.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setActiveTab('TABLES')}
-            className="self-start sm:self-auto shrink-0 px-3.5 py-1.5 rounded-xl bg-jaman-navy text-white text-xs font-bold hover:bg-jaman-darkBorder transition-all shadow-2xs cursor-pointer"
+            className="self-start sm:self-auto shrink-0 h-9 px-3.5 rounded-xl bg-white border border-jaman-border text-jaman-navy text-sm font-medium hover:bg-jaman-cream transition-colors cursor-pointer"
           >
-            Check Dining Floor →
+            View dining floor
           </button>
         </div>
       )}

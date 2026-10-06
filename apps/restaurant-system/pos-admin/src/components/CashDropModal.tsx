@@ -53,12 +53,12 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
             }}
             className={`p-3 rounded-2xl border-2 text-center transition-all ${
               type === 'CASH_OUT'
-                ? 'border-rose-500 bg-rose-50 text-rose-900 font-black'
+                ? 'border-rose-500 bg-rose-50 text-rose-900 font-bold'
                 : 'border-slate-200 bg-white text-slate-600 font-bold'
             }`}
           >
-            <span className="text-xs block">💸 Cash Out / Safe Drop (-)</span>
-            <span className="text-[10px] text-slate-400 font-normal">Petty expense or bank drop</span>
+            <span className="text-xs block">Cash Out / Safe Drop (-)</span>
+            <span className="text-[11px] text-slate-500 font-normal">Petty expense or bank drop</span>
           </button>
           <button
             type="button"
@@ -68,12 +68,12 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
             }}
             className={`p-3 rounded-2xl border-2 text-center transition-all ${
               type === 'CASH_IN'
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-900 font-black'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold'
                 : 'border-slate-200 bg-white text-slate-600 font-bold'
             }`}
           >
-            <span className="text-xs block">💵 Cash In / Float (+)</span>
-            <span className="text-[10px] text-slate-400 font-normal">Extra cash float added</span>
+            <span className="text-xs block">Cash In / Float (+)</span>
+            <span className="text-[11px] text-slate-500 font-normal">Extra cash float added</span>
           </button>
         </div>
 
@@ -85,7 +85,7 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
             required
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -97,7 +97,7 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. Milk purchase / change float"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -108,7 +108,7 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
             required
             value={authorizedBy}
             onChange={(e) => setAuthorizedBy(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 

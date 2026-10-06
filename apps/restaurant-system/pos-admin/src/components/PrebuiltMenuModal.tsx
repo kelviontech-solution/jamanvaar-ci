@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
 import { PREBUILT_MENU_TEMPLATES, db, MenuRepository, AuditRepository } from '@jamanvaar/database';
+import { Check } from 'lucide-react';
 
 interface PrebuiltMenuModalProps {
   isOpen: boolean;
@@ -94,7 +95,7 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
           </p>
           <button
             onClick={handleSelectAll}
-            className="text-xs font-bold text-jaman-saffron hover:underline"
+            className="text-xs font-bold text-brand hover:underline"
           >
             {selectedTemplateIds.length === PREBUILT_MENU_TEMPLATES.length ? 'Deselect All' : `Select All ${PREBUILT_MENU_TEMPLATES.length}`}
           </button>
@@ -109,15 +110,15 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
                 onClick={() => handleToggleTemplate(tpl.id)}
                 className={`p-3 rounded-2xl border-2 cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-jaman-saffron bg-[#FFF4ED]'
+                    ? 'border-brand bg-brand/[0.07]'
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-xs text-jaman-navy block">{tpl.name}</span>
-                  {isSelected && <span className="text-xs text-jaman-saffron font-black">✓</span>}
+                  <span className="font-bold text-xs text-jaman-navy block">{tpl.name}</span>
+                  {isSelected && <span className="text-xs text-brand font-bold"><Check className="w-3 h-3" /></span>}
                 </div>
-                <span className="text-[10px] text-slate-400 block mt-0.5">
+                <span className="text-[11px] text-slate-500 block mt-0.5">
                   {tpl.approxItemCount || 20} dishes • {tpl.cuisine}
                 </span>
               </div>
@@ -157,7 +158,7 @@ export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
           <button
             disabled={selectedTemplateIds.length === 0}
             onClick={handleImport}
-            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             Import Selected ({selectedTemplateIds.length} Cuisines)
           </button>

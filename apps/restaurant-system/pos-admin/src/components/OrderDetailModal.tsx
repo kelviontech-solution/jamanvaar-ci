@@ -5,7 +5,7 @@ import { formatDate, formatINR, formatTime, formatSplitTax } from '@jamanvaar/ut
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
-import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle } from 'lucide-react';
+import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle, Check } from 'lucide-react';
 
 interface OrderDetailModalProps {
   order: Order | null;
@@ -110,8 +110,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         <div className="p-4 bg-jaman-navy text-white rounded-2xl flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black font-mono">{order.orderNumber}</span>
-              <span className="bg-jaman-saffron text-white font-black text-xs px-2.5 py-0.5 rounded-full">
+              <span className="text-sm font-bold font-mono">{order.orderNumber}</span>
+              <span className="bg-brand text-white font-bold text-xs px-2.5 py-0.5 rounded-full">
                 TOKEN #{order.tokenNumber}
               </span>
             </div>
@@ -122,7 +122,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
 
           <div className="text-right">
-            <span className="text-xl font-mono font-black text-emerald-400 block">
+            <span className="text-xl font-mono font-bold text-emerald-400 block">
               {formatINR(order.totalAmount)}
             </span>
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
@@ -134,25 +134,25 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         {/* Customer & Staff Information */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl space-y-1">
-            <span className="text-slate-400 font-bold block text-[10px] uppercase">GUEST INFORMATION</span>
+            <span className="text-slate-500 font-bold block text-[11px] uppercase">GUEST INFORMATION</span>
             <div className="font-bold text-jaman-navy flex items-center justify-between">
               <span>{order.customerName || 'Walk-in Guest'}</span>
               {order.customerPhone && <span className="font-mono text-slate-600 font-normal">{order.customerPhone}</span>}
             </div>
             {order.tableNumber && (
-              <span className="text-[11px] text-jaman-saffron font-bold block">
+              <span className="text-[11px] text-brand font-bold block">
                 Table #{order.tableNumber} ({order.guestCount || 4} Guests)
               </span>
             )}
           </div>
 
           <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl space-y-1">
-            <span className="text-slate-400 font-bold block text-[10px] uppercase">SERVICE STAFF</span>
+            <span className="text-slate-500 font-bold block text-[11px] uppercase">SERVICE STAFF</span>
             <div className="text-slate-700 font-bold flex items-center justify-between">
               <span>Cashier: <strong>{order.cashierName || '—'}</strong></span>
               <span>Captain: <strong>{order.captainName || '—'}</strong></span>
             </div>
-            <span className="text-[10px] text-slate-400 block font-mono">
+            <span className="text-[11px] text-slate-500 block font-mono">
               Terminal: {order.kioskId || 'POS-01'}
             </span>
           </div>
@@ -167,17 +167,17 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 <div>
                   <span className="font-bold text-jaman-navy">{it.quantity}x {it.name}</span>
                   {it.modifiers && it.modifiers.length > 0 && (
-                    <span className="text-[11px] text-slate-400 block">
+                    <span className="text-[11px] text-slate-500 block">
                       + {it.modifiers.map((m: any) => m.optionName || m.name).join(', ')}
                     </span>
                   )}
                   {it.specialInstructions && (
-                    <span className="text-[10px] text-amber-700 italic block">
+                    <span className="text-[11px] text-amber-700 italic block">
                       Note: {it.specialInstructions}
                     </span>
                   )}
                 </div>
-                <span className="font-mono font-bold text-jaman-navy">{formatINR(it.totalPrice)}</span>
+                <span className="tabular-nums font-bold text-jaman-navy">{formatINR(it.totalPrice)}</span>
               </div>
             ))}
           </div>
@@ -186,10 +186,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         {/* Financial Breakup & Split Payment Allocation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-1.5">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">BILL BREAKUP</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">BILL BREAKUP</span>
             <div className="flex justify-between text-slate-600">
               <span>Subtotal</span>
-              <span className="font-mono font-semibold">{formatINR(order.subtotal)}</span>
+              <span className="tabular-nums font-semibold">{formatINR(order.subtotal)}</span>
             </div>
             {order.discountAmount > 0 && (
               <div className="flex justify-between text-emerald-700 font-semibold">
@@ -201,30 +201,30 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                     ? ` (${order.couponCode})`
                     : ''}
                 </span>
-                <span className="font-mono">-{formatINR(order.discountAmount)}</span>
+                <span className="tabular-nums">-{formatINR(order.discountAmount)}</span>
               </div>
             )}
             {/* B2-036: formatSplitTax guarantees the two halves sum to the displayed Total Payable. */}
             <div className="flex justify-between text-slate-600">
               <span>CGST (2.5%)</span>
-              <span className="font-mono">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).cgst}</span>
+              <span className="tabular-nums">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).cgst}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>SGST (2.5%)</span>
-              <span className="font-mono">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).sgst}</span>
+              <span className="tabular-nums">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).sgst}</span>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex justify-between font-black text-sm text-jaman-navy">
+            <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-jaman-navy">
               <span>Total Payable</span>
-              <span className="font-mono text-emerald-700">{formatINR(order.totalAmount)}</span>
+              <span className="tabular-nums text-emerald-700">{formatINR(order.totalAmount)}</span>
             </div>
           </div>
 
           <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PAYMENT SETTLEMENT</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">PAYMENT SETTLEMENT</span>
             <div className="space-y-1 text-xs">
               <div className="flex items-center justify-between font-bold">
                 <span className="text-slate-600">Method:</span>
-                <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 text-[11px] font-bold uppercase">
                   {order.paymentMethod}
                 </span>
               </div>
@@ -238,9 +238,9 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <div className="pt-1.5 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold">
                 <span className="text-slate-600">Status:</span>
-                <span className="text-emerald-700 flex items-center gap-1 font-black">
+                <span className="text-emerald-700 flex items-center gap-1 font-bold">
                   <CheckCircle className="w-3.5 h-3.5" />
-                  <span>{order.paymentStatus === 'SUCCESS' ? '✓ FULLY PAID' : order.paymentStatus}</span>
+                  <span>{order.paymentStatus === 'SUCCESS' ? 'FULLY PAID' : order.paymentStatus}</span>
                 </span>
               </div>
             </div>
@@ -249,33 +249,33 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
         {/* Order Service Timeline */}
         <div className="p-4 bg-jaman-cream border border-jaman-border rounded-2xl space-y-2.5">
-          <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-jaman-saffron" />
+          <span className="text-xs font-bold uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
             <span>ORDER SERVICE TIMELINE</span>
           </span>
 
           <div className="space-y-2 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 text-xs">
             <div className="flex items-start gap-3 relative pl-6">
               <div className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                ✓
+                <Check className="w-3 h-3" />
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
                   <strong className="text-jaman-navy block">Order Created ({order.orderType})</strong>
-                  <span className="text-[10px] text-slate-400">Token #{order.tokenNumber} initialized</span>
+                  <span className="text-[11px] text-slate-500">Token #{order.tokenNumber} initialized</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
               </div>
             </div>
 
             <div className="flex items-start gap-3 relative pl-6">
-              <div className="w-4 h-4 rounded-full bg-jaman-saffron text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                ✓
+              <div className="w-4 h-4 rounded-full bg-brand text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
+                <Check className="w-3 h-3" />
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
                   <strong className="text-jaman-navy block">KOT Dispatched to Kitchen Stations</strong>
-                  <span className="text-[10px] text-slate-400">Tandoor & Main Kitchen active</span>
+                  <span className="text-[11px] text-slate-500">Tandoor & Main Kitchen active</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">
                   {formatTime(new Date(new Date(order.createdAt).getTime() + 60000))}
@@ -285,12 +285,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
             <div className="flex items-start gap-3 relative pl-6">
               <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                ✓
+                <Check className="w-3 h-3" />
               </div>
               <div className="flex-1 flex items-center justify-between">
                 <div>
                   <strong className="text-jaman-navy block">Payment Received & Bill Settled</strong>
-                  <span className="text-[10px] text-slate-400">{order.paymentMethod} verified</span>
+                  <span className="text-[11px] text-slate-500">{order.paymentMethod} verified</span>
                 </div>
                 <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
               </div>
@@ -309,7 +309,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 onClick={() => handleAdvanceStatus(st)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   order.orderStatus === st
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 disabled:opacity-40'
                 }`}
               >
@@ -408,7 +408,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </Button>
               <button
                 onClick={handlePrint}
-                className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>Reprint Receipt</span>

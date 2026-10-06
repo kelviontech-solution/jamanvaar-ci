@@ -94,7 +94,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-jaman-navy text-white flex items-center justify-center shadow-xs">
-              <FileText className="w-5 h-5 text-jaman-saffron" />
+              <FileText className="w-5 h-5 text-slate-500" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -106,7 +106,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     isLocked ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
                   }`}
                 >
-                  {isLocked ? '🔒 LOCKED RECORD' : '● ACTIVE DRAFT'}
+                  {isLocked ? 'LOCKED RECORD' : '● ACTIVE DRAFT'}
                 </span>
               </div>
               <p className="text-xs text-slate-500">
@@ -124,29 +124,29 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 onClick={() => setPrintPaperSize('A4')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   printPaperSize === 'A4'
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                📄 A4 (2 Pages)
+                A4 (2 Pages)
               </button>
               <button
                 type="button"
                 onClick={() => setPrintPaperSize('80MM')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   printPaperSize === '80MM'
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                🧾 80mm Thermal Slip
+                80mm Thermal Slip
               </button>
             </div>
 
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
+              className="px-4 py-2 bg-brand hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-xs flex items-center gap-1.5 min-h-[40px]"
             >
               <Printer className="w-4 h-4" />
               <span>Print {printPaperSize} Statement</span>
@@ -186,7 +186,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 onClick={() => setSelectedDate(dateKey)}
                 className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   selectedDate === dateKey
-                    ? 'bg-jaman-navy text-white shadow-xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border'
                 }`}
               >
@@ -272,7 +272,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 END OF DAY (EOD) Z-REPORT
               </h2>
               <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-bold text-slate-700 pt-0.5">
-                <span>Business Date: <strong className="text-jaman-saffron font-mono">{report.displayDate}</strong></span>
+                <span>Business Date: <strong className="text-brand font-mono">{report.displayDate}</strong></span>
                 <span>•</span>
                 <span>Shift: <strong>{report.shiftName}</strong></span>
                 <span>•</span>
@@ -306,7 +306,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
               </div>
               <div>
                 <span className="text-[9px] uppercase font-bold text-slate-500 block">Orders Settled</span>
-                <strong className="font-mono text-jaman-saffron text-sm block">{report.ordersSettled}</strong>
+                <strong className="font-mono text-brand text-sm block">{report.ordersSettled}</strong>
               </div>
             </div>
 
@@ -445,8 +445,8 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   </span>
                 </div>
                 <div className="p-1.5 bg-orange-50 rounded-lg border border-orange-200">
-                  <span className="text-[9px] text-jaman-saffron font-bold block uppercase">Total GST (5%)</span>
-                  <span className="font-mono font-black text-jaman-saffron text-xs block mt-0.5">
+                  <span className="text-[9px] text-brand font-bold block uppercase">Total GST (5%)</span>
+                  <span className="font-mono font-black text-brand text-xs block mt-0.5">
                     {formatINR(report.gstSummary.totalTax)}
                   </span>
                 </div>
@@ -483,22 +483,22 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
                     <tr>
-                      <td className="p-1.5 font-bold">💵 Cash</td>
+                      <td className="p-1.5 font-bold">Cash</td>
                       <td className="p-1.5 text-center font-mono">{report.paymentSettlement.cash.count}</td>
                       <td className="p-1.5 text-right font-mono font-bold">{formatINR(report.paymentSettlement.cash.amount)}</td>
                     </tr>
                     <tr>
-                      <td className="p-1.5 font-bold">📱 UPI / QR</td>
+                      <td className="p-1.5 font-bold">UPI / QR</td>
                       <td className="p-1.5 text-center font-mono">{report.paymentSettlement.upi.count}</td>
                       <td className="p-1.5 text-right font-mono font-bold">{formatINR(report.paymentSettlement.upi.amount)}</td>
                     </tr>
                     <tr>
-                      <td className="p-1.5 font-bold">💳 Card (EDC)</td>
+                      <td className="p-1.5 font-bold">Card (EDC)</td>
                       <td className="p-1.5 text-center font-mono">{report.paymentSettlement.card.count}</td>
                       <td className="p-1.5 text-right font-mono font-bold">{formatINR(report.paymentSettlement.card.amount)}</td>
                     </tr>
                     <tr>
-                      <td className="p-1.5 font-bold">👛 Wallet / House</td>
+                      <td className="p-1.5 font-bold">Wallet / House</td>
                       <td className="p-1.5 text-center font-mono">{report.paymentSettlement.wallet.count + report.paymentSettlement.houseAccount.count}</td>
                       <td className="p-1.5 text-right font-mono font-bold">{formatINR(report.paymentSettlement.wallet.amount + report.paymentSettlement.houseAccount.amount)}</td>
                     </tr>
@@ -549,7 +549,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                     report.cashDrawer.isBalanced ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
                   }`}
                 >
-                  {report.cashDrawer.isBalanced ? '✓ BALANCED' : '⚠️ VARIANCE DETECTED'}
+                  {report.cashDrawer.isBalanced ? 'BALANCED' : 'VARIANCE DETECTED'}
                 </span>
               </div>
               <div className="p-2.5 grid grid-cols-2 sm:grid-cols-7 gap-2 text-xs text-center font-mono">

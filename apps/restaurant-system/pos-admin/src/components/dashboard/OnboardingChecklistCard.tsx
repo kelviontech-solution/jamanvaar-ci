@@ -53,31 +53,31 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
       <button
         onClick={dismiss}
         title="Dismiss checklist"
-        className="absolute top-3 right-3 p-1 rounded-lg text-slate-300 hover:text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
+        className="absolute top-3 right-3 p-1 rounded-lg text-slate-500 hover:text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
       >
         <X className="w-4 h-4" />
       </button>
 
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-brand/[0.07] text-brand flex items-center justify-center shrink-0">
           <Rocket className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-black text-jaman-navy">Get Your Restaurant Ready</h3>
+          <h3 className="text-sm font-bold text-jaman-navy">Get Your Restaurant Ready</h3>
           <p className="text-[11px] text-slate-500">{doneCount} of {items.length} steps complete</p>
         </div>
       </div>
 
       <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mb-4">
         <div
-          className="h-full bg-jaman-saffron rounded-full transition-all"
+          className="h-full bg-brand rounded-full transition-all"
           style={{ width: `${(doneCount / items.length) * 100}%` }}
         />
       </div>
 
       {next?.hint && (
-        <div className="mb-3 rounded-xl border border-[#FDBA74] bg-[#FFF4ED] px-3 py-2.5" data-testid="onboarding-next">
-          <p className="text-[11px] font-black uppercase tracking-wide text-jaman-saffron">Next step</p>
+        <div className="mb-3 rounded-xl border border-brand/30 bg-brand/[0.07] px-3 py-2.5" data-testid="onboarding-next">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-brand">Next step</p>
           <p className="text-xs font-bold text-jaman-navy mt-0.5">{next.label}</p>
           <p className="text-xs text-slate-600 mt-0.5">{next.hint}</p>
         </div>
@@ -99,7 +99,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
             {item.done ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             ) : (
-              <Circle className="w-4 h-4 text-slate-300 shrink-0" />
+              <Circle className="w-4 h-4 text-slate-500 shrink-0" />
             )}
             <span className={item.done ? 'line-through decoration-emerald-400' : ''}>{item.label}</span>
           </button>

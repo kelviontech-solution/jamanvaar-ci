@@ -344,10 +344,10 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
               Customer Relationship Management (CRM)
             </h1>
-            <span className="bg-amber-100 text-amber-900 font-black text-xs px-2.5 py-0.5 rounded-full border border-amber-200">
+            <span className="bg-amber-100 text-amber-900 font-bold text-xs px-2.5 py-0.5 rounded-full border border-amber-200">
               LOYALTY & 360 INTELLIGENCE
             </span>
           </div>
@@ -383,7 +383,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
           <button
             onClick={onOpenCreateModal}
-            className="px-4 py-2 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 shadow-jaman-saffron/20"
+            className="px-4 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 shadow-brand/20"
           >
             <Plus className="w-4 h-4" />
             <span>Register New Customer</span>
@@ -397,13 +397,13 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         {/* Total Customers */}
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">TOTAL GUESTS</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">TOTAL GUESTS</span>
             <Users className="w-4 h-4 text-jaman-navy" />
           </div>
-          <div className="text-2xl font-black text-jaman-navy font-mono">
+          <div className="text-2xl font-bold text-jaman-navy font-mono">
             {kpis.totalCount} Profiles
           </div>
-          <span className="text-[10px] text-slate-500 font-bold block">
+          <span className="text-[11px] text-slate-500 font-bold block">
             {kpis.vipCount} VIPs & High Spenders
           </span>
         </div>
@@ -411,13 +411,13 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         {/* Total Lifetime Spend */}
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">LIFETIME SPEND</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">LIFETIME SPEND</span>
             <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-emerald-800 font-mono">
+          <div className="text-2xl font-bold text-emerald-800 font-mono">
             {formatINR(kpis.totalLifetimeSpend)}
           </div>
-          <span className="text-[10px] text-emerald-700 font-bold block">
+          <span className="text-[11px] text-emerald-700 font-bold block">
             Avg {formatINR(kpis.avgSpendPerGuest)} per Registered Guest
           </span>
         </div>
@@ -425,13 +425,13 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         {/* Active Loyalty Points Pool */}
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">LOYALTY REWARDS</span>
-            <Award className="w-4 h-4 text-jaman-saffron" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">LOYALTY REWARDS</span>
+            <Award className="w-4 h-4 text-slate-500" />
           </div>
-          <div className="text-2xl font-black text-jaman-saffron font-mono">
-            ⭐ {kpis.totalPointsPool} Pts
+          <div className="text-2xl font-bold text-brand font-mono">
+            {kpis.totalPointsPool} Pts
           </div>
-          <span className="text-[10px] text-slate-600 font-bold block">
+          <span className="text-[11px] text-slate-600 font-bold block">
             ₹{kpis.totalPointsPool} Total Redeemable Value
           </span>
         </div>
@@ -439,13 +439,13 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         {/* VIP High Spenders */}
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">VIP ELITE TIER</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">VIP ELITE TIER</span>
             <Star className="w-4 h-4 text-jaman-navy" />
           </div>
-          <div className="text-2xl font-black text-jaman-navy font-mono">
+          <div className="text-2xl font-bold text-jaman-navy font-mono">
             {kpis.vipCount} VIP Guests
           </div>
-          <span className="text-[10px] text-slate-500 font-bold block">
+          <span className="text-[11px] text-slate-500 font-bold block">
             Highest dining frequency & ticket size
           </span>
         </div>
@@ -454,21 +454,21 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       {/* 3. SEGMENT FILTER CHIPS */}
       <div className="bg-white p-3.5 rounded-2xl border border-jaman-border shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-1.5 overflow-x-auto">
-          <span className="text-slate-400 font-bold uppercase text-[10px] mr-1">Dining Segments:</span>
+          <span className="text-slate-500 font-bold uppercase text-[11px] mr-1">Dining Segments:</span>
           {[
             { id: 'ALL', label: 'All Guests' },
-            { id: 'VIP', label: '⭐ VIP High Spenders' },
-            { id: 'REGULAR', label: '🔁 Frequent Regulars' },
-            { id: 'NEW', label: '✨ New Guests' },
-            { id: 'INACTIVE', label: '💤 Inactive (30+ Days)' },
-            { id: 'CELEBRATION', label: '🎂 Celebrations This Month' }
+            { id: 'VIP', label: 'VIP High Spenders' },
+            { id: 'REGULAR', label: 'Frequent Regulars' },
+            { id: 'NEW', label: 'New Guests' },
+            { id: 'INACTIVE', label: 'Inactive (30+ Days)' },
+            { id: 'CELEBRATION', label: 'Celebrations This Month' }
           ].map((seg) => (
             <button
               key={seg.id}
               onClick={() => setSegmentFilter(seg.id as CustomerSegment)}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                 segmentFilter === seg.id
-                  ? 'bg-jaman-navy text-white shadow-xs'
+                  ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                   : 'bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border'
               }`}
             >
@@ -478,26 +478,26 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         </div>
 
         <div className="text-[11px] font-bold text-slate-500">
-          Showing: <strong className="text-jaman-navy font-mono">{filteredCustomers.length}</strong> matching profiles
+          Showing: <strong className="text-jaman-navy tabular-nums">{filteredCustomers.length}</strong> matching profiles
         </div>
       </div>
 
       {/* 4. SEARCH & ADVANCED FILTER CONTROLS */}
-      <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Search Box */}
         <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by customer name, phone number, email, address, tags, notes..."
-            className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-8 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-9 pr-8 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -513,7 +513,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
             className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy"
           >
             <option value="ALL">All Tags</option>
-            <option value="VIP">⭐ VIP Only</option>
+            <option value="VIP">VIP Only</option>
             <option value="REGULAR">Regular Guests</option>
             <option value="CORPORATE">Corporate Clients</option>
             <option value="FAMILY">Family Diners</option>
@@ -558,7 +558,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
           }
         />
       ) : (
-        <div className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
+        <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold sticky top-0 z-10">
@@ -583,25 +583,25 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     {/* Customer & Contacts */}
                     <td className="p-3.5">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center font-black text-xs shrink-0 ${
+                        <div className={`w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-xs shrink-0 ${
                           cust.isVip
                             ? 'bg-amber-100 text-amber-900 border border-amber-300'
                             : 'bg-jaman-cream text-jaman-navy border border-jaman-border'
                         }`}>
-                          {cust.isVip ? '⭐' : (cust.name ? cust.name[0].toUpperCase() : 'G')}
+                          {cust.name ? cust.name[0].toUpperCase() : 'G'}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <strong className="font-extrabold text-jaman-navy text-sm">{cust.name || 'Valued Guest'}</strong>
+                            <strong className="font-bold text-jaman-navy text-sm">{cust.name || 'Valued Guest'}</strong>
                             {cust.isVip && (
-                              <span className="bg-amber-100 text-amber-900 text-[9px] font-black px-1.5 py-0.2 rounded">
+                              <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-1.5 py-0.2 rounded">
                                 VIP
                               </span>
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-[11px] font-mono text-slate-500 mt-0.5">
-                            <span>📞 {cust.phone}</span>
-                            {cust.email && <span className="text-slate-400">✉️ {cust.email}</span>}
+                            <span>{cust.phone}</span>
+                            {cust.email && <span className="text-slate-500">{cust.email}</span>}
                           </div>
                         </div>
                       </div>
@@ -614,11 +614,11 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                           cust.tags.map((t) => (
                             <span
                               key={t}
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                                 t === 'VIP'
-                                  ? 'bg-amber-100 text-amber-800 font-black'
+                                  ? 'bg-amber-100 text-amber-800 font-bold'
                                   : t === 'JAIN'
-                                  ? 'bg-emerald-100 text-emerald-800 font-black'
+                                  ? 'bg-emerald-100 text-emerald-800 font-bold'
                                   : t === 'VEGAN'
                                   ? 'bg-teal-100 text-teal-800'
                                   : t === 'CORPORATE'
@@ -630,11 +630,11 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                             </span>
                           ))
                         ) : (
-                          <span className="text-slate-400 text-[10px]">Standard Guest</span>
+                          <span className="text-slate-500 text-[11px]">Standard Guest</span>
                         )}
                       </div>
                       {cust.notes && (
-                        <p className="text-[10px] text-slate-500 italic truncate max-w-[180px] mt-1" title={cust.notes}>
+                        <p className="text-[11px] text-slate-500 italic truncate max-w-[180px] mt-1" title={cust.notes}>
                           "{cust.notes}"
                         </p>
                       )}
@@ -646,7 +646,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     </td>
 
                     {/* Lifetime Spend */}
-                    <td className="p-3.5 text-right font-mono font-black text-emerald-700 text-sm">
+                    <td className="p-3.5 text-right font-mono font-bold text-emerald-700 text-sm">
                       {formatINR(cust.computedTotalSpend)}
                     </td>
 
@@ -662,7 +662,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                           const tier = CustomerRepository.getTierForAccount(cust);
                           return tier ? (
                             <span
-                              className="font-black px-1.5 py-0.5 rounded-lg text-[10px] border shrink-0"
+                              className="font-bold px-1.5 py-0.5 rounded-lg text-[11px] border shrink-0"
                               style={{ color: tier.colorHex, borderColor: tier.colorHex, background: `${tier.colorHex}14` }}
                               title={`${tier.name} tier — ${tier.pointsMultiplier}x points`}
                             >
@@ -670,12 +670,12 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                             </span>
                           ) : null;
                         })()}
-                        <span className="font-mono font-black text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg text-xs">
-                          ⭐ {cust.loyaltyPoints || 0}
+                        <span className="font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg text-xs">
+                          {cust.loyaltyPoints || 0}
                         </span>
                         <button
                           onClick={() => handleQuickAwardPoints(cust.phone, 50, cust.name || 'Guest')}
-                          className="px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded text-[10px] transition-colors"
+                          className="px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded text-[11px] transition-colors"
                           title="Award 50 Bonus Points"
                         >
                           +50
@@ -705,7 +705,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                         <button
                           onClick={() => onOpenEditModal(cust)}
                           title="Edit Customer Profile"
-                          className="p-1.5 text-slate-600 hover:text-jaman-saffron hover:bg-slate-100 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-600 hover:text-brand hover:bg-slate-100 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -739,25 +739,25 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       {/* ========================================================================= */}
       {detailCustomer && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95">
             
             {/* Header */}
             <div className="p-5 bg-jaman-navy text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center font-black text-lg text-jaman-saffron">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center font-bold text-lg text-brand">
                   {detailCustomer.name ? detailCustomer.name[0].toUpperCase() : 'G'}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-black text-lg">{detailCustomer.name || 'Valued Guest'}</h3>
+                    <h3 className="font-bold text-lg">{detailCustomer.name || 'Valued Guest'}</h3>
                     {detailCustomer.tags?.map((t) => (
-                      <span key={t} className="bg-jaman-saffron text-white font-mono font-black text-[10px] px-2 py-0.5 rounded">
+                      <span key={t} className="bg-brand text-white font-mono font-bold text-[11px] px-2 py-0.5 rounded">
                         {t}
                       </span>
                     ))}
                   </div>
                   <p className="text-xs text-slate-300">
-                    📞 {detailCustomer.phone} {detailCustomer.email ? `• ✉️ ${detailCustomer.email}` : ''}
+                    {detailCustomer.phone} {detailCustomer.email ? `• ${detailCustomer.email}` : ''}
                   </p>
                 </div>
               </div>
@@ -776,27 +776,27 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
               {/* 4 Financial Highlight Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div className="bg-jaman-cream p-3 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Lifetime Spend</span>
-                  <strong className="text-base font-mono font-black text-emerald-700">
+                  <span className="text-[11px] text-slate-500 font-bold uppercase block">Lifetime Spend</span>
+                  <strong className="text-base font-mono font-bold text-emerald-700">
                     {formatINR((detailCustomer as any).computedTotalSpend || detailCustomer.totalSpend || 0)}
                   </strong>
                 </div>
                 <div className="bg-jaman-cream p-3 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Visits / Orders</span>
-                  <strong className="text-base font-mono font-black text-jaman-navy">
+                  <span className="text-[11px] text-slate-500 font-bold uppercase block">Visits / Orders</span>
+                  <strong className="text-base font-mono font-bold text-jaman-navy">
                     {(detailCustomer as any).computedTotalVisits || detailCustomer.totalVisits || 0} visits
                   </strong>
                 </div>
                 <div className="bg-jaman-cream p-3 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Average Order</span>
-                  <strong className="text-base font-mono font-black text-blue-700">
+                  <span className="text-[11px] text-slate-500 font-bold uppercase block">Average Order</span>
+                  <strong className="text-base font-mono font-bold text-blue-700">
                     {formatINR((detailCustomer as any).computedAvgOrderValue || 0)}
                   </strong>
                 </div>
                 <div className="bg-jaman-cream p-3 rounded-2xl border border-amber-200 bg-amber-50/50">
-                  <span className="text-[10px] text-amber-800 font-bold uppercase block">Loyalty Balance</span>
-                  <strong className="text-base font-mono font-black text-amber-900">
-                    ⭐ {detailCustomer.loyaltyPoints || 0} Pts
+                  <span className="text-[11px] text-amber-800 font-bold uppercase block">Loyalty Balance</span>
+                  <strong className="text-base font-mono font-bold text-amber-900">
+                    {detailCustomer.loyaltyPoints || 0} Pts
                   </strong>
                 </div>
               </div>
@@ -804,20 +804,20 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
               {/* Personal Details & Preferences Grid */}
               <div className="bg-jaman-cream p-4 rounded-2xl border border-jaman-border grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Delivery / Home Address:</span>
+                  <span className="text-[11px] text-slate-500 font-bold block uppercase">Delivery / Home Address:</span>
                   <p className="font-medium text-jaman-navy mt-0.5">{detailCustomer.address || 'No physical address recorded.'}</p>
                 </div>
 
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Celebration Dates:</span>
+                  <span className="text-[11px] text-slate-500 font-bold block uppercase">Celebration Dates:</span>
                   <div className="flex gap-4 font-mono font-bold text-slate-700 mt-0.5">
-                    <span>🎂 Birthday: {detailCustomer.dob ? formatDate(detailCustomer.dob) : 'Not set'}</span>
-                    <span>💍 Anniv: {detailCustomer.anniversary ? formatDate(detailCustomer.anniversary) : 'Not set'}</span>
+                    <span>Birthday: {detailCustomer.dob ? formatDate(detailCustomer.dob) : 'Not set'}</span>
+                    <span>Anniv: {detailCustomer.anniversary ? formatDate(detailCustomer.anniversary) : 'Not set'}</span>
                   </div>
                 </div>
 
                 <div className="sm:col-span-2 pt-2 border-t border-slate-200">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Special Notes & Dietary Instructions:</span>
+                  <span className="text-[11px] text-slate-500 font-bold block uppercase">Special Notes & Dietary Instructions:</span>
                   <p className="text-slate-700 font-medium mt-0.5 italic">
                     "{detailCustomer.notes || 'No special dietary instructions.'}"
                   </p>
@@ -825,9 +825,9 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
               </div>
 
               {/* Loyalty Reward Points Ledger & Manager */}
-              <div className="p-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50/70 to-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h4 className="font-extrabold text-xs text-amber-950 flex items-center gap-1.5">
+                  <h4 className="font-bold text-xs text-amber-950 flex items-center gap-1.5">
                     <Award className="w-4 h-4 text-amber-600" />
                     <span>Loyalty Points Management (1 Pt = ₹1 Discount)</span>
                   </h4>
@@ -866,7 +866,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                 if (rewards.length === 0) return null;
                 return (
                   <div className="space-y-2">
-                    <h4 className="font-black text-xs text-jaman-navy uppercase tracking-wide">Redeem a Reward</h4>
+                    <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide">Redeem a Reward</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {rewards.map((reward) => {
                         const canAfford = (detailCustomer.loyaltyPoints || 0) >= reward.pointsCost;
@@ -874,15 +874,15 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                           <div key={reward.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                             <div className="min-w-0">
                               <div className="font-bold text-jaman-navy truncate">{reward.name}</div>
-                              <div className="text-[10px] text-slate-500 truncate">{reward.description}</div>
+                              <div className="text-[11px] text-slate-500 truncate">{reward.description}</div>
                             </div>
                             <button
                               onClick={() => handleRedeemReward(reward.id, reward.name, reward.pointsCost)}
                               disabled={!canAfford}
-                              className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] font-bold ${
+                              className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${
                                 canAfford
                                   ? 'bg-amber-600 hover:bg-amber-700 text-white cursor-pointer'
-                                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                  : 'bg-slate-100 text-slate-500 cursor-not-allowed'
                               }`}
                             >
                               {reward.pointsCost} pts
@@ -898,14 +898,14 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
               {/* Complete Order History for this Customer */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-black text-xs text-jaman-navy uppercase tracking-wide flex items-center gap-1.5">
-                    <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide flex items-center gap-1.5">
+                    <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
                     <span>Lifetime Order & Bill History ({(detailCustomer as any).orders?.length || 0} Orders)</span>
                   </h4>
                 </div>
 
                 {!(detailCustomer as any).orders || (detailCustomer as any).orders.length === 0 ? (
-                  <div className="bg-jaman-cream p-4 rounded-2xl text-center text-slate-400 font-medium">
+                  <div className="bg-jaman-cream p-4 rounded-2xl text-center text-slate-500 font-medium">
                     No previous order bills recorded for this mobile number yet.
                   </div>
                 ) : (
@@ -933,11 +933,11 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                             </td>
                             <td className="p-2.5 text-slate-600">{ord.items.length} dishes</td>
                             <td className="p-2.5">
-                              <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 uppercase">
+                              <span className="px-2 py-0.5 rounded font-bold text-[11px] bg-slate-100 uppercase">
                                 {ord.paymentMethod}
                               </span>
                             </td>
-                            <td className="p-2.5 text-right font-mono font-black text-emerald-700">
+                            <td className="p-2.5 text-right font-mono font-bold text-emerald-700">
                               {formatINR(ord.totalAmount)}
                             </td>
                           </tr>
@@ -950,7 +950,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
               {/* Automated WhatsApp Campaigns Strip */}
               <div className="bg-jaman-cream p-4 rounded-2xl border border-slate-200 space-y-2">
-                <span className="text-[10px] font-black uppercase text-slate-500 block">
+                <span className="text-[11px] font-bold uppercase text-slate-500 block">
                   INSTANT WHATSAPP MARKETING CAMPAIGNS:
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -961,7 +961,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     }}
                     className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-emerald-50 hover:border-emerald-400 text-jaman-navy font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all"
                   >
-                    <span>🎂 Birthday 15% Offer</span>
+                    <span>Birthday 15% Offer</span>
                   </button>
 
                   <button
@@ -971,7 +971,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     }}
                     className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-emerald-50 hover:border-emerald-400 text-jaman-navy font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all"
                   >
-                    <span>⭐ Points Balance Notification</span>
+                    <span>Points Balance Notification</span>
                   </button>
 
                   <button
@@ -981,7 +981,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                     }}
                     className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-emerald-50 hover:border-emerald-400 text-jaman-navy font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all"
                   >
-                    <span>🔁 We Miss You Re-engagement</span>
+                    <span>We Miss You Re-engagement</span>
                   </button>
                 </div>
               </div>
@@ -997,7 +997,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                 }}
                 className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-jaman-navy font-bold text-xs rounded-xl flex items-center gap-1.5"
               >
-                <Edit2 className="w-3.5 h-3.5 text-jaman-saffron" />
+                <Edit2 className="w-3.5 h-3.5 text-slate-500" />
                 <span>Edit Full Profile</span>
               </button>
 

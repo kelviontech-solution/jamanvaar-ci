@@ -106,10 +106,10 @@ export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => v
 
         <div className="flex items-center justify-between gap-3 bg-jaman-ivory rounded-xl p-4 border border-jaman-border">
           <div>
-            <p className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider">Next Kiosk Token</p>
-            <p className="text-2xl font-black text-jaman-navy">{OrderRepository.nextTokenNumber('K')}</p>
+            <p className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Next Kiosk Token</p>
+            <p className="text-2xl font-bold text-jaman-navy">{OrderRepository.nextTokenNumber('K')}</p>
             {TokenSequenceRepository.getLastReset('K') && (
-              <p className="text-[10px] text-[#8C9BAE] mt-0.5">
+              <p className="text-[11px] text-[#64748B] mt-0.5">
                 Last reset {new Date(TokenSequenceRepository.getLastReset('K')!).toLocaleString()}
               </p>
             )}

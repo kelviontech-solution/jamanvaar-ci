@@ -22,7 +22,7 @@ export const PrintQueuePanel: React.FC<{ showToast: (msg: string) => void }> = (
             PrinterService.processQueue();
             showToast('Triggered background print queue retry');
           }}
-          className="text-xs font-bold text-jaman-saffron hover:underline"
+          className="text-xs font-bold text-brand hover:underline"
         >
           Process Queue Now
         </button>
@@ -30,11 +30,11 @@ export const PrintQueuePanel: React.FC<{ showToast: (msg: string) => void }> = (
     </div>
 
     {db.printJobs.length === 0 ? (
-      <p className="text-xs text-[#8C9BAE] p-6 text-center">No print jobs in spooler queue. Jobs dispatched upon customer payment will appear here.</p>
+      <p className="text-xs text-[#64748B] p-6 text-center">No print jobs in spooler queue. Jobs dispatched upon customer payment will appear here.</p>
     ) : (
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#8C9BAE] uppercase font-bold">
+          <thead className="bg-[#F8F6F0] border-b border-jaman-border text-[#64748B] uppercase font-bold">
             <tr>
               <th className="py-3 px-4">Job ID</th>
               <th className="py-3 px-4">Order / Token</th>
@@ -51,7 +51,7 @@ export const PrintQueuePanel: React.FC<{ showToast: (msg: string) => void }> = (
                 <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{job.id.substring(0, 14)}...</td>
                 <td className="py-3 px-4 font-bold text-jaman-navy">#{job.orderNumber} (TOKEN #{job.tokenNumber})</td>
                 <td className="py-3 px-4">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                     job.status === 'PRINTED'
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       : job.status === 'RETRYING'
@@ -62,15 +62,15 @@ export const PrintQueuePanel: React.FC<{ showToast: (msg: string) => void }> = (
                   </span>
                 </td>
                 <td className="py-3 px-4 font-semibold text-[#4A5568]">{job.paperSize}</td>
-                <td className="py-3 px-4 text-[#8C9BAE]">{job.attempts} / {job.maxAttempts}</td>
-                <td className="py-3 px-4 text-[#8C9BAE]">{formatTime(job.createdAt)}</td>
+                <td className="py-3 px-4 text-[#64748B]">{job.attempts} / {job.maxAttempts}</td>
+                <td className="py-3 px-4 text-[#64748B]">{formatTime(job.createdAt)}</td>
                 <td className="py-3 px-4 text-right">
                   <button
                     onClick={async () => {
                       const res = await PrinterService.reprintReceipt(job.orderId || '', 'admin');
                       showToast(res.message);
                     }}
-                    className="text-xs font-bold text-jaman-saffron hover:underline"
+                    className="text-xs font-bold text-brand hover:underline"
                   >
                     [REPRINT]
                   </button>

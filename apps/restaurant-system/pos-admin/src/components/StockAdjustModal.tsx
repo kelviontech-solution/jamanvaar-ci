@@ -55,12 +55,12 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4 py-1">
         <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl flex justify-between text-xs">
           <div>
-            <span className="text-slate-400 font-bold block">Current Stock:</span>
-            <span className="font-bold text-sm text-jaman-navy font-mono">{item.currentStock} {item.unit}</span>
+            <span className="text-slate-500 font-bold block">Current Stock:</span>
+            <span className="font-bold text-sm text-jaman-navy tabular-nums">{item.currentStock} {item.unit}</span>
           </div>
           <div className="text-right">
-            <span className="text-slate-400 font-bold block">Unit Cost:</span>
-            <span className="font-bold text-sm text-emerald-700 font-mono">₹{item.costPerUnit}/{item.unit}</span>
+            <span className="text-slate-500 font-bold block">Unit Cost:</span>
+            <span className="font-bold text-sm text-emerald-700 tabular-nums">₹{item.costPerUnit}/{item.unit}</span>
           </div>
         </div>
 
@@ -76,12 +76,12 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               else if (val === 'SPOILAGE') setReason('Ingredient expired / spoiled');
               else if (val === 'ADJUSTMENT') setReason('Physical stock audit reconciliation');
             }}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
           >
-            <option value="RESTOCK">📦 Restock / Purchase Received (+)</option>
-            <option value="WASTE">🗑️ Kitchen Wastage (-)</option>
-            <option value="SPOILAGE">⚠️ Spoilage / Expired (-)</option>
-            <option value="ADJUSTMENT">⚖️ Physical Count Reconciliation</option>
+            <option value="RESTOCK">Restock / Purchase Received (+)</option>
+            <option value="WASTE">Kitchen Wastage (-)</option>
+            <option value="SPOILAGE">Spoilage / Expired (-)</option>
+            <option value="ADJUSTMENT">Physical Count Reconciliation</option>
           </select>
         </div>
 
@@ -96,7 +96,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
             required
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -108,7 +108,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="e.g. Invoice #9981 from dairy supplier"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -118,7 +118,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
           >
             Record Movement
           </button>

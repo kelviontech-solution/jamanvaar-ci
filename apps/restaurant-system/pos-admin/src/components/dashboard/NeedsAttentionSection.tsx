@@ -50,7 +50,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
     <section aria-label="Operational Needs Attention" className="space-y-3 pt-2">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm sm:text-base font-extrabold text-jaman-navy tracking-tight flex items-center gap-2">
+          <h2 className="text-sm sm:text-base font-bold text-jaman-navy tracking-tight flex items-center gap-2">
             <span>Needs Attention & Quick Triage</span>
           </h2>
           <p className="text-xs text-[#5A6878]">
@@ -64,16 +64,16 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
         <div className="dash-subtle-card rounded-2xl p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-jaman-saffron" />
+              <span className="text-xs font-medium text-[#64748B] flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-slate-500" />
                 Kitchen Line
               </span>
               {pendingKotsCount > 0 ? (
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
                   Action Required
                 </span>
               ) : (
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   All Clear
                 </span>
               )}
@@ -94,7 +94,7 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
           <button
             type="button"
             onClick={onNavigateToKitchen}
-            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-jaman-saffron hover:text-[#C5530E] cursor-pointer group"
+            className="mt-3.5 pt-2.5 border-t border-slate-100 w-full flex items-center justify-between text-xs font-bold text-brand hover:text-[#C5530E] cursor-pointer group"
           >
             <span>Open Kitchen KDS</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -105,16 +105,16 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
         <div className="dash-subtle-card rounded-2xl p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-xs font-medium text-[#64748B] flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5 text-rose-600" />
                 Raw Materials
               </span>
               {lowStockCount > 0 ? (
-                <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-full">
                   Restock Now
                 </span>
               ) : (
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   Optimal
                 </span>
               )}
@@ -146,11 +146,11 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
         <div className="dash-subtle-card rounded-2xl p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-xs font-medium text-[#64748B] flex items-center gap-1.5">
                 <Grid className="w-3.5 h-3.5 text-blue-600" />
                 Dining Floor
               </span>
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
                 {occupiedTablesCount} / {tablesTotalCount} Occupied
               </span>
             </div>
@@ -181,22 +181,22 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
         <div className="dash-subtle-card rounded-2xl p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#8C9BAE] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-xs font-medium text-[#64748B] flex items-center gap-1.5">
                 <Coins className="w-3.5 h-3.5 text-emerald-700" />
                 Shift Drawer
               </span>
               {!activeShift ? (
-                <span className="text-[10px] font-bold text-slate-600">No shift recorded</span>
+                <span className="text-[11px] font-bold text-slate-600">No shift recorded</span>
               ) : activeShift.status !== 'CLOSED' ? (
-                <span className="text-[10px] font-bold text-amber-700">Open · Not yet counted</span>
+                <span className="text-[11px] font-bold text-amber-700">Open · Not yet counted</span>
               ) : activeShift.cashVariance === undefined ? (
-                <span className="text-[10px] font-bold text-amber-700">Closing count missing</span>
+                <span className="text-[11px] font-bold text-amber-700">Closing count missing</span>
               ) : activeShift.cashVariance === 0 ? (
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   100% Reconciled
                 </span>
               ) : (
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
                   Variance {formatINR(activeShift.cashVariance)}
                 </span>
               )}

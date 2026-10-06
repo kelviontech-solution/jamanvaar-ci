@@ -40,7 +40,7 @@ export const TerminalDisplaySettings: React.FC<{ showToast: (msg: string) => voi
   return (
     <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs space-y-3 max-w-4xl mx-auto mb-6">
       <div className="flex items-center gap-2">
-        <Monitor className="w-5 h-5 text-jaman-saffron" />
+        <Monitor className="w-5 h-5 text-slate-500" />
         <h3 className="font-bold text-sm text-jaman-navy">Terminal screen size</h3>
       </div>
       {!ready ? (
@@ -55,7 +55,7 @@ export const TerminalDisplaySettings: React.FC<{ showToast: (msg: string) => voi
           )}
           <div className="flex items-center gap-3 text-xs">
             <span className="text-slate-500 w-8 text-right">{MIN}%</span>
-            <input aria-label="Terminal screen size" type="range" min={MIN} max={MAX} step={5} value={value} onChange={(e) => setValue(Number(e.target.value))} className="flex-1 accent-jaman-saffron" />
+            <input aria-label="Terminal screen size" type="range" min={MIN} max={MAX} step={5} value={value} onChange={(e) => setValue(Number(e.target.value))} className="flex-1 accent-brand" />
             <span className="text-slate-500 w-10">{MAX}%</span>
             <strong className="w-12 text-jaman-navy">{value}%</strong>
             <button type="button" onClick={save} disabled={saving || saved === value} className="rounded-xl bg-jaman-navy px-4 py-2 font-bold text-white disabled:opacity-50">

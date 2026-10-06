@@ -40,18 +40,18 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
     <div className="space-y-5" data-testid="qr-console">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">QR Ordering</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">QR Ordering</h1>
           <p className="text-sm text-[#4A5568] mt-1">Guests scan the code on their table, order from your menu, and the order reaches your counter and kitchen.</p>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black">
-          <CheckCircle2 className="w-3.5 h-3.5" /> Enabled ✓{entitlement.source === 'MANUAL_OVERRIDE' ? ' (special access)' : ''}
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+          <CheckCircle2 className="w-3.5 h-3.5" /> Enabled {entitlement.source === 'MANUAL_OVERRIDE' ? ' (special access)' : ''}
         </span>
       </div>
       {fromCache && <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">Showing your last known plan. Connect to the internet to refresh it; QR changes need a connection.</div>}
 
       <div className="flex gap-1 bg-white border border-jaman-border p-1 rounded-2xl w-fit">
         {tabs.map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)} className={`px-4 py-1.5 rounded-xl text-xs font-bold ${tab === id ? 'bg-jaman-navy text-white' : 'text-slate-600 hover:bg-jaman-cream'}`}>{label}</button>
+          <button key={id} onClick={() => setTab(id)} className={`px-4 py-1.5 rounded-xl text-xs font-bold ${tab === id ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold' : 'text-slate-600 hover:bg-brand/[0.05]'}`}>{label}</button>
         ))}
       </div>
 
@@ -66,9 +66,9 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
 function LockedView({ message, planName, onViewPlan }: { message: string | null; planName: string | null; onViewPlan: () => void }) {
   return (
     <div className="max-w-2xl" data-testid="qr-locked">
-      <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy flex items-center gap-2"><QrCode className="w-7 h-7" /> QR Ordering <Lock className="w-5 h-5 text-slate-400" /></h1>
-      <div className="mt-5 rounded-3xl border border-jaman-border bg-white p-6">
-        <div className="flex items-center gap-2 text-slate-700 font-extrabold"><Lock className="w-4 h-4" /> {message ?? 'QR Ordering is available on an eligible plan.'}</div>
+      <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy flex items-center gap-2"><QrCode className="w-7 h-7" /> QR Ordering <Lock className="w-5 h-5 text-slate-500" /></h1>
+      <div className="mt-5 rounded-2xl border border-jaman-border bg-white p-6">
+        <div className="flex items-center gap-2 text-slate-700 font-bold"><Lock className="w-4 h-4" /> {message ?? 'QR Ordering is available on an eligible plan.'}</div>
         <p className="mt-3 text-sm text-slate-600">
           With QR Ordering, each table gets its own code. Guests scan it with their phone, see your menu, and place an order that appears at your counter and on your kitchen screen, with no app to install.
         </p>
@@ -98,7 +98,7 @@ function useLoad<T>(load: () => Promise<T>, everyMs?: number): { data: T | null;
 function Tile({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-2xl border border-jaman-border bg-white p-4">
-      <div className="text-2xl font-black text-jaman-navy">{value}</div>
+      <div className="text-2xl font-bold text-jaman-navy">{value}</div>
       <div className="text-xs text-slate-500 mt-1">{label}</div>
     </div>
   );
@@ -129,7 +129,7 @@ function Overview() {
         {t.ordersByTable.length === 0 ? <div className="text-sm text-slate-500">No QR orders yet today.</div> : (
           <ul className="text-sm divide-y">{t.ordersByTable.map((r) => <li key={r.table} className="py-1.5 flex justify-between"><span>Table {r.table}</span><b>{r.orders}</b></li>)}</ul>
         )}
-        <div className="text-[11px] text-slate-400 mt-3">Counted by the server from real orders. Sales are what guests ordered; only counter-settled bills are paid sales ({inr(t.paidSales)} so far).</div>
+        <div className="text-[11px] text-slate-500 mt-3">Counted by the server from real orders. Sales are what guests ordered; only counter-settled bills are paid sales ({inr(t.paidSales)} so far).</div>
       </div>
     </div>
   );
@@ -217,10 +217,10 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
       </div>
 
       {adding && (
-        <div className="rounded-2xl border border-jaman-saffron bg-white p-4 flex flex-wrap items-end gap-3">
+        <div className="rounded-2xl border border-brand bg-white p-4 flex flex-wrap items-end gap-3">
           <label className="text-xs font-bold text-slate-600">Table number or name<input value={newNumber} maxLength={20} onChange={(e) => setNewNumber(e.target.value)} className="block mt-1 rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. 12 or Terrace 1" /></label>
           <label className="text-xs font-bold text-slate-600">Seats<input type="number" min={1} max={200} value={newCapacity} onChange={(e) => setNewCapacity(e.target.value)} className="block mt-1 w-20 rounded-xl border border-slate-300 px-3 py-2 text-sm" /></label>
-          <button disabled={!newNumber.trim() || busy === 'add' || (activeBranches.length > 1 && !chosenBranch)} onClick={addTable} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-40">Save table</button>
+          <button disabled={!newNumber.trim() || busy === 'add' || (activeBranches.length > 1 && !chosenBranch)} onClick={addTable} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold disabled:opacity-40">Save table</button>
           {activeBranches.length > 1 && !chosenBranch && <span className="text-xs text-amber-700">Choose a branch above first.</span>}
         </div>
       )}
@@ -236,17 +236,17 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
                 <input type="checkbox" checked={selected.has(row.tableId)} onChange={() => toggle(row.tableId)} aria-label={`Select table ${row.displayNumber}`} disabled={row.qr?.status !== 'ACTIVE'} />
                 {renaming?.id === row.tableId ? (
                   <span className="w-40 flex gap-1"><input autoFocus value={renaming.value} maxLength={20} onChange={(e) => setRenaming({ id: row.tableId, value: e.target.value })} className="w-24 rounded-lg border border-slate-300 px-2 py-1 text-xs" />
-                    <button onClick={() => { const v = renaming.value.trim(); setRenaming(null); if (v && v !== row.displayNumber) void run(row.tableId, () => QrAdminApi.updateTable(row.tableId, { tableNumber: v }), 'Table renamed'); }} className="text-xs font-bold text-jaman-saffron">Save</button></span>
+                    <button onClick={() => { const v = renaming.value.trim(); setRenaming(null); if (v && v !== row.displayNumber) void run(row.tableId, () => QrAdminApi.updateTable(row.tableId, { tableNumber: v }), 'Table renamed'); }} className="text-xs font-bold text-brand">Save</button></span>
                 ) : (
-                  <div className="w-28 font-extrabold text-jaman-navy">Table {row.displayNumber} <button onClick={() => setRenaming({ id: row.tableId, value: row.displayNumber })} className="text-[10px] font-bold text-slate-400 ml-1" aria-label={`Rename table ${row.displayNumber}`}>edit</button></div>
+                  <div className="w-28 font-bold text-jaman-navy">Table {row.displayNumber} <button onClick={() => setRenaming({ id: row.tableId, value: row.displayNumber })} className="text-[11px] font-bold text-slate-500 ml-1" aria-label={`Rename table ${row.displayNumber}`}>edit</button></div>
                 )}
                 <div className="w-32 text-xs text-slate-500">{q?.branchName ?? (row.zone ?? '')}</div>
                 <div className="w-24">
                   {!row.isActive ? <span className="text-slate-500 text-xs font-bold">Table off</span>
                     : !q ? <span className="text-slate-500 text-xs font-bold">No code</span>
-                    : q.status === 'ACTIVE' ? <span className="text-emerald-700 text-xs font-black">Active</span>
-                    : q.status === 'DISABLED' ? <span className="text-amber-700 text-xs font-black">Disabled</span>
-                    : <span className="text-rose-700 text-xs font-black">Revoked</span>}
+                    : q.status === 'ACTIVE' ? <span className="text-emerald-700 text-xs font-bold">Active</span>
+                    : q.status === 'DISABLED' ? <span className="text-amber-700 text-xs font-bold">Disabled</span>
+                    : <span className="text-rose-700 text-xs font-bold">Revoked</span>}
                 </div>
                 <div className="flex flex-wrap gap-1.5 ml-auto">
                   {(!q || q.status === 'REVOKED') && (
@@ -284,8 +284,8 @@ function QrDialog({ row, onClose, showToast }: { row: QrTableRow; onClose: () =>
   }, [onClose]);
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-3xl p-6 w-full max-w-sm text-center" onClick={(e) => e.stopPropagation()}>
-        <div className="font-black text-jaman-navy text-lg">Table {row.displayNumber}</div>
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm text-center" onClick={(e) => e.stopPropagation()}>
+        <div className="font-bold text-jaman-navy text-lg">Table {row.displayNumber}</div>
         <img src={generateQrDataUrl(url, { size: 260, margin: 4, color: '#000000' })} alt={`QR code for table ${row.displayNumber}`} className="mx-auto my-3" width={260} height={260} />
         <div className="text-[11px] text-slate-500 break-all">{url}</div>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -414,7 +414,7 @@ export function BrandingForm({ showToast }: { showToast: (m: string) => void }) 
   const inputCls = 'block mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm';
   return (
     <div className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
-      <h3 className="font-extrabold text-jaman-navy text-sm">Guest page: your words, colour and logo</h3>
+      <h3 className="font-bold text-jaman-navy text-sm">Guest page: your words, colour and logo</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="text-xs font-bold text-slate-600">Heading (default: your restaurant name)<input className={inputCls} maxLength={80} value={val('welcomeTitle')} onChange={(e) => set('welcomeTitle', e.target.value)} /></label>
         <label className="text-xs font-bold text-slate-600">Order button text (default: Place order)<input className={inputCls} maxLength={30} value={val('orderButtonLabel')} onChange={(e) => set('orderButtonLabel', e.target.value)} /></label>
@@ -429,7 +429,7 @@ export function BrandingForm({ showToast }: { showToast: (m: string) => void }) 
           </div>
         </div>
       </div>
-      <button disabled={saving} onClick={save} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-40">Save</button>
+      <button disabled={saving} onClick={save} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold disabled:opacity-40">Save</button>
     </div>
   );
 }

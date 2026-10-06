@@ -43,7 +43,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onClose();
             }}
             className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 ${
-              isDanger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-jaman-saffron hover:bg-[#EA580C]'
+              isDanger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-brand hover:bg-brand-hover active:bg-brand-press'
             }`}
           >
             {confirmText}

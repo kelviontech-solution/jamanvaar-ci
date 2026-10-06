@@ -58,11 +58,11 @@ export const RiderModal: React.FC<RiderModalProps> = ({ isOpen, onClose, riderTo
         )}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Rider Name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron" />
+          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand" />
         </div>
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Phone *</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -77,7 +77,7 @@ export const RiderModal: React.FC<RiderModalProps> = ({ isOpen, onClose, riderTo
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Vehicle No. (optional)</label>
-            <input value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-jaman-saffron" />
+            <input value={vehicleNumber} onChange={(e) => setVehicleNumber(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-brand" />
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">

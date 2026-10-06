@@ -140,11 +140,11 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
             Database Backup & Disaster Recovery
           </h1>
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${
+            className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
               cloudReady
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 : 'bg-slate-100 text-slate-700 border-slate-200'
@@ -187,9 +187,9 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-extrabold text-base text-jaman-navy">Cloud Backup (Off-Device)</h4>
+                  <h4 className="font-bold text-base text-jaman-navy">Cloud Backup (Off-Device)</h4>
                   {cloudReady && (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold">
                       Recommended
                     </span>
                   )}
@@ -219,14 +219,14 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
 
           {cloudReady && cloudBackups.length > 0 && (
             <div className="border-t border-slate-100 pt-3">
-              <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">
+              <div className="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
                 Recent cloud backups
               </div>
               <div className="space-y-1.5">
                 {cloudBackups.slice(0, 5).map((b) => (
                   <div key={b.id} className="flex items-center justify-between text-xs text-slate-600">
                     <span>{new Date(b.createdAt).toLocaleString()} · {b.method === 'AUTOMATIC' ? 'Automatic (device)' : 'Manual'}</span>
-                    <span className="font-mono text-slate-400">{(b.sizeBytes / 1024).toFixed(0)} KB</span>
+                    <span className="tabular-nums text-slate-500">{(b.sizeBytes / 1024).toFixed(0)} KB</span>
                   </div>
                 ))}
               </div>
@@ -242,8 +242,8 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="font-extrabold text-base text-jaman-navy">Export Complete Database JSON</h4>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold">
+                <h4 className="font-bold text-base text-jaman-navy">Export Complete Database JSON</h4>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold">
                   Recommended
                 </span>
               </div>
@@ -264,11 +264,11 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
         {/* 2. Restore JSON */}
         <div className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-brand/[0.07] text-brand flex items-center justify-center shrink-0">
               <Upload className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-extrabold text-base text-jaman-navy">Restore Database Snapshot</h4>
+              <h4 className="font-bold text-base text-jaman-navy">Restore Database Snapshot</h4>
               <p className="text-xs text-slate-500 mt-0.5">
                 Upload and restore database state from a previously saved JAMANVAAR JSON snapshot file. Validates JSON schema before applying.
               </p>
@@ -276,7 +276,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
           </div>
           <button
             onClick={onOpenRestoreModal}
-            className="px-4 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-jaman-saffron/25 shrink-0 cursor-pointer transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-brand/25 shrink-0 cursor-pointer transition-colors"
           >
             <Upload className="w-4 h-4" />
             <span>Upload & Restore</span>
@@ -291,8 +291,8 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="font-extrabold text-base text-rose-800">Factory Demo Seed Reset</h4>
-                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">
+                <h4 className="font-bold text-base text-rose-800">Factory Demo Seed Reset</h4>
+                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] font-bold">
                   Danger Zone
                 </span>
               </div>

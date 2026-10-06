@@ -302,14 +302,14 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
   return (
     <div className="space-y-5 max-w-7xl mx-auto pb-12">
       {/* 1. TOP HEADER & ACTION BAR */}
-      <div className="bg-white border border-jaman-border rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-jaman-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
                 Reports & Analytics
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                 ● LIVE RECONCILED
               </span>
             </div>
@@ -322,7 +322,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setIsDesignModalOpen(true)}
-              className="px-3.5 py-2 bg-[#FFF4ED] hover:bg-[#FFE8DA] border border-[#FDBA74] text-jaman-saffron rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Palette className="w-3.5 h-3.5" />
               <span>Report Design</span>
@@ -332,7 +332,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
               onClick={() => setIsPreviewModalOpen(true)}
               className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
-              <Eye className="w-3.5 h-3.5 text-jaman-saffron" />
+              <Eye className="w-3.5 h-3.5 text-slate-500" />
               <span>Preview Report</span>
             </button>
 
@@ -346,7 +346,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
             <button
               onClick={() => setIsPreviewModalOpen(true)}
-              className="px-3.5 py-2 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="px-3.5 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download PDF</span>
@@ -384,7 +384,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                 onClick={() => setPeriodPreset(p.id as ReportPeriodPreset)}
                 className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
                   periodPreset === p.id
-                    ? 'bg-jaman-navy text-white shadow-2xs'
+                    ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
                 }`}
               >
@@ -402,7 +402,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                 onChange={(e) => setCustomStartDate(e.target.value)}
                 className="bg-white border border-jaman-border rounded-lg px-2 py-1 text-xs font-bold text-jaman-navy"
               />
-              <span className="text-slate-400 font-bold">to</span>
+              <span className="text-slate-500 font-bold">to</span>
               <input
                 type="date"
                 value={customEndDate}
@@ -419,7 +419,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                 type="checkbox"
                 checked={isCompareEnabled}
                 onChange={(e) => setIsCompareEnabled(e.target.checked)}
-                className="w-4 h-4 rounded text-jaman-saffron focus:ring-jaman-saffron"
+                className="w-4 h-4 rounded text-brand focus:ring-brand"
               />
               <span>Compare With:</span>
             </label>
@@ -456,21 +456,21 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
         {/* Active Filters Display */}
         {activeFilterCount > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
-            <span className="text-slate-400 font-bold text-[11px]">Active Filters:</span>
+            <span className="text-slate-500 font-bold text-[11px]">Active Filters:</span>
             {filters.orderType !== 'ALL' && (
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffron font-bold flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-brand font-bold flex items-center gap-1">
                 Order: {filters.orderType}
                 <X className="w-3 h-3 cursor-pointer" onClick={() => setFilters({ ...filters, orderType: 'ALL' })} />
               </span>
             )}
             {filters.paymentMethod !== 'ALL' && (
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffron font-bold flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-brand font-bold flex items-center gap-1">
                 Payment: {filters.paymentMethod}
                 <X className="w-3 h-3 cursor-pointer" onClick={() => setFilters({ ...filters, paymentMethod: 'ALL' })} />
               </span>
             )}
             {filters.tableNumber !== 'ALL' && (
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-jaman-saffron font-bold flex items-center gap-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-brand font-bold flex items-center gap-1">
                 Table: {filters.tableNumber}
                 <X className="w-3 h-3 cursor-pointer" onClick={() => setFilters({ ...filters, tableNumber: 'ALL' })} />
               </span>
@@ -486,17 +486,17 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
       </div>
 
       {/* ONLINE PAYMENTS (RAZORPAY) — server-side totals; a different source from the local sales figures below, so shown separately rather than merged */}
-      <div className="bg-white border border-jaman-border rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
+      <div className="bg-white border border-jaman-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-black text-jaman-navy">Online Payments (Razorpay)</h2>
-          <span className="text-[10px] text-slate-500">All time · from cloud, not local sales</span>
+          <h2 className="text-sm font-bold text-jaman-navy">Online Payments (Razorpay)</h2>
+          <span className="text-[11px] text-slate-500">All time · from cloud, not local sales</span>
         </div>
         {onlineSummary ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Online sales</div><div className="text-lg font-black text-jaman-navy">{formatINR(onlineSummary.grossVolume / 100)}</div></div>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Successful</div><div className="text-lg font-black text-jaman-navy">{onlineSummary.successfulCount}</div></div>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Failed</div><div className="text-lg font-black text-jaman-navy">{onlineSummary.failedCount}</div></div>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Refunded</div><div className="text-lg font-black text-jaman-navy">{formatINR(onlineSummary.refundedAmount / 100)}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Online sales</div><div className="text-lg font-bold text-jaman-navy">{formatINR(onlineSummary.grossVolume / 100)}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Successful</div><div className="text-lg font-bold text-jaman-navy">{onlineSummary.successfulCount}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Failed</div><div className="text-lg font-bold text-jaman-navy">{onlineSummary.failedCount}</div></div>
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100"><div className="text-slate-500">Refunded</div><div className="text-lg font-bold text-jaman-navy">{formatINR(onlineSummary.refundedAmount / 100)}</div></div>
           </div>
         ) : (
           <p className="text-xs text-slate-500">{onlineSummaryError ? 'Online payment totals unavailable right now (offline or not connected to the cloud).' : 'Loading…'}</p>
@@ -504,13 +504,13 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
       </div>
 
       {/* 3. TODAY AT A GLANCE (OWNER EXECUTIVE OVERVIEW) */}
-      <div className="bg-white border border-jaman-border rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-jaman-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-extrabold text-base text-jaman-navy">
+            <h3 className="font-bold text-base text-jaman-navy">
               Performance at a Glance • {dateRange.label}
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               {currentOrders.length} completed transactions reconciled across billing and kitchen counters.
             </p>
           </div>
@@ -525,12 +525,12 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Gross Sales */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Gross Sales</span>
-            <div className="text-lg font-mono font-black text-jaman-navy">
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">Gross Sales</span>
+            <div className="text-lg font-mono font-bold text-jaman-navy">
               {formatINR(summary.grossSales.current)}
             </div>
             {summary.grossSales.diffPercent !== undefined && (
-              <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
+              <span className={`text-[11px] font-bold flex items-center gap-0.5 ${
                 summary.grossSales.diffPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'
               }`}>
                 {summary.grossSales.diffPercent >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -541,30 +541,30 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* Discounts */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Discounts</span>
-            <div className="text-lg font-mono font-black text-rose-600">
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">Discounts</span>
+            <div className="text-lg font-mono font-bold text-rose-600">
               -{formatINR(summary.discountAmount.current)}
             </div>
-            <span className="text-[10px] text-slate-400 font-semibold block">Promotions</span>
+            <span className="text-[11px] text-slate-500 font-semibold block">Promotions</span>
           </div>
 
           {/* GST */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">GST Tax (5%)</span>
-            <div className="text-lg font-mono font-black text-jaman-saffron">
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">GST Tax (5%)</span>
+            <div className="text-lg font-mono font-bold text-brand">
               {formatINR(summary.totalTax.current)}
             </div>
-            <span className="text-[10px] text-slate-400 font-semibold block">CGST + SGST</span>
+            <span className="text-[11px] text-slate-500 font-semibold block">CGST + SGST</span>
           </div>
 
           {/* Net Sales */}
           <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1">
-            <span className="text-[10px] font-bold text-emerald-900 uppercase block">Net Collected</span>
-            <div className="text-xl font-mono font-black text-emerald-950">
+            <span className="text-[11px] font-bold text-emerald-900 uppercase block">Net Collected</span>
+            <div className="text-xl font-mono font-bold text-emerald-950">
               {formatINR(summary.netSales.current)}
             </div>
             {summary.netSales.diffPercent !== undefined && (
-              <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
+              <span className={`text-[11px] font-bold flex items-center gap-0.5 ${
                 summary.netSales.diffPercent >= 0 ? 'text-emerald-700' : 'text-rose-600'
               }`}>
                 {summary.netSales.diffPercent >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -575,12 +575,12 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* Orders Count */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Orders</span>
-            <div className="text-lg font-mono font-black text-jaman-navy">
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">Total Orders</span>
+            <div className="text-lg font-mono font-bold text-jaman-navy">
               {summary.ordersCount.current}
             </div>
             {summary.ordersCount.diffPercent !== undefined && (
-              <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
+              <span className={`text-[11px] font-bold flex items-center gap-0.5 ${
                 summary.ordersCount.diffPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'
               }`}>
                 {summary.ordersCount.diffPercent >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -591,11 +591,11 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* AOV */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Average Ticket</span>
-            <div className="text-lg font-mono font-black text-slate-800">
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">Average Ticket</span>
+            <div className="text-lg font-mono font-bold text-slate-800">
               ₹{summary.avgOrderValue.current}
             </div>
-            <span className="text-[10px] text-slate-400 font-semibold block">Avg per bill</span>
+            <span className="text-[11px] text-slate-500 font-semibold block">Avg per bill</span>
           </div>
         </div>
       </div>
@@ -605,8 +605,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
         {/* LEFT COLUMN: REPORT CATEGORIES & REPORT LIST (lg:col-span-4) */}
         <div className="lg:col-span-4 space-y-4">
           {/* Category Tabs */}
-          <div className="bg-white border border-jaman-border rounded-3xl p-3 shadow-xs space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 block">
+          <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
               Report Categories
             </span>
             <div className="grid grid-cols-3 gap-1.5 text-xs">
@@ -631,7 +631,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                     }}
                     className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       isCatActive
-                        ? 'bg-jaman-navy text-white shadow-xs'
+                        ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                         : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
                     }`}
                   >
@@ -645,20 +645,20 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* Search Reports Input */}
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search reports (e.g. GST, Sales, Cash, Dish)..."
-              className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-jaman-border rounded-2xl text-xs font-bold text-jaman-navy placeholder:text-slate-400 shadow-2xs focus:outline-none focus:border-jaman-saffron"
+              className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-jaman-border rounded-2xl text-xs font-bold text-jaman-navy placeholder:text-slate-500 shadow-2xs focus:outline-none focus:border-brand"
             />
           </div>
 
           {/* Favorite Reports Drawer */}
           {favoriteIds.length > 0 && !searchQuery.trim() && (
             <div className="bg-amber-50/60 border border-amber-200/80 rounded-2xl p-3 space-y-1.5">
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 flex items-center gap-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
                 <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
                 <span>Favorite Reports</span>
               </span>
@@ -672,7 +672,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                       onClick={() => handleSelectReport(favId)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                         activeReportId === favId
-                          ? 'bg-jaman-saffron text-white shadow-2xs'
+                          ? 'bg-brand text-white shadow-2xs'
                           : 'bg-white border border-amber-200 text-amber-900 hover:bg-amber-100'
                       }`}
                     >
@@ -685,8 +685,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
           )}
 
           {/* List of Sub-Reports */}
-          <div className="bg-white border border-jaman-border rounded-3xl p-3 shadow-xs space-y-1.5 max-h-[500px] overflow-y-auto pr-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 block">
+          <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-1.5 max-h-[500px] overflow-y-auto pr-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
               {searchQuery ? `Search Results (${displayedReports.length})` : `${selectedCategory} Reports (${displayedReports.length})`}
             </span>
 
@@ -701,28 +701,28 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                   onClick={() => handleSelectReport(rep.id)}
                   className={`p-3 rounded-2xl border transition-all flex items-center justify-between cursor-pointer group ${
                     isSelected
-                      ? 'bg-[#FFF7ED] border-jaman-saffron shadow-xs'
+                      ? 'bg-[#FFF7ED] border-brand shadow-xs'
                       : 'bg-white border-jaman-border hover:border-slate-300 hover:bg-slate-50/50'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                        isSelected ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-600'
+                        isSelected ? 'bg-brand text-white' : 'bg-slate-100 text-slate-600'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <h4 className="font-extrabold text-xs text-jaman-navy truncate">{rep.title}</h4>
+                        <h4 className="font-bold text-xs text-jaman-navy truncate">{rep.title}</h4>
                         {rep.isPopular && (
-                          <span className="text-[8px] font-black px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">
+                          <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">
                             HOT
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-400 truncate">{rep.subtitle}</p>
+                      <p className="text-[11px] text-slate-500 truncate">{rep.subtitle}</p>
                     </div>
                   </div>
 
@@ -742,13 +742,13 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
         {/* RIGHT COLUMN: ACTIVE REPORT DETAIL & VISUAL WORKSPACE (lg:col-span-8) */}
         <div className="lg:col-span-8 space-y-4">
           {/* Active Report Header Card */}
-          <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-md bg-jaman-navy text-white font-black text-[10px] uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-md bg-jaman-navy text-white font-bold text-[11px] uppercase tracking-wider">
                   {activeReport.category}
                 </span>
-                <h2 className="text-xl font-black text-jaman-navy">{activeReport.title}</h2>
+                <h2 className="text-xl font-bold text-jaman-navy">{activeReport.title}</h2>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">{activeReport.subtitle}</p>
             </div>
@@ -756,7 +756,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPreviewModalOpen(true)}
-                className="px-3.5 py-2 bg-[#FFF4ED] hover:bg-[#FFE8DA] border border-[#FDBA74] text-jaman-saffron rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                className="px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Full Document Preview</span>
@@ -767,15 +767,15 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
           {/* REPORT SPECIFIC CONTENT ROUTING */}
           {/* 1. DAILY / SUMMARY / DAY-BY-DAY */}
           {(activeReportId === 'DAILY_SALES' || activeReportId === 'SALES_SUMMARY' || activeReportId === 'DAY_BY_DAY') && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-5">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-5">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="font-extrabold text-sm text-jaman-navy">Consecutive Daily Sales Ledger</h3>
-                <span className="text-xs text-slate-400 font-mono">{dayByDay.length} Days Audited</span>
+                <h3 className="font-bold text-sm text-jaman-navy">Consecutive Daily Sales Ledger</h3>
+                <span className="text-xs text-slate-500 tabular-nums">{dayByDay.length} Days Audited</span>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-jaman-border">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[10px]">
+                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[11px]">
                     <tr>
                       <th className="p-3">Date</th>
                       <th className="p-3">Orders</th>
@@ -793,15 +793,15 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                     {dayByDay.map((d) => (
                       <tr key={d.dateKey} className="hover:bg-amber-50/40 transition-colors">
                         <td className="p-3 font-bold text-jaman-navy">{d.displayDate}</td>
-                        <td className="p-3 font-mono">{d.ordersCount}</td>
-                        <td className="p-3 font-mono font-bold text-slate-800">₹{d.grossSales}</td>
-                        <td className="p-3 font-mono text-rose-600">-₹{d.discount}</td>
-                        <td className="p-3 font-mono text-jaman-saffron">₹{d.tax}</td>
-                        <td className="p-3 font-mono font-black text-emerald-800">₹{d.netSales}</td>
-                        <td className="p-3 font-mono text-slate-600">₹{d.cash}</td>
-                        <td className="p-3 font-mono text-blue-700">₹{d.upi}</td>
-                        <td className="p-3 font-mono text-indigo-700">₹{d.card}</td>
-                        <td className="p-3 font-mono font-bold">₹{d.avgOrderValue}</td>
+                        <td className="p-3 tabular-nums">{d.ordersCount}</td>
+                        <td className="p-3 tabular-nums font-bold text-slate-800">₹{d.grossSales}</td>
+                        <td className="p-3 tabular-nums text-rose-600">-₹{d.discount}</td>
+                        <td className="p-3 tabular-nums text-brand">₹{d.tax}</td>
+                        <td className="p-3 tabular-nums font-bold text-emerald-800">₹{d.netSales}</td>
+                        <td className="p-3 tabular-nums text-slate-600">₹{d.cash}</td>
+                        <td className="p-3 tabular-nums text-blue-700">₹{d.upi}</td>
+                        <td className="p-3 tabular-nums text-indigo-700">₹{d.card}</td>
+                        <td className="p-3 tabular-nums font-bold">₹{d.avgOrderValue}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -812,19 +812,19 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* 2. HOURLY SALES */}
           {activeReportId === 'HOURLY_SALES' && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
-              <h3 className="font-extrabold text-sm text-jaman-navy">Peak Dining Rush & Hourly Revenue Heatmap</h3>
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
+              <h3 className="font-bold text-sm text-jaman-navy">Peak Dining Rush & Hourly Revenue Heatmap</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {hourly.map((h) => (
                   <div key={h.hour} className="p-3.5 rounded-2xl bg-jaman-cream border border-jaman-border space-y-1">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <span className="text-jaman-navy">{h.label}</span>
-                      <span className="font-mono text-slate-400">{h.ordersCount} orders</span>
+                      <span className="tabular-nums text-slate-500">{h.ordersCount} orders</span>
                     </div>
-                    <div className="text-base font-mono font-black text-emerald-800">
+                    <div className="text-base font-mono font-bold text-emerald-800">
                       {formatINR(h.sales)}
                     </div>
-                    <span className="text-[10px] text-slate-400 block font-mono">
+                    <span className="text-[11px] text-slate-500 block font-mono">
                       AOV: ₹{h.avgOrderValue}
                     </span>
                   </div>
@@ -835,15 +835,15 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* 3. TOP DISHES & MENU */}
           {(activeReportId === 'TOP_SELLING_DISHES' || activeReportId === 'SLOW_MOVING_DISHES' || activeReportId === 'CATEGORY_SALES' || activeReportId === 'DISH_REVENUE') && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="font-extrabold text-sm text-jaman-navy">Menu Dish Performance & Margins</h3>
-                <span className="text-xs text-slate-400 font-mono">{dishes.length} Items Listed</span>
+                <h3 className="font-bold text-sm text-jaman-navy">Menu Dish Performance & Margins</h3>
+                <span className="text-xs text-slate-500 tabular-nums">{dishes.length} Items Listed</span>
               </div>
 
               <div className="overflow-x-auto rounded-2xl border border-jaman-border">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[10px]">
+                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[11px]">
                     <tr>
                       <th className="p-3">Rank</th>
                       <th className="p-3">Dish Name</th>
@@ -858,13 +858,13 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                   <tbody className="divide-y divide-slate-100">
                     {dishes.map((d, i) => (
                       <tr key={d.id} className="hover:bg-amber-50/40 transition-colors">
-                        <td className="p-3 font-mono font-bold text-jaman-saffron">#{i + 1}</td>
+                        <td className="p-3 font-mono font-bold text-brand">#{i + 1}</td>
                         <td className="p-3 font-bold text-jaman-navy">{d.name}</td>
                         <td className="p-3 text-slate-500">{d.categoryName}</td>
-                        <td className="p-3 font-mono font-bold text-right">{d.quantitySold}</td>
-                        <td className="p-3 font-mono font-black text-right text-emerald-800">{formatINR(d.grossRevenue)}</td>
-                        <td className="p-3 font-mono text-right">₹{d.avgSellingPrice}</td>
-                        <td className="p-3 font-mono text-right font-bold text-slate-700">{d.revenueSharePercent}%</td>
+                        <td className="p-3 tabular-nums font-bold text-right">{d.quantitySold}</td>
+                        <td className="p-3 tabular-nums font-bold text-right text-emerald-800">{formatINR(d.grossRevenue)}</td>
+                        <td className="p-3 tabular-nums text-right">₹{d.avgSellingPrice}</td>
+                        <td className="p-3 tabular-nums text-right font-bold text-slate-700">{d.revenueSharePercent}%</td>
                         <td className="p-3 font-mono text-right font-bold text-emerald-700">{d.grossMarginPercent}%</td>
                       </tr>
                     ))}
@@ -876,11 +876,11 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* 4. GST TAX REPORT */}
           {activeReportId === 'TAXES_GST' && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="font-extrabold text-sm text-jaman-navy">GST Tax Audit Statement (5% Food Rate)</h3>
-                  <p className="text-xs text-slate-400">GSTIN: {db.restaurant.gstin || 'not registered'}</p>
+                  <h3 className="font-bold text-sm text-jaman-navy">GST Tax Audit Statement (5% Food Rate)</h3>
+                  <p className="text-xs text-slate-500">GSTIN: {db.restaurant.gstin || 'not registered'}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -896,7 +896,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
               <div className="overflow-x-auto rounded-2xl border border-jaman-border">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[10px]">
+                  <thead className="bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[11px]">
                     <tr>
                       <th className="p-3">Tax Slab</th>
                       <th className="p-3">Invoices</th>
@@ -913,9 +913,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                         <td className="p-3">{g.invoicesCount}</td>
                         <td className="p-3 font-bold text-right">{formatINR(g.taxableAmount)}</td>
                         {/* B2-036: derived from the same row's own totalTax via formatSplitTax. */}
-                        <td className="p-3 text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).cgst}</td>
-                        <td className="p-3 text-right text-jaman-saffron">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).sgst}</td>
-                        <td className="p-3 font-black text-right text-emerald-800">{formatINR(g.totalTax)}</td>
+                        <td className="p-3 text-right text-brand">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).cgst}</td>
+                        <td className="p-3 text-right text-brand">{formatSplitTax(g.totalTax, g.cgstAmount, g.sgstAmount).sgst}</td>
+                        <td className="p-3 font-bold text-right text-emerald-800">{formatINR(g.totalTax)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -926,37 +926,37 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* 5. EOD SETTLEMENT */}
           {activeReportId === 'EOD_SETTLEMENT' && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="font-extrabold text-sm text-jaman-navy">End of Day (EOD) Cash Drawer Reconciliation</h3>
-                  <p className="text-xs text-slate-400">Balancing cash drawer and digital settlements</p>
+                  <h3 className="font-bold text-sm text-jaman-navy">End of Day (EOD) Cash Drawer Reconciliation</h3>
+                  <p className="text-xs text-slate-500">Balancing cash drawer and digital settlements</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full font-black text-xs ${
+                <span className={`px-3 py-1 rounded-full font-bold text-xs ${
                   eod.isBalanced === null ? 'bg-slate-100 text-slate-600' : eod.isBalanced ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                 }`}>
                   {eod.isBalanced === null
                     ? 'NOT YET COUNTED'
-                    : eod.isBalanced ? '✓ BALANCED' : `⚠ VARIANCE: ${formatINR(eod.cashDifference || 0)}`}
+                    : eod.isBalanced ? 'BALANCED' : `VARIANCE: ${formatINR(eod.cashDifference || 0)}`}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-jaman-cream border border-jaman-border">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Opening Cash</span>
-                  <div className="text-lg font-mono font-black text-jaman-navy mt-1">{formatINR(eod.openingCash)}</div>
+                  <span className="text-[11px] font-bold text-slate-500 uppercase block">Opening Cash</span>
+                  <div className="text-lg tabular-nums font-bold text-jaman-navy mt-1">{formatINR(eod.openingCash)}</div>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-jaman-cream border border-jaman-border">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Cash Sales</span>
-                  <div className="text-lg font-mono font-black text-emerald-800 mt-1">{formatINR(eod.cashSales)}</div>
+                  <span className="text-[11px] font-bold text-slate-500 uppercase block">Cash Sales</span>
+                  <div className="text-lg tabular-nums font-bold text-emerald-800 mt-1">{formatINR(eod.cashSales)}</div>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-jaman-cream border border-jaman-border">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Expected Cash</span>
-                  <div className="text-lg font-mono font-black text-jaman-navy mt-1">{formatINR(eod.expectedCash)}</div>
+                  <span className="text-[11px] font-bold text-slate-500 uppercase block">Expected Cash</span>
+                  <div className="text-lg tabular-nums font-bold text-jaman-navy mt-1">{formatINR(eod.expectedCash)}</div>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200">
-                  <span className="text-[10px] font-bold text-emerald-900 uppercase block">Digital Sales</span>
-                  <div className="text-lg font-mono font-black text-blue-900 mt-1">{formatINR(eod.upiSales + eod.cardSales)}</div>
+                  <span className="text-[11px] font-bold text-emerald-900 uppercase block">Digital Sales</span>
+                  <div className="text-lg tabular-nums font-bold text-blue-900 mt-1">{formatINR(eod.upiSales + eod.cardSales)}</div>
                 </div>
               </div>
             </div>
@@ -969,14 +969,14 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
           {/* 6. KITCHEN / OPERATIONS */}
           {(activeReportId === 'KITCHEN_PREP_TIME' || activeReportId === 'STATION_PERFORMANCE' || activeReportId === 'KOT_PERFORMANCE') && (
-            <div className="bg-white border border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
-              <h3 className="font-extrabold text-sm text-jaman-navy">Kitchen Food Stations & Cook Latency</h3>
+            <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
+              <h3 className="font-bold text-sm text-jaman-navy">Kitchen Food Stations & Cook Latency</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {stations.map((st) => (
                   <div key={st.stationName} className="p-4 rounded-2xl bg-jaman-cream border border-jaman-border space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-extrabold text-xs text-jaman-navy">{st.stationName}</h4>
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-black">
+                      <h4 className="font-bold text-xs text-jaman-navy">{st.stationName}</h4>
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold">
                         {st.avgPrepMinutes !== null ? `${st.avgPrepMinutes}m avg` : 'No data yet'}
                       </span>
                     </div>

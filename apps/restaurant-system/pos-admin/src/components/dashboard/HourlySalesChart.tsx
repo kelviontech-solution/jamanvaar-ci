@@ -33,8 +33,8 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-jaman-saffron" />
-            <h3 className="font-black text-base text-jaman-navy tracking-tight">
+            <BarChart3 className="w-4 h-4 text-slate-500" />
+            <h3 className="font-bold text-base text-jaman-navy tracking-tight">
               Hourly Sales Velocity
             </h3>
           </div>
@@ -44,13 +44,13 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
         </div>
 
         {totalDaySales > 0 ? (
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-jaman-saffron bg-[#FFF4ED] border border-[#FDBA74]/40 px-3 py-1 rounded-xl self-start sm:self-auto">
-            <Flame className="w-3.5 h-3.5 fill-jaman-saffron" />
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand bg-brand/[0.07] border border-brand/30 px-3 py-1 rounded-xl self-start sm:self-auto">
+            <Flame className="w-3.5 h-3.5 fill-brand" />
             <span>Peak: {peakHours.peakHour}</span>
           </div>
         ) : (
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl self-start sm:self-auto">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
             <span>9:00 AM – 11:00 PM</span>
           </div>
         )}
@@ -59,7 +59,7 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
       {/* Chart Canvas / Empty State */}
       {totalDaySales === 0 ? (
         <div className="h-48 sm:h-52 flex flex-col items-center justify-center text-center p-6 bg-jaman-cream/50 rounded-xl border border-dashed border-jaman-border my-3">
-          <div className="w-10 h-10 rounded-full bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center mb-2 shadow-xs">
+          <div className="w-10 h-10 rounded-full bg-brand/[0.07] text-brand flex items-center justify-center mb-2 shadow-xs">
             <Clock className="w-5 h-5" />
           </div>
           <p className="text-sm font-bold text-jaman-navy">No sales recorded yet today</p>
@@ -90,21 +90,21 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
                   {/* Floating Tooltip */}
                   {isHovered && (
                     <div className="absolute -top-12 z-20 bg-jaman-navy text-white text-[11px] py-1.5 px-2.5 rounded-lg shadow-xl whitespace-nowrap pointer-events-none flex flex-col items-center animate-in fade-in zoom-in-95 duration-150">
-                      <span className="font-mono font-bold">{formatINR(h.sales)}</span>
-                      <span className="text-[9px] text-slate-300">{h.ordersCount} {h.ordersCount === 1 ? 'order' : 'orders'}</span>
+                      <span className="tabular-nums font-bold">{formatINR(h.sales)}</span>
+                      <span className="text-[11px] text-slate-500">{h.ordersCount} {h.ordersCount === 1 ? 'order' : 'orders'}</span>
                       <div className="w-2 h-2 bg-jaman-navy rotate-45 -mb-1 mt-0.5" />
                     </div>
                   )}
 
                   {/* The Bar */}
                   <div
-                    style={{ height: `${heightPercent}%` }}
-                    className={`w-full rounded-t-md transition-all duration-200 ${
+                    style={{ height: `${heightPercent}%`, ['--i' as string]: idx } as React.CSSProperties}
+                    className={`jv-bar w-full rounded-t-md transition-colors duration-200 ${
                       h.sales > 0
                         ? isPeak
-                          ? 'bg-jaman-saffron shadow-sm shadow-jaman-saffron/20 group-hover:brightness-110'
+                          ? 'bg-brand shadow-sm shadow-brand/20 group-hover:brightness-110'
                           : isHovered
-                          ? 'bg-jaman-saffron'
+                          ? 'bg-brand'
                           : 'bg-jaman-navy group-hover:bg-jaman-darkBorder'
                         : 'bg-slate-100 group-hover:bg-slate-200'
                     }`}
@@ -118,7 +118,7 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
           <div className="flex items-center gap-1.5 sm:gap-2 px-1 mt-2 border-t border-slate-100 pt-2">
             {hourlySales.map((h) => (
               <div key={h.hour} className="flex-1 text-center">
-                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 block truncate">
+                <span className="text-[11px] font-bold text-slate-500 block truncate">
                   {h.hour.replace(' ', '')}
                 </span>
               </div>
@@ -130,9 +130,9 @@ export const HourlySalesChart: React.FC<HourlySalesChartProps> = ({
       {/* Chart Footer with Velocity Summary */}
       <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-[#5A6878]">
         <span className="font-medium">
-          Total Today: <strong className="text-jaman-navy font-mono font-bold">{formatINR(totalDaySales)}</strong>
+          Total Today: <strong className="text-jaman-navy tabular-nums font-bold">{formatINR(totalDaySales)}</strong>
         </span>
-        <span className="text-[11px] text-slate-400 font-medium">
+        <span className="text-[11px] text-slate-500 font-medium">
           Active Operating Window: 9:00 AM – 11:00 PM
         </span>
       </div>

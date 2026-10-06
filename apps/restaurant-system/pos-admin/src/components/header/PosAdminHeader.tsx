@@ -89,11 +89,11 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <div className="flex items-center gap-2 min-w-0">
             <span
               title={restaurantName || 'Restaurant'}
-              className="text-xs sm:text-[13px] font-extrabold text-jaman-navy tracking-tight truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px]"
+              className="text-xs sm:text-[13px] font-bold text-jaman-navy tracking-tight truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px]"
             >
               {restaurantName || 'Restaurant'}
             </span>
-            <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold tracking-wider uppercase bg-jaman-navy/[0.05] text-jaman-navy border border-jaman-navy/15 shadow-2xs">
+            <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider uppercase bg-jaman-navy/[0.05] text-jaman-navy border border-jaman-navy/15 shadow-2xs">
               ADMIN
             </span>
           </div>
@@ -102,7 +102,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
               type="button"
               onClick={onOpenBranchDirectory}
               title="View all branches for this restaurant"
-              className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-slate-500 hover:text-jaman-saffron truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
+              className="flex items-center gap-1 text-[11px] sm:text-[11px] font-medium text-slate-500 hover:text-brand truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5 cursor-pointer transition-colors"
             >
               <Building2 className="w-3 h-3 shrink-0" />
               <span className="truncate">{outletName || 'Main outlet'}</span>
@@ -110,7 +110,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           ) : (
             <span
               title={outletName || 'Main outlet'}
-              className="text-[10px] sm:text-[11px] font-medium text-slate-500 truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5"
+              className="text-[11px] sm:text-[11px] font-medium text-slate-500 truncate max-w-[130px] sm:max-w-[180px] md:max-w-[220px] leading-tight mt-0.5"
             >
               {outletName || 'Main outlet'}
             </span>
@@ -133,15 +133,15 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           }}
           aria-label="Open global search"
         >
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-hover:text-jaman-saffron transition-colors" />
+          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 group-hover:text-slate-500 transition-colors" />
           <input
             type="text"
             readOnly
             placeholder="Search orders, invoices, dishes, tables..."
             value={globalSearch}
-            className="w-full h-10 bg-white/90 hover:bg-white border border-jaman-border group-hover:border-[#D8D1C3] focus:border-jaman-saffron focus:bg-white rounded-xl pl-10 pr-14 text-xs font-medium text-jaman-navy placeholder:text-slate-400 focus:outline-none cursor-pointer transition-all shadow-2xs"
+            className="w-full h-10 bg-white/90 hover:bg-white border border-jaman-border group-hover:border-[#D8D1C3] focus:border-brand focus:bg-white rounded-xl pl-10 pr-14 text-xs font-medium text-jaman-navy placeholder:text-slate-500 focus:outline-none cursor-pointer transition-all shadow-2xs"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 border border-jaman-border bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-slate-500 border border-jaman-border bg-[#FAF8F5] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
             Ctrl+K
           </kbd>
         </div>
@@ -167,7 +167,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         {activeShift ? (
           <div className="hidden xl:flex items-center gap-2.5 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
             <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] tracking-wide shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>{activeShift.terminalId || 'Terminal'} ONLINE</span>
             </div>
 
@@ -196,7 +196,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenEodModal}
-            className="h-10 flex items-center gap-1.5 bg-[#FFF4ED] hover:bg-[#FFE8D6] text-jaman-saffron border border-[#FDBA74]/50 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
+            className="h-10 flex items-center gap-1.5 bg-brand/[0.07] hover:bg-[#FFE8D6] text-brand border border-brand/30 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs cursor-pointer"
             title="End of Day Financial Z-Report"
           >
             <Receipt className="w-3.5 h-3.5 shrink-0" />
@@ -224,7 +224,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             className="hidden sm:flex h-10 items-center gap-1.5 bg-white hover:bg-[#FAF8F5] text-jaman-navy border border-jaman-border px-3 rounded-xl text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="JAMAN AI Operations Assistant"
           >
-            <Bot className="w-4 h-4 text-jaman-saffron shrink-0" />
+            <Bot className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="hidden lg:inline">Assistant</span>
           </button>
 
@@ -238,7 +238,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           >
             <Bell className="w-4 h-4" />
             {unreadNotifsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shadow-xs animate-pulse">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                 {unreadNotifsCount}
               </span>
             )}
@@ -246,10 +246,10 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
 
           {/* Local-First Badge */}
           <div
-            className="hidden 2xl:flex items-center gap-1.5 px-3 h-10 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/70 select-none shadow-2xs"
+            className="hidden 2xl:flex items-center gap-1.5 px-3 h-10 rounded-xl text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/70 select-none shadow-2xs"
             title="Operating in Local-First mesh mode"
           >
-            <Radio className="w-3 h-3 text-emerald-600 animate-pulse" />
+            <Radio className="w-3 h-3 text-emerald-600" />
             <span>LOCAL-FIRST</span>
           </div>
 

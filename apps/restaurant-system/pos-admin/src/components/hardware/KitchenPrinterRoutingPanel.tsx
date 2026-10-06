@@ -18,7 +18,7 @@ export const KitchenPrinterRoutingPanel: React.FC<{ showToast: (msg: string) => 
   return (
     <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border flex items-center justify-center text-jaman-saffron">
+        <div className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border flex items-center justify-center text-brand">
           <Printer className="w-6 h-6" />
         </div>
         <div>
@@ -32,7 +32,7 @@ export const KitchenPrinterRoutingPanel: React.FC<{ showToast: (msg: string) => 
           const assigned = db.configuredPrinters.find((p) => p.role === role);
           return (
             <div key={role} className="flex items-center justify-between gap-2">
-              <label className="text-[#8C9BAE] font-semibold shrink-0">{label}:</label>
+              <label className="text-[#64748B] font-semibold shrink-0">{label}:</label>
               <select
                 value={assigned?.id || ''}
                 onChange={(e) => {

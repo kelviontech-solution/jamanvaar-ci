@@ -86,7 +86,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-500">Sending "{sendQueue.campaign.name}"</div>
-            <div className="text-lg font-black text-jaman-navy">{sendQueue.index + 1} of {sendQueue.phones.length}</div>
+            <div className="text-lg font-bold text-jaman-navy">{sendQueue.index + 1} of {sendQueue.phones.length}</div>
             <div className="text-xs text-slate-500 mt-1">
               Next: {CustomerRepository.getByPhone(sendQueue.phones[sendQueue.index])?.name || sendQueue.phones[sendQueue.index]}
             </div>
@@ -106,7 +106,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Diwali VIP Offer"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             />
           </div>
           <div>
@@ -115,7 +115,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
               rows={3}
               value={messageTemplate}
               onChange={(e) => setMessageTemplate(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-jaman-saffron"
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -123,7 +123,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
             <label className="block text-xs font-bold text-slate-600">Audience Segment</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Minimum Tier</span>
+                <span className="block text-[11px] text-slate-500 font-bold uppercase mb-1">Minimum Tier</span>
                 <select
                   value={filter.minTierId || ''}
                   onChange={(e) => setFilter((f) => ({ ...f, minTierId: e.target.value || undefined }))}
@@ -134,7 +134,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                 </select>
               </div>
               <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Min Lifetime Spend (₹)</span>
+                <span className="block text-[11px] text-slate-500 font-bold uppercase mb-1">Min Lifetime Spend (₹)</span>
                 <input
                   type="number"
                   value={filter.minLifetimeSpend ?? ''}
@@ -144,7 +144,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                 />
               </div>
               <div>
-                <span className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Inactive For (days)</span>
+                <span className="block text-[11px] text-slate-500 font-bold uppercase mb-1">Inactive For (days)</span>
                 <input
                   type="number"
                   value={filter.inactiveForDays ?? ''}
@@ -164,8 +164,8 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                 </label>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-jaman-navy bg-[#FFF4ED] border border-[#FDBA74] rounded-lg px-2.5 py-1.5 w-fit">
-              <UsersIcon className="w-3.5 h-3.5 text-jaman-saffron" />
+            <div className="flex items-center gap-1.5 text-xs font-bold text-jaman-navy bg-brand/[0.07] border border-brand/30 rounded-lg px-2.5 py-1.5 w-fit">
+              <UsersIcon className="w-3.5 h-3.5 text-slate-500" />
               {matchCount} customer{matchCount === 1 ? '' : 's'} match this segment
             </div>
           </div>
@@ -187,7 +187,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
           </div>
 
           {campaigns.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-400 bg-jaman-cream rounded-xl">
+            <div className="p-8 text-center text-xs text-slate-500 bg-jaman-cream rounded-xl">
               No campaigns yet. Create one to target a real customer segment instead of messaging one guest at a time.
             </div>
           ) : (
@@ -198,18 +198,18 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
                   <div key={c.id} className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-bold text-xs text-jaman-navy truncate">{c.name}</div>
-                      <div className="text-[10px] text-slate-500 truncate">
+                      <div className="text-[11px] text-slate-500 truncate">
                         {matches} in segment · {c.sentToPhones.length} sent · {c.status}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         onClick={() => startSending(c)}
-                        className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
                       >
                         <Send className="w-3 h-3" /> Send
                       </button>
-                      <button onClick={() => handleDelete(c)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-400 hover:text-rose-600 cursor-pointer">
+                      <button onClick={() => handleDelete(c)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>

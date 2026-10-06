@@ -10,8 +10,8 @@ interface Props {
 }
 
 const inr = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-const card = 'bg-white border border-jaman-border rounded-3xl p-5';
-const input = 'w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-jaman-saffron';
+const card = 'bg-white border border-jaman-border rounded-2xl p-5';
+const input = 'w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand';
 
 /** What guests see is what the restaurant last published. This panel shows the gap and publishes it. */
 export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; changeTick: number }> = ({ showToast, changeTick }) => {
@@ -64,14 +64,14 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
     <div className={`${card} space-y-3`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-extrabold text-jaman-navy">Guest menu</h2>
+          <h2 className="text-base font-bold text-jaman-navy">Guest menu</h2>
           <p className="text-xs text-[#4A5568]">
             Guests who scan a QR code see the menu you last published, never a half-finished edit.
             {status ? ` Live now: version ${status.publishedVersion || 'none yet'}.` : ''}
           </p>
         </div>
         {status && (
-          <span className={`text-[11px] font-black px-2.5 py-1 rounded-full border ${dirty ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${dirty ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
             {dirty ? 'Unpublished changes' : 'Up to date'}
           </span>
         )}
@@ -89,12 +89,12 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
       )}
       <div className="flex flex-wrap gap-2">
         <input className={`${input} flex-1 min-w-[12rem]`} value={note} maxLength={200} onChange={(e) => setNote(e.target.value)} placeholder="What changed? (optional, for your records)" />
-        <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold disabled:opacity-60">
+        <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold disabled:opacity-60">
           <Send className="w-4 h-4" /> {busy ? 'Publishing…' : 'Publish to guests'}
         </button>
       </div>
       <div>
-        <button type="button" onClick={showPreview} className="text-xs font-bold text-jaman-saffron">Preview what guests will see</button>
+        <button type="button" onClick={showPreview} className="text-xs font-bold text-brand">Preview what guests will see</button>
         {preview && (
           <div className="mt-2 text-xs text-slate-600">
             <p><b>{preview.items}</b> dishes would be shown to guests.</p>
@@ -135,8 +135,8 @@ const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: Modifier
   };
 
   return (
-    <div className={`${card} space-y-3 border-jaman-saffron`}>
-      <h3 className="text-sm font-extrabold text-jaman-navy">{group ? `Edit "${group.name}"` : 'New customisation group'}</h3>
+    <div className={`${card} space-y-3 border-brand`}>
+      <h3 className="text-sm font-bold text-jaman-navy">{group ? `Edit "${group.name}"` : 'New customisation group'}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="text-xs font-bold text-slate-600">Name shown to guests<input className={input} value={name} maxLength={60} onChange={(e) => setName(e.target.value)} placeholder="e.g. Choose your cheese" /></label>
         <label className="text-xs font-bold text-slate-600">Short help text (optional)<input className={input} value={description} maxLength={120} onChange={(e) => setDescription(e.target.value)} /></label>
@@ -144,7 +144,7 @@ const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: Modifier
         <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
           Choose at least <input type="number" min={0} className="w-16 bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5" value={min} onChange={(e) => setMin(e.target.value)} />
           and at most <input type="number" min={0} className="w-16 bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5" value={max} onChange={(e) => setMax(e.target.value)} />
-          <span className="font-normal text-slate-400">(0 = no limit)</span>
+          <span className="font-normal text-slate-500">(0 = no limit)</span>
         </div>
       </div>
       <div className="space-y-2">
@@ -161,11 +161,11 @@ const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: Modifier
             <button type="button" aria-label="Remove option" onClick={() => setOptions((all) => all.filter((_, idx) => idx !== i))} className="p-1 text-rose-500"><Trash2 className="w-4 h-4" /></button>
           </div>
         ))}
-        <button type="button" onClick={() => setOptions((o) => [...o, blankOption()])} className="text-xs font-bold text-jaman-saffron inline-flex items-center gap-1"><Plus className="w-3.5 h-3.5" /> Add option</button>
+        <button type="button" onClick={() => setOptions((o) => [...o, blankOption()])} className="text-xs font-bold text-brand inline-flex items-center gap-1"><Plus className="w-3.5 h-3.5" /> Add option</button>
       </div>
       {error && <p role="alert" className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2">{error}</p>}
       <div className="flex gap-2">
-        <button type="button" onClick={save} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold">Save group</button>
+        <button type="button" onClick={save} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold">Save group</button>
         <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border border-jaman-border text-sm font-bold">Cancel</button>
       </div>
     </div>
@@ -188,8 +188,8 @@ const TaxEditor: React.FC<{ tax: TaxGroup | null; onSaved: () => void; onCancel:
     }
   };
   return (
-    <div className={`${card} space-y-3 border-jaman-saffron`}>
-      <h3 className="text-sm font-extrabold text-jaman-navy">{tax ? `Edit "${tax.name}"` : 'New tax group'}</h3>
+    <div className={`${card} space-y-3 border-brand`}>
+      <h3 className="text-sm font-bold text-jaman-navy">{tax ? `Edit "${tax.name}"` : 'New tax group'}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="text-xs font-bold text-slate-600">Name<input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. GST 5%" /></label>
         <label className="text-xs font-bold text-slate-600">Total GST %<input type="number" min={0} max={100} step="0.5" className={input} value={total} onChange={(e) => setTotal(e.target.value)} /></label>
@@ -199,7 +199,7 @@ const TaxEditor: React.FC<{ tax: TaxGroup | null; onSaved: () => void; onCancel:
       <p className="text-[11px] text-slate-500">Split evenly into CGST and SGST on the bill.</p>
       {error && <p role="alert" className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2">{error}</p>}
       <div className="flex gap-2">
-        <button type="button" onClick={save} className="px-4 py-2 rounded-xl bg-jaman-saffron text-white text-sm font-bold">Save tax group</button>
+        <button type="button" onClick={save} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold">Save tax group</button>
         <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border border-jaman-border text-sm font-bold">Cancel</button>
       </div>
     </div>
@@ -240,7 +240,7 @@ const BranchMenuPanel: React.FC<{ showToast: (m: string) => void; onChanged: () 
 
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-extrabold text-jaman-navy">Branch prices &amp; availability</h2>
+      <h2 className="text-base font-bold text-jaman-navy">Branch prices &amp; availability</h2>
       <div className={`${card} space-y-3`}>
         <select className={input} value={branchId} onChange={(e) => setBranchId(e.target.value)}>
           {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -252,7 +252,7 @@ const BranchMenuPanel: React.FC<{ showToast: (m: string) => void; onChanged: () 
             const draft = drafts[i.id] ?? (o.price !== undefined ? String(o.price) : '');
             return (
               <li key={i.id} className="py-2 flex flex-wrap items-center gap-2 text-sm">
-                <span className="flex-1 min-w-[10rem] font-semibold text-jaman-navy">{i.name} <span className="text-xs text-slate-400">{inr(i.price)}</span></span>
+                <span className="flex-1 min-w-[10rem] font-semibold text-jaman-navy">{i.name} <span className="text-xs text-slate-500">{inr(i.price)}</span></span>
                 <input type="number" min={0} step="0.5" className="w-28 bg-jaman-ivory border border-jaman-border rounded-xl px-2 py-1.5 text-sm" placeholder="Same price" value={draft} onChange={(e) => setDrafts((d) => ({ ...d, [i.id]: e.target.value }))}
                   onBlur={() => { const v = draft.trim() === '' ? null : Number(draft); if ((v ?? undefined) !== o.price && (v === null || Number.isFinite(v))) void save(i.id, { price: v }); }} aria-label={`${i.name} price in this branch`} />
                 <label className="text-xs flex items-center gap-1"><input type="checkbox" checked={o.isAvailable !== false} onChange={(e) => void save(i.id, { isAvailable: e.target.checked ? null : false })} /> Sold here</label>
@@ -293,7 +293,7 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy">Customisations &amp; Tax</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Customisations &amp; Tax</h1>
         <p className="text-sm text-[#4A5568] mt-1">Choices guests can add to a dish (cheese, size, spice) and the tax each dish carries. Attach them to dishes in Menu &amp; Categories.</p>
       </div>
 
@@ -301,7 +301,7 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-jaman-navy">Customisation groups</h2>
+          <h2 className="text-base font-bold text-jaman-navy">Customisation groups</h2>
           <button type="button" onClick={() => setEditingGroup('new')} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-jaman-navy text-white text-xs font-bold"><Plus className="w-3.5 h-3.5" /> New group</button>
         </div>
         {editingGroup && (
@@ -316,9 +316,9 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
         {groups.map((g) => (
           <div key={g.id} className={`${card} flex flex-wrap items-start justify-between gap-3`}>
             <div className="min-w-0">
-              <p className="font-extrabold text-jaman-navy text-sm">{g.name} {g.isRequired && <span className="ml-1 text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">Required</span>}</p>
+              <p className="font-bold text-jaman-navy text-sm">{g.name} {g.isRequired && <span className="ml-1 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">Required</span>}</p>
               <p className="text-xs text-slate-500 mt-0.5">{g.options.map((o) => `${o.name}${o.priceDelta ? ` (+${inr(o.priceDelta)})` : ''}${o.isAvailable ? '' : ' [off]'}`).join(', ') || 'No options'}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Used on {ModifierAuthoring.usedBy(g.id).length} dish(es)</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Used on {ModifierAuthoring.usedBy(g.id).length} dish(es)</p>
             </div>
             <div className="flex gap-2">
               <button type="button" aria-label={`Edit ${g.name}`} onClick={() => setEditingGroup(g)} className="p-2 rounded-lg border border-jaman-border"><Pencil className="w-4 h-4" /></button>
@@ -332,7 +332,7 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-jaman-navy">Tax groups</h2>
+          <h2 className="text-base font-bold text-jaman-navy">Tax groups</h2>
           <button type="button" onClick={() => setEditingTax('new')} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-jaman-navy text-white text-xs font-bold"><Plus className="w-3.5 h-3.5" /> New tax group</button>
         </div>
         {editingTax && (
@@ -342,7 +342,7 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
         {taxes.map((t) => (
           <div key={t.id} className={`${card} flex flex-wrap items-center justify-between gap-3`}>
             <div>
-              <p className="font-extrabold text-jaman-navy text-sm">{t.name} {!t.isActive && <span className="text-[10px] text-slate-400">(not in use)</span>}</p>
+              <p className="font-bold text-jaman-navy text-sm">{t.name} {!t.isActive && <span className="text-[11px] text-slate-500">(not in use)</span>}</p>
               <p className="text-xs text-slate-500">{t.igstPercent || t.cgstPercent + t.sgstPercent}% · {t.isInclusive ? 'included in dish price' : 'added on top of dish price'} · {TaxAuthoring.usedBy(t.id).length} dish(es)</p>
             </div>
             <div className="flex gap-2">

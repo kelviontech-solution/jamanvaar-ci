@@ -34,8 +34,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Layers,
-  Sparkles
-} from 'lucide-react';
+  Sparkles, X } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
 import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
 
@@ -291,10 +290,10 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
             <div>
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-jaman-navy text-white flex items-center justify-center shadow-xs">
-                  <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
+                  <ShoppingBag className="w-5 h-5 text-slate-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
                     Orders & Order History
                   </h1>
                   <p className="text-xs text-[#4A5568] mt-0.5">
@@ -314,7 +313,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] shadow-xs flex items-center gap-1.5 ${
                   filterPreset === 'TODAY'
-                    ? 'bg-jaman-saffron text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-white border border-jaman-border text-jaman-navy hover:bg-slate-50'
                 }`}
               >
@@ -345,16 +344,16 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Search Bar & Date Filter Presets Ribbon */}
-          <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
+          <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-3">
             {/* Search across Days */}
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={daysSearchQuery}
                 onChange={(e) => setDaysSearchQuery(e.target.value)}
                 placeholder="Search orders, bill no., token, customer, table, cashier, or dish name..."
-                className="w-full bg-jaman-cream border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron min-h-[44px]"
+                className="w-full bg-jaman-cream border border-jaman-border rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand min-h-[44px]"
               />
             </div>
 
@@ -377,9 +376,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                       setIsCustomDateOpen(true);
                     }
                   }}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all shrink-0 min-h-[38px] ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 min-h-[38px] ${
                     filterPreset === preset.id
-                      ? 'bg-jaman-navy text-white shadow-xs'
+                      ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                       : 'bg-jaman-cream text-slate-600 hover:bg-slate-200 border border-jaman-border'
                   }`}
                 >
@@ -425,43 +424,43 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <div
                 key={day.dateKey}
                 onClick={() => handleSelectDay(day.dateKey)}
-                className={`bg-white rounded-3xl border-2 transition-all p-5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between space-y-4 group ${
+                className={`bg-white rounded-2xl border-2 transition-all p-5 shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between space-y-4 group ${
                   day.isToday
-                    ? 'border-jaman-saffron ring-2 ring-jaman-saffron/15 bg-gradient-to-b from-orange-50/20 to-white'
+                    ? 'border-brand ring-2 ring-brand/15 bg-orange-50/30'
                     : 'border-jaman-border hover:border-jaman-navy'
                 }`}
               >
                 {/* Card Top: Date, Day of Week & Status */}
                 <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="font-black text-sm text-jaman-navy uppercase tracking-wide">
+                    <h3 className="font-bold text-sm text-jaman-navy uppercase tracking-wide">
                       {day.formattedDate}
                     </h3>
                     <span className="text-xs text-slate-500 font-semibold">{day.dayOfWeek}</span>
                   </div>
 
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
                       day.isToday
-                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1 animate-pulse'
+                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1'
                         : 'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}
                   >
-                    {day.isToday ? '● LIVE TODAY' : '✓ COMPLETED'}
+                    {day.isToday ? '● LIVE TODAY' : 'COMPLETED'}
                   </span>
                 </div>
 
                 {/* Main Sales & Order KPI */}
                 <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
                     TOTAL SALES
                   </span>
-                  <div className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-bold text-jaman-navy font-mono tracking-tight">
                     {formatINR(day.totalSales)}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-600 font-bold pt-1">
                     <span className="flex items-center gap-1 text-jaman-navy">
-                      <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
+                      <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
                       <span>{day.orderCount} Orders</span>
                     </span>
                     <span>•</span>
@@ -473,18 +472,18 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
                 {/* Payment Breakdown Chips */}
                 <div className="p-3 bg-jaman-cream rounded-2xl border border-jaman-border space-y-1.5 text-xs">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
                     PAYMENT ALLOCATION:
                   </span>
                   <div className="flex flex-wrap items-center gap-2 text-xs font-mono font-bold">
                     <span className="bg-emerald-50 text-emerald-900 px-2 py-0.5 rounded-md border border-emerald-200">
-                      💵 {formatINR(day.paymentBreakdown.cash)}
+                      {formatINR(day.paymentBreakdown.cash)}
                     </span>
                     <span className="bg-blue-50 text-blue-900 px-2 py-0.5 rounded-md border border-blue-200">
-                      📱 UPI {formatINR(day.paymentBreakdown.upi)}
+                      UPI {formatINR(day.paymentBreakdown.upi)}
                     </span>
                     <span className="bg-purple-50 text-purple-900 px-2 py-0.5 rounded-md border border-purple-200">
-                      💳 Card {formatINR(day.paymentBreakdown.card)}
+                      Card {formatINR(day.paymentBreakdown.card)}
                     </span>
                   </div>
                 </div>
@@ -508,9 +507,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                       e.stopPropagation();
                       handleSelectDay(day.dateKey);
                     }}
-                    className={`w-full py-3 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs min-h-[44px] ${
+                    className={`w-full py-3 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-xs min-h-[44px] ${
                       day.isToday
-                        ? 'bg-jaman-saffron hover:bg-[#EA580C] text-white'
+                        ? 'bg-brand hover:bg-brand-hover active:bg-brand-press text-white'
                         : 'bg-jaman-navy hover:bg-jaman-darkBorder text-white'
                     }`}
                   >
@@ -557,24 +556,24 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Top Drill-Down Header & Navigation */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-jaman-border shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-jaman-border shadow-xs">
             <div className="space-y-1">
               <button
                 type="button"
                 onClick={() => setViewLevel('DAYS_LIST')}
-                className="inline-flex items-center gap-1.5 text-xs font-black text-jaman-saffron hover:underline mb-1"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline mb-1"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Back to Order History (All Days)</span>
               </button>
 
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy uppercase tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-bold text-jaman-navy uppercase tracking-tight">
                   {currentDaySummary.formattedDate}
                 </h2>
                 <span className="text-xs font-bold text-slate-500">({currentDaySummary.dayOfWeek})</span>
                 {currentDaySummary.isToday && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
                     ● TODAY LIVE
                   </span>
                 )}
@@ -627,36 +626,36 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           {/* Daily Reconciled Financials & Metrics Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-slate-400 block">GROSS SALES</span>
-              <span className="text-xl font-black font-mono text-jaman-navy">
+              <span className="text-[11px] font-bold uppercase text-slate-500 block">GROSS SALES</span>
+              <span className="text-xl font-bold font-mono text-jaman-navy">
                 {formatINR(currentDaySummary.grossSales)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-rose-500 block">DISCOUNTS GIVEN</span>
-              <span className="text-xl font-black font-mono text-rose-600">
+              <span className="text-[11px] font-bold uppercase text-rose-500 block">DISCOUNTS GIVEN</span>
+              <span className="text-xl font-bold font-mono text-rose-600">
                 -{formatINR(currentDaySummary.discounts)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-amber-500 block">REFUNDS ISSUED</span>
-              <span className="text-xl font-black font-mono text-amber-600">
+              <span className="text-[11px] font-bold uppercase text-amber-500 block">REFUNDS ISSUED</span>
+              <span className="text-xl font-bold font-mono text-amber-600">
                 -{formatINR(currentDaySummary.refunds)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-2xs">
-              <span className="text-[10px] font-black uppercase text-emerald-800 block">TOTAL BILLED (INCL. GST)</span>
-              <span className="text-xl font-black font-mono text-emerald-950">
+              <span className="text-[11px] font-bold uppercase text-emerald-800 block">TOTAL BILLED (INCL. GST)</span>
+              <span className="text-xl font-bold font-mono text-emerald-950">
                 {formatINR(currentDaySummary.netSales)}
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs col-span-2 sm:col-span-1">
-              <span className="text-[10px] font-black uppercase text-jaman-saffron block">GST TAX (5%)</span>
-              <span className="text-xl font-black font-mono text-jaman-saffron">
+              <span className="text-[11px] font-bold uppercase text-brand block">GST TAX (5%)</span>
+              <span className="text-xl font-bold font-mono text-brand">
                 {formatINR(currentDaySummary.tax)}
               </span>
             </div>
@@ -666,24 +665,24 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             {/* 1. Top Selling Items for this Day */}
-            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-jaman-saffron" />
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-slate-500" />
                 <span>Top Selling Dishes ({currentDaySummary.topItems.length})</span>
               </span>
               <div className="space-y-1.5 text-xs">
                 {currentDaySummary.topItems.slice(0, 4).map((it, idx) => (
                   <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
                     <span className="text-jaman-navy truncate">{idx + 1}. {it.name}</span>
-                    <span className="font-mono text-slate-600 shrink-0">{it.quantity} sold ({formatINR(it.revenue)})</span>
+                    <span className="tabular-nums text-slate-600 shrink-0">{it.quantity} sold ({formatINR(it.revenue)})</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 2. Cashier Performance */}
-            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-blue-600" />
                 <span>Cashier Performance</span>
               </span>
@@ -691,15 +690,15 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 {currentDaySummary.cashierBreakdown.map((c, idx) => (
                   <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
                     <span className="text-jaman-navy">{c.name}</span>
-                    <span className="font-mono text-slate-600">{c.ordersCount} orders • {formatINR(c.sales)}</span>
+                    <span className="tabular-nums text-slate-600">{c.ordersCount} orders • {formatINR(c.sales)}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 3. Captain Performance & Tables */}
-            <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-2.5">
-              <span className="text-xs font-black uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-purple-600" />
                 <span>Captain & Floor Activity</span>
               </span>
@@ -707,11 +706,11 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                 {currentDaySummary.captainBreakdown.map((capt, idx) => (
                   <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-jaman-cream font-bold">
                     <span className="text-jaman-navy">{capt.name}</span>
-                    <span className="font-mono text-slate-600">{capt.ordersCount} orders • {formatINR(capt.sales)}</span>
+                    <span className="tabular-nums text-slate-600">{capt.ordersCount} orders • {formatINR(capt.sales)}</span>
                   </div>
                 ))}
                 {currentDaySummary.captainBreakdown.length === 0 && (
-                  <div className="text-slate-400 text-center py-2 text-xs">All counter orders</div>
+                  <div className="text-slate-500 text-center py-2 text-xs">All counter orders</div>
                 )}
               </div>
             </div>
@@ -719,16 +718,16 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Search, Multi-Filters & Sorting Bar for this Day */}
-          <div className="bg-white p-4 rounded-3xl border border-jaman-border shadow-xs space-y-3">
+          <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={drillSearchQuery}
                   onChange={(e) => setDrillSearchQuery(e.target.value)}
                   placeholder={`Search ${currentDaySummary.orderCount} orders on this day...`}
-                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron min-h-[40px]"
+                  className="w-full bg-jaman-cream border border-jaman-border rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-brand min-h-[40px]"
                 />
               </div>
 
@@ -786,10 +785,10 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Daily Orders Table (Full Desktop Table) */}
-          <div data-print-doc="orders-report" className="bg-white rounded-3xl border border-jaman-border overflow-hidden shadow-xs">
+          <div data-print-doc="orders-report" className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black">
+                <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold">
                   <tr>
                     <th className="p-3.5">Order #</th>
                     <th className="p-3.5">Token</th>
@@ -810,7 +809,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                     <tr key={ord.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3.5 font-bold font-mono text-jaman-navy">{ord.orderNumber}</td>
                       <td className="p-3.5">
-                        <span className="bg-[#FFF4ED] text-jaman-saffron font-black text-xs px-2 py-0.5 rounded font-mono">
+                        <span className="bg-brand/[0.07] text-brand font-bold text-xs px-2 py-0.5 rounded font-mono">
                           #{ord.tokenNumber}
                         </span>
                       </td>
@@ -824,22 +823,22 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                       <td className="p-3.5">
                         <span className="font-bold text-jaman-navy block">{ord.customerName || 'Walk-in'}</span>
                         {ord.customerPhone && (
-                          <span className="text-[10px] text-slate-400 font-mono">{ord.customerPhone}</span>
+                          <span className="text-[11px] text-slate-500 font-mono">{ord.customerPhone}</span>
                         )}
                       </td>
                       <td className="p-3.5 font-semibold text-slate-600">{ord.items.length} items</td>
-                      <td className="p-3.5 font-mono font-black text-jaman-navy text-sm">
+                      <td className="p-3.5 font-mono font-bold text-jaman-navy text-sm">
                         {formatINR(ord.totalAmount)}
                       </td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded font-bold text-[10px] uppercase bg-slate-100 text-slate-700">
+                        <span className="px-2 py-0.5 rounded font-bold text-[11px] uppercase bg-slate-100 text-slate-700">
                           {isUnpaidOpenOrder(ord) ? 'Unpaid' : ord.paymentMethod}
                         </span>
                       </td>
                       <td className="p-3.5 text-slate-600 font-semibold">{ord.cashierName || ord.captainName || '—'}</td>
                       <td className="p-3.5">
                         <span
-                          className={`px-2 py-0.5 rounded font-black text-[9px] uppercase ${
+                          className={`px-2 py-0.5 rounded font-bold text-[10px] uppercase ${
                             ord.orderStatus === 'COMPLETED'
                               ? 'bg-emerald-100 text-emerald-800'
                               : ord.orderStatus === 'CANCELLED'
@@ -879,7 +878,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
                   {paginatedOrders.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="text-center py-10 text-slate-400 font-medium text-xs">
+                      <td colSpan={12} className="text-center py-10 text-slate-500 font-medium text-xs">
                         No orders match the selected filters for this day.
                       </td>
                     </tr>
@@ -959,11 +958,11 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
       {/* ========================================================================= */}
       {isReceiptModalOpen && receiptOrder && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-black text-sm text-jaman-navy">Print Thermal Bill</h3>
-              <button onClick={() => setIsReceiptModalOpen(false)} className="text-slate-400 hover:text-slate-700">
-                ✕
+              <h3 className="font-bold text-sm text-jaman-navy">Print Thermal Bill</h3>
+              <button onClick={() => setIsReceiptModalOpen(false)} className="text-slate-500 hover:text-slate-700">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -982,7 +981,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={() => printThermalReceipt(receiptOrder, '80mm', ReceiptRepository.getConfig())}
-                className="flex-1 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs min-h-[44px]"
+                className="flex-1 py-2.5 bg-brand hover:bg-brand-hover active:bg-brand-press text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs min-h-[44px]"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Bill</span>

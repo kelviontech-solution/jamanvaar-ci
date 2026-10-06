@@ -134,14 +134,12 @@ body {
 .dash-hero-card {
   background: #FFFFFF;
   border: 1px solid #E6DEC9;
-  box-shadow: 0 4px 20px -4px rgba(11, 37, 58, 0.06), 0 1px 4px 0 rgba(11, 37, 58, 0.03);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(11, 37, 58, 0.04);
+  transition: border-color 0.2s ease;
 }
 
 .dash-hero-card:hover {
   border-color: #D1C7AF;
-  box-shadow: 0 10px 28px -6px rgba(11, 37, 58, 0.1), 0 2px 8px 0 rgba(11, 37, 58, 0.04);
-  transform: translateY(-1px);
 }
 
 .dash-subtle-card {
@@ -178,6 +176,102 @@ body {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* jv-focus: a restrained brand ring for keyboard users on buttons and links (inputs keep their own border focus). */
+button:focus-visible,
+a:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible {
+  outline: 2px solid rgb(191 84 15 / 0.55);
+  outline-offset: 2px;
+}
+
+/* ========================================================================= */
+/* MOTION — calm, short, CSS-only. Everything respects prefers-reduced-motion. */
+/* ========================================================================= */
+
+/* The admin already uses `animate-in fade-in zoom-in-95 slide-in-from-*` on dropdowns, toasts, modals and drawers,
+   but the plugin that defines them is not installed, so they never animated. These small shims define just those. */
+@keyframes jv-enter {
+  from {
+    opacity: var(--jv-op, 1);
+    transform: translate3d(var(--jv-x, 0), var(--jv-y, 0), 0) scale(var(--jv-s, 1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-in {
+  animation: jv-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.animate-in.duration-100 { animation-duration: 120ms; }
+.animate-in.duration-150 { animation-duration: 160ms; }
+.animate-in.duration-200 { animation-duration: 200ms; }
+.animate-in.duration-300 { animation-duration: 260ms; }
+.fade-in { --jv-op: 0; }
+.zoom-in-95 { --jv-s: 0.97; }
+.slide-in-from-top-2 { --jv-y: -0.5rem; }
+.slide-in-from-top { --jv-y: -0.75rem; }
+.slide-in-from-bottom-5 { --jv-y: 0.75rem; }
+.slide-in-from-right { --jv-x: 1.5rem; }
+
+/* Switching section: the new view eases in (opacity + 6px rise). */
+@keyframes jv-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.jv-page-enter {
+  animation: jv-fade-up 220ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* A group of cards appears one after another instead of all at once. */
+.jv-stagger > * {
+  animation: jv-fade-up 260ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.jv-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.jv-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.jv-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.jv-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.jv-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.jv-stagger > *:nth-child(6) { animation-delay: 200ms; }
+.jv-stagger > *:nth-child(n+7) { animation-delay: 240ms; }
+
+/* Chart bars grow from the baseline, left to right. */
+@keyframes jv-bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+.jv-bar {
+  transform-origin: bottom;
+  animation: jv-bar-grow 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+/* Interactive surfaces: smooth colour changes, nothing bounces. */
+.card-summary-premium,
+.dash-subtle-card,
+.card-data-premium {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .jv-page-enter,
+  .jv-stagger > *,
+  .jv-bar {
+    animation: none !important;
+  }
+}
+@media print {
+  .animate-in,
+  .jv-page-enter,
+  .jv-stagger > *,
+  .jv-bar {
+    animation: none !important;
+  }
 }
 
 /* ========================================================================= */

@@ -39,10 +39,10 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">
               Shift & Cash Drawer Ledger
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
               REGISTER RECONCILIATION
             </span>
           </div>
@@ -53,7 +53,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={onOpenEodModal}
-            className="px-4 py-2.5 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-jaman-saffron/25 active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-brand/25 active:scale-95 transition-all cursor-pointer"
           >
             <FileText className="w-4 h-4" />
             <span>Generate Official EOD Z-Report</span>
@@ -62,7 +62,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
             onClick={onOpenCashDropModal}
             className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-2 shadow-2xs active:scale-95 transition-all cursor-pointer"
           >
-            <Coins className="w-4 h-4 text-jaman-saffron" />
+            <Coins className="w-4 h-4 text-slate-500" />
             <span>Record Cash Movement</span>
           </button>
         </div>
@@ -73,21 +73,21 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
         <div data-print-doc="shift-slip" className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-[#FFF4ED] border border-[#FED7AA] flex items-center justify-center text-jaman-saffron">
+              <div className="w-11 h-11 rounded-2xl bg-brand/[0.07] border border-[#FED7AA] flex items-center justify-center text-brand">
                 <Coins className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-jaman-saffron uppercase tracking-wider">
+                  <span className="text-[11px] font-bold text-brand uppercase tracking-wider">
                     Active Register Shift
                   </span>
-                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-[10px] rounded-full flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[11px] rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     OPEN & RECORDING
                   </span>
                 </div>
-                <h3 className="text-xl font-black text-jaman-navy mt-0.5">{activeShift.cashierName}</h3>
-                <span className="text-xs text-slate-400">
+                <h3 className="text-xl font-bold text-jaman-navy mt-0.5">{activeShift.cashierName}</h3>
+                <span className="text-xs text-slate-500">
                   Terminal: POS-01 • Opened at {formatTime(activeShift.openedAt)}
                 </span>
               </div>
@@ -98,7 +98,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
                 onClick={onOpenCashDropModal}
                 className="px-3.5 py-2 rounded-xl bg-jaman-cream hover:bg-[#F2EFE9] border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <Coins className="w-3.5 h-3.5 text-jaman-saffron" />
+                <Coins className="w-3.5 h-3.5 text-slate-500" />
                 <span>Add Drop / Payout</span>
               </button>
               <button
@@ -117,40 +117,40 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
               <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">
                 Opening Float
               </span>
-              <div className="text-xl sm:text-2xl font-mono font-black text-jaman-navy">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-jaman-navy">
                 {formatINR(activeShift.openingCash)}
               </div>
-              <span className="text-[10px] text-slate-400 font-medium block">Starting Till Reserve</span>
+              <span className="text-[11px] text-slate-500 font-medium block">Starting Till Reserve</span>
             </div>
 
             <div className="p-4 bg-jaman-cream rounded-2xl border border-jaman-border space-y-1">
               <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">
                 Cash Sales Today
               </span>
-              <div className="text-xl sm:text-2xl font-mono font-black text-emerald-700">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-emerald-700">
                 {formatINR(dailyReport.paymentBreakdown.cash)}
               </div>
-              <span className="text-[10px] text-emerald-600 font-medium block">Physical In-Drawer Cash</span>
+              <span className="text-[11px] text-emerald-600 font-medium block">Physical In-Drawer Cash</span>
             </div>
 
             <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/80 space-y-1">
               <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider block">
                 Expected in Drawer
               </span>
-              <div className="text-xl sm:text-2xl font-mono font-black text-jaman-navy">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-jaman-navy">
                 {formatINR(activeShift.openingCash + dailyReport.paymentBreakdown.cash)}
               </div>
-              <span className="text-[10px] text-amber-700 font-medium block">Opening Float + Cash Sales</span>
+              <span className="text-[11px] text-amber-700 font-medium block">Opening Float + Cash Sales</span>
             </div>
 
             <div className="p-4 bg-jaman-cream rounded-2xl border border-jaman-border space-y-1">
               <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">
                 Digital Non-Cash Volume
               </span>
-              <div className="text-xl sm:text-2xl font-mono font-black text-blue-700">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-blue-700">
                 {formatINR(dailyReport.paymentBreakdown.upi + dailyReport.paymentBreakdown.card)}
               </div>
-              <span className="text-[10px] text-blue-600 font-medium block">UPI QR + Card Swipe</span>
+              <span className="text-[11px] text-blue-600 font-medium block">UPI QR + Card Swipe</span>
             </div>
           </div>
 
@@ -159,7 +159,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <div>
-                <span className="font-extrabold text-emerald-900 block">
+                <span className="font-bold text-emerald-900 block">
                   Drawer Register Verified & In Balance
                 </span>
                 <span className="text-emerald-700 text-[11px]">
@@ -177,18 +177,18 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
         </div>
       ) : (
         <div className="bg-white rounded-2xl p-12 border border-jaman-border text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-brand flex items-center justify-center mx-auto">
             <Coins className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-extrabold text-jaman-navy text-base">No Active Register Shift</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto mt-0.5">
+            <h3 className="font-bold text-jaman-navy text-base">No Active Register Shift</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-0.5">
               Start a new cashier register shift with an opening cash float to begin recording sales, cash drops, and drawer balance.
             </p>
           </div>
           <button
             onClick={onOpenCashDropModal}
-            className="px-4 py-2 rounded-xl bg-jaman-saffron text-white font-bold text-xs shadow-xs cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-xs cursor-pointer"
           >
             Open Cashier Shift
           </button>
@@ -199,14 +199,14 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
       {shifts.length > 0 && (
         <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs">
           <div className="p-4 bg-jaman-cream border-b border-jaman-border flex items-center justify-between">
-            <span className="font-extrabold text-sm text-jaman-navy">
+            <span className="font-bold text-sm text-jaman-navy">
               Register Shift Audit History ({shifts.length})
             </span>
-            <span className="text-xs text-slate-400 font-semibold">Local Offline Ledger</span>
+            <span className="text-xs text-slate-500 font-semibold">Local Offline Ledger</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-black text-[11px] tracking-wider">
+              <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Cashier Name</th>
                   <th className="p-4">Shift Status</th>
@@ -219,10 +219,10 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
               <tbody className="divide-y divide-slate-100 font-medium">
                 {shifts.map((s) => (
                   <tr key={s.id} className="hover:bg-[#FDFBF7] transition-colors">
-                    <td className="p-4 font-extrabold text-jaman-navy">{s.cashierName}</td>
+                    <td className="p-4 font-bold text-jaman-navy">{s.cashierName}</td>
                     <td className="p-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                           s.status === 'OPEN'
                             ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                             : 'bg-slate-100 text-slate-700'
@@ -230,14 +230,14 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
-                            s.status === 'OPEN' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                            s.status === 'OPEN' ? 'bg-emerald-500' : 'bg-slate-400'
                           }`}
                         ></span>
                         {s.status}
                       </span>
                     </td>
                     <td className="p-4 text-slate-500 font-mono text-[11px]">{formatTime(s.openedAt)}</td>
-                    <td className="p-4 font-mono font-bold text-jaman-navy">{formatINR(s.openingCash)}</td>
+                    <td className="p-4 tabular-nums font-bold text-jaman-navy">{formatINR(s.openingCash)}</td>
                     <td className="p-4 font-mono font-bold text-emerald-700">
                       {formatINR(s.openingCash + (s.status === 'OPEN' ? dailyReport.paymentBreakdown.cash : 0))}
                     </td>

@@ -38,7 +38,7 @@ export const InventoryControlModule: React.FC<Props> = ({ showToast }) => {
   return (
     <div className="space-y-5 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Purchasing & Stock Control</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Purchasing & Stock Control</h1>
         <p className="text-xs sm:text-sm text-[#4A5568] mt-0.5">Record what you buy and at what price, count the shelves, see what to reorder and what is about to expire.</p>
       </div>
       <div className="flex flex-wrap gap-2" role="tablist">
@@ -49,7 +49,7 @@ export const InventoryControlModule: React.FC<Props> = ({ showToast }) => {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold ${tab === t.id ? 'bg-jaman-navy text-white border-jaman-navy' : 'bg-white text-jaman-navy border-jaman-border hover:bg-slate-50'}`}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold ${tab === t.id ? 'bg-brand/[0.09] text-brand border-brand/40 font-semibold' : 'bg-white text-jaman-navy border-jaman-border hover:bg-slate-50'}`}
           >
             <t.icon className="w-3.5 h-3.5" /> {t.label}
           </button>
@@ -99,7 +99,7 @@ function ReceiveGoods({ showToast }: Props) {
   return (
     <div className="space-y-4">
       <form onSubmit={submit} className={`${card} space-y-4`} noValidate>
-        <h2 className="text-sm font-extrabold text-jaman-navy">New delivery</h2>
+        <h2 className="text-sm font-bold text-jaman-navy">New delivery</h2>
         {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</div>}
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-xs font-bold text-slate-700">Supplier
@@ -144,14 +144,14 @@ function ReceiveGoods({ showToast }: Props) {
             <Plus className="w-3.5 h-3.5" /> Add another item
           </button>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-black text-jaman-navy">Total {formatINR(total)}</span>
+            <span className="text-sm font-bold text-jaman-navy">Total {formatINR(total)}</span>
             <button type="submit" className={primary}>Book delivery</button>
           </div>
         </div>
       </form>
 
       <div className={card}>
-        <h2 className="text-sm font-extrabold text-jaman-navy mb-3">Recent deliveries</h2>
+        <h2 className="text-sm font-bold text-jaman-navy mb-3">Recent deliveries</h2>
         {InventoryControl.getGoodsReceipts().length === 0 ? (
           <p className="text-xs text-slate-500">Nothing received yet.</p>
         ) : (
@@ -192,7 +192,7 @@ function Suppliers({ showToast }: Props) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className={`${card} space-y-3`}>
-        <h2 className="text-sm font-extrabold text-jaman-navy">Suppliers</h2>
+        <h2 className="text-sm font-bold text-jaman-navy">Suppliers</h2>
         <form onSubmit={add} className="grid gap-2 sm:grid-cols-2" noValidate>
           <input aria-label="Supplier name" placeholder="Supplier name" className={field} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <input aria-label="Contact person" placeholder="Contact person" className={field} value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} />
@@ -205,7 +205,7 @@ function Suppliers({ showToast }: Props) {
           {suppliers.length === 0 && <li className="py-2 text-xs text-slate-500">No suppliers yet.</li>}
           {suppliers.map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-2 py-2 text-xs">
-              <span className={s.isActive ? '' : 'text-slate-400 line-through'}>
+              <span className={s.isActive ? '' : 'text-slate-500 line-through'}>
                 <strong className="text-jaman-navy">{s.name}</strong>
                 <span className="block text-slate-500">{[s.contactName, s.phone, s.paymentTerms].filter(Boolean).join(' · ') || '—'}</span>
               </span>
@@ -217,7 +217,7 @@ function Suppliers({ showToast }: Props) {
         </ul>
       </div>
       <div className={`${card} space-y-3`}>
-        <h2 className="text-sm font-extrabold text-jaman-navy">Price history</h2>
+        <h2 className="text-sm font-bold text-jaman-navy">Price history</h2>
         <select aria-label="Item" className={field} value={historyItem} onChange={(e) => setHistoryItem(e.target.value)}>
           <option value="">Choose an item…</option>
           {items.map((it) => <option key={it.id} value={it.id}>{it.name}</option>)}
@@ -286,7 +286,7 @@ function StockCountPanel({ showToast }: Props) {
   if (items.length === 0) return <div className={card}>No stock items to count yet.</div>;
   return (
     <div className={`${card} space-y-3`}>
-      <h2 className="text-sm font-extrabold text-jaman-navy">Count the shelves</h2>
+      <h2 className="text-sm font-bold text-jaman-navy">Count the shelves</h2>
       <p className="text-xs text-slate-500">Type what you physically counted. Leave an item blank to skip it. Stock is set to your count and each difference is recorded.</p>
       <table className="w-full text-left text-xs">
         <thead className="text-slate-500 uppercase"><tr><th className="py-1">Item</th><th className="text-right">In system</th><th className="w-32 text-right">Counted</th><th className="text-right">Difference</th></tr></thead>
@@ -321,7 +321,7 @@ function StockCountHistory() {
   if (counts.length === 0) return null;
   return (
     <div className="pt-3 border-t border-slate-100">
-      <h3 className="text-xs font-extrabold text-jaman-navy mb-2">Recent counts</h3>
+      <h3 className="text-xs font-bold text-jaman-navy mb-2">Recent counts</h3>
       <ul className="text-xs space-y-1">
         {counts.map((c) => (
           <li key={c.id} className="flex justify-between"><span className="font-mono">{c.number} · {day(c.countedAt)} · {c.countedBy}{c.approvedBy ? ` (approved by ${c.approvedBy})` : ''}</span><span className="font-bold">{formatINR(c.totalVarianceValue)}</span></li>
@@ -337,7 +337,7 @@ function ReorderAndExpiry() {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className={card}>
-        <h2 className="text-sm font-extrabold text-jaman-navy mb-3">What to buy</h2>
+        <h2 className="text-sm font-bold text-jaman-navy mb-3">What to buy</h2>
         {suggestions.length === 0 ? <p className="text-xs text-slate-500">Everything is comfortably stocked.</p> : (
           <table className="w-full text-left text-xs">
             <thead className="text-slate-500 uppercase"><tr><th>Item</th><th className="text-right">In stock</th><th className="text-right">Lasts</th><th className="text-right">Buy about</th></tr></thead>
@@ -355,7 +355,7 @@ function ReorderAndExpiry() {
         )}
       </div>
       <div className={card}>
-        <h2 className="text-sm font-extrabold text-jaman-navy mb-3">Expiring within a week</h2>
+        <h2 className="text-sm font-bold text-jaman-navy mb-3">Expiring within a week</h2>
         {expiring.length === 0 ? <p className="text-xs text-slate-500">Nothing is about to expire.</p> : (
           <ul className="divide-y divide-slate-100 text-xs">
             {expiring.map((b) => (
@@ -389,16 +389,16 @@ function CostingAndReports() {
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className={card}>
-          <h2 className="text-sm font-extrabold text-jaman-navy mb-1">Stock value</h2>
-          <p className="text-2xl font-black text-jaman-navy">{formatINR(valuation.total)}</p>
+          <h2 className="text-sm font-bold text-jaman-navy mb-1">Stock value</h2>
+          <p className="text-2xl font-bold text-jaman-navy">{formatINR(valuation.total)}</p>
           <ul className="mt-2 text-xs divide-y divide-slate-100">
             {valuation.byCategory.map((c) => <li key={c.category} className="flex justify-between py-1"><span>{c.category}</span><strong>{formatINR(c.value)}</strong></li>)}
           </ul>
           {valuation.negativeItems.length > 0 && <p className="mt-2 text-xs text-rose-700">Below zero: {valuation.negativeItems.map((n) => `${n.itemName} (${n.currentStock} ${n.unit})`).join(', ')}. Count these shelves.</p>}
         </div>
         <div className={card}>
-          <h2 className="text-sm font-extrabold text-jaman-navy mb-1">Wastage</h2>
-          <p className="text-2xl font-black text-rose-700">{formatINR(wastage.totalCost)}</p>
+          <h2 className="text-sm font-bold text-jaman-navy mb-1">Wastage</h2>
+          <p className="text-2xl font-bold text-rose-700">{formatINR(wastage.totalCost)}</p>
           <ul className="mt-2 text-xs divide-y divide-slate-100">
             {wastage.byReason.length === 0 && <li className="py-1 text-slate-500">No wastage recorded in this period.</li>}
             {wastage.byReason.map((r) => <li key={r.reason} className="flex justify-between py-1"><span>{WASTE_LABEL[r.reason] ?? r.reason}</span><strong>{formatINR(r.cost)}</strong></li>)}
@@ -406,14 +406,14 @@ function CostingAndReports() {
         </div>
       </div>
       <div className={card}>
-        <h2 className="text-sm font-extrabold text-jaman-navy mb-3">Dish cost and margin</h2>
+        <h2 className="text-sm font-bold text-jaman-navy mb-3">Dish cost and margin</h2>
         {dishes.length === 0 ? <p className="text-xs text-slate-500">Add recipes to see what each dish costs to make.</p> : (
           <table className="w-full text-left text-xs">
             <thead className="text-slate-500 uppercase"><tr><th>Dish</th><th className="text-right">Price</th><th className="text-right">Cost</th><th className="text-right">Food cost</th><th className="text-right">Margin</th></tr></thead>
             <tbody>
               {dishes.sort((a, b) => (b.foodCostPercent ?? 0) - (a.foodCostPercent ?? 0)).map((d) => (
                 <tr key={d.menuItemId} className="border-t border-slate-100">
-                  <td className="py-1.5 font-bold text-jaman-navy">{d.name}{d.incomplete && <span className="ml-2 text-[10px] font-bold text-amber-700">an ingredient could not be costed</span>}</td>
+                  <td className="py-1.5 font-bold text-jaman-navy">{d.name}{d.incomplete && <span className="ml-2 text-[11px] font-bold text-amber-700">an ingredient could not be costed</span>}</td>
                   <td className="text-right">{formatINR(d.price)}</td><td className="text-right">{formatINR(d.cost)}</td>
                   <td className={`text-right font-bold ${d.foodCostPercent !== null && d.foodCostPercent > 35 ? 'text-rose-600' : ''}`}>{d.foodCostPercent === null ? '—' : `${d.foodCostPercent}%`}</td>
                   <td className="text-right">{formatINR(d.marginAmount)}</td>
@@ -424,7 +424,7 @@ function CostingAndReports() {
         )}
       </div>
       <div className={card}>
-        <h2 className="text-sm font-extrabold text-jaman-navy mb-3">What was used (top 10 by value)</h2>
+        <h2 className="text-sm font-bold text-jaman-navy mb-3">What was used (top 10 by value)</h2>
         {consumption.length === 0 ? <p className="text-xs text-slate-500">No stock used in this period.</p> : (
           <table className="w-full text-left text-xs">
             <thead className="text-slate-500 uppercase"><tr><th>Item</th><th className="text-right">Sold</th><th className="text-right">Wasted</th><th className="text-right">Count adj.</th><th className="text-right">Value used</th></tr></thead>

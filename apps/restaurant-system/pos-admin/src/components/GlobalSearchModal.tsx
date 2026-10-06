@@ -93,19 +93,19 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       <div className="space-y-4 py-1">
         {/* Search Input */}
         <div className="relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             autoFocus
             placeholder="Search orders, token, dishes, SKU, customers, tables, staff..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-jaman-ivory border-2 border-jaman-border rounded-2xl pl-11 pr-10 py-3 text-sm font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron transition-all"
+            className="w-full bg-jaman-ivory border-2 border-jaman-border rounded-2xl pl-11 pr-10 py-3 text-sm font-bold text-jaman-navy focus:outline-none focus:border-brand transition-all"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
             </button>
@@ -117,8 +117,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Orders Section */}
           {results.orders.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#8C9BAE] uppercase">
-                <ShoppingBag className="w-3.5 h-3.5 text-jaman-saffron" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase">
+                <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
                 <span>Orders & Invoices ({results.orders.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -129,12 +129,12 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onSelectOrder(o);
                       onClose();
                     }}
-                    className="p-3 bg-white border border-jaman-border hover:border-jaman-saffron rounded-xl cursor-pointer transition-all hover:shadow-xs group flex justify-between items-center"
+                    className="p-3 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all hover:shadow-xs group flex justify-between items-center"
                   >
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-xs text-jaman-navy">{o.orderNumber}</span>
-                        <span className="bg-[#FFF4ED] text-jaman-saffron font-black text-[10px] px-1.5 py-0.5 rounded">
+                        <span className="bg-brand/[0.07] text-brand font-bold text-[11px] px-1.5 py-0.5 rounded">
                           #{o.tokenNumber}
                         </span>
                       </div>
@@ -143,10 +143,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono font-black text-xs text-emerald-700 block">
+                      <span className="font-mono font-bold text-xs text-emerald-700 block">
                         {formatINR(o.totalAmount)}
                       </span>
-                      <span className="text-[10px] font-bold uppercase text-slate-400">{o.paymentMethod}</span>
+                      <span className="text-[11px] font-bold uppercase text-slate-500">{o.paymentMethod}</span>
                     </div>
                   </div>
                 ))}
@@ -157,8 +157,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Dishes Section */}
           {results.items.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#8C9BAE] uppercase">
-                <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase">
+                <UtensilsCrossed className="w-3.5 h-3.5 text-slate-500" />
                 <span>Dishes & Menu ({results.items.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -169,18 +169,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onSelectMenuItem(i);
                       onClose();
                     }}
-                    className="p-3 bg-white border border-jaman-border hover:border-jaman-saffron rounded-xl cursor-pointer transition-all hover:shadow-xs group flex items-center justify-between"
+                    className="p-3 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all hover:shadow-xs group flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2.5">
                       <img src={i.imageUrl} alt={i.name} className="w-9 h-9 rounded-lg object-cover bg-slate-100" />
                       <div>
                         <span className="font-bold text-xs text-jaman-navy block">{i.name}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">{i.sku} • {i.kitchenStation}</span>
+                        <span className="text-[11px] text-slate-500 font-mono">{i.sku} • {i.kitchenStation}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono font-black text-xs text-emerald-700 block">₹{i.price}</span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${i.isAvailable ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                      <span className="tabular-nums font-bold text-xs text-emerald-700 block">₹{i.price}</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${i.isAvailable ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                         {i.isAvailable ? 'In Stock' : '86 Out'}
                       </span>
                     </div>
@@ -193,8 +193,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Customers Section */}
           {results.customers.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#8C9BAE] uppercase">
-                <Users className="w-3.5 h-3.5 text-jaman-saffron" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase">
+                <Users className="w-3.5 h-3.5 text-slate-500" />
                 <span>Customers CRM ({results.customers.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -205,14 +205,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onSelectCustomer(c);
                       onClose();
                     }}
-                    className="p-3 bg-white border border-jaman-border hover:border-jaman-saffron rounded-xl cursor-pointer transition-all hover:shadow-xs flex items-center justify-between"
+                    className="p-3 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all hover:shadow-xs flex items-center justify-between"
                   >
                     <div>
                       <span className="font-bold text-xs text-jaman-navy block">{c.name}</span>
                       <span className="text-[11px] font-mono text-slate-500">{c.phone}</span>
                     </div>
-                    <span className="text-xs font-black text-amber-600 font-mono">
-                      ⭐ {c.loyaltyPoints} Pts
+                    <span className="text-xs font-bold text-amber-600 font-mono">
+                      {c.loyaltyPoints} Pts
                     </span>
                   </div>
                 ))}
@@ -223,8 +223,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Tables Section */}
           {results.tables.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#8C9BAE] uppercase">
-                <Grid className="w-3.5 h-3.5 text-jaman-saffron" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase">
+                <Grid className="w-3.5 h-3.5 text-slate-500" />
                 <span>Dining Tables ({results.tables.length})</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -235,13 +235,13 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onSelectTable(t);
                       onClose();
                     }}
-                    className="p-2.5 bg-white border border-jaman-border hover:border-jaman-saffron rounded-xl cursor-pointer transition-all flex items-center justify-between"
+                    className="p-2.5 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all flex items-center justify-between"
                   >
                     <div>
                       <span className="font-bold text-xs text-jaman-navy block">Table {t.tableNumber}</span>
-                      <span className="text-[10px] text-slate-400">{t.capacity} Guests</span>
+                      <span className="text-[11px] text-slate-500">{t.capacity} Guests</span>
                     </div>
-                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${t.status === 'OCCUPIED' ? 'bg-jaman-saffron text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${t.status === 'OCCUPIED' ? 'bg-brand text-white' : 'bg-emerald-100 text-emerald-800'}`}>
                       {t.status}
                     </span>
                   </div>
@@ -253,8 +253,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Staff Section */}
           {results.staff.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#8C9BAE] uppercase">
-                <User className="w-3.5 h-3.5 text-jaman-saffron" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase">
+                <User className="w-3.5 h-3.5 text-slate-500" />
                 <span>Staff & Roles ({results.staff.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -265,13 +265,13 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onSelectStaff(u);
                       onClose();
                     }}
-                    className="p-2.5 bg-white border border-jaman-border hover:border-jaman-saffron rounded-xl cursor-pointer transition-all flex items-center justify-between"
+                    className="p-2.5 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all flex items-center justify-between"
                   >
                     <div>
                       <span className="font-bold text-xs text-jaman-navy block">{u.fullName}</span>
-                      <span className="text-[10px] text-slate-400">@{u.username}</span>
+                      <span className="text-[11px] text-slate-500">@{u.username}</span>
                     </div>
-                    <span className="text-[10px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded">
+                    <span className="text-[11px] font-bold uppercase bg-slate-100 px-2 py-0.5 rounded">
                       {u.roleId}
                     </span>
                   </div>
@@ -281,7 +281,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           )}
 
           {totalResults === 0 && (
-            <div className="py-10 text-center text-slate-400 text-xs">
+            <div className="py-10 text-center text-slate-500 text-xs">
               No matching orders, dishes, customers, tables, or staff found for "{query}".
             </div>
           )}

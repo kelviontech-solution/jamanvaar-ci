@@ -37,8 +37,8 @@ export const ChangeOwnerPasswordForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={submit} className="bg-white rounded-3xl p-5 border border-jaman-border shadow-2xs space-y-3">
-      <h3 className="text-sm font-black text-jaman-navy">Change owner password</h3>
+    <form onSubmit={submit} className="bg-white rounded-2xl p-5 border border-jaman-border shadow-2xs space-y-3">
+      <h3 className="text-sm font-bold text-jaman-navy">Change owner password</h3>
       <div className="form-grid">
         <div className="field">
           <label>Current password</label>

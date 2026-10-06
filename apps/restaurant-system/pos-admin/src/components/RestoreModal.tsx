@@ -97,7 +97,7 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
 
         {/* File Picker */}
         <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl text-center space-y-3 bg-jaman-ivory">
-          <Upload className="w-8 h-8 text-slate-400 mx-auto" />
+          <Upload className="w-8 h-8 text-slate-500 mx-auto" />
           <div>
             <label className="cursor-pointer px-4 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold rounded-xl shadow-xs inline-block transition-all">
               Choose JSON Backup File
@@ -126,20 +126,20 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               <div className="p-2 bg-jaman-ivory rounded-lg">
-                <span className="text-slate-400 block text-[10px]">Menu Dishes</span>
-                <span className="font-mono font-bold text-jaman-navy">{parsedData.menuItems?.length || 0}</span>
+                <span className="text-slate-500 block text-[11px]">Menu Dishes</span>
+                <span className="tabular-nums font-bold text-jaman-navy">{parsedData.menuItems?.length || 0}</span>
               </div>
               <div className="p-2 bg-jaman-ivory rounded-lg">
-                <span className="text-slate-400 block text-[10px]">Categories</span>
-                <span className="font-mono font-bold text-jaman-navy">{parsedData.categories?.length || 0}</span>
+                <span className="text-slate-500 block text-[11px]">Categories</span>
+                <span className="tabular-nums font-bold text-jaman-navy">{parsedData.categories?.length || 0}</span>
               </div>
               <div className="p-2 bg-jaman-ivory rounded-lg">
-                <span className="text-slate-400 block text-[10px]">Orders Ledger</span>
-                <span className="font-mono font-bold text-jaman-navy">{parsedData.orders?.length || 0}</span>
+                <span className="text-slate-500 block text-[11px]">Orders Ledger</span>
+                <span className="tabular-nums font-bold text-jaman-navy">{parsedData.orders?.length || 0}</span>
               </div>
               <div className="p-2 bg-jaman-ivory rounded-lg">
-                <span className="text-slate-400 block text-[10px]">Inventory Items</span>
-                <span className="font-mono font-bold text-jaman-navy">{parsedData.inventoryItems?.length || 0}</span>
+                <span className="text-slate-500 block text-[11px]">Inventory Items</span>
+                <span className="tabular-nums font-bold text-jaman-navy">{parsedData.inventoryItems?.length || 0}</span>
               </div>
             </div>
           </div>
