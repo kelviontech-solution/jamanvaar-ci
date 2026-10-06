@@ -1,3 +1,4 @@
+import { LocalRelayConnection, readRelayEvents } from './local_relay_connection';
 import { KeyValueStore } from './key_value_store';
 import {
   AppNotification,
@@ -591,16 +592,35 @@ export class JamanvaarDatabase {
   };
 
   private customSyncServerUrl: string = '';
-  // Tracks the LAN sync server's own SEC-005 pairing gate: /api/sync and
-  // /api/events are Bearer-token-protected, and nothing here ever performs
-  // the /devices/pair handshake that would obtain that token, so every
-  // request is structurally guaranteed to 401 until a real pairing flow
-  // exists. Rather than spam that rejection every 8 seconds forever (the
-  // "LAN Sync 401 polling loop" from the QA audit), this stops retrying
-  // after the first 401 instead of looping indefinitely.
   private serverSyncUnauthorized = false;
+  private serverSyncConnected = false;
+  private serverSyncScope = '';
+  private serverSyncGeneration = 0;
   private serverSyncPollTimer: ReturnType<typeof setInterval> | null = null;
-  private serverSyncStream: EventSource | null = null;
+  private serverSyncStream: AbortController | null = null;
+  private relayFingerprint(): string { return JSON.stringify([this.getSyncServerUrl(), LocalRelayConnection.scope()]); }
+  public isLocalCorePaired(): boolean { return !!LocalRelayConnection.token(this.getSyncServerUrl()); }
+  public isLocalCoreConnected(): boolean { return this.serverSyncConnected && this.serverSyncScope === this.relayFingerprint(); }
+  /** Storage boot must restore pairing after the app's tenant-scoped store is attached. */
+  public refreshLocalCoreConnection(): void { this.initServerSync(); }
+  public unpairLocalCore(): void { LocalRelayConnection.forget(this.getSyncServerUrl()); this.markLocalCoreUnauthorized(); }
+  public resetKioskConfiguration(): void {
+    this.kioskDisplaySettings = structuredClone(DEFAULT_KIOSK_DISPLAY_SETTINGS);
+    this.welcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
+    this.receiptConfig = { ...this.initialReceiptConfig, restaurantName: '', address: '', phone: '', gstin: '', fssaiNumber: '' };
+  }
+  public async pairLocalCore(pin: string, url = this.getSyncServerUrl()): Promise<void> {
+    await LocalRelayConnection.pair(url, pin);
+    this.setSyncServerUrl(url);
+    if (!await this.forceSyncNow(true)) throw new Error('Pairing saved, but Local Core did not complete the first sync. Check the server and reconnect.');
+  }
+  public async localCoreFetch(path: string, init: RequestInit = {}): Promise<Response> {
+    if (!this.legacySyncEnabled()) throw new Error('Local Core transport is unavailable for this app address.');
+    const scope = this.relayFingerprint();
+    const response = await LocalRelayConnection.request(this.getSyncServerUrl(), path, init);
+    if (response.status === 401 && scope === this.relayFingerprint()) this.markLocalCoreUnauthorized();
+    return response;
+  }
   private legacySyncEnabled(): boolean {
     if (typeof window === 'undefined') return false;
     const configured = this.customSyncServerUrl || KeyValueStore.get('jamanvaar_sync_server_url');
@@ -608,13 +628,16 @@ export class JamanvaarDatabase {
     if (configured) return window.location.protocol !== 'https:' || configured.startsWith('https://');
     return /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
   }
-  /** True once the local relay has refused this browser (it needs a pairing no screen performs yet). */
+  /** True when this restaurant/branch has no saved pairing or the server rejected it. */
   public isLocalCoreUnauthorized(): boolean {
-    return this.serverSyncUnauthorized;
+    return !this.isLocalCorePaired() || this.serverSyncUnauthorized;
   }
 
   public markLocalCoreUnauthorized(): void {
     this.serverSyncUnauthorized = true;
+    this.serverSyncConnected = false;
+    this.serverSyncStream?.abort();
+    this.listeners.forEach(fn => fn());
   }
 
   private listeners: Set<() => void> = new Set();
@@ -666,19 +689,33 @@ export class JamanvaarDatabase {
     }
   }
 
-  public async forceSyncNow(): Promise<boolean> {
+  private relayOrderIsNewer(incoming: Order, current: Order): boolean {
+    const incomingTime = Date.parse(incoming.updatedAt || incoming.createdAt || '') || 0;
+    const currentTime = Date.parse(current.updatedAt || current.createdAt || '') || 0;
+    return incomingTime > currentTime;
+  }
+
+  public async forceSyncNow(publish = false): Promise<boolean> {
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
     try {
-      const targetUrl = this.getSyncServerUrl();
-      const res = await fetch(`${targetUrl}/api/sync`, { signal: controller?.signal });
+      const scope = this.relayFingerprint();
+      const res = await this.localCoreFetch(`/api/sync`, { signal: controller?.signal });
       if (timeoutId) clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
+        if (scope !== this.relayFingerprint()) return false;
+        this.serverSyncConnected = true;
+        // An empty new relay is not an authoritative empty restaurant snapshot.
+        if (!data._relayInitialized) {
+          if (publish) this.pushToServer();
+          this.listeners.forEach(fn => fn());
+          return true;
+        }
         if (data && data.orders && Array.isArray(data.orders)) {
           const map = new Map<string, Order>();
           this.orders.forEach((o) => map.set(o.id, o));
-          data.orders.forEach((o: Order) => map.set(o.id, o));
+          data.orders.forEach((o: Order) => { const existing = map.get(o.id); if (!existing || this.relayOrderIsNewer(o, existing)) map.set(o.id, o); });
           this.orders = Array.from(map.values()).sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
@@ -693,10 +730,8 @@ export class JamanvaarDatabase {
         if (Array.isArray(data.inventoryItems)) this.inventoryItems = data.inventoryItems;
         if (Array.isArray(data.recipes)) this.recipes = data.recipes;
         if (Array.isArray(data.customerAccounts)) this.customerAccounts = data.customerAccounts;
-        if (Array.isArray(data.users)) this.users = data.users;
-        if (Array.isArray(data.roles)) this.roles = data.roles;
         this.saveToStorage();
-        this.pushToServer();
+        if (publish) this.pushToServer();
         this.listeners.forEach((fn) => fn());
         return true;
       }
@@ -709,9 +744,9 @@ export class JamanvaarDatabase {
   private pushToServer(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     if (!this.legacySyncEnabled()) return;
-    if (this.serverSyncUnauthorized) return;
+    if (this.isLocalCoreUnauthorized()) return;
     try {
-      fetch(`${this.getSyncServerUrl()}/api/sync`, {
+      this.localCoreFetch(`/api/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -745,17 +780,10 @@ export class JamanvaarDatabase {
           stockMovements: this.stockMovements,
           recipes: this.recipes,
           customerAccounts: this.customerAccounts,
-          users: this.users,
-          roles: this.roles,
           configuredPrinters: this.configuredPrinters,
-          license: this.license,
           taxGroups: this.taxGroups
         })
-      })
-        .then((res) => {
-          if (res.status === 401) this.serverSyncUnauthorized = true;
-        })
-        .catch(() => {});
+      }).catch(() => {});
     } catch {
       // Ignore network errors
     }
@@ -763,170 +791,96 @@ export class JamanvaarDatabase {
 
   private initServerSync(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
-    this.serverSyncStream?.close();
+    this.serverSyncStream?.abort();
     this.serverSyncStream = null;
-
-    // A prior call (e.g. setSyncServerUrl pointing at a new server) may have
-    // left a poll timer and an unauthorized flag from the old target running
-    // — clear both so re-syncing against a different server gets a fresh
-    // attempt instead of inheriting the previous one's rejection.
-    if (this.serverSyncPollTimer) {
-      clearInterval(this.serverSyncPollTimer);
-      this.serverSyncPollTimer = null;
+    if (this.serverSyncPollTimer) clearInterval(this.serverSyncPollTimer);
+    this.serverSyncPollTimer = null;
+    this.serverSyncConnected = false;
+    this.serverSyncScope = this.relayFingerprint();
+    const generation = ++this.serverSyncGeneration;
+    if (!this.legacySyncEnabled() || !this.isLocalCorePaired()) {
+      this.serverSyncUnauthorized = true;
+      return;
     }
-    if (!this.legacySyncEnabled()) return;
     this.serverSyncUnauthorized = false;
-
-    // 1. Initial Pull from Sync Server
-    fetch(`${this.getSyncServerUrl()}/api/sync`)
-      .then((res) => {
-        if (res.status === 401) {
-          this.serverSyncUnauthorized = true;
-          return null;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (!data) return;
-        if (data && data.orders && Array.isArray(data.orders) && data.orders.length > 0) {
-          const map = new Map<string, Order>();
-          this.orders.forEach((o) => map.set(o.id, o));
-          data.orders.forEach((o: Order) => map.set(o.id, o));
-          this.orders = Array.from(map.values()).sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        }
-        if (data && data.restaurant) this.restaurant = { ...this.restaurant, ...data.restaurant };
-        if (data && data.outlet) this.outlet = { ...this.outlet, ...data.outlet };
-        if (data && Array.isArray(data.categories) && data.categories.length > 0) this.categories = data.categories;
-        if (data && Array.isArray(data.menuItems) && data.menuItems.length > 0) this.menuItems = data.menuItems;
-        if (data && Array.isArray(data.tables) && data.tables.length > 0) this.tables = data.tables;
-        if (data && Array.isArray(data.shifts) && data.shifts.length > 0) this.shifts = data.shifts;
-        if (data && Array.isArray(data.kots)) this.kots = data.kots;
-        if (data && Array.isArray(data.heldOrders)) this.heldOrders = data.heldOrders;
-        if (data && Array.isArray(data.reservations)) this.reservations = data.reservations;
-        if (data && Array.isArray(data.waitlist)) this.waitlist = data.waitlist;
-        if (data && Array.isArray(data.inventoryItems) && data.inventoryItems.length > 0) this.inventoryItems = data.inventoryItems;
-        if (data && Array.isArray(data.stockMovements)) this.stockMovements = data.stockMovements;
-        if (data && Array.isArray(data.recipes) && data.recipes.length > 0) this.recipes = data.recipes;
-        if (data && Array.isArray(data.customerAccounts)) this.customerAccounts = data.customerAccounts;
-        if (data && Array.isArray(data.users) && data.users.length > 0) this.users = data.users;
-        if (data && Array.isArray(data.roles) && data.roles.length > 0) this.roles = data.roles;
-        if (data && Array.isArray(data.configuredPrinters)) this.configuredPrinters = data.configuredPrinters;
-        if (data && data.license) this.license = data.license;
-        if (data && Array.isArray(data.taxGroups) && data.taxGroups.length > 0) this.taxGroups = data.taxGroups;
-        
-        // Ensure menu is NEVER empty
-        if (!this.menuItems || this.menuItems.length === 0) {
-          this.menuItems = [...SEED_MENU_ITEMS];
-        }
-        if (!this.categories || this.categories.length === 0) {
-          this.categories = [...SEED_CATEGORIES];
-        }
-        this.listeners.forEach((fn) => fn());
-      })
-      .catch(() => {});
-
-    // 2. Connect to Server-Sent Events for Real-Time Cross-Port Push
-    try {
-      if ('EventSource' in window) {
-        const sse = new EventSource(`${this.getSyncServerUrl()}/api/events`);
-        this.serverSyncStream = sse;
-        sse.onmessage = (ev) => {
+    const current = () => generation === this.serverSyncGeneration && this.serverSyncScope === this.relayFingerprint();
+    const startStream = async () => {
+      if (!current() || this.serverSyncStream || this.isLocalCoreUnauthorized()) return;
+      const controller = new AbortController();
+      this.serverSyncStream = controller;
+      try {
+        const response = await this.localCoreFetch('/api/events', { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        await readRelayEvents(response, raw => {
+          if (!current()) return;
           try {
-            const parsed = JSON.parse(ev.data || '{}');
+            const parsed = JSON.parse(raw || '{}');
             const evtType = parsed.event || parsed.type;
 
             if ((evtType === 'DB_UPDATE' || evtType === 'SYNC') && parsed.state) {
-              if (parsed.state.orders && Array.isArray(parsed.state.orders) && parsed.state.orders.length > 0) {
+              if (parsed.state.orders && Array.isArray(parsed.state.orders)) {
                 const map = new Map<string, Order>();
                 this.orders.forEach((o) => map.set(o.id, o));
-                parsed.state.orders.forEach((o: Order) => map.set(o.id, o));
+                parsed.state.orders.forEach((o: Order) => { const existing = map.get(o.id); if (!existing || this.relayOrderIsNewer(o, existing)) map.set(o.id, o); });
                 this.orders = Array.from(map.values()).sort(
                   (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
               }
               if (parsed.state.restaurant) this.restaurant = { ...this.restaurant, ...parsed.state.restaurant };
               if (parsed.state.outlet) this.outlet = { ...this.outlet, ...parsed.state.outlet };
-              if (Array.isArray(parsed.state.categories) && parsed.state.categories.length > 0) this.categories = parsed.state.categories;
-              if (Array.isArray(parsed.state.menuItems) && parsed.state.menuItems.length > 0) this.menuItems = parsed.state.menuItems;
-              if (Array.isArray(parsed.state.shifts) && parsed.state.shifts.length > 0) this.shifts = parsed.state.shifts;
+              if (Array.isArray(parsed.state.categories)) this.categories = parsed.state.categories;
+              if (Array.isArray(parsed.state.menuItems)) this.menuItems = parsed.state.menuItems;
+              if (Array.isArray(parsed.state.shifts)) this.shifts = parsed.state.shifts;
               if (Array.isArray(parsed.state.kots)) this.kots = parsed.state.kots;
               if (Array.isArray(parsed.state.heldOrders)) this.heldOrders = parsed.state.heldOrders;
-              if (Array.isArray(parsed.state.tables) && parsed.state.tables.length > 0) this.tables = parsed.state.tables;
-              if (Array.isArray(parsed.state.inventoryItems) && parsed.state.inventoryItems.length > 0) this.inventoryItems = parsed.state.inventoryItems;
+              if (Array.isArray(parsed.state.tables)) this.tables = parsed.state.tables;
+              if (Array.isArray(parsed.state.inventoryItems)) this.inventoryItems = parsed.state.inventoryItems;
               if (Array.isArray(parsed.state.stockMovements)) this.stockMovements = parsed.state.stockMovements;
-              if (Array.isArray(parsed.state.recipes) && parsed.state.recipes.length > 0) this.recipes = parsed.state.recipes;
+              if (Array.isArray(parsed.state.recipes)) this.recipes = parsed.state.recipes;
               if (Array.isArray(parsed.state.customerAccounts)) this.customerAccounts = parsed.state.customerAccounts;
-              if (Array.isArray(parsed.state.users) && parsed.state.users.length > 0) this.users = parsed.state.users;
-              if (Array.isArray(parsed.state.roles) && parsed.state.roles.length > 0) this.roles = parsed.state.roles;
               if (Array.isArray(parsed.state.configuredPrinters)) this.configuredPrinters = parsed.state.configuredPrinters;
-              if (parsed.state.license) this.license = parsed.state.license;
-              if (Array.isArray(parsed.state.taxGroups) && parsed.state.taxGroups.length > 0) this.taxGroups = parsed.state.taxGroups;
+              if (Array.isArray(parsed.state.taxGroups)) this.taxGroups = parsed.state.taxGroups;
               
-              if (!this.menuItems || this.menuItems.length === 0) {
-                this.menuItems = [...SEED_MENU_ITEMS];
-              }
-              if (!this.categories || this.categories.length === 0) {
-                this.categories = [...SEED_CATEGORIES];
-              }
               this.listeners.forEach((fn) => fn());
             } else if (evtType === 'ORDER_CREATED' && parsed.order) {
               const ord = parsed.order as Order;
               const idx = this.orders.findIndex((o) => o.id === ord.id || o.orderNumber === ord.orderNumber);
-              if (idx >= 0) this.orders[idx] = { ...this.orders[idx], ...ord };
+              if (idx >= 0) { if (this.relayOrderIsNewer(ord, this.orders[idx])) this.orders[idx] = { ...this.orders[idx], ...ord }; }
               else this.orders.unshift(ord);
               this.listeners.forEach((fn) => fn());
             } else if (evtType === 'ORDER_STATUS_CHANGED' && parsed.orderId) {
               const ord = this.orders.find((o) => o.id === parsed.orderId);
               if (ord) {
-                ord.orderStatus = parsed.orderStatus;
+                if (parsed.order && !this.relayOrderIsNewer(parsed.order, ord)) return;
+                Object.assign(ord, parsed.order || { orderStatus: parsed.orderStatus });
                 this.listeners.forEach((fn) => fn());
               }
             }
-          } catch (e) {}
-        };
-      }
-    } catch (e) {}
 
-    // 3. Fallback Interval Polling (every 8 seconds, zero feedback recursion)
+            this.saveToStorage();
+          } catch { /* Ignore malformed event frames. */ }
+        });
+      } catch { /* The existing fallback interval reconnects after a successful sync. */ }
+      finally { if (this.serverSyncStream === controller) this.serverSyncStream = null; }
+    };
+    let pulling = false;
+    const pull = async () => {
+      if (!current()) { this.initServerSync(); return; }
+      if (pulling || this.isLocalCoreUnauthorized()) return;
+      pulling = true;
+      try {
+        if (await this.forceSyncNow() && current()) void startStream();
+        else if (current()) { this.serverSyncConnected = false; this.listeners.forEach(fn => fn()); }
+      } finally { pulling = false; }
+    };
+    void pull();
     this.serverSyncPollTimer = setInterval(() => {
-      if (this.serverSyncUnauthorized) {
-        if (this.serverSyncPollTimer) {
-          clearInterval(this.serverSyncPollTimer);
-          this.serverSyncPollTimer = null;
-        }
+      if (this.isLocalCoreUnauthorized()) {
+        if (this.serverSyncPollTimer) clearInterval(this.serverSyncPollTimer);
+        this.serverSyncPollTimer = null;
         return;
       }
-      fetch(`${this.getSyncServerUrl()}/api/sync`)
-        .then((res) => {
-          if (res.status === 401) {
-            this.serverSyncUnauthorized = true;
-            return null;
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (!data) return;
-          if (data && data.orders && Array.isArray(data.orders)) {
-            let changed = false;
-            const map = new Map<string, Order>();
-            this.orders.forEach((o) => map.set(o.id, o));
-            data.orders.forEach((o: Order) => {
-              if (!map.has(o.id) || JSON.stringify(map.get(o.id)) !== JSON.stringify(o)) {
-                map.set(o.id, o);
-                changed = true;
-              }
-            });
-            if (changed) {
-              this.orders = Array.from(map.values()).sort(
-                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-              );
-              this.listeners.forEach((fn) => fn());
-            }
-          }
-        })
-        .catch(() => {});
+      void pull();
     }, 8000);
   }
 
@@ -1610,6 +1564,7 @@ export class JamanvaarDatabase {
       this.batchDirty = true;
       return;
     }
+    if (typeof window !== 'undefined' && this.serverSyncScope !== this.relayFingerprint()) this.initServerSync();
     this.saveToStorage();
     this.pushToServer();
     try {

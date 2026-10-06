@@ -44,7 +44,7 @@ const CATCH_UP_MAX_ROWS = 500;
  * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
  * the newer edit or bring the deleted record back.
  */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER']);
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'KIOSK_CONFIGURATION']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
@@ -99,11 +99,11 @@ export class EntitySyncService {
       for (let evt of events) {
         await tx.$executeRaw`SAVEPOINT entity_event`;
         try {
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType) && deviceBranchId && typeof evt.payload.branchId === 'string' && evt.payload.branchId !== deviceBranchId) {
+          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && typeof evt.payload.branchId === 'string' && evt.payload.branchId !== deviceBranchId) {
             throw new Error('BRANCH_FORBIDDEN: This table belongs to another branch');
           }
           // A branch-owned record pushed by a branch-bound terminal is stamped with that branch, so other branches never receive it.
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType) && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
+          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deviceBranchId } };
           }
           if (entityType === 'MENU_ITEM' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.price === 'number') {
@@ -140,12 +140,12 @@ export class EntitySyncService {
             }
           });
           const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType) && deviceBranchId && existing && existingBranch !== deviceBranchId) {
+          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && existing && existingBranch !== deviceBranchId) {
             throw new Error('BRANCH_FORBIDDEN: This table is outside this device branch');
           }
           // Minimal deletion payloads must retain ownership, including when an unbound owner removes a branch record.
           const deletionBranch = existingBranch ?? deviceBranchId;
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType) && evt.payload.deleted === true && deletionBranch && typeof evt.payload.branchId !== 'string') {
+          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && evt.payload.deleted === true && deletionBranch && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deletionBranch } };
           }
           if (existing && JSON.stringify(existing.payload) === JSON.stringify(evt.payload)) {
@@ -207,7 +207,7 @@ export class EntitySyncService {
     });
 
     if (changed) {
-      this.realtime.publish({ restaurantId, branchId: ['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType) ? deviceBranchId ?? null : null,
+      this.realtime.publish({ restaurantId, branchId: ['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) ? deviceBranchId ?? null : null,
         kind: `entity:${entityType}`, originDeviceId: deviceId });
     }
     return { results, serverTime: new Date().toISOString() };
@@ -246,7 +246,7 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string, afterSeq?: number) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (['DINING_TABLE', 'MENU_ITEM', 'INVENTORY_ITEM', 'RECIPE'].includes(entityType)) ? device.branchId : null, device.type, afterSeq);
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (['DINING_TABLE', 'MENU_ITEM', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType)) ? device.branchId : null, device.type, afterSeq);
   }
 
   /**

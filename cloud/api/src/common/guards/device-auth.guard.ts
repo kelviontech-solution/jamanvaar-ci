@@ -17,10 +17,11 @@ function authCacheMs(): number {
 }
 export const DEVICE_AUTH_CACHE = new Map<string, { at: number; device: any; branch: any }>();
 let subscribed: RealtimeBus | null = null;
+let invalidationVersion = 0;
 function subscribeToInvalidations(bus: RealtimeBus): void {
   if (subscribed === bus) return;
   subscribed = bus;
-  bus.invalidations$.subscribe(() => DEVICE_AUTH_CACHE.clear());
+  bus.invalidations$.subscribe(() => { invalidationVersion++; DEVICE_AUTH_CACHE.clear(); });
 }
 setInterval(() => { const cutoff = Date.now() - authCacheMs(); for (const [k, v] of DEVICE_AUTH_CACHE) if (v.at < cutoff) DEVICE_AUTH_CACHE.delete(k); }, 30_000).unref?.();
 
@@ -69,6 +70,7 @@ export class DeviceAuthGuard implements CanActivate {
 
     const tokenHash = hashOpaqueToken(token as string);
     subscribeToInvalidations(this.bus);
+    const versionAtStart = invalidationVersion;
     const ttl = authCacheMs();
     const hit = ttl > 0 ? DEVICE_AUTH_CACHE.get(tokenHash) : undefined;
     let verdict: { device: any; branch: any } | null = hit && Date.now() - hit.at < ttl ? { device: hit.device, branch: hit.branch } : null;
@@ -120,19 +122,22 @@ export class DeviceAuthGuard implements CanActivate {
         this.deny('forbidden', 'SUBSCRIPTION_INACTIVE', 'This restaurant has no active subscription. Please contact your platform administrator.');
       }
 
-      // Per-application switch: disabling POS / KDS / ... for a restaurant in Super
-      // Admin must stop the terminals that are already running, not just block new ones.
+      // Restaurant Admin is one POS_ADMIN device for both product families. Activation
+      // accepts either admin entitlement; subsequent calls must use the same contract.
+      // Keep the actual app rows distinct so kiosk access never enables POS-only modules.
+      const entitledApps = device.type === 'POS_ADMIN' ? ['POS_ADMIN', 'KIOSK_ADMIN'] as const : [device.type];
       const entitlement = await this.prisma.runAsPlatform((tx) =>
         tx.applicationEntitlement.findFirst({
-          where: { subscriptionId: { in: subscriptions.map((sub) => sub.id) }, appCode: device.type, enabled: true },
+          where: { subscriptionId: { in: subscriptions.map((sub) => sub.id) }, appCode: { in: [...entitledApps] }, enabled: true },
           select: { id: true }
         })
       );
       if (!entitlement) {
-        this.deny('forbidden', 'APP_DISABLED', `${device.type} is not enabled for this restaurant. Please contact your platform administrator.`);
+        const appName = device.type === 'POS_ADMIN' ? 'Restaurant Admin (POS_ADMIN or KIOSK_ADMIN)' : device.type;
+        this.deny('forbidden', 'APP_DISABLED', `${appName} is not enabled for this restaurant. Please contact your platform administrator.`);
       }
 
-      if (ttl > 0) DEVICE_AUTH_CACHE.set(tokenHash, { at: Date.now(), device, branch: branchOfDevice });
+      if (ttl > 0 && versionAtStart === invalidationVersion) DEVICE_AUTH_CACHE.set(tokenHash, { at: Date.now(), device, branch: branchOfDevice });
       verdict = { device, branch: branchOfDevice };
 
     }

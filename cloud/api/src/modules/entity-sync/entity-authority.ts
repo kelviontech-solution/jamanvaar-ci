@@ -34,6 +34,7 @@ export const ENTITY_WRITE_AUTHORITY: Record<SyncableEntityType, readonly DeviceT
   CASH_MOVEMENT: ['POS', 'POS_ADMIN'],
   // Restaurant Admin takes bookings; the counter seats them or marks them no-show.
   RESERVATION: ['POS', 'POS_ADMIN'],
+  KIOSK_CONFIGURATION: ['POS_ADMIN', 'KIOSK_ADMIN'],
   SERVICE_MESSAGE: ALL
 };
 

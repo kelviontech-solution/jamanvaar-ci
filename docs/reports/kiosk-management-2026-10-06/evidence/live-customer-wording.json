@@ -1,0 +1,42 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Choose Your Cafe Language\n\nभाषा चुनें • ભાષા પસંદ કરો\n\nEnglish\nENGLISH\nहिन्दी\nHINDI\nગુજરાતી\nGUJARATI\n\nYOU CAN CHANGE THIS ANYTIME FROM THE HEADER",
+  "headings": [
+    "Choose Your Cafe Language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "English\nENGLISH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी\nHINDI",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી\nGUJARATI",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": true
+}

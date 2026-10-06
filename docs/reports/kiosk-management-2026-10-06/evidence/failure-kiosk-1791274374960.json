@@ -1,0 +1,18 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Kiosk Connected!\n\nThis terminal is now activated for QA Kiosk Only Merged Admin 1791270507575.\n\nTerminal ID: 26914236\nContinue",
+  "headings": [
+    "Kiosk Connected!"
+  ],
+  "buttons": [
+    {
+      "text": "Continue",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

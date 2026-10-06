@@ -74,6 +74,9 @@ export const PosLogin: React.FC = () => {
       isOnline={isOnline}
       onToggleNetwork={toggleNetworkStatus}
       isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={db.isLocalCoreConnected()}
+          localCoreUrl={db.getSyncServerUrl()}
+          onPairLocalCore={(pin, url) => db.pairLocalCore(pin, url)}
       healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
       heroHeadline="Smart Billing."
       heroHighlightWord="Better Dining."

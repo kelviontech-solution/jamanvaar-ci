@@ -1,3 +1,6 @@
+import { KioskContentPanel } from './components/settings/KioskContentPanel';
+import { KioskComboPanel } from './components/settings/KioskComboPanel';
+import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers, startLocalChangeSync, syncPromotions, syncInventoryMasters } from '@jamanvaar/sync';
 import React, { useEffect, useState, useMemo } from 'react';
 import {
@@ -167,6 +170,8 @@ export type PosAdminTab =
   | 'BACKUP'
   | 'SUPPORT'
   | 'INVENTORY_CONTROL'
+  | 'KIOSK_DESIGN'
+  | 'KIOSK_COMBOS'
   | 'KIOSKS'
   | 'COUPONS'
   | 'RECEIPTS';
@@ -523,6 +528,7 @@ export default function PosAdminApp() {
     refetchEntitlements();
     void reportDeviceHeartbeat();
     void syncRestaurantIdentity();
+    void syncKioskConfiguration({ push: true }).catch(() => {});
     const interval = setInterval(() => {
       void syncMenuCatalog({ push: true });
       void syncPromotions({ pushCombos: true, pushCoupons: true });
@@ -538,6 +544,7 @@ export default function PosAdminApp() {
       refetchEntitlements();
       void reportDeviceHeartbeat();
       void syncRestaurantIdentity();
+    void syncKioskConfiguration({ push: true }).catch(() => {});
     }, 15000);
     return () => {
       stopLocalChanges();
@@ -685,6 +692,9 @@ export default function PosAdminApp() {
           isOnline={isOnline}
           onToggleNetwork={() => setIsOnline((prev) => !prev)}
           isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={db.isLocalCoreConnected()}
+          localCoreUrl={db.getSyncServerUrl()}
+          onPairLocalCore={(pin, url) => db.pairLocalCore(pin, url)}
           healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
@@ -1278,6 +1288,8 @@ export default function PosAdminApp() {
               />
             )}
 
+            {activeTab === 'KIOSK_DESIGN' && hasApp('KIOSK_ADMIN') && <KioskContentPanel showToast={showToast} />}
+            {activeTab === 'KIOSK_COMBOS' && hasApp('KIOSK_ADMIN') && <KioskComboPanel showToast={showToast} />}
             {/* TAB: KIOSK TERMINAL FLEET (relocated from kiosk-admin, gated on KIOSK_ADMIN) */}
             {activeTab === 'KIOSKS' && (
               <div className="space-y-6">
@@ -1292,7 +1304,7 @@ export default function PosAdminApp() {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {kiosks.map((k) => (
-                    <div key={k.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
+                    <div key={k.id} data-testid={`kiosk-terminal-${k.id}`} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-jaman-navy">{k.name}</h3>
                         <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">{k.health}</span>
@@ -1312,14 +1324,16 @@ export default function PosAdminApp() {
                           {k.syncError}
                         </div>
                       )}
+                      {k.lastCommand && <p role="status" className="text-xs p-3 rounded-xl border border-jaman-border">Last command: {k.lastCommand.commandType.replace(/_/g, ' ')} — {k.lastCommand.status}{k.lastCommand.errorMessage ? `: ${k.lastCommand.errorMessage}` : ''}</p>}
                       <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_SYNC')}>Sync now</Button>
-                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_DIAGNOSTICS')}>Diagnostics</Button>
+                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_SYNC').then(() => showToast('Kiosk sync queued.')).catch(error => showToast(error.message || 'Could not request sync.'))}>Sync now</Button>
+                        <Button variant="outline" size="sm" onClick={() => void sendKioskCommand(k.id, 'REQUEST_DIAGNOSTICS').then(() => showToast('Kiosk diagnostics queued.')).catch(error => showToast(error.message || 'Could not request diagnostics.'))}>Diagnostics</Button>
+                        <Button variant="outline" size="sm" onClick={() => setConfirmDialog({ isOpen: true, title: 'Log out this kiosk?', message: `${k.name} will stop accepting orders after it acknowledges the command. Orders are retained. An active payment or unsent orders must finish first. Reactivation requires a fresh kiosk key. Offline kiosks receive this command when they reconnect.`, confirmText: 'Log out kiosk', isDanger: true, onConfirm: () => { void sendKioskCommand(k.id, 'FORCE_LOGOUT').then(() => showToast('Kiosk logout queued; awaiting terminal acknowledgement.')).catch(error => showToast(error.message || 'Could not queue kiosk logout.')); } })}>Log out kiosk</Button>
                         <Button
                           variant={k.isLocked ? 'accent' : 'outline'}
                           size="sm"
                           leftIcon={k.isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                          onClick={() => void sendKioskCommand(k.id, k.isLocked ? 'UNLOCK' : 'LOCK')}
+                          onClick={() => void sendKioskCommand(k.id, k.isLocked ? 'UNLOCK' : 'LOCK').then(() => showToast('Kiosk lock command queued.')).catch(error => showToast(error.message || 'Could not change kiosk lock.'))}
                         >
                           {k.isLocked ? 'Unlock' : 'Lockdown'}
                         </Button>

@@ -1,3 +1,4 @@
+import { LocalCorePairing } from './LocalCorePairing';
 import React, { useState, useEffect } from 'react';
 import { JamanvaarLogo, JamanvaarAppBadge, AppIdentity } from './JamanvaarBrand';
 import {
@@ -51,6 +52,9 @@ export interface JamanvaarAuthLayoutProps {
    * `@jamanvaar/database` for real reasons, so nothing new is pulled in on their behalf either.
    */
   isLocalCoreUnauthorized?: boolean;
+  isLocalCoreConnected?: boolean;
+  localCoreUrl?: string;
+  onPairLocalCore?: (pin: string, url: string) => Promise<void>;
   /**
    * B2-006: the "Cloud API: Connected"/"Local Core: Connected" badge used to be hardcoded true for
    * Super Admin and only reflect a stale pairing flag for everyone else — never a real, live check,
@@ -211,7 +215,10 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   isOnline = true,
   onToggleNetwork,
   isLocalCoreUnauthorized = false,
+  isLocalCoreConnected,
   healthCheckUrl,
+  localCoreUrl,
+  onPairLocalCore,
   heroHeadline = 'Smart Billing.',
   heroHighlightWord = 'Better Dining.',
   heroDescription = 'Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.',
@@ -262,8 +269,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
         // Any HTTP response at all (even a 404/401) proves the server is up and reachable - this
         // does not need to be a dedicated health endpoint. Only a thrown exception (connection
         // refused, DNS failure, timeout) means it genuinely isn't.
-        await fetch(healthCheckUrl, { method: 'GET', cache: 'no-store', signal: controller?.signal, mode: 'no-cors' });
-        if (!cancelled) setApiReachable(true);
+        const response = await fetch(healthCheckUrl, { method: 'GET', cache: 'no-store', signal: controller?.signal });
+        if (!cancelled) setApiReachable(appIdentity === 'SUPER_ADMIN' ? response.status < 500 : response.ok);
       } catch {
         if (!cancelled) setApiReachable(false);
       } finally {
@@ -276,11 +283,12 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [healthCheckUrl]);
+  }, [healthCheckUrl, appIdentity]);
 
   const apiBadgeConnected = healthCheckUrl ? apiReachable !== false : true;
   // Restaurant Admin is an owner/manager console: pairing plumbing is noise there unless the server is actually unreachable.
-  const showCoreBadge = appIdentity !== 'ADMIN' || !apiBadgeConnected;
+  const showCoreBadge = !!onPairLocalCore || appIdentity !== 'ADMIN' || !apiBadgeConnected;
+  const [pairingOpen, setPairingOpen] = useState(false);
 
   const defaultCapabilities: JamanvaarCapabilityItem[] = [
     { label: 'Fast Billing', icon: 'zap' },
@@ -345,21 +353,30 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           {showCoreBadge && (
           <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs ${dark ? 'bg-white/5 border border-white/10' : 'bg-white border border-[#EBE6DD]'}`}>
             {/* The local relay needs a pairing no screen performs yet; once it refuses this browser, say so instead of "Connected" (BUG-156). */}
-            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${!apiBadgeConnected ? 'bg-rose-500' : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${!apiBadgeConnected ? 'bg-rose-500' : appIdentity !== 'SUPER_ADMIN' && (isLocalCoreUnauthorized || isLocalCoreConnected === false) ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
             <span className={dark ? 'text-[#8CA0B3]' : 'text-slate-600'}>
               {appIdentity === 'SUPER_ADMIN' ? 'Cloud API: ' : 'Local Core: '}
-              {!apiBadgeConnected ? (
+              {healthCheckUrl && apiReachable === null ? <strong>Checking?</strong> : !apiBadgeConnected ? (
                 <strong className={dark ? 'text-rose-400 font-extrabold' : 'text-rose-700 font-extrabold'}>Unreachable</strong>
               ) : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? (
                 <strong className={dark ? 'text-amber-400 font-extrabold' : 'text-amber-700 font-extrabold'}>Not paired (cloud sync in use)</strong>
+              ) : isLocalCoreConnected === false ? (
+                <strong className="text-amber-700 font-extrabold">Connecting (cloud sync in use)</strong>
               ) : (
                 <strong className={dark ? 'text-emerald-400 font-extrabold' : 'text-emerald-700 font-extrabold'}>
                   {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
                 </strong>
               )}
             </span>
+            {onPairLocalCore && <button type="button" onClick={() => setPairingOpen(true)} className="text-xs font-bold underline">{isLocalCoreUnauthorized ? 'Pair' : 'Setup'}</button>}
           </div>
           )}
+          {pairingOpen && onPairLocalCore && localCoreUrl && <div role="dialog" aria-modal="true" aria-label="Local Core setup" className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-xl">
+              <button type="button" onClick={() => setPairingOpen(false)} className="mb-3 text-sm text-slate-700 underline">Close Local Core setup</button>
+              <LocalCorePairing serverUrl={localCoreUrl} paired={!isLocalCoreUnauthorized} onPair={onPairLocalCore} />
+            </div>
+          </div>}
 
           {/* Network Status Toggle Button */}
           <button

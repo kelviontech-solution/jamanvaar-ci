@@ -284,6 +284,9 @@ export const App: React.FC = () => {
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
           isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={captainDb.isLocalCoreConnected()}
+          localCoreUrl={captainDb.getSyncServerUrl()}
+          onPairLocalCore={(pin, url) => captainDb.pairLocalCore(pin, url)}
           healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
@@ -355,6 +358,9 @@ export const App: React.FC = () => {
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
           isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={captainDb.isLocalCoreConnected()}
+          localCoreUrl={captainDb.getSyncServerUrl()}
+          onPairLocalCore={(pin, url) => captainDb.pairLocalCore(pin, url)}
           healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"

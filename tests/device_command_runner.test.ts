@@ -15,6 +15,17 @@ function harness(commands: DeviceCommandRecord[]) {
 const store = new Map<string, string>();
 
 describe('DeviceCommandRunner', () => {
+  it('finishes logout only after a successful acknowledgement and rechecks safety after an ACK failure', async () => {
+    let safe = true; let loggedOut = false;
+    DeviceCommandRunner.registerHandler('FORCE_LOGOUT', async () => { if (!safe) throw Error('Payment active'); return {}; }, { recheckBeforeAcknowledgement: true });
+    DeviceCommandRunner.registerAfterAcknowledgement('FORCE_LOGOUT', () => { loggedOut = true; });
+    const h = harness([{ id: 'logout', commandType: 'FORCE_LOGOUT' }]);
+    await DeviceCommandRunner.run({ ...h.io, ack: async () => { throw Error('connection lost'); } });
+    expect(loggedOut).toBe(false);
+    safe = false; await DeviceCommandRunner.run(h.io);
+    expect(h.acks[0].outcome).toMatchObject({ status: 'FAILED', error: 'Payment active' }); expect(loggedOut).toBe(false);
+    safe = true; await DeviceCommandRunner.run(h.io); expect(loggedOut).toBe(true);
+  });
   const original = (globalThis as any).localStorage;
   beforeEach(() => {
     store.clear();

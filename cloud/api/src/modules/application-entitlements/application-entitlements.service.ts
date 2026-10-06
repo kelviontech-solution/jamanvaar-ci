@@ -237,7 +237,7 @@ export class ApplicationEntitlementsService {
 
       if (dto.enabled === false && existing.enabled && !dto.acknowledgeDeviceImpact && DEVICE_BACKED_APP_CODES.has(appCode)) {
         const activeDevices = await tx.device.count({
-          where: { restaurantId: existing.restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }
+          where: { restaurantId: existing.restaurantId, type: { in: await this.deviceTypesForEntitlement(tx, existing.restaurantId, appCode) }, status: { not: 'REVOKED' } }
         });
         if (activeDevices > 0) {
           throw new ConflictException(
@@ -328,6 +328,16 @@ export class ApplicationEntitlementsService {
     }
   }
 
+  /** Match activate-device's granting-app priority when counting the merged console. */
+  private async deviceTypesForEntitlement(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<DeviceType[]> {
+    if (appCode === 'KIOSK_ADMIN' && !(await this.isAppEnabled(tx, restaurantId, 'POS_ADMIN'))) {
+      // Kiosk-only plans register the merged console as POS_ADMIN, while older device
+      // records may still say KIOSK_ADMIN. Both consume the kiosk-admin allowance.
+      return ['POS_ADMIN', 'KIOSK_ADMIN'];
+    }
+    return [appCode as unknown as DeviceType];
+  }
+
   /**
    * The real per-app device cap: how many `appCode` devices this restaurant may have active,
    * right now. Resolves to whichever active subscription's entitlement row grants `appCode`
@@ -367,7 +377,7 @@ export class ApplicationEntitlementsService {
     const quota = row.deviceQuota ?? featureQuota ?? owningSub.plan.maxDevices;
 
     const activeDeviceCount = await tx.device.count({
-      where: { restaurantId, type: appCode as unknown as DeviceType, status: { not: 'REVOKED' } }
+      where: { restaurantId, type: { in: await this.deviceTypesForEntitlement(tx, restaurantId, appCode) }, status: { not: 'REVOKED' } }
     });
     if (activeDeviceCount >= quota) {
       throw new ConflictException(

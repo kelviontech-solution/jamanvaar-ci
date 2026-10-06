@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-06",
+  "runtimeTests": {
+    "passed": 1401,
+    "failed": 0,
+    "total": 1401
+  },
+  "focusedPairingTests": 19,
+  "browserChecks": {
+    "passed": 6,
+    "failed": 0
+  },
+  "typecheck": "PASS",
+  "appBuilds": {
+    "Restaurant Admin": "PASS",
+    "POS": "PASS",
+    "Captain": "PASS",
+    "KDS": "PASS",
+    "Kiosk": "PASS"
+  },
+  "userRuntime": "Restart pending: automatic approval review blocked the restart command; existing process 13008 remains on port 5178",
+  "qaScope": "Isolated relay files; synthetic activated tenant/branch context; actual Restaurant Admin UI and separate Chromium contexts. Does not verify cloud activation, AWS, or production latency."
+}

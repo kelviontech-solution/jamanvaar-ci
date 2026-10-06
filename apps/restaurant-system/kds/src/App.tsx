@@ -678,6 +678,9 @@ export const App: React.FC = () => {
           appTitle="Kitchen Display System"
           appSubtitle="Kitchen Stations & Line Cook Display"
           isLocalCoreUnauthorized={kdsDb.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={kdsDb.isLocalCoreConnected()}
+          localCoreUrl={kdsDb.getSyncServerUrl()}
+          onPairLocalCore={(pin, url) => kdsDb.pairLocalCore(pin, url)}
           healthCheckUrl={`${kdsDb.getSyncServerUrl()}/api/health`}
           heroHeadline="Real-Time Kitchen Production Command"
           heroHighlightWord="Live KOTs"

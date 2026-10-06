@@ -1,3 +1,4 @@
+import { KioskConfigurationRepository } from './kiosk_configuration';
 import { PaymentPolicy } from './payment_policy';
 import { NumberAllocator } from './number_allocator';
 import {
@@ -397,6 +398,11 @@ export class MenuRepository {
     const idx = db.menuItems.findIndex((i) => i.id === id);
     if (idx === -1) return null;
     db.menuItems[idx] = { ...db.menuItems[idx], ...updates };
+    const linkedCombo = db.combos.find(combo => `combo-${combo.id}` === id);
+    if (linkedCombo) {
+      const item = db.menuItems[idx];
+      Object.assign(linkedCombo, { name: item.name, description: item.description, basePrice: item.price, imageUrl: item.imageUrl, translations: item.translations, isAvailable: item.isAvailable, featured: item.isFeatured, savingsAmount: Math.max(0, Math.round((linkedCombo.originalPrice - item.price) * 100) / 100), updatedAt: new Date().toISOString() });
+    }
     db.notify();
     return db.menuItems[idx];
   }
@@ -538,11 +544,13 @@ export function isUnpaidOpenOrder(o: Pick<Order, 'orderStatus' | 'paymentStatus'
 function postToLocalService(path: string, method: 'POST' | 'PATCH', body: unknown): void {
   if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
   if (db.isLocalCoreUnauthorized()) return;
-  const host = window.location?.hostname || 'localhost';
-  fetch(`http://${host}:5178${path}`, {
+  // The relay replicates already-priced app orders. Its legacy create endpoint
+  // recalculates totals and must not replace amounts validated by the cloud.
+  const snapshot = method === 'POST' && path === '/api/orders';
+  db.localCoreFetch(snapshot ? '/api/sync' : path, {
     method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    body: JSON.stringify(snapshot ? { orders: [body] } : body)
   })
     .then((res) => {
       if (res.status === 401) db.markLocalCoreUnauthorized();
@@ -2254,6 +2262,7 @@ export class ReceiptRepository {
 
   public static updateConfig(updates: Partial<ReceiptConfig>): ReceiptConfig {
     db.receiptConfig = { ...db.receiptConfig, ...updates };
+    KioskConfigurationRepository.markChanged();
     db.notify();
     return db.receiptConfig;
   }
@@ -4627,6 +4636,7 @@ export class KioskDisplaySettingsRepository {
     }
 
     db.kioskDisplaySettings = { ...current, ...partial };
+    KioskConfigurationRepository.markChanged();
     AuditRepository.log({
       action: 'SETTINGS_UPDATE',
       category: 'BUSINESS',
@@ -4649,6 +4659,7 @@ export class WelcomeScreenSettingsRepository {
   public static updateSettings(partial: Partial<WelcomeScreenSettings>, actor: string = 'Kiosk Admin'): WelcomeScreenSettings {
     const current = this.getSettings();
     db.welcomeScreenSettings = { ...current, ...partial };
+    KioskConfigurationRepository.markChanged();
     AuditRepository.log({
       action: 'SETTINGS_UPDATE',
       category: 'BUSINESS',

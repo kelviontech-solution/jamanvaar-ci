@@ -1,0 +1,5 @@
+{
+  "command": "npm run build --workspace=@jamanvaar/cloud-api",
+  "exitCode": 0,
+  "output": ""
+}

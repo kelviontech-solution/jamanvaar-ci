@@ -7,6 +7,9 @@ dist/
 build/
 release/
 *.log
+# Generated logs live here; keep the directory guide in source control.
+/logs/*
+!/logs/README.md
 .DS_Store
 Thumbs.db
 .gemini/

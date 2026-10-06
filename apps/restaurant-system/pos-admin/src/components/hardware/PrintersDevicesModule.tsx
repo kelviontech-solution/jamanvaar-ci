@@ -1,3 +1,4 @@
+import { LocalCorePairing } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { PrinterDevice } from '@jamanvaar/types';
 import { db, PrinterRepository } from '@jamanvaar/database';
@@ -244,6 +245,7 @@ export const PrintersDevicesModule: React.FC<PrintersDevicesModuleProps> = ({
           </div>
         </div>
 
+        <LocalCorePairing serverUrl={db.getSyncServerUrl()} paired={db.isLocalCorePaired()} onPair={(pin, url) => db.pairLocalCore(pin, url)} />
         {/* Host Server URL Configuration */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-8 space-y-1.5">

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { BranchStore } from './store';
 import { mergeOrderItems, paymentViolation } from './rules';
 import { canonicalCommand } from '../../sync/src/command_signing';
+import { kioskConfigurationSchema } from '../../../cloud/api/src/modules/entity-sync/kiosk-configuration-schema';
 
 /** Version of the shared sync protocol this core speaks (bump on any wire-format change). */
 export const SYNC_PROTOCOL_VERSION = 1;
@@ -122,7 +123,7 @@ export interface OrderRow {
 
 const REDELIVER_AFTER_MS = 2 * 60 * 1000;
 const MAX_REDELIVERIES = 3;
-const FLEET_COMMANDS = new Set(['REQUEST_SYNC', 'REQUEST_HEALTH', 'REQUEST_DIAGNOSTICS', 'RESTART_APP', 'CLEAR_CACHE', 'LOCK', 'UNLOCK']);
+const FLEET_COMMANDS = new Set(['REQUEST_SYNC', 'REQUEST_HEALTH', 'REQUEST_DIAGNOSTICS', 'RESTART_APP', 'CLEAR_CACHE', 'LOCK', 'UNLOCK', 'FORCE_LOGOUT']);
 
 export class BranchCore {
   readonly listeners = new Set<(e: RealtimeEvent) => void>();
@@ -411,7 +412,14 @@ export class BranchCore {
 
   // ------------------------------------------------------------------ generic entities (menu, staff, tables ...)
 
-  pushEntities(device: { id: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any> }>, origin: 'device' | 'cloud' = 'device') {
+  pushEntities(device: { id: string; type?: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any> }>, origin: 'device' | 'cloud' = 'device') {
+    if (type === 'KIOSK_CONFIGURATION') {
+      if (origin === 'device' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') throw new CoreError(403, 'FORBIDDEN', 'Only a restaurant console can edit kiosk configuration');
+      for (const event of events) {
+        if (event.payload.branchId !== this.cfg.branchId) throw new CoreError(403, 'WRONG_BRANCH', 'Kiosk configuration belongs to another branch');
+        if (!kioskConfigurationSchema.safeParse(event.payload).success) throw new CoreError(400, 'BAD_REQUEST', 'Invalid kiosk configuration');
+      }
+    }
     const results: Array<{ externalId: string; status: 'ok' | 'error'; syncVersion?: number }> = [];
     let changed = false;
     const now = this.now();
@@ -490,6 +498,7 @@ export class BranchCore {
     const target = this.store.get<Record<string, any>>("SELECT * FROM devices WHERE id = ? AND status != 'REVOKED'", targetId);
     if (!target) throw new CoreError(404, 'NOT_FOUND', 'Device not found');
     if (issuer.type === 'KIOSK_ADMIN' && target.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Kiosk Admin can only manage kiosks');
+    if (dto.commandType === 'FORCE_LOGOUT' && target.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Remote logout is available for customer kiosks only');
     if (dto.idempotencyKey) {
       const prior = this.store.get<Record<string, any>>('SELECT * FROM commands WHERE device_id = ? AND idempotency_key = ?', targetId, dto.idempotencyKey);
       if (prior) return { id: prior.id, deviceId: targetId, commandType: prior.type, status: prior.status };
@@ -526,8 +535,13 @@ export class BranchCore {
   }
 
   ackCommand(device: { id: string }, id: string, outcome: { status: 'SUCCEEDED' | 'FAILED'; result?: unknown; error?: string }) {
-    const r = this.store.run('UPDATE commands SET status = ?, result = ?, error = ? WHERE id = ? AND device_id = ?', outcome.status, outcome.result ? JSON.stringify(outcome.result) : null, outcome.error ?? null, id, device.id);
-    if (r.changes === 0) throw new CoreError(404, 'NOT_FOUND', 'Command not found for this device');
+    if (!['SUCCEEDED', 'FAILED'].includes(outcome.status)) throw new CoreError(400, 'BAD_REQUEST', 'Invalid command outcome');
+    this.store.transaction(() => {
+      const command = this.store.get<{ type: string }>('SELECT type FROM commands WHERE id = ? AND device_id = ?', id, device.id);
+      if (!command) throw new CoreError(404, 'NOT_FOUND', 'Command not found for this device');
+      this.store.run('UPDATE commands SET status = ?, result = ?, error = ? WHERE id = ? AND device_id = ?', outcome.status, outcome.result ? JSON.stringify(outcome.result) : null, outcome.error ?? null, id, device.id);
+      if (command.type === 'FORCE_LOGOUT' && outcome.status === 'SUCCEEDED') this.store.run("UPDATE devices SET status = 'REVOKED' WHERE id = ? AND type = 'KIOSK'", device.id);
+    });
     return { id, status: outcome.status };
   }
 

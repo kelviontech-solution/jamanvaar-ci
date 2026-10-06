@@ -2,7 +2,7 @@ import { BranchCore } from './core';
 import { nextAttemptState } from '../../sync/src/sync_protocol';
 
 /** Entity types (menu, staff, tables...) the core mirrors in both directions. */
-export const MIRRORED_ENTITY_TYPES = ['TAX_GROUP', 'MODIFIER_GROUP', 'RESERVATION', 'MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK'];
+export const MIRRORED_ENTITY_TYPES = ['TAX_GROUP', 'MODIFIER_GROUP', 'RESERVATION', 'MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK', 'KIOSK_CONFIGURATION'];
 
 export interface UplinkOptions {
   cloudBase: string;
@@ -227,7 +227,9 @@ export class CloudUplink {
         if (res.status !== 200) throw new Error(`entities download ${type} ${res.status}`);
         const entities = res.data.entities as Array<{ externalId: string; payload: any; updatedAt: string }>;
         if (entities.length > 0) {
-          const applied = this.core.pushEntities({ id: 'cloud' }, type, entities.map((e) => ({ externalId: e.externalId, payload: e.payload })), 'cloud');
+          // An owner console credential can read every branch; this core mirrors only its own kiosk presentation.
+          const scoped = type === 'KIOSK_CONFIGURATION' ? entities.filter(e => e.payload.branchId === this.core.cfg.branchId) : entities;
+          const applied = this.core.pushEntities({ id: 'cloud' }, type, scoped.map((e) => ({ externalId: e.externalId, payload: e.payload })), 'cloud');
           if (applied.results.some((r) => r.status === 'error')) throw new Error(`Could not apply ${type} page`);
         }
         total += entities.length;

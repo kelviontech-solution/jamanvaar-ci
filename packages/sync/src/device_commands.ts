@@ -55,14 +55,24 @@ function writeDone(ids: string[]): void {
 export class DeviceCommandRunner {
   private static handlers = new Map<string, Handler>();
   private static running = false;
+  private static afterAcknowledgement = new Map<string, () => void | Promise<void>>();
+  private static recheck = new Set<string>();
+  private static afterAttempt = new Map<string, () => void>();
+  static registerAfterAttempt(type: string, handler: () => void): void { this.afterAttempt.set(type, handler); }
 
-  static registerHandler(type: string, handler: Handler): void {
+  static registerAfterAcknowledgement(type: string, handler: () => void | Promise<void>): void { this.afterAcknowledgement.set(type, handler); }
+
+  static registerHandler(type: string, handler: Handler, options: { recheckBeforeAcknowledgement?: boolean } = {}): void {
     this.handlers.set(type, handler);
+    if (options.recheckBeforeAcknowledgement) this.recheck.add(type); else this.recheck.delete(type);
   }
 
   static reset(): void {
     this.handlers.clear();
     this.running = false;
+    this.afterAcknowledgement.clear();
+    this.recheck.clear();
+    this.afterAttempt.clear();
   }
 
   /** Built-in handlers every app shares. Apps may override or add more with registerHandler. */
@@ -118,7 +128,10 @@ export class DeviceCommandRunner {
         if (!alreadyDone && verify && !(await verify(cmd))) {
           outcome = { status: 'FAILED', error: 'Command signature is missing or invalid; refused' };
         } else if (alreadyDone) {
-          outcome = { status: 'SUCCEEDED', result: { note: 'already executed' } };
+          if (this.recheck.has(cmd.commandType)) {
+            try { outcome = { status: 'SUCCEEDED', result: (await this.handlers.get(cmd.commandType)?.(cmd) ?? {}) as Record<string, unknown> }; }
+            catch (error) { outcome = { status: 'FAILED', error: error instanceof Error ? error.message : 'Command is no longer safe to complete' }; }
+          } else outcome = { status: 'SUCCEEDED', result: { note: 'already executed' } };
         } else if (HEARTBEAT_APPLIED.has(cmd.commandType)) {
           outcome = { status: 'SUCCEEDED', result: { note: 'applied through the device heartbeat' } };
         } else {
@@ -144,9 +157,10 @@ export class DeviceCommandRunner {
         }
         try {
           await io.ack(cmd.id, outcome);
+          if (outcome.status === 'SUCCEEDED') await this.afterAcknowledgement.get(cmd.commandType)?.();
         } catch {
-          // An unacknowledged command is redelivered and re-acknowledged, never re-run.
-        }
+          // Redelivered commands are re-acknowledged; destructive handlers recheck safety first.
+        } finally { this.afterAttempt.get(cmd.commandType)?.(); }
       }
     } finally {
       this.running = false;

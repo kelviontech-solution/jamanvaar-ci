@@ -1,0 +1,121 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nOrder Confirmed!\n\nMAIN-20261006-801 • TAKEAWAY\n\nOrder Sent to Kitchen (KDS) ✓\nTOKEN\n#K-102\nEstimated Prep Time: 15 Minutes\nPickup at:Counter 1\nDIGITAL DELIVERY & E-BILL OPTIONS\nPrint Receipt\nEmail Bill\nQR Invoice\nHOW WAS YOUR ORDERING EXPERIENCE?\nSubmit Rating\nTrack Order\n← Place New Order\nRECEIPT\nQA KIOSK ONLY MERGED ADMIN 1791270507575\nBILL / RECEIPT\nTOKEN #K-102\nInvoice No:\nMAIN-20261006-801\nOrder Type:\nTAKEAWAY\nDate: 06 Oct 2026\nTime: 02:11 pm\nPOS: Self-Order Kiosk\nITEM\nQTY\nRATE\nAMT\nQA Cafe Bundle 1791276056091\n1\n₹90\n₹90\nSubtotal\n₹90\nCGST\n₹0.00\nSGST\n₹0.00\nTOTAL\n₹90\nPAID VIA:\nUPI\nPayment ref:\n47226203-d739-4fc6-a6e9-e73272b741f5\nThank you from our QA cafe\nQA cafe receipt footer\nPowered by JAMANVAAR\nKITCHEN ORDER TICKET(KOT)\n      *** KITCHEN ORDER TICKET ***\n       STATION: [ MAIN KITCHEN ]\n========================================\nKOT #: MAIN-20261006-801     TYPE: FIRST\nORDER #: MAIN-20261006-801 TOKEN: #K-102\nTYPE: TAKEAWAY               TIME: 14:11\nSERVER / POS: Kiosk Self-Order          \n----------------------------------------\nITEM NAME                            QTY\n----------------------------------------\nQA Cafe Bundle 1791276056091          x1\n========================================",
+  "headings": [
+    "Order Confirmed!",
+    "QA Kiosk Only Merged Admin 1791270507575"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false
+    },
+    {
+      "text": "Print Receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Email Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Invoice",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Submit Rating",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Track Order",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "← Place New Order",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

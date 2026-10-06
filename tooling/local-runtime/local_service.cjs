@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const PORT = 5178;
+const PORT = Number(process.env.JAMANVAAR_LOCAL_PORT || 5178);
 const HOST = '0.0.0.0';
 const DB_FILE = path.join(__dirname, '../../packages/database/src/live_db.json');
 
@@ -16,7 +16,9 @@ const DB_FILE = path.join(__dirname, '../../packages/database/src/live_db.json')
 // and required on every data-bearing endpoint from here on; a short pairing
 // PIN (shown only in this process's own console, never over the network) is
 // the one-time bootstrap a new device uses to receive that key.
-const KEY_FILE = path.join(__dirname, '.local_service_key');
+const DATA_DIR = process.env.JAMANVAAR_LOCAL_DATA_DIR || path.join(__dirname, '../../.jamanvaar/local-relay');
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const KEY_FILE = process.env.JAMANVAAR_LOCAL_DATA_DIR ? path.join(DATA_DIR, '.service_key') : path.join(__dirname, '.local_service_key');
 let SERVICE_KEY;
 if (fs.existsSync(KEY_FILE)) {
   SERVICE_KEY = fs.readFileSync(KEY_FILE, 'utf8').trim();
@@ -39,14 +41,32 @@ const PAIR_LOCKOUT_MS = 60_000;
 let pairFailureCount = 0;
 let pairLockedUntil = 0;
 
-function isAuthorized(req, urlObj) {
-  const header = req.headers['authorization'] || '';
-  const bearerMatch = /^Bearer\s+(.+)$/i.exec(header);
-  // The key is accepted from headers only: a key in the URL ends up in logs and browser history.
-  const presentedKey = String((bearerMatch ? bearerMatch[1] : req.headers['x-service-key']) || '');
-  const a = crypto.createHash('sha256').update(presentedKey).digest();
-  const b = crypto.createHash('sha256').update(String(SERVICE_KEY)).digest();
-  return crypto.timingSafeEqual(a, b);
+function authorizationContext(req) {
+  const match = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
+  const token = String((match ? match[1] : req.headers['x-service-key']) || '');
+  if (token.startsWith('lc1.')) {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const signature = crypto.createHmac('sha256', SERVICE_KEY).update(parts[1]).digest('hex');
+    if (parts[2].length !== signature.length || !crypto.timingSafeEqual(Buffer.from(parts[2]), Buffer.from(signature))) return null;
+    try { return scopedContext(JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))); } catch { return null; }
+  }
+  // Existing manually provisioned legacy clients retain their own legacy store.
+  const a = crypto.createHash('sha256').update(token).digest();
+  const b = crypto.createHash('sha256').update(SERVICE_KEY).digest();
+  return crypto.timingSafeEqual(a, b) ? { key: 'legacy', state: dbState, file: DB_FILE } : null;
+}
+const contexts = new Map();
+function scopedContext(scope) {
+  if (![scope.restaurantId, scope.branchId].every(v => typeof v === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(v))) throw new Error('A valid restaurant and branch are required.');
+  const key = crypto.createHash('sha256').update(JSON.stringify([scope.restaurantId, scope.branchId])).digest('hex');
+  if (!contexts.has(key)) {
+    const file = path.join(DATA_DIR, `${key}.json`);
+    const empty = { orders: [], idempotencyMap: {}, kioskHeartbeats: {}, auditLogs: [], receiptRecords: [], tables: [], menuItems: [] };
+    const state = fs.existsSync(file) ? { ...empty, ...JSON.parse(fs.readFileSync(file, 'utf8')) } : empty;
+    contexts.set(key, { key, state, file, ...scope });
+  }
+  return contexts.get(key);
 }
 
 // Data-bearing endpoints only — /health, /sync/status (no sensitive payload),
@@ -92,7 +112,7 @@ if (fs.existsSync(DB_FILE)) {
 // truncated/corrupt half-write (the previous direct fs.writeFile could
 // destroy the only copy of a restaurant's data on interruption). Also keeps
 // one rolling backup of the last-known-good file as a manual recovery option.
-function saveDb() {
+function persistDb(dbState, DB_FILE) {
   const tmpFile = `${DB_FILE}.tmp`;
   const backupFile = `${DB_FILE}.bak`;
   try {
@@ -107,7 +127,7 @@ function saveDb() {
 }
 
 // Helper: Broadcast Real-Time Event via SSE
-function broadcastEvent(eventName, payload) {
+function broadcastScopedEvent(scopeKey, eventName, payload) {
   const data = JSON.stringify({
     event: eventName,
     ...payload,
@@ -117,13 +137,13 @@ function broadcastEvent(eventName, payload) {
 
   sseClients.forEach((client) => {
     try {
-      client.write(message);
+      if (client.scopeKey === scopeKey) client.res.write(message);
     } catch (e) {}
   });
 }
 
 // Helper: Generate structured order number (e.g. JV-20260825-000108)
-function generateOrderNumber() {
+function nextOrderNumber(dbState) {
   const d = new Date();
   const dateStr = d.getFullYear().toString() +
     String(d.getMonth() + 1).padStart(2, '0') +
@@ -133,7 +153,7 @@ function generateOrderNumber() {
 }
 
 // Helper: Generate next 3-digit Token Number (e.g. 101 to 999)
-function generateNextToken() {
+function nextToken(dbState) {
   let highest = 100;
   (dbState.orders || []).forEach((o) => {
     const num = parseInt(o.tokenNumber, 10);
@@ -163,8 +183,16 @@ const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = urlObj.pathname;
 
+  const context = authorizationContext(req);
+  // Request-local references are essential: asynchronous body readers must never share another tenant's state.
+  const dbState = context?.state || {};
+  const saveDb = () => persistDb(dbState, context.file);
+  const broadcastEvent = (name, payload) => broadcastScopedEvent(context.key, name, payload);
+  const generateOrderNumber = () => nextOrderNumber(dbState);
+  const generateNextToken = () => nextToken(dbState);
+
   // SEC-005 fix: reject unauthenticated access to every data-bearing endpoint.
-  if (isProtectedPath(pathname) && !isAuthorized(req, urlObj)) {
+  if (isProtectedPath(pathname) && !context) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Unauthorized — pair this device via POST /devices/pair first.' }));
     return;
@@ -172,31 +200,8 @@ const server = http.createServer((req, res) => {
 
   // 1. HEALTH & SYSTEM STATUS (/health and /api/health)
   if (req.method === 'GET' && (pathname === '/health' || pathname === '/api/health')) {
-    const now = Date.now();
-    const activeDay = (dbState.businessDays || []).find((b) => b.status === 'OPEN' || b.status === 'REOPENED') || (dbState.businessDays && dbState.businessDays[0]) || {
-      id: 'BD-20260831',
-      businessDate: '2026-08-31',
-      displayDate: '31 August 2026',
-      status: 'OPEN'
-    };
-
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      core_status: 'HEALTHY',
-      database_status: 'HEALTHY',
-      realtime_status: 'CONNECTED',
-      restaurant_id: 'JAMANVAAR-AHM-FLAGSHIP',
-      restaurant_name: (dbState.restaurant && dbState.restaurant.name) || 'JAMANVAAR — The Royal Dining',
-      outlet_id: 'AHM-FLAGSHIP',
-      outlet_name: (dbState.outlet && dbState.outlet.name) || 'Ahmedabad Flagship Store',
-      business_day_id: activeDay.id,
-      business_day_status: activeDay.status,
-      business_day_display: activeDay.displayDate || activeDay.businessDate,
-      active_orders_count: (dbState.orders || []).filter((o) => o.orderStatus !== 'COMPLETED' && o.orderStatus !== 'CANCELLED').length,
-      connected_devices_count: sseClients.length + 3,
-      version: '2.4.0-LOCAL-CORE',
-      timestamp: new Date().toISOString()
-    }));
+    res.end(JSON.stringify({ core_status: 'HEALTHY', service: 'local-relay', pairing_required: true, scoped_pairing: true, version: '3.0.0', timestamp: new Date().toISOString() }));
     return;
   }
 
@@ -265,14 +270,12 @@ const server = http.createServer((req, res) => {
           return;
         }
         pairFailureCount = 0;
+        const scope = { restaurantId: payload.restaurantId, branchId: payload.branchId };
+        const paired = scopedContext(scope);
+        const encoded = Buffer.from(JSON.stringify(scope)).toString('base64url');
+        const signature = crypto.createHmac('sha256', SERVICE_KEY).update(encoded).digest('hex');
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          success: true,
-          serviceKey: SERVICE_KEY,
-          restaurant_id: 'JAMANVAAR-AHM-FLAGSHIP',
-          outlet_id: 'AHM-FLAGSHIP',
-          port: PORT
-        }));
+        res.end(JSON.stringify({ success: true, serviceKey: `lc1.${encoded}.${signature}`, restaurant_id: paired.restaurantId, outlet_id: paired.branchId, port: PORT }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
@@ -315,9 +318,9 @@ const server = http.createServer((req, res) => {
     });
     res.write(`data: ${JSON.stringify({ event: 'CONNECTED', message: 'Connected to Local Restaurant Service' })}\n\n`);
 
-    sseClients.push(res);
+    sseClients.push({ res, scopeKey: context.key });
     req.on('close', () => {
-      sseClients = sseClients.filter((c) => c !== res);
+      sseClients = sseClients.filter((c) => c.res !== res);
     });
     return;
   }
@@ -647,20 +650,25 @@ const server = http.createServer((req, res) => {
           if (incoming.orders && Array.isArray(incoming.orders)) {
             const map = new Map();
             (dbState.orders || []).forEach((o) => map.set(o.id, o));
-            incoming.orders.forEach((o) => map.set(o.id, o));
+            incoming.orders.forEach((o) => {
+              const current = map.get(o.id);
+              const timestamp = v => Date.parse(v.updatedAt || v.createdAt || '') || 0;
+              if (!current || timestamp(o) > timestamp(current)) map.set(o.id, o);
+            });
             dbState.orders = Array.from(map.values()).sort(
               (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
           }
-          ['restaurant', 'outlet', 'categories', 'menuItems', 'modifierGroups', 'combos', 'tables', 'coupons', 'kiosks', 'receiptConfig', 'receiptRecords', 'printJobs', 'auditLogs', 'serviceRequests', 'shifts', 'cashMovements', 'kots', 'heldOrders', 'reservations', 'waitlist', 'inventoryItems', 'stockMovements', 'recipes', 'customerAccounts', 'users', 'roles', 'configuredPrinters', 'license', 'taxGroups'].forEach((k) => {
+          ['restaurant', 'outlet', 'categories', 'menuItems', 'modifierGroups', 'combos', 'tables', 'coupons', 'kiosks', 'receiptConfig', 'receiptRecords', 'printJobs', 'auditLogs', 'serviceRequests', 'shifts', 'cashMovements', 'kots', 'heldOrders', 'reservations', 'waitlist', 'inventoryItems', 'stockMovements', 'recipes', 'customerAccounts', 'configuredPrinters', 'taxGroups'].forEach((k) => {
             if (incoming[k]) {
               if (Array.isArray(incoming[k])) {
-                if (incoming[k].length > 0) dbState[k] = incoming[k];
+                dbState[k] = incoming[k];
               } else {
                 dbState[k] = incoming[k];
               }
             }
           });
+          dbState._relayInitialized = true;
           saveDb();
           broadcastEvent('DB_UPDATE', { state: dbState });
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -862,8 +870,8 @@ server.on('error', (err) => {
 server.listen(PORT, HOST, () => {
   console.log(`=======================================================`);
   console.log(`[JAMANVAAR Local Restaurant Service] ACTIVE & LISTENING`);
-  console.log(`URL: http://${HOST}:${PORT}`);
-  console.log(`Mode: 100% Local On-Premise (No Cloud Required)`);
+  console.log(`URL: http://${HOST}:${server.address().port}`);
+  console.log(`Mode: Authenticated development LAN relay (cloud activation remains required)`);
   console.log(`-------------------------------------------------------`);
   console.log(`Pairing PIN for new devices (POST /devices/pair): ${PAIRING_PIN}`);
   console.log(`This PIN only appears here and changes every restart.`);

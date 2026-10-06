@@ -7,13 +7,27 @@ This document contains all instructions, commands, port mappings, and default cr
 ## ⚡ Quick Start (1-Command Launch)
 
 ### 1. Launch All Servers Concurrently (Cloud + All Terminals)
-Run the entire platform (Cloud API, Super Admin, Restaurant Admin, POS, Captain, KDS, Kiosk, Kiosk Admin, and LAN Sync):
+Run the entire platform (Cloud API, Super Admin, Restaurant Admin, POS, Captain, KDS, Kiosk, and LAN Sync):
 
 ```bash
 npm run dev:all
 ```
 
 Or double-click `start-all-servers.bat`.
+
+### Local Core pairing (one time per app, restaurant and branch)
+
+Port 4000 is the cloud/backend API. Port 5178 is the separate development LAN relay. Starting both services does not pair a browser. **Not paired (cloud sync in use)** means the relay requires authorization; cloud login and cloud sync remain independent.
+
+1. Activate the app with the restaurant's activation key so its restaurant and branch are known. KIOSK_ADMIN keys are entered at the merged Restaurant Admin on port 5176; there is no separate Kiosk Admin app.
+2. Start `npm run dev:sync`. Its console prints a six-digit pairing PIN. If the service was already running before the pairing fix, restart that service once to load the new code. Do not launch a second copy on the same port.
+3. On the Restaurant Admin, POS, Captain or KDS login screen, click **Pair** beside Local Core. Enter `http://localhost:5178` on this computer, or the restaurant server's LAN address on other devices, then enter the console PIN. Restaurant Admin also offers this form under **Printers & Devices** and **Sync Health**.
+4. For an activated kiosk, the installer can open `http://localhost:5174/?local-core-setup=1` to pair it. Close the setup dialog to return to normal ordering.
+
+A successful authenticated sync changes the badge to **Connected**. Pairing survives refresh and server restart. The PIN changes when the server restarts; already paired apps keep working. Each browser/app origin must pair separately. Changing restaurant, branch or server requires pairing for that scope. The PIN and service tokens must remain private.
+
+The development relay is separate from the Branch Core `/api/v1` server. Do not set the Branch Core API address to this relay merely because its health endpoint responds. Scoped relay data is stored under `.jamanvaar/local-relay/`; the previous `packages/database/src/live_db.json` is retained separately and is not imported into activated restaurants.
+
 
 ---
 
@@ -35,7 +49,7 @@ If you only want to work on a specific part of the ecosystem:
 | Target Environment | NPM Command | What It Runs |
 | :--- | :--- | :--- |
 | **Cloud SaaS Suite** | `npm run dev:cloud` | Cloud API (`:4000`) + Super Admin Web (`:5180`) |
-| **Restaurant Terminal Suite** | `npm run dev` | POS Admin, POS, Captain, KDS, Kiosk, Kiosk Admin, LAN Sync |
+| **Restaurant Terminal Suite** | `npm run dev` | POS Admin, POS, Captain, KDS, Kiosk, LAN Sync |
 | **Cloud API Only** | `npm run dev:cloud-api` | NestJS + Prisma Backend (`:4000`) |
 | **Super Admin Web Only** | `npm run dev:super-admin` | Super Admin Web Console (`:5180`) |
 | **Restaurant Admin Only** | `npm run dev:pos-admin` | Restaurant Admin Web App (`:5176`) |
@@ -43,7 +57,6 @@ If you only want to work on a specific part of the ecosystem:
 | **Captain App Only** | `npm run dev:captain` | Waiter Table Ordering App (`:5177`) |
 | **Kitchen Display (KDS)** | `npm run dev:kds` | Kitchen Order Display Terminal (`:5179`) |
 | **Customer Touch Kiosk** | `npm run dev:kiosk` | Self-Ordering Touchscreen Kiosk (`:5174`) |
-| **Kiosk Fleet Admin** | `npm run dev:kiosk-admin` | Kiosk Standee Manager (`:5173`) |
 | **LAN Sync Engine** | `npm run dev:sync` | Local Offline-First Mesh Bridge (`:5178`) |
 
 ---
@@ -59,7 +72,6 @@ If you only want to work on a specific part of the ecosystem:
 | **Captain Mobile/Tablet** | `5177` | [http://localhost:5177](http://localhost:5177) | Waiter order taking, table service status, KOT dispatch |
 | **Kitchen Display System (KDS)** | `5179` | [http://localhost:5179](http://localhost:5179) | Real-time kitchen stations, prep timers, order bumping |
 | **Customer Touch Kiosk** | `5174` | [http://localhost:5174](http://localhost:5174) | Self-ordering touchscreen kiosk for customers with modifiers & combos |
-| **Kiosk Admin** | `5173` | [http://localhost:5173](http://localhost:5173) | Kiosk standee fleet management, visual themes, terminal pairing |
 | **LAN Sync Runtime Server** | `5178` | [http://localhost:5178](http://localhost:5178) | Local restaurant network service bridge (offline synchronization) |
 
 ---

@@ -5,10 +5,11 @@ import { describe, it, expect } from 'vitest';
  * correctly against the real production entitlements model: a restaurant holds one
  * subscription per product family (RESTAURANT vs KIOSK), and pos-admin is the single admin
  * app for both. A Kiosk-only subscriber (POS_ADMIN not enabled) must not see -- not even
- * read-only -- the restaurant floor-service screens (Billing, Orders, Tables, Menu, Staff,
+ * read-only -- the restaurant floor-service screens (Billing, Orders, Tables, Staff,
  * Payments, etc.) they never paid for; those are gated on 'POS_ADMIN'. Account-level/shared
  * infrastructure (Coupons, Reports, Printers, Sync, Settings, Subscription Plans, Audit,
- * Backup, Support) and the Dashboard landing page stay visible regardless of plan.
+ * Backup, Support) and the Dashboard landing page stay visible regardless of plan. Menu and
+ * customisations are shared by POS_ADMIN and KIOSK_ADMIN, since both products need menu editing.
  */
 describe('pos-admin NAV_SECTIONS gating (real data)', () => {
   const RESTAURANT_ONLY_IDS = [
@@ -18,8 +19,6 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
     'TABLES',
     'RESERVATIONS',
     'KITCHEN_KOT',
-    'MENU',
-    'MENU_OPTIONS',
     'INVENTORY',
     'INVENTORY_CONTROL',
     'CUSTOMERS',
@@ -61,6 +60,10 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
 
     expect(allIds).toContain('KIOSKS');
+    expect(allIds).toContain('KIOSK_DESIGN');
+    expect(allIds).toContain('KIOSK_COMBOS');
+    expect(allIds).toContain('MENU');
+    expect(allIds).toContain('MENU_OPTIONS');
   }, 60000);
 
   it('a Kiosk-only subscriber (POS_ADMIN off, KIOSK_ADMIN on) sees Kiosk Terminals and shared items but none of the Restaurant-only screens', async () => {

@@ -31,3 +31,5 @@ export * from './printElement';
 export * from './ScreenErrorBoundary';
 export * from './CachedImg';
 export * from './ConnectionPanel';
+
+export * from './LocalCorePairing';

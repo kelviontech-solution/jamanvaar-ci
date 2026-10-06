@@ -1,0 +1,49 @@
+[
+  {
+    "name": "Unactivated browser cannot pair or read restaurant data",
+    "status": "PASS",
+    "evidence": {
+      "activationRequired": true
+    }
+  },
+  {
+    "name": "Invalid PIN is explained and creates no paired connection",
+    "status": "PASS",
+    "evidence": {
+      "incorrectPinRejected": true
+    }
+  },
+  {
+    "name": "Restaurant Admin pairs through the actual UI and shows authenticated Connected status",
+    "status": "PASS",
+    "evidence": {
+      "paired": true,
+      "authenticatedSync": true,
+      "customHost": true
+    }
+  },
+  {
+    "name": "Refreshing preserves pairing and reopens authenticated real-time sync",
+    "status": "PASS",
+    "evidence": {
+      "refreshPreservedPairing": true
+    }
+  },
+  {
+    "name": "Separate browser terminals receive order and kitchen status over authenticated SSE",
+    "status": "PASS",
+    "evidence": {
+      "createVisibleMs": 132,
+      "statusVisibleMs": 27,
+      "mechanism": "Bearer-authenticated SSE; 8-second polling cannot explain these measurements"
+    }
+  },
+  {
+    "name": "Changing branch stops the old local stream and requires separate pairing",
+    "status": "PASS",
+    "evidence": {
+      "oldPairingRejected": true,
+      "oldConnectionStopped": true
+    }
+  }
+]

@@ -27,3 +27,5 @@ export * from './qr_order_desk';
 export * from './device_identity';
 export * from './staff_sync';
 export * from './local_change_sync';
+
+export * from './kiosk_configuration';

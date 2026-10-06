@@ -5,6 +5,7 @@ export interface GatedNavItem {
   id: string;
   /** When set, this item is hidden unless the restaurant's enabled apps include it. */
   requiresApp?: AppCode;
+  requiresAnyApp?: AppCode[];
 }
 
 /** A real sidebar nav item: GatedNavItem plus the label/icon the UI actually renders. */
@@ -32,7 +33,7 @@ export function filterNavSections<T extends GatedNavItem>(
   return sections
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !item.requiresApp || hasApp(item.requiresApp))
+      items: group.items.filter((item) => (!item.requiresApp || hasApp(item.requiresApp)) && (!item.requiresAnyApp || item.requiresAnyApp.some(hasApp)))
     }))
     .filter((group) => group.items.length > 0);
 }

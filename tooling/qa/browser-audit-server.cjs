@@ -31,7 +31,7 @@ async function main() {
   installBodyParsers(app);
   app.use(require('helmet')({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(require('cookie-parser')());
-  const allowedOrigins = [5174, 5175, 5176, 5177, 5179, 5180, 5190, 5286].map(p => `http://localhost:${p}`);
+  const allowedOrigins = [5174, 5175, 5176, 5177, 5179, 5180, 5190, 5284, 5286].map(p => `http://localhost:${p}`);
   app.enableCors((req, cb) => cb(null, corsFor({ allowedOrigins, qrOrigins: ['http://localhost:5190'] }, req.url, req.headers.origin)));
   app.get(EmailService).send = async (to, subject, html) => {
     const match = /(\d{6})<\/span>/.exec(html);

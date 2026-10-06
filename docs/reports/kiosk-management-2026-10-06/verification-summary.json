@@ -1,0 +1,28 @@
+{
+  "browser": {
+    "passed": 8,
+    "failed": 0,
+    "evidence": "browser-results.json"
+  },
+  "tests": {
+    "final-runtime": {
+      "passed": 1416,
+      "failed": 0,
+      "success": true,
+      "evidence": "logs/kiosk-management-final-runtime.json"
+    },
+    "final-focused": {
+      "passed": 47,
+      "failed": 0,
+      "success": true,
+      "evidence": "logs/kiosk-management-final-focused.json"
+    },
+    "api-tests": {
+      "passed": 38,
+      "failed": 0,
+      "success": true,
+      "evidence": "logs/kiosk-management-api-tests.json"
+    }
+  },
+  "note": "Full-suite and focused counts overlap. No production deployment or real payment verification."
+}

@@ -54,8 +54,8 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
   {
     section: 'MENU & INVENTORY',
     items: [
-      { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed, requiresApp: 'POS_ADMIN' },
-      { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders, requiresApp: 'POS_ADMIN' },
+      { id: 'MENU', label: 'Menu & Categories', icon: UtensilsCrossed, requiresAnyApp: ['POS_ADMIN', 'KIOSK_ADMIN'] },
+      { id: 'MENU_OPTIONS', label: 'Customisations & Tax', icon: Sliders, requiresAnyApp: ['POS_ADMIN', 'KIOSK_ADMIN'] },
       { id: 'INVENTORY', label: 'Inventory & Recipes', icon: Package, requiresApp: 'POS_ADMIN' },
       { id: 'INVENTORY_CONTROL', label: 'Purchasing & Stock Control', icon: Truck, requiresApp: 'POS_ADMIN' }
     ]
@@ -72,7 +72,7 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
   },
   {
     section: 'KIOSK',
-    items: [{ id: 'KIOSKS', label: 'Kiosk Terminals', icon: Tablet, requiresApp: 'KIOSK_ADMIN' }]
+    items: [{ id: 'KIOSKS', label: 'Kiosk Terminals', icon: Tablet, requiresApp: 'KIOSK_ADMIN' }, { id: 'KIOSK_DESIGN', label: 'Kiosk Appearance & Content', icon: Sliders, requiresApp: 'KIOSK_ADMIN' }, { id: 'KIOSK_COMBOS', label: 'Kiosk Combos & Deals', icon: Tag, requiresApp: 'KIOSK_ADMIN' }]
   },
   {
     section: 'ANALYTICS & SYSTEM',

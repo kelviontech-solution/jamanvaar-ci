@@ -61,6 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
           scrolls within the card instead of pushing the primary action
           off-screen or forcing the whole backdrop to scroll. */}
       <div
+        role="dialog" aria-modal="true" aria-label={title || 'Dialog'}
         className={`relative w-full ${widthClasses[maxWidth]} max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col ${className}`}
         onClick={(e) => e.stopPropagation()}
       >

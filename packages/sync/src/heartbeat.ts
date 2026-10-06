@@ -48,24 +48,39 @@ function routed(opts: HeartbeatOpts, path: string, init?: RequestInit): Promise<
 }
 
 /** Fetches this device's queued commands, runs the ones the app supports, and acknowledges each. */
-async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
+export async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
   DeviceCommandRunner.registerDefaults();
   const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` };
   let fromCore = false;
+  const cloudCommands = new Set<string>();
+  const cloudRequest = (path: string, init: RequestInit = {}) => DeviceGate.gatedFetch(`${opts.apiBase.replace(/\/+$/, '')}${path}`, { ...init, signal: AbortSignal.timeout(6000) });
   await DeviceCommandRunner.run({
     async list() {
       const r = await routed(opts, '/api/v1/devices/me/commands', { headers });
       if (!r.ok) throw new Error(`commands ${r.status}`);
       const list = (await r.json()) as Array<{ id: string; commandType: string; payload?: unknown; signature?: string }>;
       fromCore = EndpointResolver.responderFor(r) === 'core';
+      if (fromCore) {
+        // Platform/console commands are cloud-owned; the Branch Core does not mirror them.
+        // Check them on the existing heartbeat cycle even when operational sync prefers LAN.
+        try {
+          const response = await cloudRequest('/api/v1/devices/me/commands', { headers });
+          if (response.ok) {
+            const pending = await response.json() as typeof list;
+            for (const command of pending) { cloudCommands.add(command.id); if (!list.some(local => local.id === command.id)) list.push(command); }
+          }
+        } catch { /* LAN commands remain available while the internet is down. */ }
+      }
       return list;
     },
     async ack(id, outcome) {
-      await routed(opts, `/api/v1/devices/me/commands/${id}/ack`, { method: 'POST', headers, body: JSON.stringify(outcome) });
+      const request = cloudCommands.has(id) ? cloudRequest : (path: string, init: RequestInit) => routed(opts, path, init);
+      const response = await request(`/api/v1/devices/me/commands/${id}/ack`, { method: 'POST', headers, body: JSON.stringify(outcome) });
+      if (!response.ok) throw new Error(`Command acknowledgement failed (${response.status})`);
     }
   }, async (cmd) => {
     // Commands from the cloud arrive over TLS from a trusted origin. Anything from a Branch Core on the LAN must carry the core's signature.
-    if (!fromCore) return true;
+    if (!fromCore || cloudCommands.has(cmd.id)) return true;
     const deviceId = DeviceGate.getState().deviceId;
     if (!deviceId) return false; // this device does not yet know its own id: fail closed
     return verifyCommand(await tokenKey(opts.deviceToken), { id: cmd.id, commandType: cmd.commandType, payload: cmd.payload, deviceId }, cmd.signature);

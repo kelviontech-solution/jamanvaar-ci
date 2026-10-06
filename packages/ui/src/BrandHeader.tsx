@@ -29,6 +29,7 @@ export interface BrandHeaderProps {
    * Standard header height: 44px to 48px.
    */
   logoHeight?: number;
+  logoUrl?: string;
   /** App badge size */
   badgeSize?: 'sm' | 'md' | 'lg';
   /** Enable subtle ambient warm glow effect */
@@ -45,6 +46,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
   terminalId,
   showContext = true,
   logoHeight = 46,
+  logoUrl,
   badgeSize = 'sm',
   glow = true,
   className = '',
@@ -62,7 +64,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
       {/* ── JAMANVAAR Master Brand Logo (Prominent, uncropped, sharp) ── */}
       <div className="flex items-center justify-center shrink-0 pr-1">
         <img
-          src={JAMANVAAR_LOGOS.horizontal}
+          src={logoUrl || JAMANVAAR_LOGOS.horizontal}
           alt="JAMANVAAR by KELVIONTECH"
           style={{
             height: `${logoHeight}px`,

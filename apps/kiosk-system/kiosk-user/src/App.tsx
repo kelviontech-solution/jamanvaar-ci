@@ -1,3 +1,6 @@
+import { DeviceCommandRunner } from '@jamanvaar/sync';
+import { resetTerminal } from './cloud/cloudClient';
+import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers } from '@jamanvaar/sync';
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
@@ -92,7 +95,8 @@ import {
   JamanvaarKioskAuthLayout,
   ActivationNoticeBanner,
   ActivationHelpNote,
-  CachedImg
+  CachedImg,
+  LocalCorePairing
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
@@ -216,6 +220,9 @@ function toQrImageSrc(payload: string, contentType: string | null): string | nul
 }
 
 export default function KioskUserApp() {
+  const remoteLogoutSafety = useRef(false);
+  const remoteLogoutInProgressRef = useRef(false);
+  const [remoteLogoutInProgress, setRemoteLogoutInProgress] = useState(false);
   // Device activation (Phase 3) — this terminal has no identity until an
   // activation code is redeemed; everything below assumes a real device.
   const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isKioskDeviceConnected());
@@ -305,6 +312,19 @@ export default function KioskUserApp() {
     }
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_kiosk_user_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+    DeviceCommandRunner.registerHandler('FORCE_LOGOUT', async () => {
+      if (remoteLogoutSafety.current || loadPendingPayment()) throw new Error('A payment is in progress or awaiting fulfilment. Finish or cancel it before logging out this kiosk.');
+      remoteLogoutInProgressRef.current = true; setRemoteLogoutInProgress(true);
+      await SyncOutboxEngine.processOutbox();
+      if (remoteLogoutSafety.current || loadPendingPayment()) throw new Error('A payment started while preparing logout. Finish it before retrying.');
+      const stats = SyncOutboxEngine.getSyncStats();
+      if (stats.pendingCount || stats.failedCount || stats.deadLetterCount) throw new Error('Unsent orders remain. Sync them before logging out this kiosk.');
+      return { readyForLogout: true, ordersRetained: true };
+    }, { recheckBeforeAcknowledgement: true });
+    DeviceCommandRunner.registerAfterAcknowledgement('FORCE_LOGOUT', () => {
+      db.unpairLocalCore(); resetTerminal(); setIsDeviceActivated(false);
+    });
+    DeviceCommandRunner.registerAfterAttempt('FORCE_LOGOUT', () => { remoteLogoutInProgressRef.current = false; setRemoteLogoutInProgress(false); });
 
     // BUG-016: this terminal had no menu sync at all, so a fresh or cleared kiosk fell back
     // to the local seed menu instead of the restaurant's real one. Pull-only — a customer
@@ -318,6 +338,7 @@ export default function KioskUserApp() {
     void SyncOutboxEngine.processOutbox();
     void SyncOutboxEngine.catchUpFromCloud();
     void syncMenuCatalog({ push: false });
+    void syncKioskConfiguration().catch(() => {});
     // BUG-130/133/136/137: combos and coupons made in Kiosk Admin arrive here; coupon redemptions, guest ratings
     // and "call staff" requests go back.
     void syncPromotions({ pushCombos: false, pushCoupons: true });
@@ -352,6 +373,7 @@ export default function KioskUserApp() {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
       void syncMenuCatalog({ push: false });
+    void syncKioskConfiguration().catch(() => {});
       void syncPromotions({ pushCombos: false, pushCoupons: true });
       void syncFeedback({ push: true });
       void pushServiceMessages();
@@ -418,6 +440,7 @@ export default function KioskUserApp() {
   // Accessibility States
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const [localCoreSetupOpen, setLocalCoreSetupOpen] = useState(() => new URLSearchParams(window.location.search).get('local-core-setup') === '1');
   const [isLargeText, setIsLargeText] = useState(false);
 
   // Session & Order Details
@@ -488,6 +511,7 @@ export default function KioskUserApp() {
   // The restaurant's online payments are switched on only once its Razorpay vendor is verified. Until then the guest is told so.
   const [onlinePaymentsPending, setOnlinePaymentsPending] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  remoteLogoutSafety.current = isProcessingPayment || (!!realPaymentId && !['SUCCESS', 'FAILED', 'EXPIRED', 'CANCELLED', 'REFUNDED'].includes(paymentStatus));
   // The UPI QR shown on this screen for the pending payment (created by the server, rendered here).
   const [qrImageSrc, setQrImageSrc] = useState<string | null>(null);
   const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
@@ -541,25 +565,23 @@ export default function KioskUserApp() {
     {
       id: 'cust-init',
       sender: 'ASSISTANT',
-      text: 'Namaste! Welcome to JAMANVAAR. How can I help you choose your feast today?',
+      text: KioskDisplaySettingsRepository.getSettings().texts?.[lang]?.chatWelcome || 'Namaste! How can I help you choose your meal today?',
       timestamp: new Date().toISOString(),
-      suggestions: ['What should I order?', 'Show vegetarian dishes', 'Show Jain food', 'Show today\'s offers', 'How do I pay?']
+      suggestions: ['Order', 'Veg', 'Jain', 'Offers', 'Pay'].map((suffix, index) => KioskDisplaySettingsRepository.getSettings().texts?.[lang]?.[`chatSuggestion${suffix}`] || ['What should I order?', 'Show vegetarian dishes', 'Show Jain food', "Show today's offers", 'How do I pay?'][index])
     }
   ]);
 
-  // Inactivity Idle Timer — thresholds are Kiosk Admin-configurable (see
-  // KioskDisplaySettingsRepository); read once per mount, same as
-  // defaultLanguage above, since a duration changing mid-session shouldn't
-  // reset an already-running countdown out from under the current guest.
-  const [idleThresholds] = useState(() => {
+  // Read current settings on database notifications; later sessions use newly published thresholds.
+  const idleThresholds = (() => {
     const s = KioskDisplaySettingsRepository.getSettings();
     return { warningAfter: s.idleWarningAfterSeconds, resetCountdown: s.idleResetCountdownSeconds };
-  });
+  })();
   const [idleSeconds, setIdleSeconds] = useState<number>(0);
   const [showIdleWarning, setShowIdleWarning] = useState<boolean>(false);
   const [idleCountdown, setIdleCountdown] = useState<number>(idleThresholds.resetCountdown);
 
-  const t = (key: TranslationKey) => translate(key, lang);
+  const t = (key: TranslationKey) => KioskDisplaySettingsRepository.getSettings().texts?.[lang]?.[key] || translate(key, lang);
+  const kioskCopy = (key: string, fallback: string) => KioskDisplaySettingsRepository.getSettings().texts?.[lang]?.[key] || fallback;
 
   // Auto-configure built-in kiosk thermal printer & resume crash recovery on startup (Sections 2, 8, 17)
   useEffect(() => {
@@ -828,8 +850,8 @@ export default function KioskUserApp() {
     const sendHeartbeat = () => {
       if (window.location.protocol === 'https:') return;
       if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
-      const host = window.location?.hostname || 'localhost';
-      fetch(`http://${host}:5178/api/heartbeat`, {
+      if (db.isLocalCoreUnauthorized()) return;
+      db.localCoreFetch('/api/heartbeat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -868,12 +890,15 @@ export default function KioskUserApp() {
 
   // Full Session Memory Scrub (Sections 224-226: No customer data leaks)
   const handleFullSessionReset = () => {
+    const currentDisplay = KioskDisplaySettingsRepository.getSettings();
+    const nextSessionCopy = (key: string, fallback: string) => currentDisplay.texts?.[currentDisplay.defaultLanguage]?.[key] || fallback;
     cancelAbandonedPendingOrder();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     setSessionId(generateUUID());
     setStep('WELCOME');
+    setLang(currentDisplay.defaultLanguage as SupportedLanguage);
     applyCart([]);
     setIsCartOpen(false);
     setPrintSettled(false);
@@ -906,14 +931,14 @@ export default function KioskUserApp() {
       {
         id: 'cust-init',
         sender: 'ASSISTANT',
-        text: 'Namaste! Welcome to JAMANVAAR. How can I help you choose your feast today?',
+        text: nextSessionCopy('chatWelcome', 'Namaste! How can I help you choose your meal today?'),
         timestamp: new Date().toISOString(),
         suggestions: [
-          'What should I order?',
-          'Show vegetarian dishes',
-          'Show Jain food',
-          'Show today\'s offers',
-          'How do I pay?'
+          nextSessionCopy('chatSuggestionOrder', 'What should I order?'),
+          nextSessionCopy('chatSuggestionVeg', 'Show vegetarian dishes'),
+          nextSessionCopy('chatSuggestionJain', 'Show Jain food'),
+          nextSessionCopy('chatSuggestionOffers', "Show today's offers"),
+          nextSessionCopy('chatSuggestionPay', 'How do I pay?')
         ]
       }
     ]);
@@ -941,7 +966,8 @@ export default function KioskUserApp() {
     MenuRepository.getAllCategories(),
     MenuRepository.getAllMenuItems()
   );
-  const combos = ComboRepository.getAllCombos();
+  const combos = ComboRepository.getAllCombos().filter(combo => combo.isAvailable !== false);
+  const isNonVegCombo = (combo: ComboDeal) => MenuRepository.getMenuItemById(`combo-${combo.id}`)?.dietaryType === 'NON_VEG' || [...combo.mainItemIds, ...combo.sideItemIds, ...combo.drinkItemIds, ...combo.dessertItemIds].some(id => MenuRepository.getMenuItemById(id)?.dietaryType === 'NON_VEG');
   const tables = TableRepository.getAllTables();
   const kioskConfig = KioskRepository.getKioskById(kioskId);
   const receiptConfig = ReceiptRepository.getConfig();
@@ -1125,7 +1151,9 @@ export default function KioskUserApp() {
       sortOrder: 1,
       imageUrl: combo.imageUrl
     };
-    addToCartDirect(comboItem, 1, [], 'Chef Value Combo Package');
+    const publishedBundle = MenuRepository.getMenuItemById(comboItem.id);
+    if (!publishedBundle || !publishedBundle.isAvailable) { showToast('This combo is not published or is unavailable. Please choose another item.'); return; }
+    addToCartDirect(publishedBundle, 1, [], combo.description);
   };
 
   const handleConfirmCustomization = () => {
@@ -1234,6 +1262,7 @@ export default function KioskUserApp() {
 
   // Start Payment Process
   const handleProceedToPayment = async () => {
+    if (remoteLogoutInProgressRef.current) return;
     SoundService.playTap();
     resetIdleTimer();
     if (cartItems.length === 0) return;
@@ -1861,6 +1890,8 @@ export default function KioskUserApp() {
     );
   }
 
+  if (remoteLogoutInProgress) return <JAMANVAARStartup appName="Self-Order Kiosk" appType="KIOSK"><div role="status" className="p-8 text-center"><h2 className="text-2xl font-bold">Kiosk logout in progress</h2><p>Waiting for Restaurant Admin confirmation. Your saved orders are retained.</p></div></JAMANVAARStartup>;
+
   // Maintenance screen if locked by Admin
   if (kioskConfig && kioskConfig.isLocked) {
     return (
@@ -1887,6 +1918,7 @@ export default function KioskUserApp() {
   return (
     <JAMANVAARStartup appName="Self-Order Kiosk" appType="KIOSK" subtitle="Customer Self-Ordering Experience">
       <div
+        style={{ '--color-brand': kioskSettings.accentColor || '#EF6A0B', '--kiosk-accent': kioskSettings.accentColor || '#EF6A0B' } as React.CSSProperties}
         onClick={resetIdleTimer}
         onTouchStart={resetIdleTimer}
         className={`min-h-screen min-h-dvh flex flex-col bg-jaman-ivory text-jaman-navy select-none ${
@@ -1899,6 +1931,9 @@ export default function KioskUserApp() {
           these classes. See handleStartOrder / the step-effect above for
           the JS side that flips these on and off. */}
       <style>{`
+        .bg-brand, .bg-jaman-saffron { background-color: var(--kiosk-accent); }
+        .text-brand, .text-jaman-saffron { color: var(--kiosk-accent); }
+        .border-brand { border-color: var(--kiosk-accent); }
         @keyframes kioskStartOrderTap {
           0% { transform: scale(1); }
           45% { transform: scale(0.93); }
@@ -2042,6 +2077,7 @@ export default function KioskUserApp() {
           )}
           <BrandHeader
             app="KIOSK"
+            logoUrl={kioskSettings.logoUrl}
             logoHeight={64}
             badgeSize="sm"
             showContext={false}
@@ -2061,7 +2097,7 @@ export default function KioskUserApp() {
           {loggedInAccount && (
             <div className="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-800">
               <Award className="w-4 h-4 text-emerald-600" />
-              <span>{loggedInAccount.loyaltyPoints} Pts (₹{loggedInAccount.loyaltyPoints})</span>
+              <span>{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts__f501d5", "Pts (₹")}{loggedInAccount.loyaltyPoints})</span>
             </div>
           )}
 
@@ -2074,7 +2110,7 @@ export default function KioskUserApp() {
             className="flex items-center gap-2 h-11 bg-jaman-saffron/10 hover:bg-jaman-saffron/20 text-jaman-saffron px-4 py-2.5 rounded-xl text-sm font-bold border border-jaman-saffron/30 transition-all active:scale-95"
           >
             <Sparkles className="w-4 h-4" />
-            <span className="hidden sm:inline">Need Help?</span>
+            <span className="hidden sm:inline">{kioskCopy("screen_need_help__5c799f", "Need Help?")}</span>
           </button>
 
           {/* Call Staff Button — kept directly visible and one tap, not
@@ -2147,8 +2183,7 @@ export default function KioskUserApp() {
                           : 'bg-amber-500'
                       }`}
                     ></span>
-                    <span>
-                      Network: {networkState === 'ONLINE' ? 'Online' : networkState === 'SYNCING' ? 'Syncing…' : 'Offline'}
+                    <span>{kioskCopy("screen_network__760113", "Network:")}{networkState === 'ONLINE' ? 'Online' : networkState === 'SYNCING' ? 'Syncing…' : 'Offline'}
                     </span>
                     <button
                       onClick={() => {
@@ -2157,9 +2192,7 @@ export default function KioskUserApp() {
                       }}
                       title="Simulate online/offline (staff diagnostic)"
                       className="ml-auto text-[10px] text-[#8C9BAE] underline"
-                    >
-                      simulate
-                    </button>
+                    >{kioskCopy("screen_simulate_b9efe3", "simulate")}</button>
                   </div>
 
                   <button
@@ -2185,15 +2218,12 @@ export default function KioskUserApp() {
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-jaman-navy hover:bg-jaman-ivory text-left"
                   >
-                    <Smartphone className="w-4 h-4 text-jaman-saffron" />
-                    Order on Phone
-                  </button>
+                    <Smartphone className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_order_on_phone_a6b0af", "Order on Phone")}</button>
 
                   {loggedInAccount ? (
                     <div className="sm:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-emerald-800">
                       <Award className="w-4 h-4 text-emerald-600" />
-                      {loggedInAccount.loyaltyPoints} Loyalty Points
-                    </div>
+                      {loggedInAccount.loyaltyPoints}{kioskCopy("screen_loyalty_points_d9d154", "Loyalty Points")}</div>
                   ) : (
                     <button
                       onClick={() => {
@@ -2203,9 +2233,7 @@ export default function KioskUserApp() {
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-jaman-navy hover:bg-jaman-ivory text-left"
                     >
-                      <UserCheck className="w-4 h-4 text-jaman-saffron" />
-                      Loyalty / Login
-                    </button>
+                      <UserCheck className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_loyalty_login_eceb65", "Loyalty / Login")}</button>
                   )}
                 </div>
               </>
@@ -2270,13 +2298,11 @@ export default function KioskUserApp() {
             <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
           </button>
           <div className="kiosk-lang-logo relative z-10 flex justify-center">
-            <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '96px', width: 'auto' }} className="drop-shadow-sm" />
+            {kioskSettings.logoUrl ? <img src={kioskSettings.logoUrl} alt="Restaurant logo" style={{height: 96, maxWidth: '100%', objectFit: 'contain'}} /> : <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '96px', width: 'auto' }} className="drop-shadow-sm" />}
           </div>
 
           <div className="kiosk-lang-heading relative z-10 space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-black text-jaman-navy tracking-tight font-serif">
-              Choose your language
-            </h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-jaman-navy tracking-tight font-serif">{kioskCopy("screen_choose_your_language_8e2d06", "Choose your language")}</h1>
             <p className="text-base text-[#4A5568] font-medium">भाषा चुनें • ભાષા પસંદ કરો</p>
           </div>
 
@@ -2299,9 +2325,7 @@ export default function KioskUserApp() {
             ))}
           </div>
 
-          <p className="relative z-10 text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">
-            You can change this anytime from the header
-          </p>
+          <p className="relative z-10 text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">{kioskCopy("screen_you_can_change_this_anytime_from_the_header_d8f222", "You can change this anytime from the header")}</p>
         </div>
       )}
 
@@ -2332,7 +2356,7 @@ export default function KioskUserApp() {
             {/* CENTER SAFE AREA */}
             <div className={`kiosk-welcome-center flex-shrink-0 flex flex-col items-center text-center space-y-6 relative z-10 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '440px' }}>
               <div className="flex justify-center pb-2">
-                <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />
+                {kioskSettings.logoUrl ? <img src={kioskSettings.logoUrl} alt="Restaurant logo" style={{height: 110, maxWidth: '100%', objectFit: 'contain'}} /> : <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />}
               </div>
 
               <div className="inline-flex items-center gap-2 bg-jaman-saffron/10 border border-jaman-saffron/25 px-4 py-2 rounded-full text-sm font-bold text-jaman-saffron shadow-sm animate-pulse text-center">
@@ -2394,13 +2418,13 @@ export default function KioskUserApp() {
 
           {/* Footer Information */}
           <footer className="flex items-center justify-between text-xs text-[#8C9BAE] font-medium px-8 pb-4 relative z-10">
-            <span>Terminal {kioskId}</span>
+            <span>{kioskCopy("screen_terminal_e0926f", "Terminal")}{kioskId}</span>
             <button
               onClick={() => setIsStaffPinModalOpen(true)}
               className="text-[11px] text-[#8C9BAE] hover:text-jaman-navy flex items-center gap-1 opacity-60 hover:opacity-100"
             >
               <Lock className="w-3 h-3" />
-              <span>Staff Mode</span>
+              <span>{kioskCopy("screen_staff_mode_35c0cd", "Staff Mode")}</span>
             </button>
           </footer>
         </div>
@@ -2471,15 +2495,11 @@ export default function KioskUserApp() {
         <div className="flex-1 flex flex-col p-8 max-w-5xl mx-auto w-full space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-jaman-navy">{t('selectTable')}</h2>
-            <p className="text-sm text-[#4A5568]">
-              Tap the table number where you are seated.
-            </p>
+            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_tap_the_table_number_where_you_are_seated__5e0202", "Tap the table number where you are seated.")}</p>
           </div>
 
           {tables.length === 0 && (
-            <div className="rounded-2xl border border-jaman-border bg-white p-6 text-center text-sm text-[#4A5568]">
-              No dining tables are set up for this kiosk yet. Continue without a table, or ask staff to add tables.
-            </div>
+            <div className="rounded-2xl border border-jaman-border bg-white p-6 text-center text-sm text-[#4A5568]">{kioskCopy("screen_no_dining_tables_are_set_up_for_this_kiosk_yet_continue_5dc39c", "No dining tables are set up for this kiosk yet. Continue without a table, or ask staff to add tables.")}</div>
           )}
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
             {tables.map((tbl) => (
@@ -2515,9 +2535,7 @@ export default function KioskUserApp() {
                 setSelectedTable(null);
                 setStep('MENU');
               }}
-            >
-              Skip Table Selection (Pick up at counter)
-            </Button>
+            >{kioskCopy("screen_skip_table_selection_pick_up_at_counter__b68635", "Skip Table Selection (Pick up at counter)")}</Button>
           </div>
         </div>
       )}
@@ -2582,7 +2600,7 @@ export default function KioskUserApp() {
               <div className="w-full h-16 rounded-xl bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
                 <Flame className="w-6 h-6" />
               </div>
-              <span className="text-xs font-semibold leading-tight line-clamp-2">Combos & Deals</span>
+              <span className="text-xs font-semibold leading-tight line-clamp-2">{kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}</span>
             </button>
 
             {categories.filter((cat) => menuItems.some((m) => m.categoryId === cat.id && m.isAvailable)).map((cat) => {
@@ -2673,9 +2691,7 @@ export default function KioskUserApp() {
                       : 'bg-jaman-ivory text-[#4A5568] border border-jaman-border hover:bg-orange-50'
                   }`}
                 >
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${dietaryFilter === 'JAIN' ? 'bg-white' : 'bg-jaman-saffron'}`}></span>
-                  🌱 Pure Jain
-                </button>
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${dietaryFilter === 'JAIN' ? 'bg-white' : 'bg-jaman-saffron'}`}></span>{kioskCopy("screen__pure_jain_521c29", "🌱 Pure Jain")}</button>
               </div>
             </div>
 
@@ -2741,7 +2757,7 @@ export default function KioskUserApp() {
                             />
                             <div>
                               <span className="block text-xs sm:text-sm font-black text-jaman-navy whitespace-nowrap">{thali.name}</span>
-                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{thali.price} · Chef Signature</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{thali.price}{kioskCopy("screen__chef_signature_093f51", "· Chef Signature")}</span>
                             </div>
                           </button>
                         )}
@@ -2758,7 +2774,7 @@ export default function KioskUserApp() {
                             />
                             <div>
                               <span className="block text-xs sm:text-sm font-black text-emerald-800 whitespace-nowrap">{coffee.name}</span>
-                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price} · Cold Beverage</span>
+                              <span className="block text-[11px] text-[#4A5568] whitespace-nowrap">₹{coffee.price}{kioskCopy("screen__cold_beverage_f926d2", "· Cold Beverage")}</span>
                             </div>
                           </button>
                         )}
@@ -2794,11 +2810,11 @@ export default function KioskUserApp() {
                               alt={localizedName(combo, lang)}
                               className="w-full h-full object-cover"
                             />
-                            <span className="absolute top-2 left-2 flex items-center gap-1.5 bg-white/95 rounded-full px-2.5 py-1 text-[11px] font-black text-emerald-700">
-                              <span className="w-3 h-3 border border-emerald-600 flex items-center justify-center rounded-sm">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                            <span className={`absolute top-2 left-2 flex items-center gap-1.5 bg-white/95 rounded-full px-2.5 py-1 text-[11px] font-black ${isNonVegCombo(combo) ? 'text-rose-700' : 'text-emerald-700'}`}>
+                              <span className={`w-3 h-3 border flex items-center justify-center rounded-sm ${isNonVegCombo(combo) ? 'border-rose-600' : 'border-emerald-600'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${isNonVegCombo(combo) ? 'bg-rose-600' : 'bg-emerald-600'}`} />
                               </span>
-                              {t('pureVegCombo')}
+                              {isNonVegCombo(combo) ? kioskCopy('nonVegCombo', 'Non-Vegetarian Combo') : t('pureVegCombo')}
                             </span>
                           </div>
                           <div className="flex flex-col flex-1 p-3 gap-1.5">
@@ -2810,7 +2826,7 @@ export default function KioskUserApp() {
                                   ₹{combo.basePrice}
                                   <span className="text-sm line-through text-[#8C9BAE] font-medium ml-1">₹{combo.originalPrice}</span>
                                 </div>
-                                <span className="block mt-1 text-[11px] font-bold text-emerald-600">Save ₹{combo.savingsAmount}</span>
+                                <span className="block mt-1 text-[11px] font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
                               </div>
                               <button
                                 onClick={() => handleSelectCombo(combo)}
@@ -2891,8 +2907,7 @@ export default function KioskUserApp() {
                       onClick={handleFullSessionReset}
                       className="text-xs font-bold text-white/90 hover:text-white flex items-center gap-1.5 transition-colors"
                     >
-                      <Trash2 className="w-3.5 h-3.5" /> Clear All
-                    </button>
+                      <Trash2 className="w-3.5 h-3.5" />{kioskCopy("screen_clear_all_ddceb7", "Clear All")}</button>
                   </h2>
                 </div>
 
@@ -2957,9 +2972,7 @@ export default function KioskUserApp() {
                     <div className="pt-4 space-y-3">
                       <div className="flex items-center justify-between text-[#4A5568] px-1">
                         <span className="text-sm font-bold flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                          Add-ons (Suggested)
-                        </span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>{kioskCopy("screen_add_ons_suggested__fa91bb", "Add-ons (Suggested)")}</span>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
                       </div>
                       <div className="space-y-2">
@@ -2975,9 +2988,7 @@ export default function KioskUserApp() {
                             <button
                               className="h-11 px-5 rounded-full border-[1.5px] border-jaman-saffron bg-white text-jaman-saffron text-sm font-bold shrink-0 active:bg-jaman-saffron/10 transition-colors"
                               onClick={() => handleSelectItem(rec.item)}
-                            >
-                              Add
-                            </button>
+                            >{kioskCopy("screen_add_9fd728", "Add")}</button>
                           </div>
                         ))}
                       </div>
@@ -2994,16 +3005,14 @@ export default function KioskUserApp() {
                   {appliedCoupon ? (
                     <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
                       <div>
-                        <span className="font-bold text-emerald-900">Coupon Applied: {appliedCoupon.code}</span>
+                        <span className="font-bold text-emerald-900">{kioskCopy("screen_coupon_applied__194992", "Coupon Applied:")}{appliedCoupon.code}</span>
                         <p className="text-[10px] text-emerald-700">{appliedCoupon.description}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => { setAppliedCoupon(null); setCouponCodeInput(''); setCouponError(null); }}
                         className="text-xs font-bold text-rose-600"
-                      >
-                        Remove
-                      </button>
+                      >{kioskCopy("screen_remove_c3812f", "Remove")}</button>
                     </div>
                   ) : (
                     <div className="space-y-1.5">
@@ -3020,9 +3029,7 @@ export default function KioskUserApp() {
                           onClick={handleApplyCoupon}
                           disabled={!couponCodeInput.trim()}
                           className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl disabled:opacity-40 shrink-0"
-                        >
-                          Apply
-                        </button>
+                        >{kioskCopy("screen_apply_31e392", "Apply")}</button>
                       </div>
                       {couponError && <p className="text-[10px] text-rose-600 font-semibold">{couponError}</p>}
                     </div>
@@ -3032,22 +3039,20 @@ export default function KioskUserApp() {
                   {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (
                     <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
                       <div>
-                        <span className="font-bold text-emerald-900">Redeem Loyalty Points</span>
-                        <p className="text-[10px] text-emerald-700">Balance: {loggedInAccount.loyaltyPoints} Pts</p>
+                        <span className="font-bold text-emerald-900">{kioskCopy("screen_redeem_loyalty_points_8591d3", "Redeem Loyalty Points")}</span>
+                        <p className="text-[10px] text-emerald-700">{kioskCopy("screen_balance__e03512", "Balance:")}{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts_52ee19", "Pts")}</p>
                       </div>
                       {redeemedPoints > 0 ? (
                         <button
                           onClick={() => setRedeemedPoints(0)}
                           className="text-xs font-bold text-rose-600"
-                        >
-                          Remove (₹{redeemedPoints})
+                        >{kioskCopy("screen_remove__4a816f", "Remove (₹")}{redeemedPoints})
                         </button>
                       ) : (
                         <button
                           onClick={() => setRedeemedPoints(Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal))}
                           className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
-                        >
-                          Redeem ₹{Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal)}
+                        >{kioskCopy("screen_redeem__324583", "Redeem ₹")}{Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal)}
                         </button>
                       )}
                     </div>
@@ -3067,13 +3072,13 @@ export default function KioskUserApp() {
                     )}
                     {redeemedPoints > 0 && (
                       <div className="flex justify-between text-sm text-emerald-600 font-bold">
-                        <span>Loyalty Reward Points</span>
+                        <span>{kioskCopy("screen_loyalty_reward_points_fe7dc0", "Loyalty Reward Points")}</span>
                         <span>-{formatINR(redeemedPoints)}</span>
                       </div>
                     )}
                     {staffDiscount > 0 && (
                       <div className="flex justify-between text-indigo-600 font-bold">
-                        <span>Staff Manager Discount (10%)</span>
+                        <span>{kioskCopy("screen_staff_manager_discount_10__c08554", "Staff Manager Discount (10%)")}</span>
                         <span>-{formatINR(staffDiscount)}</span>
                       </div>
                     )}
@@ -3112,8 +3117,7 @@ export default function KioskUserApp() {
         <div className="flex-1 flex flex-col p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-jaman-navy">{t('paymentTitle')}</h2>
-            <p className="text-sm text-[#4A5568]">
-              Total Payable: <span className="font-black text-jaman-saffron text-lg">{formatINR(netTotalPayable)}</span>
+            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_total_payable__6577c8", "Total Payable:")}<span className="font-black text-jaman-saffron text-lg">{formatINR(netTotalPayable)}</span>
             </p>
           </div>
 
@@ -3173,9 +3177,7 @@ export default function KioskUserApp() {
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center">
                   <Coins className="w-8 h-8" />
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                  Offline & Online
-                </span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">{kioskCopy("screen_offline_online_99d685", "Offline & Online")}</span>
               </div>
               <div>
                 <h4 className="text-xl font-bold text-jaman-navy">{t('cashAtCounter')}</h4>
@@ -3188,10 +3190,8 @@ export default function KioskUserApp() {
             {paymentStatus === 'EXPIRED' && !onlinePaymentUnavailable ? (
               <div className="py-8 space-y-4">
                 <Clock className="w-16 h-16 text-rose-500 mx-auto" />
-                <h3 className="text-xl font-black text-jaman-navy">Payment Session Expired</h3>
-                <p className="text-sm text-[#4A5568]">
-                  This QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code.
-                </p>
+                <h3 className="text-xl font-black text-jaman-navy">{kioskCopy("screen_payment_session_expired_4c8564", "Payment Session Expired")}</h3>
+                <p className="text-sm text-[#4A5568]">{kioskCopy("screen_this_qr_timed_out_if_you_already_paid_please_wait_a_few_4226ae", "This QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code.")}</p>
                 <Button
                   variant="accent"
                   size="touch"
@@ -3205,13 +3205,9 @@ export default function KioskUserApp() {
                       setPaymentTimeLeft(60);
                     }
                   }}
-                >
-                  Try Again
-                </Button>
+                >{kioskCopy("screen_try_again_df0fe9", "Try Again")}</Button>
                 {realPaymentId && (
-                  <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>
-                    Cancel
-                  </Button>
+                  <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
                 )}
               </div>
             ) : (
@@ -3220,8 +3216,7 @@ export default function KioskUserApp() {
               <div className="space-y-4">
                 {qrImageSrc ? (
                   <>
-                    <p className="text-sm font-semibold text-[#4A5568]">
-                      Scan with any UPI app to pay <span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
+                    <p className="text-sm font-semibold text-[#4A5568]">{kioskCopy("screen_scan_with_any_upi_app_to_pay_ca123c", "Scan with any UPI app to pay")}<span className="font-black text-jaman-saffron">{formatINR(netTotalPayable)}</span>
                     </p>
                     <div className="mx-auto w-[min(88vw,520px)] h-[min(88vw,520px)] bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
@@ -3230,10 +3225,8 @@ export default function KioskUserApp() {
                       <Clock className="w-4 h-4 text-jaman-saffron" />
                       <span>{t('paymentExpiresIn')}: <strong className="text-jaman-navy font-mono">{Math.floor(qrSecondsLeft / 60)}:{String(qrSecondsLeft % 60).padStart(2, '0')}</strong></span>
                     </div>
-                    <p className="text-xs text-[#4A5568]">Waiting for your payment… your token prints automatically once it is received.</p>
-                    <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>
-                      Cancel
-                    </Button>
+                    <p className="text-xs text-[#4A5568]">{kioskCopy("screen_waiting_for_your_payment_your_token_prints_automaticall_2a6f9b", "Waiting for your payment… your token prints automatically once it is received.")}</p>
+                    <Button variant="ghost" size="touch" className="w-full" onClick={handleCancelQr}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
                   </>
                 ) : (
                   <p className="text-sm font-semibold text-[#4A5568]">{qrLoading ? 'Preparing your payment QR…' : 'Preparing…'}</p>
@@ -3256,8 +3249,8 @@ export default function KioskUserApp() {
             {paymentMethod === 'CASH_AT_COUNTER' && (
               <div className="py-8 space-y-4">
                 <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
-                <h3 className="text-xl font-black text-jaman-navy">Pay at Pickup Counter</h3>
-                <p className="text-sm text-[#4A5568]">You will receive your token now. Please pay at Counter 1.</p>
+                <h3 className="text-xl font-black text-jaman-navy">{kioskCopy("screen_pay_at_pickup_counter_c8a1db", "Pay at Pickup Counter")}</h3>
+                <p className="text-sm text-[#4A5568]">{kioskCopy("screen_you_will_receive_your_token_now_please_pay_at_counter_1_df2bd4", "You will receive your token now. Please pay at Counter 1.")}</p>
               </div>
             )}
 
@@ -3269,9 +3262,7 @@ export default function KioskUserApp() {
                   className="w-full"
                   isLoading={isProcessingPayment}
                   onClick={handleGetToken}
-                >
-                  Confirm & Get Token
-                </Button>
+                >{kioskCopy("screen_confirm_get_token_a40e2d", "Confirm & Get Token")}</Button>
               </div>
             )}
               </>
@@ -3348,16 +3339,13 @@ export default function KioskUserApp() {
                 <div className="pt-1 text-xs font-bold text-[#4A5568]">
                   {t('estimatedWait')}: <span className="text-jaman-navy font-black">{placedOrder.estimatedWaitMinutes} {t('minutes')}</span>
                 </div>
-                <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 py-1 px-3 rounded-full inline-block mt-1">
-                  Pickup at: <strong>{placedOrder.pickupCounter || 'Counter 1'}</strong>
+                <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 py-1 px-3 rounded-full inline-block mt-1">{kioskCopy("screen_pickup_at__e0c9b2", "Pickup at:")}<strong>{placedOrder.pickupCounter || 'Counter 1'}</strong>
                 </div>
               </div>
 
               {/* POST-PAYMENT DIGITAL RECEIPT DELIVERY OPTIONS */}
               <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm text-center space-y-3">
-                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">
-                  Digital Delivery & E-Bill Options
-                </h4>
+                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">{kioskCopy("screen_digital_delivery_e_bill_options_91fcfc", "Digital Delivery & E-Bill Options")}</h4>
 
                 <div className="grid grid-cols-3 gap-2.5">
                   {/* Printing is always an explicit, on-demand action here —
@@ -3383,28 +3371,28 @@ export default function KioskUserApp() {
                     className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-[#FFF4ED] hover:border-jaman-saffron flex flex-col items-center gap-1.5 transition-all active:scale-95"
                   >
                     <Printer className="w-5 h-5 text-jaman-saffron" />
-                    <span className="text-[11px] font-bold text-jaman-navy">Print Receipt</span>
+                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_print_receipt_98bad4", "Print Receipt")}</span>
                   </button>
 
                   {/* Option 1: Email E-Bill (PDF invoice) */}
-                  <button
+                  {receiptConfig.enableEmail && <button
                     onClick={() => setIsEBillModalOpen(true)}
                     className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-emerald-50 hover:border-emerald-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
                   >
                     <Mail className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">Email Bill</span>
-                  </button>
+                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_email_bill_64ee94", "Email Bill")}</span>
+                  </button>}
 
                   {/* Option 2: Scannable QR Code */}
-                  <button
+                  {receiptConfig.enableQrReceipt && <button
                     onClick={() => {
                       setIsHandoffModalOpen(true);
                     }}
                     className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-purple-50 hover:border-purple-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
                   >
                     <QrCode className="w-5 h-5 text-purple-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">QR Invoice</span>
-                  </button>
+                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_qr_invoice_39afac", "QR Invoice")}</span>
+                  </button>}
                 </div>
 
                 {eBillSuccessMessage && (
@@ -3417,7 +3405,7 @@ export default function KioskUserApp() {
               {/* Customer Feedback Prompt */}
               {!feedbackSubmitted ? (
                 <div className="bg-white rounded-2xl p-4 border border-jaman-border shadow-sm text-center space-y-2.5">
-                  <h4 className="font-bold text-[11px] text-jaman-navy uppercase tracking-wider">How was your ordering experience?</h4>
+                  <h4 className="font-bold text-[11px] text-jaman-navy uppercase tracking-wider">{kioskCopy("screen_how_was_your_ordering_experience__ae5150", "How was your ordering experience?")}</h4>
                   <div className="flex justify-center gap-2 text-amber-400">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <button
@@ -3434,14 +3422,10 @@ export default function KioskUserApp() {
                       </button>
                     ))}
                   </div>
-                  <Button variant="secondary" size="sm" onClick={handleSubmitFeedback} disabled={feedbackRating === 0}>
-                    Submit Rating
-                  </Button>
+                  <Button variant="secondary" size="sm" onClick={handleSubmitFeedback} disabled={feedbackRating === 0}>{kioskCopy("screen_submit_rating_79a8aa", "Submit Rating")}</Button>
                 </div>
               ) : (
-                <p className="text-xs text-emerald-600 font-bold text-center bg-emerald-50 py-2 rounded-xl border border-emerald-200">
-                  ✓ Feedback recorded. Thank you!
-                </p>
+                <p className="text-xs text-emerald-600 font-bold text-center bg-emerald-50 py-2 rounded-xl border border-emerald-200">{kioskCopy("screen__feedback_recorded_thank_you__632564", "✓ Feedback recorded. Thank you!")}</p>
               )}
 
               {/* Action Buttons */}
@@ -3475,9 +3459,7 @@ export default function KioskUserApp() {
                 hand a guest/tester an actual slip. */}
             <div className="w-full max-w-xl mx-auto lg:mx-0 space-y-5">
               <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
-                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">
-                  Receipt
-                </h4>
+                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">{kioskCopy("screen_receipt_dad5a9", "Receipt")}</h4>
                 <ThermalReceiptView order={placedOrder} config={ReceiptRepository.getConfig()} />
               </div>
 
@@ -3489,9 +3471,7 @@ export default function KioskUserApp() {
                   half-empty box. */}
               {db.kots.filter((k) => k.orderId === placedOrder.id).length > 0 && (
                 <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
-                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">
-                    Kitchen Order Ticket{db.kots.filter((k) => k.orderId === placedOrder.id).length > 1 ? 's' : ''} (KOT)
-                  </h4>
+                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">{kioskCopy("screen_kitchen_order_ticket_a68e9c", "Kitchen Order Ticket")}{db.kots.filter((k) => k.orderId === placedOrder.id).length > 1 ? 's' : ''}{kioskCopy("screen__kot__58647b", "(KOT)")}</h4>
                   <div className="flex flex-col items-center gap-3">
                     {db.kots
                       .filter((k) => k.orderId === placedOrder.id)
@@ -3516,8 +3496,7 @@ export default function KioskUserApp() {
         <div className="flex-1 flex flex-col p-8 max-w-4xl mx-auto w-full space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-jaman-navy">{t('orderStatus')}</h2>
-            <p className="text-sm text-[#4A5568]">
-              Live updates from JAMANVAAR Kitchen for Token <strong className="text-jaman-saffron">#{placedOrder.tokenNumber}</strong>
+            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_live_updates_from_jamanvaar_kitchen_for_token_e65167", "Live updates from JAMANVAAR Kitchen for Token")}<strong className="text-jaman-saffron">#{placedOrder.tokenNumber}</strong>
             </p>
           </div>
 
@@ -3565,12 +3544,12 @@ export default function KioskUserApp() {
             </div>
 
             <div className="border-t border-[#F3EFE6] pt-6">
-              <h4 className="font-bold text-sm text-jaman-navy mb-3">Order Items:</h4>
+              <h4 className="font-bold text-sm text-jaman-navy mb-3">{kioskCopy("screen_order_items__cc32cc", "Order Items:")}</h4>
               <div className="divide-y divide-slate-100">
                 {placedOrder.items.map((it) => (
                   <div key={it.id} className="py-2 flex justify-between text-sm">
                     <span className="font-semibold text-jaman-navy">
-                      {it.quantity}x {it.name}
+                      {it.quantity}{kioskCopy("screen_x_2d7116", "x")}{it.name}
                     </span>
                     <span className="font-bold text-jaman-saffron">{formatINR(it.totalPrice)}</span>
                   </div>
@@ -3594,12 +3573,10 @@ export default function KioskUserApp() {
         title="Email Your Bill"
       >
         <form onSubmit={handleDispatchEBill} className="space-y-4 py-2">
-          <p className="text-xs text-[#4A5568]">
-            Enter your email address to receive your official JAMANVAAR tax invoice as a PDF.
-          </p>
+          <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_your_email_address_to_receive_your_official_jaman_350fe2", "Enter your email address to receive your official JAMANVAAR tax invoice as a PDF.")}</p>
 
           <div>
-            <label className="block text-xs font-bold text-jaman-navy mb-1">Email Address</label>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">{kioskCopy("screen_email_address_09bf25", "Email Address")}</label>
             <input
               type="email"
               required
@@ -3611,12 +3588,8 @@ export default function KioskUserApp() {
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setIsEBillModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="accent" type="submit" leftIcon={<Send className="w-3.5 h-3.5" />}>
-              Email My Bill
-            </Button>
+            <Button variant="ghost" type="button" onClick={() => setIsEBillModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
+            <Button variant="accent" type="submit" leftIcon={<Send className="w-3.5 h-3.5" />}>{kioskCopy("screen_email_my_bill_dd97a2", "Email My Bill")}</Button>
           </div>
         </form>
       </Modal>
@@ -3654,8 +3627,7 @@ export default function KioskUserApp() {
                 </button>
               </div>
 
-              <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>
-                Add to Cart • {formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
+              <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>{kioskCopy("screen_add_to_cart__7aa3dd", "Add to Cart •")}{formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
               </Button>
             </div>
           }
@@ -3752,7 +3724,7 @@ export default function KioskUserApp() {
                             +{formatINR(opt.priceDelta)}
                           </span>
                         ) : (
-                          <span className="text-[10px] opacity-60 mt-1">Included</span>
+                          <span className="text-[10px] opacity-60 mt-1">{kioskCopy("screen_included_ba829a", "Included")}</span>
                         )}
                       </button>
                     );
@@ -3814,13 +3786,9 @@ export default function KioskUserApp() {
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base flex items-center gap-2">
-                    JAMAN AI
-                    <span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      Live AI
-                    </span>
+                  <h3 className="font-bold text-base flex items-center gap-2">{kioskCopy("screen_jaman_ai_8a6f7b", "JAMAN AI")}<span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">{kioskCopy("screen_live_ai_a0e6e8", "Live AI")}</span>
                   </h3>
-                  <p className="text-xs text-white/70">Complete conversational food ordering & dietary guide</p>
+                  <p className="text-xs text-white/70">{kioskCopy("screen_complete_conversational_food_ordering_dietary_guide_22ba6d", "Complete conversational food ordering & dietary guide")}</p>
                 </div>
               </div>
               <button
@@ -3889,9 +3857,7 @@ export default function KioskUserApp() {
                               <div className="flex items-center gap-1.5">
                                 <StatusBadge status={item.dietaryType} type="dietary" />
                                 {item.isPopular && (
-                                  <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">
-                                    ★ Popular
-                                  </span>
+                                  <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded">{kioskCopy("screen__popular_74fe96", "★ Popular")}</span>
                                 )}
                               </div>
                               <h5 className="font-bold text-xs text-jaman-navy truncate mt-0.5">{localizedName(item, lang)}</h5>
@@ -3906,9 +3872,7 @@ export default function KioskUserApp() {
                               handleSelectItem(item);
                             }}
                             className="shrink-0 font-bold"
-                          >
-                            + Add to Cart
-                          </Button>
+                          >{kioskCopy("screen__add_to_cart_927657", "+ Add to Cart")}</Button>
                         </div>
                       ))}
                     </div>
@@ -3923,9 +3887,7 @@ export default function KioskUserApp() {
                           className="p-3.5 bg-gradient-to-r from-amber-50/70 to-orange-50/70 rounded-2xl border border-amber-200 shadow-sm flex items-center justify-between gap-3"
                         >
                           <div className="min-w-0">
-                            <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded-full inline-block">
-                              Save ₹{combo.savingsAmount} Deal
-                            </span>
+                            <span className="text-[10px] uppercase font-black tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded-full inline-block">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}{kioskCopy("screen_deal_ae642d", "Deal")}</span>
                             <h5 className="font-bold text-xs text-jaman-navy mt-1">{localizedName(combo, lang)}</h5>
                             <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{localizedDescription(combo, lang)}</p>
                             <div className="flex items-center gap-2 mt-1">
@@ -3941,9 +3903,7 @@ export default function KioskUserApp() {
                               handleSelectCombo(combo);
                             }}
                             className="shrink-0 font-bold"
-                          >
-                            + Add Combo
-                          </Button>
+                          >{kioskCopy("screen__add_combo_618900", "+ Add Combo")}</Button>
                         </div>
                       ))}
                     </div>
@@ -3971,8 +3931,8 @@ export default function KioskUserApp() {
             {cartItems.length > 0 && (
               <div className="p-3 bg-jaman-navy text-white flex items-center justify-between px-4 border-t border-jaman-border shadow-lg">
                 <div>
-                  <span className="text-xs font-bold block">{cartItems.length} items added to order</span>
-                  <span className="text-xs font-black text-[#FED7AA]">Total: {formatINR(netTotalPayable)}</span>
+                  <span className="text-xs font-bold block">{cartItems.length}{kioskCopy("screen_items_added_to_order_e5a5e3", "items added to order")}</span>
+                  <span className="text-xs font-black text-[#FED7AA]">{kioskCopy("screen_total__18e872", "Total:")}{formatINR(netTotalPayable)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -3981,9 +3941,7 @@ export default function KioskUserApp() {
                       setIsCartOpen(true);
                     }}
                     className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
-                  >
-                    View Cart
-                  </button>
+                  >{kioskCopy("screen_view_cart_708640", "View Cart")}</button>
                   <Button
                     variant="accent"
                     size="sm"
@@ -3998,9 +3956,7 @@ export default function KioskUserApp() {
                       void handleProceedToPayment();
                     }}
                     className="font-bold shadow-md"
-                  >
-                    ⚡ Checkout Now
-                  </Button>
+                  >{kioskCopy("screen__checkout_now_c53cf8", "⚡ Checkout Now")}</Button>
                 </div>
               </div>
             )}
@@ -4009,12 +3965,8 @@ export default function KioskUserApp() {
             <div className="p-3.5 sm:p-4 border-t border-jaman-border bg-white space-y-2 select-none">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase text-[#8C9BAE] tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />
-                  Tap Any Preloaded Option Below:
-                </span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                  1-Tap Instant Response
-                </span>
+                  <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />{kioskCopy("screen_tap_any_preloaded_option_below__a407c3", "Tap Any Preloaded Option Below:")}</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">{kioskCopy("screen_1_tap_instant_response_55bf08", "1-Tap Instant Response")}</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -4024,7 +3976,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">🔥</span>
-                  <span>Best Sellers</span>
+                  <span>{kioskCopy("screen_best_sellers_f4b25b", "Best Sellers")}</span>
                 </button>
 
                 <button
@@ -4033,7 +3985,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#FEF3C7] hover:bg-[#FDE68A] border border-[#FCD34D] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">👑</span>
-                  <span>Value Combos</span>
+                  <span>{kioskCopy("screen_value_combos_e99d11", "Value Combos")}</span>
                 </button>
 
                 <button
@@ -4042,7 +3994,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#ECFDF5] hover:bg-[#D1FAE5] border border-[#6EE7B7] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">🌱</span>
-                  <span>Pure Jain Food</span>
+                  <span>{kioskCopy("screen_pure_jain_food_e0750a", "Pure Jain Food")}</span>
                 </button>
 
                 <button
@@ -4051,7 +4003,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#93C5FD] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">🥘</span>
-                  <span>Gujarati Thali</span>
+                  <span>{kioskCopy("screen_gujarati_thali_4acbef", "Gujarati Thali")}</span>
                 </button>
 
                 <button
@@ -4060,7 +4012,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#FAF5FF] hover:bg-[#F3E8FF] border border-[#D8B4FE] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">🍛</span>
-                  <span>Dum Biryani</span>
+                  <span>{kioskCopy("screen_dum_biryani_04dea4", "Dum Biryani")}</span>
                 </button>
 
                 <button
@@ -4069,7 +4021,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#F0FDF4] hover:bg-[#DCFCE7] border border-[#86EFAC] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">☕</span>
-                  <span>Drinks & Sweets</span>
+                  <span>{kioskCopy("screen_drinks_sweets_c3d7d4", "Drinks & Sweets")}</span>
                 </button>
 
                 <button
@@ -4078,7 +4030,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#FFF1F2] hover:bg-[#FFE4E6] border border-[#FDA4AF] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">🎁</span>
-                  <span>Offers & Coupons</span>
+                  <span>{kioskCopy("screen_offers_coupons_9520f2", "Offers & Coupons")}</span>
                 </button>
 
                 <button
@@ -4087,7 +4039,7 @@ export default function KioskUserApp() {
                   className="p-2.5 rounded-2xl bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#CBD5E1] text-left text-xs font-bold text-jaman-navy flex items-center gap-2 transition-all active:scale-95 shadow-2xs"
                 >
                   <span className="text-base">💳</span>
-                  <span>Payment Help</span>
+                  <span>{kioskCopy("screen_payment_help_c652c4", "Payment Help")}</span>
                 </button>
               </div>
             </div>
@@ -4102,18 +4054,13 @@ export default function KioskUserApp() {
         title="Continue Order on Your Mobile"
       >
         <div className="text-center space-y-4 py-4">
-          <p className="text-xs text-[#4A5568]">
-            Scan this QR code with your phone camera to browse the menu and order directly from your mobile browser.
-          </p>
+          <p className="text-xs text-[#4A5568]">{kioskCopy("screen_scan_this_qr_code_with_your_phone_camera_to_browse_the__fb1a74", "Scan this QR code with your phone camera to browse the menu and order directly from your mobile browser.")}</p>
           <div className="w-48 h-48 mx-auto bg-white p-4 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
             <QrCode className="w-40 h-40 text-jaman-navy" />
           </div>
-          <p className="text-xs font-mono font-bold text-[#8C9BAE]">
-            https://kiosk.jamanvaar.com/m/{sessionId.substring(0, 8)}
+          <p className="text-xs font-mono font-bold text-[#8C9BAE]">{kioskCopy("screen_https_kiosk_jamanvaar_com_m__ef0f32", "https://kiosk.jamanvaar.com/m/")}{sessionId.substring(0, 8)}
           </p>
-          <Button variant="primary" size="md" className="w-full" onClick={() => setIsHandoffModalOpen(false)}>
-            Close
-          </Button>
+          <Button variant="primary" size="md" className="w-full" onClick={() => setIsHandoffModalOpen(false)}>{kioskCopy("screen_close_7d9eb7", "Close")}</Button>
         </div>
       </Modal>
 
@@ -4129,11 +4076,9 @@ export default function KioskUserApp() {
         <div className="space-y-4 py-2">
           {!otpSent ? (
             <>
-              <p className="text-xs text-[#4A5568]">
-                Enter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards.
-              </p>
+              <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_your_mobile_number_to_check_loyalty_points_re_ord_08e4ca", "Enter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards.")}</p>
               <div>
-                <label className="block text-xs font-bold text-jaman-navy mb-1">Mobile Number</label>
+                <label className="block text-xs font-bold text-jaman-navy mb-1">{kioskCopy("screen_mobile_number_34975e", "Mobile Number")}</label>
                 <div className="flex gap-2">
                   <span className="bg-jaman-ivory border border-jaman-border px-3 py-2 rounded-xl text-xs font-bold flex items-center">+91</span>
                   <input
@@ -4146,15 +4091,11 @@ export default function KioskUserApp() {
                   />
                 </div>
               </div>
-              <Button variant="accent" size="md" className="w-full" onClick={handleSendOtp}>
-                Send OTP
-              </Button>
+              <Button variant="accent" size="md" className="w-full" onClick={handleSendOtp}>{kioskCopy("screen_send_otp_9c4566", "Send OTP")}</Button>
             </>
           ) : (
             <>
-              <p className="text-xs text-[#4A5568]">
-                Enter the 4-digit code for +91 {phoneInput}. No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes.
-              </p>
+              <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_the_4_digit_code_for_91_cea004", "Enter the 4-digit code for +91")}{phoneInput}{kioskCopy("screen__no_sms_gateway_is_configured_on_this_kiosk_so_the_code_efb4a3", ". No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes.")}</p>
               <input
                 type="text"
                 inputMode="numeric"
@@ -4164,9 +4105,7 @@ export default function KioskUserApp() {
                 placeholder="••••"
                 className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
-              <Button variant="accent" size="md" className="w-full" onClick={handleVerifyOtp}>
-                Verify & Login
-              </Button>
+              <Button variant="accent" size="md" className="w-full" onClick={handleVerifyOtp}>{kioskCopy("screen_verify_login_91ef55", "Verify & Login")}</Button>
             </>
           )}
         </div>
@@ -4179,9 +4118,7 @@ export default function KioskUserApp() {
         title="Staff Manager Mode PIN"
       >
         <form onSubmit={handleStaffPinVerify} className="space-y-4 py-2">
-          <p className="text-xs text-[#4A5568]">
-            Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel.
-          </p>
+          <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_4_digit_staff_authorization_pin_to_unlock_manager_b6b3eb", "Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel.")}</p>
           <input
             type="password"
             maxLength={4}
@@ -4191,16 +4128,20 @@ export default function KioskUserApp() {
             className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
           />
           <div className="flex gap-2">
-            <Button variant="ghost" type="button" className="flex-1" onClick={() => setIsStaffPinModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="accent" type="submit" className="flex-1">
-              Verify PIN
-            </Button>
+            <Button variant="ghost" type="button" className="flex-1" onClick={() => setIsStaffPinModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
+            <Button variant="accent" type="submit" className="flex-1">{kioskCopy("screen_verify_pin_d4d945", "Verify PIN")}</Button>
           </div>
         </form>
       </Modal>
 
+      {/* Installer-only entry URL; a physical console PIN is still required to pair. */}
+      <Modal isOpen={localCoreSetupOpen} onClose={() => {
+        setLocalCoreSetupOpen(false);
+        const next = new URL(window.location.href); next.searchParams.delete('local-core-setup');
+        window.history.replaceState(null, '', next.toString());
+      }} title="Local Core setup">
+        <LocalCorePairing serverUrl={db.getSyncServerUrl()} paired={db.isLocalCorePaired()} onPair={(pin, url) => db.pairLocalCore(pin, url)} />
+      </Modal>
       {/* MODAL: STAFF ASSISTANCE CONFIRMATION */}
       <Modal
         isOpen={isStaffModalOpen}
@@ -4213,25 +4154,21 @@ export default function KioskUserApp() {
           </div>
           {staffCallDelivered === null ? (
             <>
-              <h3 className="text-xl font-bold text-jaman-navy">Calling a team member…</h3>
-              <p className="text-sm text-[#4A5568] leading-relaxed">Please wait a moment.</p>
+              <h3 className="text-xl font-bold text-jaman-navy">{kioskCopy("screen_calling_a_team_member__484ef0", "Calling a team member…")}</h3>
+              <p className="text-sm text-[#4A5568] leading-relaxed">{kioskCopy("screen_please_wait_a_moment__11ee54", "Please wait a moment.")}</p>
             </>
           ) : staffCallDelivered ? (
             <>
-              <h3 className="text-xl font-bold text-jaman-navy">Team Member Notified</h3>
+              <h3 className="text-xl font-bold text-jaman-navy">{kioskCopy("screen_team_member_notified_0a21d5", "Team Member Notified")}</h3>
               <p className="text-sm text-[#4A5568] leading-relaxed">{t('staffOnTheWay')}</p>
             </>
           ) : (
             <>
-              <h3 className="text-xl font-bold text-jaman-navy">Please ask at the counter</h3>
-              <p className="text-sm text-[#4A5568] leading-relaxed">
-                We could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you.
-              </p>
+              <h3 className="text-xl font-bold text-jaman-navy">{kioskCopy("screen_please_ask_at_the_counter_73be27", "Please ask at the counter")}</h3>
+              <p className="text-sm text-[#4A5568] leading-relaxed">{kioskCopy("screen_we_could_not_reach_our_team_from_this_kiosk_right_now_p_92b60f", "We could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you.")}</p>
             </>
           )}
-          <Button variant="accent" size="md" className="w-full" onClick={() => setIsStaffModalOpen(false)}>
-            Close
-          </Button>
+          <Button variant="accent" size="md" className="w-full" onClick={() => setIsStaffModalOpen(false)}>{kioskCopy("screen_close_7d9eb7", "Close")}</Button>
         </div>
       </Modal>
 
@@ -4262,9 +4199,7 @@ export default function KioskUserApp() {
               <button
                 onClick={handleFullSessionReset}
                 className="text-xs font-bold text-[#8C9BAE] hover:text-jaman-navy"
-              >
-                Cancel & Reset Screen
-              </button>
+              >{kioskCopy("screen_cancel_reset_screen_a5c397", "Cancel & Reset Screen")}</button>
             </div>
           </div>
         </div>

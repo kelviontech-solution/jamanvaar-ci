@@ -35,3 +35,6 @@ export * from './sync_cursors';
 export * from './kitchen_status';
 export * from './table_bulk';
 export * from './kitchen_routing';
+
+export * from './kiosk_configuration';
+export * from './kiosk_combo_authoring';

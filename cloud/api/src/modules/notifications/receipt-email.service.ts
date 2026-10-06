@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableE
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from './email.service';
 import { buildReceiptPdfBuffer, ReceiptPdfOrderLine } from './receipt-pdf.util';
+import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
 
 /** Mirrors payments.service.ts's own PAID_STATUSES — kept as a local copy rather than a cross-module import. */
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
@@ -40,16 +41,26 @@ export class ReceiptEmailService {
     private readonly email: EmailService
   ) {}
 
-  async sendBillEmail(restaurantId: string, orderId: string, email: string): Promise<{ success: true }> {
+  async sendBillEmail(restaurantId: string, orderId: string, email: string, branchId?: string | null): Promise<{ success: true }> {
     if (!this.email.configured) {
       throw new ServiceUnavailableException('Email is not configured on this server (set SMTP_HOST, SMTP_USER, SMTP_PASSWORD)');
     }
 
     const built = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const presentation = async (orderBranchId?: string | null) => {
+        if (branchId && orderBranchId && branchId !== orderBranchId) throw new NotFoundException('Order not found');
+        const scope = orderBranchId || branchId;
+        const row = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'KIOSK_CONFIGURATION', externalId: `kiosk-config-${scope || 'restaurant'}` } } });
+        const parsed = kioskConfigurationSchema.safeParse(row?.payload);
+        if (!parsed.success || parsed.data.branchId !== (scope || undefined)) return undefined;
+        if (!parsed.data.receipt.enableEmail) throw new BadRequestException('Email receipts are disabled by this restaurant');
+        return parsed.data.receipt;
+      };
       const order = await tx.order.findUnique({
         where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: orderId } },
         include: {
           paymentTransactions: { orderBy: { createdAt: 'desc' }, take: 1 },
+          kiosk: { select: { branchId: true } },
           restaurant: { select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true } }
         }
       });
@@ -66,7 +77,7 @@ export class ReceiptEmailService {
           subtotal: order.subtotal,
           taxAmount: order.taxAmount,
           totalAmount: order.totalAmount
-        });
+        }, await presentation(order.branchId || order.kiosk?.branchId));
       }
 
       const synced = await tx.syncedOrder.findUnique({
@@ -85,7 +96,7 @@ export class ReceiptEmailService {
         subtotal: synced.subtotal,
         taxAmount: synced.taxAmount,
         totalAmount: synced.totalAmount
-      });
+      }, await presentation(synced.branchId));
     });
 
     if (!built) {
@@ -106,7 +117,8 @@ export class ReceiptEmailService {
 
   private async buildPdf(
     restaurant: RestaurantBranding,
-    order: { externalOrderId: string; paidAt: Date | null; method: string | null; items: RawLine[]; subtotal: number; taxAmount: number; totalAmount: number }
+    order: { externalOrderId: string; paidAt: Date | null; method: string | null; items: RawLine[]; subtotal: number; taxAmount: number; totalAmount: number },
+    presentation?: { thankYouMessage: string; footerMessage: string; logoUrl?: string; showTaxBreakup: boolean }
   ) {
     const items = order.items ?? [];
     const lines: ReceiptPdfOrderLine[] = items.map((it) => ({ name: it.name, quantity: it.quantity, unitPrice: it.unitPrice, lineTotal: it.lineTotal }));
@@ -123,7 +135,8 @@ export class ReceiptEmailService {
       lines,
       subtotal: order.subtotal,
       taxAmount: order.taxAmount,
-      totalAmount: order.totalAmount
+      totalAmount: order.totalAmount,
+      thankYouMessage: presentation?.thankYouMessage, footerMessage: presentation?.footerMessage, logoDataUrl: presentation?.logoUrl, showTaxBreakup: presentation?.showTaxBreakup
     });
 
     return { pdf, orderNo: order.externalOrderId.slice(-10).toUpperCase(), restaurantName: restaurant.name };

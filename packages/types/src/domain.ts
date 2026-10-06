@@ -722,6 +722,9 @@ export type DisplayLanguage = 'en' | 'hi' | 'gu' | 'mr' | 'ta' | 'te' | 'kn';
  * just create two conflicting sources of truth for the same text.
  */
 export interface KioskDisplaySettings {
+  logoUrl?: string;
+  accentColor?: string;
+  texts?: Partial<Record<DisplayLanguage, Record<string, string>>>;
   enabledLanguages: DisplayLanguage[];
   defaultLanguage: DisplayLanguage;
   /** Seconds of no touch/interaction before the idle warning appears. */

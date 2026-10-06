@@ -25,6 +25,8 @@ build/
 !.env.example
 
 # Test artifacts and local databases
+logs/
+**/*.log
 **/*.db
 **/*.sqlite3
 coverage/

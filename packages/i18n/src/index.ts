@@ -6,3 +6,4 @@ export * from './ta';
 export * from './te';
 export * from './kn';
 export * from './i18n';
+export * from './kiosk_content_catalog';

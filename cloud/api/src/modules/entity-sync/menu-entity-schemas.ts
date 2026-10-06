@@ -1,3 +1,4 @@
+import { kioskConfigurationSchema } from './kiosk-configuration-schema';
 import { z } from 'zod';
 
 /**
@@ -59,7 +60,7 @@ const diningTable = z
   })
   .passthrough();
 
-const SCHEMAS: Record<string, z.ZodTypeAny> = { DINING_TABLE: diningTable, MENU_ITEM: menuItem, MENU_CATEGORY: category, MODIFIER_GROUP: modifierGroup, TAX_GROUP: taxGroup };
+const SCHEMAS: Record<string, z.ZodTypeAny> = { KIOSK_CONFIGURATION: kioskConfigurationSchema, DINING_TABLE: diningTable, MENU_ITEM: menuItem, MENU_CATEGORY: category, MODIFIER_GROUP: modifierGroup, TAX_GROUP: taxGroup };
 
 /** A readable reason when the record is not acceptable, otherwise null. */
 export function menuEntityProblem(entityType: string, payload: Record<string, unknown>): string | null {

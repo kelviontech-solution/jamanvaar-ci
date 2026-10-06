@@ -1,3 +1,4 @@
+import { LocalCorePairing } from './LocalCorePairing';
 import React, { useEffect, useState } from 'react';
 import { collectDiagnostics, connectionStatus, saveCoreUrl, syncNow, EndpointResolver, type StatusTone } from '@jamanvaar/sync';
 import { db, TenantIsolation } from '@jamanvaar/database';
@@ -69,6 +70,7 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         </button>
       </div>
 
+      <LocalCorePairing serverUrl={db.getSyncServerUrl()} paired={db.isLocalCorePaired()} onPair={(pin, url) => db.pairLocalCore(pin, url)} />
       <div className="rounded-2xl border border-slate-200 p-4">
         <div className="font-bold text-slate-800">Branch Core (restaurant server)</div>
         <p className="text-xs text-slate-500 mt-1">The always-on machine that lets every device work together without internet. Enter its address, e.g. 192.168.1.10. Leave empty to use the cloud only.</p>

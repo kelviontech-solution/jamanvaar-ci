@@ -84,7 +84,8 @@ export class DeviceCommandsService {
     DeviceCommandType.RESTART_APP,
     DeviceCommandType.CLEAR_CACHE,
     DeviceCommandType.LOCK,
-    DeviceCommandType.UNLOCK
+    DeviceCommandType.UNLOCK,
+    DeviceCommandType.FORCE_LOGOUT
   ]);
 
   /** The devices a console can see and command: its whole restaurant, or only its own branch when it is branch-bound. */
@@ -107,6 +108,7 @@ export class DeviceCommandsService {
     const command = await this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
       const target = await tx.device.findFirst({ where: { id: targetId, ...this.scopeWhere(issuer) } });
       if (!target) throw new NotFoundException('Device not found');
+      if (dto.commandType === DeviceCommandType.FORCE_LOGOUT && target.type !== 'KIOSK') throw new ForbiddenException('Restaurant consoles can remotely log out kiosks only');
       if (issuer.type === 'KIOSK_ADMIN' && target.type !== 'KIOSK') {
         throw new ForbiddenException('Kiosk Admin can only manage kiosks');
       }
@@ -130,7 +132,8 @@ export class DeviceCommandsService {
         where: { ...this.scopeWhere(issuer), status: { not: 'REVOKED' }, ...(issuer.type === 'KIOSK_ADMIN' ? { type: { in: ['KIOSK', 'KIOSK_ADMIN'] as DeviceType[] } } : {}) },
         select: {
           id: true, type: true, name: true, status: true, lastSeenAt: true, lastSyncAt: true, appVersion: true, isLocked: true,
-          lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } }
+          lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } },
+          commands: { orderBy: { issuedAt: 'desc' }, take: 1, select: { commandType: true, status: true, errorMessage: true } }
         },
         orderBy: [{ type: 'asc' }, { createdAt: 'asc' }]
       })
@@ -146,7 +149,7 @@ export class DeviceCommandsService {
       pendingSyncCount: d.pendingSyncCount, syncStatus: d.syncStatus, syncError: d.syncError,
       menuVersion: d.menuVersion, latestMenuVersion,
       menuStatus: latestMenuVersion === 0 ? 'none' : (d.menuVersion ?? 0) >= latestMenuVersion ? 'current' : 'behind',
-      branch: d.branch
+      branch: d.branch, lastCommand: d.commands[0] ?? null
     }));
     return {
       devices,
@@ -321,11 +324,12 @@ export class DeviceCommandsService {
     commandId: string,
     outcome: { status: 'SUCCEEDED' | 'FAILED'; result?: Record<string, unknown>; error?: string }
   ) {
-    return this.prisma.runAsTenant(device.restaurantId, async (tx) => {
+    const updated = await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       const command = await tx.deviceCommand.findFirst({
         where: { id: commandId, deviceId: device.id }
       });
       if (!command) throw new NotFoundException('Command not found for this device');
+      if (!['SUCCEEDED', 'FAILED'].includes(outcome.status)) throw new BadRequestException('Invalid command outcome');
 
       const updated = await tx.deviceCommand.update({
         where: { id: commandId },
@@ -349,7 +353,15 @@ export class DeviceCommandsService {
         tx
       );
 
+      if (command.commandType === DeviceCommandType.FORCE_LOGOUT && outcome.status === 'SUCCEEDED' && device.type === 'KIOSK') {
+        await tx.device.update({ where: { id: device.id }, data: { status: 'REVOKED' } });
+        await tx.tenantRefreshToken.updateMany({ where: { deviceId: device.id, revokedAt: null }, data: { revokedAt: new Date() } });
+      }
+
       return updated;
     });
+    // Invalidate after commit: the successful acknowledgement must not leave a cached ACTIVE verdict.
+    if (updated.commandType === DeviceCommandType.FORCE_LOGOUT && outcome.status === 'SUCCEEDED' && device.type === 'KIOSK') this.realtime.publishInvalidation(device.restaurantId);
+    return updated;
   }
 }

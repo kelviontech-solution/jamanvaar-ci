@@ -1,0 +1,119 @@
+{
+  "scope": "Final local merged Restaurant Admin and Kiosk run; simulated payments",
+  "passed": 8,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "admin-1791276056092",
+      "app": "admin",
+      "role": "merged-kiosk-1791270507575",
+      "page": "http://localhost:5286/",
+      "feature": "Kiosk-only merged console exposes menu, customisations, receipts and appearance while POS billing stays gated",
+      "result": "PASS",
+      "ms": 572.67,
+      "evidence": {
+        "mergedConsole": true,
+        "sharedMenuAndReceiptEditing": true,
+        "posBillingHidden": true
+      }
+    },
+    {
+      "id": "kiosk-1791276056666",
+      "app": "kiosk",
+      "role": "kiosk-management-1791276038374",
+      "page": "http://localhost:5284/",
+      "feature": "Customer kiosk activates with its own KIOSK key and loads the restaurant through real auth",
+      "result": "PASS",
+      "ms": 4972.64,
+      "evidence": {
+        "activationStatus": 201,
+        "authenticated": true
+      }
+    },
+    {
+      "id": "admin-1791276061639",
+      "app": "admin",
+      "role": "merged-kiosk-1791270507575",
+      "page": "http://localhost:5286/",
+      "feature": "Publish welcome text, promotion, logo, accent and customer wording; kiosk receives changes without refresh",
+      "result": "PASS",
+      "ms": 6065.25,
+      "evidence": {
+        "propagationMs": 253,
+        "noKioskRefresh": true,
+        "languageScreenUpdated": true
+      }
+    },
+    {
+      "id": "admin-1791276067705",
+      "app": "admin",
+      "role": "merged-kiosk-1791270507575",
+      "page": "http://localhost:5286/",
+      "feature": "Receipt editing publishes footer, thank-you message and 58mm size to the same kiosk configuration",
+      "result": "PASS",
+      "ms": 700.46,
+      "evidence": {
+        "footerPublished": true,
+        "kioskApplied": true,
+        "paperSize": "58mm"
+      }
+    },
+    {
+      "id": "kiosk-1791276068406",
+      "app": "kiosk",
+      "role": "kiosk-management-1791276038374",
+      "page": "http://localhost:5284/",
+      "feature": "Refresh retains cloud-published appearance and wording",
+      "result": "PASS",
+      "ms": 582.53,
+      "evidence": {
+        "reloadPreservedConfiguration": true
+      }
+    },
+    {
+      "id": "admin-1791276068990",
+      "app": "admin",
+      "role": "merged-kiosk-1791270507575",
+      "page": "http://localhost:5286/",
+      "feature": "Create an editable combo in the kiosk-only console with a real priced bundle",
+      "result": "PASS",
+      "ms": 844.87,
+      "evidence": {
+        "genericBundleCreated": true,
+        "authoritativeMenuPrice": 90
+      }
+    },
+    {
+      "id": "kiosk-1791276069835",
+      "app": "kiosk",
+      "role": "kiosk-management-1791276038374",
+      "page": "http://localhost:5284/",
+      "feature": "SIMULATED customer payment blocks remote logout; paid confirmation uses the edited receipt and orders remain synced",
+      "result": "PASS",
+      "ms": 5357.92,
+      "evidence": {
+        "realFunds": false,
+        "gateway": "SIMULATED",
+        "busyLogoutRejected": true,
+        "receiptRendered": true,
+        "oneSyncedPaidOrder": true,
+        "amountPaise": 9000
+      }
+    },
+    {
+      "id": "admin-1791276075193",
+      "app": "admin",
+      "role": "merged-kiosk-1791270507575",
+      "page": "http://localhost:5286/",
+      "feature": "Offline kiosk receives queued logout after reconnect, acknowledges it, returns to activation and refuses the old credential",
+      "result": "PASS",
+      "ms": 16201.82,
+      "evidence": {
+        "commandAcknowledged": true,
+        "credentialRevoked": true,
+        "customerActivationRestored": true,
+        "oldCredentialStatus": 401
+      }
+    }
+  ]
+}

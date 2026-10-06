@@ -1,5 +1,7 @@
 # Implemented fix plan and remaining release verification
 
+Additional merged-key follow-up: [kiosk-only post-activation access](../merged-admin-key-fix-2026-10-06/REPORT.md) is now corrected in the backend device guard and quota accounting. Actual browser key entry and refresh pass with POS-only modules remaining hidden.
+
 Updated 2026-10-06 after authorized implementation. All twelve confirmed discovery findings are fixed and their demonstrated local paths pass. Additional B013–B015 were corrected during verification. Changes have not been deployed; production readiness remains unverified.
 
 See the [implementation report](../browser-fixes-2026-10-06/IMPLEMENTATION_REPORT.md), [per-app and system scores](../browser-fixes-2026-10-06/SCORES.md), [reviewed Playwright scenarios](../browser-fixes-2026-10-06/TEST_MATRIX.csv), and [verification summary](../browser-fixes-2026-10-06/verification-summary.json). The original audit preserves pre-fix discovery evidence.

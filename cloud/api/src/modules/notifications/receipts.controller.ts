@@ -35,6 +35,6 @@ export class ReceiptsController {
     if (!RECEIPT_SENDER_DEVICE_TYPES.includes(device.type)) {
       throw new ForbiddenException('This device type cannot send receipts');
     }
-    return this.receiptEmail.sendBillEmail(device.restaurantId, body.orderId, body.email);
+    return this.receiptEmail.sendBillEmail(device.restaurantId, body.orderId, body.email, device.branchId);
   }
 }

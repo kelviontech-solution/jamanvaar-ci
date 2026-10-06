@@ -44,6 +44,7 @@ export async function bootDurableStorage(opts: { appId?: string; restaurantId?: 
     db.discardUnscopedCache();
     JamanvaarDatabase.attachDurableStorageToAll(fallback);
     KeyValueStore.attach(fallback, { migrateLegacy: false });
+    db.refreshLocalCoreConnection();
   };
   try {
     const nav = navigator as Navigator & { locks?: Locks };
@@ -95,6 +96,7 @@ export async function bootDurableStorage(opts: { appId?: string; restaurantId?: 
     if (app) db.discardUnscopedCache();
     JamanvaarDatabase.attachDurableStorageToAll(storage);
     KeyValueStore.attach(storage, { migrateLegacy: !app });
+    db.refreshLocalCoreConnection();
 
     // Best effort: push anything still queued when the window goes away.
     window.addEventListener('pagehide', () => void storage.flush().catch(() => undefined));

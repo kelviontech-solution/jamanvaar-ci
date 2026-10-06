@@ -4,6 +4,7 @@ import { PrinterService } from '@jamanvaar/api';
 import { formatTime } from '@jamanvaar/utils';
 import type { Order, ReceiptConfig } from '@jamanvaar/types';
 import { Button, ThermalReceiptView } from '@jamanvaar/ui';
+import { syncKioskConfiguration } from '@jamanvaar/sync';
 
 /** What the preview shows before any real order exists — a real order appears once a guest has ordered. */
 const SAMPLE_RECEIPT_ORDER = {
@@ -47,9 +48,13 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
 }) => {
   const [config, setConfig] = useState<ReceiptConfig>(ReceiptRepository.getConfig());
   const records = ReceiptRepository.getAllRecords();
+  const [publishing, setPublishing] = useState(false);
+  const [publishMessage, setPublishMessage] = useState('');
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (publishing) return;
+    setPublishing(true); setPublishMessage('');
     ReceiptRepository.updateConfig(config);
     AuditRepository.log({
       username: 'admin',
@@ -57,7 +62,12 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
       category: 'SETTINGS',
       details: `Updated thermal receipt template and paper size to ${config.paperSize}`
     });
-    showToast('Receipt & e-bill settings saved!');
+    try {
+      await syncKioskConfiguration({ push: true });
+      setPublishMessage('Receipt settings published to connected kiosks.');
+      showToast('Receipt settings saved and published.');
+    } catch (error) { setPublishMessage(error instanceof Error ? error.message : 'Receipt settings saved locally. Publication failed; retry when connected.'); }
+    finally { setPublishing(false); }
   };
 
   return (
@@ -72,6 +82,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
           <form onSubmit={handleSave} className="space-y-4">
+            {publishMessage && <p role="status" className="text-sm">{publishMessage}</p>}
             <div className="p-3 bg-jaman-ivory border border-jaman-border rounded-xl text-[11px] text-[#4A5568] flex items-center justify-between gap-3">
               <span>
                 Restaurant name, GSTIN, FSSAI and address print from <strong>Settings → Report Branding</strong>.
@@ -223,8 +234,8 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
             </div>
 
             <div className="pt-3 border-t border-[#F3EFE6] flex justify-end">
-              <Button variant="accent" type="submit">
-                Save Receipt Settings
+              <Button variant="accent" type="submit" disabled={publishing}>
+                {publishing ? 'Publishing receipt settings…' : 'Save Receipt Settings'}
               </Button>
             </div>
           </form>
