@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
 import { Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
@@ -56,7 +56,12 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [translations, setTranslations] = useState<Record<string, { name: string; description: string }>>({});
   const [activeKeyboardField, setActiveKeyboardField] = useState<{ lang: VirtualKeyboardLanguage; field: 'name' | 'description' } | null>(null);
 
+  const initializedForm = useRef<string | null>(null);
   useEffect(() => {
+    if (!isOpen) { initializedForm.current = null; return; }
+    const session = itemToEdit?.id ?? 'new';
+    if (initializedForm.current === session) return;
+    initializedForm.current = session;
     if (itemToEdit) {
       setName(itemToEdit.name);
       setSku(itemToEdit.sku); setSubcategory(itemToEdit.subcategory || ''); setTags((itemToEdit.tags || []).join('; '));
