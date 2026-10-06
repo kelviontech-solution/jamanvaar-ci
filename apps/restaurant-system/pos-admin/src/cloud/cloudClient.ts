@@ -1351,6 +1351,7 @@ export interface PaymentConnectionFields {
 
 export interface PaymentConnectionStatus {
   directSettlementRequested?: boolean;
+  gatewayConfigured?: boolean;
   collectionAccount?: 'JAMANVAAR';
   payoutMode?: 'MANUAL';
   routeStatus?: 'PENDING';

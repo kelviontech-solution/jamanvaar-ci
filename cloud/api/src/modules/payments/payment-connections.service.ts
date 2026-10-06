@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { RazorpayGatewayService } from './razorpay-gateway.service';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -22,7 +23,8 @@ export class PaymentConnectionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly gateway: RazorpayGatewayService
   ) {}
 
   private encryptionKey(): string {
@@ -152,7 +154,7 @@ export class PaymentConnectionsService {
     const [connection, defaultBps] = await Promise.all([this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } })
     ), getDefaultCommissionBps(this.prisma)]);
-    if (!connection) return { status: 'NOT_CONNECTED' as const, directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED', effectiveCommissionBps: defaultBps };
+    if (!connection) return { status: 'NOT_CONNECTED' as const, gatewayConfigured: this.gateway.isConfigured(), directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED', effectiveCommissionBps: defaultBps };
     return this.toOwnView(connection, defaultBps);
   }
 
@@ -192,6 +194,7 @@ export class PaymentConnectionsService {
     // password or CVV field.
     return {
       directSettlementRequested: connection.directSettlementRequested,
+      gatewayConfigured: this.gateway.isConfigured(),
       collectionAccount: 'JAMANVAAR',
       payoutMode: 'MANUAL',
       routeStatus: 'PENDING',

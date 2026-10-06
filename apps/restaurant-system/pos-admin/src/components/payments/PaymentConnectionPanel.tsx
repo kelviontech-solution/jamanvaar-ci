@@ -83,6 +83,7 @@ export function PaymentConnectionPanel({ onStatusChange }: { onStatusChange?: (s
         {['NOT_CONNECTED', 'DISCONNECTED'].includes(status.status) &&
           <Button size="sm" variant="accent" disabled={busy} onClick={() => change(requestPlatformPayments, 'Online payment activation requested. Super Admin will review it.')}>Request online payment activation</Button>}
         {status.status === 'PENDING_VERIFICATION' && <p className="text-xs text-amber-700">Online payment activation is awaiting Super Admin approval.</p>}
+        {status.status === 'ACTIVE' && status.gatewayConfigured === false && <p className="text-xs text-rose-700 font-bold">Kiosk QR payments cannot be created yet: the payment gateway is not configured on this server. Contact Jamanvaar support.</p>}
         {status.status === 'SUSPENDED' && <p className="text-xs text-rose-700">Online payments are suspended. Contact Jamanvaar support.</p>}
         <label className="flex items-center gap-3 text-sm font-bold text-jaman-navy">
           <input type="checkbox" role="switch" aria-label="Request direct settlement to restaurant bank" checked={status.directSettlementRequested ?? false} disabled={busy}
