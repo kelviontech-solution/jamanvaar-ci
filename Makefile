@@ -76,14 +76,14 @@ check:
 	@echo ""
 	@echo "=== [4/4] Checking Each Terminal/Customer App (direct, bridge-gateway) ==="
 	@HBI=$$(grep -E '^HOST_BIND_IP=' .env 2>/dev/null | cut -d '=' -f2 || echo 172.17.0.1); \
-	for pair in "kiosk-admin:KIOSK_ADMIN_PORT:8091" "kiosk-user:KIOSK_USER_PORT:8092" "pos:POS_PORT:8093" "pos-admin:POS_ADMIN_PORT:8094" "captain:CAPTAIN_PORT:8095" "kds:KDS_PORT:8096" "qr-guest:QR_GUEST_PORT:8097"; do \
+	for pair in "kiosk-user:KIOSK_USER_PORT:8092" "pos:POS_PORT:8093" "pos-admin:POS_ADMIN_PORT:8094" "captain:CAPTAIN_PORT:8095" "kds:KDS_PORT:8096" "qr-guest:QR_GUEST_PORT:8097"; do \
 		name=$$(echo $$pair | cut -d: -f1); var=$$(echo $$pair | cut -d: -f2); default=$$(echo $$pair | cut -d: -f3); \
 		port=$$(grep -E "^$${var}=" .env 2>/dev/null | cut -d '=' -f2 || echo $$default); \
 		code=$$(curl -s -o /dev/null -w "%{http_code}" http://$$HBI:$${port:-$$default}/); \
 		echo " -> $$name (port $${port:-$$default}): $$code"; \
 	done
 	@echo ""
-	@echo "Public routing lives at https://system.kelviontech.in/<admin|kiosk-admin|kiosk|pos|pos-admin|captain|kds|q>/ -- see nginx/system.kelviontech.in.conf. Reload the SHARED kelviontech-nginx-1 container after deploying this config, not this stack's own compose."
+	@echo "Public routing lives at https://system.kelviontech.in/<admin|kiosk|pos|pos-admin|captain|kds|q>/ -- see nginx/system.kelviontech.in.conf. Reload the SHARED kelviontech-nginx-1 container after deploying this config, not this stack's own compose."
 
 seed:
 	$(COMPOSE) exec backend npm run seed

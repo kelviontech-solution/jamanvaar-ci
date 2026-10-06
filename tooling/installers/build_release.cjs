@@ -1,6 +1,6 @@
 /**
  * JAMANVAAR Production Release Master Builder
- * Builds 4 Native Windows Desktop Applications + 4 Installers + 2 Machine ZIP Packages
+ * Builds 3 Native Windows Desktop Applications + 3 Installers + 2 Machine ZIP Packages
  * Uses Microsoft csc.exe compiler with Full PE Assembly Metadata & JAMANVAAR Icon Embedding
  * 100% Antivirus & Smart App Control Safe
  */
@@ -59,7 +59,6 @@ if (fs.existsSync(RELEASE)) {
 ensureDir(path.join(WINDOWS_DIR, 'pos'));
 ensureDir(path.join(WINDOWS_DIR, 'pos-admin'));
 ensureDir(path.join(WINDOWS_DIR, 'kiosk'));
-ensureDir(path.join(WINDOWS_DIR, 'kiosk-admin'));
 ensureDir(PACKAGES_DIR);
 ensureDir(CHECKSUMS_DIR);
 ensureDir(README_DIR);
@@ -108,25 +107,11 @@ const APPS = [
     installerName: 'JAMANVAAR-Kiosk-Setup.exe',
     isKiosk: true,
     startsCore: false
-  },
-  {
-    key: 'kiosk-admin',
-    name: 'KioskAdmin',
-    displayName: 'JAMANVAAR Kiosk Admin',
-    title: 'JAMANVAAR Kiosk Admin — Control Plane',
-    description: 'JAMANVAAR Touch Kiosk Device Management & Operations Console',
-    id: 'com.jamanvaar.kioskadmin',
-    dist: path.join(ROOT, 'apps', 'kiosk-system', 'kiosk-admin', 'dist'),
-    outDir: path.join(WINDOWS_DIR, 'kiosk-admin'),
-    exeName: 'JamanvaarKioskAdmin.exe',
-    installerName: 'JAMANVAAR-Kiosk-Admin-Setup.exe',
-    isKiosk: false,
-    startsCore: false
   }
 ];
 
 // 3. Compile Native Windows Apps with Assembly Info
-console.log('[2/6] Compiling 4 native Windows desktop executables with full metadata & embedded icons...');
+console.log('[2/6] Compiling 3 native Windows desktop executables with full metadata & embedded icons...');
 
 for (const app of APPS) {
   const appCs = `
@@ -564,7 +549,6 @@ console.log('  ✓ Created: JAMANVAAR-POS-MACHINE.zip');
 const kioskMachineDir = path.join(PACKAGES_DIR, 'JAMANVAAR-KIOSK-MACHINE');
 ensureDir(kioskMachineDir);
 fs.copyFileSync(path.join(WINDOWS_DIR, 'kiosk', 'JAMANVAAR-Kiosk-Setup.exe'), path.join(kioskMachineDir, 'JAMANVAAR-Kiosk-Setup.exe'));
-fs.copyFileSync(path.join(WINDOWS_DIR, 'kiosk-admin', 'JAMANVAAR-Kiosk-Admin-Setup.exe'), path.join(kioskMachineDir, 'JAMANVAAR-Kiosk-Admin-Setup.exe'));
 
 const kioskReadme = `================================================================
   JAMANVAAR — KIOSK MACHINE INSTALLATION INSTRUCTIONS
@@ -578,9 +562,7 @@ MACHINE 2: CUSTOMER TOUCH KIOSK
 2. Double-click "JAMANVAAR-Kiosk-Setup.exe"
    Click "Install JAMANVAAR Kiosk".
 
-3. Double-click "JAMANVAAR-Kiosk-Admin-Setup.exe" (Optional, for admin).
-
-4. Open "JAMANVAAR Kiosk" from the Desktop.
+3. Open "JAMANVAAR Kiosk" from the Desktop.
    The app will automatically discover the POS machine on your network.
    Click "Connect to Restaurant" to begin self-ordering!
 
@@ -603,7 +585,6 @@ const releaseArtifacts = [
   path.join(WINDOWS_DIR, 'pos', 'JAMANVAAR-POS-Setup.exe'),
   path.join(WINDOWS_DIR, 'pos-admin', 'JAMANVAAR-POS-Admin-Setup.exe'),
   path.join(WINDOWS_DIR, 'kiosk', 'JAMANVAAR-Kiosk-Setup.exe'),
-  path.join(WINDOWS_DIR, 'kiosk-admin', 'JAMANVAAR-Kiosk-Admin-Setup.exe'),
   posZip,
   kioskZip
 ];
@@ -635,7 +616,7 @@ const installDoc = `# JAMANVAAR Production Desktop Installation Guide
 | Package | Description | Target Machine |
 |---|---|---|
 | **\`JAMANVAAR-POS-MACHINE.zip\`** | Contains POS & POS Admin Setups + Local Core | Machine 1 (Counter / Billing) |
-| **\`JAMANVAAR-KIOSK-MACHINE.zip\`** | Contains Kiosk & Kiosk Admin Setups | Machine 2 (Self-Ordering Kiosk) |
+| **\`JAMANVAAR-KIOSK-MACHINE.zip\`** | Contains the Kiosk Setup | Machine 2 (Self-Ordering Kiosk) |
 
 ### Individual Installers
 - **\`JAMANVAAR-POS-Setup.exe\`**: High-speed counter billing POS

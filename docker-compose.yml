@@ -47,6 +47,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
+      - DB_POOL_SIZE=${DB_POOL_SIZE:-5}
+      - DB_POOL_TIMEOUT_SECONDS=${DB_POOL_TIMEOUT_SECONDS:-5}
+      - DB_TX_MAX_WAIT_MS=${DB_TX_MAX_WAIT_MS:-5000}
+      - DB_TX_TIMEOUT_MS=${DB_TX_TIMEOUT_MS:-15000}
+      - REALTIME_PG_RELAY=${REALTIME_PG_RELAY:-on}
+      - DEVICE_SYNC_RPM=${DEVICE_SYNC_RPM:-12000}
       # jamanvaar_app, not the bootstrap postgres superuser above -- see docker-init-app-role.sh.
       - DATABASE_URL=postgresql://jamanvaar_app:${APP_DB_PASSWORD}@db:5432/jamanvaar?schema=public
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET must be set in .env -- see scripts/generate-production-env.js}
@@ -139,7 +145,7 @@ services:
   # section 4). Added here so the whole platform can be exercised online, not just the
   # admin console -- same shared-nginx-front-door pattern as `frontend` above, each on
   # its own 172.17.0.1 port (new nginx/system.kelviontech.in.conf location blocks map
-  # /kiosk-admin/, /kiosk/, /pos/, /pos-admin/, /captain/, /kds/, /q/ to these).
+  # /kiosk/, /pos/, /pos-admin/, /captain/, /kds/, /q/ to these).
   #
   # Each one calls cloud/api at the box's real public origin, baked in at build time
   # (VITE_CLOUD_API_BASE_URL -- see each app's src/cloud/cloudClient.ts or, for qr-guest,
@@ -149,27 +155,6 @@ services:
   # https://system.kelviontech.in -- since every app above and below shares that one
   # origin regardless of its own subpath, these absolute fetches stay same-origin (no
   # CORS) exactly like a relative path would.
-  kiosk-admin:
-    build:
-      context: .
-      dockerfile: apps/kiosk-system/kiosk-admin/Dockerfile
-      args:
-        - VITE_CLOUD_API_BASE_URL=${PUBLIC_ORIGIN:-}
-    container_name: kiosk_kiosk_admin
-    restart: unless-stopped
-    ports:
-      - "${HOST_BIND_IP:-172.17.0.1}:${KIOSK_ADMIN_PORT:-8091}:80"
-    depends_on:
-      - backend
-    networks:
-      - kiosk_network
-    mem_limit: 128m
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   kiosk-user:
     build:
       context: .
@@ -322,7 +307,6 @@ services:
     depends_on:
       - backend
       - frontend
-      - kiosk-admin
       - kiosk-user
       - pos
       - pos-admin

@@ -743,7 +743,6 @@ const server = http.createServer((req, res) => {
   const posDir = getDir('pos_app', 'restaurant-system/pos');
   const posAdminDir = getDir('pos_admin_app', 'restaurant-system/pos-admin');
   const kioskDir = getDir('kiosk_app', 'kiosk-system/kiosk-user');
-  const kioskAdminDir = getDir('kiosk_admin_app', 'kiosk-system/kiosk-admin');
 
   // Handle Root Favicons, Manifests & Application Icons
   if (pathname === '/favicon.ico' || pathname === '/favicon.svg' || pathname === '/icon.png' || pathname === '/app-icon.png' || pathname === '/jamanvaar.png' || pathname === '/manifest.json' || pathname === '/manifest.webmanifest') {
@@ -771,7 +770,6 @@ const server = http.createServer((req, res) => {
   if (pathname === '/pos') { res.writeHead(302, { Location: '/pos/' }); res.end(); return; }
   if (pathname === '/admin' || pathname === '/pos-admin') { res.writeHead(302, { Location: '/pos-admin/' }); res.end(); return; }
   if (pathname === '/kiosk') { res.writeHead(302, { Location: '/kiosk/' }); res.end(); return; }
-  if (pathname === '/kiosk-admin') { res.writeHead(302, { Location: '/kiosk-admin/' }); res.end(); return; }
 
   if (pathname.startsWith('/pos/')) {
     return serveStatic(posDir, pathname.replace(/^\/pos\//, '') || 'index.html');
@@ -782,13 +780,10 @@ const server = http.createServer((req, res) => {
   if (pathname.startsWith('/kiosk/')) {
     return serveStatic(kioskDir, pathname.replace(/^\/kiosk\//, '') || 'index.html');
   }
-  if (pathname.startsWith('/kiosk-admin/')) {
-    return serveStatic(kioskAdminDir, pathname.replace(/^\/kiosk-admin\//, '') || 'index.html');
-  }
 
   if (pathname.startsWith('/assets/')) {
     const sub = pathname.replace(/^\//, '');
-    for (const d of [posDir, posAdminDir, kioskDir, kioskAdminDir]) {
+    for (const d of [posDir, posAdminDir, kioskDir]) {
       const fullP = path.join(d, sub);
       if (fs.existsSync(fullP) && !fs.statSync(fullP).isDirectory()) {
         return serveStatic(d, sub);
@@ -819,7 +814,6 @@ const server = http.createServer((req, res) => {
     .app-pos { background: #0B253A; color: white; border-color: #0B253A; }
     .app-admin { background: #FFF7ED; color: #0B253A; border-color: #FDBA74; }
     .app-kiosk { background: #E66817; color: white; border-color: #E66817; }
-    .app-kiosk-admin { background: #F1F5F9; color: #0B253A; border-color: #CBD5E1; }
     .app-title { font-weight: 900; font-size: 16px; margin-bottom: 4px; display: flex; items-center; gap: 8px; }
     .app-desc { font-size: 12px; opacity: 0.85; line-height: 1.4; }
     .footer-credit { margin-top: 28px; font-size: 11px; color: #8C9BAE; font-weight: 600; }
@@ -843,10 +837,6 @@ const server = http.createServer((req, res) => {
       <a href="/kiosk/" class="app-card app-kiosk">
         <div class="app-title">📱 Touch Kiosk</div>
         <div class="app-desc">Customer Self-Ordering & Digital Touchscreen Terminal</div>
-      </a>
-      <a href="/kiosk-admin/" class="app-card app-kiosk-admin">
-        <div class="app-title">⚙️ Kiosk Admin</div>
-        <div class="app-desc">Fleet Control, Terminal Catalog & Upsell Rules</div>
       </a>
     </div>
     <div class="footer-credit">JAMANVAAR by KELVIONTECH • Enterprise Restaurant Operating System</div>

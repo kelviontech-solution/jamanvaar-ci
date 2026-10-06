@@ -84,14 +84,11 @@ async function updateAllFaviconsAndTaskbar() {
     path.join(ROOT, 'apps', 'restaurant-system', 'pos-admin', 'dist'),
     path.join(ROOT, 'apps', 'kiosk-system', 'kiosk-user', 'public'),
     path.join(ROOT, 'apps', 'kiosk-system', 'kiosk-user', 'dist'),
-    path.join(ROOT, 'apps', 'kiosk-system', 'kiosk-admin', 'public'),
-    path.join(ROOT, 'apps', 'kiosk-system', 'kiosk-admin', 'dist'),
     path.join(ROOT, 'packages', 'ui', 'src', 'assets', 'branding'),
     path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'icons'),
     path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'pos_app'),
     path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'pos_admin_app'),
-    path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'kiosk_app'),
-    path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'kiosk_admin_app')
+    path.join(ROOT, 'JAMANVAAR_DESKTOP_PACKAGE', 'kiosk_app')
   ];
 
   targetDirs.forEach(dir => {
@@ -136,8 +133,7 @@ async function updateAllFaviconsAndTaskbar() {
   const apps = [
     { name: 'JAMANVAAR POS.lnk', target: 'pos', title: 'JAMANVAAR POS' },
     { name: 'JAMANVAAR POS Admin.lnk', target: 'pos-admin', title: 'JAMANVAAR POS Admin' },
-    { name: 'JAMANVAAR Kiosk.lnk', target: 'kiosk', title: 'JAMANVAAR Kiosk' },
-    { name: 'JAMANVAAR Kiosk Admin.lnk', target: 'kiosk-admin', title: 'JAMANVAAR Kiosk Admin' }
+    { name: 'JAMANVAAR Kiosk.lnk', target: 'kiosk', title: 'JAMANVAAR Kiosk' }
   ];
 
   const vbsLines = [

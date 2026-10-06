@@ -16,8 +16,7 @@ const desktops = [
 const apps = [
   { name: 'JAMANVAAR POS.lnk', target: 'pos', title: 'JAMANVAAR POS' },
   { name: 'JAMANVAAR POS Admin.lnk', target: 'pos-admin', title: 'JAMANVAAR POS Admin' },
-  { name: 'JAMANVAAR Kiosk.lnk', target: 'kiosk', title: 'JAMANVAAR Kiosk' },
-  { name: 'JAMANVAAR Kiosk Admin.lnk', target: 'kiosk-admin', title: 'JAMANVAAR Kiosk Admin' }
+  { name: 'JAMANVAAR Kiosk.lnk', target: 'kiosk', title: 'JAMANVAAR Kiosk' }
 ];
 
 // Generate VBS script to reliably create Windows shortcuts

@@ -1,5 +1,5 @@
 # JAMANVAAR — Master Production Windows Desktop Release Pipeline
-# Compiles 4 Native Windows Executables + Standalone Installers + Machine Packages
+# Compiles 3 Native Windows Executables + Standalone Installers + Machine Packages
 # 100% Clean, Fast Startup, Virus-Free, Anti-Malware Compliant (No Smart App Control warnings)
 
 $ErrorActionPreference = "Stop"
@@ -24,7 +24,6 @@ New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $windowsDir "pos") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $windowsDir "pos-admin") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $windowsDir "kiosk") | Out-Null
-New-Item -ItemType Directory -Force -Path (Join-Path $windowsDir "kiosk-admin") | Out-Null
 New-Item -ItemType Directory -Force -Path $packagesDir | Out-Null
 New-Item -ItemType Directory -Force -Path $checksumsDir | Out-Null
 New-Item -ItemType Directory -Force -Path $readmeDir | Out-Null
@@ -37,7 +36,6 @@ Write-Host "[2/7] Checking compiled Vite production bundles..."
 $posDist = Join-Path $workspaceRoot "apps\restaurant-system\pos\dist"
 $posAdminDist = Join-Path $workspaceRoot "apps\restaurant-system\pos-admin\dist"
 $kioskDist = Join-Path $workspaceRoot "apps\kiosk-system\kiosk-user\dist"
-$kioskAdminDist = Join-Path $workspaceRoot "apps\kiosk-system\kiosk-admin\dist"
 
 # 3. Create C# Source for 4 Native Desktop Executables (with embedded AppUserModelID & Chromium/Edge App Mode)
 Write-Host "[3/7] Generating native Windows application binaries with embedded JAMANVAAR icon..."
@@ -193,19 +191,17 @@ function Compile-NativeApp {
     Write-Host "  ✓ Compiled: $(Split-Path $OutExePath -Leaf)"
 }
 
-# 4. Compile all 4 applications
+# 4. Compile all 3 applications
 $posExe = Join-Path $windowsDir "pos\JamanvaarPOS.exe"
 $posAdminExe = Join-Path $windowsDir "pos-admin\JamanvaarPOSAdmin.exe"
 $kioskExe = Join-Path $windowsDir "kiosk\JamanvaarKiosk.exe"
-$kioskAdminExe = Join-Path $windowsDir "kiosk-admin\JamanvaarKioskAdmin.exe"
 
 Compile-NativeApp -AppName "POS" -AppTitle "JAMANVAAR POS" -AppId "com.jamanvaar.pos" -DistPath $posDist -OutExePath $posExe -IsKiosk $false -StartsCore $true
 Compile-NativeApp -AppName "POSAdmin" -AppTitle "JAMANVAAR POS Admin" -AppId "com.jamanvaar.posadmin" -DistPath $posAdminDist -OutExePath $posAdminExe -IsKiosk $false -StartsCore $true
 Compile-NativeApp -AppName "Kiosk" -AppTitle "JAMANVAAR Kiosk" -AppId "com.jamanvaar.kiosk" -DistPath $kioskDist -OutExePath $kioskExe -IsKiosk $true -StartsCore $false
-Compile-NativeApp -AppName "KioskAdmin" -AppTitle "JAMANVAAR Kiosk Admin" -AppId "com.jamanvaar.kioskadmin" -DistPath $kioskAdminDist -OutExePath $kioskAdminExe -IsKiosk $false -StartsCore $false
 
 # 5. Build Individual Self-Contained Installers
-Write-Host "`n[4/7] Generating 4 Self-Extracting One-Click Installers..."
+Write-Host "`n[4/7] Generating 3 Self-Extracting One-Click Installers..."
 
 function Build-Installer {
     param(
@@ -465,19 +461,14 @@ Copy-Item -Force (Join-Path $workspaceRoot "tooling\local-runtime\JamanvaarLocal
 Copy-Item -Recurse -Force $kioskDist (Join-Path $windowsDir "kiosk\app_data")
 Copy-Item -Force $iconPath (Join-Path $windowsDir "kiosk\icon.ico")
 
-Copy-Item -Recurse -Force $kioskAdminDist (Join-Path $windowsDir "kiosk-admin\app_data")
-Copy-Item -Force $iconPath (Join-Path $windowsDir "kiosk-admin\icon.ico")
-
 # Build Setup Installers
 $posInstaller = Join-Path $windowsDir "pos\JAMANVAAR-POS-Setup.exe"
 $posAdminInstaller = Join-Path $windowsDir "pos-admin\JAMANVAAR-POS-Admin-Setup.exe"
 $kioskInstaller = Join-Path $windowsDir "kiosk\JAMANVAAR-Kiosk-Setup.exe"
-$kioskAdminInstaller = Join-Path $windowsDir "kiosk-admin\JAMANVAAR-Kiosk-Admin-Setup.exe"
 
 Build-Installer -AppName "POS" -AppDisplayName "JAMANVAAR POS" -AppId "com.jamanvaar.pos" -ExeSource $posExe -DistSource $posDist -InstallerOutPath $posInstaller
 Build-Installer -AppName "POSAdmin" -AppDisplayName "JAMANVAAR POS Admin" -AppId "com.jamanvaar.posadmin" -ExeSource $posAdminExe -DistSource $posAdminDist -InstallerOutPath $posAdminInstaller
 Build-Installer -AppName "Kiosk" -AppDisplayName "JAMANVAAR Kiosk" -AppId "com.jamanvaar.kiosk" -ExeSource $kioskExe -DistSource $kioskDist -InstallerOutPath $kioskInstaller
-Build-Installer -AppName "KioskAdmin" -AppDisplayName "JAMANVAAR Kiosk Admin" -AppId "com.jamanvaar.kioskadmin" -ExeSource $kioskAdminExe -DistSource $kioskAdminDist -InstallerOutPath $kioskAdminInstaller
 
 # 6. Build Two Machine Deployment ZIP Packages
 Write-Host "`n[5/7] Creating Machine Deployment ZIP Packages..."
@@ -530,7 +521,6 @@ Write-Host "  ✓ Created Package: JAMANVAAR-POS-MACHINE.zip"
 $kioskMachineDir = Join-Path $packagesDir "JAMANVAAR-KIOSK-MACHINE"
 New-Item -ItemType Directory -Force -Path $kioskMachineDir | Out-Null
 Copy-Item -Force $kioskInstaller (Join-Path $kioskMachineDir "JAMANVAAR-Kiosk-Setup.exe")
-Copy-Item -Force $kioskAdminInstaller (Join-Path $kioskMachineDir "JAMANVAAR-Kiosk-Admin-Setup.exe")
 
 $kioskReadme = @(
     "================================================================",
@@ -545,9 +535,7 @@ $kioskReadme = @(
     "2. Double-click ""JAMANVAAR-Kiosk-Setup.exe""",
     "   Click ""Install JAMANVAAR Kiosk"".",
     "",
-    "3. Double-click ""JAMANVAAR-Kiosk-Admin-Setup.exe"" (Optional, for admin).",
-    "",
-    "4. Open ""JAMANVAAR Kiosk"" from the Desktop.",
+    "3. Open ""JAMANVAAR Kiosk"" from the Desktop.",
     "   The app will automatically discover the POS machine on your network.",
     "   Click ""Connect to Restaurant"" to begin self-ordering!",
     "",
@@ -571,7 +559,6 @@ $artifacts = @(
     $posInstaller,
     $posAdminInstaller,
     $kioskInstaller,
-    $kioskAdminInstaller,
     $posZip,
     $kioskZip
 )
@@ -605,7 +592,7 @@ $installMd = @(
     "| Package | Description | Target Machine |",
     "|---|---|---|",
     "| **``JAMANVAAR-POS-MACHINE.zip``** | Contains POS & POS Admin Setups + Local Core | Machine 1 (Counter / Billing) |",
-    "| **``JAMANVAAR-KIOSK-MACHINE.zip``** | Contains Kiosk & Kiosk Admin Setups | Machine 2 (Self-Ordering Kiosk) |",
+    "| **``JAMANVAAR-KIOSK-MACHINE.zip``** | Contains the Kiosk Setup | Machine 2 (Self-Ordering Kiosk) |",
     "",
     "### Individual Installers",
     "- **``JAMANVAAR-POS-Setup.exe``**: High-speed counter billing POS",

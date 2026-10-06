@@ -43,9 +43,6 @@ jobs:
           - workspace: '@jamanvaar/pos-admin'
             dir: apps/restaurant-system/pos-admin
             name: POS Admin
-          - workspace: '@jamanvaar/kiosk-admin'
-            dir: apps/kiosk-system/kiosk-admin
-            name: Kiosk Admin
           - workspace: '@jamanvaar/kiosk-user'
             dir: apps/kiosk-system/kiosk-user
             name: Kiosk User

@@ -1,7 +1,0 @@
-C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\kiosk-system\kiosk-admin\src-tauri\target\debug\deps\scopeguard-3482c872007b9287.d: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\scopeguard-1.2.0\src\lib.rs
-
-C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\kiosk-system\kiosk-admin\src-tauri\target\debug\deps\libscopeguard-3482c872007b9287.rlib: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\scopeguard-1.2.0\src\lib.rs
-
-C:\Users\OM Sanjhira\OneDrive\Desktop\k2\apps\kiosk-system\kiosk-admin\src-tauri\target\debug\deps\libscopeguard-3482c872007b9287.rmeta: C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\scopeguard-1.2.0\src\lib.rs
-
-C:\Users\OM\ Sanjhira\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\scopeguard-1.2.0\src\lib.rs:

@@ -738,6 +738,9 @@ export default function PosAdminApp() {
                     placeholder="e.g. JM9876543210"
                     className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                   />
+                  <p className="text-[11px] text-slate-500 mt-1.5">
+                    Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button).
+                  </p>
                 </div>
 
                 <div>

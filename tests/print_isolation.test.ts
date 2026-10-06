@@ -138,7 +138,7 @@ describe('print isolation (BUG-037)', () => {
 });
 
 /** The buttons themselves: no app may call window.print() directly. */
-const APP_DIRS = ['../apps/restaurant-system/pos-admin/src', '../apps/kiosk-system/kiosk-admin/src', '../cloud/super-admin-web/src'];
+const APP_DIRS = ['../apps/restaurant-system/pos-admin/src', '../cloud/super-admin-web/src'];
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {

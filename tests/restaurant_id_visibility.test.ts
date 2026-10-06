@@ -32,8 +32,11 @@ describe('The Restaurant ID can be found and copied (BUG-127)', () => {
     expect(panel).toMatch(/getStoredRestaurantId\(\)/);
   });
 
-  it('the Kiosk Admin connect screen says where to find the Restaurant ID', () => {
-    const source = read('apps/kiosk-system/kiosk-admin/src/App.tsx');
+  // Kiosk Admin's own connect screen is retired (Phase 2 Task 11) -- its Restaurant Admin
+  // merge console (pos-admin) is now the one login screen a Kiosk-only or Restaurant-only
+  // subscriber alike uses, so this is the only "connect screen" left to check.
+  it('the Restaurant Admin (pos-admin) login screen says where to find the Restaurant ID', () => {
+    const source = read('apps/restaurant-system/pos-admin/src/App.tsx');
     expect(source).not.toContain("From your restaurant's admin dashboard");
     expect(source).toMatch(/Super Admin[\s\S]{0,200}Restaurant ID|Restaurant ID[\s\S]{0,300}Super Admin/);
   });
