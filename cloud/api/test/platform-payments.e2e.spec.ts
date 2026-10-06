@@ -94,7 +94,12 @@ describe('Platform payments visibility', () => {
 
   it('includes refunds on a payment that has one', async () => {
     const paymentId = await seedPayment(10000, 'SUCCESS');
-    await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 4000, reason: 'Partial refund for visibility test', requestedBy: 'Test Manager' });
+    // Refunds need a manager approval (RefundAuthorizationGuard); the approval flow has its own tests.
+    // Here the refund row already exists, and this asserts the platform view shows it.
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.refund.create({ data: { paymentId, restaurantId, amount: 4000, reason: 'Partial refund for visibility test', requestedBy: 'Test Manager', status: 'PENDING' } })
+    );
+    await prisma.runAsTenant(restaurantId, (tx) => tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: 'REFUND_PENDING' } }));
 
     const res = await authed('get', `/api/v1/payments?restaurantId=${restaurantId}`, platformToken);
     const row = res.body.rows.find((r: { id: string }) => r.id === paymentId);

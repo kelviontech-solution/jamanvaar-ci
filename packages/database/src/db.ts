@@ -900,7 +900,11 @@ export class JamanvaarDatabase {
         if ('BroadcastChannel' in window) {
           this.broadcastChannel = new BroadcastChannel('jamanvaar_realtime_db_bus');
           this.broadcastChannel.onmessage = (ev) => {
-            if (ev.data && ev.data.type === 'DB_SYNC') {
+            // SQLite's own scoped channel applies persisted changes before notifying.
+            // The old global bus fired before that write completed, reloading stale
+            // follower caches (and waking unrelated apps on the same production origin).
+            if (!this.store?.subscribeRemote && ev.data?.type === 'DB_SYNC'
+              && ev.data.scope === KeyValueStore.browserKey(this.storagePrefix)) {
               this.loadFromStorage();
               this.listeners.forEach((fn) => fn());
             }
@@ -911,7 +915,7 @@ export class JamanvaarDatabase {
       }
 
       window.addEventListener('storage', (e) => {
-        if (e.key && e.key.startsWith(this.storagePrefix)) {
+        if (!this.store?.subscribeRemote && e.key?.startsWith(KeyValueStore.browserKey(this.storagePrefix))) {
           this.loadFromStorage();
           this.listeners.forEach((fn) => fn());
         }
@@ -1568,8 +1572,8 @@ export class JamanvaarDatabase {
     this.saveToStorage();
     this.pushToServer();
     try {
-      if (this.broadcastChannel) {
-        this.broadcastChannel.postMessage({ type: 'DB_SYNC', timestamp: Date.now() });
+      if (this.broadcastChannel && !this.store?.subscribeRemote) {
+        this.broadcastChannel.postMessage({ type: 'DB_SYNC', scope: KeyValueStore.browserKey(this.storagePrefix), timestamp: Date.now() });
       }
     } catch (e) {
       // Ignore broadcast errors

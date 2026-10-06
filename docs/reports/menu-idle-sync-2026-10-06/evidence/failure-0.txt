@@ -1,0 +1,112 @@
+QA idle sync 1791303192365
+RESTAURANT ADMIN
+QA idle sync 1791303192365
+Switch application
+Restaurant Admin
+Kiosk Admin
+Ctrl+K
+No open shift
+EOD Report
+Reconciliation
+Assistant
+Logout
+OPERATIONS
+Dashboard
+Billing / Invoices
+Orders
+Live Orders / KDS
+Floor / Tables
+Reservations
+Kitchen / KOT
+DIGITAL ORDERING
+QR Table Ordering
+MENU & INVENTORY
+Menu & Categories
+Customisations & Tax
+Inventory & Recipes
+Purchasing & Stock Control
+PEOPLE & CASH
+Customers CRM
+Staff & Roles (RBAC)
+Payments & Split
+Offers & Coupons
+Shift & Cash Drawer
+ANALYTICS & SYSTEM
+Reports & Analytics
+Printers & Devices
+Receipt & E-Bill
+Sync & Devices
+Restaurant Settings
+Subscription Plans
+Audit Trail Logs
+Backup & Restore
+Help & Support
+Menu & Catalog Manager
+4 ITEMS
+
+Create, edit dishes, adjust pricing, upload device photos, and import templates.
+
+Add Dish
+Add Category
+Load Menu Template
+Upload CSV
+Download CSV Template
+Export Menu CSV
+Bulk Price Adjust
+Clean Duplicate Items
+All Diets
+Veg
+Non-Veg
+Egg
+Jain
+Vegan
+All Categories (4)
+Gujarati Thali Special
+1
+Rotli, Bhakri & Thepla
+1
+Sweets & Mithai
+1
+Chaas & Beverages
+1
+QA-0
+Royal Gujarati Grand Thali
+₹299
+
+QA restaurant dish
+
+In Stock
+QA-1
+Methi Thepla (4 Pcs)
+₹70
+
+QA restaurant dish
+
+In Stock
+QA-2
+Rich Basundi Bowl
+₹110
+
+QA restaurant dish
+
+In Stock
+QA-3
+Kathiyawadi Masala Chaas
+₹40
+
+QA restaurant dish
+
+In Stock
+Combos & Meal Deals
+0 COMBOS
+
+Bundle dishes into a fixed-price deal with an automatic savings badge.
+
+Create Combo
+No Combos Yet
+
+Bundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.
+
++ Create First Combo
+JAMAN AI
+ACTIVE

@@ -349,33 +349,37 @@ export class PaymentsService {
       throw new ForbiddenException({ message: 'Online payments are not active for this restaurant', code: PAYMENTS_NOT_ACTIVE });
     }
 
-    return this.prisma.runAsTenant(restaurantId, async (tx) => {
-      // One live QR per payment: the row is locked while a QR is created, so two taps cannot produce two QRs,
-      // and a QR that is still valid is returned instead of creating another.
+    const cached = (payment.providerResponse ?? null) as { qr?: { id: string; imageUrl: string; expiresAt: string } } | null;
+    if (cached?.qr && Date.parse(cached.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) {
+      this.logger.log(`event=qr_generated paymentId=${paymentId} cached=true`);
+      return { qrPayload: cached.qr.imageUrl, contentType: 'image/url', expiresAt: cached.qr.expiresAt, method: 'UPI_QR' as const };
+    }
+
+    // The Razorpay call runs outside any database transaction: holding a row lock across a network round-trip
+    // is what made the QR slow under load. The row lock below only covers the store, so the first QR written wins.
+    const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
+    const startedAt = Date.now();
+    const qr = await this.razorpay.createUpiQr({
+      paymentRef: payment.providerOrderId,
+      amountPaise: payment.amount,
+      closeByUnix: Math.floor(expiresAt.getTime() / 1000),
+      description: `Order ${payment.orderId.slice(0, 8)}`
+    });
+    const razorpayCallMs = Date.now() - startedAt;
+    if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
+    const created = { id: qr.qrId, imageUrl: qr.imageUrl, expiresAt: expiresAt.toISOString() };
+
+    const winner = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const [locked] = await tx.$queryRaw<{ providerResponse: Prisma.JsonValue | null }[]>`
         SELECT "providerResponse" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
       `;
       const existing = (locked?.providerResponse ?? null) as { qr?: { id: string; imageUrl: string; expiresAt: string } } | null;
-      if (existing?.qr && Date.parse(existing.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) {
-        this.logger.log(`event=qr_generated paymentId=${paymentId} cached=true`);
-        return { qrPayload: existing.qr.imageUrl, contentType: 'image/url', expiresAt: existing.qr.expiresAt, method: 'UPI_QR' as const };
-      }
-
-      const expiresAt = new Date(Date.now() + QR_TTL_SECONDS * 1000);
-      const startedAt = Date.now();
-      const qr = await this.razorpay.createUpiQr({
-        paymentRef: payment.providerOrderId,
-        amountPaise: payment.amount,
-        closeByUnix: Math.floor(expiresAt.getTime() / 1000),
-        description: `Order ${payment.orderId.slice(0, 8)}`
-      });
-      const razorpayCallMs = Date.now() - startedAt;
-      if (!qr.imageUrl) throw new ServiceUnavailableException('Razorpay did not return a QR image for this payment');
-      const stored = { qr: { id: qr.qrId, imageUrl: qr.imageUrl, expiresAt: expiresAt.toISOString() } };
-      await tx.paymentTransaction.update({ where: { id: paymentId }, data: { providerResponse: stored as unknown as Prisma.InputJsonValue } });
-      this.logger.log(`event=qr_generated paymentId=${paymentId} cached=false qrId=${qr.qrId} razorpayCallMs=${razorpayCallMs}`);
-      return { qrPayload: qr.imageUrl, contentType: 'image/url', expiresAt: expiresAt.toISOString(), method: 'UPI_QR' as const };
+      if (existing?.qr && Date.parse(existing.qr.expiresAt) - Date.now() > QR_MIN_REMAINING_MS) return { qr: existing.qr, cached: true };
+      await tx.paymentTransaction.update({ where: { id: paymentId }, data: { providerResponse: { qr: created } as unknown as Prisma.InputJsonValue } });
+      return { qr: created, cached: false };
     });
+    this.logger.log(`event=qr_generated paymentId=${paymentId} cached=${winner.cached} qrId=${qr.qrId} razorpayCallMs=${razorpayCallMs}`);
+    return { qrPayload: winner.qr.imageUrl, contentType: 'image/url', expiresAt: winner.qr.expiresAt, method: 'UPI_QR' as const };
   }
 
   /**

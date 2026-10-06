@@ -58,6 +58,7 @@ function time(value: unknown): number {
 export class CollectionSync<T extends Syncable> {
   private memory: SyncState = { pushed: {}, tombstones: {} };
   private loaded = false;
+  private storedState: string | null = null;
 
   constructor(
     private readonly storageKey: string,
@@ -76,10 +77,12 @@ export class CollectionSync<T extends Syncable> {
   }
 
   private load(): SyncState {
-    if (this.loaded) return this.memory;
-    this.loaded = true;
     try {
       const raw = KeyValueStore.get(this.storageKey);
+      if (this.loaded && raw === this.storedState) return this.memory;
+      this.loaded = true;
+      this.storedState = raw;
+      this.memory = { pushed: {}, tombstones: {} };
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<SyncState>;
         this.memory = { sigs: parsed.sigs, pushed: parsed.pushed ?? {}, tombstones: parsed.tombstones ?? {} };
@@ -93,6 +96,9 @@ export class CollectionSync<T extends Syncable> {
   private save(): void {
     try {
       KeyValueStore.set(this.storageKey, JSON.stringify(this.memory));
+      // Another window can update the shared SQLite bookkeeping. Observe its next
+      // version instead of treating its acknowledged menu as a fresh local edit.
+      this.storedState = KeyValueStore.get(this.storageKey);
     } catch {
       // Storage unavailable - state stays in memory for this session.
     }
@@ -134,7 +140,7 @@ export class CollectionSync<T extends Syncable> {
     for (const record of this.list()) {
       const asRecord = record as unknown as Record<string, unknown>;
       if (state.pushed[this.idOf(record)] !== this.signature(asRecord)) {
-        records.push({ externalId: this.idOf(record), payload: { ...(this.serialize ? this.serialize(record) : asRecord), updatedAt: record.updatedAt ?? EPOCH } });
+        records.push({ externalId: this.idOf(record), payload: structuredClone({ ...(this.serialize ? this.serialize(record) : asRecord), updatedAt: record.updatedAt ?? EPOCH }) });
       }
     }
     for (const [id, at] of Object.entries(state.tombstones)) {
@@ -186,6 +192,9 @@ export class CollectionSync<T extends Syncable> {
     const incoming = this.materialize ? this.materialize(parsed) : parsed;
     if (typeof remote.updatedAt !== 'string') incoming.updatedAt = EPOCH;
 
+    const unchanged = idx >= 0 && remoteTime === time(list[idx].updatedAt)
+      && this.signature(list[idx] as unknown as Record<string, unknown>) === this.signature(incoming as unknown as Record<string, unknown>);
+
     if (idx < 0) {
       list.push(incoming);
     } else {
@@ -203,7 +212,7 @@ export class CollectionSync<T extends Syncable> {
     state.pushed[id] = sig;
     delete state.tombstones[id];
     this.save();
-    db.notify();
+    if (!unchanged) db.notify();
   }
 
   /** True when this device holds no record of this kind at all. */

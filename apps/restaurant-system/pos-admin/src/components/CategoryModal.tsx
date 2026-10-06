@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Category } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
 import { MenuRepository, AuditRepository } from '@jamanvaar/database';
@@ -26,7 +26,12 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [imageUrl, setImageUrl] = useState('');
   const [formError, setFormError] = useState('');
 
+  const initializedForm = useRef<string | null>(null);
   useEffect(() => {
+    if (!isOpen) { initializedForm.current = null; return; }
+    const session = categoryToEdit?.id ?? 'new';
+    if (initializedForm.current === session) return;
+    initializedForm.current = session;
     if (categoryToEdit) {
       setName(categoryToEdit.name); setSortOrder(categoryToEdit.sortOrder);
       setSlug(categoryToEdit.slug);

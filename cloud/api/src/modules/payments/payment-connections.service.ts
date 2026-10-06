@@ -116,7 +116,8 @@ export class PaymentConnectionsService {
         // Legacy clients cannot supply this metadata; don't retain a previous bank's name/type.
         settlementBankName: null,
         settlementBankAccountType: null,
-        directSettlementRequested: Boolean(dto.settlementAccountNumber && existing?.directSettlementRequested),
+        // Settle to the restaurant's own bank account by default; the owner can switch it off in Settings.
+        directSettlementRequested: Boolean(dto.settlementAccountNumber),
         // A resubmission is by definition not yet verified — clear the old
         // timestamp so a pending-re-review connection can't read as verified.
         verifiedAt: null,

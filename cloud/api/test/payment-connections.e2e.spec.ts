@@ -12,6 +12,7 @@ describe('Payment connection onboarding', () => {
   const adminPassword = 'correct-horse-battery-staple';
   let platformToken: string;
   let restaurantId: string;
+  const planIds: string[] = [];
   let ownerToken: string;
 
   const authed = (method: 'get' | 'post' | 'patch', url: string, token: string) =>
@@ -23,6 +24,16 @@ describe('Payment connection onboarding', () => {
    * own isolated connection lifecycle instead, so they provision a throwaway
    * restaurant with this.
    */
+  // Kiosk payment settings belong to a restaurant on a plan that includes the kiosk.
+  const subscribeKiosk = async (rid: string) => {
+    const plan = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'PRO', name: `TEST Pay Connection Plan ${Date.now()}`, priceMonthly: 900000, maxBranches: 5, maxDevices: 20, maxUsers: 20,
+      entitlements: { posTerminal: true, restaurantAdmin: true, kotKdsRouting: true, captainApp: true, selfOrderKiosk: true, qrTableOrdering: true }
+    });
+    planIds.push(plan.body.id);
+    await authed('post', '/api/v1/subscriptions', platformToken).send({ restaurantId: rid, planId: plan.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString() });
+  };
+
   const createRestaurantWithOwner = async (label: string) => {
     const ownerEmail = `payconn-${label}-${Date.now()}@test.example.com`;
     const ownerPassword = 'scoped-correct-horse-battery';
@@ -32,6 +43,7 @@ describe('Payment connection onboarding', () => {
       ownerEmail
     });
     const id = res.body.restaurant.id;
+    await subscribeKiosk(id);
     await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
       restaurantId: id, email: ownerEmail, activationToken: res.body.activationToken, newPassword: ownerPassword
     });
@@ -75,6 +87,7 @@ describe('Payment connection onboarding', () => {
     });
     restaurantId = restaurantRes.body.restaurant.id;
     const activationToken = restaurantRes.body.activationToken;
+    await subscribeKiosk(restaurantId);
 
     await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
       restaurantId, email: ownerEmail, activationToken, newPassword: ownerPassword
@@ -280,6 +293,7 @@ describe('Payment connection onboarding', () => {
       name: `TEST Other Pay Connection Restaurant ${Date.now()}`, ownerName: 'Other Owner', ownerEmail: otherOwnerEmail
     });
     const otherRestaurantId = otherRes.body.restaurant.id;
+    await subscribeKiosk(otherRestaurantId);
     await request(app.getHttpServer()).post('/api/v1/tenant-auth/set-initial-password').send({
       restaurantId: otherRestaurantId, email: otherOwnerEmail, activationToken: otherRes.body.activationToken, newPassword: otherOwnerPassword
     });

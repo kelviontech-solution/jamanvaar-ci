@@ -102,7 +102,7 @@ import {
 import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
   AlertCircle,
@@ -339,6 +339,7 @@ export default function KioskUserApp() {
     void SyncOutboxEngine.processOutbox();
     void SyncOutboxEngine.catchUpFromCloud();
     void syncMenuCatalog({ push: false });
+    void syncDiningTables();
     void syncKioskConfiguration().catch(() => {});
     // BUG-130/133/136/137: combos and coupons made in Kiosk Admin arrive here; coupon redemptions, guest ratings
     // and "call staff" requests go back.
@@ -374,6 +375,7 @@ export default function KioskUserApp() {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
       void syncMenuCatalog({ push: false });
+      void syncDiningTables();
     void syncKioskConfiguration().catch(() => {});
       void syncPromotions({ pushCombos: false, pushCoupons: true });
       void syncFeedback({ push: true });
@@ -3148,12 +3150,12 @@ export default function KioskUserApp() {
                   showToast('Internet required for UPI. Please choose Pay Cash at Counter.');
                   return;
                 }
-                if (onlinePaymentUnavailable) {
-                  showToast('Online payment is unavailable right now. Please choose Pay Cash at Counter.');
-                  return;
-                }
                 SoundService.playTap();
                 setPaymentMethod('UPI');
+                // The server decides whether online payment is active. A flag from an earlier attempt
+                // (made before the restaurant was activated) must not block the guest from asking again.
+                setRazorpayUnavailable(false);
+                setOnlinePaymentsPending(false);
                 // No QR has ever been requested yet for this order (guest arrived with Cash
                 // selected, or switched away from UPI and back) -- without this, the tile just
                 // highlights and the QR panel is stuck on "Preparing…" forever. Safe to call even
