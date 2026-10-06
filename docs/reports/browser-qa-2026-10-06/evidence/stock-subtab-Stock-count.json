@@ -1,0 +1,348 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\n2\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nKIOSK\nKiosk Terminals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nPurchasing & Stock Control\n\nRecord what you buy and at what price, count the shelves, see what to reorder and what is about to expire.\n\nReceive goods\nSuppliers\nStock count\nReorder & expiry\nCosting & reports\nCount the shelves\n\nType what you physically counted. Leave an item blank to skip it. Stock is set to your count and each difference is recorded.\n\nITEM\tIN SYSTEM\tCOUNTED\tDIFFERENCE\nQA Cheese\t14 kg\t\t\nNet difference ₹0\nSave count\nRecent counts\nCOUNT-000001 · 6 Oct 2026 · Restaurant Admin\n₹400\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Purchasing & Stock Control",
+    "Count the shelves",
+    "Recent counts"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receive goods",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Suppliers",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Stock count",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reorder & expiry",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Costing & reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save count",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Note (optional)",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

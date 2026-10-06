@@ -1,0 +1,302 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nMaster Menu Catalog & Franchise Syndication\n\nCentral repository of standardized recipes, authentic Indian culinary items, GST tax profiles, and safe push syndication to franchise outlets.\n\nUpdated just now\nRefresh\nImport Starter Library\nManage Categories\nAdd Master Dish\nAll Categories\n0\nAll Dietary Classifications\nVegetarian (VEG)\nJain Friendly\nSwaminarayan\nNon-Vegetarian\n100% Vegan\nCards\nTable\nNo master dishes match your search\n\nTry clearing search keywords, or click \"Import Starter Library\" to automatically load 30+ authentic Indian culinary recipes.\n\nImport Starter Library\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Master Menu Catalog & Franchise Syndication",
+    "No master dishes match your search"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "Last updated just now",
+      "disabled": false
+    },
+    {
+      "text": "Import Starter Library",
+      "aria": null,
+      "title": "Import authentic preloaded Indian starter dishes and recipes",
+      "disabled": false
+    },
+    {
+      "text": "Manage Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Master Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cards",
+      "aria": null,
+      "title": "SaaS Cards View",
+      "disabled": false
+    },
+    {
+      "text": "Table",
+      "aria": null,
+      "title": "Compact Table View",
+      "disabled": false
+    },
+    {
+      "text": "Import Starter Library",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search master dishes by name or ingredients…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All Dietary Classifications"
+        },
+        {
+          "value": "VEG",
+          "text": "Vegetarian (VEG)"
+        },
+        {
+          "value": "JAIN",
+          "text": "Jain Friendly"
+        },
+        {
+          "value": "SWAMINARAYAN",
+          "text": "Swaminarayan"
+        },
+        {
+          "value": "NON_VEG",
+          "text": "Non-Vegetarian"
+        },
+        {
+          "value": "VEGAN",
+          "text": "100% Vegan"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

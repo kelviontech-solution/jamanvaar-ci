@@ -1,0 +1,8682 @@
+[
+  {
+    "app": "super",
+    "route": "/",
+    "actual": "/",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Control Center"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/dashboard",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/dashboard",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/restaurants",
+    "actual": "/restaurants",
+    "result": "RENDERED",
+    "headings": [
+      "Restaurants"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "+ Quick create",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Onboard Restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspended\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Trial\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "No Plan",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Cards",
+        "aria": null,
+        "title": "SaaS Cards View",
+        "disabled": false
+      },
+      {
+        "text": "Table",
+        "aria": null,
+        "title": "Tabular View",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search name, owner, city, ID…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "All SaaS Tiers"
+          },
+          {
+            "value": "CORE",
+            "text": "CORE (₹5,000)"
+          },
+          {
+            "value": "PRO",
+            "text": "PRO (₹7,000)"
+          },
+          {
+            "value": "ENTERPRISE",
+            "text": "ENTERPRISE"
+          },
+          {
+            "value": "NO_PLAN",
+            "text": "No Plan"
+          }
+        ]
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "recent",
+            "text": "Recently Onboarded"
+          },
+          {
+            "value": "name_asc",
+            "text": "Name (A → Z)"
+          },
+          {
+            "value": "name_desc",
+            "text": "Name (Z → A)"
+          },
+          {
+            "value": "branches_desc",
+            "text": "Most Branches"
+          },
+          {
+            "value": "devices_desc",
+            "text": "Most Devices"
+          },
+          {
+            "value": "status",
+            "text": "Subscription Status"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/restaurants/onboard",
+    "actual": "/restaurants/onboard",
+    "result": "RENDERED",
+    "headings": [
+      "Onboard New Restaurant"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/settings",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/settings",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "← Back to Restaurants",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Cancel",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Next: Owner Credentials →",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "e.g. The Royal Haveli",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "10-digit mobile, e.g. 9876543210",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "e.g. Haveli Hospitality Pvt. Ltd.",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "Fine Dining",
+            "text": "Fine Dining"
+          },
+          {
+            "value": "Casual Dine-in",
+            "text": "Casual Dine-in"
+          },
+          {
+            "value": "QSR / Fast Food",
+            "text": "QSR / Quick Service"
+          },
+          {
+            "value": "Cafe & Bakery",
+            "text": "Cafe & Bakery"
+          },
+          {
+            "value": "Cloud Kitchen",
+            "text": "Cloud Kitchen / Delivery Only"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "24AAAAA0000A1Z5",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "14-digit FSSAI number",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Street, Landmark, Area",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/restaurants/:id",
+    "actual": "/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f",
+    "result": "RENDERED",
+    "headings": [
+      "QA-Restaurant-A-1791252294734",
+      "Hardware & Terminal Activation Keys (7)"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy the Restaurant ID",
+        "disabled": false
+      },
+      {
+        "text": "Generate Key",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspend Restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Overview",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Owner & Users",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Branches",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Subscription",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Applications",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Plan Quotas",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Feature Entitlements",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Devices & Keys",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Billing & Invoices",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Payments",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Reports & Analytics",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Audit Logs",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Support & Diagnostics",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Backup & Recovery",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Menu",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Copy the internal UUID",
+        "disabled": false
+      },
+      {
+        "text": "Copy ID",
+        "aria": null,
+        "title": "Copy the Restaurant ID",
+        "disabled": false
+      },
+      {
+        "text": "Generate Activation Key",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Copy",
+        "aria": null,
+        "title": "Copy",
+        "disabled": false
+      },
+      {
+        "text": "Revoke",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/owners",
+    "actual": "/owners",
+    "result": "RENDERED",
+    "headings": [
+      "Restaurant Owners"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/owners",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/owners",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Pending\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspended\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search name, email, phone, restaurant…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/owners/:id",
+    "result": "BLOCKED",
+    "reason": "No fixture ID known yet"
+  },
+  {
+    "app": "super",
+    "route": "/branches",
+    "actual": "/branches",
+    "result": "RENDERED",
+    "headings": [
+      "Branches"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Add Branch",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n5",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n5",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Inactive\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "More actions",
+        "disabled": false
+      },
+      {
+        "text": "Prev",
+        "aria": "Previous page",
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Next",
+        "aria": "Next page",
+        "title": "",
+        "disabled": true
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search name, code, restaurant…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/branches/:id",
+    "actual": "/branches/356381a7-29f1-47d3-9cdb-c3eb6dcc5648",
+    "result": "RENDERED",
+    "headings": [
+      "QA-Branch-A",
+      "Branch Information",
+      "Parent Restaurant"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "356381a7…",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate Branch",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Overview",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Staff Users",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Devices & Terminals",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Activation Keys",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Audit Logs",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/plans",
+    "actual": "/plans",
+    "result": "RENDERED",
+    "headings": [
+      "SaaS Plans"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Create Plan",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All Plans\n5",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n5",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Inactive\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by plan name or tier…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/plans/:id",
+    "actual": "/plans/seed-plan-pro",
+    "result": "RENDERED",
+    "headings": [
+      "JAMANVAAR PRO"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans/seed-plan-pro",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans/seed-plan-pro",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/qr-ordering",
+    "actual": "/qr-ordering",
+    "result": "RENDERED",
+    "headings": [
+      "QR Ordering Suite Control"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/qr-ordering/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/qr-ordering/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/qr-ordering/metrics",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/qr-ordering/metrics",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh fleet",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n2",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Disabled\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Limit reached\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Not entitled\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "QA-Restaurant-A-1791252294734",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Manage",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Disable QR ordering",
+        "disabled": false
+      },
+      {
+        "text": "QA-Restaurant-B-1791252294734",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Manage",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Disable QR ordering",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search restaurant, branch, city or plan...",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "All plan tiers"
+          },
+          {
+            "value": "PRO",
+            "text": "PRO"
+          }
+        ]
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "Any usage state"
+          },
+          {
+            "value": "REPORTING",
+            "text": "Reporting usage"
+          },
+          {
+            "value": "NOT_REPORTING",
+            "text": "No usage reported"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/whatsapp-ordering",
+    "actual": "/whatsapp-ordering",
+    "result": "RENDERED",
+    "headings": [
+      "WhatsApp Ordering Connector",
+      "No restaurant has connected yet"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/whatsapp-ordering/metrics",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/whatsapp-ordering/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/whatsapp-ordering/metrics",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/whatsapp-ordering/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search restaurants…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/ai-assistant",
+    "actual": "/ai-assistant",
+    "result": "RENDERED",
+    "headings": [
+      "JAMAN AI Engine",
+      "Plan Entitlement & Tier Access Control",
+      "Anomaly Thresholds & AI Alert Engine Tuning",
+      "JAMAN AI for one restaurant",
+      "Query Template & Category Registry (32 Questions)"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/ai-assistant/config",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/ai-assistant/config",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Add Custom Query",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Save Global Thresholds",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All Categories (32)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Today's Pulse (7)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sales & Finance (4)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Payment Split (3)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Order Pipeline (4)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Kitchen & KOT (3)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Dining Tables (2)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Menu Analytics (3)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Stock & Inventory (2)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Customer CRM (1)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Staff & Shift (2)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "✨ Business Insights (1)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Edit Question",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "ai-restaurant",
+        "options": [
+          {
+            "value": "",
+            "text": "Choose a restaurant…"
+          },
+          {
+            "value": "f84751ce-d9bf-439b-8fd0-ead11c838fd5",
+            "text": "QA-Restaurant-B-1791252294734"
+          },
+          {
+            "value": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+            "text": "QA-Restaurant-A-1791252294734"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search query label or intent code…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/catalog",
+    "actual": "/catalog",
+    "result": "RENDERED",
+    "headings": [
+      "Master Menu Catalog & Franchise Syndication",
+      "No master dishes match your search"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/master-catalog/categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/master-catalog/items",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/master-catalog/categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/master-catalog/items",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "Last updated just now",
+        "disabled": false
+      },
+      {
+        "text": "Import Starter Library",
+        "aria": null,
+        "title": "Import authentic preloaded Indian starter dishes and recipes",
+        "disabled": false
+      },
+      {
+        "text": "Manage Categories",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Add Master Dish",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All Categories\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Cards",
+        "aria": null,
+        "title": "SaaS Cards View",
+        "disabled": false
+      },
+      {
+        "text": "Table",
+        "aria": null,
+        "title": "Compact Table View",
+        "disabled": false
+      },
+      {
+        "text": "Import Starter Library",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search master dishes by name or ingredients…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "All Dietary Classifications"
+          },
+          {
+            "value": "VEG",
+            "text": "Vegetarian (VEG)"
+          },
+          {
+            "value": "JAIN",
+            "text": "Jain Friendly"
+          },
+          {
+            "value": "SWAMINARAYAN",
+            "text": "Swaminarayan"
+          },
+          {
+            "value": "NON_VEG",
+            "text": "Non-Vegetarian"
+          },
+          {
+            "value": "VEGAN",
+            "text": "100% Vegan"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/subscriptions",
+    "actual": "/subscriptions",
+    "result": "RENDERED",
+    "headings": [
+      "Subscriptions"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/subscriptions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/subscriptions",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Assign Subscription",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n3",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Trial\n3",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspended\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Renew",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Change Tier",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspend",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Renew",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Change Tier",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspend",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Renew",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Change Tier",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspend",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by restaurant or plan…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "All Tiers"
+          },
+          {
+            "value": "CORE",
+            "text": "CORE (₹5,000)"
+          },
+          {
+            "value": "PRO",
+            "text": "PRO (₹7,000)"
+          },
+          {
+            "value": "ENTERPRISE",
+            "text": "ENTERPRISE"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/billing",
+    "actual": "/billing",
+    "result": "RENDERED",
+    "headings": [
+      "Invoices & Billing"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/receivables",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/receivables",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/receivables",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/invoices/receivables",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Check Renewals",
+        "aria": null,
+        "title": "Renewal invoices are also issued automatically; this runs the scan right now",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Issue Invoice",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Who owes",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All invoices",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Filters",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View invoices",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View invoices",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Prev",
+        "aria": "Previous page",
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Next",
+        "aria": "Next page",
+        "title": "",
+        "disabled": true
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by invoice #, restaurant, or plan…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/entitlements",
+    "actual": "/entitlements",
+    "result": "RENDERED",
+    "headings": [
+      "SaaS Feature Entitlements & Matrix"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/application-entitlements/catalog",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/plans",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/application-entitlements/catalog",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "All Modules",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "1. POS & Fast Billing",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "2. Payments & Cash Drawer",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "3. Table & Floor Management",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "4. Kitchen, KOT & KDS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "5. Menu & Inventory Management",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "6. Reports, GST & Administration",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "7. Connected Restaurant Ecosystem",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ACTIVE_ONLY",
+            "text": "Active Plans Only"
+          },
+          {
+            "value": "ALL",
+            "text": "All Plans (Including Inactive)"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search feature or module (e.g. QR, KOT, Captain)…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/feature-catalog",
+    "actual": "/feature-catalog",
+    "result": "RENDERED",
+    "headings": [
+      "Feature Catalog"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/feature-categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/features",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/feature-categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/features",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "+ New Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "+ New Feature",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit Category",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Edit",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Deactivate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Delete",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/reports",
+    "actual": "/reports",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Reports & Analytics"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/revenue",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/subscriptions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/revenue",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/subscriptions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/reports/summary",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Export REVENUE CSV",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Revenue Analytics",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Restaurant Cohorts",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Device Telemetry",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Plan Distribution",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "7d",
+            "text": "Last 7 Days"
+          },
+          {
+            "value": "30d",
+            "text": "Last 30 Days"
+          },
+          {
+            "value": "90d",
+            "text": "Last Quarter (90d)"
+          },
+          {
+            "value": "all",
+            "text": "All-Time Cohort"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/applications",
+    "actual": "/applications",
+    "result": "RENDERED",
+    "headings": [
+      "Applications & Ecosystem"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/applications",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/applications",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      },
+      {
+        "text": "Publish Version",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": null,
+        "title": "Toggle Release History",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/activation-keys",
+    "actual": "/activation-keys",
+    "result": "RENDERED",
+    "headings": [
+      "Activation Keys"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/activation-keys/by-restaurant",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/activation-keys/by-restaurant",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Generate Key",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "By restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All keys",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View keys",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "View keys",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Prev",
+        "aria": "Previous page",
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Next",
+        "aria": "Next page",
+        "title": "",
+        "disabled": true
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search restaurants…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/payment-connections",
+    "actual": "/payment-connections",
+    "result": "RENDERED",
+    "headings": [
+      "Payment Gateways",
+      "No payment connections yet"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/commission-config",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payment-connections",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/commission-config",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payment-connections",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Save",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Pending Review",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Active",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Suspended",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Disconnected",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by restaurant or contact email…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/platform-payments",
+    "actual": "/platform-payments",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Payments"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/platform-summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/attention",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/platform-summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/attention",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Show statement",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Restaurant ID (optional)",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "",
+            "text": "All statuses"
+          },
+          {
+            "value": "SUCCESS",
+            "text": "Success"
+          },
+          {
+            "value": "FAILED",
+            "text": "Failed"
+          },
+          {
+            "value": "PENDING",
+            "text": "Pending"
+          },
+          {
+            "value": "REFUNDED",
+            "text": "Refunded"
+          },
+          {
+            "value": "PARTIALLY_REFUNDED",
+            "text": "Partially refunded"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "date",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "date",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "date",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/payouts",
+    "actual": "/payouts",
+    "result": "RENDERED",
+    "headings": [
+      "Restaurant Payouts",
+      "No payouts yet"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/payouts",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/payouts/overview",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/payouts",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/payments/payouts/overview",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Run EOD batch now",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Pending",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "On hold",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Paid",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by restaurant or business date (YYYYMMDD)…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/devices",
+    "actual": "/devices",
+    "result": "RENDERED",
+    "headings": [
+      "Device Fleet / MDM Control Center",
+      "Nothing needs attention"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "ONLINE\n1",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "DEGRADED\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OFFLINE\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "NEVER SEEN\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "REVOKED\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "MDM LOCKED\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Needs attention",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All devices",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "By restaurant",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search terminal, ID, restaurant or branch…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "All hardware types"
+          },
+          {
+            "value": "POS",
+            "text": "Billing POS"
+          },
+          {
+            "value": "POS_ADMIN",
+            "text": "Restaurant Admin"
+          },
+          {
+            "value": "CAPTAIN",
+            "text": "Captain Device"
+          },
+          {
+            "value": "KDS",
+            "text": "Kitchen Display"
+          },
+          {
+            "value": "KIOSK",
+            "text": "Self-Service Kiosk"
+          },
+          {
+            "value": "KIOSK_ADMIN",
+            "text": "Kiosk Admin"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/devices/:id",
+    "actual": "/devices/ba5bd193-4b35-4006-8eff-1164d2f3b468",
+    "result": "RENDERED",
+    "headings": [
+      "QA A POS_ADMIN",
+      "Hardware & Operational Identity",
+      "Connectivity & Sync Telemetry",
+      "Remote Command History (0)"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices/ba5bd193-4b35-4006-8eff-1164d2f3b468",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices/ba5bd193-4b35-4006-8eff-1164d2f3b468/commands",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices/ba5bd193-4b35-4006-8eff-1164d2f3b468",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/devices/ba5bd193-4b35-4006-8eff-1164d2f3b468/commands",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Request Sync",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Lock Device",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Dispatch Command",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Remote Wipe",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/sync-monitor",
+    "actual": "/sync-monitor",
+    "result": "RENDERED",
+    "headings": [
+      "Real-Time Telemetry & Sync Observability",
+      "Live Synchronization Stream"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/conflicts",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/sync-logs",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/sync-metrics",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/conflicts",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/sync-logs",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/telemetry/sync-metrics",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Live Sync Event Stream (0)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sync Conflict Inspector (0 Active)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/backups",
+    "actual": "/backups",
+    "result": "RENDERED",
+    "headings": [
+      "Fleet Backups & Data Recovery",
+      "No Backups Found"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/backups",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/backups",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Trigger Snapshot",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All Snapshots\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Completed\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Failed\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Trigger First Snapshot",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by restaurant name or snapshot ID...",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/sandboxes",
+    "actual": "/sandboxes",
+    "result": "RENDERED",
+    "headings": [
+      "1-Click Staging Sandbox Clones",
+      "Active Staging Sandboxes (0)"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/sandboxes",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/sandboxes",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/sandboxes",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Clone New Sandbox",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/offline-policy",
+    "actual": "/offline-policy",
+    "result": "RENDERED",
+    "headings": [
+      "Emergency Offline Policy & Licensing",
+      "Emergency Extensions (0 active, 0 total)"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/extensions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/policy",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/signing-status",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/extensions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/policy",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/signing-status",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/extensions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/policy",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/signing-status",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/offline-policy/approaching-expiry",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/branches",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Grant Emergency Extension",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/team",
+    "actual": "/team",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Team & RBAC"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform-users",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform-users",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Invite Teammate",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All (1)",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Super Admins",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Operations",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Support",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Finance",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Auditors",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search teammate by name or email…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/support",
+    "actual": "/support",
+    "result": "RENDERED",
+    "headings": [
+      "Support & Diagnostic Console",
+      "Live Diagnostic Targets"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Inspect",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Inspect Live Diagnostics",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Inspect Live Diagnostics",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by restaurant name, owner email, GSTIN, terminal device ID, or activation key…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/tickets",
+    "actual": "/tickets",
+    "result": "RENDERED",
+    "headings": [
+      "Support Tickets",
+      "No support tickets yet"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform-users",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/support-tickets",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform-users",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/support-tickets/summary",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/support-tickets",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/restaurants",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/support-tickets/summary",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "New Ticket",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "My work today\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Unassigned\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Created by me\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Overdue\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "From restaurants\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Create Ticket",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "ALL",
+            "text": "Any status"
+          },
+          {
+            "value": "OPEN",
+            "text": "Open"
+          },
+          {
+            "value": "IN_PROGRESS",
+            "text": "In progress"
+          },
+          {
+            "value": "RESOLVED",
+            "text": "Resolved"
+          },
+          {
+            "value": "CLOSED",
+            "text": "Closed"
+          }
+        ]
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search subject or number (TKT-123)…",
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/notifications",
+    "actual": "/notifications",
+    "result": "RENDERED",
+    "headings": [
+      "Notifications",
+      "You are all caught up"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Refresh",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Mark all read",
+        "aria": null,
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Unread\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "All",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Any severity",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Critical\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Warning\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Info\n0",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Prev",
+        "aria": "Previous page",
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Next",
+        "aria": "Next page",
+        "title": "",
+        "disabled": true
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "",
+            "text": "All types"
+          },
+          {
+            "value": "SUBSCRIPTION_EXPIRING",
+            "text": "Subscription"
+          },
+          {
+            "value": "BACKUP_FAILED",
+            "text": "Backup"
+          },
+          {
+            "value": "INVOICE_OVERDUE",
+            "text": "Invoice"
+          },
+          {
+            "value": "DEVICES_OFFLINE",
+            "text": "Terminals offline"
+          },
+          {
+            "value": "KEYS_EXPIRING",
+            "text": "Activation keys"
+          },
+          {
+            "value": "SYNC_FAILING",
+            "text": "Sync"
+          },
+          {
+            "value": "RESTAURANT_SUSPENDED",
+            "text": "Suspended"
+          },
+          {
+            "value": "TICKET_CREATED",
+            "text": "Ticket"
+          },
+          {
+            "value": "TICKET_ASSIGNED",
+            "text": "Ticket"
+          },
+          {
+            "value": "TICKET_COMMENT",
+            "text": "Ticket"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/audit-logs",
+    "actual": "/audit-logs",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Audit Logs"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/audit-logs/categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/audit-logs",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/audit-logs/categories",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/audit-logs",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Export CSV",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sync Staff User Changed",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sync Staff User Changed",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sync Staff User Changed",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sync Staff User Changed",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Terminal Hardware Activated",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Branch Created",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Subscription Assigned",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Branch Created",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Branch Created",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Subscription Assigned",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Restaurant Tenant Provisioned",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Hardware Activation Key Issued",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Subscription Assigned",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Restaurant Tenant Provisioned",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Platform Login",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Platform Login Otp Sent",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Previous",
+        "aria": null,
+        "title": "",
+        "disabled": true
+      },
+      {
+        "text": "Next",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search by action keyword…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "",
+            "text": "All Categories"
+          },
+          {
+            "value": "ACTIVATION",
+            "text": "ACTIVATION"
+          },
+          {
+            "value": "AUTH",
+            "text": "AUTH"
+          },
+          {
+            "value": "BRANCH",
+            "text": "BRANCH"
+          },
+          {
+            "value": "RESTAURANT",
+            "text": "RESTAURANT"
+          },
+          {
+            "value": "SUBSCRIPTION",
+            "text": "SUBSCRIPTION"
+          },
+          {
+            "value": "SYNC",
+            "text": "SYNC"
+          }
+        ]
+      },
+      {
+        "tag": "SELECT",
+        "type": "select-one",
+        "placeholder": null,
+        "name": "",
+        "id": "",
+        "options": [
+          {
+            "value": "",
+            "text": "All Actors"
+          },
+          {
+            "value": "PLATFORM",
+            "text": "Platform Admin"
+          },
+          {
+            "value": "TENANT",
+            "text": "Tenant Staff"
+          },
+          {
+            "value": "SYSTEM",
+            "text": "System Process"
+          }
+        ]
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/system-health",
+    "actual": "/system-health",
+    "result": "RENDERED",
+    "headings": [
+      "System Health & Infrastructure",
+      "All Platform Core Services Operational"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Re-check Now",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/settings/platform",
+    "actual": "/settings/platform",
+    "result": "RENDERED",
+    "headings": [
+      "Platform Settings",
+      "Platform Branding",
+      "Invoice seller details",
+      "Onboarding Default Quotas",
+      "Maintenance & Alerts"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/settings",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/settings",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Save Branding",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Save seller details",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Save Quotas",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Save notice",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "email",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-tradeName"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-legalName"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-address"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-city"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-state"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-pincode"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-gstin"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-panNumber"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-sacCode"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-bankName"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-bankAccountName"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-bankAccountNumber"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-bankIfsc"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-upiId"
+      },
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": null,
+        "name": "",
+        "id": "seller-billingEmail"
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "number",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "placeholder": null,
+        "name": "",
+        "id": "maintenanceToggle"
+      },
+      {
+        "tag": "TEXTAREA",
+        "type": "textarea",
+        "placeholder": "e.g. Scheduled database optimization on Sunday 2:00 AM IST. All offline devices remain operational.",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "datetime-local",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "datetime-local",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "app": "super",
+    "route": "/profile",
+    "actual": "/profile",
+    "result": "RENDERED",
+    "headings": [
+      "My Profile"
+    ],
+    "api": [
+      {
+        "endpoint": "/api/v1/platform-auth/refresh",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/me",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/system-health",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/sessions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/sessions",
+        "status": 200
+      },
+      {
+        "endpoint": "/api/v1/platform/notifications/unread-count",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "buttons": [
+      {
+        "text": "PLATFORM CONTROL CENTER",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "BUSINESS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SAAS MANAGEMENT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "OPERATIONS & MDM",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "SECURITY & REPORTS",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "ACCOUNT",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle Navigation Menu",
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Notifications",
+        "title": "Notifications",
+        "disabled": false
+      },
+      {
+        "text": "",
+        "aria": "Toggle dark mode",
+        "title": "Switch to dark theme",
+        "disabled": false
+      },
+      {
+        "text": "Logout",
+        "aria": null,
+        "title": "Log out of Super Admin",
+        "disabled": false
+      },
+      {
+        "text": "Change password",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      },
+      {
+        "text": "Sign out",
+        "aria": null,
+        "title": "",
+        "disabled": false
+      }
+    ],
+    "inputs": [
+      {
+        "tag": "INPUT",
+        "type": "text",
+        "placeholder": "Search pages, restaurants, owners, devices, keys…",
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "password",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      },
+      {
+        "tag": "INPUT",
+        "type": "password",
+        "placeholder": null,
+        "name": "",
+        "id": ""
+      }
+    ],
+    "overflow": false
+  }
+]

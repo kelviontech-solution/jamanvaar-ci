@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-06T04:17:19.426Z",
+  "applicationTrackedDiff": "none; git status has only added tooling/qa and browser report directory",
+  "qaScriptsParsed": 40,
+  "qaSyntaxErrors": 0,
+  "missingMarkdownReportTargets": 0,
+  "publicTextArtifactsScanned": 295,
+  "privateSensitiveFieldsCompared": 36,
+  "publicCredentialMatches": 0,
+  "ownedTestServersStopped": true,
+  "existingUserPort4000Preserved": true,
+  "isolatedDatabaseAndProfilesRetained": true,
+  "release": "NOT READY",
+  "allFeaturesCertified": false
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Order",
+  "text": "QA-Restaurant-A-1791252294734\nQA-Branch-A · Table QA01\nDine-in ordering\n← Menu\nYour cart\nQA GST18 Pizza\n−\n1\n+\nRemove\nSubtotal\n₹100\nTax\n₹18\nTotal\n₹118\nCheckout",
+  "headings": [
+    "Your cart"
+  ],
+  "buttons": [
+    {
+      "text": "← Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Checkout",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

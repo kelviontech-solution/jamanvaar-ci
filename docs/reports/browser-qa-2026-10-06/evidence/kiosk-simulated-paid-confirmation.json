@@ -1,0 +1,24 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Authentic Indian Heritage Flavors • Freshly Prepared\nWelcome to\nQA-Restaurant-A-1791252294734\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTOUCH SCREEN TO BEGIN YOUR ORDER\n\nTerminal a32f4676-b058-479f-8f50-7d87346d64e1\nStaff Mode",
+  "headings": [
+    "Welcome toQA-Restaurant-A-1791252294734"
+  ],
+  "buttons": [
+    {
+      "text": "Start Order",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff Mode",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

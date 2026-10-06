@@ -1,0 +1,298 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n78\nDAY OPEN\n•\nNo Shift\nJAMAN AI\n30\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n36\nBills & Invoices\nKitchen & KOT\n35\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\n78\nHeld Carts\n1\nCore: Offline First\nShift & Cash Management\n\nManage cashier shifts, cash drawer movements, float reconciliation and settlements.\n\n+ Cash Movement\nClose Shift\nActive Shift #1\n● SHIFT OPEN\nCashier: QA Cashier\n•\nTerminal: POS-01\n•\nOpened: 08:27 am\nEXPECTED DRAWER CASH\n₹314\nTOTAL SHIFT SALES\n₹314\n● 1 Completed Orders\nCASH SALES ADDED\n₹314\nCounter cash receipts\nUPI / DIGITAL QR\n₹0\nDirect bank settlement\nOPENING CASH FLOAT\n₹0\nStarting drawer balance\nCASH DRAWER MATHEMATICAL RECONCILIATION\nREAL-TIME MATH\nOpening Float:\n₹0\n+ Cash Sales:\n+ ₹314\n+ Cash In (Paid In):\n+ ₹0\n- Cash Out (Paid Out):\n- ₹0\n= Current Expected Cash in Drawer:\n₹314\nSHIFT PAYMENT CHANNEL BREAKDOWN\nTENDER SETTLEMENT\nCash Collections:\n₹314\nUPI / Bharat QR:\n₹0\nCard POS Terminal:\n₹0\nDiscounts Granted:\n- ₹0\nTotal Billed (incl. GST):\n₹314\nCASH MOVEMENTS IN THIS SHIFT (0)\n+ Record Movement\nNo cash in/out float adjustments recorded during this shift.\nHistorical Shift Archives\n\nPermanent cashier shift records, actual counts, and variance audits.\n\nAll Shifts\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nNo Data Found\n\nNo historical shifts found for the selected filter.\n\nClose Cashier Shift & Settle Drawer\nShift #1 • QA Cashier\nOpening Float:\n₹0\nCash Sales Collected:\n+ ₹314\nNet Cash Movements:\n₹0\nExpected Drawer Cash:\n₹314\nCASH DRAWER DENOMINATION COUNT\nCURRENCY CALCULATOR\n₹2,000\n₹500\n₹200\n₹100\n₹50\n₹20\n₹10\nCoins (₹)\nCounted Cash:\n₹314\nCalculated Variance:\n✓ MATCHED (₹0)\nCancel\nFinalize & Close Shift\nToday Sales:\n₹14833\nOrders:\n47\nAOV:\n₹316\nTables:\n0% (0/1)\nPending KOT:\n35\nLocal Engine Active",
+  "headings": [
+    "Shift & Cash Management",
+    "Active Shift #1",
+    "Cash Drawer Mathematical Reconciliation",
+    "Shift Payment Channel Breakdown",
+    "Cash Movements in this Shift (0)",
+    "Historical Shift Archives",
+    "No Data Found",
+    "Close Cashier Shift & Settle Drawer"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n78",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\n30",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n36",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n78",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "+ Cash Movement",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Close Shift",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Record Movement",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Shifts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Finalize & Close Shift",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹14833",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n47",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n35",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": "0",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

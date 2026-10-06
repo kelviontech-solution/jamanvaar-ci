@@ -1,0 +1,262 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Team & RBAC\n\nManage administrators, operators, and platform roles across the JAMANVAAR control plane\n\nInvite Teammate\nTOTAL TEAMMATES\n1\nPlatform accounts\nACTIVE ADMINS\n1\nEnabled accounts\nPENDING ACTIVATION\n0\nAwaiting first login\nSUPER ADMINISTRATORS\n1\nRoot & Super Admin tier\nAll (1)\nSuper Admins\nOperations\nSupport\nFinance\nAuditors\nTEAMMATE\tROLE\tSTATUS\tLAST LOGIN\tINVITED / CREATED\tACTIONS\n\nJ\nJAMANVAAR Super Admin (You)\nqa-platform@example.invalid\n\t\nPLATFORM OWNER\nUltimate platform authority & root management\n\t\nACTIVE\t06/10/2026, 07:37:53\t06/10/2026\t\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Platform Team & RBAC"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Invite Teammate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Super Admins",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Operations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Finance",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Auditors",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search teammate by name or email…",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

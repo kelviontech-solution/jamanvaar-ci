@@ -1,0 +1,82 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nAll stations\nMain Kitchen\nLIVE\n|\n08:16:57\n33\nCooking\n1\nReady\nSwitch Station\nACTIVE\n34\nCOOKING\n33\nREADY\n1\nSERVED\n2\nEXPO (PASS)\n34\n#K-101\nQAA-20261006-302\nNo table\n•\nTAKEAWAY\n•\nMain Kitchen\n1/1 of the order ready\n1×\nQA Pizza 01\n#0wv44\nServed\nRECALL\n#101\nQAA-20261006-301\nTable QA01\n•\nDINE IN\n•\nMain Kitchen\n1/1 of the order ready\n1×\nQA Pizza 01\nCaptain: QA Captain\n#4j7y7\nServed\nRECALL",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "All stations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false
+    },
+    {
+      "text": "ACTIVE\n34",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "COOKING\n33",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "READY\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SERVED\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EXPO (PASS)\n34",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1×\nQA Pizza 01",
+      "aria": "1 QA Pizza 01: served",
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "RECALL",
+      "aria": null,
+      "title": "Served by mistake? Bring the ticket back",
+      "disabled": false
+    },
+    {
+      "text": "1×\nQA Pizza 01",
+      "aria": "1 QA Pizza 01: served",
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "RECALL",
+      "aria": null,
+      "title": "Served by mistake? Bring the ticket back",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

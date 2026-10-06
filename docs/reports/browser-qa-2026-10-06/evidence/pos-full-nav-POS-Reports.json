@@ -1,0 +1,268 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n75\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n35\nBills & Invoices\nKitchen & KOT\n33\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\n75\nHeld Carts\n1\nCore: Offline First\nPOS Operational Reports\n\nSales, payments, taxes, orders and dish performance.\n\nPreview Report\nPrint Report\nDownload PDF\nExport CSV\nToday\nYesterday\n7 Days\n30 Days\nThis Month\nThis Year\nCustom Date\nReport Design:\nClassic Accounting\nModern Dashboard\nCompact A4\nFinancial Statement\nRestaurant Branded\nQA-RESTAURANT-A-1791252294734\nPOS DAILY SALES REPORT\nToday (06 Oct 2026)\nGenerated: 6/10/2026, 8:17:09 am\nTOTAL BILLED (INCL. GST)\n₹14205\n● 45 Total Orders\nAVERAGE ORDER VALUE\n₹316\nPer bill average\nCASH COLLECTIONS\n₹13607\nDrawer cash collected\nGST & TAXES (5%)\n₹678\nCGST 2.5% + SGST 2.5%\nFINANCIAL & TAX BREAKDOWN\nAUDIT\nGross Food & Beverage Sales:\n₹13555\nDiscounts Granted:\n- ₹0\nCGST (2.5%):\n₹339\nSGST (2.5%):\n₹339\nTotal Tax Collected:\n₹678\nTotal Collected (incl. GST):\n₹14205\nSETTLEMENT MIX & TENDER ALLOCATION\n100% RECONCILED\nCash at Counter:\n₹13607\nUPI / Bharat QR:\n₹598\nCredit / Debit Cards:\n₹0\nSplit Tender Payments:\n₹0\nDigital Wallets / Other:\n₹0\nTotal Payment Reconciled:\n₹14205\nTOP SELLING DISHES & MENU VELOCITY\n2 items ranked\n#\tDish Name\tCategory\tQty Sold\tAvg Rate\tGross Revenue\n1\tQA Pizza 01\tQA Pizza\t80\t₹299\t₹23920\n2\tQA GST18 Pizza\tQA Pizza\t2\t₹100\t₹200\nCASHIER SHIFT & COUNTER PERFORMANCE\nCashier Name\tOrders\tCash Tender\tUPI / QR\tTotal Billed (incl. GST)\nQA Cashier\t75\t₹23760\t₹0\t₹23760\nCLOUD-SYNC\t5\t₹314\t₹1196\t₹1510\nQA-Restaurant-A-1791252294734 • JAMANVAAR POS Operational Audit System\nThank you for your valued patronage\nToday Sales:\n₹14205\nOrders:\n45\nAOV:\n₹316\nTables:\n0% (0/1)\nPending KOT:\n33\nLocal Engine Active",
+  "headings": [
+    "POS Operational Reports",
+    "QA-RESTAURANT-A-1791252294734",
+    "POS Daily Sales Report",
+    "Top Selling Dishes & Menu Velocity",
+    "Cashier Shift & Counter Performance"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n75",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n33",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n75",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Preview Report",
+      "aria": null,
+      "title": "Preview full report document",
+      "disabled": false
+    },
+    {
+      "text": "Print Report",
+      "aria": null,
+      "title": "Send report directly to configured POS report printer",
+      "disabled": false
+    },
+    {
+      "text": "Download PDF",
+      "aria": null,
+      "title": "Download direct PDF file without browser print dialogs",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Custom Date",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹14205",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n45",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n33",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "CLASSIC",
+          "text": "Classic Accounting"
+        },
+        {
+          "value": "MODERN",
+          "text": "Modern Dashboard"
+        },
+        {
+          "value": "COMPACT",
+          "text": "Compact A4"
+        },
+        {
+          "value": "STATEMENT",
+          "text": "Financial Statement"
+        },
+        {
+          "value": "BRANDED",
+          "text": "Restaurant Branded"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

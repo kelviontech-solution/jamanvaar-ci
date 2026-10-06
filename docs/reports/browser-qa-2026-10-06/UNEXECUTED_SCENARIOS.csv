@@ -1,0 +1,11 @@
+scope,status,reason
+"All views/controls","PARTIAL","Route and control inventories completed for visited screens; a large number of CRUD, delete, undo, bulk actions, form variants and disabled-state transitions remain unexecuted. CONTROL_INVENTORY is not an action-pass matrix."
+"Peak operations","PARTIAL","20 sequential cashier sales and 30 sequential KOT submissions were executed. Simultaneous 20 cashiers/30 active kitchen workflows/multiple Captains/kiosks were not executed."
+"AWS performance/infrastructure","BLOCKED","No deployed logs/credentials/ALB metrics or reproducible sanitized live trace; all timing measurements are local."
+"Real UPI/Route/refund/bank payout","BLOCKED","Provider simulation after initial harness incident; Route is pending, QA bank unverified; no real customer charge, refund or bank transfer."
+"Physical printer and drawer","BLOCKED","No connected printer/drawer; queue/failure screens observed but paper output and drawer pulse not tested."
+"SMTP/WhatsApp delivery","BLOCKED","OTP captured locally; real delivery and WhatsApp provider integration unavailable."
+"Full finance lifecycle","PARTIAL","Default 3% snapshot and negative step-up checks passed; positive rate edit, overrides, approved-bank EOD creation, mark-paid, payout/refund races and post-refund statement reconciliation untested."
+"Complex ordering","PARTIAL","Modifiers, combos, coupons, inclusive/mixed tax, partial/split payments, table transfers/merges, cancellation/void approval and all refund states untested."
+"Resilience/security","PARTIAL","Single API restart, short offline queue, two-tenant/branch probes passed. Multi-API relay, long outage/soak, expiry during active SSE, backup restore and simultaneous edit/conflict resolution untested."
+"Responsive/accessibility","PARTIAL","Unauthenticated 390×844 gates plus Captain/QR mobile workflows observed; keyboard/screen-reader, all devices, touch misclicks and every page viewport not certified."

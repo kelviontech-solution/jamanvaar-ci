@@ -1,0 +1,759 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nFeature Catalog\n\nThe database-backed catalog of every feature and category the platform recognises. Edits apply immediately across Plans, Entitlements and Application controls, with no deploy.\n\n+ New Category\n+ New Feature\nPOS & Fast Billing\nFast counter billing, dine-in/takeaway/delivery/token order creation, discounts and automated tax calculation.\nEdit Category\nDine-In / Takeaway / Delivery / Token\nOrder-type selection at billing.\n\t\t\nACTIVE\tEditDeactivateDelete\n\nPOS Terminal\nCounter billing terminal — order creation, item search and bill generation.\n\t\nPOS\t\nACTIVE\tEditDeactivateDelete\nPayments & Cash Drawer\nCash, UPI/BharatQR, card and split payments, cashier shifts, cash float and variance tracking.\nEdit Category\nMulti-Payment Tenders\nCash, UPI/BharatQR, card and split payments.\n\t\t\nACTIVE\tEditDeactivateDelete\n\nShift & Cash Drawer\nCashier shift tracking, opening/closing cash and variance.\n\t\t\nACTIVE\tEditDeactivateDelete\nTable & Floor Management\nVisual floor plan, multi-zone dining, table occupancy status, table merge, split and transfer.\nEdit Category\nTable Management\nVisual floor plan and table occupancy tracking.\n\t\t\nACTIVE\tEditDeactivateDelete\nKitchen, KOT & KDS\nKOT generation, kitchen timers, multi-station kitchen routing, preparing/ready tracking and station load balancing.\nEdit Category\nKOT / KDS Routing\nKitchen order ticket generation and kitchen display routing.\n\t\nKDS\t\nACTIVE\tEditDeactivateDelete\nMenu & Inventory Management\nCategorized menu, item modifiers, recipe costing, dish availability toggles, stock adjustments and low stock alerts.\nEdit Category\nFood Customization\nItem modifiers and customization options.\n\t\t\nACTIVE\tEditDeactivateDelete\n\nInventory Management\nStock tracking and dish availability toggles.\n\t\t\nACTIVE\tEditDeactivateDelete\n\nMenu Management\nCategory and dish management.\n\t\t\nACTIVE\tEditDeactivateDelete\nReports & GST\nStatutory GST reporting (CGST/SGST), daily sales summaries and discount reporting.\nEdit Category\nDiscounts & GST\nDiscount application and automated GST calculation.\n\t\t\nACTIVE\tEditDeactivateDelete\n\nSales & GST Reports\nDaily sales and statutory GST reporting.\n\t\t\nACTIVE\tEditDeactivateDelete\nOffline-First Operations\nLocal SQLite database, offline billing and order creation, automatic sync when back online.\nEdit Category\nOffline Billing\nLocal-first billing that works with no internet connection.\n\t\t\nACTIVE\tEditDeactivateDelete\nPrinting & Hardware\n58mm/80mm ESC/POS thermal receipt printing and print queue management.\nEdit Category\nReceipt Printing\nThermal receipt and KOT printing.\n\t\t\nACTIVE\tEditDeactivateDelete\nCustomer Management\nCustomer database, order/visit history and loyalty points.\nEdit Category\nCustomer Management\nCustomer database and order history.\n\t\t\nACTIVE\tEditDeactivateDelete\nRestaurant Administration\nRestaurant settings, branch information, tax/bill/printer configuration, user and role management.\nEdit Category\nRestaurant Admin\nBack-office console for managing menu, staff and settings.\n\t\nPOS_ADMIN\t\nACTIVE\tEditDeactivateDelete\nWireless Captain / Waiter App\nTable-side ordering, course dispatch, order status tracking and waiter performance.\nEdit Category\nCaptain App\nWaiter-facing tableside ordering app.\n\t\nCAPTAIN\t\nACTIVE\tEditDeactivateDelete\nQR Table Ordering\nTable QR code, scan-to-order digital menu, customer cart and order submission direct to POS/kitchen.\nEdit Category\nQR Table Ordering\nGuest self-ordering from a table's QR code.\n\t\nQR_ORDERING\t\nACTIVE\tEditDeactivateDelete\nSelf-Order Kiosk\nCustomer-facing self-ordering kiosk terminal and its Kiosk Admin management console.\nEdit Category\nKiosk Admin\nBack-office console for managing kiosk menu and settings.\n\t\nKIOSK_ADMIN\t\nACTIVE\tEditDeactivateDelete\n\nKiosk Remote Fleet Management\nRemote restart, cache clear, diagnostics, sync and update commands for kiosks (Kiosk Pro).\n\t\t\nACTIVE\tEditDeactivateDelete\n\nSelf-Order Kiosk\nSelf-service ordering kiosk terminal.\n\t\nKIOSK\t\nACTIVE\tEditDeactivateDelete\nReal-Time Multi-Machine Mesh Sync\nPOS/Captain/KDS/Kiosk real-time order, table, menu and availability synchronization.\nEdit Category\nReal-Time Multi-Machine Mesh Sync\nPOS/Captain/KDS/Kiosk real-time order and table synchronization.\n\t\t\nACTIVE\tEditDeactivateDelete\nJAMANVAAR AI Restaurant Assistant\nNatural-language restaurant queries answered from local, offline data.\nEdit Category\nJAMAN AI Assistant\nOffline, local-data-based natural-language restaurant queries.\n\t\t\nACTIVE\tEditDeactivateDelete\nAdvanced Analytics & CRM\nAdvanced sales analytics, channel performance, customer lifetime value and staff attribution.\nEdit Category\nAdvanced Analytics & CRM\nAdvanced sales analytics, channel performance and staff attribution.\n\t\t\nACTIVE\tEditDeactivateDelete\nWhatsApp Ordering\nConnects a restaurant to the Jamanvaar WhatsApp connector — customers order and pay from chat, orders land on POS/KDS only once paid.\nEdit Category\nWhatsApp Ordering\nCustomers order and pay from a WhatsApp chat via the Jamanvaar connector.\n\t\nWHATSAPP_ORDERING\t\nACTIVE\tEditDeactivateDelete\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Feature Catalog"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "+ New Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ New Feature",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

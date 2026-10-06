@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-10-06T04:15:12.316Z",
+  "environment": "isolated local, not AWS",
+  "release": "NOT READY",
+  "rawAttempts": 170,
+  "rawResults": {
+    "FAIL": 52,
+    "PASS": 118
+  },
+  "distinctNamedScenarios": 138,
+  "reviewedResults": {
+    "PASS": 100,
+    "PARTIAL": 14,
+    "HARNESS_ERROR": 11,
+    "FAIL": 13
+  },
+  "severity": {
+    "Critical": 5,
+    "High": 2,
+    "Medium": 4,
+    "Low": 1
+  },
+  "capturedApiRecords": 32486,
+  "capturedNonStreamingApiGroups": 240,
+  "routeViewInventoryRows": 126,
+  "controlObservations": 12003,
+  "database": {
+    "orders": 85,
+    "paymentTransactions": 5,
+    "duplicateExternalIds": 0,
+    "inventoryCloudDefinitions": 0,
+    "inventoryMovements": 3
+  }
+}

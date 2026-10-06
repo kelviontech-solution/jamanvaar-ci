@@ -1,0 +1,327 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nNotifications\n\nThings that need attention across restaurants: expiring subscriptions, failed backups, overdue invoices, terminals gone quiet. Each opens the exact record.\n\nRefresh\nMark all read\nUnread\n0\nAll\nAny severity\nCritical\n0\nWarning\n0\nInfo\n0\nAll types\nSubscription\nBackup\nInvoice\nTerminals offline\nActivation keys\nSync\nSuspended\nTicket\nTicket\nTicket\nYou are all caught up\n\nNew ones appear here when something needs attention.\n\n0 results\nPrev\nPage 1 of 1\nNext\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Notifications",
+    "You are all caught up"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Mark all read",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Unread\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Any severity",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Critical\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Warning\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Info\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Prev",
+      "aria": "Previous page",
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Next",
+      "aria": "Next page",
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "",
+          "text": "All types"
+        },
+        {
+          "value": "SUBSCRIPTION_EXPIRING",
+          "text": "Subscription"
+        },
+        {
+          "value": "BACKUP_FAILED",
+          "text": "Backup"
+        },
+        {
+          "value": "INVOICE_OVERDUE",
+          "text": "Invoice"
+        },
+        {
+          "value": "DEVICES_OFFLINE",
+          "text": "Terminals offline"
+        },
+        {
+          "value": "KEYS_EXPIRING",
+          "text": "Activation keys"
+        },
+        {
+          "value": "SYNC_FAILING",
+          "text": "Sync"
+        },
+        {
+          "value": "RESTAURANT_SUSPENDED",
+          "text": "Suspended"
+        },
+        {
+          "value": "TICKET_CREATED",
+          "text": "Ticket"
+        },
+        {
+          "value": "TICKET_ASSIGNED",
+          "text": "Ticket"
+        },
+        {
+          "value": "TICKET_COMMENT",
+          "text": "Ticket"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

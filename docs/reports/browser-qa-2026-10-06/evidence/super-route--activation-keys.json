@@ -1,0 +1,276 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nActivation Keys\n\nOne-time provisioning codes for POS, Captain, KDS, Kiosk and admin terminals. A code is shown only while it can still be used.\n\nExport CSV\nGenerate Key\nBy restaurant\nAll keys\n2 restaurants\nRESTAURANT\tISSUED\tAVAILABLE\tREDEEMED\tREVOKED\tEXPIRED\tEXPIRING IN 7 DAYS\t\nQA-Restaurant-A-1791252294734\t7\t6\t1\t0\t0\t\n5\tView keys\nQA-Restaurant-B-1791252294734\t3\t3\t0\t0\t0\t\n2\tView keys\n1-2 of 2\nPrev\nPage 1 of 1\nNext\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Activation Keys"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Generate Key",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "By restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All keys",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View keys",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View keys",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Prev",
+      "aria": "Previous page",
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Next",
+      "aria": "Next page",
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search restaurants…",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "href": "/restaurants/c5f75d1f-915e-4a3d-953b-a787fd76364f"
+    },
+    {
+      "text": "QA-Restaurant-B-1791252294734",
+      "href": "/restaurants/f84751ce-d9bf-439b-8fd0-ead11c838fd5"
+    }
+  ],
+  "overflow": false
+}

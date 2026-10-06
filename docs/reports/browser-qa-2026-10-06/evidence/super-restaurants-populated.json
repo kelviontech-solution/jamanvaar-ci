@@ -1,0 +1,368 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nRestaurants\n\nManage every restaurant tenant, branch, subscription, and connected device from one place.\n\nExport CSV\n+ Quick create\nOnboard Restaurant\nAll\n2\nActive\n2\nSuspended\n0\nTrial\n2\nNo Plan\nAll SaaS Tiers\nCORE (₹5,000)\nPRO (₹7,000)\nENTERPRISE\nNo Plan\nRecently Onboarded\nName (A → Z)\nName (Z → A)\nMost Branches\nMost Devices\nSubscription Status\nCards\nTable\n2 of 2\n#838fd5\nACTIVE\nSUB: TRIAL\nQ\n\nQA-Restaurant-B-1791252294734\n\nJAMANVAAR PRO\nBRANCHES\n1\nTERMINALS\n0\nAhmedabad, Gujarat\nQA Owner B\nqa-owner-b@example.invalid\nManage Restaurant\nOct 2026\n#76364f\nACTIVE\nSUB: TRIAL\nQ\n\nQA-Restaurant-A-1791252294734\n\nJAMANVAAR PRO\nBRANCHES\n1\nTERMINALS\n0\nAhmedabad, Gujarat\nQA Owner A\nqa-owner-a@example.invalid\nManage Restaurant\nOct 2026\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Restaurants"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Quick create",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Onboard Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Active\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Suspended\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Trial\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "No Plan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cards",
+      "aria": null,
+      "title": "SaaS Cards View",
+      "disabled": false
+    },
+    {
+      "text": "Table",
+      "aria": null,
+      "title": "Tabular View",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search name, owner, city, ID…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All SaaS Tiers"
+        },
+        {
+          "value": "CORE",
+          "text": "CORE (₹5,000)"
+        },
+        {
+          "value": "PRO",
+          "text": "PRO (₹7,000)"
+        },
+        {
+          "value": "ENTERPRISE",
+          "text": "ENTERPRISE"
+        },
+        {
+          "value": "NO_PLAN",
+          "text": "No Plan"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "recent",
+          "text": "Recently Onboarded"
+        },
+        {
+          "value": "name_asc",
+          "text": "Name (A → Z)"
+        },
+        {
+          "value": "name_desc",
+          "text": "Name (Z → A)"
+        },
+        {
+          "value": "branches_desc",
+          "text": "Most Branches"
+        },
+        {
+          "value": "devices_desc",
+          "text": "Most Devices"
+        },
+        {
+          "value": "status",
+          "text": "Subscription Status"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

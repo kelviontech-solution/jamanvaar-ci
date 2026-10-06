@@ -1,0 +1,79 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Your order total was updated to match the latest price.\nCUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nChoose Payment Method\n\nTotal Payable: ₹314\n\nUnavailable\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM\n\nOffline & Online\nCash at Counter\n\nPay at billing counter when collecting order\n\nPay at Pickup Counter\n\nYou will receive your token now. Please pay at Counter 1.\n\nConfirm & Get Token",
+  "headings": [
+    "Choose Payment Method",
+    "Pay at Pickup Counter"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false
+    },
+    {
+      "text": "Unavailable\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offline & Online\nCash at Counter\n\nPay at billing counter when collecting order",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Confirm & Get Token",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

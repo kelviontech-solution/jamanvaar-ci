@@ -1,0 +1,470 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nKIOSK\nKiosk Terminals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nBilling & Invoices\n● REAL-TIME DB\n\nManage sales, payments, invoices, and financial reconciliation.\n\n📄 Flat Ledger\n🗓️ Day-by-Day\nExport PDF\nExport CSV\nExport JSON\nDATE SCOPE:\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nThis Year\nCustom Date\nShowing: Today (06 Oct 2026) (0 Invoices)\nTOTAL NET SALES\n₹0\n0 Invoices recorded\nTax: ₹0\n💵 CASH\n₹0\n0 orders\n📱 UPI / QR\n₹0\n0 orders\n💳 CARD\n₹0\n0 orders\n↩️ REFUNDS\n-₹0\n0 refunds\nORDER MIX:\n🍽️ Dine-in: ₹0 (0)\n🛍️ Takeaway: ₹0 (0)\n🛵 Delivery: ₹0 (0)\n⚡ Quick Token: ₹0 (0)\nAll Statuses\nCompleted\nConfirmed\nPreparing\nReady\nVoided / Cancelled\nRefunded\nAll Cashiers\nAll Captains\nNo Invoices or Orders Found\n\nNo transaction records matched the selected date scope, tender filters, or search criteria.\n\nClear Filters & Show All Records\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Billing & Invoices",
+    "No Invoices or Orders Found",
+    "QA-Restaurant-A-1791252294734"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "📄 Flat Ledger",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🗓️ Day-by-Day",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Export PDF",
+      "aria": null,
+      "title": "Download / Print Invoices Ledger as PDF",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Export JSON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Custom Date",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🍽️ Dine-in: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🛍️ Takeaway: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🛵 Delivery: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "⚡ Quick Token: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clear Filters & Show All Records",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search invoice, order, token, customer, phone, cashier, captain, table...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All Statuses"
+        },
+        {
+          "value": "COMPLETED",
+          "text": "Completed"
+        },
+        {
+          "value": "CONFIRMED",
+          "text": "Confirmed"
+        },
+        {
+          "value": "PREPARING",
+          "text": "Preparing"
+        },
+        {
+          "value": "READY",
+          "text": "Ready"
+        },
+        {
+          "value": "CANCELLED",
+          "text": "Voided / Cancelled"
+        },
+        {
+          "value": "REFUNDED",
+          "text": "Refunded"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All Cashiers"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All Captains"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

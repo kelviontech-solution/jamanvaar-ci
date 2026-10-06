@@ -1,0 +1,780 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nJAMAN AI Engine\nPRO CONTROL CENTER\n\nPlatform-wide operations intelligence, tier entitlement gating (₹580 PRO vs ₹420 CORE), question templates, and edge query telemetry.\n\nAdd Custom Query\nAI-ENABLED TENANTS\n3 / 3\n100% on JAMANVAAR PRO (₹580)\nTOTAL QUERIES HANDLED\n0\n+0 queries processed today\nTOP INQUIRED INTENT\n—\nLeading operational metric requested\nEDGE QUERY LATENCY\nNo data yet\nAverage per answer, measured on the terminals\nPlan Entitlement & Tier Access Control\n\nJAMAN AI Assistant is strictly restricted as a flagship PRO feature to drive SaaS plan upgrades.\n\nJAMANVAAR CORE\n₹420 / month (Foundation)\nGATED / LOCKED\nJAMAN AI is LOCKED by default (a teaser), or hidden if the teaser is off\nNo KOT delayed bottleneck detection\nNo proactive cash drawer discrepancy alerts\nStaff tap the AI button ➔ see a locked panel with a few example questions. Nothing is answered. Switch it on for one restaurant below.\nJAMANVAAR PRO\n₹580 / month (Growth Edition)\n100% UNLOCKED\nFull access to all 11 Intelligence Modules\nReal-time Financial Pulse & Tax breakdowns\nProactive Delayed KOT & Low Stock alerts\nNatural Language Search & Executive EOD Briefing\nIncluded alongside Captain App & Table QR Standee Ordering.\nAnomaly Thresholds & AI Alert Engine Tuning\n\nTuned values are pushed down to restaurant instances to trigger proactive assistant banners and urgent cards.\n\nDELAYED KOT ALERT THRESHOLD (MINUTES) *\nTriggers urgent alert when ticket prep > X mins\nCRITICAL LOW STOCK THRESHOLD (UNITS) *\nFlags ingredient in assistant when qty ≤ X\nCASH DRAWER DISCREPANCY VARIANCE (₹) *\nAlerts manager when active shift variance > ₹X\nEnable Proactive Anomaly Alerts in Restaurant POS/Admin\nShow PRO Teaser Preview to CORE (₹5,000) users\nSave Global Thresholds\nJAMAN AI for one restaurant\n\nBy default a restaurant follows its plan: PRO is ON, CORE is LOCKED (a teaser) or OFF (hidden), depending on the teaser setting above. Change it here for a single restaurant.\n\nRESTAURANT\nChoose a restaurant…\nQA-Restaurant-B-1791252294734\nQA-Restaurant-A-1791252294734\nQuery Template & Category Registry (32 Questions)\n\nEnable, disable, reprioritize, or configure minimum tier requirements for assistant questions.\n\nAll Categories (32)\nToday's Pulse (7)\nSales & Finance (4)\nPayment Split (3)\nOrder Pipeline (4)\nKitchen & KOT (3)\nDining Tables (2)\nMenu Analytics (3)\nStock & Inventory (2)\nCustomer CRM (1)\nStaff & Shift (2)\n✨ Business Insights (1)\nQUESTION LABEL\tCATEGORY\tINTERNAL INTENT\tMIN TIER\tPRIORITY\tSTATUS\tACTIONS\n\nExecutive EOD Closing Brief\n\t✨ BUSINESS INSIGHTS\tEND_OF_DAY\t\nPRO ONLY\t100\t\n\t\n\n\nCritical Low Stock Ingredients\n\tSTOCK & INVENTORY\tLOW_STOCK\t\nPRO ONLY\t100\t\n\t\n\n\nDelayed KOTs (> 15 mins)\n\tKITCHEN & KOT\tDELAYED_KOT\t\nPRO ONLY\t100\t\n\t\n\n\nToday's Gross Sales\n\tTODAY'S PULSE\tTODAY_SALES\t\nPRO ONLY\t100\t\n\t\n\n\nTop Selling Dishes by Volume\n\tMENU ANALYTICS\tTOP_ITEMS\t\nPRO ONLY\t95\t\n\t\n\n\nToday's Total Orders\n\tTODAY'S PULSE\tTODAY_ORDERS\t\nPRO ONLY\t95\t\n\t\n\n\nOut of Stock Dishes (86 List)\n\tSTOCK & INVENTORY\tOUT_OF_STOCK\t\nPRO ONLY\t90\t\n\t\n\n\nActive Live KOT Queue\n\tKITCHEN & KOT\tPENDING_KOT\t\nPRO ONLY\t90\t\n\t\n\n\nComplete Tender Breakdown\n\tPAYMENT SPLIT\tPAYMENT_SUMMARY\t\nPRO ONLY\t90\t\n\t\n\n\nAverage Order Value (AOV)\n\tTODAY'S PULSE\tAOV\t\nPRO ONLY\t90\t\n\t\n\n\nSlow Moving / Least Ordered Items\n\tMENU ANALYTICS\tLEAST_ITEMS\t\nPRO ONLY\t85\t\n\t\n\n\nDine-In Revenue Today\n\tORDER PIPELINE\tDINE_IN_REVENUE\t\nPRO ONLY\t85\t\n\t\n\n\nBusiest Trading Hour\n\tSALES & FINANCE\tBUSIEST_HOUR\t\nPRO ONLY\t85\t\n\t\n\n\nDining Floor Occupancy %\n\tDINING TABLES\tTABLE_OCCUPANCY\t\nPRO ONLY\t85\t\n\t\n\n\nCash in Drawer & Float\n\tTODAY'S PULSE\tCASH_COLLECTION\t\nPRO ONLY\t85\t\n\t\n\n\nTakeaway / Parcel Revenue Today\n\tORDER PIPELINE\tTAKEAWAY_REVENUE\t\nPRO ONLY\t82\t\n\t\n\n\nKitchen Station Turnaround\n\tKITCHEN & KOT\tKITCHEN_PERFORMANCE\t\nPRO ONLY\t80\t\n\t\n\n\nRevenue by Menu Category\n\tMENU ANALYTICS\tBEST_CATEGORY\t\nPRO ONLY\t80\t\n\t\n\n\nCurrent In-Progress Orders\n\tORDER PIPELINE\tACTIVE_ORDERS\t\nPRO ONLY\t80\t\n\t\n\n\nCard Swipes & POS Machine\n\tPAYMENT SPLIT\tCARD_COLLECTION\t\nPRO ONLY\t80\t\n\t\n\n\nPopular Order Combos\n\tSALES & FINANCE\tPOPULAR_COMBOS\t\nPRO ONLY\t80\t\n\t\n\n\nActive Logged-in Staff\n\tSTAFF & SHIFT\tACTIVE_STAFF\t\nPRO ONLY\t80\t\n\t\n\n\nAvailable Clean Tables\n\tDINING TABLES\tAVAILABLE_TABLES\t\nPRO ONLY\t80\t\n\t\n\n\nUPI QR Collections\n\tTODAY'S PULSE\tUPI_COLLECTION\t\nPRO ONLY\t80\t\n\t\n\n\nFootfall: Parties Served Today\n\tCUSTOMER CRM\tFOOTFALL\t\nPRO ONLY\t75\t\n\t\n\n\nCash vs Digital Payment Share\n\tPAYMENT SPLIT\tPAYMENT_SHARE\t\nPRO ONLY\t75\t\n\t\n\n\nRefunds & Voids Summary\n\tSALES & FINANCE\tTODAY_REFUNDS\t\nPRO ONLY\t75\t\n\t\n\n\nCashier Shift Cash Variance\n\tSTAFF & SHIFT\tCASH_VARIANCE\t\nPRO ONLY\t75\t\n\t\n\n\nToday's GST Tax Breakdown\n\tTODAY'S PULSE\tTAX_SUMMARY\t\nPRO ONLY\t75\t\n\t\n\n\nCompleted & Settled Orders\n\tORDER PIPELINE\tCOMPLETED_ORDERS\t\nPRO ONLY\t70\t\n\t\n\n\nCancelled Bills & Voids\n\tSALES & FINANCE\tTODAY_CANCELLED\t\nPRO ONLY\t70\t\n\t\n\n\nDiscounts & Offers Given\n\tTODAY'S PULSE\tTODAY_DISCOUNTS\t\nPRO ONLY\t70\t\n\t\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "JAMAN AI Engine",
+    "Plan Entitlement & Tier Access Control",
+    "Anomaly Thresholds & AI Alert Engine Tuning",
+    "JAMAN AI for one restaurant",
+    "Query Template & Category Registry (32 Questions)"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Add Custom Query",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save Global Thresholds",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories (32)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today's Pulse (7)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sales & Finance (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payment Split (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Order Pipeline (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dining Tables (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu Analytics (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Stock & Inventory (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customer CRM (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Shift (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "✨ Business Insights (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "ai-restaurant",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose a restaurant…"
+        },
+        {
+          "value": "f84751ce-d9bf-439b-8fd0-ead11c838fd5",
+          "text": "QA-Restaurant-B-1791252294734"
+        },
+        {
+          "value": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+          "text": "QA-Restaurant-A-1791252294734"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search query label or intent code…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

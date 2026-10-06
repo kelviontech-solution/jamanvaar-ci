@@ -1,0 +1,212 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n75\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n35\nBills & Invoices\nKitchen & KOT\n33\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\n75\nHeld Carts\n1\nCore: Offline First\nPOS System & License Settings\n\nConfigure hardware stations, thermal receipt print queues, and restaurant subscription licenses.\n\nHardware & Printers\nReports & Design\n⚡ Instant Bill\nLocal DB & Sync\nSubscription & License\nLocal Storage Health\nHEALTHY\nDatabase Engine:\nBrowser LocalStorage (device-local)\nTotal Menu Dishes:\n2 records\nTotal Orders:\n80 records\nPrint Queue Buffer:\n75 jobs\nForce Local Database Synchronization\nOffline Resilience Engine\nONLINE\n\nJAMANVAAR POS operates with 100% offline capability. When internet connectivity drops, billing, kitchen tickets, thermal printing, and cash registers continue without interruption.\n\nSimulate Offline Mode\nToday Sales:\n₹14205\nOrders:\n45\nAOV:\n₹316\nTables:\n0% (0/1)\nPending KOT:\n33\nLocal Engine Active",
+  "headings": [
+    "POS System & License Settings",
+    "Local Storage Health",
+    "Offline Resilience Engine"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n75",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n33",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n75",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Hardware & Printers",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Design",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "⚡ Instant Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Local DB & Sync",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription & License",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Force Local Database Synchronization",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Simulate Offline Mode",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹14205",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n45",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n33",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,266 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n2\nBills & Invoices\nKitchen & KOT\n2\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\nCore: Offline First\nLive Restaurant Orders\nSession Active\n\nShowing real-time orders for current business session: 6 October 2026 (BD-20261006)\n\nActive Session (5)\nAll History (5)\nAll Sources\n🟠 QR Table\n🖥️ Counter POS\n📱 Self-Order Kiosk\n🧑‍🍳 Floor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#QAA-20261006-404\nToken #K-104\nTAKEAWAY\n📱 Kiosk (CLOUD-SYNC)\n08:02\n•\n1 items\n₹299\nCOMPLETED\n#QAA-20261006-403\nToken #K-103\nTAKEAWAY\n📱 Kiosk (CLOUD-SYNC)\n07:59\n•\n1 items\n₹299\nCOMPLETED\n#QAA-20261006-402\nToken #K-102\nTAKEAWAY\n📱 Kiosk (CLOUD-SYNC)\n07:55\n•\n1 items\n₹299\nCONFIRMED\n\n⚠ Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.\n\nSettle Cash\n#QAA-20261006-401\nToken #K-101\nTAKEAWAY\n📱 Kiosk (CLOUD-SYNC)\n07:53\n•\n1 items\n₹299\nCONFIRMED\n\n⚠ Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.\n\nSettle Cash\n#QAA-20261006-201\nToken #101\nDINE_IN\n🧑‍🍳 Captain (T-QA01)\n07:48\n•\n1 items\n₹314\nCOMPLETED\n\nSelect an order from the list to view full itemized breakdown and print receipt.\n\nToday Sales:\n₹912\nOrders:\n3\nAOV:\n₹304\nTables:\n0% (0/1)\nPending KOT:\n2\nLocal Engine Active",
+  "headings": [
+    "Live Restaurant Orders"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Active Session (5)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All History (5)",
+      "aria": null,
+      "title": "View complete historical orders across all past days",
+      "disabled": false
+    },
+    {
+      "text": "All Sources",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🟠 QR Table",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🖥️ Counter POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "📱 Self-Order Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🧑‍🍳 Floor Captain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "New",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Confirmed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Preparing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Ready",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Served",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Completed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settle Cash",
+      "aria": null,
+      "title": "Checks the real UPI payment status before collecting cash",
+      "disabled": false
+    },
+    {
+      "text": "Settle Cash",
+      "aria": null,
+      "title": "Checks the real UPI payment status before collecting cash",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹912",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n3",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search order #, token, table, customer...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

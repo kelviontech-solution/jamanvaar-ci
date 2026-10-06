@@ -1,0 +1,100 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nAll stations\nMain Kitchen\nLIVE\n|\n08:10:04\n1\nCooking\n1\nReady\nSwitch Station\nACTIVE\n2\nCOOKING\n1\nREADY\n1\nSERVED\n1\nEXPO (PASS)\n2\nTO COOK\n1×\nQA Pizza 01\n#K-102\nQAA-20261006-303\nNo table\n•\nTAKEAWAY\n•\nMain Kitchen\n10:18\n1×\nQA Pizza 01\n#3hhhr\nALL DISHES READY\n#K-101\nQAA-20261006-302\nNo table\n•\nTAKEAWAY\n•\nMain Kitchen\n10:35\n1/1 of the order ready\n1×\nQA Pizza 01\n#0wv44\nUNDO\nSERVED\nQA Pizza 01 ready\nUNDO\n×",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "All stations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false
+    },
+    {
+      "text": "ACTIVE\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "COOKING\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "READY\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SERVED\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EXPO (PASS)\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1×\nQA Pizza 01",
+      "aria": "1 QA Pizza 01: cooking, tap when ready",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ALL DISHES READY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1×\nQA Pizza 01",
+      "aria": "1 QA Pizza 01: ready, tap to undo",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "UNDO",
+      "aria": null,
+      "title": "Marked ready by mistake? Put it back to cooking",
+      "disabled": false
+    },
+    {
+      "text": "SERVED",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "UNDO",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "×",
+      "aria": "Dismiss",
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

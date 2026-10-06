@@ -1,0 +1,117 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nCart\n0\n₹0\nAll Menu\nCombos & Deals\nChinese & Continental\nAll Menu\nPure Veg\n🌱 Pure Jain\nAll Dishes & Specialities\nPure Veg\nQA Pizza 01\n₹249",
+  "headings": [
+    "All Dishes & Specialities",
+    "QA Pizza 01"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false
+    },
+    {
+      "text": "Cart\n0\n₹0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Chinese & Continental",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add QA Pizza 01 to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

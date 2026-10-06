@@ -1,0 +1,106 @@
+{
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "text": "Local Core: Unreachable\nNetwork: Online\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nFloor Captain Sign In\n\nEnter your authorized 4-digit staff PIN to unlock this tablet\n\n🔒 Registered Staff Access\nAsk your manager for your 4-digit staff PIN\nSTAFF 4-DIGIT PIN\n\nInvalid staff PIN code. Please enter your authorized 4-digit PIN.\n\n1\n2\n3\n4\n5\n6\n7\n8\n9\nCLEAR\n0\n⌫\nUnlock Captain Terminal\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "headings": [
+    "Touch-First Restaurant Floor Command Instant KOT",
+    "Floor Captain & Service",
+    "Floor Captain Sign In"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "3",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "6",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "8",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "9",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CLEAR",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "⌫",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Unlock Captain Terminal",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "placeholder": "• • • •",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

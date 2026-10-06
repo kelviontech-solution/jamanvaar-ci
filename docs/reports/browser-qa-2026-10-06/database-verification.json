@@ -1,0 +1,210 @@
+{
+  "role": [
+    {
+      "current_user": "jamanvaar_app",
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ],
+  "unscopedVisibleOrders": 0,
+  "tenantAOrders": 85,
+  "duplicateExternalIds": [],
+  "paidKiosk": [
+    {
+      "id": "ord-1791253791054-lqsugous",
+      "status": "COMPLETED",
+      "totalAmount": 29900,
+      "taxAmount": 1496,
+      "receiptTax": 1496,
+      "kitchenStates": [
+        "PENDING"
+      ]
+    },
+    {
+      "id": "ord-1791253930895-m0ffi3j7",
+      "status": "COMPLETED",
+      "totalAmount": 29900,
+      "taxAmount": 1496,
+      "receiptTax": 1496,
+      "kitchenStates": [
+        "PENDING"
+      ]
+    }
+  ],
+  "pendingKiosk": [
+    {
+      "id": "ord-1791253541541-fehxxlhj",
+      "status": "READY",
+      "paymentStatus": "PENDING",
+      "token": "K-102"
+    },
+    {
+      "id": "ord-1791253397166-ezdpi2at",
+      "status": "READY",
+      "paymentStatus": "PENDING",
+      "token": "K-101"
+    },
+    {
+      "id": "ord-1791255888715-pcy97go7",
+      "status": "CONFIRMED",
+      "paymentStatus": "PENDING",
+      "token": "K-105"
+    }
+  ],
+  "payments": [
+    {
+      "id": "d344842d-1fc4-4ced-94b9-0ae51197bebc",
+      "orderId": "371d96d9-6943-41a1-9d45-03830ce97283",
+      "status": "PENDING",
+      "amount": 29900,
+      "platformAmount": 897,
+      "restaurantAmount": 29003,
+      "commissionBps": 300,
+      "payoutId": null,
+      "order": {
+        "externalOrderId": "ord-1791253397166-ezdpi2at",
+        "status": "PENDING_PAYMENT",
+        "subtotal": 29900,
+        "taxAmount": 0,
+        "totalAmount": 29900
+      }
+    },
+    {
+      "id": "864ca321-7efe-4777-8f25-ea79feed6e37",
+      "orderId": "0d34dc30-ab7a-46cd-82cc-3a5e5a28411d",
+      "status": "PENDING",
+      "amount": 29900,
+      "platformAmount": 897,
+      "restaurantAmount": 29003,
+      "commissionBps": 300,
+      "payoutId": null,
+      "order": {
+        "externalOrderId": "ord-1791253541541-fehxxlhj",
+        "status": "PENDING_PAYMENT",
+        "subtotal": 29900,
+        "taxAmount": 0,
+        "totalAmount": 29900
+      }
+    },
+    {
+      "id": "315e42d4-e6a8-406f-a5f4-10abb08b1a16",
+      "orderId": "8b47b7ec-d3a3-4586-bf98-14d323879600",
+      "status": "SUCCESS",
+      "amount": 29900,
+      "platformAmount": 897,
+      "restaurantAmount": 29003,
+      "commissionBps": 300,
+      "payoutId": null,
+      "order": {
+        "externalOrderId": "ord-1791253791054-lqsugous",
+        "status": "PAID",
+        "subtotal": 29900,
+        "taxAmount": 0,
+        "totalAmount": 29900
+      }
+    },
+    {
+      "id": "f04f731b-8b2c-4484-9231-a42bae0c906b",
+      "orderId": "f4b0625e-d323-4190-aa7d-075c1b179ba8",
+      "status": "PARTIALLY_REFUNDED",
+      "amount": 29900,
+      "platformAmount": 897,
+      "restaurantAmount": 29003,
+      "commissionBps": 300,
+      "payoutId": null,
+      "order": {
+        "externalOrderId": "ord-1791253930895-m0ffi3j7",
+        "status": "PAID",
+        "subtotal": 29900,
+        "taxAmount": 0,
+        "totalAmount": 29900
+      }
+    },
+    {
+      "id": "9990be99-3144-4586-af31-05e09f363a24",
+      "orderId": "31eeef66-8b33-4d07-88ff-a67f74fb682a",
+      "status": "PENDING",
+      "amount": 11800,
+      "platformAmount": 354,
+      "restaurantAmount": 11446,
+      "commissionBps": 300,
+      "payoutId": null,
+      "order": {
+        "externalOrderId": "ord-1791255888715-pcy97go7",
+        "status": "PENDING_PAYMENT",
+        "subtotal": 10000,
+        "taxAmount": 1800,
+        "totalAmount": 11800
+      }
+    }
+  ],
+  "inventoryCloudDefinitions": 0,
+  "stockMovements": [
+    {
+      "itemName": "QA Cheese",
+      "type": "ADJUSTMENT",
+      "quantityDelta": 4,
+      "seq": 35
+    },
+    {
+      "itemName": "QA Cheese",
+      "type": "PURCHASE",
+      "quantityDelta": 5,
+      "seq": 36
+    },
+    {
+      "itemName": "QA Cheese",
+      "type": "ADJUSTMENT",
+      "quantityDelta": -1,
+      "seq": 37
+    }
+  ],
+  "authReuseEvents": [
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:49:04.138Z"
+    },
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:47:16.319Z"
+    },
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:47:43.465Z"
+    },
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:55:02.715Z"
+    },
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:55:41.007Z"
+    },
+    {
+      "restaurantId": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+      "action": "TENANT_REFRESH_TOKEN_REUSE",
+      "createdAt": "2026-10-06T02:57:48.597Z"
+    }
+  ],
+  "captainSettlement": {
+    "id": "ord-1791253110676-xjux0man",
+    "status": "COMPLETED",
+    "paymentStatus": "SUCCESS",
+    "amount": 31400
+  },
+  "databaseConnectionsAtObservation": [
+    {
+      "state": "active",
+      "connections": 1
+    },
+    {
+      "state": "idle",
+      "connections": 4
+    }
+  ]
+}

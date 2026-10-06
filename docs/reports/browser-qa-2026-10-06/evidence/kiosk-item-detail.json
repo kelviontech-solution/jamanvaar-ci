@@ -1,0 +1,155 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nCart\n1\n₹314\nAll Menu\nCombos & Deals\nChinese & Continental\nAll Menu\nPure Veg\n🌱 Pure Jain\nAll Dishes & Specialities\nPure Veg\nQA Pizza 01\n₹299\nOrder Summary\n1\nClear All\nQA Pizza 01\n₹299\n1\nApply\nSubtotal\n₹299\nCGST (2.5%)\n₹8\nSGST (2.5%)\n₹7\nTotal Payable\n₹314\nProceed to Payment",
+  "headings": [
+    "All Dishes & Specialities",
+    "QA Pizza 01",
+    "Order Summary1 Clear All"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false
+    },
+    {
+      "text": "Cart\n1\n₹314",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Chinese & Continental",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add QA Pizza 01 to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "Clear All",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Remove item",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Decrease quantity of QA Pizza 01",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Increase quantity of QA Pizza 01",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Apply",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Proceed to Payment",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter coupon code",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

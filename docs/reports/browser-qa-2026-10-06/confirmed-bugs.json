@@ -1,0 +1,346 @@
+[
+  {
+    "id": "B001",
+    "severity": "Critical",
+    "apps": [
+      "Restaurant Admin"
+    ],
+    "title": "Idle production dashboard creates a kiosk-fleet request storm",
+    "role": "Restaurant Owner",
+    "steps": "Activate the merged production Restaurant Admin with the QA KIOSK_ADMIN key; leave the dashboard idle for 10 seconds.",
+    "expected": "One initial fleet fetch and the configured 30-second refresh interval.",
+    "actual": "1316 GET fleet responses in 10 seconds, with no user action. Development also produced 2,734 calls in a 32.7-second observation.",
+    "endpoint": "GET /api/v1/devices/me/fleet",
+    "request": "Authenticated branch device; no body.",
+    "evidence": [
+      "production-idle-fleet.json",
+      "evidence/production-admin-fleet-storm.png",
+      "evidence/failure-adminprod-1791253679880.png",
+      "network.jsonl"
+    ],
+    "files": [
+      "apps/restaurant-system/pos-admin/src/App.tsx:550",
+      "apps/restaurant-system/pos-admin/src/hooks/useEntitlements.ts:77"
+    ],
+    "root": "useEntitlements returns a new hasApp function every render. The fleet effect depends on that function and immediately fetches; setKiosks triggers the next render and restarts the effect.",
+    "impact": "Unbounded background traffic multiplies auth and database work. This is a concrete code-level contributor to shared API pressure; its contribution to AWS latency cannot be measured locally.",
+    "fix": "Stabilize the entitlement function and effect dependency; preserve the existing refresh policy; cancel obsolete fetches and keep one in-flight refresh.",
+    "regression": "Idle production build, entitlement changes, kiosk-only keys and navigation: bounded call counts, no missed legitimate fleet changes."
+  },
+  {
+    "id": "B002",
+    "severity": "Critical",
+    "apps": [
+      "POS",
+      "Kiosk",
+      "Restaurant Admin",
+      "QR guest (comparison)"
+    ],
+    "title": "Configured tax, displayed payable, gateway amount and receipt disagree",
+    "role": "Cashier / Customer / Owner",
+    "steps": "Owner creates a GST18 group and a ₹100 dish. Add it in POS, Kiosk and guest QR. Separately pay for the unassigned-tax ₹299 dish through the simulated kiosk gateway and inspect its receipt.",
+    "expected": "Identical configured tax and amount across cart, authoritative quote, payment, order and receipt; components reconcile to total.",
+    "actual": "GST18: POS and Kiosk display ₹105; Kiosk backend and QR guest quote ₹118. For the unassigned-tax ₹299 dish, Kiosk displays ₹314 but charges ₹299. Receipt shows subtotal ₹299 + CGST ₹7.48 + SGST ₹7.48 + round ₹0.04, yet total ₹299. Final SyncedOrder tax is 1,496 paise while the primary payment Order tax is zero.",
+    "endpoint": "POST /api/v1/payments/orders; POST /api/v1/public/qr/:token/quote; POST /api/v1/orders; GET /api/v1/orders/sync",
+    "request": "items: [{ menu item id, quantity: 1 }]; owner tax group CGST 9%, SGST 9%; money in integer paise at API boundaries.",
+    "evidence": [
+      "evidence/pos-gst18-cart.png",
+      "evidence/kiosk-ui-vs-payment-amount.png",
+      "evidence/gst18-kiosk-unpaid-amount.png",
+      "evidence/qr-customer-authoritative-tax.png",
+      "evidence/failure-kiosk-1791253956137.png",
+      "database-verification.json"
+    ],
+    "files": [
+      "packages/business/src/pricing.ts:74",
+      "apps/restaurant-system/pos/src/store/posStore.ts:311",
+      "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "cloud/api/src/modules/payments/pricing.util.ts",
+      "packages/business/src/central_reporting_service.ts:358"
+    ],
+    "root": "The shared frontend cart defaults to 5% without applying the menu item tax-group reference in these paths. Server menu-snapshot pricing follows configured tax instead. Receipt/sync metadata is not constrained to that authoritative quote. The exact subsequent writer that changed SyncedOrder tax was not isolated.",
+    "impact": "Customers see one amount and are asked to pay another; tax receipts and reports can disagree with the actual collected amount.",
+    "fix": "Use the same item-aware pricing contract at every consumer and snapshot the authoritative quote. Validate subtotal − discount + tax + charges + round-off = total. Preserve legitimate zero tax.",
+    "regression": "Zero, 5%, 18%, inclusive tax, mixed baskets, modifiers, discounts, round-off, cash/online, refunds, reports and offline resync all reconcile; paid snapshots stay immutable."
+  },
+  {
+    "id": "B003",
+    "severity": "Critical",
+    "apps": [
+      "Kiosk",
+      "KDS",
+      "POS"
+    ],
+    "title": "Paid kiosk customer confirmation does not deliver a kitchen ticket",
+    "role": "Customer / Kitchen Staff",
+    "steps": "Use cloud sync only, with no LAN core. Capture a simulated kiosk payment using the real signature validator. Wait for confirmation and check KDS by the same external order id/token.",
+    "expected": "Exactly one durable kitchen ticket containing the paid item, visible without refresh.",
+    "actual": "Customer confirmation and successful payment persist; two tested paid kiosk orders become COMPLETED with PENDING kitchen items. K104 remains absent from KDS after a 15-second wait and after reopening. Cloud existence alone did not prove kitchen delivery.",
+    "endpoint": "POST /api/v1/payments/razorpay/webhook; POST /api/v1/payments/:id/kot-claim; POST /api/v1/payments/:id/fulfilled; GET /api/v1/orders/sync",
+    "request": "Valid simulated captured-payment event, duplicate same event, external order id retained; provider and delivery are simulated only.",
+    "evidence": [
+      "evidence/kiosk-simulated-paid-confirmation.png",
+      "evidence/kds-kiosk-paid-ticket.png",
+      "evidence/failure-kds-1791253941089.png",
+      "database-verification.json"
+    ],
+    "files": [
+      "apps/kiosk-system/kiosk-user/src/App.tsx:1379",
+      "apps/kiosk-system/kiosk-user/src/App.tsx:1392",
+      "packages/sync/src/outbox.ts:435"
+    ],
+    "root": "finalizePaidOrder settles the local order before kitchen fulfilment; settlement marks it COMPLETED. The cloud kitchen projector excludes COMPLETED orders. A local KOT/fulfilled acknowledgement can therefore precede remote kitchen availability.",
+    "impact": "A customer can pay and receive confirmation while kitchen staff never see the order.",
+    "fix": "Separate payment settlement from kitchen lifecycle; persist/acknowledge kitchen delivery before treating fulfilment as successful. Ensure cloud fallback works without LAN.",
+    "regression": "Cloud-only and LAN modes, duplicate callback, kiosk crash before/after capture, late capture, restart and reconnect: one paid order and one KOT, no lost dishes."
+  },
+  {
+    "id": "B004",
+    "severity": "Critical",
+    "apps": [
+      "POS",
+      "KDS",
+      "Restaurant Admin"
+    ],
+    "title": "SEND KOT followed by Instant Bill creates a second order",
+    "role": "Cashier",
+    "steps": "Add a dish; SEND KOT; invoke Instant Bill for that running cart. Compare persisted external ids and payment statuses.",
+    "expected": "Settle the existing running order and preserve its kitchen item identities.",
+    "actual": "Two backend orders persist: the original PREPARING/PENDING and a new COMPLETED/SUCCESS order with the same dish. Reproduced again with a clean single-item cart. Unique external-id constraints do not prevent this business duplicate.",
+    "endpoint": "POST /api/v1/orders (two different externalOrderId values)",
+    "request": "Same cart item/quantity; first operation SEND KOT, second Instant Bill CASH.",
+    "evidence": [
+      "data-consistency.jsonl",
+      "evidence/pos-running-kot-instant-bill.png",
+      "evidence/failure-pos-1791254660924.png"
+    ],
+    "files": [
+      "apps/restaurant-system/pos/src/store/posStore.ts:1581",
+      "apps/restaurant-system/pos/src/store/posStore.ts:1649"
+    ],
+    "root": "executeInstantBill unconditionally creates an order instead of resolving the runningOrderId already retained by SEND KOT.",
+    "impact": "Orphan unpaid tickets, misleading open-order totals and possible duplicate preparation or reporting.",
+    "fix": "Resolve and settle the existing running order; create a new order only when the cart has no running order.",
+    "regression": "Takeaway/dine-in, recalled cart, running KOT, repeat click and offline reconnect: one sale, one kitchen identity and one shift posting."
+  },
+  {
+    "id": "B005",
+    "severity": "Critical",
+    "apps": [
+      "POS",
+      "Payment backend"
+    ],
+    "title": "Cashier can invoke a refund without server-verified manager approval",
+    "role": "Cashier",
+    "steps": "Authenticate POS using the issued Cashier PIN. Call the published cloud refund client from the browser without a manager approval credential; request a one-paise refund on a simulated paid transaction.",
+    "expected": "Server denies a cashier without refund permission or verified manager step-up.",
+    "actual": "Refund API returned 201 and processed one paise through the simulated provider. Transaction changed to PARTIALLY_REFUNDED. No manager approval occurred. Device signatures are present but they do not establish the staff role.",
+    "endpoint": "POST /api/v1/payments/:paymentId/refund",
+    "request": "{ amount: 1 paise, reason: QA permission probe, idempotency key }; signed POS device request, Cashier staff session.",
+    "evidence": [
+      "data-consistency.jsonl",
+      "evidence/cashier-refund-api-permission-probe.png",
+      "evidence/failure-pos-1791255595719.png",
+      "database-verification.json"
+    ],
+    "files": [
+      "cloud/api/src/modules/payments/payment-orders.controller.ts:118",
+      "cloud/api/src/modules/payments/payments.service.ts",
+      "cloud/api/src/common/guards/device-signature.guard.ts"
+    ],
+    "root": "Refund route verifies device credentials, signature and device type, but does not enforce server-verified staff permission/manager approval. Client-supplied attribution cannot substitute for authorization.",
+    "impact": "An operator with access to an activated POS can bypass the approval UI and initiate financial refunds. Real provider behaviour was not exercised.",
+    "fix": "Require verified staff identity with refund permission or a bound, short-lived manager approval credential. Validate scope and transaction limits, and derive audit attribution server-side.",
+    "regression": "Cashier denied, authorized manager allowed, expired/replayed/other-branch approval denied, duplicate idempotency key refunded once, audit actor verified."
+  },
+  {
+    "id": "B006",
+    "severity": "High",
+    "apps": [
+      "Kiosk",
+      "KDS"
+    ],
+    "title": "Unpaid online checkout appears in the kitchen before cash acceptance or capture",
+    "role": "Customer / Kitchen Staff",
+    "steps": "Open a fresh GST18 kiosk checkout, choose online QR, never pay and never confirm Cash at Counter. Inspect the KDS ticket and database.",
+    "expected": "Online payment pending stays outside actionable kitchen preparation until payment or explicit accepted cash workflow.",
+    "actual": "Backend payment amount 11,800 paise, order CONFIRMED/PENDING and one visible KDS ticket after five seconds. Evidence explicitly records neverConfirmedCash=true.",
+    "endpoint": "POST /api/v1/payments/orders; GET /api/v1/orders/sync",
+    "request": "Fresh one-item online checkout; no successful callback or cash confirmation.",
+    "evidence": [
+      "data-consistency.jsonl",
+      "evidence/kds-unpaid-checkout-visible.png",
+      "evidence/failure-kds-1791255893848.png"
+    ],
+    "files": [
+      "apps/kiosk-system/kiosk-user/src/App.tsx:1291",
+      "packages/sync/src/outbox.ts:435"
+    ],
+    "root": "Checkout creates a CONFIRMED local order before payment; kitchen projection admits the confirmed order without checking this online-payment acceptance state.",
+    "impact": "Kitchen may prepare abandoned, expired or unpaid orders.",
+    "fix": "Publish actionable online kitchen work only on verified capture; use an explicit accepted cash-at-counter state for the intended cash flow.",
+    "regression": "Abandoned QR, cancel, expiry, failed payment, late capture and explicit cash confirmation: correct admission, cancellation and exactly-once ticket."
+  },
+  {
+    "id": "B007",
+    "severity": "High",
+    "apps": [
+      "Restaurant Admin",
+      "Inventory consumers"
+    ],
+    "title": "Inventory master definition does not reach another activated admin",
+    "role": "Restaurant Owner / Stock Manager",
+    "steps": "Create QA Cheese (10 kg, ₹100/unit) in owner UI; receive five kg and count-adjust stock. Open a second activated production Restaurant Admin for the same tenant/branch.",
+    "expected": "Another device receives the stock definition and reconciles movements to the same balance.",
+    "actual": "First device ultimately holds 18 kg and cloud has three movements. Cloud INVENTORY_ITEM definitions remain zero; second admin shows zero items. A reload on the original device restores its local record but does not prove cross-device persistence.",
+    "endpoint": "GET /api/v1/entity-sync/INVENTORY_ITEM; inventory ledger pull/push",
+    "request": "Create stock definition, receive +5 kg, adjustments +4 and −1 kg; second device same branch.",
+    "evidence": [
+      "database-verification.json",
+      "evidence/second-admin-stock-definition-missing.png",
+      "evidence/qa-delivery-ledger.png",
+      "evidence/stock-count-corrected-saved-quantity.png"
+    ],
+    "files": [
+      "packages/database/src/repositories.ts:3270",
+      "packages/sync/src/inventory_ledger_sync.ts:135",
+      "apps/restaurant-system/pos-admin/src/App.tsx"
+    ],
+    "root": "Definition creation mutates local storage without the observed cloud master-entity transport. applyRemote returns if an inventory definition is absent; movements alone cannot bootstrap a new device.",
+    "impact": "Owners and terminals disagree on available stock, valuation and purchasing; a replacement device loses the inventory catalogue.",
+    "fix": "Durably sync stock master definitions before replaying movements, with stable ids and tenant/branch scoping. Bootstrap and reconcile balances deterministically.",
+    "regression": "New device, offline definition creation, duplicate/out-of-order movements, stock count, delivery and replacement-device recovery all converge."
+  },
+  {
+    "id": "B008",
+    "severity": "Medium",
+    "apps": [
+      "Restaurant Admin"
+    ],
+    "title": "Newly created stock item is missing from the current inventory list",
+    "role": "Restaurant Owner",
+    "steps": "Create QA Cheese and inspect summary plus ingredient list immediately without leaving the screen; remount the view.",
+    "expected": "Created stock item appears immediately in both summary and table.",
+    "actual": "Summary shows one item and ₹1,000 value while the ingredient table shows zero/no ingredients. Remounting makes the item visible.",
+    "endpoint": "Local inventory repository create; cloud gap separately tracked as B007.",
+    "request": "One new raw ingredient; default filters.",
+    "evidence": [
+      "evidence/admin-inventory-populated.png",
+      "evidence/inventory-after-remount.png"
+    ],
+    "files": [
+      "apps/restaurant-system/pos-admin/src/components/inventory/InventoryRecipesModule.tsx:54",
+      "packages/database/src/repositories.ts:3270"
+    ],
+    "root": "Filtered inventory useMemo depends on the array identity; the repository unshifts into that same array, leaving the cached list stale.",
+    "impact": "Owner may think saving failed and create duplicates or refresh unnecessarily.",
+    "fix": "Use a changed collection/version when mutations occur, or recompute the filtered view on the actual mutation signal.",
+    "regression": "Create/edit/delete with active filters: immediate correct rows and summaries, no manual refresh."
+  },
+  {
+    "id": "B009",
+    "severity": "Medium",
+    "apps": [
+      "Restaurant Admin"
+    ],
+    "title": "Cash reconciliation dashboard asserts a float and reconciliation without a shift",
+    "role": "Restaurant Owner / Cashier",
+    "steps": "Inspect dashboard before any shift exists; confirm POS says no active shift and cloud contains no shift.",
+    "expected": "Show no active shift/unreconciled state and no invented opening cash.",
+    "actual": "Dashboard claims 100% reconciled and a ₹2,000 cashier float. Later an actual zero-opening shift is persisted correctly, showing that the dashboard default is not evidence of cash truth.",
+    "endpoint": "GET /api/v1/entity-sync/SHIFT; dashboard local aggregation.",
+    "request": "Empty shift collection, then zero-opening QA shift for comparison.",
+    "evidence": [
+      "evidence/owner-no-shift-reconciliation.png",
+      "evidence/owner-actual-shift-ledger.png",
+      "evidence/pos-qa-shift-closed.png"
+    ],
+    "files": [
+      "apps/restaurant-system/pos-admin/src/components/dashboard/NeedsAttentionSection.tsx:200"
+    ],
+    "root": "openingCash || 2000 substitutes a fabricated float for missing or zero values; the dashboard treats absence of variance as reconciliation evidence.",
+    "impact": "Owner receives misleading financial assurance and cannot trust the dashboard cash position.",
+    "fix": "Represent no-shift, open, uncounted and reconciled states explicitly; preserve zero with null-aware defaults and calculate only from persisted cash counts.",
+    "regression": "No shift, zero float, open shift, short/over cash and closed shift: honest status and exact ledger amounts."
+  },
+  {
+    "id": "B010",
+    "severity": "Medium",
+    "apps": [
+      "Restaurant Admin"
+    ],
+    "title": "Revoked cloud owner session silently removes navigation without sign-in recovery",
+    "role": "Restaurant Owner",
+    "steps": "Observe an owner session rejected by refresh/applications APIs, while local admin session remains signed in.",
+    "expected": "Visible session-expired/reconnect state with a clear login recovery action.",
+    "actual": "Refresh/applications return 401; owner remains on Dashboard while Menu/Kiosk navigation disappears, with no useful expired-session prompt. Explicit logout/login recovers; three subsequent clean reloads pass.",
+    "endpoint": "POST /api/v1/tenant-auth/refresh; GET /api/v1/tenant/me/applications",
+    "request": "Existing local session with rejected cloud refresh.",
+    "evidence": [
+      "evidence/owner-refresh-failure-before-login.png",
+      "evidence/owner-clean-session-reloads.png",
+      "database-verification.json"
+    ],
+    "files": [
+      "apps/restaurant-system/pos-admin/src/hooks/useEntitlements.ts:48",
+      "apps/restaurant-system/pos-admin/src/App.tsx"
+    ],
+    "root": "Entitlement error becomes an empty app list while local login state remains active. Why refresh reuse occurred under interrupted audit sessions is not proven as a normal production defect.",
+    "impact": "Owner can misinterpret auth failure as a missing plan/module and remain stuck.",
+    "fix": "Distinguish auth failure, network failure and a genuinely empty entitlement list; surface re-authentication while preserving appropriate local work.",
+    "regression": "401, revoked token, offline startup, valid empty plan and repeated normal reloads; retain reuse detection and validate refresh coordination separately."
+  },
+  {
+    "id": "B011",
+    "severity": "Low",
+    "apps": [
+      "Kiosk"
+    ],
+    "title": "Kiosk auto-print path dereferences an absent printer",
+    "role": "Customer / Owner",
+    "steps": "Complete simulated kiosk payment on a fresh device with no configured printer; inspect console.",
+    "expected": "Clear pending/unavailable printer state without a TypeError.",
+    "actual": "Console records Auto print dispatch error: TypeError: Cannot read properties of undefined (reading 'name'). Customer confirmation remains visible; actual printing is blocked by absent hardware.",
+    "endpoint": "Local proceedToConfirmation / PrinterService; no physical print was tested.",
+    "request": "No active printer on an activated kiosk.",
+    "evidence": [
+      "console.jsonl",
+      "evidence/kiosk-simulated-paid-confirmation.png"
+    ],
+    "files": [
+      "apps/kiosk-system/kiosk-user/src/App.tsx:1487"
+    ],
+    "root": "getActivePrinter may return undefined and the code immediately uses activePrn.name.",
+    "impact": "No-printer startup produces avoidable runtime errors and ambiguous receipt-delivery feedback.",
+    "fix": "Guard absent printer and show accurate queued/unavailable/delivered states.",
+    "regression": "No printer, offline printer, failed dispatch, successful physical receipt and duplicate dispatch."
+  },
+  {
+    "id": "B012",
+    "severity": "Medium",
+    "apps": [
+      "Super Admin",
+      "Merged Restaurant Admin"
+    ],
+    "title": "Provisioning instructions send kiosk owners to the retired standalone admin",
+    "role": "Super Admin / Restaurant Owner",
+    "steps": "Open the real QA restaurant detail and read Hardware & Terminal Activation Keys instructions. Compare with the successfully activated merged production admin.",
+    "expected": "KIOSK_ADMIN keys route the owner into Restaurant Admin according to the plan, as the user specified.",
+    "actual": "Restaurant detail says a KIOSK_ADMIN key must instead be entered at a separate Kiosk Admin console (local default :5173). That surface is retired; the same key actually activated merged Restaurant Admin at :5286 in the production browser test.",
+    "endpoint": "GET /api/v1/restaurants/:id; presentation-level app URL and provisioning instructions.",
+    "request": "No mutation; actual restaurant detail browser snapshot and production activation response compared.",
+    "evidence": [
+      "evidence/super-route--restaurants-c5f75d1f-915e-4a3d-953b-a787fd76364f.json",
+      "TEST_MATRIX.csv"
+    ],
+    "files": [
+      "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx:918",
+      "cloud/super-admin-web/src/lib/appUrls.ts:9",
+      "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx:592"
+    ],
+    "root": "Super Admin retains standalone Kiosk Admin URLs and instructions after the actual admin workflow was merged.",
+    "impact": "Owners can follow onboarding instructions to a deleted app or believe they need a different console.",
+    "fix": "Point KIOSK_ADMIN provisioning and copied onboarding messages to merged Restaurant Admin, with plan-specific wording.",
+    "regression": "POS_ADMIN and KIOSK_ADMIN keys both follow the current merged flow; every displayed/copied app link matches deployed routes."
+  }
+]

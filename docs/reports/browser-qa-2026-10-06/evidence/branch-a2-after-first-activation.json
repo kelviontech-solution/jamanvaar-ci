@@ -1,0 +1,109 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "Local Core: Connected\nNetwork: Online\nTue, 6 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nEnter your 4-digit staff PIN to continue\n\nSELECT STAFF PROFILE\nQ\nQA Cashier\nCashier\nQ\nQA Manager\nManager\n1\n2\n3\n4\n5\n6\n7\n8\n9\nC\n0\nUNLOCK TERMINAL\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "headings": [
+    "Smart Billing. Better Dining.",
+    "POS Counter"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCashier",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Manager\nManager",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "3",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "6",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "8",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "9",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "C",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "UNLOCK TERMINAL",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,374 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nKIOSK\nKiosk Terminals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nReceipt & E-Bill System\n\nConfigure thermal paper dimensions (58mm vs 80mm), WhatsApp digital receipt templates, and audit history.\n\nRestaurant name, GSTIN, FSSAI and address print from Settings → Report Branding.\nGo to Settings\nThank You & Footer\nThank You Closing Message\nFooter Heritage Tagline\nLogo\n\nShown on the on-screen and WhatsApp receipt and printed at the top of the physical slip.\n\nReceipt Logo\nNo logo\n📁 Click to upload a logo (PNG/JPG, under 2MB)\nPaper Dimension & Display Rules\n80mm Standard POS\n58mm Compact POS\nTax Breakup (GST)\nEmail Bill (PDF)\nMark cash bills with a faint diagonal watermark (off by default)\nBills paid by cash at the counter show the word across the slip in four slanted lines, faint enough to read the bill through it. Card and UPI bills stay plain.\nSave Receipt Settings\nLive Receipt Preview (80mm)\n\nSample receipt: a real order appears here once a guest has ordered.\n\nQA-RESTAURANT-A-1791252294734\nBILL / RECEIPT\nTOKEN #101\nInvoice No:\nSAMPLE-0001\nOrder Type:\nTAKEAWAY\nDate: 06 Oct 2026\nTime: 07:44 am\nPOS: POS-01\nITEM\nQTY\nRATE\nAMT\nSample dish\n2\n₹100\n₹200\nSample drink\n1\n₹60\n₹60\nSubtotal\n₹260\nCGST (2.5%)\n₹6.50\nSGST (2.5%)\n₹6.50\nTOTAL\n₹273\nPAID VIA:\nCASH\nThank you for dining at QA-Restaurant-A-1791252294734! Please visit again.\nFreshly Prepared • Zero Preservatives • Pure Heritage Taste\nPowered by JAMANVAAR\nDigital E-Bill Transmission Audit Log\n0 records\n\nNo digital receipts dispatched yet. Dispatched WhatsApp & SMS e-bills will appear here with masked privacy numbers.\n\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Receipt & E-Bill System",
+    "Thank You & Footer",
+    "Logo",
+    "Paper Dimension & Display Rules",
+    "Live Receipt Preview (80mm)",
+    "QA-Restaurant-A-1791252294734"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Go to Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "80mm Standard POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "58mm Compact POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save Receipt Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": "receipt-logo-upload-input"
+    },
+    {
+      "tag": "INPUT",
+      "type": "url",
+      "placeholder": "...or paste a logo image URL",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

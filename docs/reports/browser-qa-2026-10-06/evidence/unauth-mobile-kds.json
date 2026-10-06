@@ -1,0 +1,34 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "Local Core: Connected\nNetwork: Online\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display to start receiving tickets.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nKITCHEN PRODUCTION & EXPEDITER SYSTEM\n\nKITCHEN DISPLAY (KDS)\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Real-Time Kitchen Production Command Live KOTs",
+    "Kitchen Display System",
+    "Activate This Terminal"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Activate Terminal",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "[ACTIVATION KEY REDACTED]",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

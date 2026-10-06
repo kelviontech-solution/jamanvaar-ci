@@ -1,0 +1,112 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "Local Core: Connected\nNetwork: Online\nTue, 6 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nKitchen Stations & Line Cook Display\n\nKitchen Staff Sign In\n\nChoose your station, then enter your 4-digit staff PIN\n\nKITCHEN STATION\nAll stations\nMain Kitchen\nSTAFF 4-DIGIT PIN\n1\n2\n3\n4\n5\n6\n7\n8\n9\nCLEAR\n0\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "headings": [
+    "Real-Time Kitchen Production Command Live KOTs",
+    "Kitchen Display System",
+    "Kitchen Staff Sign In"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "All stations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "3",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "6",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "8",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "9",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CLEAR",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "placeholder": "• • • •",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

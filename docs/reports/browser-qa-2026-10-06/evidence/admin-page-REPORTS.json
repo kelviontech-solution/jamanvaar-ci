@@ -1,0 +1,565 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nKIOSK\nKiosk Terminals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nReports & Analytics\n● LIVE RECONCILED\n\nUnderstand sales, operations, payments, customers and restaurant performance.\n\nReport Design\nPreview Report\nPrint Report\nDownload PDF\nExport CSV\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nLast Month\nThis Year\nCustom Range\nCompare With:\nPrevious Period\nPrevious Day\nPrevious Week\nPrevious Month\nPrevious Year\nFilters\nOnline Payments (Razorpay)\nAll time · from cloud, not local sales\nOnline sales\n₹0\nSuccessful\n0\nFailed\n0\nRefunded\n₹0\nPerformance at a Glance • Today (06 Oct 2026)\n\n0 completed transactions reconciled across billing and kitchen counters.\n\nvs. Previous Period (05 Oct 2026 - 05 Oct 2026)\nGROSS SALES\n₹0\nDISCOUNTS\n-₹0\nPromotions\nGST TAX (5%)\n₹0\nCGST + SGST\nNET COLLECTED\n₹0\nTOTAL ORDERS\n0\nAVERAGE TICKET\n₹0\nAvg per bill\nREPORT CATEGORIES\nSales\nMenu\nFinancial\nOperations\nCustomers\nInventory\nFAVORITE REPORTS\n★ Daily Sales\n★ Top Selling Dishes\n★ Taxes / GST Report\n★ EOD Settlement (Z-Report)\n★ Kitchen Prep Time\nSALES REPORTS (11)\nDaily Sales\nHOT\n\nToday’s itemized sales, discounts, and net collection\n\nSales Summary\n\nHigh-level aggregated sales KPI comparison\n\nDay-by-Day Sales\nHOT\n\nConsecutive daily sales ledger and day-over-day tracking\n\nMonthly Sales\n\nMonth-over-month revenue analysis and seasonal trends\n\nYearly Sales\n\nAnnual fiscal revenue statement and tax totals\n\nHourly Sales\nHOT\n\nPeak dining rush hours and hourly revenue distribution\n\nSales by Order Type\n\nDine-In, Takeaway, Delivery, and Token breakdown\n\nSales by Payment Method\n\nCash, UPI BharatQR, and Card POS breakdown\n\nSales by Table\n\nTable-wise revenue and occupancy performance\n\nSales by Captain\n\nCaptain order volume and revenue generation\n\nSales by Cashier\n\nCashier-wise billing transactions and cash drawer intake\n\nSALES\nDaily Sales\n\nToday’s itemized sales, discounts, and net collection\n\nFull Document Preview\nConsecutive Daily Sales Ledger\n0 Days Audited\nDATE\tORDERS\tGROSS\tDISCOUNT\tGST (5%)\tTOTAL BILLED (INCL. GST)\tCASH\tUPI\tCARD\tAOV\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Reports & Analytics",
+    "Online Payments (Razorpay)",
+    "Performance at a Glance • Today (06 Oct 2026)",
+    "Daily Sales",
+    "Consecutive Daily Sales Ledger"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Report Design",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Preview Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Print Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download PDF",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last Month",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Custom Range",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Filters",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sales",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Financial",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Operations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "★ Daily Sales",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "★ Top Selling Dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "★ Taxes / GST Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "★ EOD Settlement (Z-Report)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "★ Kitchen Prep Time",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Remove from favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Add to favorites",
+      "disabled": false
+    },
+    {
+      "text": "Full Document Preview",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "PREVIOUS_PERIOD",
+          "text": "Previous Period"
+        },
+        {
+          "value": "PREVIOUS_DAY",
+          "text": "Previous Day"
+        },
+        {
+          "value": "PREVIOUS_WEEK",
+          "text": "Previous Week"
+        },
+        {
+          "value": "PREVIOUS_MONTH",
+          "text": "Previous Month"
+        },
+        {
+          "value": "PREVIOUS_YEAR",
+          "text": "Previous Year"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search reports (e.g. GST, Sales, Cash, Dish)...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,464 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\n← Back to restaurants\nQA-Restaurant-A-1791252294734\nACTIVE\nPRO PLAN (₹7,000)\n6 ACTIVE KEYS\n\nAhmedabad, Gujarat, India • 3 Branches • 1 Registered Terminal\n\nRestaurant ID:\nJM9891000001\nCopy\nGenerate Key\nEdit Restaurant\nSuspend Restaurant\nOverview\nOwner & Users\nBranches\nSubscription\nApplications\nPlan Quotas\nFeature Entitlements\nDevices & Keys\nBilling & Invoices\nPayments\nReports & Analytics\nAudit Logs\nSupport & Diagnostics\nBackup & Recovery\nMenu\nCommercial & Legal Profile\nRestaurant ID\nJM9891000001\nRegistered Mobile\n9891000001\nLegal Name\n—\nGSTIN\n—\nFSSAI\n—\nAddress\n—\nCity / State\nAhmedabad, Gujarat\nTimezone\nAsia/Kolkata\nCurrency\nINR\nOnboarded\n6/10/2026\nAdvanced / Internal IDs\nAt a Glance Summary\nActive Plan\nKIOSK PRO (PRO)\nSubscription Status\nTRIAL\nBranches\n3\nRegistered Terminals\n1\nMaster Owner\nQA Owner A (qa-owner-a@example.invalid)\nPlatform Authority\nSAAS MANAGED\nHardware & Terminal Activation Keys (7)\n6 AVAILABLE TO REDEEM\nRestaurant ID\nJM9891000001\nCopy ID\n\nKiosk Admin asks for this Restaurant ID together with the restaurant owner's login before it takes a key. Captain, POS and Kitchen Display need only their key. Relay these keys to the restaurant owner. On first login at Restaurant Admin (http://localhost:5176), POS, or Captain, entering this key registers and binds the device. A KIOSK_ADMIN key must instead be entered at the Kiosk Admin console (http://localhost:5173).\n\nGenerate Activation Key\n● KIOSK ADMIN CONSOLE\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 7/10/2026\nRevoke\nDelete\n● SELF-ORDER KIOSK\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 7/10/2026\nRevoke\nDelete\n● KITCHEN DISPLAY (KDS)\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 7/10/2026\nRevoke\nDelete\n● CAPTAIN ORDER TABLET\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 7/10/2026\nRevoke\nDelete\n● BILLING COUNTER POS\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 7/10/2026\nRevoke\nDelete\n● RESTAURANT ADMIN CONSOLE\nREDEEMED\n•••• FB7F\nExpires: 7/10/2026\n✓ Redeemed 6/10/2026\nRevoke\n● RESTAURANT ADMIN CONSOLE\nACTIVE\n[ACTIVATION KEY REDACTED]\nCopy\nExpires: 5/11/2026\nRevoke\nDelete\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "QA-Restaurant-A-1791252294734",
+    "Hardware & Terminal Activation Keys (7)"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy the Restaurant ID",
+      "disabled": false
+    },
+    {
+      "text": "Generate Key",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Edit Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Suspend Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Owner & Users",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Branches",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Applications",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Plan Quotas",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Feature Entitlements",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Devices & Keys",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Support & Diagnostics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Recovery",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Copy the internal UUID",
+      "disabled": false
+    },
+    {
+      "text": "Copy ID",
+      "aria": null,
+      "title": "Copy the Restaurant ID",
+      "disabled": false
+    },
+    {
+      "text": "Generate Activation Key",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    },
+    {
+      "text": "← Back to restaurants",
+      "href": "/restaurants"
+    }
+  ],
+  "overflow": false
+}

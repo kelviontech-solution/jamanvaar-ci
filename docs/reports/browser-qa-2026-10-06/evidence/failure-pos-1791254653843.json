@@ -1,0 +1,284 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n23\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nMenu\nCATEGORIES\nAll Menu\n2\nPIZZA & PASTA\n2\nPrint Queue\n23\nHeld Carts\n1\nCore: Offline First\nAll Menu\n2 dishes\n🍽️\nAll\n🟢\nVeg\n🌾\nJain\n🍗\nNon-Veg\nQUICK:\nQA Pizza 01\n₹299\nQA GST18 Pizza\n₹100\nMenu\nMain Kitchen\nQA Pizza 01\nSKU: QA-PIZZA-01\n₹299\n1\nMain Kitchen\nQA GST18 Pizza\nSKU: QA-TAX-18\n₹100\n1\nNEW ORDER — UNSAVED\n• QA Cashier\nClear\n🍽️\nDINE-IN\n🛍️\nTAKEAWAY\n🛵\nDELIVERY\n🎫\nTOKEN\nAttach Customer\nChef Notes\nQA GST18 Pizza\n₹100\n@ ₹100\nAdd note\nRemove\n1\nFREQUENTLY PAIRED TOGETHER\nQA Pizza 01\n₹299\nQA GST18 Pizza\n₹100\nDiscount\nHold Order\nSubtotal\n₹100\nGST (CGST 2.5% + SGST 2.5%)\n₹5\nTotal Payable\n₹105\nSEND KOT\nPAY ₹105\n⚡ INSTANT BILL\n₹105\nCash • Auto Print\nToday Sales:\n₹7611\nOrders:\n24\nAOV:\n₹317\nTables:\n0% (0/1)\nPending KOT:\n2\nLocal Engine Active",
+  "headings": [
+    "All Menu",
+    "QA Pizza 01",
+    "QA GST18 Pizza"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n23",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "Back to the main menu",
+      "disabled": false
+    },
+    {
+      "text": "All Menu\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PIZZA & PASTA\n2",
+      "aria": null,
+      "title": "QA Pizza",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n23",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "🍽️\nAll",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🟢\nVeg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🌾\nJain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🍗\nNon-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Pizza 01\n₹299",
+      "aria": null,
+      "title": "1-Tap Add QA Pizza 01 (₹299)",
+      "disabled": false
+    },
+    {
+      "text": "QA GST18 Pizza\n₹100",
+      "aria": null,
+      "title": "1-Tap Add QA GST18 Pizza (₹100)",
+      "disabled": false
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "Open Menu Manager & Prebuilt Starter Library (30 Types)",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "1-Tap Add to Order",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Decrease quantity",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Increase quantity",
+      "disabled": false
+    },
+    {
+      "text": "Clear",
+      "aria": null,
+      "title": "Clear Cart",
+      "disabled": false
+    },
+    {
+      "text": "🍽️\nDINE-IN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🛍️\nTAKEAWAY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🛵\nDELIVERY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🎫\nTOKEN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Attach Customer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Chef Notes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add note",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Decrease quantity",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Increase quantity",
+      "disabled": false
+    },
+    {
+      "text": "QA Pizza 01\n₹299",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA GST18 Pizza\n₹100",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Discount",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Hold Order",
+      "aria": null,
+      "title": "Save this order for later",
+      "disabled": false
+    },
+    {
+      "text": "SEND KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PAY ₹105",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "⚡ INSTANT BILL\n₹105\nCash • Auto Print",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹7611",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n24",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

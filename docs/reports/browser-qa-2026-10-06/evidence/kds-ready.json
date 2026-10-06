@@ -1,0 +1,76 @@
+{
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nAll stations\nMain Kitchen\nLIVE\n|\n07:50:34\n0\nCooking\n1\nReady\nSwitch Station\nACTIVE\n1\nCOOKING\n0\nREADY\n1\nSERVED\n0\nEXPO (PASS)\n1\n#101\nQAA-20261006-301\nTable QA01\n•\nDINE IN\n•\nMain Kitchen\n02:03\n1/1 of the order ready\n1×\nQA Pizza 01\nCaptain: QA Captain\n#4j7y7\nUNDO\nSERVED",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "All stations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false
+    },
+    {
+      "text": "ACTIVE\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "COOKING\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "READY\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SERVED\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EXPO (PASS)\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1×\nQA Pizza 01",
+      "aria": "1 QA Pizza 01: ready, tap to undo",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "UNDO",
+      "aria": null,
+      "title": "Marked ready by mistake? Put it back to cooking",
+      "disabled": false
+    },
+    {
+      "text": "SERVED",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

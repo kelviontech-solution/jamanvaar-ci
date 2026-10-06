@@ -1,0 +1,18 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "You're Connected!\n\nThis POS Terminal is now activated and linked to your restaurant.\n\n1\nSign in with your 4-digit staff PIN.\n2\nTap a dish to add it — Customize opens options for dishes that have them.\n3\nSend KOT fires the ticket to the kitchen; Instant Bill skips that for quick takeaway sales.\nContinue",
+  "headings": [
+    "You're Connected!"
+  ],
+  "buttons": [
+    {
+      "text": "Continue",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

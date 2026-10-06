@@ -1,0 +1,283 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n77\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n36\nBills & Invoices\nKitchen & KOT\n35\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\n77\nHeld Carts\n1\nCore: Offline First\nShift & Cash Management\n\nManage cashier shifts, cash drawer movements, float reconciliation and settlements.\n\n+ Open New Shift\nNo Active Cashier Shift\n\nOpen a new shift with a starting drawer float to begin accepting counter billing and tracking cash reconciliation.\n\nOpen Cashier Shift Now\nHistorical Shift Archives\n\nPermanent cashier shift records, actual counts, and variance audits.\n\nAll Shifts\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nNo Data Found\n\nNo historical shifts found for the selected filter.\n\nStart New Cashier Shift\nPOS Terminal: POS-01\nAssigned Cashier:\nQA Cashier\nOpening Date & Time:\n6/10/2026, 8:26:16 am\nOpening Cash Float in Drawer (₹):\n₹100\n₹500\n₹1000\n₹2000\n₹5000\n₹10000\nOpening Note (Optional):\nCancel\nStart Shift\nToday Sales:\n₹14519\nOrders:\n46\nAOV:\n₹316\nTables:\n0% (0/1)\nPending KOT:\n35\nLocal Engine Active",
+  "headings": [
+    "Shift & Cash Management",
+    "No Active Cashier Shift",
+    "Historical Shift Archives",
+    "No Data Found",
+    "Start New Cashier Shift"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n77",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n36",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n77",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "+ Open New Shift",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Open Cashier Shift Now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Shifts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹100",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹500",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹1000",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹2000",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹5000",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹10000",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Start Shift",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹14519",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n46",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n35",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "e.g. Starting drawer for morning shift",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-10-06T02:53:53.872Z",
+  "environment": "local actual API and PostgreSQL, cloud sync only, no LAN core",
+  "posToBackendAckMs": 1620.63,
+  "orderId": "ord-1791255233913-plj6vg30",
+  "orderNumber": "QAA-20261006-177",
+  "token": "178",
+  "posToKdsVisibleMs": 1667.44,
+  "kdsReadyToBackendAckMs": 132.77,
+  "kdsReadyToPosVisibleMs": 450.44,
+  "cashToBackendMs": 4182.49
+}

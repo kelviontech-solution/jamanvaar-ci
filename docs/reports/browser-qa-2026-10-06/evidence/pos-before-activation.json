@@ -1,0 +1,34 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "Local Core: Connected\nNetwork: Online\nTue, 6 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nRESTAURANT OPERATIONS PLATFORM\n\nPOS TERMINAL\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Smart Billing. Better Dining.",
+    "POS Counter",
+    "Activate This Terminal"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Activate Terminal",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "[ACTIVATION KEY REDACTED]",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,260 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\n1\nLive Orders\n1\nBills & Invoices\nKitchen & KOT\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\nCore: Offline First\nLive Restaurant Orders\nSession Active\n\nShowing real-time orders for current business session: 6 October 2026 (BD-20261006)\n\nActive Session (1)\nAll History (1)\nAll Sources\n🟠 QR Table\n🖥️ Counter POS\n📱 Self-Order Kiosk\n🧑‍🍳 Floor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#QAA-20261006-201\nToken #101\nDINE_IN\n🧑‍🍳 Captain (T-QA01)\n07:48\n•\n1 items\n₹314\nREADY\nSettle Cash\n\nSelect an order from the list to view full itemized breakdown and print receipt.\n\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n0\nLocal Engine Active",
+  "headings": [
+    "Live Restaurant Orders"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Active Session (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All History (1)",
+      "aria": null,
+      "title": "View complete historical orders across all past days",
+      "disabled": false
+    },
+    {
+      "text": "All Sources",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🟠 QR Table",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🖥️ Counter POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "📱 Self-Order Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🧑‍🍳 Floor Captain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "New",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Confirmed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Preparing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Ready",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Served",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Completed",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settle Cash",
+      "aria": null,
+      "title": "Collect cash & print thermal receipt",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search order #, token, table, customer...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

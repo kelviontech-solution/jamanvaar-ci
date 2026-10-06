@@ -1,0 +1,53 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "Cloud API: Connected (Port 4000)\nNetwork: Online\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nPort 4000 • Live Cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "Platform Control. Unified Cloud Engine.",
+    "JAMANVAAR"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Show Password",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CONTINUE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "email",
+      "placeholder": "e.g. superadmin@jamanvaar.app",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "placeholder": "Enter your password",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

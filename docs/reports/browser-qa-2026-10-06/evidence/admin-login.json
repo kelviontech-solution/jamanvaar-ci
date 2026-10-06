@@ -1,0 +1,65 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "Local Core: Connected\nNetwork: Online\nTue, 6 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nCentralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nRESTAURANT ADMIN\nJAMANVAAR\n\nRestaurant Operations SaaS\n\nRestaurant ID *\n\nFind it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button).\n\nOwner Password *\nShow Password\nRemember this device\nForgot password?\nSIGN IN TO ADMIN\nFirst time? Activate account\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nRESTAURANT OPERATIONS PLATFORM\n\nRESTAURANT ADMIN\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Restaurant Control. Live Intelligence.",
+    "JAMANVAAR"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false
+    },
+    {
+      "text": "Show Password",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Forgot password?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SIGN IN TO ADMIN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "First time? Activate account",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "e.g. JM9876543210",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "placeholder": "Enter owner password",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

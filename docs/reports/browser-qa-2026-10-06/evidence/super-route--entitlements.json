@@ -1,0 +1,309 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nSaaS Feature Entitlements & Matrix\n\nCentral comparison matrix dynamically calculated from database Plan.entitlements. Plan allotments govern customer terminal access authoritatively.\n\nActive Plans Only\nAll Plans (Including Inactive)\nManage Plans →\nAll Modules\n1. POS & Fast Billing\n2. Payments & Cash Drawer\n3. Table & Floor Management\n4. Kitchen, KOT & KDS\n5. Menu & Inventory Management\n6. Reports, GST & Administration\n7. Connected Restaurant Ecosystem\nSOFTWARE MODULE & CAPABILITY\n\t\nCORE\nJAMANVAAR CORE\n₹420/MO\n252 CAPABILITIES ACTIVE\n\t\nPRO\nJAMANVAAR PRO\n₹580/MO\n364 CAPABILITIES ACTIVE\n\t\nQR\nJAMANVAAR QR\n₹750/MO\n364 CAPABILITIES ACTIVE\n\t\nCORE\nKIOSK STANDARD\n₹750/MO\n28 CAPABILITIES ACTIVE\n\t\nPRO\nKIOSK PRO\n₹920/MO\n28 CAPABILITIES ACTIVE\n\n\n📦\n1. POS & Fast Billing\n28 Capabilities\n\n\n•\nPOS Terminal\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nDine-in / Takeaway / Delivery / Token\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n2. Payments & Cash Drawer\n19 Capabilities\n\n\n•\nMulti-Payment Tenders\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nShift & Cash Drawer\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n3. Table & Floor Management\n20 Capabilities\n\n\n•\nTable Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n4. Kitchen, KOT & KDS\n45 Capabilities\n\n\n•\nKOT / KDS Routing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n5. Menu & Inventory Management\n21 Capabilities\n\n\n•\nMenu Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nFood Customization\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nInventory Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n6. Reports, GST & Administration\n76 Capabilities\n\n\n•\nSales & GST Reports\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nDiscounts & GST\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nOffline Billing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nReceipt Printing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nCustomer Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nRestaurant Admin\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n⭐\n7. Connected Restaurant Ecosystem\nPRO EXCLUSIVE\n155 Capabilities\n\n\n•\nCaptain App\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nAdvanced Captain Reports\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nAdvanced Service Workflow\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nQR Table Ordering & Standees\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nPOS Assistant (JAMAN AI)\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nSelf-Order Kiosk & Kiosk Admin\n\t—\t✓ Included\t✓ Included\t✓ Included\t✓ Included\n\n🔌\nConnected Applications\n\n\n•\nPOS\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nKitchen Display (KDS)\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nCaptain App\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nQR Table Ordering\n\t—\t—\t✓ Included\t—\t—\n\n•\nWhatsApp Ordering\n\t—\t—\t—\t—\t—\n\n•\nSelf-Ordering Kiosk\n\t—\t—\t—\t✓ Included\t✓ Included\n\n•\nKiosk Admin\n\t—\t—\t—\t✓ Included\t✓ Included\n\n•\nRestaurant Admin\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\nKELVIONTECH ENTERPRISE\nCloud Control Active\nENTERPRISE MULTI-TENANT CLOUD CONTROL\nv2.0 • POWERED BY KELVIONTECH\n\nJAMANVAAR CLOUD PLATFORM CONTROL\n\nSUPER ADMIN\nCore Engine Ready\n•\nCloud Database Connected\n•\nMulti-Tenant Active",
+  "headings": [
+    "SaaS Feature Entitlements & Matrix"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "All Modules",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1. POS & Fast Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "2. Payments & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "3. Table & Floor Management",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "4. Kitchen, KOT & KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "5. Menu & Inventory Management",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "6. Reports, GST & Administration",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7. Connected Restaurant Ecosystem",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ACTIVE_ONLY",
+          "text": "Active Plans Only"
+        },
+        {
+          "value": "ALL",
+          "text": "All Plans (Including Inactive)"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search feature or module (e.g. QR, KOT, Captain)…",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    },
+    {
+      "text": "Manage Plans →",
+      "href": "/plans"
+    },
+    {
+      "text": "JAMANVAAR CORE",
+      "href": "/plans/seed-plan-core"
+    },
+    {
+      "text": "JAMANVAAR PRO",
+      "href": "/plans/seed-plan-pro"
+    },
+    {
+      "text": "JAMANVAAR QR",
+      "href": "/plans/seed-plan-qr"
+    },
+    {
+      "text": "KIOSK STANDARD",
+      "href": "/plans/seed-plan-kiosk-standard"
+    },
+    {
+      "text": "KIOSK PRO",
+      "href": "/plans/seed-plan-kiosk-pro"
+    }
+  ],
+  "overflow": false
+}

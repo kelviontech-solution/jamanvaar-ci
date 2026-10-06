@@ -1,0 +1,274 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\n\nACCOUNTING BUSINESS DAY\n\n6 October 2026\n\nBD-20261006\n🟢 OPEN\nOpened At:\n07:44 am\nBilled (incl. GST):\n₹1510\nOrders:\n3 completed / 5 total\nActive Tables:\n0 occupied\nView Day History & Reports\nShift Closed — Open New Shift\nCash In / Out (Float Adjustment)\nClose Business Day (EOD)\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n2\nBills & Invoices\nKitchen & KOT\n2\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\nCore: Offline First\nKitchen Inventory & Availability\n\nControl which dishes are available for billing and kitchen preparation.\n\nTOTAL DISHES\n2\nAVAILABLE\n2\nUNAVAILABLE\n0\nLOW STOCK\n0\nAll\n2\nAvailable\n2\nUnavailable\n0\nLow Stock\n0\nOut of Stock\n0\nStation:\nAll Kitchen Stations\nMain Kitchen\n\tDISH / SKU\tKITCHEN STATION\tPRICE\tAVAILABILITY\tSTOCK\tACTION\n\t\nQA Pizza 01\nSKU: QA-PIZZA-01\n\tMain Kitchen\t₹299\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nQA GST18 Pizza\nSKU: QA-TAX-18\n\tMain Kitchen\t₹100\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\nToday Sales:\n₹912\nOrders:\n3\nAOV:\n₹304\nTables:\n0% (0/1)\nPending KOT:\n2\nLocal Engine Active",
+  "headings": [
+    "Kitchen Inventory & Availability"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "View Day History & Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift Closed — Open New Shift",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Cash In / Out (Float Adjustment)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Close Business Day (EOD)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "All\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Available\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Unavailable\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Low Stock\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Out of Stock\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set QA Pizza 01 as unavailable for billing",
+      "disabled": false
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set QA GST18 Pizza as unavailable for billing",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹912",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n3",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search by dish name, SKU, or station...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All Kitchen Stations"
+        },
+        {
+          "value": "Main Kitchen",
+          "text": "Main Kitchen"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

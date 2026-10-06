@@ -1,0 +1,321 @@
+{
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "text": "POS TERMINAL\nQA-Restaurant-A-1791252294734\n\nQA-Restaurant-A-1791252294734\n•\nPOS-01\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n75\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nQ\nQA Cashier\nCASHIER\nBilling / Menu\nFloor & Tables\nLive Orders\n35\nBills & Invoices\nKitchen & KOT\n33\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nPrint Queue\n75\nHeld Carts\n1\nCore: Offline First\nPOS System & License Settings\n\nConfigure hardware stations, thermal receipt print queues, and restaurant subscription licenses.\n\nHardware & Printers\nReports & Design\n⚡ Instant Bill\nLocal DB & Sync\nSubscription & License\nConnection & Diagnostics\nONLINE ● Connected\nConnected to the cloud. Everything is up to date.\nSync now\nBranch Core (restaurant server)\n\nThe always-on machine that lets every device work together without internet. Enter its address, e.g. 192.168.1.10. Leave empty to use the cloud only.\n\nConnect\nConnection\nCloud\nInternet verified\nYes\nWaiting to send\n0\nCould not send\n0\nOrders on this device\n80\nLocal storage\nHealthy\nApp version\n1.0.0\nStart this device fresh\n\nRemoves the staff list, orders and other data stored on this device and downloads this restaurant's own data again. Use it if you see staff, orders or items that are not yours. Orders not yet sent are set aside, not deleted.\n\nClear and re-download\nScreen size\n100%\n\nMakes everything on this screen bigger or smaller. Your restaurant default is 100% (set in Restaurant Admin). This terminal is using it.\n\n70%\n150%\nUse the restaurant default\nReset to 100%\nSound Effects\nAUDIO FEEDBACK\nEnable Sound Feedback\nClick, add, remove, payment, KOT, and notification sounds\nVolume Level\n🔈 Low\n🔉 Medium\n🔊 High\nPlay Test Sound\nPrinting & Automation Rules\nAUTO-PRINT\nAuto-Print Receipt on Settlement\nAutomatically queue thermal receipt upon successful payment\nAuto-Print KOT on Order Dispatch\nSend kitchen tickets to station printers automatically\nDefault Paper Width\nStandard counter roll dimension\n80mm\n58mm\nFind printers\nLooks for USB / Windows printers, network printers and serial ports\nScan\nPrinters & Hardware Devices\nAuto-detected Windows, USB & LAN Thermal Printers\nScan for Printers\nPrint Queue\nToday Sales:\n₹14205\nOrders:\n45\nAOV:\n₹316\nTables:\n0% (0/1)\nPending KOT:\n33\nLocal Engine Active",
+  "headings": [
+    "POS System & License Settings",
+    "Connection & Diagnostics",
+    "Screen size",
+    "Sound Effects",
+    "Printing & Automation Rules",
+    "Find printers",
+    "Printers & Hardware Devices"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printer Offline\n75",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false
+    },
+    {
+      "text": "Q\nQA Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen & KOT\n33",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue\n75",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false
+    },
+    {
+      "text": "Hardware & Printers",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Design",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "⚡ Instant Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Local DB & Sync",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription & License",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Connect",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clear and re-download",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Use the restaurant default",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Reset to 100%",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🔈 Low",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🔉 Medium",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🔊 High",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Play Test Sound",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "80mm",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "58mm",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Scan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Scan for Printers",
+      "aria": null,
+      "title": "Scan for connected physical & network printers",
+      "disabled": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today Sales:\n₹14205",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false
+    },
+    {
+      "text": "Orders:\n45",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false
+    },
+    {
+      "text": "Pending KOT:\n33",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "192.168.1.10:5178",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}
