@@ -26,7 +26,7 @@
     "dev:qr-guest": "npm run dev --workspace=@jamanvaar/qr-guest",
     "build:qr-guest": "npm run build --workspace=@jamanvaar/qr-guest",
     "dev": "concurrently \"npm run dev:sync\" \"npm run dev:kiosk\" \"npm run dev:pos\" \"npm run dev:pos-admin\" \"npm run dev:captain\" \"npm run dev:kds\"",
-    "dev:all": "concurrently -n \"API,SUPER,POS-ADM,POS,CAPT,KDS,KIOSK,SYNC\" -c \"blue,magenta,cyan,green,yellow,red,blueBright,gray\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\" \"npm run dev:pos-admin\" \"npm run dev:pos\" \"npm run dev:captain\" \"npm run dev:kds\" \"npm run dev:kiosk\" \"npm run dev:sync\"",
+    "dev:all": "concurrently -n \"API,SUPER,POS-ADM,POS,CAPT,KDS,KIOSK,SYNC,QR\" -c \"blue,magenta,cyan,green,yellow,red,blueBright,gray,cyanBright\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\" \"npm run dev:pos-admin\" \"npm run dev:pos\" \"npm run dev:captain\" \"npm run dev:kds\" \"npm run dev:kiosk\" \"npm run dev:sync\" \"npm run dev:qr-guest\"",
     "stop": "node tooling/dev/stop_servers.cjs",
     "validate:menu": "node tooling/dev/validate_menu_assets.mjs",
     "validate:menu-assets": "node tooling/dev/validate_menu_assets.mjs",

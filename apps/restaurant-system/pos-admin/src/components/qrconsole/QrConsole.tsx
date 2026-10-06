@@ -316,7 +316,7 @@ function Orders() {
               <td className="p-3 font-bold">{o.orderNumber ?? '-'}</td>
               <td>{o.table ?? '-'}</td>
               <td>{STATUS_WORDS[o.status] ?? o.status}</td>
-              <td>{o.paymentStatus === 'SUCCESS' ? 'Paid' : 'Pay at counter'}</td>
+              <td>{o.paymentStatus === 'SUCCESS' ? 'Paid' : o.paymentMethod === 'ONLINE' ? 'Online payment pending' : 'Pay at counter'}</td>
               <td className="text-right">{inr(o.total)}</td>
               <td className="p-3 text-right text-slate-500">{new Date(o.placedAt).toLocaleString('en-IN')}</td>
             </tr>
@@ -334,7 +334,7 @@ const SETTING_ROWS: Array<[keyof QrSettings, string, string, boolean?]> = [
   ['allowCustomerNotes', 'Customer notes', 'Let guests add notes to their order.'],
   ['allowModifiers', 'Customisations', 'Let guests choose add-ons and options.'],
   ['allowCash', 'Pay at counter', 'Guests pay at the counter when they are done.'],
-  ['allowOnlinePayment', 'Online payment', 'Not available yet: guests pay at the counter.', true],
+  ['allowOnlinePayment', 'Online payment', 'Razorpay mobile checkout. Available to guests once payment collection is active.'],
   ['showOrderStatus', 'Show order status', 'Guests can follow Received, Preparing, Ready.'],
   ['autoAccept', 'Send straight to the kitchen', 'When off, the counter accepts each order first.'],
   ['requireCustomerName', 'Ask for name', 'Guests must enter their name.'],

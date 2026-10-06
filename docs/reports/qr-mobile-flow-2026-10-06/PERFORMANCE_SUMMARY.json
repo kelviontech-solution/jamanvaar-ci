@@ -1,0 +1,14 @@
+{
+  "browserChecks": 18,
+  "browserPassed": 18,
+  "uncaughtErrors": [],
+  "successfulPublicApiRequests": 27,
+  "localPublicApiMs": {
+    "p50": 32.94,
+    "p95": 71.39,
+    "max": 80.37
+  },
+  "paymentToKdsMs": 311.93,
+  "simulation": "Only provider HTTP is simulated; real compiled guest/POS/KDS, database, auth, HMAC and order synchronization",
+  "physicalPhones": false
+}

@@ -36,9 +36,11 @@ export function syncMenuCatalog(opts: { push?: boolean } = {}): Promise<void> {
 const SELF_HEALING_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'COMBO', 'COUPON']);
 
 export async function syncCollection<T extends { updatedAt?: string }>(entityType: string, sync: CollectionSync<T>, push: boolean): Promise<void> {
-  sync.stampChanges();
+  const readOnlyCatalog = !push && ['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP'].includes(entityType);
+  if (!readOnlyCatalog) sync.stampChanges();
+  EntitySyncEngine.ensureCatalogIntegrity(entityType, id => sync.hasRecord(id));
   if (SELF_HEALING_TYPES.has(entityType) && sync.isEmpty()) EntitySyncEngine.restartFromBeginning(entityType);
-  await EntitySyncEngine.catchUp(entityType, (remote) => sync.applyRemote(remote.payload));
+  await EntitySyncEngine.catchUp(entityType, (remote) => sync.applyRemote(remote.payload, { authoritative: readOnlyCatalog }));
   if (!push) return;
   const records = sync.collectSyncRecords();
   for (let i = 0; i < records.length; i += PUSH_BATCH) {

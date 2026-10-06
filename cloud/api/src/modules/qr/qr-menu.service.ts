@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -7,6 +7,7 @@ import { publicImageUrl, viewForBranch } from '../menu-publications/menu-snapsho
 import type { MenuSnapshotItemLookup, ModifierGroupSnapshot } from '../payments/pricing.util';
 
 export interface QrMenuCategory {
+  translations?: Record<string, {name: string; description?: string}>;
   id: string;
   name: string;
   description?: string;
@@ -14,6 +15,7 @@ export interface QrMenuCategory {
   sortOrder: number;
 }
 export interface QrMenuItem {
+  translations?: Record<string, {name: string; description?: string}>;
   id: string;
   name: string;
   description?: string;
@@ -70,28 +72,33 @@ export class QrMenuService {
     return Number.isFinite(v) && v >= 0 ? v : 5_000;
   }
 
-  private async liveUnavailable(restaurantId: string): Promise<Set<string>> {
-    const hit = this.liveOff.get(restaurantId);
-    if (hit && Date.now() - hit.at < this.liveTtlMs()) return hit.ids;
+  private async liveUnavailable(restaurantId: string, branchId: string | null, fresh = false): Promise<Set<string>> {
+    const key = `${restaurantId}:${branchId ?? ''}`;
+    const hit = this.liveOff.get(key);
+    if (!fresh && hit && Date.now() - hit.at < this.liveTtlMs()) return hit.ids;
     try {
       const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
-        tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'MENU_ITEM', payload: { path: ['isAvailable'], equals: false } }, select: { externalId: true } })
+        tx.syncedEntity.findMany({ where: { restaurantId, entityType: { in: ['MENU_ITEM', 'MENU_CATEGORY'] } }, select: { externalId: true, entityType: true, payload: true } })
       );
-      const ids = new Set(rows.map((r) => r.externalId));
-      this.liveOff.set(restaurantId, { at: Date.now(), ids });
+      const hiddenCategories = new Set(rows.filter(row => row.entityType==='MENU_CATEGORY' && ((row.payload as any)?.deleted || (row.payload as any)?.isActive===false || (row.payload as any)?.qrVisible===false)).map(row=>row.externalId));
+      const ids = new Set(rows.filter(row=>{
+        if(row.entityType!=='MENU_ITEM')return false;
+        const p=row.payload as Record<string,any>;
+        return p.deleted===true || !!p.archivedAt || p.isAvailable===false || p.isQrOrderingEnabled===false || hiddenCategories.has(p.categoryId) || (Array.isArray(p.salesChannels)&&!p.salesChannels.includes('QR')) || (p.branchIds?.length && !p.branchIds.includes(branchId));
+      }).map(r=>r.externalId));
+      this.liveOff.set(key, { at: Date.now(), ids });
       if (this.liveOff.size > 1000) this.liveOff.delete(this.liveOff.keys().next().value as string);
       return ids;
     } catch (err) {
-      // A failed look-up must never stop ordering: show the published menu, the counter still refuses what it cannot make.
       this.log.warn(`live availability unavailable for ${restaurantId}: ${(err as Error).message}`);
-      return hit?.ids ?? new Set();
+      throw new ServiceUnavailableException('The restaurant menu could not be checked. Please try again.');
     }
   }
 
   /** The published menu minus anything switched off since. Guests and channels never offer a dish the counter has run out of. */
-  private async withLiveAvailability(restaurantId: string, menu: BuiltQrMenu): Promise<BuiltQrMenu> {
+  private async withLiveAvailability(restaurantId: string, menu: BuiltQrMenu, branchId: string | null, fresh = false): Promise<BuiltQrMenu> {
     if (!menu.ready) return menu;
-    const off = await this.liveUnavailable(restaurantId);
+    const off = await this.liveUnavailable(restaurantId, branchId, fresh);
     if (off.size === 0 || !menu.items.some((i) => off.has(i.id))) return menu;
     const lookup = new Map(menu.lookup);
     for (const id of off) {
@@ -106,8 +113,8 @@ export class QrMenuService {
   private readonly built = new Map<string, BuiltQrMenu>();
 
   /** The menu of the newest published version, or of `version` when a guest's older page is being checked. */
-  async build(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
-    return this.withLiveAvailability(restaurantId, await this.buildFromSnapshot(restaurantId, branchId, version));
+  async build(restaurantId: string, branchId: string | null, version?: number, fresh = false): Promise<BuiltQrMenu> {
+    return this.withLiveAvailability(restaurantId, await this.buildFromSnapshot(restaurantId, branchId, version), branchId, fresh);
   }
 
   private async buildFromSnapshot(restaurantId: string, branchId: string | null, version?: number): Promise<BuiltQrMenu> {
@@ -144,7 +151,7 @@ export class QrMenuService {
         isAvailable: true, modifierGroups: groups, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       });
       return {
-        id: i.id, name: i.name, description: i.description, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: publicImageUrl(i.imageUrl), dietaryType: i.dietaryType,
+        id: i.id, name: i.name, description: i.description, translations: i.translations, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: publicImageUrl(i.imageUrl), dietaryType: i.dietaryType,
         modifierGroupIds: groups.map((g) => g.id), sortOrder: i.sortOrder, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       };
     });
@@ -156,7 +163,7 @@ export class QrMenuService {
         id: g.id, name: g.name, description: g.description, isRequired: g.isRequired, minSelections: g.minSelections, maxSelections: g.maxSelections,
         options: g.options.map((o) => ({ id: o.id, name: o.name, description: o.description, imageUrl: publicImageUrl(o.imageUrl), priceDelta: o.priceDelta / 100, isDefault: o.isDefault }))
       }));
-    const categories: QrMenuCategory[] = view.categories.map((c) => ({ id: c.id, name: c.name, description: c.description, imageUrl: publicImageUrl(c.imageUrl), sortOrder: c.sortOrder }));
+    const categories: QrMenuCategory[] = view.categories.map((c) => ({ id: c.id, name: c.name, description: c.description, translations: c.translations, imageUrl: publicImageUrl(c.imageUrl), sortOrder: c.sortOrder }));
 
     const body = { menuVersion: snap.version, categories, items, modifierGroups };
     const etag = createHash('sha1').update(`${snap.checksum}:${branchId ?? ''}`).digest('hex').slice(0, 16);

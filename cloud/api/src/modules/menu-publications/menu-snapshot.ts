@@ -12,8 +12,17 @@ const num = (v: unknown, d = 0): number => (typeof v === 'number' && Number.isFi
 
 export interface SnapOption { id: string; name: string; description?: string; imageUrl?: string; priceDelta: number; isDefault: boolean; displayOrder: number }
 export interface SnapGroup { id: string; name: string; description?: string; isRequired: boolean; minSelections: number; maxSelections: number; displayOrder: number; options: SnapOption[] }
-export interface SnapCategory { id: string; name: string; description?: string; imageUrl?: string; sortOrder: number; qrVisible: boolean }
+export type MenuTranslations = Record<string, { name: string; description?: string }>;
+const translations = (value: unknown): MenuTranslations | undefined => {
+  if (!isObj(value)) return undefined;
+  const result: MenuTranslations = {};
+  for (const lang of ['en', 'hi', 'gu']) { const v = value[lang]; if (isObj(v) && str(v.name)) result[lang] = { name: String(v.name), ...(str(v.description) ? { description: String(v.description) } : {}) }; }
+  return Object.keys(result).length ? result : undefined;
+};
+
+export interface SnapCategory { translations?: MenuTranslations; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number; qrVisible: boolean }
 export interface SnapItem {
+  translations?: MenuTranslations;
   id: string; name: string; description?: string; categoryId: string; pricePaise: number; imageUrl?: string; dietaryType?: string; sortOrder: number;
   available: boolean; salesChannels: string[] | null; qrEnabled: boolean; branchIds: string[]; taxGroupId?: string; modifierGroupIds: string[];
   kitchenStation?: string; minQuantity: number; maxQuantity: number; allowInstructions: boolean;
@@ -48,7 +57,7 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
 
   const categories: SnapCategory[] = live(rows, 'MENU_CATEGORY')
     .filter((c) => str(c.id) && c.isActive !== false)
-    .map((c) => ({ id: String(c.id), name: String(c.name ?? ''), description: str(c.description), imageUrl: str(c.imageUrl), sortOrder: num(c.sortOrder), qrVisible: c.qrVisible !== false }));
+    .map((c) => ({ id: String(c.id), name: String(c.name ?? ''), description: str(c.description), imageUrl: str(c.imageUrl), sortOrder: num(c.sortOrder), qrVisible: c.qrVisible !== false, translations: translations(c.translations) }));
   const categoryIds = new Set(categories.map((c) => c.id));
 
   const groups: SnapGroup[] = [];
@@ -87,7 +96,7 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
     const minQ = Math.max(1, Math.floor(num(p.minQuantity, 1)));
     const maxQ = Math.min(50, Math.max(minQ, Math.floor(num(p.maxQuantity, 50))));
     items.push({
-      id, name, description: str(p.description), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType),
+      id, name, description: str(p.description), translations: translations(p.translations), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType),
       sortOrder: num(p.sortOrder), available: p.isAvailable !== false, salesChannels: Array.isArray(p.salesChannels) ? (p.salesChannels as unknown[]).filter((c): c is string => typeof c === 'string') : null,
       qrEnabled: p.isQrOrderingEnabled !== false, branchIds: Array.isArray(p.branchIds) ? (p.branchIds as unknown[]).filter((b): b is string => typeof b === 'string') : [],
       taxGroupId, modifierGroupIds: Array.isArray(p.modifierGroupIds) ? (p.modifierGroupIds as unknown[]).filter((g): g is string => typeof g === 'string') : [],

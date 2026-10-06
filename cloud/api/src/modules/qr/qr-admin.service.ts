@@ -300,7 +300,7 @@ export class QrAdminService {
     );
     return rows.map((o) => {
       const meta = (o.meta ?? {}) as Record<string, unknown>;
-      return { orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0 };
+      return { orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0 };
     });
   }
 

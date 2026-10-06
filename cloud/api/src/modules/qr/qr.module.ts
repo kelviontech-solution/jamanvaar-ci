@@ -19,13 +19,14 @@ import { QrSessions } from './qr-session';
 import { QrAdmission } from './qr-resilience';
 import { QrResolutionCache } from './qr-resolution-cache';
 import { QrRateLimiter, QrRateLimitInterceptor } from './qr-rate-limit';
+import { PaymentsModule } from '../payments/payments.module';
 
 /**
  * QR ordering: one more channel into the platform's single order pipeline. It owns QR codes, QR settings and QR
  * analytics events. It owns no order table, no menu, no sync protocol and no entitlement logic of its own.
  */
 @Module({
-  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule],
+  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule],
   controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController],
   providers: [QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]

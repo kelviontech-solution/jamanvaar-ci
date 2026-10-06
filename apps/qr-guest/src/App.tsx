@@ -29,19 +29,26 @@ function tokenFromPath(): string | null {
 let sessionId = '';
 // The menu version this guest is looking at; sent with the order so a menu published meanwhile is never charged silently.
 let seenMenuVersion: number | undefined;
+let sessionRequest: Promise<string> | null = null;
 async function ensureSession(): Promise<string> {
   if (sessionId) return sessionId;
-  try { sessionId = sessionStorage.getItem('jv_qr_session2') ?? ''; } catch { /* storage unavailable */ }
-  if (!sessionId) {
-    try {
+  if (sessionRequest) return sessionRequest;
+  sessionRequest = (async () => {
+    try { sessionId = sessionStorage.getItem('jv_qr_session2') ?? ''; } catch { /* storage unavailable */ }
+    if (!sessionId) {
       sessionId = (await QrApi.session()).session;
       try { sessionStorage.setItem('jv_qr_session2', sessionId); } catch { /* storage unavailable */ }
-    } catch { sessionId = ''; }
-  }
-  return sessionId;
+    }
+    return sessionId;
+  })().finally(() => { sessionRequest = null; });
+  return sessionRequest;
 }
 
 type Screen = 'MENU' | 'CART' | 'CHECKOUT' | 'STATUS';
+const currentScreen = (): Screen => ({'#menu':'MENU','#cart':'CART','#checkout':'CHECKOUT','#status':'STATUS'} as Record<string,Screen>)[location.hash] ?? 'MENU';
+const paymentUrl = (url: string | null | undefined) => {
+  try { const value=new URL(url ?? ''); return value.protocol==='https:' && (value.hostname==='rzp.io' || value.hostname==='razorpay.com' || value.hostname.endsWith('.razorpay.com')) ? value.href : null; } catch { return null; }
+};
 
 export default function App() {
   const token = tokenFromPath();
@@ -63,9 +70,13 @@ function Ordering({ token }: { token: string }) {
   const [info, setInfo] = useState<Describe | null>(null);
   const [menu, setMenu] = useState<Menu | null>(null);
   const [problem, setProblem] = useState<{ title: string; text: string; retry: boolean } | null>(null);
-  const [screen, setScreen] = useState<Screen>('MENU');
+  const [screen, setScreen] = useState<Screen>(currentScreen);
+  const navigate = (target: Screen) => { const url=new URL(location.href); if(target!=='STATUS')url.searchParams.delete('order');url.hash=target.toLowerCase();history.pushState({},'',url);setScreen(target); };
+  useEffect(()=>{const restore=()=>setScreen(currentScreen());window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore);},[]);
   const [cart, setCart] = useState<Cart>(() => parseCart(store.get(`jv_qr_cart:${token}`)));
   const [placed, setPlaced] = useState<Placed | null>(null);
+  const [restoreError,setRestoreError]=useState<string|null>(null);
+  const [restoreAttempt,setRestoreAttempt]=useState(0);
   const etag = useRef<string | null>(null);
 
   const load = useCallback(async () => {
@@ -80,7 +91,7 @@ function Ordering({ token }: { token: string }) {
       setMenu(m.menu);
     } catch (e) {
       const err = e as ApiError;
-      const network = err.code === 'NETWORK';
+      const network = err.code === 'NETWORK' || err.status >= 500;
       setProblem(
         network
           ? { title: 'No connection', text: err.message, retry: true }
@@ -95,22 +106,39 @@ function Ordering({ token }: { token: string }) {
 
   // A refresh must not lose the order that was already placed, and must not place it again.
   useEffect(() => {
-    const last = store.get(`jv_qr_last:${token}`);
-    if (last) QrApi.status(last).then((p) => { setPlaced(p); if (p.status !== 'COMPLETED' && p.status !== 'CANCELLED') setScreen('STATUS'); }).catch(() => store.del(`jv_qr_last:${token}`));
-  }, [token]);
+    const returned = new URLSearchParams(location.search).get('order');
+    const last = returned || store.get(`jv_qr_last:${token}`);
+    let active = true;
+    if (last) QrApi.status(last).then((p) => { if(!active)return;setPlaced(p);setRestoreError(null);store.set(`jv_qr_last:${token}`,p.publicOrderId);if (returned || location.hash==='#status' || (p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !location.hash)) setScreen('STATUS'); })
+      .catch((error:ApiError) => { if(!active)return;if(error.status===404)store.del(`jv_qr_last:${token}`);setRestoreError(error.message); });
+    return()=>{active=false;};
+  }, [token,restoreAttempt]);
 
   // Keep the menu current while the guest browses: a changed price or a sold-out dish appears without a reload.
   useEffect(() => {
     if (screen === 'STATUS') return;
-    const t = setInterval(() => {
-      QrApi.menu(token, sessionId, etag.current).then((m) => { if (m.menu) { etag.current = m.etag; seenMenuVersion = m.menu.menuVersion; setMenu(m.menu); } }).catch(() => undefined);
-    }, 60000);
-    return () => clearInterval(t);
+    let active=true, running=false;
+    const refresh=async()=>{
+      if(running||document.hidden)return;
+      running=true;
+      try {
+        const [m,d]=await Promise.all([QrApi.menu(token,sessionId,etag.current),QrApi.describe(token,sessionId)]);
+        if(!active)return;
+        setInfo(d);
+        if(m.menu){etag.current=m.etag;seenMenuVersion=m.menu.menuVersion;setMenu(m.menu);}
+      } catch { /* Existing menu remains visible; checkout always checks current server availability. */ }
+      finally {running=false;}
+    };
+    const t=setInterval(()=>void refresh(),60000);
+    const onFocus=()=>void refresh();
+    window.addEventListener('focus',onFocus);document.addEventListener('visibilitychange',onFocus);
+    return()=>{active=false;clearInterval(t);window.removeEventListener('focus',onFocus);document.removeEventListener('visibilitychange',onFocus);};
   }, [token, screen]);
 
   useEffect(() => { store.set(`jv_qr_cart:${token}`, JSON.stringify(cart)); }, [cart, token]);
 
-  if (problem) return <Message title={problem.title} text={problem.text} action={problem.retry ? { label: 'Try again', run: () => void load() } : undefined} />;
+  if (problem && placed && screen === 'STATUS') return <StatusScreen placed={placed} setPlaced={setPlaced} showStatus onMore={()=>void load().then(()=>navigate('MENU'))} />;
+  if (problem) return <Message title={problem.title} text={problem.text} action={problem.retry ? { label: 'Try again', run: () => { setRestoreAttempt(a=>a+1);void load(); } } : undefined} />;
   if (!info || !menu) return <main className="center"><p className="muted">Loading the menu…</p></main>;
 
   const gone = unavailableLines(cart, new Set(menu.items.map((i) => i.id)));
@@ -127,13 +155,14 @@ function Ordering({ token }: { token: string }) {
       </header>
       {info.branding?.welcomeMessage && screen === 'MENU' && <p className="muted pad">{info.branding.welcomeMessage}</p>}
 
-      {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => setScreen('CART')} placed={placed} onStatus={() => setScreen('STATUS')} />}
-      {screen === 'CART' && <CartScreen token={token} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => setScreen('MENU')} onNext={() => setScreen('CHECKOUT')} />}
+      {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} />}
+      {screen === 'CART' && <CartScreen token={token} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => navigate('MENU')} onNext={() => navigate('CHECKOUT')} />}
       {screen === 'CHECKOUT' && (
-        <Checkout token={token} info={info} cart={cart} setCart={setCart} onBack={() => setScreen('CART')}
-          onPlaced={(p) => { store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart()); setScreen('STATUS'); }} />
+        <Checkout token={token} info={info} cart={cart} setCart={setCart} onBack={() => navigate('CART')}
+          onPlaced={(p) => { store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart()); navigate('STATUS'); const url=paymentUrl(p.payment?.url);if(url)location.assign(url); }} />
       )}
-      {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => setScreen('MENU')} />}
+      {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
+      {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError||"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
       {info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
     </div>
   );
@@ -143,10 +172,15 @@ function Ordering({ token }: { token: string }) {
 
 function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { info: Describe; menu: Menu; cart: Cart; setCart: (c: Cart) => void; onCart: () => void; placed: Placed | null; onStatus: () => void }) {
   const [query, setQuery] = useState('');
+  const [language, setLanguage] = useState(() => store.get('jv_qr_language') || 'en');
+  const [diet, setDiet] = useState('ALL');
+  const local = <T extends { name: string; description?: string; translations?: Record<string, {name: string; description?: string}> }>(value: T): T => ({...value,...value.translations?.[language]});
+  const languages = ['en','hi','gu'].filter(l => l==='en'||menu.items.some(i=>i.translations?.[l])||menu.categories.some(c=>c.translations?.[l]));
+  const diets = [...new Set(menu.items.map(i=>i.dietaryType).filter((d): d is string=>!!d))];
   const [category, setCategory] = useState<string>('ALL');
   const [picking, setPicking] = useState<MenuItem | null>(null);
   const groups = useMemo(() => new Map(menu.modifierGroups.map((g) => [g.id, g])), [menu]);
-  const visible = menu.items.filter((i) => (category === 'ALL' || i.categoryId === category) && (!query || `${i.name} ${i.description ?? ''}`.toLowerCase().includes(query.toLowerCase())));
+  const visible = menu.items.map(local).filter((i) => (diet==='ALL'||i.dietaryType===diet) && (category === 'ALL' || i.categoryId === category) && (!query || `${i.name} ${i.description ?? ''}`.toLowerCase().includes(query.toLowerCase())));
 
   const quickAdd = (item: MenuItem) => {
     // A dish with nothing to choose goes straight into the cart; one with options (or a required choice) opens the sheet.
@@ -161,23 +195,25 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
         <button className="banner" onClick={onStatus}>Your order {placed.orderNumber ?? ''} is {placed.status.toLowerCase()} — view status</button>
       )}
       <div className="search"><input type="search" placeholder="Search food…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search the menu" /></div>
+      {languages.length>1 && <nav className="chips" aria-label="Language">{languages.map(l=><button key={l} className={language===l?'chip on':'chip'} onClick={()=>{setLanguage(l);store.set('jv_qr_language',l);}}>{({en:'English',hi:'\u0939\u093f\u0928\u094d\u0926\u0940',gu:'\u0a97\u0ac1\u0a9c\u0ab0\u0abe\u0aa4\u0ac0'} as Record<string,string>)[l]}</button>)}</nav>}
+      {diets.length>0 && <nav className="chips" aria-label="Dietary filters"><button className={diet==='ALL'?'chip on':'chip'} onClick={()=>setDiet('ALL')}>All diets</button>{diets.map(d=><button key={d} className={diet===d?'chip on':'chip'} onClick={()=>setDiet(d)}>{d.replaceAll('_',' ')}</button>)}</nav>}
       <nav className="chips" aria-label="Categories">
         <button className={category === 'ALL' ? 'chip on' : 'chip'} onClick={() => setCategory('ALL')}>All</button>
-        {menu.categories.map((c) => <button key={c.id} className={category === c.id ? 'chip on' : 'chip'} onClick={() => setCategory(c.id)}>{c.name}</button>)}
+        {menu.categories.map((c) => <button key={c.id} className={category === c.id ? 'chip on' : 'chip'} onClick={() => setCategory(c.id)}>{local(c).name}</button>)}
       </nav>
       <ul className="items">
         {visible.map((i) => (
           <li key={i.id} className="item">
             {imageSrc(i.imageUrl) && <img src={imageSrc(i.imageUrl)} alt="" loading="lazy" />}
             <div className="grow">
-              <div className="iname">{i.name}</div>
+              <div className="iname">{i.name}</div>{i.dietaryType&&<small>{i.dietaryType.replaceAll('_',' ')}</small>}
               {i.description && <div className="idesc">{i.description}</div>}
               <div className="price">{inr(i.price)}</div>
             </div>
             <button className="add" onClick={() => quickAdd(i)} aria-label={`Add ${i.name}`}>Add</button>
           </li>
         ))}
-        {visible.length === 0 && <li className="muted pad">Nothing matches your search.</li>}
+        {visible.length === 0 && <li className="muted pad">{query || category !== 'ALL' || diet !== 'ALL' ? 'Nothing matches your search.' : 'No dishes are available right now. Please ask a team member.'}</li>}
       </ul>
       {itemCount(cart) > 0 && (
         <button className="cartbar" onClick={onCart}><span>{itemCount(cart)} item{itemCount(cart) === 1 ? '' : 's'}</span><span>{inr(estimatedSubtotal(cart))}</span><span>View Cart</span></button>
@@ -249,12 +285,14 @@ function useQuote(token: string, cart: Cart) {
   const [error, setError] = useState<string | null>(null);
   const items = JSON.stringify(toOrderItems(cart));
   useEffect(() => {
+    let active=true;
+    setQuote(null);
     if (cart.lines.length === 0) { setQuote(null); return; }
     const t = setTimeout(() => {
-      QrApi.quote(token, JSON.parse(items)).then((q) => { setQuote(q); setError(null); }).catch((e: ApiError) => { setQuote(null); setError(e.message); });
+      QrApi.quote(token, JSON.parse(items)).then((q) => { if(active){setQuote(q);setError(null);} }).catch((e: ApiError) => { if(active){setQuote(null);setError(e.message);} });
     }, 350);
-    return () => clearTimeout(t);
-  }, [token, items, cart.lines.length]);
+    return () => {active=false;clearTimeout(t);};
+  }, [token, items, cart.lines.length, seenMenuVersion]);
   return { quote, error };
 }
 
@@ -298,29 +336,33 @@ function Totals({ quote }: { quote: Quote }) {
 
 function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: string; info: Describe; cart: Cart; setCart: (c: Cart) => void; onBack: () => void; onPlaced: (p: Placed) => void }) {
   const s = info.ordering.settings;
-  const { quote } = useQuote(token, cart);
+  const { quote, error: quoteError } = useQuote(token, cart);
+  const [paymentMethod,setPaymentMethod]=useState<'CASH_AT_COUNTER'|'ONLINE'>(()=>s.allowCash?'CASH_AT_COUNTER':'ONLINE');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [orderType, setOrderType] = useState<'DINE_IN' | 'TAKEAWAY' | ''>('');
   const [tableNumber, setTableNumber] = useState('');
   const [busy, setBusy] = useState(false);
+  const submitLock = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const menuOnly = info.mode === 'MENU_ONLY';
   const ready = (!s.requireCustomerName || name.trim()) && (!s.requireCustomerPhone || phone.trim()) && (!menuOnly || orderType === 'TAKEAWAY' || (orderType === 'DINE_IN' && tableNumber.trim()));
 
   const submit = async () => {
-    if (busy) return; // a double tap is ignored here and made harmless on the server by the attempt key
+    if (submitLock.current) return; // Latch before React renders, including two taps in the same event turn.
+    submitLock.current = true;
     setBusy(true);
     setError(null);
     const attempt = withAttempt(cart, () => randomId(24));
+    store.set(`jv_qr_cart:${token}`, JSON.stringify(attempt));
     if (attempt !== cart) setCart(attempt);
     try {
       const placed = await QrApi.place(token, {
         items: toOrderItems(attempt),
-        paymentMethod: 'CASH_AT_COUNTER',
+        paymentMethod,
         idempotencyKey: attempt.attemptKey,
-        ...(seenMenuVersion !== undefined ? { menuVersion: seenMenuVersion } : {}),
+        ...((quote?.menuVersion ?? seenMenuVersion) !== undefined ? { menuVersion: quote?.menuVersion ?? seenMenuVersion } : {}),
         ...(name.trim() ? { customerName: name.trim() } : {}),
         ...(phone.trim() ? { customerPhone: phone.trim() } : {}),
         ...(notes.trim() && s.allowCustomerNotes ? { orderNotes: notes.trim() } : {}),
@@ -338,6 +380,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
         setError(err.message);
       }
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   };
@@ -359,9 +402,15 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
       <input placeholder={s.requireCustomerPhone ? 'Mobile number' : 'Mobile number (optional)'} value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} autoComplete="tel" />
       {s.allowCustomerNotes && <textarea placeholder="Note for the kitchen (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} />}
       {quote && <Totals quote={quote} />}
-      <p className="muted">You pay at the counter when you are done. No payment is taken here.</p>
+      <fieldset><legend>Payment method</legend>
+        {s.allowCash && <label className="opt"><input type="radio" name="payment" checked={paymentMethod==='CASH_AT_COUNTER'} onChange={()=>setPaymentMethod('CASH_AT_COUNTER')} /><span>Pay at counter</span></label>}
+        {s.allowOnlinePayment && <label className="opt"><input type="radio" name="payment" checked={paymentMethod==='ONLINE'} onChange={()=>setPaymentMethod('ONLINE')} /><span>Pay online / UPI</span></label>}
+      </fieldset>
+      <p className="muted">{paymentMethod==='ONLINE'?'You will continue to secure Razorpay checkout. Your order reaches the kitchen after payment is verified.':'You pay at the counter when you are done.'}</p>
+      {!s.allowCash&&!s.allowOnlinePayment&&<p className="warn">No payment method is currently available. Please ask a team member.</p>}
+      {quoteError&&<p className="warn" role="alert">{quoteError}</p>}
       {error && <p className="warn" role="alert">{error}</p>}
-      <button className="primary" disabled={busy || !quote || !ready} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `${info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
+      <button className="primary" disabled={busy || !quote || !ready || !(s.allowCash||s.allowOnlinePayment)} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `${paymentMethod==='ONLINE'?'Pay online':info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
     </section>
   );
 }
@@ -371,22 +420,40 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
 const STEPS: Array<[Placed['status'], string]> = [['RECEIVED', 'Order received'], ['PREPARING', 'Preparing'], ['READY', 'Ready'], ['COMPLETED', 'Completed']];
 
 function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Placed; setPlaced: (p: Placed) => void; showStatus: boolean; onMore: () => void }) {
+  if (placed.currency) currencyCode = placed.currency;
+  const [error,setError]=useState<string|null>(null);
+  const [busy,setBusy]=useState(false);
+  const mounted=useRef(true),checking=useRef(false);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
+  const refresh=async()=>{if(checking.current)return;checking.current=true;try{const p=await QrApi.status(placed.publicOrderId);if(mounted.current){setPlaced(p);setError(null);}}catch(e){if(mounted.current)setError((e as Error).message);}finally{checking.current=false;}};
+  const retry=async()=>{if(busy)return;setBusy(true);try{const p=await QrApi.retryPayment(placed.publicOrderId);setPlaced(p);const url=paymentUrl(p.payment?.url);if(url)location.assign(url);setError(null);}catch(e){setError((e as Error).message);}finally{setBusy(false);}};
   useEffect(() => {
-    if (placed.status === 'COMPLETED' || placed.status === 'CANCELLED') return;
-    const t = setInterval(() => { QrApi.status(placed.publicOrderId).then(setPlaced).catch(() => undefined); }, 5000);
-    return () => clearInterval(t);
-  }, [placed.publicOrderId, placed.status, setPlaced]);
+    if (placed.status === 'COMPLETED' || placed.status === 'CANCELLED' || (!showStatus && placed.status !== 'PENDING_PAYMENT')) return;
+    const t = setInterval(() => { void refresh(); }, 5000);
+    const onResume=()=>{if(!document.hidden)void refresh();};
+    window.addEventListener('focus',onResume);document.addEventListener('visibilitychange',onResume);
+    return () => {clearInterval(t);window.removeEventListener('focus',onResume);document.removeEventListener('visibilitychange',onResume);};
+  }, [placed.publicOrderId, placed.status, setPlaced, showStatus]);
   const at = STEPS.findIndex(([s]) => s === placed.status);
   return (
     <section className="page center-text">
-      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : 'Thank you!'}</h2>
+      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Payment pending':'Order confirmed'}</h2>
       <p className="big">{placed.orderNumber ?? placed.publicOrderId}</p>
       <p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>
-      {showStatus && placed.status !== 'CANCELLED' && (
+      {showStatus && placed.status !== 'CANCELLED' && placed.status!=='PENDING_PAYMENT' && (
         <ol className="steps">{STEPS.map(([s, label], i) => <li key={s} className={i <= at ? 'done' : ''}>{label}</li>)}</ol>
       )}
       {placed.status === 'CANCELLED' && <p className="warn">The restaurant could not take this order. Please ask a team member.</p>}
-      <p className="muted">Pay at the counter when you are done.</p>
+      <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?'Payment verified':placed.paymentMethod==='ONLINE'?'Your payment is being checked. The kitchen will receive this order after payment is verified.':'Pay at the counter when you are done.'}</p>
+      {placed.status==='PENDING_PAYMENT'&&<><button className="primary" disabled={busy} onClick={()=>void retry()}>{busy?'Checking…':placed.payment?.status==='FAILED'?'Try payment again':'Continue payment'}</button><button className="link" onClick={()=>void refresh()}>Check payment status</button></>}
+      {error&&<p role="alert" className="warn">{error}<button className="link" onClick={()=>void refresh()}>Check again</button></p>}
+      <details className="receipt"><summary>Order details / receipt</summary>
+        <p><b>{placed.restaurantName}</b>{placed.branchName && ` · ${placed.branchName}`}</p>
+        <p>{new Date(placed.placedAt).toLocaleString()}</p>
+        <ul className="lines">{placed.items?.map((item,i)=><li key={i}><div className="grow"><b>{item.name} × {item.quantity}</b><p className="idesc">{item.options.join(', ')} {item.note}</p></div><span>{inr(item.lineTotal)}</span></li>)}</ul>
+        <dl className="totals"><div><dt>Subtotal</dt><dd>{inr(placed.subtotal??0)}</dd></div><div><dt>Tax</dt><dd>{inr(placed.tax??0)}</dd></div><div><dt>Discount</dt><dd>{inr(placed.discount??0)}</dd></div><div className="grand"><dt>Total</dt><dd>{inr(placed.total)}</dd></div></dl>
+        {placed.paymentStatus==='SUCCESS'&&<button className="link" onClick={()=>window.print()}>Print / save receipt</button>}
+      </details>
       <button className="primary" onClick={onMore}>Order more</button>
     </section>
   );

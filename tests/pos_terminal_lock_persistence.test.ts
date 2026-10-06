@@ -35,7 +35,7 @@ describe('POS terminal lock survives a reload (LOW-05)', () => {
 
   it('lockTerminal persists locked:true on the session record, not just in-memory state', async () => {
     const staff = await StaffRepository.createUser({ fullName: 'Lock Test Cashier', username: 'locktestcashier', roleId: 'role-cashier' });
-    await usePosStore.getState().loginWithPin(staff.issuedPin!);
+    await usePosStore.getState().loginWithPin(staff.issuedPin!, staff.id);
     expect(usePosStore.getState().isLocked).toBe(false);
 
     usePosStore.getState().lockTerminal();
@@ -45,7 +45,7 @@ describe('POS terminal lock survives a reload (LOW-05)', () => {
 
   it('a simulated reload (restoreSession re-reading the persisted session from scratch) comes back locked, not silently unlocked', async () => {
     const staff = await StaffRepository.createUser({ fullName: 'Reload Test Cashier', username: 'reloadtestcashier', roleId: 'role-cashier' });
-    await usePosStore.getState().loginWithPin(staff.issuedPin!);
+    await usePosStore.getState().loginWithPin(staff.issuedPin!, staff.id);
     usePosStore.getState().lockTerminal();
     expect(usePosStore.getState().isLocked).toBe(true);
 
@@ -64,7 +64,7 @@ describe('POS terminal lock survives a reload (LOW-05)', () => {
 
   it('unlockTerminal with the correct PIN clears the persisted lock flag too', async () => {
     const staff = await StaffRepository.createUser({ fullName: 'Unlock Test Cashier', username: 'unlocktestcashier', roleId: 'role-cashier' });
-    await usePosStore.getState().loginWithPin(staff.issuedPin!);
+    await usePosStore.getState().loginWithPin(staff.issuedPin!, staff.id);
     usePosStore.getState().lockTerminal();
     expect(SessionPersistence.load('pos')?.locked).toBe(true);
 
@@ -81,7 +81,7 @@ describe('POS terminal lock survives a reload (LOW-05)', () => {
 
   it('a fresh login always starts unlocked, even if a stale locked flag somehow lingered', async () => {
     const staff = await StaffRepository.createUser({ fullName: 'Fresh Login Cashier', username: 'freshlogincashier', roleId: 'role-cashier' });
-    await usePosStore.getState().loginWithPin(staff.issuedPin!);
+    await usePosStore.getState().loginWithPin(staff.issuedPin!, staff.id);
     expect(usePosStore.getState().isLocked).toBe(false);
     expect(SessionPersistence.load('pos')?.locked ?? false).toBe(false);
   });

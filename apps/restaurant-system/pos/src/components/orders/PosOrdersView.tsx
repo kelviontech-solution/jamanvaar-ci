@@ -97,6 +97,10 @@ export const PosOrdersView: React.FC = () => {
   }, [scopedOrders]);
 
   const handleSettleCounterCash = async (order: Order) => {
+    if (order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT') {
+      alert('This QR order is awaiting online payment verification. Ask the guest to continue payment on their phone.');
+      return;
+    }
     const isUnconfirmedKioskUpi = order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
     // A UPI attempt may have landed at Razorpay moments after the kiosk gave
     // up waiting — check the real cloud status before trusting the customer's
@@ -305,7 +309,8 @@ export const PosOrdersView: React.FC = () => {
               // kiosk order whose UPI attempt failed or timed out still
               // carries paymentMethod: 'UPI' with paymentStatus: 'PENDING',
               // and staff need to be able to collect cash for it too.
-              const isCounterCashPending = order.paymentStatus === 'PENDING';
+              const isPendingOnlineQr = order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT';
+              const isCounterCashPending = order.paymentStatus === 'PENDING' && !isPendingOnlineQr;
               // This specific order attempted a real UPI payment first —
               // Razorpay's webhook (or this kiosk's own background
               // reconciliation) may still confirm it after the visible
@@ -392,6 +397,7 @@ export const PosOrdersView: React.FC = () => {
                       </span>
                     </div>
 
+                    {isPendingOnlineQr && <p className="text-xs font-bold text-amber-700">Online payment pending — awaiting verification</p>}
                     {/* Fast Cash at Counter Settle Action */}
                     {isCounterCashPending && (
                       <div className="flex flex-col items-end gap-1">
@@ -701,7 +707,7 @@ export const PosOrdersView: React.FC = () => {
                   <span>Print Thermal Receipt</span>
                 </button>
 
-                {selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'REFUNDED' && (
+                {selectedOrder.orderStatus !== 'CANCELLED' && selectedOrder.orderStatus !== 'REFUNDED' && !(selectedOrder.source_type === 'QR_TABLE' && selectedOrder.orderStatus === 'DRAFT') && (
                   <>
                     {selectedOrder.paymentStatus === 'SUCCESS' ? (
                       <button

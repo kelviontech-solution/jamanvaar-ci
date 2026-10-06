@@ -51,6 +51,15 @@ function safeSet(key: string, value: string): void {
   }
 }
 
+const CATALOG_TYPES = new Set(['MENU_CATEGORY', 'MENU_ITEM', 'MODIFIER_GROUP', 'TAX_GROUP']);
+interface CatalogCheckpoint { version: 1; ids: string[]; complete: boolean }
+function catalogCheckpoint(key: string): CatalogCheckpoint | null {
+  try {
+    const value = JSON.parse(safeGet(key + ':catalog_checkpoint') || 'null');
+    return value?.version === 1 && Array.isArray(value.ids) && value.ids.every((id: unknown) => typeof id === 'string') ? value : null;
+  } catch { return null; }
+}
+
 import { db, KeyValueStore } from '@jamanvaar/database';
 import { EndpointResolver } from './endpoint_resolver';
 import { jsonBatches } from './batches';
@@ -75,6 +84,18 @@ export class EntitySyncEngine {
 
   public static configureTransport(transport: EntitySyncTransport | null): void {
     this.transport = transport;
+  }
+
+  /** A cursor alone cannot prove that its local records survived a reload/storage race.
+   * Upgrade existing partial caches once, and recover again only when a known record is missing. */
+  public static ensureCatalogIntegrity(entityType: string, hasRecord: (id: string) => boolean): void {
+    if (!this.transport || !CATALOG_TYPES.has(entityType)) return;
+    const key = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
+    if (this.pulls.has(key)) return;
+    const checkpoint = catalogCheckpoint(key);
+    if (checkpoint && (!checkpoint.complete || checkpoint.ids.every(hasRecord))) return;
+    try { KeyValueStore.remove(key); KeyValueStore.remove(key + ':caught_up_at'); } catch {}
+    safeSet(key + ':catalog_checkpoint', JSON.stringify({ version: 1, ids: [], complete: false }));
   }
 
   public static async pushSnapshot(entityType: string, records: EntitySyncEvent[]): Promise<{ processed: number; failed: number }> {
@@ -133,6 +154,8 @@ export class EntitySyncEngine {
     const upgradedKey = `${cursorKey}:sequence_protocol`;
     let cursor = saved?.startsWith('seq:') || safeGet(upgradedKey) ? saved ?? 'seq:0' : 'seq:0';
     let pulled = 0;
+    const checkpoint = CATALOG_TYPES.has(entityType) ? catalogCheckpoint(cursorKey) : null;
+    const knownIds = checkpoint ? new Set(checkpoint.ids) : null;
     try {
       for (let page = 0; page < 50; page++) {
         const result = await transport.pull(entityType, cursor);
@@ -140,6 +163,13 @@ export class EntitySyncEngine {
         db.batch(() => result.entities.forEach(onEntity));
         pulled += result.entities.length;
         if ((result.serverKey ?? EndpointResolver.lastResponder() ?? predicted) !== predicted) break;
+        if (knownIds) {
+          for (const entity of result.entities) {
+            if (entity.payload.deleted === true) knownIds.delete(entity.externalId);
+            else knownIds.add(entity.externalId);
+          }
+          safeSet(cursorKey + ':catalog_checkpoint', JSON.stringify({ version: 1, ids: [...knownIds], complete: !result.hasMore }));
+        }
         const next = typeof result.latestSeq === 'number' ? `seq:${result.latestSeq}`
           : result.entities.length >= CATCH_UP_PAGE_SIZE ? result.entities[result.entities.length - 1]?.updatedAt : result.serverTime;
         if (!next) break;

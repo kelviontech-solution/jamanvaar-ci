@@ -1,5 +1,6 @@
 // Production-like shared origin: two owner tabs and customer Kiosk, actual built apps/API.
-process.env.JAMANVAAR_QA_REPORT_DIR = 'docs/reports/menu-idle-sync-2026-10-06';
+const completeness = process.env.JAMANVAAR_QA_MENU_COMPLETENESS === '1';
+process.env.JAMANVAAR_QA_REPORT_DIR = completeness ? 'docs/reports/menu-completeness-2026-10-06' : 'docs/reports/menu-idle-sync-2026-10-06';
 const q = require('./browser-audit-lib.cjs');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
@@ -16,6 +17,11 @@ const report = async (title, run) => {
 async function ready(url) { for (let i=0;i<100;i++) { try { if ((await fetch(url,{signal:AbortSignal.timeout(500)})).status<500) return; } catch {} await new Promise(r=>setTimeout(r,300)); } throw Error('QA service did not start'); }
 async function main() {
   if (!/test/i.test(new URL(q.state.databaseUrl).pathname)) throw Error('Dedicated test database required');
+  if(completeness)for(const app of ['apps/restaurant-system/pos-admin','apps/kiosk-system/kiosk-user']){
+    const assets=q.path.join(q.root,app,'dist/assets');
+    if(!q.fs.readdirSync(assets).filter(f=>/^index.*\.js$/.test(f)).some(f=>q.fs.readFileSync(q.path.join(assets,f),'utf8').includes(':catalog_checkpoint')))
+      throw Error(`${app} build does not yet include the menu completeness fix`);
+  }
   for (const p of [port,q.state.port]) {
     try { await fetch(`http://localhost:${p}`,{signal:AbortSignal.timeout(300)}); throw Error(`Port ${p} occupied; no user process stopped`); }
     catch(error) { if(error.message.includes('occupied')) throw error; }
@@ -71,6 +77,7 @@ async function main() {
   const now=new Date().toISOString();
   const categories=[['thali','Gujarati Thali Special'],['breads','Rotli, Bhakri & Thepla'],['sweets','Sweets & Mithai'],['drinks','Chaas & Beverages']].map(([id,name],i)=>({id,name,slug:id,sortOrder:i,isActive:true,updatedAt:now}));
   const items=[['thali','Royal Gujarati Grand Thali',299],['breads','Methi Thepla (4 Pcs)',70],['sweets','Rich Basundi Bowl',110],['drinks','Kathiyawadi Masala Chaas',40]].map(([categoryId,name,price],i)=>({id:`qa-dish-${i}`,categoryId,name,sku:`QA-${i}`,price,description:'QA restaurant dish',dietaryType:'VEG',spiceLevel:'NONE',isAvailable:true,isPopular:false,isNew:false,isFeatured:false,prepTimeMinutes:5,allergens:[],modifierGroupIds:[],sortOrder:i,updatedAt:now}));
+  if (completeness) for(let i=4;i<20;i++)items.push({...items[i%4],id:`qa-dish-${i}`,name:`Gujarati Dish ${i+1}`,sku:`QA-${i}`,sortOrder:i,price:100+i});
   await q.mustApi('POST','/api/v1/entity-sync/MENU_CATEGORY',{events:categories.map(payload=>({externalId:payload.id,payload}))},token);
   await q.mustApi('POST','/api/v1/entity-sync/MENU_ITEM',{events:items.map(payload=>({externalId:payload.id,payload}))},token);
   await q.expect(admin.getByText(items[1].name,{exact:true}).first()).toBeVisible({timeout:60000});
@@ -81,6 +88,28 @@ async function main() {
   await kiosk.getByRole('button',{name:'Start Order',exact:true}).click({timeout:60000});await kiosk.getByRole('button',{name:/English/}).click();await kiosk.getByRole('button',{name:/Takeaway/i}).click();
   await q.expect(kiosk.getByRole('button',{name:`Add ${items[1].name} to cart`,exact:true})).toBeVisible({timeout:60000});
   console.log('Customer kiosk menu ready');
+  if (completeness) {
+    await report('Admin publishes 20 dishes and customer kiosk displays all 20',async()=>{
+      await q.expect(kiosk.locator('button[aria-label^="Add "]')).toHaveCount(20,{timeout:45000});
+      await q.expect(admin.getByText('20 ITEMS',{exact:true})).toBeVisible();
+      const stored=await kiosk.evaluate(()=>JSON.parse(window.__jamanvaarStorage.getItem('jamanvaar_db_menu_items')).length);
+      q.expect(stored).toBe(20);return {adminItems:20,customerItems:20};
+    });
+    await report('An already caught-up kiosk with only four persisted dishes recovers all 20 after reopening',async()=>{
+      const originalDevice=await kiosk.evaluate(()=>localStorage.getItem('jamanvaar_cloud_device_id'));
+      const damage=await kiosk.evaluate(async()=>{
+        const store=window.__jamanvaarStorage,items=JSON.parse(store.getItem('jamanvaar_db_menu_items'));
+        const cursors=store.keys().filter(k=>k.includes('entity_sync_cursor_MENU_ITEM')&&!k.includes(':'));
+        store.setItem('jamanvaar_db_menu_items',JSON.stringify(items.slice(0,4)));await store.flush();
+        return {cachedItems:JSON.parse(store.getItem('jamanvaar_db_menu_items')).length,cursors:store.keys().filter(k=>k.includes('entity_sync_cursor_MENU_ITEM')&&k.includes('catalog_checkpoint')).length};
+      });q.expect(damage.cachedItems).toBe(4);q.expect(damage.cursors).toBeGreaterThan(0);
+      const requestCursors=[];kiosk.on('request',r=>{if(new URL(r.url()).pathname==='/api/v1/entity-sync/MENU_ITEM')requestCursors.push(new URL(r.url()).searchParams.get('afterSeq'));});
+      await kiosk.reload();await kiosk.getByRole('button',{name:'Start Order',exact:true}).click({timeout:45000});await kiosk.getByRole('button',{name:/English/}).click();await kiosk.getByRole('button',{name:/Takeaway/i}).click();
+      await q.expect(kiosk.locator('button[aria-label^="Add "]')).toHaveCount(20,{timeout:45000});
+      q.expect(requestCursors).toContain('0');q.expect(await kiosk.evaluate(()=>localStorage.getItem('jamanvaar_cloud_device_id'))).toBe(originalDevice);
+      return {damagedCache:4,recoveredItems:20,fullCatchUpRequested:true,activationPreserved:true};
+    });
+  }
   await report('Idle tabs on one production-like origin do not change the menu or upload it',async()=>{
     await admin.waitForTimeout(2000);const before=writes.length;const samples=[];
     for(let i=0;i<18;i++) { samples.push(await kiosk.locator('button[aria-label^="Add "]').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label')).sort())); await admin.waitForTimeout(1000); }

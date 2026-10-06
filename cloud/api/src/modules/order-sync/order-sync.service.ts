@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -200,6 +200,18 @@ export class OrderSyncService {
           // once, a paid order can be refunded but never silently reopened, and only a device with
           // payment authority may refund. Violations are refused and recorded, never applied.
           const violation = existing ? paymentViolation(existing, evt, device) : null;
+          if (existing?.source === 'QR' && existing.paymentMethod === 'ONLINE') {
+            throw new Error('PAYMENT_VERIFICATION_REQUIRED: Online QR orders are released only by verified gateway payment');
+          }
+          if (existing?.source === 'QR' && existing.paymentMethod === 'RAZORPAY') {
+            const frozen = new Map((Array.isArray(existing.items) ? existing.items : []).map((item: any) => [item.externalItemId, item]));
+            if (evt.items.some(item => {
+              const original: any = frozen.get(item.externalItemId);
+              return !original || item.quantity !== original.quantity || item.unitPrice !== original.unitPrice || item.lineTotal !== original.lineTotal;
+            }) || evt.totalAmount !== existing.totalAmount || evt.subtotal !== existing.subtotal || evt.taxAmount !== existing.taxAmount || (evt.discountAmount ?? 0) !== existing.discountAmount) {
+              throw new Error('PAID_QR_ORDER_FROZEN: Paid QR quantities and prices cannot be rewritten by device sync');
+            }
+          }
           if (existing && violation) {
             await tx.syncConflict.create({
               data: {
@@ -502,6 +514,29 @@ export class OrderSyncService {
    * by realtime and through the Branch Core exactly like a POS order. There is no second order pipeline.
    * Idempotent on (restaurantId, externalOrderId): a repeat returns the original order and creates nothing.
    */
+  /** Only a verified shared payment may release an online QR draft to the kitchen. */
+  async confirmPaidQrOrder(restaurantId: string, externalOrderId: string, paymentId: string) {
+    const result = await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + restaurantId + ':' + externalOrderId}))`;
+      const payment = await tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId, status: 'SUCCESS' }, include: { order: true } });
+      const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId } } });
+      if (!payment || payment.order.source !== 'QR' || payment.order.externalOrderId !== externalOrderId || !order || order.source !== 'QR' || order.totalAmount !== payment.amount) throw new BadRequestException('Verified QR payment does not match the order');
+      if (order.status !== 'DRAFT') return { order, changed: false };
+      const meta = (order.meta ?? {}) as Record<string, unknown>;
+      const seq = await nextSyncSequence(tx, restaurantId);
+      const saved = await tx.syncedOrder.update({ where: { id: order.id }, data: {
+        status: meta.qrAutoAccept ? 'PREPARING' : 'NEW', paymentStatus: 'SUCCESS', paymentMethod: 'RAZORPAY',
+        meta: { ...meta, paymentTransactionId: paymentId } as Prisma.InputJsonValue, syncVersion: { increment: 1 }, seq
+      } });
+      // The existing operational order is now durably admitted; gateway success alone did not count as delivery.
+      await tx.paymentTransaction.updateMany({ where: { id: paymentId, fulfilledAt: null }, data: { fulfilledAt: new Date() } });
+      await tx.syncEventLog.create({ data: { restaurantId, branchId: saved.branchId, entityType: 'ORDER', entityId: externalOrderId, action: 'UPDATE', status: 'SUCCESS', traceId: externalOrderId } });
+      return { order: saved, changed: true };
+    });
+    if (result.changed) this.realtime.publish({ restaurantId, branchId: result.order.branchId, kind: 'orders', seq: result.order.seq ?? undefined });
+    return result.order;
+  }
+
   async ingestServerOrder(input: ServerOrderInput) {
     const startedAt = Date.now();
     const result = await this.prisma.runAsTenant(input.restaurantId, async (tx) => {

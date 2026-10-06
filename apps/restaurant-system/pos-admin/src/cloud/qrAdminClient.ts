@@ -63,6 +63,7 @@ export interface QrOrderRow {
   branchId: string | null;
   status: string;
   paymentStatus: string | null;
+  paymentMethod: string | null;
   total: number;
   placedAt: string;
   itemCount: number;

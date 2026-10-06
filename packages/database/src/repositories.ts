@@ -1307,6 +1307,25 @@ export class TableRepository {
     return released;
   }
 
+  /** QR guests can order without Captain seating them. Associate admitted orders with the existing floor lifecycle. */
+  public static reconcileQrTableOrders(): number {
+    let changed = 0;
+    const closed = new Set(['DRAFT', 'COMPLETED', 'COLLECTED', 'CANCELLED', 'REFUNDED', 'VOID', 'VOIDED']);
+    for (const table of db.tables) {
+      if (table.status === 'BLOCKED' || table.isActive === false) continue;
+      const current = db.orders.find(order => order.id === table.currentOrderId);
+      if (current && !closed.has(current.orderStatus)) continue;
+      const next = db.orders.filter(order => order.source_type === 'QR_TABLE' && order.orderType === 'DINE_IN' && order.tableId === table.id && !closed.has(order.orderStatus))
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))[0];
+      if (!next) continue;
+      table.status = 'OCCUPIED';
+      table.currentOrderId = next.id;
+      changed++;
+    }
+    if (changed) db.notify();
+    return changed;
+  }
+
   public static deleteTable(id: string): boolean {
     const idx = db.tables.findIndex((t) => t.id === id);
     if (idx === -1) return false;

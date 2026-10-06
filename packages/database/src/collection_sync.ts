@@ -164,7 +164,7 @@ export class CollectionSync<T extends Syncable> {
   }
 
   /** Applies one record pulled from the cloud. The newer change wins; an older one is ignored. */
-  public applyRemote(remote: Record<string, unknown>): void {
+  public applyRemote(remote: Record<string, unknown>, opts: { authoritative?: boolean } = {}): void {
     const id = remote?.[this.idKey];
     if (typeof id !== 'string' || !id) return;
     const state = this.load();
@@ -173,7 +173,7 @@ export class CollectionSync<T extends Syncable> {
     const idx = list.findIndex((r) => this.idOf(r) === id);
 
     if (remote.deleted === true) {
-      if (idx >= 0 && time(list[idx].updatedAt) <= remoteTime) {
+      if (idx >= 0 && (opts.authoritative || time(list[idx].updatedAt) <= remoteTime)) {
         list.splice(idx, 1);
         if (state.sigs) delete state.sigs[id];
         delete state.pushed[id];
@@ -186,7 +186,7 @@ export class CollectionSync<T extends Syncable> {
 
     // We deleted it more recently than this copy was written: the deletion stands.
     const deletedAt = state.tombstones[id];
-    if (deletedAt && time(deletedAt) >= remoteTime) return;
+    if (!opts.authoritative && deletedAt && time(deletedAt) >= remoteTime) return;
 
     const parsed = { ...remote } as unknown as T;
     const incoming = this.materialize ? this.materialize(parsed) : parsed;
@@ -199,7 +199,7 @@ export class CollectionSync<T extends Syncable> {
       list.push(incoming);
     } else {
       const local = list[idx];
-      if (remoteTime < time(local.updatedAt)) return;
+      if (!opts.authoritative && remoteTime < time(local.updatedAt)) return;
       // Update in place: screens may hold references to these objects.
       const target = local as unknown as Record<string, unknown>;
       for (const key of Object.keys(target)) delete target[key];
@@ -218,6 +218,11 @@ export class CollectionSync<T extends Syncable> {
   /** True when this device holds no record of this kind at all. */
   public isEmpty(): boolean {
     return this.list().length === 0;
+  }
+
+  /** Completeness checks use identity, not the visible/available item count. */
+  public hasRecord(id: string): boolean {
+    return this.list().some(record => this.idOf(record) === id);
   }
 
   /** Forget all bookkeeping: the next stamp is a fresh baseline (used when a device is activated to a restaurant). */

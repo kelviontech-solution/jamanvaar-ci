@@ -320,7 +320,9 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
           {filteredTables.map((tbl: DiningTable) => {
             const activeOrder = orders.find(
               (o) =>
-                (o.tableNumber === tbl.tableNumber || o.tableId === tbl.id) &&
+                (o.tableId ? o.tableId === tbl.id : o.tableNumber === tbl.tableNumber) &&
+                o.orderStatus !== 'DRAFT' &&
+                o.orderStatus !== 'REFUNDED' &&
                 o.orderStatus !== 'COMPLETED' &&
                 o.orderStatus !== 'CANCELLED'
             );

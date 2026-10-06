@@ -19,12 +19,15 @@ export interface Describe {
   };
 }
 
-export interface MenuItem { id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[]; sortOrder?: number; minQuantity?: number; maxQuantity?: number; allowInstructions?: boolean }
+export interface MenuItem { translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[]; sortOrder?: number; minQuantity?: number; maxQuantity?: number; allowInstructions?: boolean }
 export interface MenuGroup { id: string; name: string; description?: string; isRequired: boolean; minSelections: number; maxSelections: number; options: Array<{ id: string; name: string; description?: string; imageUrl?: string; priceDelta: number; isDefault?: boolean }> }
-export interface Menu { menuVersion: number; etag: string; categories: Array<{ id: string; name: string; description?: string; imageUrl?: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
+export interface Menu { menuVersion: number; etag: string; categories: Array<{ translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
 
-export interface Quote { lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
-export interface Placed { publicOrderId: string; orderNumber: string | null; status: 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string }
+export interface Quote { menuVersion?: number; lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
+export interface Placed { publicOrderId: string; restaurantName?: string; branchName?: string; currency?: string; orderNumber: string | null; status: 'PENDING_PAYMENT' | 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string;
+  paymentStatus?: string; paymentMethod?: string; subtotal?: number; tax?: number; discount?: number;
+  items?: Array<{name:string;quantity:number;unitPrice:number;lineTotal:number;options:string[];note?:string}>;
+  payment?: {status:string;url:string|null;expiresAt:string|null} | null }
 
 export class ApiError extends Error {
   constructor(message: string, public status: number, public code?: string) {
@@ -54,6 +57,7 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
   try {
     res = await fetch(`${base}/api/v1/public/qr${path}`, {
       ...init,
+      signal: init.signal ?? AbortSignal.timeout(15000),
       headers: { 'Content-Type': 'application/json', ...(init.session ? { 'X-QR-Session': init.session } : {}), ...(init.headers ?? {}) }
     });
   } catch {
@@ -62,6 +66,7 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
   if (res.status === 304) return { data: null, status: 304, etag: res.headers.get('etag') };
   const body = (await res.json().catch(() => null)) as (T & { message?: string; code?: string }) | null;
   if (!res.ok) throw new ApiError(body?.message ?? 'Something went wrong. Please try again.', res.status, body?.code);
+  if (!body || typeof body !== 'object') throw new ApiError('The ordering service returned an unreadable response. Please try again.', 502, 'BAD_RESPONSE');
   return { data: body as T, status: res.status, etag: res.headers.get('etag') };
 }
 
@@ -76,5 +81,6 @@ export const QrApi = {
     (await call<Quote>(`/${encodeURIComponent(token)}/quote`, { method: 'POST', body: JSON.stringify({ items }) })).data as Quote,
   place: async (token: string, body: Record<string, unknown>, session: string) =>
     (await call<Placed>(`/${encodeURIComponent(token)}/orders`, { method: 'POST', body: JSON.stringify(body), session })).data as Placed,
-  status: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}`)).data as Placed
+  status: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}`)).data as Placed,
+  retryPayment: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}/payment`, { method: 'POST' })).data as Placed
 };

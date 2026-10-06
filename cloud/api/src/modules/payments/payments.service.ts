@@ -314,6 +314,89 @@ export class PaymentsService {
       quote: { subtotal: order.subtotal, taxAmount: order.taxAmount, totalAmount: order.totalAmount, lines: order.items } };
   }
 
+  async qrOnlineAvailable(restaurantId: string): Promise<boolean> {
+    if (!this.config.get<string>('RAZORPAY_KEY_ID') || !this.config.get<string>('RAZORPAY_KEY_SECRET') || !this.config.get<string>('RAZORPAY_WEBHOOK_SECRET')) return false;
+    return !!await this.prisma.runAsTenant(restaurantId, tx => tx.restaurantPaymentConnection.findFirst({ where: { restaurantId, status: 'ACTIVE' }, select: { id: true } }));
+  }
+
+  /** Hosted mobile checkout through the same gateway and payment tables as Kiosk. */
+  async createQrPayment(restaurantId: string, publicOrderId: string) {
+    if (!await this.qrOnlineAvailable(restaurantId)) throw new ForbiddenException({ code: PAYMENTS_NOT_ACTIVE, message: 'Online payments are not active for this restaurant.' });
+    const attempt = await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-payment:' + restaurantId + ':' + publicOrderId}))`;
+      const synced = await tx.syncedOrder.findFirst({ where: { publicOrderId, restaurantId, source: 'QR', paymentMethod: 'ONLINE' } });
+      if (!synced || synced.status === 'CANCELLED') throw new NotFoundException('Online order not found');
+      let order = await tx.order.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: synced.externalOrderId } }, include: { paymentTransactions: { orderBy: { createdAt: 'desc' } } } });
+      if (order && order.source !== 'QR') throw new ConflictException('Payment channel mismatch');
+      const prior = order?.paymentTransactions[0];
+      const previous = prior?.providerResponse as { linkId?: string } | null;
+      if (prior && !previous?.linkId && !PAID_STATUSES.includes(prior.status)) {
+        // A timed-out create may already exist at Razorpay. Reuse its unique reference;
+        // never issue a new payment attempt while the old result is unknown.
+        if (prior.status === 'CREATED' && Date.now() - prior.updatedAt.getTime() < 30_000) return { payment: prior, created: false, synced, recover: false };
+        const payment = await tx.paymentTransaction.update({ where: { id: prior.id }, data: { status: 'CREATED', failureReason: null } });
+        return { payment, created: true, synced, recover: true };
+      }
+      if (prior && (PAID_STATUSES.includes(prior.status) || NON_TERMINAL_STATUSES.includes(prior.status) || (previous?.linkId && !/^Payment link (expired|cancelled)$/.test(prior.failureReason ?? '')))) return { payment: prior, created: false, synced };
+      if (synced.status !== 'DRAFT') throw new ConflictException('This order is already confirmed');
+      if (!order) {
+        const meta = (synced.meta ?? {}) as Record<string, unknown>;
+        const restaurant = await tx.restaurant.findUniqueOrThrow({ where: { id: restaurantId }, select: { currency: true } });
+        const saved = await tx.order.create({ data: { restaurantId, externalOrderId: synced.externalOrderId, source: 'QR', branchId: synced.branchId, orderType: synced.orderType, tableLabel: synced.tableLabel,
+          customerName: typeof meta.customerName === 'string' ? meta.customerName : null, customerPhone: typeof meta.customerPhone === 'string' ? meta.customerPhone : null,
+          items: (synced.items ?? []) as Prisma.InputJsonValue, subtotal: synced.subtotal, taxAmount: synced.taxAmount, totalAmount: synced.totalAmount, currency: restaurant.currency, status: 'PENDING_PAYMENT' } });
+        order = { ...saved, paymentTransactions: [] };
+      }
+      const payment = await tx.paymentTransaction.create({ data: { restaurantId, orderId: order.id, provider: 'RAZORPAY', providerOrderId: `qrp_${randomUUID()}`, amount: order.totalAmount, currency: order.currency, status: 'CREATED', commissionBps: 0, platformAmount: 0, restaurantAmount: order.totalAmount } });
+      return { payment, created: true, synced };
+    });
+    if (!attempt.created) return this.qrPaymentView(attempt.payment);
+    try {
+      const meta = (attempt.synced.meta ?? {}) as Record<string, unknown>;
+      const code = attempt.synced.qrCodeId ? await this.prisma.runAsTenant(restaurantId, tx => tx.qrCode.findUnique({ where: { id: attempt.synced.qrCodeId! }, select: { publicToken: true } })) : null;
+      const base = this.config.get<string>('QR_ORDER_BASE_URL');
+      if (!base || !code) throw new ServiceUnavailableException('The public ordering return URL is not configured');
+      const callback = new URL(`/q/${encodeURIComponent(code.publicToken)}`, base); callback.searchParams.set('order', publicOrderId);
+      if (this.config.get<string>('NODE_ENV') === 'production' && callback.protocol !== 'https:') throw new ServiceUnavailableException('The ordering return URL must use HTTPS');
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+      const recovered = 'recover' in attempt && attempt.recover ? await this.razorpay.findPaymentLink(attempt.payment.providerOrderId) : null;
+      if (recovered && (recovered.amount !== attempt.payment.amount || recovered.currency !== attempt.payment.currency)) throw new ConflictException('The previous payment does not match this order');
+      const link = recovered ? { linkId: recovered.id, shortUrl: recovered.short_url } : await this.razorpay.createPaymentLink({ referenceId: attempt.payment.providerOrderId, amountPaise: attempt.payment.amount, currency: attempt.payment.currency,
+        description: `Restaurant order ${String(meta.orderNumber ?? publicOrderId)}`, customerName: String(meta.customerName ?? ''), customerPhone: String(meta.customerPhone ?? ''),
+        expireByUnix: Math.floor(expiresAt.getTime() / 1000), callbackUrl: callback.toString() });
+      const payment = await this.prisma.runAsTenant(restaurantId, async tx => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'payment-settle:' + attempt.payment.id}))`;
+        const current = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: attempt.payment.id } });
+        const closed = recovered && ['expired', 'cancelled'].includes(recovered.status);
+        return tx.paymentTransaction.update({ where: { id: current.id }, data: {
+          status: PAID_STATUSES.includes(current.status) ? current.status : closed ? 'FAILED' : 'PENDING',
+          ...(closed ? { failureReason: `Payment link ${recovered.status}` } : {}),
+          providerResponse: { ...(current.providerResponse as Record<string, any> ?? {}), linkId: link.linkId, linkUrl: link.shortUrl, expiresAt: recovered?.expire_by ? new Date(recovered.expire_by * 1000).toISOString() : expiresAt.toISOString() }
+        } });
+      });
+      return this.qrPaymentView(payment);
+    } catch (error) {
+      await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.updateMany({ where: { id: attempt.payment.id, status: 'CREATED' }, data: { status: 'FAILED', failureReason: 'Payment link could not be created' } }));
+      this.logger.warn(`event=qr_payment_creation_failed paymentId=${attempt.payment.id} reason=${error instanceof Error ? error.constructor.name : 'UnknownError'}`);
+      throw error;
+    }
+  }
+
+  private qrPaymentView(payment: { status: string; providerResponse: Prisma.JsonValue; failureReason?: string | null }) {
+    const response = payment.providerResponse as { linkUrl?: string; expiresAt?: string } | null;
+    const expired = /^Payment link (expired|cancelled)$/.test(payment.failureReason ?? '');
+    return { status: payment.status, url: !expired && !PAID_STATUSES.includes(payment.status) ? response?.linkUrl ?? null : null, expiresAt: response?.expiresAt ?? null };
+  }
+
+  async qrPaymentStatus(restaurantId: string, externalOrderId: string) {
+    const payment = await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirst({ where: { restaurantId, order: { externalOrderId, source: 'QR' } }, orderBy: { createdAt: 'desc' } }));
+    if (!payment) return { status: 'PENDING', url: null, expiresAt: null };
+    await this.getPaymentStatus(restaurantId, payment.id);
+    const current = await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirstOrThrow({ where: { id: payment.id, restaurantId } }));
+    if (current.status === 'SUCCESS') await this.orderSync.confirmPaidQrOrder(restaurantId, externalOrderId, current.id);
+    return this.qrPaymentView(current);
+  }
+
   async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
       const where = { restaurantId, ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {}) };
@@ -505,6 +588,20 @@ export class PaymentsService {
     const qrId = (current.providerResponse as { qr?: { id?: string } } | null)?.qr?.id;
     // Give Razorpay's webhook a short head start: a confirmed payment then reaches the kiosk with no extra lookup.
     const webhookGraceOver = Date.now() - current.createdAt.getTime() > STATUS_WEBHOOK_GRACE_MS;
+    const linkId = (current.providerResponse as { linkId?: string } | null)?.linkId;
+    if (current.order?.source === 'QR' && linkId && webhookGraceOver && !PAID_STATUSES.includes(current.status)) {
+      const link = await this.razorpay.fetchPaymentLink(linkId);
+      const captured = link.payments?.find(p => p.status === 'captured' && p.amount === current.amount);
+      if (link.id === linkId && link.reference_id === current.providerOrderId && link.currency === current.currency && link.amount === current.amount && link.amount_paid === current.amount && link.status === 'paid' && captured) {
+        await this.settleRazorpayPayment(current, 'SUCCESS', captured.payment_id, link, null, false);
+        payment = await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirstOrThrow({ where: { id: paymentId, restaurantId }, include: { order: true } }));
+      } else if (['cancelled', 'expired'].includes(link.status)) {
+        payment = await this.prisma.runAsTenant(restaurantId, async tx => {
+          await tx.paymentTransaction.updateMany({ where: { id: paymentId, status: { notIn: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED'] } }, data: { status: 'FAILED', failureReason: `Payment link ${link.status}` } });
+          return tx.paymentTransaction.findFirstOrThrow({ where: { id: paymentId, restaurantId }, include: { order: true } });
+        });
+      }
+    }
     if (current.provider === 'RAZORPAY' && qrId && webhookGraceOver && NON_TERMINAL_STATUSES.includes(current.status)) {
       const paid = (await this.razorpay.listQrPayments(qrId)).find((p) => p.status === 'captured' && p.amount === current.amount && p.currency === current.currency);
       if (paid) {
@@ -823,13 +920,18 @@ export class PaymentsService {
     failureReason: string | null,
     fromWebhook: boolean
   ): Promise<string | null> {
-    await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+    const settled = await this.prisma.runAsTenant(payment.restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'payment-settle:' + payment.id}))`;
+      const fresh = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: payment.id } });
+      if (PAID_STATUSES.includes(fresh.status)) return newStatus === 'SUCCESS';
       await tx.paymentTransaction.update({
         where: { id: payment.id },
         data: {
           status: newStatus,
           providerPaymentId: razorpayPaymentId,
-          providerResponse: providerResponse as Prisma.InputJsonValue,
+          providerResponse: payment.order?.source === 'QR'
+            ? { ...((await tx.paymentTransaction.findUniqueOrThrow({ where: { id: payment.id } })).providerResponse as Record<string, unknown> ?? {}), settlement: providerResponse } as Prisma.InputJsonValue
+            : providerResponse as Prisma.InputJsonValue,
           failureReason: newStatus === 'SUCCESS' ? null : failureReason,
           paidAt: newStatus === 'SUCCESS' ? new Date() : null
         }
@@ -842,7 +944,10 @@ export class PaymentsService {
           ...(newStatus === 'SUCCESS' ? { lastPaymentAt: new Date() } : {})
         }
       });
+      return true;
     });
+
+    if (!settled) return null;
 
     const source = fromWebhook ? 'webhook' : 'reconciliation';
     if (newStatus === 'SUCCESS') {
@@ -884,7 +989,12 @@ export class PaymentsService {
     } | null;
   }): Promise<string | null> {
     const order = payment.order;
-    if (!order || order.source !== 'WHATSAPP') return null;
+    if (!order) return null;
+    if (order.source === 'QR') {
+      try { await this.orderSync.confirmPaidQrOrder(payment.restaurantId, order.externalOrderId, payment.id); return null; }
+      catch (error) { return error instanceof Error ? error.message : 'QR kitchen admission failed'; }
+    }
+    if (order.source !== 'WHATSAPP') return null;
 
     try {
       const [restaurant, connection] = await Promise.all([

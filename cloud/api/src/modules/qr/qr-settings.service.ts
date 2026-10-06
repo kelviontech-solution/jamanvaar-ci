@@ -1,5 +1,5 @@
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snapshot';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -98,11 +98,6 @@ export class QrSettingsService {
 
   async update(restaurantId: string, actor: { id: string; type: string }, changes: QrSettingsUpdate, branchId: string | null = null): Promise<QrSettingsView> {
     if (Object.keys(changes).length === 0) throw new BadRequestException('No settings supplied');
-    // Online payment for QR orders needs a verified gateway path that does not exist yet; it is never switched on
-    // in a way that could let an order be treated as paid without the gateway confirming it.
-    if (changes.allowOnlinePayment === true) {
-      throw new ConflictException('Online payment for QR ordering is not available yet. Guests pay at the counter.');
-    }
     const before = await this.effective(restaurantId, branchId);
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
       if (branchId) {

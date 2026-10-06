@@ -4,9 +4,12 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const dir = path.join(root, '.jamanvaar/browser-audit');
 const state = JSON.parse(fs.readFileSync(path.join(dir, 'private-state.json')));
+const qrPayments = process.env.JAMANVAAR_QA_QR_PAYMENTS === '1';
+const qrOrigin = process.env.JAMANVAAR_QA_QR_ORIGIN || 'http://localhost:5190';
+if (qrPayments) state.simulatedGateway = true;
 // Prisma eagerly reads .env at import time. Load it BEFORE sanitizing environment values.
 require('@prisma/client');
-Object.assign(process.env, { NODE_ENV: 'test', DATABASE_URL: state.databaseUrl, JWT_ACCESS_SECRET: state.jwtSecret, PAYMENT_CREDENTIAL_ENCRYPTION_KEY: state.encryptionKey, PORT: String(state.port), SMTP_HOST: '', BACKUP_SCHEDULE: 'off', BACKUP_LOCAL_DIR: path.join(dir, 'backups'), QR_ORDER_BASE_URL: 'http://localhost:5190' });
+Object.assign(process.env, { NODE_ENV: 'test', DATABASE_URL: state.databaseUrl, JWT_ACCESS_SECRET: state.jwtSecret, PAYMENT_CREDENTIAL_ENCRYPTION_KEY: state.encryptionKey, PORT: String(state.port), SMTP_HOST: '', BACKUP_SCHEDULE: 'off', BACKUP_LOCAL_DIR: path.join(dir, 'backups'), QR_ORDER_BASE_URL: qrOrigin });
 for (const key of Object.keys(process.env)) if (/RAZORPAY|SMTP_|AWS_|WHATSAPP|JAMANVAAR_SERVICE_SECRET|BACKUP_S3/.test(key)) delete process.env[key];
 const nativeFetch = globalThis.fetch;
 globalThis.fetch = (input, init) => {
@@ -46,6 +49,17 @@ async function main() {
     gateway.createUpiQr = async input => ({ qrId: `qa_qr_${input.paymentRef}`, imageUrl: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="240" height="240" fill="white"/><text x="15" y="110" font-size="16">QA SIMULATED QR</text></svg>'), status: 'active' });
     gateway.listQrPayments = async () => [];
     gateway.createRefund = async input => ({ refundId: `qa_refund_${input.receipt}`, status: 'processed', amountPaise: input.amountPaise });
+    if (qrPayments) {
+      const links = new Map();
+      gateway.createPaymentLink = async input => {
+        const link = { id: `plink_${input.referenceId}`, reference_id: input.referenceId, amount: input.amountPaise, amount_paid: 0, currency: input.currency || 'INR', status: 'created', short_url: `https://rzp.io/i/${input.referenceId}`, callbackUrl: input.callbackUrl, payments: [] };
+        links.set(link.id, link);
+        fs.writeFileSync(path.join(dir, 'private-qr-gateway.json'), JSON.stringify([...links.values()]));
+        return { linkId: link.id, shortUrl: link.short_url, status: link.status };
+      };
+      gateway.fetchPaymentLink = async id => { const link = links.get(id); if (!link) throw Error('QA link not found'); return link; };
+      gateway.findPaymentLink = async reference => [...links.values()].find(link => link.reference_id === reference) || null;
+    }
   }
   // Signature validation remains the actual gateway implementation with a throw-away QA secret.
   app.use((req, res, next) => {

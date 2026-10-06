@@ -522,11 +522,13 @@ describe('QR ordering (SaaS)', () => {
         expect(other.body.publicOrderId).not.toBe(a.body.publicOrderId);
       });
 
-      it('online payment is not offered and cannot be forced: the order is unpaid until the counter settles it', async () => {
+      it('online payment remains unavailable without a configured active gateway; cash stays unpaid until settled', async () => {
         const online = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }], { paymentMethod: 'UPI' }));
         expect(online.status).toBe(400);
         const put = await as('put', '/api/v1/restaurant/qr/settings', F.A.console).send({ allowOnlinePayment: true });
-        expect(put.status).toBe(409);
+        expect(put.status).toBe(200);
+        const describe = await http().get(`/api/v1/public/qr/${tokenA12}`);
+        expect(describe.body.ordering.settings.allowOnlinePayment).toBe(false);
         const placed = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]));
         const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId: placed.body.publicOrderId } }));
         expect(row).toMatchObject({ paymentStatus: 'PENDING', paymentMethod: 'CASH_AT_COUNTER', source: 'QR', orderType: 'DINE_IN', tableLabel: '12' });

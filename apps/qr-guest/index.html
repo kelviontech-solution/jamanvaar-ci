@@ -8,7 +8,15 @@
     <link rel="icon" href="data:," />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><p style="padding:24px;font-family:system-ui">Loading your restaurant menu…</p></div>
+    <script>
+      window.addEventListener('error', function (event) {
+        if (event.target && event.target.tagName === 'SCRIPT') {
+          var root = document.getElementById('root');
+          if (root) root.innerHTML = '<main style="padding:24px;font-family:system-ui"><h1>Ordering could not load</h1><p>Please check your connection and try again, or ask a team member.</p><button onclick="location.reload()" style="padding:14px">Try again</button></main>';
+        }
+      }, true);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

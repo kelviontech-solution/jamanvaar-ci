@@ -9,6 +9,7 @@ import { priceCart, PriceValidationError } from '../payments/pricing.util';
 import { QrMenuService } from './qr-menu.service';
 import { QrAdmission } from './qr-resilience';
 import { QrResolutionCache } from './qr-resolution-cache';
+import { PaymentsService } from '../payments/payments.service';
 import { QrSettingsService, QrSettingsView } from './qr-settings.service';
 import {
   businessDateIn, customerStatusFor, newPublicOrderId, PUBLIC_ORDER_ID_PATTERN, QR_APP_CODE, QR_EVENT, QR_MODE, QR_STATUS, QR_TOKEN_PATTERN,
@@ -31,7 +32,7 @@ export const qrOrderLineSchema = z
 export const placeQrOrderSchema = z
   .object({
     items: z.array(qrOrderLineSchema).min(1).max(50),
-    paymentMethod: z.enum(['CASH_AT_COUNTER']).default('CASH_AT_COUNTER'),
+    paymentMethod: z.enum(['CASH_AT_COUNTER', 'ONLINE']).default('CASH_AT_COUNTER'),
     customerName: z.string().trim().max(120).optional(),
     customerPhone: z.string().trim().regex(/^[0-9+\-\s]{6,20}$/).optional(),
     orderNotes: z.string().max(500).optional(),
@@ -70,7 +71,8 @@ export class QrPublicService {
     private readonly settingsService: QrSettingsService,
     private readonly orders: OrderSyncService,
     private readonly admission: QrAdmission,
-    private readonly cache: QrResolutionCache<QrContext>
+    private readonly cache: QrResolutionCache<QrContext>,
+    private readonly payments: PaymentsService
   ) {}
 
   // ------------------------------------------------------------------ resolution (spec 13, 14)
@@ -121,7 +123,7 @@ export class QrPublicService {
         tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId: code.restaurantId, entityType: 'DINING_TABLE', externalId: code.tableId! } } })
       );
       const payload = (row?.payload ?? null) as Record<string, unknown> | null;
-      if (!payload || payload.deleted === true || payload.isActive === false) throw new QrUnavailableException('TABLE_INACTIVE');
+      if (!payload || payload.deleted === true || payload.isActive === false || payload.status === 'BLOCKED') throw new QrUnavailableException('TABLE_INACTIVE');
       // A table that names a branch must be in this code's branch: a code can never open another branch's table.
       if (typeof payload.branchId === 'string' && payload.branchId !== code.branchId) throw new QrUnavailableException('TABLE_INACTIVE');
       table = { id: code.tableId, number: String(payload.tableNumber ?? code.tableNumber ?? ''), capacity: typeof payload.capacity === 'number' ? payload.capacity : undefined };
@@ -147,7 +149,7 @@ export class QrPublicService {
         enabled: true,
         menuReady: menu.ready,
         menuVersion: menu.menuVersion,
-        settings: this.publicSettings(ctx.settings)
+        settings: { ...this.publicSettings(ctx.settings), allowOnlinePayment: ctx.settings.allowOnlinePayment && await this.payments.qrOnlineAvailable(ctx.restaurant.id) }
       }
     };
   }
@@ -180,10 +182,11 @@ export class QrPublicService {
     const ctx = await this.resolve(rawToken);
     if (!ctx.settings.allowModifiers && dto.items.some((i) => i.optionIds.length > 0)) throw new BadRequestException('Customisations are turned off for QR orders.');
     if (!ctx.settings.allowCustomerNotes && dto.items.some((i) => i.note)) throw new BadRequestException('This restaurant does not accept item notes.');
-    const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
+    const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id, undefined, true);
     try {
       const priced = priceCart(dto.items.map((i) => ({ externalItemId: i.itemId, quantity: i.quantity, selectedOptionIds: i.optionIds })), menu.lookup);
       return {
+        menuVersion: menu.menuVersion,
         lines: priced.lines.map((l) => ({ itemId: l.externalItemId, name: l.name, quantity: l.quantity, unitPrice: l.unitPrice / 100, lineTotal: l.lineTotal / 100, options: l.modifiers.map((m) => m.name) })),
         subtotal: priced.subtotal / 100,
         tax: priced.taxAmount / 100,
@@ -208,7 +211,16 @@ export class QrPublicService {
 
   private async createOrder(ctx: QrContext, dto: PlaceQrOrder, sessionId?: string) {
     const { settings } = ctx;
-    if (!settings.allowCash) throw new BadRequestException('This restaurant is not accepting orders from QR right now.');
+    const externalOrderId = `qr_${createHash('sha256').update(`${ctx.restaurant.id}:${ctx.code.id}:${dto.idempotencyKey}`).digest('hex').slice(0, 40)}`;
+    const prior = await this.prisma.runAsTenant(ctx.restaurant.id, tx => tx.syncedOrder.findUnique({where:{restaurantId_externalOrderId:{restaurantId:ctx.restaurant.id,externalOrderId}}}));
+    if(prior){
+      if(prior.status==='DRAFT' && prior.paymentMethod==='ONLINE' && settings.allowOnlinePayment){
+        try { await this.payments.createQrPayment(ctx.restaurant.id,prior.publicOrderId!); } catch { /* Status exposes the failed attempt and its explicit retry action. */ }
+      }
+      return this.orderStatus(prior.publicOrderId!);
+    }
+    const online = dto.paymentMethod === 'ONLINE';
+    if (online ? !settings.allowOnlinePayment || !await this.payments.qrOnlineAvailable(ctx.restaurant.id) : !settings.allowCash) throw new BadRequestException('This payment method is not available for QR orders.');
     if (dto.orderNotes && !settings.allowCustomerNotes) throw new BadRequestException('This restaurant does not accept order notes.');
     if (dto.items.some((i) => i.note) && !settings.allowCustomerNotes) throw new BadRequestException('This restaurant does not accept item notes.');
     if (!settings.allowModifiers && dto.items.some((i) => i.optionIds.length > 0)) throw new BadRequestException('Customisations are turned off for QR orders.');
@@ -235,7 +247,7 @@ export class QrPublicService {
 
     await this.track(ctx, QR_EVENT.ORDER_STARTED, sessionId);
 
-    const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
+    const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id, undefined, true);
     const cart = dto.items.map((i) => ({ externalItemId: i.itemId, quantity: i.quantity, selectedOptionIds: i.optionIds }));
     let priced;
     try {
@@ -257,7 +269,6 @@ export class QrPublicService {
 
     // The client's key becomes a per-restaurant, per-code identifier: a repeat is the same order, and one guest can
     // never collide with (or probe) another guest's key.
-    const externalOrderId = `qr_${createHash('sha256').update(`${ctx.restaurant.id}:${ctx.code.id}:${dto.idempotencyKey}`).digest('hex').slice(0, 40)}`;
     const maxOrdersPerDay = typeof ctx.entitlement.limits.qrMaxOrdersPerDay === 'number' ? (ctx.entitlement.limits.qrMaxOrdersPerDay as number) : typeof ctx.entitlement.limits.maxOrdersPerDay === 'number' ? (ctx.entitlement.limits.maxOrdersPerDay as number) : null;
     const businessDate = businessDateIn(ctx.restaurant.timezone);
     const dayStart = startOfDayIn(ctx.restaurant.timezone);
@@ -272,11 +283,12 @@ export class QrPublicService {
       qrCodeId: ctx.code.id,
       menuVersion: menu.menuVersion,
       orderType,
-      status: settings.autoAccept ? 'PREPARING' : 'NEW',
+      status: online ? 'DRAFT' : settings.autoAccept ? 'PREPARING' : 'NEW',
       tableId,
       tableLabel,
-      items: priced.lines.map((line) => ({
-        externalItemId: line.externalItemId,
+      items: priced.lines.map((line, index) => ({
+        externalItemId: `${line.externalItemId}:${index}`,
+        menuItemId: line.externalItemId,
         name: line.name,
         quantity: line.quantity,
         unitPrice: line.unitPrice,
@@ -286,7 +298,7 @@ export class QrPublicService {
         kitchenStatus: 'PENDING',
         ...(menu.stations.get(line.externalItemId) ? { kitchenStation: menu.stations.get(line.externalItemId) } : {}),
         lineTotal: line.lineTotal,
-        ...(dto.items.find((i) => i.itemId === line.externalItemId)?.note ? { specialInstructions: dto.items.find((i) => i.itemId === line.externalItemId)!.note } : {})
+        ...(dto.items[index]?.note ? { specialInstructions: dto.items[index].note } : {})
       })),
       subtotal: priced.subtotal,
       taxAmount: priced.taxAmount,
@@ -313,17 +325,29 @@ export class QrPublicService {
       },
       meta: {
         sourceType: 'QR_TABLE',
+        restaurantName: ctx.restaurant.name,
+        branchName: ctx.branch.name,
+        currency: ctx.restaurant.currency,
         customerName: dto.customerName,
         customerPhone: dto.customerPhone,
         qrMode: ctx.code.mode,
         qrCodeVersion: ctx.code.version,
+        qrAutoAccept: settings.autoAccept,
         cgstPaise: Math.round(priced.taxAmount / 2),
         sgstPaise: priced.taxAmount - Math.round(priced.taxAmount / 2)
       }
     });
 
     if (!duplicate) await this.track(ctx, QR_EVENT.ORDER_PLACED, sessionId, { totalPaise: order.totalAmount });
-    return this.confirmation(order);
+    if (online && order.status === 'DRAFT') {
+      try { await this.payments.createQrPayment(ctx.restaurant.id, order.publicOrderId!); return this.orderStatus(order.publicOrderId!); }
+      catch {
+        // The provider may have delivered a signed success while its create response timed out.
+        try { return await this.orderStatus(order.publicOrderId!); }
+        catch { return { ...this.confirmation(order), payment: { status: 'FAILED', url: null, expiresAt: null } }; }
+      }
+    }
+    return this.orderStatus(order.publicOrderId!);
   }
 
   private async menuMovedOn(_ctx: QrContext, dto: PlaceQrOrder, currentVersion: number): Promise<boolean> {
@@ -334,12 +358,19 @@ export class QrPublicService {
     return new ConflictException({ statusCode: 409, code: 'MENU_CHANGED', message: 'The menu was updated. Please review your order and confirm the new prices.', menuVersion });
   }
 
-  private confirmation(order: { publicOrderId: string | null; totalAmount: number; status: string; createdAt: Date; tableLabel: string | null; meta: unknown }) {
+  private confirmation(order: { publicOrderId: string | null; totalAmount: number; status: string; createdAt: Date; tableLabel: string | null; meta: unknown; paymentStatus?: string | null; paymentMethod?: string | null; subtotal?: number; taxAmount?: number; discountAmount?: number; items?: unknown; notes?: string | null }) {
     const meta = (order.meta ?? {}) as Record<string, unknown>;
     return {
       publicOrderId: order.publicOrderId,
       orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null,
-      status: customerStatusFor(order.status),
+      restaurantName: typeof meta.restaurantName === 'string' ? meta.restaurantName : undefined,
+      branchName: typeof meta.branchName === 'string' ? meta.branchName : undefined,
+      currency: typeof meta.currency === 'string' ? meta.currency : undefined,
+      status: order.status === 'DRAFT' ? 'PENDING_PAYMENT' : customerStatusFor(order.status),
+      paymentStatus: order.paymentStatus ?? 'PENDING',
+      paymentMethod: order.paymentMethod,
+      subtotal: (order.subtotal ?? 0) / 100, tax: (order.taxAmount ?? 0) / 100, discount: (order.discountAmount ?? 0) / 100,
+      items: Array.isArray(order.items) ? order.items.map((line: any) => ({ name: line.name, quantity: line.quantity, unitPrice: line.unitPrice / 100, lineTotal: line.lineTotal / 100, options: Array.isArray(line.modifiers) ? line.modifiers : [], note: line.specialInstructions })) : [],
       total: order.totalAmount / 100,
       table: order.tableLabel,
       placedAt: order.createdAt.toISOString()
@@ -351,11 +382,27 @@ export class QrPublicService {
   /** The public reference is the capability: unguessable, random, and it reveals only this order's customer-safe state. */
   async orderStatus(publicOrderId: string) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId ?? '')) throw new NotFoundException('Order not found.');
-    const order = await this.prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
+    let order = await this.prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR') throw new NotFoundException('Order not found.');
+    const payment = order.paymentMethod === 'ONLINE' || order.paymentMethod === 'RAZORPAY' ? await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId) : null;
+    if (payment?.status === 'SUCCESS') order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { publicOrderId } }));
     const settings = await this.settingsService.effective(order.restaurantId, order.branchId);
     const view = this.confirmation(order);
-    return settings.showOrderStatus ? view : { ...view, status: 'RECEIVED' as const };
+    return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), payment };
+  }
+
+  async retryPayment(publicOrderId: string) {
+    if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId)) throw new NotFoundException('Order not found');
+    const order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
+    if (!order || order.source !== 'QR' || !['ONLINE', 'RAZORPAY'].includes(order.paymentMethod ?? '') || !order.qrCodeId) throw new NotFoundException('Online order not found');
+    if (order.paymentStatus === 'SUCCESS') return this.orderStatus(publicOrderId);
+    const code = await this.prisma.runAsTenant(order.restaurantId, tx => tx.qrCode.findUniqueOrThrow({ where: { id: order.qrCodeId! } }));
+    const ctx = await this.resolve(code.publicToken);
+    if (!ctx.settings.allowOnlinePayment) throw new ForbiddenException('Online payments are currently unavailable');
+    const payment = await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId);
+    if (payment.status === 'SUCCESS') return this.orderStatus(publicOrderId);
+    await this.payments.createQrPayment(order.restaurantId, publicOrderId);
+    return this.orderStatus(publicOrderId);
   }
 
   // ------------------------------------------------------------------ events (spec 47)

@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Admin publishes 20 dishes and customer kiosk displays all 20",
+    "passed": true,
+    "evidence": {
+      "adminItems": 20,
+      "customerItems": 20
+    }
+  },
+  {
+    "title": "An already caught-up kiosk with only four persisted dishes recovers all 20 after reopening",
+    "passed": true,
+    "evidence": {
+      "damagedCache": 4,
+      "recoveredItems": 20,
+      "fullCatchUpRequested": true,
+      "activationPreserved": true
+    }
+  },
+  {
+    "title": "Idle tabs on one production-like origin do not change the menu or upload it",
+    "passed": true,
+    "evidence": {
+      "idleSeconds": 18,
+      "unsolicitedMenuPosts": 0,
+      "sameOrigin": true,
+      "ownerTabs": 2,
+      "customerKiosks": 1
+    }
+  },
+  {
+    "title": "A real category edit reaches both admin workspaces and customer kiosk without bouncing back",
+    "passed": true,
+    "evidence": {
+      "propagated": true,
+      "unsolicitedMenuPosts": 0,
+      "stableSeconds": 10
+    }
+  },
+  {
+    "title": "Background updates do not replace an open unsaved dish form",
+    "passed": true,
+    "evidence": {
+      "draftRetained": true
+    }
+  }
+]

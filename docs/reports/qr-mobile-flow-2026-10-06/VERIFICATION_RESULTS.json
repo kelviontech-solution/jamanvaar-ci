@@ -1,0 +1,85 @@
+{
+  "fullApiRun": {
+    "files": 12,
+    "passed": 184,
+    "failed": 0,
+    "log": "logs/qr-mobile-final-api-tests.log"
+  },
+  "quoteVersionRegression": {
+    "files": 3,
+    "passed": 80,
+    "failed": 0,
+    "log": "logs/qr-mobile-quote-regressions.log"
+  },
+  "latestPaymentSuite": {
+    "passed": 13,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "guest QR resolves without login, with gated online payment",
+        "status": "passed"
+      },
+      {
+        "name": "online checkout freezes server price, has zero kiosk fee, and stays DRAFT until verified",
+        "status": "passed"
+      },
+      {
+        "name": "parallel duplicate submits produce one order and payment attempt",
+        "status": "passed"
+      },
+      {
+        "name": "invalid signature and wrong signed amounts cannot admit a kitchen order",
+        "status": "passed"
+      },
+      {
+        "name": "a device cannot change draft items or forge payment completion",
+        "status": "passed"
+      },
+      {
+        "name": "signed paid webhook admits the existing order once; replay/retry never creates another",
+        "status": "passed"
+      },
+      {
+        "name": "missed webhook recovers from independently fetched captured provider payment",
+        "status": "passed"
+      },
+      {
+        "name": "unavailable or deleted dishes are refused at checkout even inside availability cache TTL",
+        "status": "passed"
+      },
+      {
+        "name": "an ambiguous link-creation failure recovers its original reference and does not create a second payment",
+        "status": "passed"
+      },
+      {
+        "name": "a webhook arriving before payment-link creation returns cannot be downgraded to pending",
+        "status": "passed"
+      },
+      {
+        "name": "paid QR totals and quantities remain immutable while kitchen state can advance",
+        "status": "passed"
+      },
+      {
+        "name": "verified payment wins when the link-create response fails after its signed webhook",
+        "status": "passed"
+      },
+      {
+        "name": "online payment is unavailable without a webhook verification secret",
+        "status": "passed"
+      }
+    ]
+  },
+  "distinctApiCases": 186,
+  "unit": {
+    "files": 5,
+    "passed": 40,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 18,
+    "failed": 0,
+    "provider": "SIMULATED",
+    "physicalPhones": false
+  },
+  "productionDeployed": false
+}

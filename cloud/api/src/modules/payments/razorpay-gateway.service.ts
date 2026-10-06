@@ -67,26 +67,41 @@ export class RazorpayGatewayService {
   }
 
   /** A one-time payment link for a WhatsApp order (https://razorpay.com/docs/api/payments/payment-links/create/). Razorpay sends no SMS or email; the connector sends the link itself. */
-  async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number }): Promise<{ linkId: string; shortUrl: string; status: string }> {
+  async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number; currency?: string; callbackUrl?: string }): Promise<{ linkId: string; shortUrl: string; status: string }> {
     const { response: res, body } = await upstreamJson('https://api.razorpay.com/v1/payment_links', {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({
         amount: input.amountPaise,
-        currency: 'INR',
+        currency: input.currency ?? 'INR',
         accept_partial: false,
         description: input.description,
         reference_id: input.referenceId,
-        customer: { name: input.customerName, contact: input.customerPhone },
+        customer: { ...(input.customerName ? { name: input.customerName } : {}), ...(input.customerPhone ? { contact: input.customerPhone } : {}) },
         notify: { sms: false, email: false },
         reminder_enable: false,
-        expire_by: input.expireByUnix
+        expire_by: input.expireByUnix,
+        ...(input.callbackUrl ? { callback_url: input.callbackUrl, callback_method: 'get' } : {})
       })
     });
     if (!res.ok) {
       throw new ServiceUnavailableException(`Razorpay payment link creation failed: ${body?.error?.description ?? res.statusText}`);
     }
     return { linkId: body.id, shortUrl: body.short_url, status: body.status };
+  }
+
+  async fetchPaymentLink(id: string): Promise<{ id: string; reference_id: string; amount: number; amount_paid: number; currency: string; status: string; payments?: Array<{ payment_id: string; amount: number; status: string }> }> {
+    const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/payment_links/${encodeURIComponent(id)}`, { method: 'GET', headers: this.headers() });
+    if (!response.ok) throw new ServiceUnavailableException('Payment status could not be checked. Please try again.');
+    return body;
+  }
+
+  /** Recover an ambiguous create without changing its unique provider reference. */
+  async findPaymentLink(referenceId: string): Promise<{ id: string; reference_id: string; amount: number; currency: string; short_url: string; status: string; expire_by?: number } | null> {
+    const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/payment_links/?reference_id=${encodeURIComponent(referenceId)}`, { method: 'GET', headers: this.headers() });
+    if (!response.ok) throw new ServiceUnavailableException('The previous payment attempt could not be checked. Please try again.');
+    const links = Array.isArray(body.payment_links) ? body.payment_links : body.id ? [body] : [];
+    return links.find((link: { reference_id?: string }) => link.reference_id === referenceId) ?? null;
   }
 
   /** A refund of part or all of one captured Razorpay payment (https://razorpay.com/docs/api/refunds/create-normal/). */

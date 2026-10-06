@@ -7,7 +7,7 @@ This document contains all instructions, commands, port mappings, and default cr
 ## ⚡ Quick Start (1-Command Launch)
 
 ### 1. Launch All Servers Concurrently (Cloud + All Terminals)
-Run the entire platform (Cloud API, Super Admin, Restaurant Admin, POS, Captain, KDS, Kiosk, and LAN Sync):
+Run the entire platform (Cloud API, Super Admin, Restaurant Admin, POS, Captain, KDS, Kiosk, QR Guest, and LAN Sync):
 
 ```bash
 npm run dev:all
@@ -262,3 +262,7 @@ ever shown.
 <div align="center">
   <sub>© 2026 JAMANVAAR by KELVIONTECH. All rights reserved.</sub>
 </div>
+
+## QR guest page
+
+`npm run dev:all` also starts the guest ordering app on port 5190. Open a generated development QR link at `http://localhost:5190/q/<token>`. Set the API's `QR_ORDER_BASE_URL` to that origin for local generated codes. Production uses the public HTTPS origin and serves the guest app under `/q/`; its JS and CSS must resolve under `/q/assets/`.
