@@ -79,7 +79,6 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
 
   it('ignores a malformed remote record instead of corrupting the local staff list', () => {
     const before = db.users.length;
-    // @ts-expect-error intentionally malformed for the test
     StaffRepository.applyRemoteUser({ fullName: 'No id or pinHash' });
     expect(db.users.length).toBe(before);
   });

@@ -20,7 +20,7 @@ describe('Captain service workflow', () => {
     db.orders = [];
     db.kots = [];
     const created = await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
-    pin = created.issuedPin;
+    pin = created.issuedPin!;
     userId = created.id;
     ServiceMessages.resetForTests();
     store().logout();
@@ -43,7 +43,7 @@ describe('Captain service workflow', () => {
 
     it('refuses a PIN that belongs to a role that does not work the floor (BUG-118)', async () => {
       const cook = await StaffRepository.createUser({ username: 'chefji', fullName: 'Chef Ji', roleId: 'role-chef' });
-      expect(await store().login(cook.issuedPin)).toBe(false);
+      expect(await store().login(cook.issuedPin!)).toBe(false);
       expect(store().isLoggedIn).toBe(false);
       // BUG-147: the screen says why, instead of "incorrect PIN"; a plain typo says nothing special.
       expect(store().loginError).toMatch(/Chef.*can't open the Captain app/);

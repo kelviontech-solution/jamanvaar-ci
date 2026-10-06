@@ -95,7 +95,8 @@ export class PlatformAuthService {
   private async issueRefreshToken(
     platformUserId: string,
     session: { sessionId: string; startedAt?: Date; userAgent?: string | null; ip?: string | null; location?: string | null },
-    role?: string
+    role?: string,
+    transaction?: import('@prisma/client').Prisma.TransactionClient
   ): Promise<{ token: string; expiresAt: Date }> {
     const token = randomBytes(48).toString('base64url');
     const normalTtl = Number(this.config.get<string>('JWT_REFRESH_TTL_DAYS') ?? 30);
@@ -103,7 +104,7 @@ export class PlatformAuthService {
     const ttlDays = role === 'PLATFORM_OWNER' || role === 'SUPER_ADMIN' ? Math.min(normalTtl, privilegedTtl) : normalTtl;
     const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
 
-    await this.prisma.platformRefreshToken.create({
+    await (transaction ?? this.prisma).platformRefreshToken.create({
       data: {
         platformUserId,
         tokenHash: hashRefreshToken(token),
@@ -333,32 +334,22 @@ export class PlatformAuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    await this.prisma.platformRefreshToken.update({
-      where: { id: existing.id },
-      data: { revokedAt: new Date() }
-    });
-
     const user = existing.platformUser;
-    if (user.status !== PlatformUserStatus.ACTIVE) {
-      throw new UnauthorizedException('Account disabled');
-    }
-
-    // Same session, new token: the id and start time carry over so the list keeps showing one row per login.
-    const accessToken = this.signAccessToken(user, existing.sessionId);
-    const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, {
-      sessionId: existing.sessionId,
-      startedAt: existing.sessionStartedAt,
-      userAgent: existing.userAgent ?? context.userAgent,
-      ip: context.ip ?? existing.ip,
-      location: existing.location ?? context.location
-    }, user.role);
-
-    return {
-      accessToken,
-      refreshToken: newRefreshToken,
-      refreshTokenExpiresAt: expiresAt,
-      user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status, role: user.role, permissions: permissionsForRole(user.role as PlatformRoleName) }
-    };
+    if (user.status !== PlatformUserStatus.ACTIVE) throw new UnauthorizedException('Account disabled');
+    return this.prisma.$transaction(async (tx) => {
+      const claimed = await tx.platformRefreshToken.updateMany({
+        where: { id: existing.id, revokedAt: null, terminatedAt: null }, data: { revokedAt: new Date() }
+      });
+      if (claimed.count !== 1) throw new UnauthorizedException('Invalid refresh token');
+      const accessToken = this.signAccessToken(user, existing.sessionId);
+      const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, {
+        sessionId: existing.sessionId, startedAt: existing.sessionStartedAt,
+        userAgent: existing.userAgent ?? context.userAgent, ip: context.ip ?? existing.ip,
+        location: existing.location ?? context.location
+      }, user.role, tx);
+      return { accessToken, refreshToken: newRefreshToken, refreshTokenExpiresAt: expiresAt,
+        user: { id: user.id, email: user.email, fullName: user.fullName, status: user.status, role: user.role, permissions: permissionsForRole(user.role as PlatformRoleName) } };
+    });
   }
 
   /** A sign-in beyond the cap ends the least recently used sessions, so old forgotten logins do not pile up. */

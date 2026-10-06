@@ -275,4 +275,53 @@ describe('Manual restaurant payouts (Route pending)', () => {
     const noBankDetails = await authed('patch', `/api/v1/payments/payouts/bank-verification/${a.rid}`, platformToken).send({ status: 'VERIFIED', password: adminPassword });
     expect(noBankDetails.status).toBe(400);
   });
+  it('pending includes captured collections before EOD and never counts refunded shares as payable', async () => {
+    const a = await makeRestaurant('before-eod');
+    await seedPayment(a.rid, { amount: 2500000 });
+    const refundable = await seedPayment(a.rid, { amount: 10000 });
+    await prisma.runAsTenant(a.rid, tx => tx.refund.create({ data: { restaurantId: a.rid, paymentId: refundable.id, amount: 5000, status: 'PENDING' } }));
+    const summary = await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin);
+    expect(summary.status).toBe(200);
+    expect(summary.body).toMatchObject({ grossCollection: 2510000, platformFee: 75300, netPayable: 2425000, pendingPayout: 2425000, paidPayout: 0, heldPayable: 9700 });
+    await verifyBank(a.rid);
+    await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
+    expect((await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin)).body.pendingPayout).toBe(2425000);
+  });
+
+  it('refunds after batching block payment and release, and held payout destinations cannot be changed', async () => {
+    const a = await makeRestaurant('refund-after-batch');
+    await verifyBank(a.rid);
+    const payment = await seedPayment(a.rid, { amount: 10000 });
+    await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
+    const list = await authed('get', `/api/v1/payments/payouts?restaurantId=${a.rid}`, platformToken);
+    const id = list.body.rows[0].id;
+    await prisma.runAsTenant(a.rid, tx => tx.refund.create({ data: { restaurantId: a.rid, paymentId: payment.id, amount: 1000, status: 'PENDING' } }));
+    expect((await authed('patch', `/api/v1/payments/payouts/${id}/mark-paid`, platformToken).send({ utr: 'BLOCKED', password: adminPassword })).status).toBe(409);
+    await authed('patch', `/api/v1/payments/payouts/${id}/hold`, platformToken).send({ reason: 'refund', password: adminPassword });
+    expect((await authed('patch', `/api/v1/payments/payouts/${id}/release`, platformToken).send({ password: adminPassword })).status).toBe(409);
+    const summary = await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin);
+    expect(summary.body).toMatchObject({ pendingPayout: 0, netPayable: 0, heldPayable: 9700 });
+  });
+
+  it('concurrent mark-paid requests record only one immutable transfer reference', async () => {
+    const a = await makeRestaurant('concurrent-paid');
+    await verifyBank(a.rid);
+    await seedPayment(a.rid, { amount: 10000 });
+    await authed('post', '/api/v1/payments/payouts/run-eod', platformToken).send({});
+    const list = await authed('get', `/api/v1/payments/payouts?restaurantId=${a.rid}`, platformToken);
+    const id = list.body.rows[0].id;
+    const responses = await Promise.all(['ONE', 'TWO'].map(utr => authed('patch', `/api/v1/payments/payouts/${id}/mark-paid`, platformToken).send({ utr, password: adminPassword })));
+    expect(responses.map(r => r.status).sort()).toEqual([200, 409]);
+    const summary = await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin);
+    expect(summary.body).toMatchObject({ netPayable: 9700, pendingPayout: 0, paidPayout: 9700 });
+  });
+
+  it('historical collections without a split remain visible for review and are not assigned an invented fee', async () => {
+    const a = await makeRestaurant('legacy-split');
+    const payment = await seedPayment(a.rid, { amount: 10000 });
+    await prisma.runAsTenant(a.rid, tx => tx.paymentTransaction.update({ where: { id: payment.id }, data: { commissionBps: null, platformAmount: null, restaurantAmount: null } }));
+    const summary = await authed('get', '/api/v1/payments/payout-summary', a.kioskAdmin);
+    expect(summary.body).toMatchObject({ grossCollection: 10000, platformFee: 0, netPayable: 0, pendingPayout: 0, unallocatedCollection: 10000 });
+  });
+
 });

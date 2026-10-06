@@ -88,6 +88,12 @@ export class DurableStorage {
 
   /** Called with the changes another window made, after they have been applied to this window's copy. */
   onRemoteChange: ((ops: StoreOp[]) => void) | null = null;
+  private readonly remoteListeners = new Set<(ops: StoreOp[]) => void>();
+
+  subscribeRemote(listener: (ops: StoreOp[]) => void): () => void {
+    this.remoteListeners.add(listener);
+    return () => this.remoteListeners.delete(listener);
+  }
 
   private applyRemote(ops: StoreOp[]): void {
     const applied: StoreOp[] = [];
@@ -98,6 +104,7 @@ export class DurableStorage {
       applied.push(op);
     }
     if (applied.length > 0) this.onRemoteChange?.(applied);
+    if (applied.length > 0) this.remoteListeners.forEach((listener) => listener(applied));
   }
 
   getItem(key: string): string | null {

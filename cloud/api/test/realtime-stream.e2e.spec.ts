@@ -25,6 +25,7 @@ describe('Realtime stream', () => {
   let kdsBId: string;
   let otherRestaurantKds: string;
   let adminConsole: string;
+  let captainA: string;
 
   const platform = (method: 'get' | 'post' | 'patch', url: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${platformToken}`);
 
@@ -97,6 +98,7 @@ describe('Realtime stream', () => {
     const branchA = (await platform('post', '/api/v1/branches').send({ restaurantId: rid, name: 'Branch RT-A', code: 'RTA' })).body.id;
     const branchB = (await platform('post', '/api/v1/branches').send({ restaurantId: rid, name: 'Branch RT-B', code: 'RTB' })).body.id;
     posA = (await activate(rid, 'POS', branchA)).token;
+    captainA = (await activate(rid, 'CAPTAIN', branchA)).token;
     kdsA = (await activate(rid, 'KDS', branchA)).token;
     const b = await activate(rid, 'KDS', branchB);
     kdsB = b.token; kdsBId = b.id;
@@ -174,4 +176,35 @@ describe('Realtime stream', () => {
     expect(b.events.some((e) => e.event === 'revoked')).toBe(true);
     b.close();
   });
+  it('measures Captain creation, committed DB row, KDS delivery and READY returning to Captain and POS', async () => {
+    const kitchen = listen(kdsA); const captain = listen(captainA);
+    try {
+      await until(() => kitchen.events.some((e) => e.event === 'ready') && captain.events.some((e) => e.event === 'ready'));
+      const id = `captain-roundtrip-${Date.now()}`;
+      const draft = { ...order(id), eventId: `${id}:new`, meta: { sourceType: 'CAPTAIN' } };
+      const start = performance.now();
+      const pushed = await request(base).post('/api/v1/orders/sync').set('Authorization', `Bearer ${captainA}`).send({ events: [draft] });
+      expect(pushed.body.results[0].status).toBe('ok');
+      const createMs = performance.now() - start;
+      const dbStart = performance.now();
+      const stored = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirstOrThrow({ where: { externalOrderId: id } }));
+      expect(stored.items).toHaveLength(1);
+      const dbReadMs = performance.now() - dbStart;
+      await until(() => kitchen.events.some((e) => e.event === 'change' && e.data.kind === 'orders'));
+      const pulled = await request(base).get('/api/v1/orders/sync?afterSeq=0').set('Authorization', `Bearer ${kdsA}`);
+      expect(pulled.body.orders.find((o: any) => o.externalOrderId === id)).toMatchObject({ status: 'NEW' });
+      const kitchenVisibleMs = performance.now() - start;
+      const returnStart = performance.now();
+      const update = { ...draft, eventId: `${id}:ready`, baseSyncVersion: pushed.body.results[0].syncVersion, status: 'READY', items: draft.items.map((i) => ({ ...i, kitchenStatus: 'READY' })) };
+      const updated = await request(base).post('/api/v1/orders/sync').set('Authorization', `Bearer ${kdsA}`).send({ events: [update] });
+      expect(updated.body.results[0].status).toBe('ok');
+      await until(() => captain.events.some((e) => e.event === 'change' && e.data.kind === 'orders'));
+      for (const token of [captainA, posA]) {
+        const res = await request(base).get(`/api/v1/orders/sync?afterSeq=${stored.seq}`).set('Authorization', `Bearer ${token}`);
+        expect(res.body.orders.find((o: any) => o.externalOrderId === id)).toMatchObject({ status: 'READY', items: [expect.objectContaining({ kitchenStatus: 'READY' })] });
+      }
+      console.log('[sync-flow-local]', JSON.stringify({ createMs: Math.round(createMs), dbReadMs: Math.round(dbReadMs), kitchenVisibleMs: Math.round(kitchenVisibleMs), readyReturnMs: Math.round(performance.now() - returnStart) }));
+    } finally { kitchen.close(); captain.close(); await Promise.all([kitchen.done, captain.done]); }
+  });
+
 });

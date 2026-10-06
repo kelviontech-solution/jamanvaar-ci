@@ -100,7 +100,7 @@ describe('a device whose menu is empty but whose cursor says it is up to date', 
 
     EntitySyncEngine.restartFromBeginning('HEAL_TEST');
     await EntitySyncEngine.catchUp('HEAL_TEST', () => undefined);
-    expect(since[0]).toBe(new Date(0).toISOString());
+    expect(since[0]).toBe('seq:0');
 
     // Second call in the same session does nothing: the cursor set by the pull above is kept.
     EntitySyncEngine.restartFromBeginning('HEAL_TEST');

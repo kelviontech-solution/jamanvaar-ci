@@ -192,6 +192,9 @@ export class OrderSyncService {
           const existing = await tx.syncedOrder.findUnique({
             where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId } }
           });
+          if (existing && device.branchId && existing.branchId !== device.branchId) {
+            throw new Error('BRANCH_FORBIDDEN: This order is outside this device branch');
+          }
 
           // A settled payment is a business invariant, not an ordinary sync conflict: one order is paid
           // once, a paid order can be refunded but never silently reopened, and only a device with

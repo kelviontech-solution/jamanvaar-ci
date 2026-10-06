@@ -19,7 +19,7 @@ const CURSOR_KEYS = [
   'jamanvaar_inventory_ledger_cursor:core',
   'jamanvaar_menu_applied_version'
 ];
-const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT'];
+const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION'];
 
 export interface TenantEntry {
   /** True when data from another restaurant (or of unknown ownership) was removed. */
@@ -98,6 +98,7 @@ export class TenantIsolation {
       KeyValueStore.remove(`jamanvaar_entity_sync_cursor_${t}`);
       KeyValueStore.remove(`jamanvaar_entity_sync_cursor_${t}:core`);
     }
+    for (const key of KeyValueStore.keys()) if (key.includes(':device:') && (key.includes('sync_cursor') || key.includes('ledger_cursor'))) KeyValueStore.remove(key);
     KeyValueStore.set(TENANT_KEY, restaurantId);
     AuditRepository.log({ action: 'TENANT_SWITCH_LOCAL_DATA_CLEARED', category: 'SETTINGS', details: `Local data from ${previous} was cleared when this device was activated for ${restaurantId}; ${unsynced.length} unsent order(s) were set aside.`, username: 'System' });
     db.notify();

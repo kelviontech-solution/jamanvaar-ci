@@ -368,4 +368,41 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       expect(res.body.kiosks.every((k: { id: string }) => typeof k.id === 'string')).toBe(true);
     });
   });
+  it('replays 501 old entities with tied timestamps without skipping the second page', async () => {
+    const baseline = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.aggregate({ where: { restaurantId }, _max: { seq: true } }));
+    const after = baseline._max.seq ?? 0;
+    await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.createMany({ data: Array.from({ length: 501 }, (_, i) => ({
+      restaurantId, entityType: 'INVENTORY_ITEM', externalId: `sequence-tie-${i}`, payload: { id: `sequence-tie-${i}` }, updatedAt: new Date('2000-01-01T00:00:00Z')
+    })) }));
+    const first = await authed('get', `/api/v1/entity-sync/INVENTORY_ITEM?afterSeq=${after}`, posAdminToken);
+    expect(first.status).toBe(200); expect(first.body.entities).toHaveLength(500); expect(first.body.hasMore).toBe(true);
+    const second = await authed('get', `/api/v1/entity-sync/INVENTORY_ITEM?afterSeq=${first.body.latestSeq}`, posAdminToken);
+    expect(second.status).toBe(200); expect(second.body.entities).toHaveLength(1); expect(second.body.hasMore).toBe(false);
+    expect(new Set([...first.body.entities, ...second.body.entities].map((e: any) => e.externalId)).size).toBe(501);
+  });
+
+  it('advances over an entirely filtered table page and refuses writes across branches', async () => {
+    const device = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findFirstOrThrow({ where: { restaurantId, type: 'POS' } }));
+    const originalBranch = device.branchId;
+    const branches = await prisma.runAsTenant(restaurantId, async (tx) => Promise.all(['Sequence A', 'Sequence B'].map((name) => tx.branch.create({ data: { restaurantId, name, code: name.replaceAll(' ', '_') } }))));
+    try {
+      await prisma.runAsTenant(restaurantId, (tx) => tx.device.update({ where: { id: device.id }, data: { branchId: branches[0].id } }));
+      const baseline = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.aggregate({ where: { restaurantId }, _max: { seq: true } }));
+      await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.createMany({ data: Array.from({ length: 501 }, (_, i) => ({
+        restaurantId, entityType: 'DINING_TABLE', externalId: `filtered-${i}`, payload: { id: `filtered-${i}`, branchId: branches[i < 500 ? 1 : 0].id }
+      })) }));
+      const first = await authed('get', `/api/v1/entity-sync/DINING_TABLE?afterSeq=${baseline._max.seq ?? 0}`, posToken);
+      expect(first.body.entities).toEqual([]); expect(first.body.hasMore).toBe(true);
+      const second = await authed('get', `/api/v1/entity-sync/DINING_TABLE?afterSeq=${first.body.latestSeq}`, posToken);
+      expect(second.body.entities.map((e: any) => e.externalId)).toEqual(['filtered-500']);
+      const denied = await authed('post', '/api/v1/entity-sync/DINING_TABLE', posToken).send({ events: [{ externalId: 'filtered-0', payload: { id: 'filtered-0', branchId: branches[0].id, updatedAt: new Date().toISOString() } }] });
+      expect(denied.body.results[0].status).toBe('error');
+      expect((await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.findFirstOrThrow({ where: { restaurantId, externalId: 'filtered-0' } }))).payload).toMatchObject({ branchId: branches[1].id });
+    } finally {
+      await prisma.runAsTenant(restaurantId, (tx) => tx.device.update({ where: { id: device.id }, data: { branchId: originalBranch } }));
+      await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, externalId: { startsWith: 'filtered-' } } }));
+      await prisma.runAsTenant(restaurantId, (tx) => tx.branch.deleteMany({ where: { id: { in: branches.map((b) => b.id) } } }));
+    }
+  });
+
 });

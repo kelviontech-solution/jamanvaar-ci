@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { Client } from 'pg';
 import { Subject } from 'rxjs';
 
-export type RealtimeKind = 'orders' | 'inventory' | 'menu' | 'command';
+export type RealtimeKind = 'orders' | 'inventory' | 'menu' | 'command' | 'entities' | `entity:${string}`;
 
 export interface RealtimeEvent {
   /** '*' means every restaurant: sent to all connected devices after the relay reconnects, so they pull anything they missed. */
@@ -44,6 +44,8 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
   private closing = false;
   private everConnected = false;
   private retry: NodeJS.Timeout | null = null;
+  private readonly pendingNotifications = new Map<string, string>();
+  private notifying = false;
 
   async onModuleInit(): Promise<void> {
     if (process.env.REALTIME_PG_RELAY === 'off' || !process.env.DATABASE_URL) return;
@@ -52,6 +54,7 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     this.closing = true;
+    this.pendingNotifications.clear();
     if (this.retry) clearTimeout(this.retry);
     const c = this.client;
     this.client = null;
@@ -60,7 +63,7 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
 
   private async connect(): Promise<void> {
     if (this.closing) return;
-    const client = new Client({ connectionString: pgConnectionString(process.env.DATABASE_URL as string) });
+    const client = new Client({ connectionString: pgConnectionString(process.env.DATABASE_URL as string), connectionTimeoutMillis: 5000, query_timeout: 5000, keepAlive: true });
     client.on('error', (e) => this.lost(client, e));
     client.on('end', () => this.lost(client));
     client.on('notification', (msg) => {
@@ -77,10 +80,11 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
     try {
       await client.connect();
       await client.query(`LISTEN ${CHANNEL}`);
+      if (this.closing) { await client.end(); return; }
       this.client = client;
       // Wake-ups raised elsewhere while the relay was down were lost. Tell every connected device to pull now, so a gap costs
       // one extra pull and never a missed change.
-      if (this.everConnected) for (const kind of ['orders', 'inventory', 'menu'] as const) this.events$.next({ restaurantId: '*', branchId: null, kind });
+      if (this.everConnected) for (const kind of ['orders', 'inventory', 'menu', 'entities'] as const) this.events$.next({ restaurantId: '*', branchId: null, kind });
       this.everConnected = true;
     } catch (e) {
       this.lost(client, e as Error);
@@ -100,7 +104,7 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
   /** Tells every instance that this restaurant's cached QR state (codes, settings, entitlement) changed. */
   publishInvalidation(restaurantId: string): void {
     this.invalidations$.next(restaurantId);
-    this.client?.query('SELECT pg_notify($1, $2)', [CHANNEL, JSON.stringify({ i: this.instanceId, inv: restaurantId })]).catch(() => undefined);
+    this.notify(`invalidate:${restaurantId}`, JSON.stringify({ i: this.instanceId, inv: restaurantId }));
   }
 
   publish(event: RealtimeEvent): void {
@@ -108,7 +112,23 @@ export class RealtimeBus implements OnModuleInit, OnModuleDestroy {
     if (!this.client) return;
     const payload = JSON.stringify({ i: this.instanceId, e: event });
     if (Buffer.byteLength(payload) > 7000) return;
-    this.client.query('SELECT pg_notify($1, $2)', [CHANNEL, payload]).catch(() => undefined);
+    this.notify([event.restaurantId, event.branchId, event.deviceId, event.kind, event.originDeviceId].join(':'), payload);
+  }
+
+  /** Hints for the same scope can be coalesced; cursor pulls still retrieve every committed change. */
+  private notify(key: string, payload: string): void {
+    if (!this.client || this.closing) return;
+    if (this.pendingNotifications.size >= 2048 && !this.pendingNotifications.has(key)) return;
+    this.pendingNotifications.set(key, payload);
+    if (this.notifying) return;
+    this.notifying = true;
+    void (async () => {
+      while (this.client && !this.closing && this.pendingNotifications.size) {
+        const [nextKey, nextPayload] = this.pendingNotifications.entries().next().value!;
+        this.pendingNotifications.delete(nextKey);
+        await this.client.query('SELECT pg_notify($1, $2)', [CHANNEL, nextPayload]).catch(() => undefined);
+      }
+    })().finally(() => { this.notifying = false; });
   }
 
   /** Whether `event` may be delivered to a device with these credentials. Scope comes from the authenticated device, never from the client. */

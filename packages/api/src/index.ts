@@ -7,3 +7,4 @@ export * from './services/ebill';
 export * from './services/voice';
 export * from './print_transport';
 export * from './platform';
+export * from './http';

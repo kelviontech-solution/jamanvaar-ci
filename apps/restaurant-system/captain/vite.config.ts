@@ -2,12 +2,13 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { readFileSync } from 'fs';
+import { appShellCache } from '../../../tooling/vite/app_shell_cache';
 
 const appVersion = (JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')) as { version: string }).version;
 
 export default defineConfig({
   base: './',
-  plugins: [react()],
+  plugins: [react(), appShellCache()],
   optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
   worker: { format: 'es' },
   define: { __APP_VERSION__: JSON.stringify(appVersion) },

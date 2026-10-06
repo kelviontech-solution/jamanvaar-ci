@@ -154,7 +154,7 @@ export function PaymentConnectionsListPage() {
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="muted" style={{ fontSize: 12 }}>Platform default commission</span>
+          <span className="muted" style={{ fontSize: 12 }}>Default kiosk QR fee</span>
           <input
             type="number"
             min={0}
@@ -207,7 +207,7 @@ export function PaymentConnectionsListPage() {
             <EmptyState
               icon={<CreditCard className="w-6 h-6 text-slate-400" />}
               title={connections.length === 0 ? 'No payment connections yet' : 'No matching connections'}
-              description="Restaurants submit their settlement details from Kiosk Admin's Payment Gateway settings."
+              description="Restaurants submit bank details and direct settlement requests in Restaurant Admin kiosk payment settings."
             />
           ) : (
             <div className="data-table-container">
@@ -218,8 +218,9 @@ export function PaymentConnectionsListPage() {
                     <th>Status</th>
                     <th>Contact</th>
                     <th>Settlement</th>
+                    <th>Direct settlement</th>
                     <th>Bank verification</th>
-                    <th>Commission</th>
+                    <th>Kiosk QR fee</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -239,7 +240,13 @@ export function PaymentConnectionsListPage() {
                         <div className="muted" style={{ fontSize: 11 }}>{c.contactEmail ?? ''}</div>
                       </td>
                       <td style={{ fontSize: 12 }}>
+                        <div>{c.settlementAccountName}</div>
+                        <div className="muted">{c.settlementBankName} {c.settlementBankAccountType}</div>
                         {c.settlementUpiVpaMasked ? c.settlementUpiVpaMasked : c.settlementAccountNumberMasked ? `${c.settlementAccountNumberMasked} (${c.settlementIfsc ?? ''})` : '—'}
+                      </td>
+                      <td style={{ fontSize: 12 }}>
+                        {c.directSettlementRequested ? 'Requested - Route pending' : 'Jamanvaar collection (default)'}
+                        <div className="muted">Effective payouts: manual</div>
                       </td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

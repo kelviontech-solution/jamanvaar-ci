@@ -91,14 +91,14 @@ export async function run(dataDir: string, port: number, appDirs: Record<string,
   });
   scheduler.start();
   // Answer whenever an order arrives so the cloud hears about it promptly.
-  core.listeners.add((e) => { if (e.kind === 'orders' || e.kind === 'inventory') scheduler.poke(); });
+  core.listeners.add((e) => { if (['orders', 'inventory', 'menu', 'entities'].includes(e.kind) && e.originDeviceId) scheduler.poke(); });
 
   const discovery = await startDiscoveryResponder({ httpPort: port, restaurantId, branchCode: core.cfg.branchCode }).catch(() => null);
   console.log(`Branch Core running on port ${port}. Devices can reach it at: ${lanAddresses().map((a) => `${runOpts.tls ? 'https' : 'http'}://${a}:${port}`).join(', ') || `http://localhost:${port}`}`);
 
   return {
     stop: async () => {
-      scheduler.stop();
+      await scheduler.stop();
       backups?.stop();
       discovery?.close();
       await new Promise<void>((r) => { server.closeAllConnections?.(); server.close(() => r()); });

@@ -128,10 +128,10 @@ describe('Captain sign-in needs the staff record from the cloud', () => {
     const created = await StaffRepository.createUser({ username: 'sunil', fullName: 'Sunil Captain', roleId: 'role-captain' });
     const payload = StaffRepository.toSyncPayload(db.users.find((u) => u.id === created.id)!);
     db.users = [];
-    expect(await useCaptainStore.getState().login(created.issuedPin)).toBe(false);
+    expect(await useCaptainStore.getState().login(created.issuedPin!)).toBe(false);
 
     StaffRepository.applyRemoteUser(payload);
-    expect(await useCaptainStore.getState().login(created.issuedPin)).toBe(true);
+    expect(await useCaptainStore.getState().login(created.issuedPin!)).toBe(true);
     expect(useCaptainStore.getState().currentCaptain?.name).toBe('Sunil Captain');
   });
 });

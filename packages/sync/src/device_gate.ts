@@ -10,6 +10,7 @@
  * limited offline window is allowed, not unlimited).
  */
 import { KeyValueStore } from '@jamanvaar/database';
+import { fetchWithDeadline } from '@jamanvaar/api';
 import { DisplayScale } from './display_scale';
 import { LICENSE_PUBLIC_KEYS, type LicensePublicKey } from '@jamanvaar/config';
 import { AppUpdate, type AppUpdateOffer } from './app_update';
@@ -86,15 +87,15 @@ const memory: { value: string | null; disconnectReason: string | null } = { valu
 const DISCONNECTED_FLAG = 'jamanvaar_gate_disconnected';
 const isDisconnected = (): boolean => {
   try {
-    return globalThis.localStorage?.getItem(DISCONNECTED_FLAG) === '1';
+    return globalThis.localStorage?.getItem(KeyValueStore.browserKey(DISCONNECTED_FLAG)) === '1';
   } catch {
     return false;
   }
 };
 const setDisconnected = (on: boolean): void => {
   try {
-    if (on) globalThis.localStorage?.setItem(DISCONNECTED_FLAG, '1');
-    else globalThis.localStorage?.removeItem(DISCONNECTED_FLAG);
+    if (on) globalThis.localStorage?.setItem(KeyValueStore.browserKey(DISCONNECTED_FLAG), '1');
+    else globalThis.localStorage?.removeItem(KeyValueStore.browserKey(DISCONNECTED_FLAG));
   } catch {
     /* storage unavailable: the in-memory reset still applies until the reload */
   }
@@ -134,6 +135,9 @@ const MESSAGES: Record<DeviceGateCode, string> = {
 };
 
 export interface HeartbeatAnswer {
+  restaurantId?: string;
+  branchId?: string | null;
+  deviceId?: string;
   ok?: boolean;
   locked?: boolean;
   lockCode?: string | null;
@@ -176,6 +180,12 @@ export class DeviceGate {
 
   static getState(): DeviceGateState {
     return { ...this.state };
+  }
+
+  static reload(): void {
+    memory.value = null;
+    this.state = readStorage() ?? { locked: false };
+    this.listeners.forEach((listener) => listener());
   }
 
   static subscribe(listener: () => void): () => void {
@@ -426,7 +436,7 @@ export class DeviceGate {
 
   /** fetch() that feeds every response through the gate. */
   static async gatedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-    const res = await fetch(input, init);
+    const res = await fetchWithDeadline(input, init);
     await this.observe(res, !/\/devices\/me(\/|\?|$)/.test(String(input)));
     return res;
   }

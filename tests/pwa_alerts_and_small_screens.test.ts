@@ -38,8 +38,8 @@ describe('the Captain and KDS install like apps and open without signal', () => 
       it('the service worker caches only this app\'s own files: never the API, never a write', () => {
         const sw = read(`${app}/public/sw.js`);
         expect(sw).toMatch(/req\.method !== 'GET'\) return/);
-        expect(sw).toMatch(/url\.origin !== self\.location\.origin\) return/);
-        expect(sw).not.toMatch(/\/api\//);
+        expect(sw).toContain('url.origin !== self.location.origin');
+        expect(sw).toContain("url.pathname.startsWith('/api/')");
       });
     });
   }

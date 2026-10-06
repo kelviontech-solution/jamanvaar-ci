@@ -1,3 +1,4 @@
+import { syncStaffUsers } from '@jamanvaar/sync';
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
@@ -312,11 +313,10 @@ export default function KioskUserApp() {
     // BUG-019/034/035: the manager-override staff PIN used to work only on the device that created
     // it — a kiosk was never in the entity-sync loop for staff, despite the create/reset screen's own
     // promise that the PIN would work on Kiosk too. Pull only — a kiosk never edits staff.
-    const syncStaff = async () => {
-      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
-    };
+    const syncStaff = () => syncStaffUsers({ push: false });
 
     void SyncOutboxEngine.processOutbox();
+    void SyncOutboxEngine.catchUpFromCloud();
     void syncMenuCatalog({ push: false });
     // BUG-130/133/136/137: combos and coupons made in Kiosk Admin arrive here; coupon redemptions, guest ratings
     // and "call staff" requests go back.
@@ -350,6 +350,7 @@ export default function KioskUserApp() {
 
     const interval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
+      void SyncOutboxEngine.catchUpFromCloud();
       void syncMenuCatalog({ push: false });
       void syncPromotions({ pushCombos: false, pushCoupons: true });
       void syncFeedback({ push: true });
@@ -700,12 +701,15 @@ export default function KioskUserApp() {
 
     // Deliberately NOT tied to the payment screen: a guest who taps Back or Cancel after scanning may
     // still complete the payment on their phone, and that must still produce their token and KOT.
+    let checking = false;
     const interval = setInterval(async () => {
+      if (checking) return;
       if (reconciliationDeadlineRef.current && Date.now() > reconciliationDeadlineRef.current) {
         clearInterval(interval);
         return;
       }
 
+      checking = true;
       try {
         const result = await getPaymentOrderStatus(realPaymentId);
         if (result.status === 'SUCCESS') {
@@ -723,7 +727,7 @@ export default function KioskUserApp() {
         }
       } catch (err) {
         console.error('Payment status poll failed:', err);
-      }
+      } finally { checking = false; }
     }, 1000);
 
     return () => clearInterval(interval);
@@ -757,9 +761,13 @@ export default function KioskUserApp() {
     const pending = loadPendingPayment();
     if (!pending || !isKioskDeviceConnected()) return;
     let stopped = false;
+    let recoveryTimer: ReturnType<typeof setInterval> | undefined;
+    let recoveryChecking = false;
     const RESUME_WINDOW_MS = 6 * 60 * 1000;
 
     const check = async (): Promise<boolean> => {
+      if (recoveryChecking || stopped) return false;
+      recoveryChecking = true;
       try {
         const result = await getPaymentOrderStatus(pending.paymentId);
         if (result.status === 'SUCCESS') {
@@ -772,7 +780,7 @@ export default function KioskUserApp() {
         }
       } catch (err) {
         console.error('Resuming pending payment failed:', err);
-      }
+      } finally { recoveryChecking = false; }
       return false;
     };
 
@@ -782,7 +790,8 @@ export default function KioskUserApp() {
         clearPendingPayment();
         return;
       }
-      const timer = setInterval(async () => {
+      if (stopped) return;
+      const timer = recoveryTimer = setInterval(async () => {
         if (stopped || Date.now() - pending.startedAt > RESUME_WINDOW_MS) {
           clearInterval(timer);
           if (!stopped) clearPendingPayment();
@@ -794,6 +803,7 @@ export default function KioskUserApp() {
 
     return () => {
       stopped = true;
+      clearInterval(recoveryTimer);
     };
     // Runs once per app start on purpose.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -815,6 +825,7 @@ export default function KioskUserApp() {
   // Periodic Heartbeat to Authoritative Local Service
   useEffect(() => {
     const sendHeartbeat = () => {
+      if (window.location.protocol === 'https:') return;
       if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
       const host = window.location?.hostname || 'localhost';
       fetch(`http://${host}:5178/api/heartbeat`, {

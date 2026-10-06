@@ -3,6 +3,7 @@ import path from 'path';
 import swc from 'unplugin-swc';
 
 export default defineConfig({
+  root: __dirname,
   // NestJS's dependency injection reads constructor parameter types from
   // decorator metadata (`emitDecoratorMetadata`), which esbuild (Vitest's
   // default transform) does not emit — DI silently resolves providers as

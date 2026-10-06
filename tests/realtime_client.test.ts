@@ -19,7 +19,7 @@ function streamOf(chunks: string[], hold = false): Response {
   return new Response(body, { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
 }
 
-const tick = (ms = 20) => new Promise((r) => setTimeout(r, ms));
+const tick = (ms = 20) => new Promise<void>((r) => setTimeout(r, ms));
 
 describe('parseSseBlocks', () => {
   it('splits complete events and keeps a partial one for the next chunk', () => {

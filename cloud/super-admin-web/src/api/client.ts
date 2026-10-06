@@ -1,3 +1,4 @@
+import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api/http';
 export const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
 
 export class ApiError extends Error {
@@ -12,8 +13,10 @@ export class ApiError extends Error {
 
 let accessToken: string | null = null;
 let refreshInFlight: Promise<boolean> | null = null;
+let sessionEpoch = 0;
 
 export function setAccessToken(token: string | null) {
+  sessionEpoch++;
   accessToken = token;
 }
 
@@ -27,16 +30,21 @@ export function onSessionEnded(handler: (() => void) | null) {
   sessionEndedHandler = handler;
 }
 
-async function refreshAccessToken(): Promise<boolean> {
-  const res = await fetch(`${API_BASE}/api/v1/platform-auth/refresh`, {
+function refreshAccessToken(): Promise<boolean> { return withSessionLock('platform', refreshAccessTokenLocked); }
+
+async function refreshAccessTokenLocked(): Promise<boolean> {
+  const epoch = sessionEpoch;
+  const res = await fetchWithDeadline(`${API_BASE}/api/v1/platform-auth/refresh`, {
     method: 'POST',
     credentials: 'include'
   });
+  if (epoch !== sessionEpoch) return false;
   if (!res.ok) {
     accessToken = null;
     return false;
   }
   const body = await res.json();
+  if (epoch !== sessionEpoch) return false;
   accessToken = body.accessToken;
   return true;
 }
@@ -67,7 +75,7 @@ async function rawRequest<T>(path: string, options: RequestOptions = {}): Promis
   // If the session was just tried and there is none, a 401 needs no second attempt.
   const triedResume = await resumeSessionIfNeeded(path);
   if (triedResume) options = { ...options, skipAuthRetry: true };
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetchWithDeadline(`${API_BASE}${path}`, {
     method: options.method ?? 'GET',
     credentials: 'include',
     headers: {
@@ -102,7 +110,7 @@ async function rawRequest<T>(path: string, options: RequestOptions = {}): Promis
 
 /** An authenticated file download (the response is not JSON, so it cannot go through `rawRequest`). */
 async function download(path: string, retried = false): Promise<{ blob: Blob; filename: string | null }> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetchWithDeadline(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
   });

@@ -270,9 +270,9 @@ describe('QR ordering: scale, resilience and shared counters', () => {
       const sub = bus.events$.subscribe((e: RealtimeEvent) => { if (e.restaurantId === '*') seen.push(e); });
       const old = bus.client;
       await old.end(); // the relay connection drops
-      for (let i = 0; i < 80 && seen.length < 3; i++) await new Promise((r) => setTimeout(r, 100));
+      for (let i = 0; i < 80 && seen.length < 4; i++) await new Promise((r) => setTimeout(r, 100));
       sub.unsubscribe();
-      expect(seen.map((e) => e.kind).sort()).toEqual(['inventory', 'menu', 'orders']);
+      expect(seen.map((e) => e.kind).sort()).toEqual(['entities', 'inventory', 'menu', 'orders']);
     }, 20_000);
 
     it('a counter store that cannot be read lets the guest through rather than failing the request', async () => {

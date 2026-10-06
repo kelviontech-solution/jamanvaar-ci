@@ -1,3 +1,6 @@
+import { KeyValueStore } from '@jamanvaar/database';
+import { stopRealtime } from '@jamanvaar/sync';
+import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 /**
  * kiosk-user's only connection to cloud/api. Unlike every other app in this
  * monorepo's activation flow, this one is deliberately a single call: a
@@ -36,7 +39,9 @@ export class CloudApiError extends Error {
 
 async function parseJsonResponse(res: Response): Promise<any> {
   const contentType = res.headers.get('content-type') ?? '';
-  return contentType.includes('application/json') ? res.json() : undefined;
+  const data = contentType.includes('application/json') ? await res.json() : undefined;
+  if (data && typeof data === 'object' && !Array.isArray(data)) data.serverKey = EndpointResolver.responderFor(res);
+  return data;
 }
 
 export function isKioskDeviceConnected(): boolean {
@@ -77,6 +82,7 @@ export function getKioskDeviceId(): string | null {
  * device credential and forgets the lock state, so the app falls back to asking for a fresh activation key.
  */
 export function resetTerminal(): void {
+  stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
     localStorage.removeItem(DEVICE_ID_KEY);
@@ -105,7 +111,7 @@ export interface ResolvedRestaurant {
 }
 
 export async function resolveRestaurantByCode(code: string): Promise<ResolvedRestaurant> {
-  const res = await fetch(`${API_BASE}/api/v1/restaurant-lookup/resolve`, {
+  const res = await fetchWithDeadline(`${API_BASE}/api/v1/restaurant-lookup/resolve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ restaurantCode: code.trim().toUpperCase() })
@@ -126,7 +132,7 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
   // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
   // to it from the very first activation — see deviceKeys.ts for why only the public half is ever sent.
   const publicKeyJwk = await getDevicePublicKeyJwk('KIOSK').catch(() => null);
-  const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
+  const res = await fetchWithDeadline(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: code.trim(), deviceType: 'KIOSK', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
@@ -138,7 +144,8 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
   }
 
   try {
-    TenantIsolation.enter(data.restaurantId); // a different restaurant's local data is never carried over
+    TenantIsolation.enter(data.restaurantId);
+    KeyValueStore.set('jamanvaar_bound_branch_id', data.device?.branchId ?? ''); // a different restaurant's local data is never carried over
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
     localStorage.setItem(DEVICE_ID_KEY, data.device.id);
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);
@@ -209,7 +216,7 @@ export async function pushOrderSync(
   return data;
 }
 
-export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }> {
+export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
   const query = orderSyncPullQuery(cursor);
   const res = await deviceFetch(`/api/v1/orders/sync${query}`);
   const data = await parseJsonResponse(res);
@@ -237,8 +244,8 @@ export async function pushEntitySync(
   return data;
 }
 
-export async function pullEntitySync(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }> {
-  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+export async function pullEntitySync(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
+  const query = since?.startsWith('seq:') ? `?afterSeq=${encodeURIComponent(since.slice(4))}` : since ? `?since=${encodeURIComponent(since)}` : '?afterSeq=0';
   const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {

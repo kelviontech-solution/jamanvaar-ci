@@ -35,8 +35,9 @@ export class RealtimeController {
     // Re-verify the credential: a revoked, locked-out or removed device must not keep listening.
     const status$ = interval(recheckMs).pipe(
       concatMap(async () => {
-        const row = await this.prisma.runAsPlatform((tx) => tx.device.findUnique({ where: { id: device.id }, select: { status: true } }));
-        return row?.status === 'ACTIVE' ? null : ({ type: 'revoked', data: { reason: 'DEVICE_NOT_ACTIVE' } } as MessageEvent);
+        const row = await this.prisma.runAsPlatform((tx) => tx.device.findUnique({ where: { id: device.id }, select: { status: true, isLocked: true, branchId: true, restaurant: { select: { status: true, deletedAt: true } }, branch: { select: { status: true } } } }));
+        const allowed = row?.status === 'ACTIVE' && !row.isLocked && row.branchId === device.branchId && row.restaurant.status === 'ACTIVE' && !row.restaurant.deletedAt && (!row.branch || row.branch.status === 'ACTIVE');
+        return allowed ? null : ({ type: 'revoked', data: { reason: 'DEVICE_SCOPE_CHANGED' } } as MessageEvent);
       }),
       filter((m): m is MessageEvent => m !== null),
       tap(() => setTimeout(() => stop$.next(), 50))

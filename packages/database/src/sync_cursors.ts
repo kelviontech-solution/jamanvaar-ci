@@ -9,8 +9,10 @@ const MENU_APPLIED_VERSION_KEY = 'jamanvaar_menu_applied_version';
  */
 export function resetEntitySyncCursors(entityTypes: readonly string[]): void {
   for (const type of entityTypes) {
-    KeyValueStore.remove(`jamanvaar_entity_sync_cursor_${type}`);
-    KeyValueStore.remove(`jamanvaar_entity_sync_cursor_${type}:core`);
+    const base = `jamanvaar_entity_sync_cursor_${type}`;
+    KeyValueStore.remove(base);
+    KeyValueStore.remove(`${base}:core`);
+    for (const key of KeyValueStore.keys()) if (key.startsWith(`${base}:`)) KeyValueStore.remove(key);
   }
   if (entityTypes.includes('MENU_ITEM') || entityTypes.includes('MENU_CATEGORY')) KeyValueStore.remove(MENU_APPLIED_VERSION_KEY);
 }

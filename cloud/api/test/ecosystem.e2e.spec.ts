@@ -55,8 +55,10 @@ describe('ecosystem: every app, every channel, several branches and restaurants 
     for (const [bi, bid] of branchIds.entries()) {
       const mk = async (type: string, n: number, tag: string) => Promise.all(Array.from({ length: n }, (_, i) => terminal(rid, type, bid, `${tag}-${bi}${i + 1}`)));
       const [pos, kiosk, kds, captain] = await Promise.all([mk('POS', counts.pos, 'POS'), mk('KIOSK', counts.kiosk, 'KIOSK'), mk('KDS', counts.kds, 'KDS'), mk('CAPTAIN', counts.captain, 'CAP')]);
-      await push('DINING_TABLE', `T0${bi + 1}`, { tableNumber: `T0${bi + 1}`, capacity: 4, isActive: true, branchId: bid });
-      const gen = await as('post', `/api/v1/restaurant/qr/tables/T0${bi + 1}/generate`, admin).send({ branchId: bid });
+      const tableAdmin = bi === 0 ? admin : (await terminal(rid, 'POS_ADMIN', bid, `Admin ${name} ${bi}`)).token;
+      await as('post', '/api/v1/entity-sync/DINING_TABLE', tableAdmin).send({ events: [{ externalId: `T0${bi + 1}`, payload: { id: `T0${bi + 1}`, tableNumber: `T0${bi + 1}`, capacity: 4, isActive: true, branchId: bid, updatedAt: now() } }] });
+      // Table ownership comes from this branch's own admin.
+      const gen = await as('post', `/api/v1/restaurant/qr/tables/T0${bi + 1}/generate`, tableAdmin).send({ branchId: bid });
       branches.push({ id: bid, pos, kiosk, kds, captain, qrToken: (gen.body.url as string).split('/q/')[1] });
     }
     await as('post', '/api/v1/menu/publish', admin).send({ note: 'eco' });

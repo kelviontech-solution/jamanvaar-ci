@@ -1,13 +1,14 @@
 import { randomUUID } from 'crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PlatformUser } from '@prisma/client';
+import { PlatformUser, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
-import { MIN_COMMISSION_BPS } from './commission.util';
+import { MIN_COMMISSION_BPS, DEFAULT_COMMISSION_BPS, getDefaultCommissionBps } from './commission.util';
 import { encryptCredential, decryptCredential } from '../../common/security/credential-encryption.util';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
-import { SubmitPaymentConnectionDto } from './dto/payment-connection.dto';
+import { SubmitPaymentConnectionDto, SettlementBankDetailsDto } from './dto/payment-connection.dto';
+import { lockSettlement } from './settlement-lock.util';
 
 const RESUBMITTABLE_STATUSES = ['NOT_CONNECTED', 'PENDING_VERIFICATION', 'DISCONNECTED'];
 
@@ -32,8 +33,58 @@ export class PaymentConnectionsService {
     return key;
   }
 
+  private async lockConnection(tx: Prisma.TransactionClient, restaurantId: string): Promise<void> {
+    await lockSettlement(tx, restaurantId);
+  }
+
+  async requestPlatformPayments(restaurantId: string, actorId: string) {
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await this.lockConnection(tx, restaurantId);
+      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (connection && !['NOT_CONNECTED', 'DISCONNECTED'].includes(connection.status)) return;
+      await tx.restaurantPaymentConnection.upsert({ where: { restaurantId },
+        create: { restaurantId, status: 'PENDING_VERIFICATION' }, update: { status: 'PENDING_VERIFICATION' } });
+      await this.audit.log({ actorType: 'TENANT', actorId, restaurantId, action: 'PLATFORM_COLLECTION_REQUESTED', category: 'PAYMENTS', details: {} }, tx);
+    });
+    return this.getOwn(restaurantId);
+  }
+
+  async setSettlementPreference(restaurantId: string, requested: boolean, actorId: string) {
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await this.lockConnection(tx, restaurantId);
+      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (requested && (!connection?.settlementAccountNumberEncrypted || !connection.settlementAccountName || !connection.settlementIfsc)) {
+        throw new BadRequestException('Save your bank account details before requesting direct settlement');
+      }
+      await tx.restaurantPaymentConnection.upsert({ where: { restaurantId },
+        create: { restaurantId, directSettlementRequested: requested }, update: { directSettlementRequested: requested } });
+      await this.audit.log({ actorType: 'TENANT', actorId, restaurantId, action: 'SETTLEMENT_PREFERENCE_CHANGED', category: 'PAYMENTS', details: { directSettlementRequested: requested, effectivePayoutMode: 'MANUAL' } }, tx);
+    });
+    return this.getOwn(restaurantId);
+  }
+
+  async setBankDetails(restaurantId: string, bank: SettlementBankDetailsDto, actorId: string) {
+    const encrypted = encryptCredential(bank.settlementAccountNumber, this.encryptionKey());
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await this.lockConnection(tx, restaurantId);
+      const unpaidBatch = await tx.restaurantPayout.count({ where: { restaurantId, status: { not: 'PAID' } } });
+      if (unpaidBatch) throw new ConflictException('An unpaid payout batch exists. Contact Super Admin before changing the payout bank account.');
+      const data = { settlementAccountName: bank.settlementAccountName, settlementAccountNumberEncrypted: encrypted,
+        settlementBankName: bank.settlementBankName, settlementBankAccountType: bank.settlementBankAccountType,
+        settlementIfsc: bank.settlementIfsc, settlementUpiVpa: null, bankVerificationStatus: 'PENDING' as const,
+        bankVerifiedAt: null, bankVerifiedByPlatformUserId: null };
+      await tx.restaurantPaymentConnection.upsert({ where: { restaurantId }, create: { restaurantId, ...data }, update: data });
+      await this.audit.log({ actorType: 'TENANT', actorId, restaurantId, action: 'SETTLEMENT_BANK_SUBMITTED', category: 'PAYMENTS', details: { bankVerificationStatus: 'PENDING' } }, tx);
+    });
+    return this.getOwn(restaurantId);
+  }
+
   async submit(restaurantId: string, dto: SubmitPaymentConnectionDto) {
+    const defaultBps = await getDefaultCommissionBps(this.prisma);
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await this.lockConnection(tx, restaurantId);
+      const unpaidBatch = await tx.restaurantPayout.count({ where: { restaurantId, status: { not: 'PAID' } } });
+      if (unpaidBatch) throw new ConflictException('An unpaid payout batch exists. Contact Super Admin before changing the payout bank account.');
       const existing = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (existing && !RESUBMITTABLE_STATUSES.includes(existing.status)) {
         throw new ForbiddenException(
@@ -62,9 +113,16 @@ export class PaymentConnectionsService {
           : null,
         settlementIfsc: dto.settlementIfsc ?? null,
         settlementUpiVpa: dto.settlementUpiVpa ?? null,
+        // Legacy clients cannot supply this metadata; don't retain a previous bank's name/type.
+        settlementBankName: null,
+        settlementBankAccountType: null,
+        directSettlementRequested: Boolean(dto.settlementAccountNumber && existing?.directSettlementRequested),
         // A resubmission is by definition not yet verified — clear the old
         // timestamp so a pending-re-review connection can't read as verified.
         verifiedAt: null,
+        bankVerificationStatus: 'PENDING' as const,
+        bankVerifiedAt: null,
+        bankVerifiedByPlatformUserId: null,
         status: 'PENDING_VERIFICATION' as const
       };
 
@@ -85,16 +143,16 @@ export class PaymentConnectionsService {
         tx
       );
 
-      return this.toOwnView(connection);
+      return this.toOwnView(connection, defaultBps);
     });
   }
 
   async getOwn(restaurantId: string) {
-    const connection = await this.prisma.runAsTenant(restaurantId, (tx) =>
+    const [connection, defaultBps] = await Promise.all([this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } })
-    );
-    if (!connection) return { status: 'NOT_CONNECTED' as const };
-    return this.toOwnView(connection);
+    ), getDefaultCommissionBps(this.prisma)]);
+    if (!connection) return { status: 'NOT_CONNECTED' as const, directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED', effectiveCommissionBps: defaultBps };
+    return this.toOwnView(connection, defaultBps);
   }
 
   private toOwnView(connection: {
@@ -112,7 +170,13 @@ export class PaymentConnectionsService {
     settlementIfsc: string | null;
     settlementUpiVpa: string | null;
     verifiedAt: Date | null;
-  }) {
+    directSettlementRequested: boolean;
+    settlementAccountNumberEncrypted: string | null;
+    settlementBankName: string | null;
+    settlementBankAccountType: string | null;
+    bankVerificationStatus: string;
+    commissionOverrideBps: number | null;
+  }, defaultBps = DEFAULT_COMMISSION_BPS) {
     // Deliberately never includes the settlement account number, even
     // decrypted for its own owner — once encrypted at submission time, the
     // plaintext is never sent back over the wire again.
@@ -126,6 +190,15 @@ export class PaymentConnectionsService {
     // resubmission requires re-entering the real value, the same convention used for a
     // password or CVV field.
     return {
+      directSettlementRequested: connection.directSettlementRequested,
+      collectionAccount: 'JAMANVAAR',
+      payoutMode: 'MANUAL',
+      routeStatus: 'PENDING',
+      effectiveCommissionBps: connection.commissionOverrideBps ?? defaultBps,
+      bankVerificationStatus: connection.bankVerificationStatus,
+      settlementBankName: connection.settlementBankName,
+      settlementBankAccountType: connection.settlementBankAccountType,
+      settlementAccountNumberMasked: connection.settlementAccountNumberEncrypted ? this.bankMask(connection.settlementAccountNumberEncrypted) : null,
       status: connection.status,
       accountType: connection.accountType,
       businessType: connection.businessType,
@@ -141,6 +214,11 @@ export class PaymentConnectionsService {
       settlementUpiVpa: connection.settlementUpiVpa,
       verifiedAt: connection.verifiedAt
     };
+  }
+
+  private bankMask(encrypted: string): string {
+    try { return maskLast4(decryptCredential(encrypted, this.encryptionKey()))!; }
+    catch { return '**** (unavailable)'; }
   }
 
   async listForPlatform() {
@@ -175,6 +253,7 @@ export class PaymentConnectionsService {
   async approve(restaurantId: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
+      await this.lockConnection(tx, restaurantId);
       const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!connection) throw new NotFoundException('No payment connection for this restaurant');
       if (connection.status !== 'PENDING_VERIFICATION') {
@@ -188,6 +267,7 @@ export class PaymentConnectionsService {
 
   private async transitionStatus(restaurantId: string, actor: PlatformUser, allowedFrom: string[], to: string, auditAction: string) {
     return this.prisma.runAsPlatform(async (tx) => {
+      await this.lockConnection(tx, restaurantId);
       const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!connection) throw new NotFoundException('No payment connection for this restaurant');
       if (!allowedFrom.includes(connection.status)) {
@@ -263,6 +343,9 @@ export class PaymentConnectionsService {
     lastWebhookAt: Date | null;
     lastPaymentAt: Date | null;
     commissionOverrideBps: number | null;
+    directSettlementRequested: boolean;
+    settlementBankName: string | null;
+    settlementBankAccountType: string | null;
     bankVerificationStatus: string;
     createdAt: Date;
     updatedAt: Date;
@@ -300,6 +383,10 @@ export class PaymentConnectionsService {
       settlementUpiVpaMasked: maskLast4(connection.settlementUpiVpa),
       commissionOverrideBps: connection.commissionOverrideBps,
       bankVerificationStatus: connection.bankVerificationStatus,
+      directSettlementRequested: connection.directSettlementRequested,
+      collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING',
+      settlementBankName: connection.settlementBankName,
+      settlementBankAccountType: connection.settlementBankAccountType,
       verifiedAt: connection.verifiedAt,
       lastWebhookAt: connection.lastWebhookAt,
       lastPaymentAt: connection.lastPaymentAt,

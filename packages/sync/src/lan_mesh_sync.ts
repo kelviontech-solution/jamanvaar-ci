@@ -9,7 +9,7 @@ import {
   SyncEventStatus
 } from '@jamanvaar/types';
 import { generateUUID } from '@jamanvaar/utils';
-import { db, JamanvaarDatabase, NotificationRepository } from '@jamanvaar/database';
+import { db, JamanvaarDatabase, NotificationRepository, KeyValueStore } from '@jamanvaar/database';
 
 export type MeshDeviceRole = 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK_USER' | 'KIOSK_ADMIN';
 
@@ -32,6 +32,7 @@ export interface MeshSyncEvent<T = any> {
   operationId: string;
   eventType: string;
   restaurantId: string;
+  branchId?: string | null;
   deviceId: string;
   senderRole: MeshDeviceRole;
   timestamp: string;
@@ -180,6 +181,7 @@ export class LanMeshSyncEngine {
       operationId: opId,
       eventType,
       restaurantId: this.attachedDatabase?.restaurant?.id || 'rest-jamanvaar-01',
+      branchId: KeyValueStore.get('jamanvaar_bound_branch_id'),
       deviceId: this.deviceId,
       senderRole: this.deviceRole,
       timestamp: new Date().toISOString(),
@@ -337,6 +339,7 @@ export class LanMeshSyncEngine {
           operationId: 'hb',
           eventType: 'HEARTBEAT',
           restaurantId: this.attachedDatabase?.restaurant?.id || 'rest-1',
+          branchId: KeyValueStore.get('jamanvaar_bound_branch_id'),
           deviceId: this.deviceId,
           senderRole: this.deviceRole,
           timestamp: new Date().toISOString(),
@@ -348,6 +351,10 @@ export class LanMeshSyncEngine {
   }
 
   private handleIncomingEvent(event: MeshSyncEvent): void {
+    const owner = this.attachedDatabase?.restaurant?.id;
+    if (owner && event.restaurantId !== owner) return;
+    const branch = KeyValueStore.get('jamanvaar_bound_branch_id');
+    if (branch && event.branchId !== branch) return;
     // 1. Idempotency Check: Don't process already ingested events
     if (this.processedEventIds.has(event.eventId)) {
       return;

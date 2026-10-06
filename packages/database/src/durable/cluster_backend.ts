@@ -42,6 +42,7 @@ export class ClusterBackend implements StorageBackend {
   private acks = new Map<number, { resolve: () => void; reject: (e: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   private snapshotWaiter: ((data: Record<string, string>) => void) | null = null;
   private closed = false;
+  private releaseLeadership: (() => void) | null = null;
 
   constructor(private readonly opts: ClusterOptions) {
     this.channel = opts.makeChannel();
@@ -60,8 +61,8 @@ export class ClusterBackend implements StorageBackend {
           return undefined;
         }
         resolve(true);
-        return new Promise(() => undefined); // hold leadership until this window goes away
-      });
+        return new Promise<void>((release) => { this.releaseLeadership = release; });
+      }).catch(() => resolve(false));
     });
 
     if (acquired) {
@@ -73,9 +74,10 @@ export class ClusterBackend implements StorageBackend {
     // Follower: queue for leadership in the background and ask the current leader for its data.
     void this.opts.locks.request(`jamanvaar-db-${this.opts.name}`, (lock) => {
       if (this.closed) return undefined;
-      void this.promote();
-      return lock ? new Promise(() => undefined) : undefined;
-    });
+      if (!lock) return undefined;
+      void this.promote().catch(() => { this.releaseLeadership?.(); });
+      return new Promise<void>((release) => { this.releaseLeadership = release; });
+    }).catch(() => undefined);
     return this.requestSnapshot();
   }
 
@@ -104,7 +106,9 @@ export class ClusterBackend implements StorageBackend {
   private async promote(): Promise<void> {
     if (this.isLeader || this.closed) return;
     const backend = this.opts.makeLeaderBackend();
-    await backend.load(); // opens the file; our in-memory copy is already current (every applied change was persisted first)
+    try { await backend.load(); }
+    catch (error) { backend.close(); throw error; }
+    if (this.closed) { backend.close(); return; }
     this.leader = backend;
     this.isLeader = true;
   }
@@ -167,7 +171,10 @@ export class ClusterBackend implements StorageBackend {
 
   close(): void {
     this.closed = true;
-    this.acks.forEach((w) => clearTimeout(w.timer));
+    this.releaseLeadership?.();
+    this.releaseLeadership = null;
+    this.snapshotWaiter?.({});
+    this.acks.forEach((w) => { clearTimeout(w.timer); w.reject(new Error('Local database closed')); });
     this.acks.clear();
     this.channel.close();
     this.leader?.close();

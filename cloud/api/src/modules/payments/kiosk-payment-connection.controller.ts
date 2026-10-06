@@ -1,7 +1,7 @@
-import { Body, Controller, ForbiddenException, Get, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PaymentConnectionsService } from './payment-connections.service';
-import { submitPaymentConnectionSchema, SubmitPaymentConnectionDto } from './dto/payment-connection.dto';
+import { submitPaymentConnectionSchema, SubmitPaymentConnectionDto, settlementPreferenceSchema, SettlementPreferenceDto, settlementBankDetailsSchema, SettlementBankDetailsDto } from './dto/payment-connection.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
@@ -10,6 +10,30 @@ import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.d
 @UseGuards(TenantAuthGuard)
 export class KioskPaymentConnectionController {
   constructor(private readonly connections: PaymentConnectionsService) {}
+
+  private requireOwner(user: User): void {
+    if (user.role !== 'OWNER' && user.role !== 'MANAGER') throw new ForbiddenException('Only restaurant owners and managers can manage payment settings.');
+  }
+
+  @Patch('settlement-preference')
+  @UsePipes(new ZodValidationPipe(settlementPreferenceSchema))
+  preference(@Body() body: SettlementPreferenceDto, @CurrentTenantUser() user: User) {
+    this.requireOwner(user);
+    return this.connections.setSettlementPreference(user.restaurantId, body.directSettlementRequested, user.id);
+  }
+
+  @Patch('bank-details')
+  @UsePipes(new ZodValidationPipe(settlementBankDetailsSchema))
+  bankDetails(@Body() body: SettlementBankDetailsDto, @CurrentTenantUser() user: User) {
+    this.requireOwner(user);
+    return this.connections.setBankDetails(user.restaurantId, body, user.id);
+  }
+
+  @Post('request-platform-payments')
+  requestPlatformPayments(@CurrentTenantUser() user: User) {
+    this.requireOwner(user);
+    return this.connections.requestPlatformPayments(user.restaurantId, user.id);
+  }
 
   @Get()
   getOwn(@CurrentTenantUser() user: User) {

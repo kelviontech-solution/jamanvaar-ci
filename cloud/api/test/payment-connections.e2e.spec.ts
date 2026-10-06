@@ -140,6 +140,10 @@ describe('Payment connection onboarding', () => {
     // unmasked PAN/GST/CIN/UIDAI/IFSC/VPA, which toOwnView() never masks.
     const staffGetRes = await authed('get', '/api/v1/tenant/payment-connection', staffToken);
     expect(staffGetRes.status).toBe(403);
+    expect((await authed('post', '/api/v1/tenant/payment-connection/request-platform-payments', staffToken)).status).toBe(403);
+    expect((await authed('patch', '/api/v1/tenant/payment-connection/settlement-preference', staffToken).send({ directSettlementRequested: false })).status).toBe(403);
+    expect((await authed('patch', '/api/v1/tenant/payment-connection/bank-details', staffToken).send({ settlementAccountName: 'Staff', settlementBankName: 'HDFC', settlementAccountNumber: '1234567890', settlementIfsc: 'HDFC0000001', settlementBankAccountType: 'CURRENT' })).status).toBe(403);
+
 
     // Confirm nothing was written — the guard trips before the service layer.
     const getRes = await authed('get', '/api/v1/tenant/payment-connection', ownerToken);
@@ -405,7 +409,7 @@ describe('Payment connection onboarding', () => {
     expect(row.verifiedAt).not.toBeNull();
     // Approval switches payments on; it does not by itself make the restaurant payout-eligible — that still needs
     // a Super Admin to verify the bank details (see RestaurantPayoutsService.setBankVerification).
-    expect(row.bankVerificationStatus).toBe('NOT_ADDED');
+    expect(row.bankVerificationStatus).toBe('PENDING');
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
@@ -439,4 +443,40 @@ describe('Payment connection onboarding', () => {
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: rid } }));
   });
+  it('platform collection is the default; a direct request never activates Route and bank edits require verification again', async () => {
+    const own = await createRestaurantWithOwner('settlement-request');
+    const other = await createRestaurantWithOwner('settlement-isolation');
+    const bank = { settlementAccountName: 'Restaurant Owner', settlementBankName: 'HDFC', settlementAccountNumber: '123456789012', settlementIfsc: 'HDFC0000001', settlementBankAccountType: 'CURRENT' };
+    try {
+      const initial = await authed('get', '/api/v1/tenant/payment-connection', own.token);
+      expect(initial.body).toMatchObject({ directSettlementRequested: false, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING', bankVerificationStatus: 'NOT_ADDED' });
+      expect((await authed('patch', '/api/v1/tenant/payment-connection/settlement-preference', own.token).send({ directSettlementRequested: true })).status).toBe(400);
+      const requested = await authed('post', '/api/v1/tenant/payment-connection/request-platform-payments', own.token);
+      expect(requested.status).toBe(201);
+      expect(requested.body.status).toBe('PENDING_VERIFICATION');
+      expect((await authed('patch', `/api/v1/restaurants/${own.restaurantId}/payment-connection/approve`, platformToken).send({ password: adminPassword })).status).toBe(200);
+      const saved = await authed('patch', '/api/v1/tenant/payment-connection/bank-details', own.token).send(bank);
+      expect(saved.status).toBe(200);
+      expect(saved.body).toMatchObject({ status: 'ACTIVE', bankVerificationStatus: 'PENDING', settlementBankName: 'HDFC', settlementBankAccountType: 'CURRENT' });
+      expect(saved.body.settlementAccountNumberMasked).toContain('9012');
+      expect(JSON.stringify(saved.body)).not.toContain(bank.settlementAccountNumber);
+      const stored = await prisma.runAsTenant(own.restaurantId, tx => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: own.restaurantId } }));
+      expect(stored.settlementAccountNumberEncrypted).not.toContain(bank.settlementAccountNumber);
+      const enabled = await authed('patch', '/api/v1/tenant/payment-connection/settlement-preference', own.token).send({ directSettlementRequested: true });
+      expect(enabled.body).toMatchObject({ directSettlementRequested: true, collectionAccount: 'JAMANVAAR', payoutMode: 'MANUAL', routeStatus: 'PENDING' });
+      expect((await authed('get', '/api/v1/tenant/payment-connection', other.token)).body.directSettlementRequested).toBe(false);
+      expect((await authed('patch', '/api/v1/tenant/payment-connection/bank-details', own.token).send({ ...bank, restaurantId: other.restaurantId, bankVerificationStatus: 'VERIFIED' })).status).toBe(400);
+      await prisma.runAsTenant(own.restaurantId, tx => tx.restaurantPaymentConnection.update({ where: { restaurantId: own.restaurantId }, data: { bankVerificationStatus: 'VERIFIED', bankVerifiedAt: new Date() } }));
+      const edited = await authed('patch', '/api/v1/tenant/payment-connection/bank-details', own.token).send({ ...bank, settlementAccountNumber: '987654321012' });
+      expect(edited.body.bankVerificationStatus).toBe('PENDING');
+      const current = await prisma.runAsTenant(own.restaurantId, tx => tx.restaurantPaymentConnection.findUniqueOrThrow({ where: { restaurantId: own.restaurantId } }));
+      expect(current.bankVerifiedAt).toBeNull();
+      const disabled = await authed('patch', '/api/v1/tenant/payment-connection/settlement-preference', own.token).send({ directSettlementRequested: false });
+      expect(disabled.body.directSettlementRequested).toBe(false);
+      await prisma.runAsTenant(own.restaurantId, tx => tx.restaurantPayout.create({ data: { restaurantId: own.restaurantId, businessDate: '20261006', grossAmount: 10000, feeAmount: 300, netAmount: 9700, paymentCount: 1 } }));
+      expect((await authed('patch', '/api/v1/tenant/payment-connection/bank-details', own.token).send(bank)).status).toBe(409);
+
+    } finally { await prisma.runAsPlatform(tx => tx.restaurant.deleteMany({ where: { id: { in: [own.restaurantId, other.restaurantId] } } })); }
+  });
+
 });

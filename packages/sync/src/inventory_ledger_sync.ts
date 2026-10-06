@@ -29,7 +29,7 @@ export interface RemoteMovement extends PushedMovement {
 
 export interface LedgerTransport {
   push(movements: PushedMovement[]): Promise<{ results: Array<{ movementId: string; status: 'ok' | 'error'; duplicate?: boolean; error?: string }> }>;
-  pull(afterSeq: number): Promise<{ movements: RemoteMovement[]; latestSeq: number; hasMore: boolean }>;
+  pull(afterSeq: number): Promise<{ movements: RemoteMovement[]; latestSeq: number; hasMore: boolean; serverKey?: 'cloud' | 'core' }>;
 }
 
 import { EndpointResolver } from './endpoint_resolver';
@@ -84,6 +84,7 @@ export class InventoryLedgerSync {
     const pending = db.stockMovements.filter((m) => !m.syncedAt && !m.remote);
     let pushed = 0;
     for (let i = 0; i < pending.length; i += PUSH_BATCH) {
+      if (t !== this.transport) break;
       const batch = pending.slice(i, i + PUSH_BATCH);
       try {
         const { results } = await t.push(
@@ -110,12 +111,16 @@ export class InventoryLedgerSync {
 
   private static async pullAndApply(t: LedgerTransport): Promise<number> {
     let applied = 0;
+    const cursorKey = EndpointResolver.cursorKey(CURSOR_KEY, LEDGER_PATH);
+    const predicted = EndpointResolver.serverKeyFor(LEDGER_PATH);
     try {
       for (let page = 0; page < MAX_PAGES; page++) {
-        const { movements, latestSeq, hasMore } = await t.pull(readCursor());
+        const { movements, latestSeq, hasMore, serverKey } = await t.pull(readCursor());
+        if (t !== this.transport || cursorKey !== EndpointResolver.cursorKey(CURSOR_KEY, LEDGER_PATH)) break;
         for (const r of movements) {
           if (this.applyRemote(r)) applied++;
         }
+        if ((serverKey ?? EndpointResolver.lastResponder() ?? predicted) !== predicted) break;
         writeCursor(latestSeq);
         if (!hasMore) break;
       }

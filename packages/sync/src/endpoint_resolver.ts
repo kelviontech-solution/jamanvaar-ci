@@ -16,6 +16,7 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { PaymentPolicy } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
+import { fetchWithDeadline } from '@jamanvaar/api';
 
 export type Responder = 'core' | 'cloud';
 export type ConnectionMode = 'ONLINE' | 'LOCAL' | 'OFFLINE';
@@ -53,6 +54,11 @@ export class EndpointResolver {
   private static coreUrl: string | null = null;
   private static health: Record<Responder, Health | null> = { core: null, cloud: null };
   private static responder: Responder | null = null;
+  private static readonly responses = new WeakMap<Response, Responder>();
+  private static identity: string | null = null;
+
+  static setIdentity(identity: string | null): void { this.identity = identity; }
+  static responderFor(response: Response): Responder | undefined { return this.responses.get(response); }
   private static now: () => number = Date.now;
   private static listeners = new Set<() => void>();
 
@@ -61,6 +67,7 @@ export class EndpointResolver {
     this.coreUrl = null;
     this.health = { core: null, cloud: null };
     this.responder = null;
+    this.identity = null;
     this.lastOkAt = null;
     this.now = opts.now ?? Date.now;
   }
@@ -156,7 +163,8 @@ export class EndpointResolver {
 
   /** A storage key for a sync cursor that is specific to the server that will answer `path`. The cloud keeps the original key. */
   static cursorKey(baseKey: string, path: string): string {
-    return this.serverKeyFor(path) === 'core' ? `${baseKey}:core` : baseKey;
+    const scoped = this.identity ? `${baseKey}:device:${this.identity}` : baseKey;
+    return this.serverKeyFor(path) === 'core' ? `${scoped}:core` : scoped;
   }
 
   /** Who answered the most recent successful request. */
@@ -184,7 +192,7 @@ export class EndpointResolver {
     this.transport = fn;
   }
 
-  static async fetch(path: string, init: RequestInit = {}, doFetch: (url: string, init?: RequestInit) => Promise<Response> = (u, i) => (this.transport ?? fetch)(u, i)): Promise<Response> {
+  static async fetch(path: string, init: RequestInit = {}, doFetch: (url: string, init?: RequestInit) => Promise<Response> = (u, i) => this.transport ? this.transport(u, i) : fetchWithDeadline(u, i)): Promise<Response> {
     const first = this.serverKeyFor(path);
     const order: Responder[] = this.coreUrl && isOperationalPath(path) ? (first === 'core' ? ['core', 'cloud'] : ['cloud', 'core']) : ['cloud'];
     let lastError: unknown;
@@ -193,6 +201,7 @@ export class EndpointResolver {
       if (!base) continue;
       try {
         const res = await doFetch(`${base}${path}`, init);
+        this.responses.set(res, r);
         this.mark(r, true);
         return res;
       } catch (err) {

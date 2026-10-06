@@ -132,7 +132,12 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
           if (!Array.isArray(body.events)) throw new CoreError(400, 'BAD_REQUEST', 'events must be a list');
           return send(res, 201, core.pushEntities(device, ent[1], body.events));
         }
-        if (req.method === 'GET') return send(res, 200, core.pullEntities(ent[1], url.searchParams.get('since') ?? undefined));
+        if (req.method === 'GET') {
+          const raw = url.searchParams.get('afterSeq');
+          const after = raw === null ? undefined : Number(raw);
+          if (after !== undefined && (!Number.isSafeInteger(after) || after < 0)) throw new CoreError(400, 'BAD_REQUEST', 'afterSeq must be a non-negative integer');
+          return send(res, 200, core.pullEntities(ent[1], url.searchParams.get('since') ?? undefined, after));
+        }
       }
 
       if (p === '/api/v1/devices/me/heartbeat' && req.method === 'PATCH') return send(res, 200, core.heartbeat(device, await readBody(req)));

@@ -166,7 +166,7 @@ describe('SyncOutboxEngine sequence cursor', () => {
       }
     });
     await SyncOutboxEngine.catchUpFromCloud();
-    expect(seen).toEqual([undefined, 'seq:500']);
+    expect(seen).toEqual(['seq:0', 'seq:500']);
 
     seen.length = 0;
     page = 5;

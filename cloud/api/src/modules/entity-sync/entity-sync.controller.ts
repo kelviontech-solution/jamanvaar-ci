@@ -41,9 +41,11 @@ export class EntitySyncController {
   }
 
   @Get()
-  pull(@Param('entityType') entityType: string, @Query('since') since: string | undefined, @CurrentDevice() device: Device) {
+  pull(@Param('entityType') entityType: string, @Query('since') since: string | undefined, @CurrentDevice() device: Device, @Query('afterSeq') afterSeq?: string) {
     assertSyncableEntityType(entityType);
     assertDeviceMayRead(entityType, device);
-    return this.entitySync.catchUp(device, entityType, since);
+    const sequence = afterSeq === undefined ? undefined : Number(afterSeq);
+    if (sequence !== undefined && (!Number.isSafeInteger(sequence) || sequence < 0)) throw new BadRequestException('afterSeq must be a non-negative integer');
+    return this.entitySync.catchUp(device, entityType, since, sequence);
   }
 }

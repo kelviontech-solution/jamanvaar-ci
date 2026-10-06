@@ -1281,6 +1281,7 @@ model RestaurantPaymentConnection {
   restaurant                       Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   provider                         PaymentProvider         @default(RAZORPAY)
   connectionType                   PaymentConnectionType   @default(PLATFORM_POOLED)
+  directSettlementRequested        Boolean                 @default(false)
   accountType                      PayoutAccountType?
   businessType                     String? // free text, passed through to Razorpay verbatim — see plan's Global Constraints
   pan                              String?
@@ -1292,6 +1293,8 @@ model RestaurantPaymentConnection {
   contactPhone                     String?
   status                           PaymentConnectionStatus @default(NOT_CONNECTED)
   settlementAccountName            String?
+  settlementBankName               String?
+  settlementBankAccountType        String?
   settlementAccountNumberEncrypted String? // encrypted via credential-encryption.util
   settlementIfsc                   String?
   settlementUpiVpa                 String?
@@ -1599,11 +1602,13 @@ model SyncedEntity {
   externalId   String // the local app's own key for this record (e.g. CustomerAccount.phone, InventoryItem.id)
   payload      Json
   syncVersion  Int        @default(1)
+  seq          Int        @default(0)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
   @@unique([restaurantId, entityType, externalId])
   @@index([restaurantId, entityType, updatedAt])
+  @@index([restaurantId, entityType, seq])
   @@index([deviceId])
 }
 

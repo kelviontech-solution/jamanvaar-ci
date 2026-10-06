@@ -29,7 +29,7 @@ describe('Captain session survives a reload (BUG-106)', { timeout: 60_000 }, () 
     db.users = [];
     const created = await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' });
     userId = created.id;
-    pin = created.issuedPin;
+    pin = created.issuedPin!;
   }, 60_000);
 
   it('signing in saves the real user, and a fresh start restores exactly that person', async () => {

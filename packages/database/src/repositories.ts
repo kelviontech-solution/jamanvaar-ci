@@ -3869,6 +3869,7 @@ export class StaffRepository {
     } as User & { pinHash: string };
 
     const idx = db.users.findIndex((u) => u.id === id);
+      if (idx >= 0 && Date.parse(db.users[idx].updatedAt) > Date.parse(incoming.updatedAt)) return;
     if (idx >= 0) db.users[idx] = { ...db.users[idx], ...incoming };
     else db.users.push(incoming);
     db.notify();

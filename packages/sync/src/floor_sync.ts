@@ -11,14 +11,17 @@ const PUSH_BATCH = 200;
  * confirmed every record, so a dropped connection just retries on the next tick.
  */
 let inFlight: Promise<void> | null = null;
+let again = false;
 
 export function syncDiningTables(): Promise<void> {
   // A slow connection must not let two ticks push the same changes twice.
-  if (!inFlight) inFlight = runTick().finally(() => { inFlight = null; });
+  if (inFlight) { again = true; return inFlight; }
+  inFlight = (async () => { do { again = false; await runTick(); } while (again); })().finally(() => { inFlight = null; });
   return inFlight;
 }
 
 async function runTick(): Promise<void> {
+  EntitySyncEngine.registerWakeUp('DINING_TABLE', syncDiningTables);
   TableSync.stampChanges();
 
   const records = TableSync.collectSyncRecords();

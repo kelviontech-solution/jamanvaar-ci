@@ -191,6 +191,11 @@ describe('Jamanvaar WhatsApp connector — channels/quote, channels/checkout, pa
 
       const order = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: res.body.orderId } }));
       expect(order.source).toBe('WHATSAPP');
+      const feeSnapshot = await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirstOrThrow({ where: { orderId: order.id } }));
+      expect(feeSnapshot.commissionBps).toBe(0);
+      expect(feeSnapshot.platformAmount).toBe(0);
+      expect(feeSnapshot.restaurantAmount).toBe(feeSnapshot.amount);
+
       expect(order.branchId).toBe(branchId);
       expect(order.orderType).toBe('TAKEAWAY'); // PICKUP mapped to the platform's own vocabulary
       expect(order.customerName).toBe('Asha Patel');

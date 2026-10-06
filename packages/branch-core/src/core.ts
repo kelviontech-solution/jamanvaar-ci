@@ -432,9 +432,9 @@ export class BranchCore {
         }
         const version = (existing?.sync_version ?? 0) + 1;
         this.store.run(
-          `INSERT INTO entities (entity_type, external_id, payload, sync_version, updated_at, dirty) VALUES (?, ?, ?, ?, ?, ?)
-           ON CONFLICT(entity_type, external_id) DO UPDATE SET payload = excluded.payload, sync_version = excluded.sync_version, updated_at = excluded.updated_at, dirty = excluded.dirty`,
-          type, e.externalId, JSON.stringify(e.payload), version, now, origin === 'device' ? 1 : 0
+          `INSERT INTO entities (entity_type, external_id, payload, sync_version, updated_at, dirty, seq) VALUES (?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(entity_type, external_id) DO UPDATE SET payload = excluded.payload, sync_version = excluded.sync_version, updated_at = excluded.updated_at, dirty = excluded.dirty, seq = excluded.seq`,
+          type, e.externalId, JSON.stringify(e.payload), version, now, origin === 'device' ? 1 : 0, this.store.nextSeq('entities')
         );
         results.push({ externalId: e.externalId, status: 'ok', syncVersion: version });
         changed = true;
@@ -444,11 +444,15 @@ export class BranchCore {
     return { results, serverTime: new Date(now).toISOString() };
   }
 
-  pullEntities(type: string, since?: string) {
+  pullEntities(type: string, since?: string, afterSeq?: number) {
     const sinceMs = since ? Date.parse(since) || 0 : 0;
-    const rows = this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND updated_at > ? ORDER BY updated_at ASC LIMIT 500', type, sinceMs);
+    const rows = afterSeq !== undefined
+      ? this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND seq > ? ORDER BY seq ASC LIMIT 501', type, afterSeq)
+      : this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND updated_at > ? ORDER BY updated_at ASC, external_id ASC LIMIT 501', type, sinceMs);
+    const page = rows.slice(0, 500);
     return {
-      entities: rows.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), updatedAt: new Date(r.updated_at).toISOString() })),
+      entities: page.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), updatedAt: new Date(r.updated_at).toISOString() })),
+      latestSeq: page.length ? page[page.length - 1].seq : afterSeq ?? 0, hasMore: rows.length > 500,
       serverTime: new Date(this.now()).toISOString()
     };
   }
@@ -555,8 +559,10 @@ export class BranchCore {
       .map((r) => ({ type: r.entity_type, externalId: r.external_id, payload: JSON.parse(r.payload) }));
   }
 
-  clearDirty(type: string, externalId: string): void {
-    this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ?', type, externalId);
+  clearDirty(type: string, externalId: string, acknowledgedPayload?: unknown): void {
+    if (acknowledgedPayload !== undefined) {
+      this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ? AND payload = ?', type, externalId, JSON.stringify(acknowledgedPayload));
+    } else this.store.run('UPDATE entities SET dirty = 0 WHERE entity_type = ? AND external_id = ?', type, externalId);
   }
 
   /** What the cloud should know about each device this core serves. */

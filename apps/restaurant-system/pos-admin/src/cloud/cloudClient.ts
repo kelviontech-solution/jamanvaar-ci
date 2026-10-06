@@ -1,3 +1,6 @@
+import { KeyValueStore } from '@jamanvaar/database';
+import { stopRealtime } from '@jamanvaar/sync';
+import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
 import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
@@ -66,6 +69,7 @@ interface CachedEntitlements {
 }
 
 let accessToken: string | null = null;
+let sessionEpoch = 0;
 let refreshInFlight: Promise<boolean> | null = null;
 
 /** The restaurant this console is connected to (shown so the owner can give it to Kiosk Admin or Captain). */
@@ -131,6 +135,9 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
  * cloud sign-in, backups, Help & Support) fall back to asking to reconnect.
  */
 export function resetTerminal(): void {
+  sessionEpoch++;
+  accessToken = null;
+  stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
     localStorage.removeItem(DEVICE_ID_KEY);
@@ -173,22 +180,28 @@ export function isCloudConnected(): boolean {
   return getRestaurantId() !== null;
 }
 
-async function refreshAccessToken(): Promise<boolean> {
+function refreshAccessToken(): Promise<boolean> { return withSessionLock('tenant-cookie', refreshAccessTokenLocked); }
+
+async function refreshAccessTokenLocked(): Promise<boolean> {
+  const epoch = sessionEpoch;
   const restaurantId = getRestaurantId();
   if (!restaurantId) return false;
   try {
-    const res = await fetch(`${API_BASE}/api/v1/tenant-auth/refresh`, {
+    const res = await fetchWithDeadline(`${API_BASE}/api/v1/tenant-auth/refresh`, {
       method: 'POST',
       credentials: 'include'
     });
+    if (epoch !== sessionEpoch) return false;
     if (!res.ok) {
       accessToken = null;
       return false;
     }
     const body = await res.json();
+    if (epoch !== sessionEpoch) return false;
     accessToken = body.accessToken;
     return true;
   } catch {
+    if (epoch !== sessionEpoch) return false;
     accessToken = null;
     return false;
   }
@@ -306,6 +319,7 @@ export async function cloudLogin(
   });
 
   if (result.status === 'LOGIN_SUCCESS') {
+    sessionEpoch++;
     accessToken = result.accessToken;
     setRestaurantId(result.restaurant.id);
     if (result.deviceId && result.deviceToken) {
@@ -361,6 +375,7 @@ export async function cloudLoginOwner(restaurantCode: string, password: string):
   });
 
   if (result.status === 'LOGIN_SUCCESS') {
+    sessionEpoch++;
     accessToken = result.accessToken;
     setRestaurantId(result.restaurant.id);
     if (result.deviceId && result.deviceToken) {
@@ -404,6 +419,7 @@ export async function cloudActivateDevice(
     restaurant: CloudRestaurantProfile;
     deviceId: string;
     deviceToken: string;
+    branchId?: string | null;
   }>('/api/v1/tenant-auth/activate-device', {
     method: 'POST',
     body: {
@@ -415,7 +431,9 @@ export async function cloudActivateDevice(
     }
   });
 
+  sessionEpoch++;
   accessToken = result.accessToken;
+  KeyValueStore.set('jamanvaar_bound_branch_id', result.branchId ?? '');
   saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
   setRestaurantId(result.restaurant.id);
 
@@ -494,6 +512,7 @@ export async function cloudResetPasswordOwner(restaurantCode: string, otp: strin
  * even if it's offline or the server is unreachable).
  */
 export async function cloudLogout(): Promise<void> {
+  sessionEpoch++;
   try {
     await request('/api/v1/tenant-auth/logout', { method: 'POST', skipAuthRetry: true });
   } catch {
@@ -851,7 +870,9 @@ async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<
 
 async function parseJsonResponse(res: Response): Promise<any> {
   const contentType = res.headers.get('content-type') ?? '';
-  return contentType.includes('application/json') ? res.json() : undefined;
+  const data = contentType.includes('application/json') ? await res.json() : undefined;
+  if (data && typeof data === 'object' && !Array.isArray(data)) data.serverKey = EndpointResolver.responderFor(res);
+  return data;
 }
 
 export interface PaymentsSummary {
@@ -883,7 +904,7 @@ export async function pushOrderSync(
   return data;
 }
 
-export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }> {
+export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
   const query = orderSyncPullQuery(cursor);
   const res = await deviceFetch(`/api/v1/orders/sync${query}`);
   const data = await parseJsonResponse(res);
@@ -912,7 +933,7 @@ export async function pullEntitySync(
   entityType: string,
   since?: string
 ): Promise<{ entities: Array<{ externalId: string; payload: Record<string, unknown>; updatedAt: string }>; serverTime: string }> {
-  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+  const query = since?.startsWith('seq:') ? `?afterSeq=${encodeURIComponent(since.slice(4))}` : since ? `?since=${encodeURIComponent(since)}` : '?afterSeq=0';
   const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
@@ -968,7 +989,7 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
     console.error('Could not sign device request; sending unsigned:', err);
     return null;
   });
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetchWithDeadline(`${API_BASE}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1315,6 +1336,14 @@ export interface PaymentConnectionFields {
 }
 
 export interface PaymentConnectionStatus {
+  directSettlementRequested?: boolean;
+  collectionAccount?: 'JAMANVAAR';
+  payoutMode?: 'MANUAL';
+  routeStatus?: 'PENDING';
+  effectiveCommissionBps?: number;
+  settlementAccountNumberMasked?: string | null;
+  settlementBankName?: string | null;
+  settlementBankAccountType?: string | null;
   status: 'NOT_CONNECTED' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DISCONNECTED';
   accountType?: string | null;
   businessType?: string | null;
@@ -1333,6 +1362,26 @@ export interface PaymentConnectionStatus {
 
 export async function getPaymentConnection(): Promise<PaymentConnectionStatus> {
   return request<PaymentConnectionStatus>('/api/v1/tenant/payment-connection', { method: 'GET' });
+}
+
+export interface SettlementBankDetails {
+  settlementAccountName: string;
+  settlementBankName: string;
+  settlementAccountNumber: string;
+  settlementIfsc: string;
+  settlementBankAccountType: 'SAVINGS' | 'CURRENT';
+}
+
+export function saveSettlementBankDetails(bank: SettlementBankDetails): Promise<PaymentConnectionStatus> {
+  return request('/api/v1/tenant/payment-connection/bank-details', { method: 'PATCH', body: bank });
+}
+
+export function setDirectSettlementRequest(directSettlementRequested: boolean): Promise<PaymentConnectionStatus> {
+  return request('/api/v1/tenant/payment-connection/settlement-preference', { method: 'PATCH', body: { directSettlementRequested } });
+}
+
+export function requestPlatformPayments(): Promise<PaymentConnectionStatus> {
+  return request('/api/v1/tenant/payment-connection/request-platform-payments', { method: 'POST' });
 }
 
 export async function submitPaymentConnection(fields: PaymentConnectionFields): Promise<PaymentConnectionStatus> {
@@ -1368,21 +1417,27 @@ export interface DayStatement {
   platformCommission: number;
   razorpayFee: number;
   platformNetCommission: number;
-  commissionReversed: number;
+  commissionReversed: number | null;
   restaurantGross: number;
-  restaurantRefundImpact: number;
+  restaurantRefundImpact: number | null;
+  heldPayable: number;
+  unallocatedCollection: number;
   netPayableToRestaurant: number;
   settlementNote: string;
-  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number; method: string | null; paidAt: string | null }>;
+  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number | null; method: string | null; paidAt: string | null }>;
   rowsTruncated: boolean;
 }
 
 export interface PayoutSummary {
+  unallocatedCollection: number;
   grossCollection: number;
   platformFee: number;
   netPayable: number;
   pendingPayout: number;
   paidPayout: number;
+  heldPayable: number;
+  netBeforeAdjustments: number;
+  refundedAmount: number;
 }
 
 export interface RestaurantPayout {

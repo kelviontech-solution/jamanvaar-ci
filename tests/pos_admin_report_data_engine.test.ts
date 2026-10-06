@@ -21,7 +21,7 @@ describe('ReportDataEngine.getOrders() excludes unpaid orders, not just cancelle
   });
 
   it('leaves a KOT-only (unpaid) order out of the report, but keeps a paid one', () => {
-    const item = { id: 'i1', orderId: '', menuItemId: 'm1', name: 'Paneer', quantity: 1, unitPrice: 280, modifiers: [], totalPrice: 280, kitchenStatus: 'PENDING' as const };
+    const item = { id: 'i1', orderId: '', menuItemId: 'm1', sku: 'TEST-M1', name: 'Paneer', quantity: 1, unitPrice: 280, modifiers: [], totalPrice: 280, kitchenStatus: 'PENDING' as const };
     const paid = OrderRepository.createOrder({
       idempotencyKey: `k-${Math.random()}`, orderType: 'DINE_IN', items: [{ ...item }],
       subtotal: 280, cgstAmount: 7, sgstAmount: 7, taxAmount: 14, totalAmount: 294,

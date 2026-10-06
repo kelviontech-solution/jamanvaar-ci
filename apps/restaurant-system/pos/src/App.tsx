@@ -1,3 +1,4 @@
+import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
 import React, { useEffect, useState } from 'react';
 import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
@@ -149,13 +150,12 @@ export const App: React.FC = () => {
     // created it — nothing synced staff records here, despite the create/reset screen's own promise
     // that the PIN would work on POS too. Restaurant Admin is the only place staff are created, so
     // this terminal only pulls.
-    const syncStaff = async () => {
-      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
-    };
+    const syncStaff = () => syncStaffUsers({ push: false });
 
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncCrm();
+    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: false });
     void syncMenuCatalog({ push: true });
     void syncStaff();
     void syncDiningTables();
@@ -194,6 +194,7 @@ export const App: React.FC = () => {
     });
 
     return () => {
+      stopLocalChanges();
       clearInterval(orderInterval);
       clearInterval(interval);
       stopResume();

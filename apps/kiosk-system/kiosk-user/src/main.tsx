@@ -15,7 +15,8 @@ DeviceGate.onIdentityInvalid(() => {
 });
 
 // The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
-void bootDurableStorage().then(() => {
+void bootDurableStorage({ appId: 'kiosk-user', restaurantId: localStorage.getItem('jamanvaar_kiosk_user_restaurant_id') }).then(() => {
+  DeviceGate.reload();
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />

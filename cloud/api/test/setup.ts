@@ -7,6 +7,9 @@ import '@prisma/client';
 // Never run the suite against the development database: use the dedicated test database when one is
 // configured. It is owned by a non-superuser role, so row-level security is genuinely enforced.
 if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
+if (!process.env.DATABASE_URL || !/test/i.test(new URL(process.env.DATABASE_URL).pathname)) {
+  throw new Error('Database tests require TEST_DATABASE_URL pointing to a dedicated test database');
+}
 
 // Tests must never see (or spend) the developer's real Razorpay keys, whatever their .env holds: the
 // payment suites mock the gateway or set their own throw-away secrets. Removed here, and the app's

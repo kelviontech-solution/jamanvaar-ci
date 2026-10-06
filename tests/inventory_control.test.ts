@@ -19,9 +19,9 @@ describe('Inventory control (BUG-046)', () => {
   beforeEach(() => {
     InventoryRepository.startFresh();
     db.restaurant.stockAdjustmentApprovalLimit = undefined;
-    paneer = InventoryRepository.createItem({ name: 'Paneer', sku: 'PAN', category: 'Dairy', unit: 'kg', currentStock: 0, minStockLevel: 2, reorderLevel: 5, costPerUnit: 0 }).id;
-    flour = InventoryRepository.createItem({ name: 'Flour', sku: 'FLR', category: 'Dry', unit: 'kg', currentStock: 20, minStockLevel: 5, reorderLevel: 10, costPerUnit: 40 }).id;
-    butter = InventoryRepository.createItem({ name: 'Butter', sku: 'BUT', category: 'Dairy', unit: 'kg', currentStock: 4, minStockLevel: 1, reorderLevel: 3, costPerUnit: 500 }).id;
+    paneer = InventoryRepository.createItem({ name: 'Paneer', sku: 'PAN', category: 'Dairy', unit: 'kg', currentStock: 0, minStockLevel: 2, reorderLevel: 5, costPerUnit: 0 })!.id;
+    flour = InventoryRepository.createItem({ name: 'Flour', sku: 'FLR', category: 'Dry', unit: 'kg', currentStock: 20, minStockLevel: 5, reorderLevel: 10, costPerUnit: 40 })!.id;
+    butter = InventoryRepository.createItem({ name: 'Butter', sku: 'BUT', category: 'Dairy', unit: 'kg', currentStock: 4, minStockLevel: 1, reorderLevel: 3, costPerUnit: 500 })!.id;
     supplierA = InventoryControl.addSupplier({ name: 'Ahmedabad Dairy', phone: '9876500001' }).id;
     supplierB = InventoryControl.addSupplier({ name: 'Metro Wholesale' }).id;
   });
@@ -214,7 +214,7 @@ describe('Inventory control (BUG-046)', () => {
     });
 
     it('an item with no reorder level is only suggested when it has run out', () => {
-      const salt = InventoryRepository.createItem({ name: 'Salt', sku: 'SLT', category: 'Dry', unit: 'kg', currentStock: 0, minStockLevel: 0, reorderLevel: 0, costPerUnit: 20 }).id;
+      const salt = InventoryRepository.createItem({ name: 'Salt', sku: 'SLT', category: 'Dry', unit: 'kg', currentStock: 0, minStockLevel: 0, reorderLevel: 0, costPerUnit: 20 })!.id;
       expect(InventoryControl.getReorderSuggestions().map((s) => s.itemId)).toContain(salt);
     });
   });

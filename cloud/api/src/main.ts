@@ -49,6 +49,12 @@ async function bootstrap() {
     res.on('finish', () => {
       httpLogger.log(`${requestId} ${req.method} ${redactUrl(req.originalUrl)} ${res.statusCode} ${Date.now() - start}ms`);
     });
+    res.on('close', () => {
+      if (res.writableFinished) return;
+      const message = `${requestId} ${req.method} ${redactUrl(req.originalUrl)} connection closed after ${Date.now() - start}ms`;
+      if (req.headers.accept?.includes('text/event-stream')) httpLogger.debug(message);
+      else httpLogger.warn(message);
+    });
     next();
   });
 

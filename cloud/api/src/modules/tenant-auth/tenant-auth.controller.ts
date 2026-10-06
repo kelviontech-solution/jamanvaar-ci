@@ -189,12 +189,13 @@ export class TenantAuthController {
     @Body() body: TenantRefreshDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE] ?? body.refreshToken;
+    const usesBody = req.headers['x-refresh-transport'] === 'body';
+    const refreshToken = usesBody ? body.refreshToken : req.cookies?.[REFRESH_COOKIE] ?? body.refreshToken;
     if (!refreshToken) {
       throw new UnauthorizedException('Missing refresh token');
     }
     const result = await this.authService.refresh(refreshToken);
-    this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
+    if (!usesBody) this.setRefreshCookie(res, result.refreshToken, result.refreshTokenExpiresAt);
     if (body.refreshToken) {
       return { accessToken: result.accessToken, user: result.user, refreshToken: result.refreshToken, refreshTokenExpiresAt: result.refreshTokenExpiresAt };
     }
@@ -210,7 +211,7 @@ export class TenantAuthController {
     @Res({ passthrough: true }) res: Response,
     @CurrentTenantUser() user: User
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE] ?? body?.refreshToken;
+    const refreshToken = req.headers['x-refresh-transport'] === 'body' ? body?.refreshToken : req.cookies?.[REFRESH_COOKIE] ?? body?.refreshToken;
     if (refreshToken) {
       await this.authService.logout(refreshToken, user.restaurantId, user.id);
     }

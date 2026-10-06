@@ -323,7 +323,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   const jan15 = new Date('2026-01-15T10:00:00+05:30');
 
-  it('the day statement adds up gross, commission, refunds and the restaurant net using the original split', async () => {
+  it('the day statement holds refund exposure without inventing a fee reversal policy', async () => {
     const a = await seedPayment(restaurantId, { amount: 10000, bps: 200, paidAt: jan15, fulfilled: true }); // platform 200, restaurant 9800
     await seedPayment(restaurantId, { amount: 5000, bps: 300, paidAt: jan15, fulfilled: true }); // platform 150, restaurant 4850
     await prisma.runAsTenant(restaurantId, (tx) =>
@@ -346,10 +346,11 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
         platformCommission: 350,
         razorpayFee: 300,
         platformNetCommission: 50,
-        commissionReversed: 80,
+        commissionReversed: null,
         restaurantGross: 14650,
-        restaurantRefundImpact: 3920,
-        netPayableToRestaurant: 10730
+        restaurantRefundImpact: null,
+        heldPayable: 9800,
+        netPayableToRestaurant: 4850
       });
       expect(res.body.rows.length).toBe(2);
     }
@@ -362,6 +363,37 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect((await authed('get', '/api/v1/payments/tenant-statement?date=15-01-2026', kioskAdminToken)).status).toBe(400);
     expect((await authed('get', '/api/v1/payments/tenant-statement', kioskAdminToken)).status).toBe(400);
     expect((await authed('get', '/api/v1/payments/tenant-statement?date=2026-01-15', kioskToken)).status).toBe(403);
+  });
+
+  it('prices a kiosk cart from the merged Restaurant Admin menu without a separate snapshot upload', async () => {
+    const pushed = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posAdminToken).send({ events: [{ externalId: 'merged-menu-only', payload: {
+      id: 'merged-menu-only', name: 'Fresh Thali', price: 125, isAvailable: true, isKioskEnabled: true, modifierGroupIds: [], updatedAt: new Date().toISOString()
+    } }] });
+    expect(pushed.status).toBe(201);
+    const created = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: `merged-price-${Date.now()}`, lines: [{ externalItemId: 'merged-menu-only', quantity: 2, selectedOptionIds: [] }] });
+    expect(created.status, JSON.stringify(created.body)).toBe(201); expect(created.body.amount).toBe(25000);
+    await authed('post', '/api/v1/entity-sync/MENU_ITEM', posAdminToken).send({ events: [{ externalId: 'merged-menu-only', payload: {
+      id: 'merged-menu-only', name: 'Fresh Thali', price: 125, isAvailable: false, isKioskEnabled: true, updatedAt: new Date(Date.now() + 1000).toISOString()
+    } }] });
+    const unavailable = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: `merged-unavailable-${Date.now()}`, lines: [{ externalItemId: 'merged-menu-only', quantity: 1, selectedOptionIds: [] }] });
+    expect(unavailable.status).toBe(400);
+  });
+
+  it('starting a refund after batching holds the payout and audits the hold without rewriting its split', async () => {
+    const p = await seedPayment(restaurantId, { amount: 10000, bps: 300, fulfilled: true });
+    const payout = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.create({ data: { restaurantId, businessDate: '20261006', grossAmount: 10000, feeAmount: 300, netAmount: 9700, paymentCount: 1 } }));
+    await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.update({ where: { id: p.id }, data: { payoutId: payout.id } }));
+    gateway.createRefund.mockResolvedValueOnce({ refundId: `rfnd_batch_${p.id}`, status: 'processed', amountPaise: 1000 });
+    const result = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 1000, reason: 'wrong dish after batch', requestedBy: 'Owner' });
+    expect(result.status).toBe(201);
+    const held = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.findUniqueOrThrow({ where: { id: payout.id } }));
+    expect(held.status).toBe('ON_HOLD');
+    expect(held.netAmount).toBe(9700);
+    const payment = await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findUniqueOrThrow({ where: { id: p.id } }));
+    expect(payment.platformAmount).toBe(300);
+    expect(payment.restaurantAmount).toBe(9700);
+    const audit = await prisma.runAsPlatform(tx => tx.auditLog.findFirst({ where: { restaurantId, action: 'PAYOUT_ON_HOLD' }, orderBy: { createdAt: 'desc' } }));
+    expect(audit?.details).toMatchObject({ payoutId: payout.id, reason: 'REFUND_AFTER_BATCHING' });
   });
 
 });

@@ -1,3 +1,4 @@
+import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
 import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
 import { DiningTable, MenuItem, Category } from '@jamanvaar/types';
@@ -117,9 +118,7 @@ export const App: React.FC = () => {
     // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
     // created it — Captain never pulled staff records, despite the create/reset screen's own promise
     // that the PIN would work here too. Captain never edits staff either — pull only.
-    const syncStaff = async () => {
-      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
-    };
+    const syncStaff = () => syncStaffUsers({ push: false });
 
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
@@ -127,6 +126,7 @@ export const App: React.FC = () => {
     void syncReservations({ push: false });
     void syncStaff();
     void syncDiningTables();
+    EntitySyncEngine.registerWakeUp('SERVICE_MESSAGE', async () => { const inbound = await syncServiceMessages('CAPTAIN'); useCaptainStore.getState().receiveMessages(inbound); });
     void reportHeartbeat();
 
     const orderInterval = setInterval(() => {

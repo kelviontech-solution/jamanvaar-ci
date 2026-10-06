@@ -47,6 +47,12 @@ const MIGRATIONS: string[][] = [
     `CREATE TABLE sync_log (
        id INTEGER PRIMARY KEY AUTOINCREMENT, trace_id TEXT, event_id TEXT, entity_id TEXT, status TEXT NOT NULL, error TEXT,
        device_id TEXT, at INTEGER NOT NULL)`
+  ],
+  [
+    `ALTER TABLE entities ADD COLUMN seq INTEGER NOT NULL DEFAULT 0`,
+    `UPDATE entities SET seq = rowid`,
+    `INSERT INTO seq_counter (name, value) SELECT 'entities', COALESCE(MAX(seq), 0) FROM entities`,
+    `CREATE INDEX entities_by_seq ON entities (entity_type, seq)`
   ]
 ];
 

@@ -1,3 +1,4 @@
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Device, Prisma } from '@prisma/client';
@@ -57,7 +58,8 @@ export class QrAdminService {
     private readonly config: ConfigService,
     private readonly entitlements: ApplicationEntitlementsService,
     private readonly settings: QrSettingsService,
-    private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>
+    private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>,
+    private readonly realtime: RealtimeBus
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -164,6 +166,7 @@ export class QrAdminService {
       return payload;
     });
     this.cache.invalidate(restaurantId);
+    this.realtime.publish({ restaurantId, branchId: device.branchId, kind: 'entity:DINING_TABLE', originDeviceId: device.id });
     return out;
   }
 

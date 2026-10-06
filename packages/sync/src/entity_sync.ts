@@ -29,7 +29,7 @@ export interface CloudSyncedEntity {
 
 export interface EntitySyncTransport {
   push(entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }>;
-  pull(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }>;
+  pull(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }>;
 }
 
 /** The server returns at most this many records per pull (see cloud/api entity-sync). */
@@ -51,13 +51,27 @@ function safeSet(key: string, value: string): void {
   }
 }
 
-import { KeyValueStore } from '@jamanvaar/database';
+import { db, KeyValueStore } from '@jamanvaar/database';
 import { EndpointResolver } from './endpoint_resolver';
+import { jsonBatches } from './batches';
 
 const restartedThisSession = new Set<string>();
 
 export class EntitySyncEngine {
   private static transport: EntitySyncTransport | null = null;
+  private static readonly pulls = new Map<string, Promise<{ pulled: number }>>();
+  private static readonly wakeUps = new Map<string, () => Promise<unknown>>();
+  private static readonly consumers = new Map<string, (entity: CloudSyncedEntity) => void>();
+
+  static registerWakeUp(type: string, handler: () => Promise<unknown>): void { this.wakeUps.set(type, handler); }
+  static wake(type?: string): void {
+    for (const [kind, consumer] of this.consumers) {
+      if (type && type !== kind) continue;
+      const handler = this.wakeUps.get(kind);
+      if (handler) void handler().catch(() => undefined);
+      else void this.catchUp(kind, consumer);
+    }
+  }
 
   public static configureTransport(transport: EntitySyncTransport | null): void {
     this.transport = transport;
@@ -65,13 +79,21 @@ export class EntitySyncEngine {
 
   public static async pushSnapshot(entityType: string, records: EntitySyncEvent[]): Promise<{ processed: number; failed: number }> {
     if (!this.transport || records.length === 0) return { processed: 0, failed: 0 };
-    try {
-      const { results } = await this.transport.push(entityType, records);
-      const processed = results.filter((r) => r.status === 'ok').length;
-      return { processed, failed: results.length - processed };
-    } catch {
-      return { processed: 0, failed: records.length };
+    let processed = 0;
+    let failed = 0;
+    const transport = this.transport;
+    const scope = EndpointResolver.cursorKey(`entity-push-${entityType}`, `/api/v1/entity-sync/${entityType}`);
+    let visited = 0;
+    for (const batch of jsonBatches(records, 200, 15_000_000)) {
+      if (transport !== this.transport || scope !== EndpointResolver.cursorKey(`entity-push-${entityType}`, `/api/v1/entity-sync/${entityType}`)) { failed += records.length - visited; break; }
+      visited += batch.length;
+      try {
+        const { results } = await transport.push(entityType, batch);
+        processed += results.filter((r) => r.status === 'ok').length;
+        failed += batch.length - results.filter((r) => r.status === 'ok').length;
+      } catch { failed += batch.length; }
     }
+    return { processed, failed };
   }
 
   /**
@@ -92,26 +114,45 @@ export class EntitySyncEngine {
   }
 
   /** Pulls everything changed since the last call and hands each record to `onEntity` to merge into local storage — the merge policy is domain-specific, so it stays with the caller. */
-  public static async catchUp(entityType: string, onEntity: (entity: CloudSyncedEntity) => void): Promise<{ pulled: number }> {
-    if (!this.transport) return { pulled: 0 };
-    const cursorKey = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
-    const predicted = EndpointResolver.serverKeyFor(`/api/v1/entity-sync/${entityType}`);
-    // A device that has never pulled asks for everything, not just the last day: devices no longer re-upload
-    // unchanged records every tick (BUG-149), so a menu untouched for a week must still reach a new terminal.
-    const since = safeGet(cursorKey) ?? new Date(0).toISOString();
+  public static catchUp(entityType: string, onEntity: (entity: CloudSyncedEntity) => void): Promise<{ pulled: number }> {
+    this.consumers.set(entityType, onEntity);
+    const key = EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`);
+    const existing = this.pulls.get(key);
+    if (existing) return existing;
+    const run = this.pullPages(entityType, onEntity, key).finally(() => this.pulls.delete(key));
+    this.pulls.set(key, run);
+    return run;
+  }
 
+  private static async pullPages(entityType: string, onEntity: (entity: CloudSyncedEntity) => void, cursorKey: string): Promise<{ pulled: number }> {
+    const transport = this.transport;
+    if (!transport) return { pulled: 0 };
+    const predicted = EndpointResolver.serverKeyFor(`/api/v1/entity-sync/${entityType}`);
+    // Rebuild once when upgrading timestamp cursors; earlier timestamp gaps must also be recovered.
+    const saved = safeGet(cursorKey);
+    const upgradedKey = `${cursorKey}:sequence_protocol`;
+    let cursor = saved?.startsWith('seq:') || safeGet(upgradedKey) ? saved ?? 'seq:0' : 'seq:0';
+    let pulled = 0;
     try {
-      const { entities, serverTime } = await this.transport.pull(entityType, since);
-      entities.forEach(onEntity);
-      if ((EndpointResolver.lastResponder() ?? predicted) !== predicted) return { pulled: entities.length }; // answered by the other server: its position is not ours
-      // A full page means there may be more: continue from the last record received, not from "now", so
-      // nothing beyond the page limit is skipped.
-      const last = entities[entities.length - 1];
-      const nextCursor = entities.length >= CATCH_UP_PAGE_SIZE && last?.updatedAt ? last.updatedAt : serverTime;
-      safeSet(cursorKey, nextCursor);
-      return { pulled: entities.length };
-    } catch {
-      return { pulled: 0 };
-    }
+      for (let page = 0; page < 50; page++) {
+        const result = await transport.pull(entityType, cursor);
+        if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(`jamanvaar_entity_sync_cursor_${entityType}`, `/api/v1/entity-sync/${entityType}`)) break;
+        db.batch(() => result.entities.forEach(onEntity));
+        pulled += result.entities.length;
+        if ((result.serverKey ?? EndpointResolver.lastResponder() ?? predicted) !== predicted) break;
+        const next = typeof result.latestSeq === 'number' ? `seq:${result.latestSeq}`
+          : result.entities.length >= CATCH_UP_PAGE_SIZE ? result.entities[result.entities.length - 1]?.updatedAt : result.serverTime;
+        if (!next) break;
+        safeSet(cursorKey, next);
+        safeSet(upgradedKey, '1');
+        if (!result.hasMore) {
+          safeSet(`${cursorKey}:caught_up_at`, result.serverTime);
+          break;
+        }
+        if (next === cursor) break;
+        cursor = next;
+      }
+    } catch { /* Do not acknowledge a page which failed to apply. The next wake-up resumes it. */ }
+    return { pulled };
   }
 }

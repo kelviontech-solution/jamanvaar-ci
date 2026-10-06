@@ -166,8 +166,8 @@ describe('QR ordering (SaaS)', () => {
 
     it('upgrade enables QR for the existing tables; downgrade blocks new QR orders at once; history is kept', async () => {
       const r = await restaurant('QrUpDown', F.pro);
-      const console = await activate(r.id, 'POS_ADMIN');
       const bId = await branch(r.id, 'U Main', 'UUU');
+      const console = await activate(r.id, 'POS_ADMIN', bId);
       const pos = await activate(r.id, 'POS', bId);
       await seedMenu(console, 'u');
       await table(console, 'tbl-u1', '1', { branchId: bId });
@@ -194,8 +194,8 @@ describe('QR ordering (SaaS)', () => {
 
     it('a Super Admin override enables QR for one restaurant without touching the plan, and revoking it disables again', async () => {
       const r = await restaurant('QrOverride', F.pro);
-      const console = await activate(r.id, 'POS_ADMIN');
       const ob = await branch(r.id, 'O Main', 'OOO');
+      const console = await activate(r.id, 'POS_ADMIN', ob);
       await seedMenu(console, 'o');
       await table(console, 'tbl-o1', '1', { branchId: ob });
       expect((await gen(console, 'tbl-o1')).status).toBe(403);
@@ -313,8 +313,8 @@ describe('QR ordering (SaaS)', () => {
 
     it('the table limit from the entitlement is enforced', async () => {
       const r = await restaurant('QrLimit', F.qr);
-      const console = await activate(r.id, 'POS_ADMIN');
       const b = await branch(r.id, 'L Main', 'LLL');
+      const console = await activate(r.id, 'POS_ADMIN', b);
       await table(console, 'tbl-l1', '1', { branchId: b });
       await table(console, 'tbl-l2', '2', { branchId: b });
       await http().patch(`/api/v1/qr-ordering/restaurants/${r.id}/entitlement`).set('Authorization', `Bearer ${platformToken}`).send({ maxActiveTables: 1 });
@@ -394,8 +394,8 @@ describe('QR ordering (SaaS)', () => {
 
     it('a suspended restaurant and a deactivated branch stop the guest page at once, and coming back restores it', async () => {
       const r = await restaurant('QrStates', F.qr);
-      const console = await activate(r.id, 'POS_ADMIN');
       const b = await branch(r.id, 'S Main', 'SSM');
+      const console = await activate(r.id, 'POS_ADMIN', b);
       await seedMenu(console, 's');
       await table(console, 'tbl-s9', '1', { branchId: b });
       const t = tokenOf((await gen(console, 'tbl-s9')).body.url);
@@ -419,9 +419,9 @@ describe('QR ordering (SaaS)', () => {
 
     it('a table that belongs to another branch cannot be opened through this branch\'s code', async () => {
       const r = await restaurant('QrBranchClash', F.qr);
-      const console = await activate(r.id, 'POS_ADMIN');
       const b1 = await branch(r.id, 'X1', 'XX1');
       const b2 = await branch(r.id, 'X2', 'XX2');
+      const console = await activate(r.id, 'POS_ADMIN');
       await table(console, 'tbl-x', '1', { branchId: b1 });
       const made = await gen(console, 'tbl-x', { branchId: b1 });
       const token = tokenOf(made.body.url);
@@ -534,8 +534,8 @@ describe('QR ordering (SaaS)', () => {
 
       it('tax-inclusive menus extract the tax instead of adding it', async () => {
         const r = await restaurant('QrInclusive', F.qr);
-        const console = await activate(r.id, 'POS_ADMIN');
         const b = await branch(r.id, 'I Main', 'III');
+        const console = await activate(r.id, 'POS_ADMIN', b);
         await seedMenu(console, 'i', { taxInclusive: true });
         await table(console, 'tbl-i1', '1', { branchId: b });
         const t = tokenOf((await gen(console, 'tbl-i1')).body.url);
@@ -679,8 +679,8 @@ describe('QR ordering (SaaS)', () => {
 
       it('the daily QR order limit stops the next order even under concurrency', async () => {
         const r = await restaurant('QrDaily', F.qr);
-        const console = await activate(r.id, 'POS_ADMIN');
         const b = await branch(r.id, 'D Main', 'DDD');
+        const console = await activate(r.id, 'POS_ADMIN', b);
         await seedMenu(console, 'd');
         await table(console, 'tbl-d1', '1', { branchId: b });
         const t = tokenOf((await gen(console, 'tbl-d1')).body.url);

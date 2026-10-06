@@ -82,7 +82,7 @@ export class ReportsService {
       activeDevices,
       totalSubscriptions,
       activeSubscriptions,
-      invoices
+      invoiceTotals
     ] = await Promise.all([
       this.prisma.platformDb.restaurant.count({ where: { deletedAt: null } }),
       this.prisma.platformDb.restaurant.count({ where: { status: 'ACTIVE', deletedAt: null } }),
@@ -92,26 +92,16 @@ export class ReportsService {
       this.prisma.platformDb.device.count({ where: { status: 'ACTIVE' } }),
       this.prisma.platformDb.subscription.count(),
       this.prisma.platformDb.subscription.count({ where: { status: 'ACTIVE' } }),
-      this.prisma.platformDb.invoice.findMany({
-        where: { status: { not: 'VOID' } },
-        select: { totalAmount: true, status: true }
-      })
+      this.prisma.platformDb.invoice.groupBy({ by: ['status'], _sum: { totalAmount: true } })
     ]);
 
-    // Financial reconciliation
-    const collectedPaise = invoices
-      .filter((inv) => inv.status === 'PAID')
-      .reduce((sum, inv) => sum + inv.totalAmount, 0);
-    const outstandingPaise = invoices
-      .filter((inv) => inv.status === 'ISSUED' || inv.status === 'PAST_DUE' || inv.status === 'DRAFT')
-      .reduce((sum, inv) => sum + inv.totalAmount, 0);
-
-    // MRR calculation based on active subscriptions
-    const activeSubsWithPlan = await this.prisma.platformDb.subscription.findMany({
-      where: { status: 'ACTIVE' },
-      include: { plan: true }
-    });
-    const mrrPaise = activeSubsWithPlan.reduce((sum, sub) => sum + sub.plan.priceMonthly, 0);
+    const collectedPaise = invoiceTotals.find((i) => i.status === 'PAID')?._sum.totalAmount ?? 0;
+    const outstandingPaise = invoiceTotals.filter((i) => ['ISSUED', 'PAST_DUE', 'DRAFT'].includes(i.status))
+      .reduce((sum, i) => sum + (i._sum.totalAmount ?? 0), 0);
+    const mrr = await this.prisma.runAsPlatform((tx) => tx.$queryRaw<Array<{ amount: number }>>(Prisma.sql`
+      SELECT COALESCE(SUM(p."priceMonthly"), 0)::float8 AS amount
+      FROM "Subscription" s JOIN "Plan" p ON p.id = s."planId" WHERE s.status = 'ACTIVE'`));
+    const mrrPaise = Number(mrr[0]?.amount ?? 0);
     const arrPaise = mrrPaise * 12;
 
     return {
@@ -142,21 +132,18 @@ export class ReportsService {
   }
 
   async getRevenue() {
-    const invoices = await this.prisma.platformDb.invoice.findMany({
-      include: { plan: true, restaurant: true },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    const coreInvoices = invoices.filter((i) => i.plan?.tier === 'CORE');
-    const proInvoices = invoices.filter((i) => i.plan?.tier === 'PRO');
-
-    const coreRevenue = coreInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
-    const proRevenue = proInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
-
+    const [invoices, totals] = await Promise.all([
+      this.prisma.platformDb.invoice.findMany({ include: { plan: true, restaurant: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
+      this.prisma.runAsPlatform((tx) => tx.$queryRaw<Array<{ tier: string; revenue: number; count: number }>>(Prisma.sql`
+        SELECT p.tier::text AS tier, SUM(i."totalAmount")::float8 AS revenue, COUNT(*)::int AS count
+        FROM "Invoice" i JOIN "Plan" p ON p.id = i."planId" GROUP BY p.tier`))
+    ]);
+    const core = totals.find((t) => t.tier === 'CORE');
+    const pro = totals.find((t) => t.tier === 'PRO');
     return {
       byPlan: [
-        { tier: 'CORE', name: 'JAMANVAAR CORE', revenue: Math.round(coreRevenue / 100), count: coreInvoices.length },
-        { tier: 'PRO', name: 'JAMANVAAR PRO', revenue: Math.round(proRevenue / 100), count: proInvoices.length }
+        { tier: 'CORE', name: 'JAMANVAAR CORE', revenue: Math.round(Number(core?.revenue ?? 0) / 100), count: core?.count ?? 0 },
+        { tier: 'PRO', name: 'JAMANVAAR PRO', revenue: Math.round(Number(pro?.revenue ?? 0) / 100), count: pro?.count ?? 0 }
       ],
       recentInvoices: invoices.slice(0, 10).map((i) => ({
         id: i.id,
@@ -171,34 +158,26 @@ export class ReportsService {
   }
 
   async getRestaurants() {
-    const restaurants = await this.prisma.platformDb.restaurant.findMany({
-      where: { deletedAt: null },
-      include: {
-        branches: true,
-        subscriptions: { include: { plan: true } },
-        devices: true
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    const cityMap: Record<string, number> = {};
-    for (const r of restaurants) {
-      const city = r.city || 'Unknown';
-      cityMap[city] = (cityMap[city] || 0) + 1;
-    }
-
-    const cityBreakdown = Object.entries(cityMap).map(([city, count]) => ({ city, count }));
-
+    const [restaurants, cities, total] = await Promise.all([
+      this.prisma.platformDb.restaurant.findMany({ where: { deletedAt: null },
+        include: { _count: { select: { branches: true, devices: true } }, subscriptions: { include: { plan: true }, orderBy: { createdAt: 'desc' }, take: 1 } },
+        orderBy: { createdAt: 'desc' }, take: 15 }),
+      this.prisma.platformDb.restaurant.groupBy({ by: ['city'], where: { deletedAt: null }, _count: true }),
+      this.prisma.platformDb.restaurant.count({ where: { deletedAt: null } })
+    ]);
+    const cityMap = new Map<string, number>();
+    for (const c of cities) { const city = c.city || 'Unknown'; cityMap.set(city, (cityMap.get(city) ?? 0) + c._count); }
+    const cityBreakdown = Array.from(cityMap, ([city, count]) => ({ city, count }));
     return {
-      total: restaurants.length,
+      total,
       cityBreakdown,
       list: restaurants.slice(0, 15).map((r) => ({
         id: r.id,
         name: r.name,
         city: r.city,
         status: r.status,
-        branchCount: r.branches.length,
-        deviceCount: r.devices.length,
+        branchCount: r._count.branches,
+        deviceCount: r._count.devices,
         activePlan: r.subscriptions[0]?.plan.name ?? 'No Plan',
         createdAt: r.createdAt.toISOString()
       }))
@@ -206,20 +185,15 @@ export class ReportsService {
   }
 
   async getDevices() {
-    const devices = await this.prisma.platformDb.device.findMany({
-      include: { restaurant: true, branch: true },
-      orderBy: { createdAt: 'desc' }
-    });
-
+    const [devices, counts, total] = await Promise.all([
+      this.prisma.platformDb.device.findMany({ include: { restaurant: true, branch: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
+      this.prisma.platformDb.device.groupBy({ by: ['type'], _count: true }),
+      this.prisma.platformDb.device.count()
+    ]);
     const typeCounts: Record<string, number> = { POS: 0, CAPTAIN: 0, KDS: 0, KIOSK: 0, POS_ADMIN: 0, KIOSK_ADMIN: 0 };
-    for (const d of devices) {
-      if (typeCounts[d.type] !== undefined) {
-        typeCounts[d.type]++;
-      }
-    }
-
+    for (const c of counts) typeCounts[c.type] = c._count;
     return {
-      total: devices.length,
+      total,
       byType: Object.entries(typeCounts).map(([type, count]) => ({ type, count })),
       list: devices.slice(0, 20).map((d) => ({
         id: d.id,
@@ -235,18 +209,15 @@ export class ReportsService {
   }
 
   async getSubscriptions() {
-    const subscriptions = await this.prisma.platformDb.subscription.findMany({
-      include: { restaurant: true, plan: true },
-      orderBy: { createdAt: 'desc' }
-    });
-
+    const [subscriptions, counts, total] = await Promise.all([
+      this.prisma.platformDb.subscription.findMany({ include: { restaurant: true, plan: true }, orderBy: { createdAt: 'desc' }, take: 15 }),
+      this.prisma.platformDb.subscription.groupBy({ by: ['status'], _count: true }),
+      this.prisma.platformDb.subscription.count()
+    ]);
     const statusCounts: Record<string, number> = { ACTIVE: 0, TRIAL: 0, PAST_DUE: 0, SUSPENDED: 0, EXPIRED: 0 };
-    for (const s of subscriptions) {
-      statusCounts[s.status] = (statusCounts[s.status] || 0) + 1;
-    }
-
+    for (const c of counts) statusCounts[c.status] = c._count;
     return {
-      total: subscriptions.length,
+      total,
       byStatus: Object.entries(statusCounts).map(([status, count]) => ({ status, count })),
       list: subscriptions.slice(0, 15).map((s) => ({
         id: s.id,

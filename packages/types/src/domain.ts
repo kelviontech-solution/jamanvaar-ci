@@ -483,6 +483,8 @@ export interface OrderItem {
   readyAt?: string;
   /** What this line was priced with when it was ordered (QR orders): never recalculated from the current menu. */
   snapshot?: { menuVersion?: number; basePrice?: number; taxGroupId?: string; taxRateBp?: number; taxInclusive?: boolean; lineTax?: number };
+  /** Kitchen routing retained with the ordered line for offline/replay fidelity. */
+  kitchenStation?: string;
 }
 
 export type BusinessDayStatus = 'OPEN' | 'CLOSING' | 'CLOSED' | 'REOPENED';

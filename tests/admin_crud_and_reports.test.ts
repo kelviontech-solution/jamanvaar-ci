@@ -113,8 +113,8 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
       supplierName: 'Gujarat Dairy Co'
     });
 
-    expect(rawPaneer.currentStock).toBe(20);
-    expect(rawPaneer.status).toBe('IN_STOCK');
+    expect(rawPaneer!.currentStock).toBe(20);
+    expect(rawPaneer!.status).toBe('IN_STOCK');
 
     // Create dish and recipe
     const dish = MenuRepository.createMenuItem({
@@ -130,8 +130,8 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
       menuItemName: dish.name,
       ingredients: [
         {
-          inventoryItemId: rawPaneer.id,
-          inventoryItemName: rawPaneer.name,
+          inventoryItemId: rawPaneer!.id,
+          inventoryItemName: rawPaneer!.name,
           quantityPerPortion: 0.25, // 250g paneer per portion
           unit: 'kg'
         }
@@ -166,7 +166,7 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
       orderStatus: 'CONFIRMED'
     });
 
-    const updatedPaneer = InventoryRepository.getItemById(rawPaneer.id);
+    const updatedPaneer = InventoryRepository.getItemById(rawPaneer!.id);
     expect(updatedPaneer?.currentStock).toBe(19.5); // 20 - 0.5kg auto-deducted
   });
 

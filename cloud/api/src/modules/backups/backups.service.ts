@@ -1,3 +1,5 @@
+import { nextSyncSequence } from '../../common/sync-sequence';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { createHash } from 'crypto';
 import { gunzipSync } from 'zlib';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, NotImplementedException, ServiceUnavailableException } from '@nestjs/common';
@@ -17,7 +19,8 @@ export class BackupsService {
     private readonly prisma: PrismaService,
     private readonly storage: BackupStorageService,
     private readonly audit: AuditService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly realtime: RealtimeBus
   ) {}
 
   /** Some storage always works now (the server's disk when there is no S3 bucket), so this is always true. */
@@ -464,7 +467,9 @@ export class BackupsService {
       const safety = await this.triggerForRestaurant(job.restaurantId);
       const data = inspected.parsed as { syncedEntities?: Array<Record<string, unknown>>; syncedOrders?: Array<Record<string, unknown>> };
 
-      const restored = await this.prisma.runAsPlatform(async (tx) => {
+      const restored = await this.prisma.runAsTenant(job.restaurantId, async (tx) => {
+        for (const id of [...new Set((data.syncedOrders ?? []).map((o) => String(o.externalOrderId)))].sort()) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + job.restaurantId + ':' + id}))`;
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + job.restaurantId}))`;
         let syncedEntities = 0;
         let syncedOrders = 0;
         for (const e of data.syncedEntities ?? []) {
@@ -477,7 +482,7 @@ export class BackupsService {
         }
         for (const o of data.syncedOrders ?? []) {
           const fields = {
-            orderType: String(o.orderType), status: String(o.status), tableId: (o.tableId as string) ?? null, tableLabel: (o.tableLabel as string) ?? null,
+            seq: await nextSyncSequence(tx, job.restaurantId), orderType: String(o.orderType), status: String(o.status), tableId: (o.tableId as string) ?? null, tableLabel: (o.tableLabel as string) ?? null,
             items: o.items as Prisma.InputJsonValue, subtotal: Number(o.subtotal), taxAmount: Number(o.taxAmount), discountAmount: Number(o.discountAmount ?? 0),
             totalAmount: Number(o.totalAmount), notes: (o.notes as string) ?? null, paymentStatus: (o.paymentStatus as string) ?? null, paymentMethod: (o.paymentMethod as string) ?? null,
             meta: (o.meta as Prisma.InputJsonValue) ?? undefined, branchId: (o.branchId as string) ?? null
@@ -506,6 +511,7 @@ export class BackupsService {
         actorType: 'PLATFORM', actorId: actor.id, restaurantId: job.restaurantId, action: 'BACKUP_RESTORE_EXECUTED', category: 'BACKUP',
         details: { jobId, backupId: job.backupId, restored, safetyBackupId: safety.id }
       });
+      for (const kind of ['orders', 'entities', 'menu'] as const) this.realtime.publish({ restaurantId: job.restaurantId, branchId: null, kind });
       return { ...updated, restored, safetyBackupId: safety.id };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

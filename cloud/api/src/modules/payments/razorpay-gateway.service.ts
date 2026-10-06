@@ -1,3 +1,4 @@
+import { upstreamJson } from '../../common/upstream-fetch';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -41,7 +42,7 @@ export class RazorpayGatewayService {
    * is matched. close_by must be at least two minutes ahead, so the caller passes it as Unix seconds.
    */
   async createUpiQr(input: CreateRazorpayUpiQrInput): Promise<RazorpayUpiQrResult> {
-    const res = await fetch('https://api.razorpay.com/v1/payments/qr_codes', {
+    const { response: res, body } = await upstreamJson('https://api.razorpay.com/v1/payments/qr_codes', {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({
@@ -55,7 +56,6 @@ export class RazorpayGatewayService {
         notes: { payment_ref: input.paymentRef }
       })
     });
-    const body = await res.json();
     if (!res.ok) {
       throw new ServiceUnavailableException(`Razorpay QR creation failed: ${body?.error?.description ?? res.statusText}`);
     }
@@ -68,7 +68,7 @@ export class RazorpayGatewayService {
 
   /** A one-time payment link for a WhatsApp order (https://razorpay.com/docs/api/payments/payment-links/create/). Razorpay sends no SMS or email; the connector sends the link itself. */
   async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number }): Promise<{ linkId: string; shortUrl: string; status: string }> {
-    const res = await fetch('https://api.razorpay.com/v1/payment_links', {
+    const { response: res, body } = await upstreamJson('https://api.razorpay.com/v1/payment_links', {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({
@@ -83,7 +83,6 @@ export class RazorpayGatewayService {
         expire_by: input.expireByUnix
       })
     });
-    const body = await res.json();
     if (!res.ok) {
       throw new ServiceUnavailableException(`Razorpay payment link creation failed: ${body?.error?.description ?? res.statusText}`);
     }
@@ -92,12 +91,11 @@ export class RazorpayGatewayService {
 
   /** A refund of part or all of one captured Razorpay payment (https://razorpay.com/docs/api/refunds/create-normal/). */
   async createRefund(input: { razorpayPaymentId: string; amountPaise: number; receipt: string; notes?: Record<string, string> }): Promise<{ refundId: string; status: string; amountPaise: number }> {
-    const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(input.razorpayPaymentId)}/refund`, {
+    const { response: res, body } = await upstreamJson(`https://api.razorpay.com/v1/payments/${encodeURIComponent(input.razorpayPaymentId)}/refund`, {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({ amount: input.amountPaise, receipt: input.receipt, ...(input.notes ? { notes: input.notes } : {}) })
     });
-    const body = await res.json();
     if (!res.ok) {
       throw new ServiceUnavailableException(`Razorpay refund failed: ${body?.error?.description ?? res.statusText}`);
     }
@@ -106,8 +104,7 @@ export class RazorpayGatewayService {
 
   /** Payments made on one QR code (https://razorpay.com/docs/api/qr-codes/fetch-payments/). Only this QR is looked at, never the whole account. */
   async listQrPayments(qrId: string): Promise<{ id: string; amount: number; currency: string; status: string }[]> {
-    const res = await fetch(`https://api.razorpay.com/v1/payments/qr_codes/${encodeURIComponent(qrId)}/payments`, { method: 'GET', headers: this.headers() });
-    const body = await res.json();
+    const { response: res, body } = await upstreamJson(`https://api.razorpay.com/v1/payments/qr_codes/${encodeURIComponent(qrId)}/payments`, { method: 'GET', headers: this.headers() });
     if (!res.ok) {
       throw new ServiceUnavailableException(`Razorpay QR payment lookup failed: ${body?.error?.description ?? res.statusText}`);
     }

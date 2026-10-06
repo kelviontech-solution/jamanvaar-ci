@@ -6,6 +6,7 @@ import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAl
 import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
 import { EndpointResolver } from './endpoint_resolver';
+import { jsonBatches } from './batches';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
 const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
@@ -129,7 +130,7 @@ export interface CloudSyncedOrder {
 export interface OrderSyncTransport {
   push(events: OrderSyncPushEvent[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }>;
   /** `cursor` is either `seq:<n>` (preferred) or a legacy ISO timestamp; undefined means first pull. */
-  pull(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }>;
+  pull(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }>;
   /** Reserves a block of human order/KOT numbers for this device (POST /sync/number-leases). */
   leaseNumbers?(kind: 'ORDER' | 'KOT', count: number): Promise<NumberLease>;
   /** This device's id, used to derive the short code that keeps offline fallback numbers unique. */
@@ -492,6 +493,8 @@ export class SyncOutboxEngine {
   private static isSyncing = false;
   private static runAgain = false;
   private static leasing = false;
+  private static pullInFlight: Promise<{ pulled: number; created: number }> | null = null;
+  private static pullAgain = false;
   private static transport: OrderSyncTransport | null = null;
   private static unsubscribeNetwork: (() => void) | null = null;
 
@@ -503,6 +506,11 @@ export class SyncOutboxEngine {
    */
   public static configureTransport(transport: OrderSyncTransport | null): void {
     this.transport = transport;
+    const deviceId = transport?.deviceId?.();
+    EndpointResolver.setIdentity(deviceId ? `${deviceId}:${KeyValueStore.get('jamanvaar_bound_branch_id') || 'all'}` : null);
+    if (transport && !this.isSyncing) {
+      for (const order of db.orders) if (order.syncStatus === 'SYNCING') order.syncStatus = 'SAVED_LOCALLY';
+    }
     NumberAllocator.reload();
     this.unsubscribeNetwork?.();
     this.unsubscribeNetwork = null;
@@ -510,12 +518,14 @@ export class SyncOutboxEngine {
     if (transport) {
       let wasOnline = NetworkStatusService.isOnline();
       this.unsubscribeNetwork = NetworkStatusService.subscribe((state) => {
-        const isOnlineNow = state === 'ONLINE';
-        if (isOnlineNow && !wasOnline) {
+        // SYNCING is still connected. Only a real offline-to-online transition is a reconnect.
+        if (state === 'SYNCING') return;
+        const reconnect = state === 'ONLINE' && !wasOnline;
+        wasOnline = state === 'ONLINE';
+        if (reconnect && !this.isSyncing) {
           void this.processOutbox({ ignoreBackoff: true });
           void this.catchUpFromCloud();
         }
-        wasOnline = isOnlineNow;
       });
     }
   }
@@ -581,6 +591,8 @@ export class SyncOutboxEngine {
     }
     this.isSyncing = true;
     this.runAgain = false;
+    const transport = this.transport;
+    try {
     NetworkStatusService.setNetworkState('SYNCING', NetworkStatusService.getLatency());
     void this.refillNumberLeases();
 
@@ -596,7 +608,7 @@ export class SyncOutboxEngine {
     );
 
     if (pendingOrders.length > 0) {
-      if (!this.transport) {
+      if (!transport) {
         // No transport configured is a device-activation gap, not a
         // connectivity blip — fail loud instead of the old stub's silent
         // "SYNCED" so a caller can never mistake this for a real round-trip.
@@ -605,13 +617,20 @@ export class SyncOutboxEngine {
           failed++;
         }
       } else {
-        pendingOrders.forEach((o) => {
+        const events = new Map(pendingOrders.map((order) => [order.id, toPushEvent(order)]));
+        for (const payload of jsonBatches([...events.values()], 100, 1_500_000)) {
+        if (transport !== this.transport) break;
+        const ids = new Set(payload.map((event) => event.externalOrderId));
+        const batch = pendingOrders.filter((order) => ids.has(order.id));
+        const startedAt = Date.now();
+        batch.forEach((o) => {
           o.syncStatus = 'SYNCING';
         });
         try {
-          const { results } = await this.transport.push(pendingOrders.map(toPushEvent));
+          const { results } = await transport.push(payload);
+          if (transport !== this.transport) break;
           const byId = new Map(results.map((r) => [r.externalOrderId, r]));
-          for (const ord of pendingOrders) {
+          for (const ord of batch) {
             const res = byId.get(ord.id);
             if (res && res.status === 'ok') {
               // While this push was in flight the order shows SYNCING. If it shows SAVED_LOCALLY now, something changed it
@@ -622,16 +641,19 @@ export class SyncOutboxEngine {
               processed++;
             } else {
               markFailedAttempt(ord, res?.error ?? 'Not acknowledged by the server');
+              if (/BRANCH_FORBIDDEN|Invalid order payload/.test(res?.error ?? '')) ord.syncStatus = 'DEAD_LETTER';
               failed++;
             }
           }
-          NetworkStatusService.setNetworkState('ONLINE', 18);
+          NetworkStatusService.setNetworkState('ONLINE', Date.now() - startedAt);
         } catch (err) {
-          for (const ord of pendingOrders) {
+          for (const ord of batch) {
             markFailedAttempt(ord, err instanceof Error ? err.message : 'Network error');
+            if ([400, 403, 404, 409, 413, 422].includes((err as { status?: number })?.status ?? 0)) ord.syncStatus = 'DEAD_LETTER';
             failed++;
           }
-          NetworkStatusService.setNetworkState('OFFLINE', 0);
+          if (err instanceof TypeError || (err as { code?: string })?.code === 'REQUEST_TIMEOUT') NetworkStatusService.setNetworkState('OFFLINE', 0);
+        }
         }
       }
     }
@@ -650,7 +672,7 @@ export class SyncOutboxEngine {
         typeof evt.payload === 'object'
           ? (evt.payload as { id?: string }).id
           : undefined;
-      const relatedOrder = relatedOrderId ? pendingOrders.find((o) => o.id === relatedOrderId) : undefined;
+      const relatedOrder = relatedOrderId ? db.orders.find((o) => o.id === relatedOrderId) : undefined;
 
       if (relatedOrder) {
         if (relatedOrder.syncStatus === 'SYNCED') {
@@ -670,13 +692,16 @@ export class SyncOutboxEngine {
     }
 
     db.notify();
+    return { processed, failed };
+    } finally {
+    if (NetworkStatusService.getNetworkState() === 'SYNCING') NetworkStatusService.setNetworkState('ONLINE', NetworkStatusService.getLatency());
     this.isSyncing = false;
     // Run again only when a change really is waiting: the network-state change this function itself causes must not re-trigger it.
     if (this.runAgain) {
       this.runAgain = false;
       if (db.orders.some((o) => o.syncStatus === 'SAVED_LOCALLY')) void this.processOutbox();
     }
-    return { processed, failed };
+    }
   }
 
   /**
@@ -685,24 +710,42 @@ export class SyncOutboxEngine {
    * cursor rather than this device's clock, so client/server clock skew
    * can't cause a missed or re-fetched window.
    */
-  public static async catchUpFromCloud(): Promise<{ pulled: number; created: number }> {
+  public static catchUpFromCloud(): Promise<{ pulled: number; created: number }> {
+    if (this.pullInFlight) { this.pullAgain = true; return this.pullInFlight; }
+    this.pullInFlight = (async () => {
+      let total = { pulled: 0, created: 0 };
+      do {
+        this.pullAgain = false;
+        const result = await this.pullPages();
+        total = { pulled: total.pulled + result.pulled, created: total.created + result.created };
+      } while (this.pullAgain);
+      return total;
+    })().finally(() => { this.pullInFlight = null; });
+    return this.pullInFlight;
+  }
+
+  private static async pullPages(): Promise<{ pulled: number; created: number }> {
     if (!this.transport) return { pulled: 0, created: 0 };
 
     // A position on the Branch Core means nothing on the cloud (and vice versa), so each has its own cursor.
     const ORDERS_PATH = '/api/v1/orders/sync';
     const cursorKey = EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH);
     const predicted = EndpointResolver.serverKeyFor(ORDERS_PATH);
-    let cursor = safeGet(cursorKey) ?? undefined;
+    const savedCursor = safeGet(cursorKey);
+    let cursor = savedCursor?.startsWith('seq:') ? savedCursor : 'seq:0';
     let pulled = 0;
     let created = 0;
 
     try {
       // Follow `hasMore` so a long outage catches up page by page, saving the cursor after each applied page.
       for (let page = 0; page < 50; page++) {
-      const { orders, serverTime, latestSeq, hasMore } = await this.transport.pull(cursor);
+      const transport: OrderSyncTransport = this.transport;
+      const { orders, serverTime, latestSeq, hasMore, serverKey } = await transport.pull(cursor);
+      if (transport !== this.transport || cursorKey !== EndpointResolver.cursorKey(CATCH_UP_CURSOR_KEY, ORDERS_PATH)) break;
+      let deferred = false;
       // If the other server answered (fallback), the orders are still applied (safe, idempotent) but the
       // position it returned belongs to a different server than the cursor that was sent: do not store it.
-      const answeredByPredicted = (EndpointResolver.lastResponder() ?? predicted) === predicted;
+      const answeredByPredicted = (serverKey ?? EndpointResolver.lastResponder() ?? predicted) === predicted;
       const touchedDays = new Set<string>();
       for (const remote of orders) {
         const existing = db.orders.find((o) => o.id === remote.externalOrderId);
@@ -714,6 +757,7 @@ export class SyncOutboxEngine {
           // whose clock runs ahead used to ignore every server update. With unsent local changes the push goes first; the merged
           // result comes back on the next pull. Older cloud rows without a sequence still use the timestamp.
           const localPending = existing.syncStatus === 'SAVED_LOCALLY' || existing.syncStatus === 'SYNCING' || existing.syncStatus === 'FAILED';
+          if (localPending) deferred = true;
           const remoteIsNewer =
             typeof remote.seq === 'number'
               ? remote.seq > (existing.remoteSeq ?? 0) && !localPending
@@ -768,7 +812,8 @@ export class SyncOutboxEngine {
       // dish the kitchen finished shows as ready here and a settled order's ticket clears (BUG-098/113).
       KOTRepository.reconcileWithOrders();
       // Prefer the gapless sequence; use the server clock only while no sequenced row has been seen.
-      cursor = latestSeq && latestSeq > 0 ? `seq:${latestSeq}` : serverTime;
+      if (deferred) break; // retry this page after the local push; do not acknowledge unapplied updates
+      cursor = typeof latestSeq === 'number' ? `seq:${latestSeq}` : serverTime;
       if (!answeredByPredicted) break;
       safeSet(cursorKey, cursor);
       if (!hasMore) break;

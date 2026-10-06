@@ -1,3 +1,6 @@
+import { KeyValueStore } from '@jamanvaar/database';
+import { stopRealtime } from '@jamanvaar/sync';
+import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 /**
  * Captain's only connection to cloud/api — owner-issued login id + password,
  * not a separate activation code (mirrors pos-admin's cloudLogin/cloudActivateDevice
@@ -42,7 +45,9 @@ export class CloudApiError extends Error {
 
 async function parseJsonResponse(res: Response): Promise<any> {
   const contentType = res.headers.get('content-type') ?? '';
-  return contentType.includes('application/json') ? res.json() : undefined;
+  const data = contentType.includes('application/json') ? await res.json() : undefined;
+  if (data && typeof data === 'object' && !Array.isArray(data)) data.serverKey = EndpointResolver.responderFor(res);
+  return data;
 }
 
 export function isDeviceConnected(): boolean {
@@ -68,6 +73,7 @@ export function getConnectedDeviceLabel(): string | null {
  * the device id/token and label, is what actually returns this tablet to the connect/activation screen.
  */
 export function resetTerminal(): void {
+  stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
     localStorage.removeItem(DEVICE_LABEL_KEY);
@@ -121,7 +127,7 @@ export async function activateCaptainWithKey(code: string): Promise<void> {
   // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
   // to it from the very first activation — see @jamanvaar/sync's device_identity.ts.
   const publicKeyJwk = await getDevicePublicKeyJwk('CAPTAIN').catch(() => null);
-  const res = await fetch(`${API_BASE}/api/v1/activation/redeem`, {
+  const res = await fetchWithDeadline(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: code.trim(), deviceType: 'CAPTAIN', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
@@ -130,6 +136,7 @@ export async function activateCaptainWithKey(code: string): Promise<void> {
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Activation failed (${res.status})`, res.status);
   }
+  KeyValueStore.set('jamanvaar_bound_branch_id', data.device?.branchId ?? '');
   persistConnection(data.restaurantId, data.device?.name ?? 'Captain Tablet', data.device?.id, data.deviceToken, data.restaurant?.name);
 }
 
@@ -156,7 +163,7 @@ export async function pushOrderSync(
   return data;
 }
 
-export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean }> {
+export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
   const query = orderSyncPullQuery(cursor);
   const res = await deviceFetch(`/api/v1/orders/sync${query}`);
   const data = await parseJsonResponse(res);
@@ -184,8 +191,8 @@ export async function pushEntitySync(
 export async function pullEntitySync(
   entityType: string,
   since?: string
-): Promise<{ entities: CloudSyncedEntity[]; serverTime: string }> {
-  const query = since ? `?since=${encodeURIComponent(since)}` : '';
+): Promise<{ entities: CloudSyncedEntity[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
+  const query = since?.startsWith('seq:') ? `?afterSeq=${encodeURIComponent(since.slice(4))}` : since ? `?since=${encodeURIComponent(since)}` : '?afterSeq=0';
   const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {

@@ -396,6 +396,9 @@ export class DevicesService {
     return {
       ok: true,
       serverTime: new Date().toISOString(),
+      restaurantId: device.restaurantId,
+      branchId: device.branchId,
+      deviceId: device.id,
       // The station this KDS screen was assigned by Restaurant Admin (null: it chooses).
       station: updated.kitchenStation ?? null,
       // A deactivated branch locks its terminals just as an MDM lock does (BUG-048).

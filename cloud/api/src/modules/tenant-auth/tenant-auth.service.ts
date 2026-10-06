@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { BCRYPT_COST } from '../../common/security/password-cost';
-import { User, TenantUserStatus, Device } from '@prisma/client';
+import { User, TenantUserStatus, Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret, maskEmail } from '../../common/security/token.util';
@@ -84,6 +84,7 @@ export interface TenantLoginSuccess {
   restaurant: RestaurantProfile;
   deviceId?: string;
   deviceToken?: string;
+  branchId?: string | null;
 }
 
 export interface TenantActivationRequired {
@@ -177,16 +178,16 @@ export class TenantAuthService {
     };
   }
 
-  private async issueRefreshToken(userId: string, restaurantId: string, deviceId?: string): Promise<{ token: string; expiresAt: Date }> {
+  private async issueRefreshToken(userId: string, restaurantId: string, deviceId?: string, transaction?: Prisma.TransactionClient): Promise<{ token: string; expiresAt: Date }> {
     const token = randomBytes(48).toString('base64url');
     const ttlDays = Number(this.config.get<string>('JWT_REFRESH_TTL_DAYS') ?? 30);
     const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
 
-    await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.tenantRefreshToken.create({
-        data: { userId, restaurantId, tokenHash: hashRefreshToken(token), expiresAt, deviceId }
-      })
-    );
+    const create = (tx: Prisma.TransactionClient) => tx.tenantRefreshToken.create({
+      data: { userId, restaurantId, tokenHash: hashRefreshToken(token), expiresAt, deviceId }
+    });
+    if (transaction) await create(transaction);
+    else await this.prisma.runAsTenant(restaurantId, create);
 
     return { token, expiresAt };
   }
@@ -691,6 +692,7 @@ export class TenantAuthService {
         user: publicUser(user),
         restaurant: restaurantProfile(key.restaurant),
         deviceId: device.id,
+        branchId: device.branchId,
         deviceToken
       };
     });
@@ -726,29 +728,16 @@ export class TenantAuthService {
 
     const user = existing.user;
 
-    // Revoke atomically: of two simultaneous refreshes with the same token exactly one gets the new pair.
-    const claimed = await this.prisma.runAsTenant(user.restaurantId, (tx) =>
-      tx.tenantRefreshToken.updateMany({ where: { id: existing.id, revokedAt: null }, data: { revokedAt: new Date() } })
-    );
-    if (claimed.count === 0) throw new UnauthorizedException('Invalid refresh token');
-
-    if (user.status !== TenantUserStatus.ACTIVE) {
-      throw new UnauthorizedException('Account disabled');
-    }
-
-    // A session must not outlive the state that allowed it: the restaurant, its
-    // subscription and the device it was created on are re-checked on every refresh.
+    if (user.status !== TenantUserStatus.ACTIVE) throw new UnauthorizedException('Account disabled');
+    // Do not consume a usable token if validation or replacement issuance fails.
     await this.assertSessionStillAllowed(user.restaurantId, existing.deviceId ?? undefined);
-
-    const accessToken = this.signAccessToken(user, existing.deviceId ?? undefined);
-    const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, user.restaurantId, existing.deviceId ?? undefined);
-
-    return {
-      accessToken,
-      refreshToken: newRefreshToken,
-      refreshTokenExpiresAt: expiresAt,
-      user: publicUser(user)
-    };
+    return this.prisma.runAsTenant(user.restaurantId, async (tx) => {
+      const claimed = await tx.tenantRefreshToken.updateMany({ where: { id: existing.id, revokedAt: null }, data: { revokedAt: new Date() } });
+      if (claimed.count === 0) throw new UnauthorizedException('Invalid refresh token');
+      const accessToken = this.signAccessToken(user, existing.deviceId ?? undefined);
+      const { token: newRefreshToken, expiresAt } = await this.issueRefreshToken(user.id, user.restaurantId, existing.deviceId ?? undefined, tx);
+      return { accessToken, refreshToken: newRefreshToken, refreshTokenExpiresAt: expiresAt, user: publicUser(user) };
+    });
   }
 
   async logout(refreshToken: string, restaurantId: string, actorId?: string): Promise<void> {

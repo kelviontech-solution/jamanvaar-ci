@@ -364,3 +364,21 @@ describe('Branch Core: serving the KDS with no internet, and support status', ()
     expect(await (await fetch(h.base + '/discover')).json()).toMatchObject({ service: 'jamanvaar-branch-core', branchCode: 'AHD' });
   });
 });
+
+
+describe('Branch Core entity upload acknowledgements', () => {
+  it('keeps an edit made during an upload dirty until that new payload is acknowledged', () => {
+    const store = new BranchStore(':memory:');
+    const core = new BranchCore(store, { restaurantId: 'r', branchId: 'b', branchCode: 'B' });
+    try {
+      const first = { id: 'dish', name: 'First', updatedAt: '2026-10-01T00:00:00Z' };
+      const second = { ...first, name: 'Second', updatedAt: '2026-10-02T00:00:00Z' };
+      core.pushEntities({ id: 'admin' }, 'MENU_ITEM', [{ externalId: 'dish', payload: first }]);
+      core.pushEntities({ id: 'admin' }, 'MENU_ITEM', [{ externalId: 'dish', payload: second }]);
+      core.clearDirty('MENU_ITEM', 'dish', first);
+      expect(core.dirtyEntities()).toHaveLength(1);
+      core.clearDirty('MENU_ITEM', 'dish', second);
+      expect(core.dirtyEntities()).toEqual([]);
+    } finally { store.close(); }
+  });
+});

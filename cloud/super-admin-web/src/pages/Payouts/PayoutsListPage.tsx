@@ -11,6 +11,8 @@ interface PayoutOverview {
   restaurantPayable: number;
   pendingPayout: number;
   paidPayout: number;
+  heldPayable: number;
+  unallocatedCollection: number;
 }
 
 interface Payout {
@@ -58,6 +60,7 @@ export function PayoutsListPage() {
   const [runningEod, setRunningEod] = useState(false);
   const [modal, setModal] = useState<ModalAction | null>(null);
   const [utr, setUtr] = useState('');
+  const [transferConfirmed, setTransferConfirmed] = useState(false);
   const [holdReason, setHoldReason] = useState('');
   const [password, setPassword] = useState('');
   const [actionPending, setActionPending] = useState(false);
@@ -111,6 +114,7 @@ export function PayoutsListPage() {
 
   async function handleExecuteModal() {
     if (!modal) return;
+    if (modal.kind === 'mark-paid' && !transferConfirmed) { showToast('Confirm that the bank transfer was completed'); return; }
     setActionPending(true);
     try {
       if (modal.kind === 'mark-paid') {
@@ -134,7 +138,7 @@ export function PayoutsListPage() {
         showToast(`${modal.payout.restaurant.name}: payout released back to pending`);
       }
       setModal(null);
-      setUtr('');
+      setUtr(''); setTransferConfirmed(false);
       setHoldReason('');
       setPassword('');
       refreshAll();
@@ -189,7 +193,9 @@ export function PayoutsListPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 16, marginBottom: 16 }}>
           {tile('Gross Collection', formatRupees(overview.grossCollection))}
           {tile('Jamanvaar Fee', formatRupees(overview.platformFee), 'good')}
-          {tile('Net Payable (lifetime)', formatRupees(overview.restaurantPayable))}
+          {tile('Net Payable after holds (all time)', formatRupees(overview.restaurantPayable))}
+          {tile('Held for review', formatRupees(overview.heldPayable), 'warn')}
+          {tile('Historical collection needing split review', formatRupees(overview.unallocatedCollection), 'warn')}
           {tile('Pending payout', formatRupees(overview.pendingPayout), 'warn')}
           {tile('Paid out', formatRupees(overview.paidPayout), 'good')}
         </div>
@@ -260,7 +266,7 @@ export function PayoutsListPage() {
                       <td>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {(p.status === 'PENDING' || p.status === 'APPROVED' || p.status === 'ON_HOLD') && (
-                            <Button size="sm" variant="accent" onClick={() => { setModal({ payout: p, kind: 'mark-paid' }); setUtr(''); setPassword(''); }}>Mark paid</Button>
+                            <Button size="sm" variant="accent" onClick={() => { setModal({ payout: p, kind: 'mark-paid' }); setUtr(''); setTransferConfirmed(false); setPassword(''); }}>Mark paid</Button>
                           )}
                           {p.status === 'ON_HOLD' ? (
                             <Button size="sm" variant="ghost" onClick={() => { setModal({ payout: p, kind: 'release' }); setPassword(''); }}>Release</Button>
@@ -304,6 +310,9 @@ export function PayoutsListPage() {
                 autoFocus
               />
             )}
+            {modal.kind === 'mark-paid' && <label style={{ display: 'block', fontSize: 12, marginBottom: 12 }}>
+              <input type="checkbox" checked={transferConfirmed} onChange={e => setTransferConfirmed(e.target.checked)} /> I have completed the bank transfer for this amount.
+            </label>}
             {modal.kind === 'hold' && (
               <input
                 placeholder="Reason (required)"
@@ -322,7 +331,7 @@ export function PayoutsListPage() {
             />
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <Button size="sm" variant="ghost" onClick={() => setModal(null)}>Cancel</Button>
-              <Button size="sm" variant={modal.kind === 'hold' ? 'danger' : 'primary'} disabled={actionPending} onClick={handleExecuteModal}>
+              <Button size="sm" variant={modal.kind === 'hold' ? 'danger' : 'primary'} disabled={actionPending || (modal.kind === 'mark-paid' && !transferConfirmed)} onClick={handleExecuteModal}>
                 Confirm
               </Button>
             </div>

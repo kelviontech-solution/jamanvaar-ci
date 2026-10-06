@@ -1164,6 +1164,12 @@ export interface PaymentConnection {
   lastPaymentAt: string | null;
   createdAt: string;
   updatedAt: string;
+  directSettlementRequested?: boolean;
+  settlementBankName?: string | null;
+  settlementBankAccountType?: string | null;
+  collectionAccount?: 'JAMANVAAR';
+  payoutMode?: 'MANUAL';
+  routeStatus?: 'PENDING';
 }
 
 

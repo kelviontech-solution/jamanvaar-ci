@@ -15,10 +15,20 @@ const PUSH_BATCH = 200;
  * retries on the next tick.
  */
 let inFlight: Promise<void> | null = null;
+let menuAgain = false;
+let menuPushNext = false;
 
 export function syncMenuCatalog(opts: { push?: boolean } = {}): Promise<void> {
   // A slow connection must not let two ticks push the same changes twice.
-  if (!inFlight) inFlight = runTick(opts.push !== false).finally(() => { inFlight = null; });
+  menuPushNext ||= opts.push !== false;
+  if (inFlight) { menuAgain = true; return inFlight; }
+  inFlight = (async () => {
+    do {
+      menuAgain = false;
+      const push = menuPushNext; menuPushNext = false;
+      await runTick(push);
+    } while (menuAgain);
+  })().finally(() => { inFlight = null; });
   return inFlight;
 }
 
@@ -26,7 +36,7 @@ export function syncMenuCatalog(opts: { push?: boolean } = {}): Promise<void> {
 const SELF_HEALING_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'COMBO', 'COUPON']);
 
 export async function syncCollection<T extends { updatedAt?: string }>(entityType: string, sync: CollectionSync<T>, push: boolean): Promise<void> {
-  if (push) sync.stampChanges();
+  sync.stampChanges();
   if (SELF_HEALING_TYPES.has(entityType) && sync.isEmpty()) EntitySyncEngine.restartFromBeginning(entityType);
   await EntitySyncEngine.catchUp(entityType, (remote) => sync.applyRemote(remote.payload));
   if (!push) return;
@@ -40,6 +50,7 @@ export async function syncCollection<T extends { updatedAt?: string }>(entityTyp
 }
 
 async function runTick(push: boolean): Promise<void> {
+  for (const type of ['TAX_GROUP', 'MODIFIER_GROUP', 'MENU_CATEGORY', 'MENU_ITEM']) EntitySyncEngine.registerWakeUp(type, () => syncMenuCatalog({ push }));
   // Tax and modifier groups first: a dish is only orderable by a guest once the groups it names are published too.
   await syncCollection('TAX_GROUP', TaxGroupSync, push);
   await syncCollection('MODIFIER_GROUP', ModifierGroupSync, push);
@@ -56,6 +67,7 @@ async function runTick(push: boolean): Promise<void> {
 let promotionsInFlight: Promise<void> | null = null;
 
 export function syncPromotions(opts: { pushCombos: boolean; pushCoupons: boolean }): Promise<void> {
+  for (const type of ['COMBO', 'COUPON']) EntitySyncEngine.registerWakeUp(type, () => syncPromotions(opts));
   if (!promotionsInFlight) {
     promotionsInFlight = (async () => {
       await syncCollection('COMBO', ComboSync, opts.pushCombos);

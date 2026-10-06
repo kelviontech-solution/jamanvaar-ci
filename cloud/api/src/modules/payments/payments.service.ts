@@ -1,3 +1,4 @@
+import { lockSettlement } from './settlement-lock.util';
 import { randomUUID } from 'crypto';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -90,6 +91,7 @@ export class PaymentsService {
     );
 
     if (existingOrder) {
+      if (existingOrder.source !== 'KIOSK') throw new ConflictException('This order belongs to another payment channel');
       const latest = existingOrder.paymentTransactions[0];
       if (existingOrder.status === 'PAID' || (latest && NON_TERMINAL_STATUSES.includes(latest.status))) {
         return this.toOrderResponse(existingOrder, latest);
@@ -104,7 +106,7 @@ export class PaymentsService {
       throw new ForbiddenException({ message: 'Online payments are not active for this restaurant yet', code: PAYMENTS_NOT_ACTIVE });
     }
 
-    const menuItems = await this.menuSync.loadItemsByExternalIds(restaurantId, dto.lines.map((l) => l.externalItemId));
+    const menuItems = await this.menuSync.loadItemsByExternalIds(restaurantId, dto.lines.map((l) => l.externalItemId), kioskId);
     const lookup = new Map<string, MenuSnapshotItemLookup>(
       menuItems.map((item) => [
         item.externalItemId,
@@ -237,15 +239,15 @@ export class PaymentsService {
     };
   }
 
-  /** Shared by the kiosk QR and WhatsApp payment paths so both compute platform commission identically. */
-  private async commissionSplitFor(amount: number, connection: { commissionOverrideBps: number | null } | null) {
-    const commissionBps = connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma));
+  /** The Jamanvaar fee applies to kiosk QR collection only; every payment keeps its original full amount. */
+  private async commissionSplitFor(amount: number, connection: { commissionOverrideBps: number | null } | null, source: 'KIOSK' | 'WHATSAPP') {
+    const commissionBps = source === 'KIOSK' ? connection?.commissionOverrideBps ?? (await getDefaultCommissionBps(this.prisma)) : 0;
     const { platformAmount, restaurantAmount } = splitCommission(amount, commissionBps);
     return { commissionBps, platformAmount, restaurantAmount };
   }
 
   private async createRazorpayAttempt(orderId: string, restaurantId: string, amount: number, currency: string, connection: { commissionOverrideBps: number | null } | null) {
-    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
+    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection, 'KIOSK');
 
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({
@@ -271,7 +273,7 @@ export class PaymentsService {
     customerPhone: string,
     connection: { commissionOverrideBps: number | null } | null
   ) {
-    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection);
+    const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection, 'WHATSAPP');
     const reference = `wapay_${randomUUID()}`;
 
     const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -467,7 +469,17 @@ export class PaymentsService {
     return this.prisma.runAsTenant(restaurantId, (tx) => buildDayStatement(tx, restaurantId, date));
   }
 
-  async getPaymentStatus(restaurantId: string, paymentId: string) {
+  private readonly statusRequests = new Map<string, Promise<{ paymentId: string; orderId: string; status: string; amount: number; currency: string; orderStatus: string }>>();
+  getPaymentStatus(restaurantId: string, paymentId: string) {
+    const key = `${restaurantId}:${paymentId}`;
+    const running = this.statusRequests.get(key);
+    if (running) return running;
+    const request = this.readPaymentStatus(restaurantId, paymentId).finally(() => this.statusRequests.delete(key));
+    this.statusRequests.set(key, request);
+    return request;
+  }
+
+  private async readPaymentStatus(restaurantId: string, paymentId: string) {
     let payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId }, include: { order: true } })
     );
@@ -501,6 +513,7 @@ export class PaymentsService {
     // (`FOR UPDATE`), so a second concurrent request blocks until the first
     // commits and then sees its refund in the aggregate.
     const { refund, providerOrderId, provider, providerPaymentId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await lockSettlement(tx, restaurantId);
       const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string; provider: string; providerPaymentId: string | null }[]>`
         SELECT id, status, amount, "providerOrderId", provider::text AS provider, "providerPaymentId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
       `;
@@ -535,6 +548,14 @@ export class PaymentsService {
         }
       });
 
+      const paymentWithBatch = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId }, select: { payoutId: true } });
+      if (paymentWithBatch.payoutId) {
+        const held = await tx.restaurantPayout.updateMany({ where: { id: paymentWithBatch.payoutId, status: { not: 'PAID' } },
+          data: { status: 'ON_HOLD', holdReason: 'Refund requested after batching; reconciliation required' } });
+        if (held.count) await this.audit.log({ actorType, actorId: device.id, restaurantId,
+          action: 'PAYOUT_ON_HOLD', category: 'PAYMENTS', details: { payoutId: paymentWithBatch.payoutId, refundId: created.id, reason: 'REFUND_AFTER_BATCHING' } }, tx);
+      }
+
       await this.audit.log(
         {
           actorType,
@@ -559,7 +580,8 @@ export class PaymentsService {
       try {
         rzp = await this.razorpay.createRefund({ razorpayPaymentId: providerPaymentId, amountPaise: dto.amountPaise, receipt: refund.id, notes: { refund_id: refund.id } });
       } catch (err) {
-        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
+        const response = err instanceof ServiceUnavailableException ? err.getResponse() : null;
+        if (!response || typeof response !== 'object' || (response as { code?: string }).code !== 'UPSTREAM_RESULT_UNKNOWN') await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
         throw err;
       }
       const rzpStatus = rzp.status === 'processed' ? 'SUCCESS' : 'PENDING';

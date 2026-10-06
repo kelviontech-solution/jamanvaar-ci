@@ -176,7 +176,7 @@ export class MenuPublicationsService {
   async setBranchOverride(device: Device, dto: BranchOverrideDto) {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can manage branch menus');
     const restaurantId = device.restaurantId;
-    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+    const result = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const branch = await tx.branch.findFirst({ where: { id: dto.branchId, restaurantId }, select: { id: true } });
       if (!branch) throw new NotFoundException('Branch not found');
       const item = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'MENU_ITEM', externalId: dto.itemId } } });
@@ -198,6 +198,8 @@ export class MenuPublicationsService {
       await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId, action: 'MENU_BRANCH_OVERRIDE_SET', category: 'MENU', details: { branchId: dto.branchId, itemId: dto.itemId, price: dto.price ?? null, isAvailable: dto.isAvailable ?? null } }, tx);
       return payload;
     });
+    this.realtime.publish({ restaurantId, branchId: dto.branchId, kind: 'entity:MENU_ITEM', originDeviceId: device.id });
+    return result;
   }
 
   /** A stored menu picture by content hash. The hash of the bytes is the address, so it is safe to cache for a year. */

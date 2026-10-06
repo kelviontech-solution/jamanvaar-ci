@@ -20,7 +20,7 @@ export class DashboardService {
       let dbActiveConns = 1;
       try {
         const start = Date.now();
-        const res: any = await this.prisma.$queryRaw`
+        const res: any = await tx.$queryRaw`
           SELECT (SELECT count(*) FROM pg_stat_activity WHERE datname = current_database())::int as conns
         `;
         dbLatency = Math.max(1, Date.now() - start);
@@ -126,26 +126,20 @@ export class DashboardService {
       const growthTrend: Array<{ month: string; count: number }> = [];
       const revenueTrend: Array<{ month: string; revenue: number }> = [];
 
+      const trendStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      const monthly = await tx.$queryRaw<Array<{ month: string; restaurants: number; revenue: number }>>`
+        SELECT to_char(m.month, 'YYYY-MM') AS month,
+          (SELECT count(*)::int FROM "Restaurant" r WHERE r."deletedAt" IS NULL AND r."createdAt" >= m.month AND r."createdAt" < m.month + interval '1 month') AS restaurants,
+          COALESCE((SELECT sum(i."totalAmount") FROM "Invoice" i WHERE i.status = 'PAID' AND i."paidAt" >= m.month AND i."paidAt" < m.month + interval '1 month'), 0)::float8 AS revenue
+        FROM generate_series(${trendStart}::timestamp, ${startOfMonth}::timestamp, interval '1 month') AS m(month)
+        ORDER BY m.month`;
       for (let i = 5; i >= 0; i--) {
-        const dStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const dEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-        const label = dStart.toLocaleDateString('en-IN', { month: 'short' });
-
-        const count = await tx.restaurant.count({
-          where: { deletedAt: null, createdAt: { gte: dStart, lt: dEnd } }
-        });
-        growthTrend.push({ month: label, count });
-
-        // Calculate real paid revenue in that month or fallback to active mrr base
-        const paid = await tx.invoice.findMany({
-          where: { status: 'PAID', paidAt: { gte: dStart, lt: dEnd } },
-          select: { totalAmount: true }
-        });
-        const monthRevenue = paid.reduce((acc, inv) => acc + inv.totalAmount, 0);
-        revenueTrend.push({
-          month: label,
-          revenue: monthRevenue > 0 ? monthRevenue / 100 : Math.round((mrrPaise / 100) * (0.65 + 0.07 * (5 - i)))
-        });
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const row = monthly.find((m) => m.month === key);
+        const month = d.toLocaleDateString('en-IN', { month: 'short' });
+        growthTrend.push({ month, count: row?.restaurants ?? 0 });
+        revenueTrend.push({ month, revenue: (row?.revenue ?? 0) / 100 });
       }
 
       const syncSuccessRate = syncEvents24h > 0

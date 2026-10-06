@@ -107,7 +107,7 @@ export function formatDisplayNumber(branchCode: string, businessDate: Date, sequ
 
 /** Query string for GET /orders/sync: `seq:<n>` becomes `afterSeq`, anything else is the legacy timestamp `since`. */
 export function orderSyncPullQuery(cursor?: string): string {
-  if (!cursor) return '';
+  if (!cursor) return '?afterSeq=0';
   if (cursor.startsWith('seq:')) return `?afterSeq=${encodeURIComponent(cursor.slice(4))}`;
   return `?since=${encodeURIComponent(cursor)}`;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import {
@@ -10,11 +10,10 @@ import {
   TrendingUp,
   Receipt
 } from 'lucide-react';
-import { PaymentConnectionPanel } from './PaymentConnectionPanel';
-import { OnlinePaymentsPanel } from './OnlinePaymentsPanel';
-import type { PaymentConnectionStatus } from '../../cloud/cloudClient';
+import { KioskPaymentSettingsPanel } from './KioskPaymentSettingsPanel';
 
 interface PaymentsSplitModuleProps {
+  showKioskPayments: boolean;
   orders: Order[];
   dashPeriodReport: {
     summary: {
@@ -32,17 +31,16 @@ interface PaymentsSplitModuleProps {
 
 export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
   orders,
+  showKioskPayments,
   dashPeriodReport,
   onSelectOrderDetail,
   showToast
 }) => {
   const settledOrders = orders.filter((o) => o.paymentStatus === 'SUCCESS');
-  const [connectionStatus, setConnectionStatus] = useState<PaymentConnectionStatus | null>(null);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <PaymentConnectionPanel onStatusChange={setConnectionStatus} />
-      {(connectionStatus?.status === 'ACTIVE' || connectionStatus?.status === 'PENDING_VERIFICATION') && <OnlinePaymentsPanel />}
+      {showKioskPayments && <KioskPaymentSettingsPanel />}
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -63,7 +61,7 @@ export const PaymentsSplitModule: React.FC<PaymentsSplitModuleProps> = ({
       {/* 4 Financial Tender Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs space-y-1">
-          <span className="text-[11px] font-black uppercase text-slate-500 block">TOTAL COLLECTIONS</span>
+          <span className="text-[11px] font-black uppercase text-slate-500 block">GROSS SALES RECEIVED</span>
           <div className="text-2xl font-black text-jaman-navy font-mono">
             {formatINR(dashPeriodReport.summary.netSales)}
           </div>

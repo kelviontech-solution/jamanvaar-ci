@@ -22,14 +22,22 @@ function browserStorage(): DbStorage | null {
 
 export class KeyValueStore {
   private static durable: DbStorage | null = null;
+  private static legacyFallback = true;
+  private static browserNamespace = '';
+
+  static setBrowserNamespace(namespace: string): void { this.browserNamespace = namespace; }
+  static browserKey(key: string): string { return this.browserNamespace + key; }
 
   /** Called once at startup after the durable database is opened. */
-  static attach(storage: DbStorage | null): void {
+  static attach(storage: DbStorage | null, opts: { migrateLegacy?: boolean } = {}): void {
     this.durable = storage;
+    this.legacyFallback = opts.migrateLegacy !== false;
   }
 
   static reset(): void {
     this.durable = null;
+    this.legacyFallback = true;
+    this.browserNamespace = '';
   }
 
   static get(key: string): string | null {
@@ -37,6 +45,7 @@ export class KeyValueStore {
       if (this.durable) {
         const v = this.durable.getItem(key);
         if (v !== null) return v;
+        if (!this.legacyFallback) return null;
         const legacy = browserStorage()?.getItem(key) ?? null;
         if (legacy !== null) this.durable.setItem(key, legacy); // one-time migration
         return legacy;
@@ -64,9 +73,17 @@ export class KeyValueStore {
   static remove(key: string): void {
     try {
       (this.durable ?? browserStorage())?.removeItem(key);
-      if (this.durable) browserStorage()?.removeItem(key);
+      if (this.durable && this.legacyFallback) browserStorage()?.removeItem(key);
     } catch {
       // nothing to remove from
     }
+  }
+
+  static keys(): string[] {
+    const storage = (this.durable ?? browserStorage()) as (DbStorage & { length?: number; key?(index: number): string | null; keys?(): string[] }) | null;
+    if (storage?.keys) return storage.keys();
+    const keys: string[] = [];
+    for (let i = 0; i < (storage?.length ?? 0); i++) { const key = storage?.key?.(i); if (key) keys.push(key); }
+    return keys;
   }
 }

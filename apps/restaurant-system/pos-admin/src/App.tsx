@@ -1,3 +1,4 @@
+import { syncStaffUsers, startLocalChangeSync, syncPromotions } from '@jamanvaar/sync';
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   AuditRepository,
@@ -102,6 +103,7 @@ import { InventoryRecipesModule } from './components/inventory/InventoryRecipesM
 import { CustomersCrmModule } from './components/customers/CustomersCrmModule';
 import { StaffRolesModule } from './components/staff/StaffRolesModule';
 import { PaymentsSplitModule } from './components/payments/PaymentsSplitModule';
+import { KioskPaymentSettingsPanel } from './components/payments/KioskPaymentSettingsPanel';
 import { ReportsDashboard } from './components/reports/ReportsDashboard';
 import { ShiftCashDrawerModule } from './components/shifts/ShiftCashDrawerModule';
 import { PrintersDevicesModule } from './components/hardware/PrintersDevicesModule';
@@ -502,12 +504,11 @@ export default function PosAdminApp() {
     // synced them to POS, Captain, KDS or Kiosk, despite the create/reset screen's own promise that
     // they would. Restaurant Admin is the sole place staff are created, so this is push-heavy, but it
     // still applies whatever it pulls back in case another admin device edited a record first.
-    const syncStaff = async () => {
-      await EntitySyncEngine.pushSnapshot('STAFF_USER', db.users.map((u) => ({ externalId: u.id, payload: StaffRepository.toSyncPayload(u) })));
-      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
-    };
+    const syncStaff = () => syncStaffUsers({ push: true });
 
+    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true });
     void syncMenuCatalog({ push: true });
+    void syncPromotions({ pushCombos: true, pushCoupons: true });
     void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
     void syncStaff();
     // B2-056: POS's own cash-drawer shift and its cash movements, so the Shift & Cash Drawer
@@ -524,7 +525,8 @@ export default function PosAdminApp() {
     void syncRestaurantIdentity();
     const interval = setInterval(() => {
       void syncMenuCatalog({ push: true });
-      void syncCustomers({ push: true });
+      void syncPromotions({ pushCombos: true, pushCoupons: true });
+    void syncCustomers({ push: true });
       void syncStaff();
       void syncShifts({ push: false });
       // Guests who did not come free their table, then the change goes out with the rest.
@@ -538,6 +540,7 @@ export default function PosAdminApp() {
       void syncRestaurantIdentity();
     }, 15000);
     return () => {
+      stopLocalChanges();
       clearInterval(interval);
       clearInterval(orderInterval);
       SyncOutboxEngine.configureTransport(null);
@@ -1260,6 +1263,7 @@ export default function PosAdminApp() {
             {/* TAB 11: PAYMENTS & SPLIT LEDGER */}
             {activeTab === 'PAYMENTS' && (
               <PaymentsSplitModule
+                showKioskPayments={hasApp('KIOSK_ADMIN')}
                 orders={orders}
                 dashPeriodReport={dashPeriodReport}
                 onSelectOrderDetail={(ord) => setSelectedOrderDetail(ord)}
@@ -1423,6 +1427,7 @@ export default function PosAdminApp() {
                   onUpdated={() => setDbTick((t) => t + 1)}
                 />
                 {hasApp('KIOSK_ADMIN') && <KioskDisplaySettingsPanel showToast={showToast} />}
+                {hasApp('KIOSK_ADMIN') && <KioskPaymentSettingsPanel />}
               </>
             )}
 

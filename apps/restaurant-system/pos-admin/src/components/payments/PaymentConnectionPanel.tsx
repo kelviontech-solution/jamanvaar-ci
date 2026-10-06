@@ -1,286 +1,120 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import {
-  getPaymentConnection,
-  submitPaymentConnection,
-  type PaymentConnectionFields,
-  type PaymentConnectionStatus
+  getPaymentConnection, requestPlatformPayments, saveSettlementBankDetails, setDirectSettlementRequest,
+  type PaymentConnectionStatus, type SettlementBankDetails
 } from '../../cloud/cloudClient';
 
-const EMPTY_FIELDS: PaymentConnectionFields = {
-  accountType: 'INDIVIDUAL',
-  businessType: '',
-  pan: '',
-  gst: '',
-  cin: '',
-  uidai: '',
-  contactName: '',
-  contactEmail: '',
-  contactPhone: '',
-  settlementAccountName: '',
-  settlementAccountNumber: '',
-  settlementIfsc: '',
-  settlementUpiVpa: ''
+const emptyBank: SettlementBankDetails = {
+  settlementAccountName: '', settlementBankName: '', settlementAccountNumber: '', settlementIfsc: '', settlementBankAccountType: 'CURRENT'
 };
 
-function maskedSummary(s: PaymentConnectionStatus): string {
-  if (s.settlementUpiVpa) return `UPI: ${s.settlementUpiVpa}`;
-  if (s.settlementAccountName) return `Bank account: ${s.settlementAccountName}`;
-  return 'Submitted bank details';
-}
-
-interface PaymentConnectionPanelProps {
-  onStatusChange?: (status: PaymentConnectionStatus) => void;
-}
-
-export const PaymentConnectionPanel: React.FC<PaymentConnectionPanelProps> = ({ onStatusChange }) => {
+export function PaymentConnectionPanel({ onStatusChange }: { onStatusChange?: (status: PaymentConnectionStatus) => void }) {
   const admin = SessionPersistence.load('admin');
   const canManage = admin?.roleId === 'role-admin' || admin?.roleId === 'role-manager';
-
   const [status, setStatus] = useState<PaymentConnectionStatus | null>(null);
-  const [loadError, setLoadError] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [fields, setFields] = useState<PaymentConnectionFields>(EMPTY_FIELDS);
-  const [submitError, setSubmitError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const mountId = useRef(0);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [editingBank, setEditingBank] = useState(false);
+  const [bank, setBank] = useState<SettlementBankDetails>(emptyBank);
+  const sequence = useRef(0);
+  const callback = useRef(onStatusChange);
+  callback.current = onStatusChange;
 
+  const accept = (value: PaymentConnectionStatus) => { setStatus(value); callback.current?.(value); };
   const load = () => {
-    const myMount = ++mountId.current;
-    getPaymentConnection()
-      .then((s) => {
-        if (mountId.current !== myMount) return; // a later load already started; drop this stale result
-        setStatus(s);
-        setLoadError('');
-        onStatusChange?.(s);
-      })
-      .catch((e) => {
-        if (mountId.current !== myMount) return;
-        setLoadError(e instanceof Error ? e.message : 'Could not load your payment connection status');
-      });
+    const current = ++sequence.current;
+    setError('');
+    getPaymentConnection().then(value => {
+      if (current === sequence.current) accept(value);
+    }).catch(e => { if (current === sequence.current) setError(e instanceof Error ? e.message : 'Could not load payment settings'); });
   };
-
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (canManage) load();
+    return () => { sequence.current++; };
+  }, [canManage]);
 
-  const openEditForm = () => {
-    if (status) {
-      setFields({
-        accountType: (status.accountType as PaymentConnectionFields['accountType']) || 'INDIVIDUAL',
-        businessType: status.businessType || '',
-        pan: status.pan || '',
-        gst: status.gst || '',
-        cin: status.cin || '',
-        uidai: status.uidai || '',
-        contactName: status.contactName || '',
-        contactEmail: status.contactEmail || '',
-        contactPhone: status.contactPhone || '',
-        settlementAccountName: status.settlementAccountName || '',
-        settlementAccountNumber: '',
-        settlementIfsc: status.settlementIfsc || '',
-        settlementUpiVpa: status.settlementUpiVpa || ''
-      });
-    } else {
-      setFields(EMPTY_FIELDS);
-    }
-    setSubmitError('');
-    setIsEditing(true);
-  };
+  async function change(action: () => Promise<PaymentConnectionStatus>, success: string) {
+    if (busy) return;
+    ++sequence.current;
+    setBusy(true); setError(''); setMessage('');
+    try { accept(await action()); setMessage(success); }
+    catch (e) { setError(e instanceof Error ? e.message : 'Could not save payment settings'); }
+    finally { setBusy(false); }
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  function editBank() {
+    setBank({ ...emptyBank, settlementAccountName: status?.settlementAccountName ?? '', settlementBankName: status?.settlementBankName ?? '',
+      settlementIfsc: status?.settlementIfsc ?? '', settlementBankAccountType: status?.settlementBankAccountType === 'SAVINGS' ? 'SAVINGS' : 'CURRENT' });
+    setEditingBank(true); setError('');
+  }
+
+  async function submitBank(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setSubmitError('');
-    try {
-      const updated = await submitPaymentConnection(fields);
-      setStatus(updated);
-      onStatusChange?.(updated);
-      setIsEditing(false);
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Could not submit your bank details');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (!canManage) {
-    return (
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
-        <h3 className="text-lg font-bold text-jaman-navy">Online payments</h3>
-        <p className="text-xs text-[#4A5568] mt-1">
-          Ask your restaurant owner or manager to connect online payments from this tab.
-        </p>
-      </div>
-    );
+    await change(async () => {
+      const updated = await saveSettlementBankDetails(bank);
+      setBank(emptyBank); setEditingBank(false);
+      return updated;
+    }, 'Bank details saved for Super Admin verification.');
   }
 
-  if (loadError) {
-    return (
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
-        <h3 className="text-lg font-bold text-jaman-navy">Online payments</h3>
-        <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 mt-2">{loadError}</div>
-        <Button variant="ghost" size="sm" className="mt-2" onClick={load}>Retry</Button>
-      </div>
-    );
-  }
+  if (!canManage) return <p className="text-sm p-6">Ask your restaurant owner or manager to manage kiosk payment settings.</p>;
 
-  if (status === null) {
-    return (
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
-        <p className="text-xs text-[#8C9BAE]">Loading your payment connection status…</p>
-      </div>
-    );
-  }
-
-  if (isEditing) {
-    return (
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
-        <h3 className="text-lg font-bold text-jaman-navy">
-          {status.status === 'NOT_CONNECTED' ? 'Connect online payments' : 'Update your bank details'}
-        </h3>
-        {submitError && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{submitError}</div>}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">Account type *</label>
-              <select
-                value={fields.accountType}
-                onChange={(e) => setFields((f) => ({ ...f, accountType: e.target.value as PaymentConnectionFields['accountType'] }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm"
-              >
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="BUSINESS">Business</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">PAN *</label>
-              <input
-                type="text"
-                required
-                value={fields.pan}
-                onChange={(e) => setFields((f) => ({ ...f, pan: e.target.value.toUpperCase() }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm font-mono"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">Contact name *</label>
-              <input
-                type="text"
-                required
-                value={fields.contactName}
-                onChange={(e) => setFields((f) => ({ ...f, contactName: e.target.value }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">Contact email *</label>
-              <input
-                type="email"
-                required
-                value={fields.contactEmail}
-                onChange={(e) => setFields((f) => ({ ...f, contactEmail: e.target.value }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">Contact phone *</label>
-              <input
-                type="tel"
-                required
-                value={fields.contactPhone}
-                onChange={(e) => setFields((f) => ({ ...f, contactPhone: e.target.value }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">UPI VPA (optional)</label>
-              <input
-                type="text"
-                value={fields.settlementUpiVpa}
-                onChange={(e) => setFields((f) => ({ ...f, settlementUpiVpa: e.target.value }))}
-                placeholder="yourname@bank"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">Bank account number</label>
-              <input
-                type="text"
-                value={fields.settlementAccountNumber}
-                onChange={(e) => setFields((f) => ({ ...f, settlementAccountNumber: e.target.value }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm font-mono"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-jaman-navy mb-1">IFSC</label>
-              <input
-                type="text"
-                value={fields.settlementIfsc}
-                onChange={(e) => setFields((f) => ({ ...f, settlementIfsc: e.target.value.toUpperCase() }))}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm font-mono"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 justify-end pt-2">
-            <Button type="button" variant="ghost" size="sm" onClick={() => setIsEditing(false)} disabled={submitting}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="accent" size="sm" disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Submit for verification'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-
+  const inputClass = 'w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm';
   return (
-    <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-3">
+    <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-jaman-navy">Online payments</h3>
-        <Button variant="ghost" size="sm" onClick={openEditForm}>
-          {status.status === 'NOT_CONNECTED' ? 'Connect' : 'Update bank details'}
-        </Button>
+        <h3 className="text-lg font-bold text-jaman-navy">Kiosk payment settings</h3>
+        <Button variant="ghost" size="sm" onClick={load} disabled={busy}>Refresh</Button>
       </div>
-
-      {status.status === 'NOT_CONNECTED' && (
-        <p className="text-xs text-[#4A5568]">
-          Not connected yet. Connect your bank details so customers can pay by UPI/QR from the Kiosk or QR table ordering.
-        </p>
-      )}
-
-      {status.status === 'PENDING_VERIFICATION' && (
-        <>
-          <div className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
-            Verification in progress — Jamanvaar will review your bank details shortly.
-          </div>
-          <p className="text-xs text-[#8C9BAE]">{maskedSummary(status)}</p>
-        </>
-      )}
-
-      {status.bankVerificationStatus === 'REJECTED' && (
-        <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">
-          Your submitted bank details were rejected. Please check them and resubmit.
+      {error && <div role="alert" className="text-xs text-rose-700 bg-rose-50 rounded-xl p-3">{error}</div>}
+      {message && <p role="status" className="text-xs text-emerald-700">{message}</p>}
+      {!status && !error && <p className="text-xs">Loading payment settings...</p>}
+      {status && <>
+        <p className="text-xs text-[#4A5568]">Kiosk QR payments collect into Jamanvaar's account. Your net payable is transferred manually after your bank details are verified.</p>
+        <div className="text-xs bg-jaman-ivory rounded-xl p-3 space-y-1">
+          <p>Online payments: <strong>{status.status.replaceAll('_', ' ')}</strong></p>
+          <p>Jamanvaar Fee: <strong>{((status.effectiveCommissionBps ?? 300) / 100).toFixed(2)}%</strong> on kiosk QR payments only. Super Admin controls this rate.</p>
+          <p>Current collection account: <strong>Jamanvaar</strong></p>
+          <p>Current payout mode: <strong>Manual bank transfer</strong></p>
         </div>
-      )}
-
-      {status.status === 'ACTIVE' && (
-        <>
-          <div className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-            Online payments are live.
+        {['NOT_CONNECTED', 'DISCONNECTED'].includes(status.status) &&
+          <Button size="sm" variant="accent" disabled={busy} onClick={() => change(requestPlatformPayments, 'Online payment activation requested. Super Admin will review it.')}>Request online payment activation</Button>}
+        {status.status === 'PENDING_VERIFICATION' && <p className="text-xs text-amber-700">Online payment activation is awaiting Super Admin approval.</p>}
+        {status.status === 'SUSPENDED' && <p className="text-xs text-rose-700">Online payments are suspended. Contact Jamanvaar support.</p>}
+        <label className="flex items-center gap-3 text-sm font-bold text-jaman-navy">
+          <input type="checkbox" role="switch" aria-label="Request direct settlement to restaurant bank" checked={status.directSettlementRequested ?? false} disabled={busy}
+            onChange={e => { const requested = e.target.checked; void change(() => setDirectSettlementRequest(requested), requested ? 'Direct settlement requested. Manual payouts continue while Route is pending.' : 'Direct settlement request cancelled. Jamanvaar collection continues.'); }} />
+          Request direct settlement to my bank
+        </label>
+        <p className="text-xs text-[#4A5568]">Razorpay Route is pending. This toggle saves your request for later activation; payments continue through Jamanvaar with manual payouts. Save your bank details before enabling it.</p>
+        {status.directSettlementRequested && <p className="text-xs text-amber-700 font-bold">Direct settlement requested - awaiting Route activation and linked account verification.</p>}
+        <div className="flex items-center justify-between border-t border-jaman-border pt-3">
+          <div className="text-xs">
+            <strong>Payout bank: {status.bankVerificationStatus ?? 'NOT_ADDED'}</strong>
+            {status.settlementAccountNumberMasked && <p>{status.settlementAccountName} | {status.settlementBankName} | {status.settlementAccountNumberMasked} | {status.settlementIfsc}</p>}
+            {status.settlementUpiVpa && <p>Existing payout destination: {status.settlementUpiVpa}</p>}
           </div>
-          <p className="text-xs text-[#8C9BAE]">{maskedSummary(status)}</p>
-        </>
-      )}
-
-      {status.status === 'SUSPENDED' && (
-        <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">
-          Online payments are suspended. Contact Jamanvaar support.
+          <Button size="sm" variant="ghost" onClick={editBank} disabled={busy}>Update bank details</Button>
         </div>
-      )}
+        {status.bankVerificationStatus === 'REJECTED' && <p className="text-xs text-rose-700">Bank details were rejected. Check and resubmit them.</p>}
+        {editingBank && <form onSubmit={submitBank} className="space-y-3 border-t border-jaman-border pt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="text-xs">Account holder name<input required maxLength={120} className={inputClass} value={bank.settlementAccountName} onChange={e => setBank(b => ({ ...b, settlementAccountName: e.target.value }))} /></label>
+            <label className="text-xs">Bank name<input required maxLength={120} className={inputClass} value={bank.settlementBankName} onChange={e => setBank(b => ({ ...b, settlementBankName: e.target.value }))} /></label>
+            <label className="text-xs">Account number<input required autoComplete="off" inputMode="numeric" pattern="[0-9]{6,34}" className={inputClass} value={bank.settlementAccountNumber} onChange={e => setBank(b => ({ ...b, settlementAccountNumber: e.target.value }))} /></label>
+            <label className="text-xs">IFSC<input required pattern="[A-Z]{4}0[A-Z0-9]{6}" maxLength={11} className={inputClass} value={bank.settlementIfsc} onChange={e => setBank(b => ({ ...b, settlementIfsc: e.target.value.toUpperCase() }))} /></label>
+            <label className="text-xs">Account type<select className={inputClass} value={bank.settlementBankAccountType} onChange={e => setBank(b => ({ ...b, settlementBankAccountType: e.target.value as 'SAVINGS' | 'CURRENT' }))}><option value="CURRENT">Current</option><option value="SAVINGS">Savings</option></select></label>
+          </div>
+          <p className="text-xs">Saving a new account requires bank verification again. An unpaid payout batch must be reconciled before changing its destination.</p>
+          <div className="flex justify-end gap-2">
+            <Button type="button" size="sm" variant="ghost" disabled={busy} onClick={() => { setEditingBank(false); setBank(emptyBank); }}>Cancel</Button>
+            <Button type="submit" size="sm" variant="accent" disabled={busy}>{busy ? 'Saving...' : 'Save for verification'}</Button>
+          </div>
+        </form>}
+      </>}
     </div>
   );
-};
+}

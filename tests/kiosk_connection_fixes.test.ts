@@ -15,7 +15,7 @@ describe('Kiosk and Kiosk Admin fixes', () => {
   it('BUG-134: choosing Cash at Counter is written onto the order, and stays unpaid', () => {
     const m = db.menuItems[0];
     const order = OrderRepository.createOrder({
-      items: [{ id: 'i', orderId: '', menuItemId: m.id, name: m.name, quantity: 1, unitPrice: m.price, modifiers: [], totalPrice: m.price, kitchenStatus: 'PENDING' }],
+      items: [{ id: 'i', orderId: '', menuItemId: m.id, sku: m.sku, name: m.name, quantity: 1, unitPrice: m.price, modifiers: [], totalPrice: m.price, kitchenStatus: 'PENDING' }],
       subtotal: m.price, totalAmount: m.price, paymentMethod: 'UPI', paymentStatus: 'PENDING', orderStatus: 'CONFIRMED'
     });
     const updated = OrderRepository.choosePaymentMethod(order.id, 'CASH_AT_COUNTER')!;

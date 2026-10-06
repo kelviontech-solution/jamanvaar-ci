@@ -2,7 +2,7 @@ import { BranchCore } from './core';
 import { nextAttemptState } from '../../sync/src/sync_protocol';
 
 /** Entity types (menu, staff, tables...) the core mirrors in both directions. */
-export const MIRRORED_ENTITY_TYPES = ['MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK'];
+export const MIRRORED_ENTITY_TYPES = ['TAX_GROUP', 'MODIFIER_GROUP', 'RESERVATION', 'MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK'];
 
 export interface UplinkOptions {
   cloudBase: string;
@@ -28,6 +28,11 @@ export interface UplinkResult {
  */
 export class CloudUplink {
   private running = false;
+  private cancelled = false;
+  private activeRequest: AbortController | null = null;
+
+  resume(): void { this.cancelled = false; }
+  cancel(): void { this.cancelled = true; this.activeRequest?.abort(); }
 
   constructor(
     private readonly core: BranchCore,
@@ -35,8 +40,10 @@ export class CloudUplink {
   ) {}
 
   private async request(method: string, path: string, body?: unknown): Promise<{ status: number; data: any }> {
+    if (this.cancelled) throw new Error('Cloud uplink stopped');
     const f = this.opts.fetchImpl ?? fetch;
     const ctl = new AbortController();
+    this.activeRequest = ctl;
     const timer = setTimeout(() => ctl.abort(), this.opts.timeoutMs ?? 10_000);
     try {
       const res = await f(`${this.opts.cloudBase}${path}`, {
@@ -49,6 +56,7 @@ export class CloudUplink {
       return { status: res.status, data };
     } finally {
       clearTimeout(timer);
+      if (this.activeRequest === ctl) this.activeRequest = null;
     }
   }
 
@@ -136,15 +144,18 @@ export class CloudUplink {
     let total = 0;
     const byType = new Map<string, typeof dirty>();
     dirty.forEach((d) => byType.set(d.type, [...(byType.get(d.type) ?? []), d]));
-    for (const [type, list] of byType) {
+    for (const [type, records] of byType) {
+      for (let offset = 0; offset < records.length; offset += 200) {
+      const list = records.slice(offset, offset + 200);
       const res = await this.request('POST', `/api/v1/entity-sync/${type}`, { events: list.map((e) => ({ externalId: e.externalId, payload: e.payload })) });
       if (res.status !== 201 && res.status !== 200) throw new Error(`entities ${type} ${res.status}`);
       (res.data.results as Array<{ externalId: string; status: string }>).forEach((r) => {
         if (r.status === 'ok') {
-          this.core.clearDirty(type, r.externalId);
+          this.core.clearDirty(type, r.externalId, list.find((record) => record.externalId === r.externalId)?.payload);
           total++;
         }
       });
+      }
     }
     return total;
   }
@@ -209,14 +220,21 @@ export class CloudUplink {
   private async downloadEntities(): Promise<number> {
     let total = 0;
     for (const type of MIRRORED_ENTITY_TYPES) {
-      const key = `cloud_since_${type}`;
-      const res = await this.request('GET', `/api/v1/entity-sync/${type}?since=${encodeURIComponent(this.cursor(key) ?? new Date(0).toISOString())}`);
-      if (res.status !== 200) continue; // a type the cloud does not serve is skipped, not fatal
-      const entities = res.data.entities as Array<{ externalId: string; payload: any; updatedAt: string }>;
-      if (entities.length > 0) this.core.pushEntities({ id: 'cloud' }, type, entities.map((e) => ({ externalId: e.externalId, payload: e.payload })), 'cloud');
-      total += entities.length;
-      const last = entities[entities.length - 1];
-      this.core.store.setConfig(key, entities.length >= 500 && last ? last.updatedAt : res.data.serverTime);
+      const key = `cloud_seq_${type}`;
+      for (let page = 0; page < 50; page++) {
+        const after = Number(this.cursor(key) ?? 0);
+        const res = await this.request('GET', `/api/v1/entity-sync/${type}?afterSeq=${after}`);
+        if (res.status !== 200) throw new Error(`entities download ${type} ${res.status}`);
+        const entities = res.data.entities as Array<{ externalId: string; payload: any; updatedAt: string }>;
+        if (entities.length > 0) {
+          const applied = this.core.pushEntities({ id: 'cloud' }, type, entities.map((e) => ({ externalId: e.externalId, payload: e.payload })), 'cloud');
+          if (applied.results.some((r) => r.status === 'error')) throw new Error(`Could not apply ${type} page`);
+        }
+        total += entities.length;
+        const next = res.data.latestSeq ?? after;
+        this.core.store.setConfig(key, String(next));
+        if (!res.data.hasMore || next === after) break;
+      }
     }
     return total;
   }
@@ -237,6 +255,7 @@ export class UplinkScheduler {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private stopped = true;
   private failures = 0;
+  private activeTick: Promise<void> | null = null;
 
   constructor(
     private readonly uplink: CloudUplink,
@@ -244,13 +263,17 @@ export class UplinkScheduler {
   ) {}
 
   start(): void {
+    this.uplink.resume();
     this.stopped = false;
     this.schedule(0);
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     this.stopped = true;
     if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.uplink.cancel();
+    await this.activeTick;
   }
 
   /** Sync soon (e.g. an order was just accepted). */
@@ -260,11 +283,15 @@ export class UplinkScheduler {
 
   private schedule(ms: number): void {
     if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => void this.tick(), ms);
+    this.timer = setTimeout(() => {
+      if (this.stopped || this.activeTick) return;
+      this.activeTick = this.tick().finally(() => { this.activeTick = null; });
+    }, ms);
   }
 
   private async tick(): Promise<void> {
     const r = await this.uplink.syncOnce();
+    if (this.stopped) return;
     this.opts.onResult?.(r);
     this.failures = r.reachable && !r.error ? 0 : this.failures + 1;
     if (this.stopped) return;

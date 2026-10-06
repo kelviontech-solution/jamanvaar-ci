@@ -1,3 +1,4 @@
+import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore } from '@jamanvaar/database';
 import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
@@ -176,9 +177,7 @@ export const App: React.FC = () => {
     // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
     // created it — KDS had no entity-sync wiring at all (not even for menu/CRM), so a kitchen chef's
     // PIN never reached this screen despite the create/reset screen's own promise that it would.
-    const syncStaff = async () => {
-      await EntitySyncEngine.catchUp('STAFF_USER', (remote) => StaffRepository.applyRemoteUser(remote.payload));
-    };
+    const syncStaff = () => syncStaffUsers({ push: false });
 
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();

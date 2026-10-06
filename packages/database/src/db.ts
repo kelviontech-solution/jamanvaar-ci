@@ -91,6 +91,7 @@ export interface DbStorage {
   readonly atomicBatches?: boolean;
   health?(): { ok: boolean; error: string | null };
   onRemoteChange?: ((ops: Array<{ op: 'set'; key: string; value: string } | { op: 'remove'; key: string }>) => void) | null;
+  subscribeRemote?: (listener: NonNullable<DbStorage['onRemoteChange']>) => () => void;
 }
 
 export class JamanvaarDatabase {
@@ -407,6 +408,8 @@ export class JamanvaarDatabase {
     enableQrReceipt: true
   };
 
+  private readonly initialReceiptConfig = { ...this.receiptConfig };
+
   public receiptRecords: ReceiptRecord[] = [];
   public printJobs: PrintJob[] = [];
   public configuredPrinters: PrinterDevice[] = [
@@ -597,6 +600,14 @@ export class JamanvaarDatabase {
   // after the first 401 instead of looping indefinitely.
   private serverSyncUnauthorized = false;
   private serverSyncPollTimer: ReturnType<typeof setInterval> | null = null;
+  private serverSyncStream: EventSource | null = null;
+  private legacySyncEnabled(): boolean {
+    if (typeof window === 'undefined') return false;
+    const configured = this.customSyncServerUrl || KeyValueStore.get('jamanvaar_sync_server_url');
+    if (!window.location) return false;
+    if (configured) return window.location.protocol !== 'https:' || configured.startsWith('https://');
+    return /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+  }
   /** True once the local relay has refused this browser (it needs a pairing no screen performs yet). */
   public isLocalCoreUnauthorized(): boolean {
     return this.serverSyncUnauthorized;
@@ -697,6 +708,7 @@ export class JamanvaarDatabase {
 
   private pushToServer(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+    if (!this.legacySyncEnabled()) return;
     if (this.serverSyncUnauthorized) return;
     try {
       fetch(`${this.getSyncServerUrl()}/api/sync`, {
@@ -751,6 +763,8 @@ export class JamanvaarDatabase {
 
   private initServerSync(): void {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+    this.serverSyncStream?.close();
+    this.serverSyncStream = null;
 
     // A prior call (e.g. setSyncServerUrl pointing at a new server) may have
     // left a poll timer and an unauthorized flag from the old target running
@@ -760,6 +774,7 @@ export class JamanvaarDatabase {
       clearInterval(this.serverSyncPollTimer);
       this.serverSyncPollTimer = null;
     }
+    if (!this.legacySyncEnabled()) return;
     this.serverSyncUnauthorized = false;
 
     // 1. Initial Pull from Sync Server
@@ -816,6 +831,7 @@ export class JamanvaarDatabase {
     try {
       if ('EventSource' in window) {
         const sse = new EventSource(`${this.getSyncServerUrl()}/api/events`);
+        this.serverSyncStream = sse;
         sse.onmessage = (ev) => {
           try {
             const parsed = JSON.parse(ev.data || '{}');
@@ -986,6 +1002,7 @@ export class JamanvaarDatabase {
    * atomically in the background.
    */
   private store: DbStorage | null = null;
+  private unsubscribeStore: (() => void) | null = null;
 
   private ls(): DbStorage | null {
     if (this.store) return this.store;
@@ -997,13 +1014,30 @@ export class JamanvaarDatabase {
   }
 
   /** Switches this database to a durable store and reloads everything from it. Call once at startup, before the UI renders. */
+  public discardUnscopedCache(): void {
+    for (const key of Object.keys(this)) {
+      const record = this as unknown as Record<string, unknown>;
+      if (Array.isArray(record[key]) && key !== 'roles') record[key] = [];
+    }
+    this.restaurant = { ...SEED_RESTAURANT };
+    this.outlet = { ...SEED_OUTLET };
+    this.qrSettings = { ...DEFAULT_QR_SETTINGS };
+    this.kioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
+    this.welcomeScreenSettings = { ...DEFAULT_WELCOME_SCREEN_SETTINGS };
+    this.receiptConfig = { ...this.initialReceiptConfig };
+    this.roles = [...SEED_ROLES];
+    this.tokenSequenceResets = {};
+    this.floorPlanStartedEmpty = false;
+  }
+
   public attachDurableStorage(store: DbStorage): void {
     this.store = store;
     this.lastWritten.clear();
     this.persistenceError = null;
     this.loadFromStorage();
     // Another window on this machine changed the shared database: adopt its data, as the old storage event did.
-    store.onRemoteChange = (ops) => {
+    this.unsubscribeStore?.();
+    const onRemoteChange: NonNullable<DbStorage['onRemoteChange']> = (ops) => {
       if (!ops.some((op) => op.key.startsWith(this.storagePrefix))) return;
       for (const op of ops) {
         if (op.op === 'set') this.lastWritten.set(op.key, op.value);
@@ -1012,6 +1046,11 @@ export class JamanvaarDatabase {
       this.loadFromStorage();
       this.listeners.forEach((fn) => fn());
     };
+    if (store.subscribeRemote) this.unsubscribeStore = store.subscribeRemote(onRemoteChange);
+    else {
+      const previous = store.onRemoteChange;
+      store.onRemoteChange = (ops) => { previous?.(ops); onRemoteChange(ops); };
+    }
     this.listeners.forEach((fn) => fn());
   }
 

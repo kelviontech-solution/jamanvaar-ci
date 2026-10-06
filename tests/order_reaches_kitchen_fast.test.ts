@@ -22,7 +22,7 @@ describe('Captain pushes to the cloud immediately', () => {
     db.orders = [];
     db.kots = [];
     ServiceMessages.resetForTests();
-    pin = (await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' })).issuedPin;
+    pin = (await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' })).issuedPin!;
     store().logout();
     useCaptainStore.setState({ cartItems: [], selectedTable: null, selectedTableOrder: null, foodReadyItems: [], tableFilter: 'ALL_TABLES' });
     expect(await store().login(pin)).toBe(true);

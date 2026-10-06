@@ -316,4 +316,18 @@ describe('Payment order creation', () => {
     const res = await authed('get', '/api/v1/payments/00000000-0000-0000-0000-000000000000/status', kioskToken);
     expect(res.status).toBe(404);
   });
+  it('a kiosk cannot reuse an external order ID from the WhatsApp channel', async () => {
+    const order = await prisma.runAsTenant(restaurantId, tx => tx.order.create({ data: { restaurantId, externalOrderId: 'foreign-channel-id', source: 'WHATSAPP', items: [], subtotal: 10000, taxAmount: 0, totalAmount: 10000 } }));
+    const result = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId: order.externalOrderId, lines: validLines });
+    expect(result.status).toBe(409);
+    expect(await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.count({ where: { orderId: order.id } }))).toBe(0);
+  });
+
+  it('changing the configured rate leaves an earlier payment snapshot unchanged', async () => {
+    const previous = await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirstOrThrow({ where: { order: { externalOrderId: 'local-order-split-1' } } }));
+    expect(previous.commissionBps).toBe(200);
+    expect(previous.platformAmount).toBe(1092);
+    expect(previous.restaurantAmount).toBe(53508);
+  });
+
 });

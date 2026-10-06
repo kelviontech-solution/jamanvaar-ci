@@ -43,6 +43,9 @@ export interface RealtimeOptions {
   onChange(kind: string): void;
   onCommand(): void;
   onRevoked?(): void;
+  onReady?(): void;
+  onDenied?(response: Response): void | Promise<void>;
+  idleTimeoutMs?: number;
   /** Bursts of the same change kind within this window become a single wake-up. */
   debounceMs?: number;
   fetchImpl?: typeof fetch;
@@ -52,6 +55,7 @@ export interface RealtimeOptions {
 export class RealtimeClient {
   private running = false;
   private controller: AbortController | null = null;
+  private reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
   private pending = new Set<string>();
 
@@ -66,6 +70,7 @@ export class RealtimeClient {
   stop(): void {
     this.running = false;
     this.controller?.abort();
+    void this.reader?.cancel().catch(() => undefined);
     this.timers.forEach((t) => clearTimeout(t));
     this.timers.clear();
     this.pending.clear();
@@ -100,8 +105,14 @@ export class RealtimeClient {
     let attempt = 0;
     while (this.running) {
       let connected = false;
+      let watchdog: ReturnType<typeof setTimeout> | undefined;
+      const resetWatchdog = () => {
+        clearTimeout(watchdog);
+        watchdog = setTimeout(() => { this.controller?.abort(); void this.reader?.cancel().catch(() => undefined); }, this.opts.idleTimeoutMs ?? 60_000);
+      };
       try {
         this.controller = new AbortController();
+        resetWatchdog();
         const doFetch = this.opts.fetchImpl ?? fetch;
         const streamPath = '/api/v1/realtime/stream';
         EndpointResolver.ensureConfigured(this.opts.apiBase);
@@ -109,13 +120,21 @@ export class RealtimeClient {
           headers: { Authorization: `Bearer ${this.opts.deviceToken}`, Accept: 'text/event-stream' },
           signal: this.controller.signal
         });
+        if (res.status === 401 || res.status === 403) {
+          await this.opts.onDenied?.(res);
+          this.running = false;
+          this.opts.onRevoked?.();
+          return;
+        }
         if (res.ok && res.body) {
           const reader = res.body.getReader();
+          this.reader = reader;
           const decoder = new TextDecoder();
           let buffer = '';
           for (;;) {
             const { value, done } = await reader.read();
             if (done) break;
+            resetWatchdog();
             buffer += decoder.decode(value, { stream: true });
             const parsed = parseSseBlocks(buffer);
             buffer = parsed.rest;
@@ -123,6 +142,7 @@ export class RealtimeClient {
               if (ev.event === 'ready') {
                 connected = true;
                 attempt = 0;
+                this.opts.onReady?.();
               } else if (ev.event === 'change') {
                 this.wake(String(ev.data?.kind ?? 'orders'));
               } else if (ev.event === 'command') {
@@ -137,6 +157,10 @@ export class RealtimeClient {
         }
       } catch {
         // dropped or aborted: fall through to reconnect (or exit if stopped)
+      } finally {
+        clearTimeout(watchdog);
+        void this.reader?.cancel().catch(() => undefined);
+        this.reader = null;
       }
       if (!this.running) return;
       attempt = connected ? 1 : attempt + 1;

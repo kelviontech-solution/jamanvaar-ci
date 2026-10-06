@@ -22,8 +22,8 @@ describe('Captain: courses, held dishes and cancelling a sent dish', () => {
     db.orders = [];
     db.kots = [];
     ServiceMessages.resetForTests();
-    captainPin = (await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' })).issuedPin;
-    managerPin = (await StaffRepository.createUser({ username: 'mona', fullName: 'Mona Manager', roleId: 'role-manager' })).issuedPin;
+    captainPin = (await StaffRepository.createUser({ username: 'ravi', fullName: 'Ravi Waiter', roleId: 'role-captain' })).issuedPin!;
+    managerPin = (await StaffRepository.createUser({ username: 'mona', fullName: 'Mona Manager', roleId: 'role-manager' })).issuedPin!;
     store().logout();
     useCaptainStore.setState({ cartItems: [], selectedTable: null, selectedTableOrder: null, foodReadyItems: [], tableFilter: 'ALL_TABLES' });
     expect(await store().login(captainPin)).toBe(true);

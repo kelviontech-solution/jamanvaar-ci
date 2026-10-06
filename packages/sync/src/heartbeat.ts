@@ -1,4 +1,4 @@
-import { db } from '@jamanvaar/database';
+import { db, KeyValueStore, TenantIsolation, MenuRepository } from '@jamanvaar/database';
 import { DeviceGate, type HeartbeatAnswer } from './device_gate';
 import { SyncOutboxEngine } from './outbox';
 import { DeviceCommandRunner } from './device_commands';
@@ -8,6 +8,7 @@ import { EndpointResolver } from './endpoint_resolver';
 import { InventoryLedgerSync } from './inventory_ledger_sync';
 import { syncMenuCatalog } from './menu_sync';
 import { tokenKey, verifyCommand } from './command_signing';
+import { EntitySyncEngine } from './entity_sync';
 
 /** A readable OS name for the fleet list ("Windows", "Android", ...). Never throws. */
 export function detectOsPlatform(): string | undefined {
@@ -56,7 +57,7 @@ async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
       const r = await routed(opts, '/api/v1/devices/me/commands', { headers });
       if (!r.ok) throw new Error(`commands ${r.status}`);
       const list = (await r.json()) as Array<{ id: string; commandType: string; payload?: unknown; signature?: string }>;
-      fromCore = EndpointResolver.lastResponder() === 'core';
+      fromCore = EndpointResolver.responderFor(r) === 'core';
       return list;
     },
     async ack(id, outcome) {
@@ -73,6 +74,9 @@ async function runDeviceCommands(opts: HeartbeatOpts): Promise<void> {
 
 let realtime: RealtimeClient | null = null;
 let realtimeToken: string | null = null;
+export function stopRealtime(): void {
+  realtime?.stop(); realtime = null; realtimeToken = null;
+}
 
 /**
  * Opens the realtime channel once per credential. Each wake-up just triggers the matching cursor-based
@@ -89,7 +93,11 @@ function startRealtime(opts: HeartbeatOpts): void {
       if (kind === 'orders') void SyncOutboxEngine.catchUpFromCloud();
       else if (kind === 'inventory') void InventoryLedgerSync.sync();
       else if (kind === 'menu') void syncMenuCatalog({ push: false });
+      else if (kind.startsWith('entity:')) EntitySyncEngine.wake(kind.slice(7));
+      else if (kind === 'entities') EntitySyncEngine.wake();
     },
+    onReady: () => { void SyncOutboxEngine.catchUpFromCloud(); EntitySyncEngine.wake(); void InventoryLedgerSync.sync(); },
+    onDenied: (response) => DeviceGate.observe(response),
     onCommand: () => void runDeviceCommands(opts),
     onRevoked: () => {
       realtime = null;
@@ -118,17 +126,29 @@ export async function sendHeartbeat(opts: {
       body: JSON.stringify(buildHeartbeatBody(opts.appVersion))
     });
     if (res.ok) {
-      await DeviceGate.applyHeartbeatAsync((await res.json()) as HeartbeatAnswer, {
-        restaurantId: opts.restaurantId ?? undefined,
-        branchId: opts.branchId,
-        deviceId: opts.deviceId
+      const answer = (await res.json()) as HeartbeatAnswer;
+      const previousBranch = KeyValueStore.get('jamanvaar_bound_branch_id');
+      const restaurantId = answer.restaurantId ?? opts.restaurantId;
+      if (answer.deviceId) EndpointResolver.setIdentity(`${answer.deviceId}:${answer.branchId ?? 'all'}`);
+      if (answer.branchId !== undefined && previousBranch !== (answer.branchId ?? '') && restaurantId) {
+        // Unknown legacy branch ownership is recovered from the authorized cloud snapshot. Unsent orders are quarantined.
+        if (answer.branchId || previousBranch) {
+          TenantIsolation.reset(restaurantId);
+          MenuRepository.startFreshMenu();
+        }
+      }
+      if (answer.branchId !== undefined) KeyValueStore.set('jamanvaar_bound_branch_id', answer.branchId ?? '');
+      await DeviceGate.applyHeartbeatAsync(answer, {
+        restaurantId: answer.restaurantId ?? opts.restaurantId ?? undefined,
+        branchId: answer.branchId !== undefined ? answer.branchId : opts.branchId,
+        deviceId: answer.deviceId ?? opts.deviceId
       });
       void MenuVersionTracker.refresh(async () => {
         const r = await routed(opts, '/api/v1/menu/version', { headers: { Authorization: `Bearer ${opts.deviceToken}` } });
         return r.ok ? ((await r.json()) as { version: number; watermark: string | null }) : null;
       });
-      await runDeviceCommands(opts);
       startRealtime(opts);
+      await runDeviceCommands(opts);
     }
   } catch {
     // Best-effort: a missed heartbeat is retried on the next tick.

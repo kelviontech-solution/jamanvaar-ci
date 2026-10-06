@@ -43,7 +43,8 @@ export class MenuVersionTracker {
 
     const mark = Date.parse(latest.watermark);
     const caughtUp = MENU_ENTITIES.every((entity) => {
-      const cursor = read(EndpointResolver.cursorKey(CURSOR_PREFIX + entity, `/api/v1/entity-sync/${entity}`));
+      const key = EndpointResolver.cursorKey(CURSOR_PREFIX + entity, `/api/v1/entity-sync/${entity}`);
+      const cursor = read(key + ':caught_up_at') ?? read(key);
       return cursor !== null && Date.parse(cursor) >= mark;
     });
     if (caughtUp && latest.version > this.applied()) {

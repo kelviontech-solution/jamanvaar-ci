@@ -6,6 +6,7 @@ import { AuditService } from '../audit/audit.service';
 import { requireStepUpPassword } from '../../common/security/step-up.util';
 import { decryptCredential } from '../../common/security/credential-encryption.util';
 import { businessDateIn } from '../qr/qr.support';
+import { lockSettlement } from './settlement-lock.util';
 
 function maskLast4(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -46,6 +47,7 @@ export class RestaurantPayoutsService {
   async setBankVerification(restaurantId: string, status: 'VERIFIED' | 'REJECTED', actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
+      await lockSettlement(tx, restaurantId);
       const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
       if (!connection) throw new NotFoundException('No payment connection for this restaurant');
       if (!connection.settlementAccountNumberEncrypted && !connection.settlementUpiVpa) {
@@ -62,7 +64,7 @@ export class RestaurantPayoutsService {
         action: status === 'VERIFIED' ? 'BANK_DETAILS_VERIFIED' : 'BANK_DETAILS_REJECTED',
         category: 'PAYMENTS',
         details: {}
-      });
+      }, tx);
       return { bankVerificationStatus: updated.bankVerificationStatus };
     });
   }
@@ -79,8 +81,14 @@ export class RestaurantPayoutsService {
     bank: { accountNumberEncrypted: string | null; ifsc: string | null }
   ): Promise<{ id: string; netAmount: number } | null> {
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await lockSettlement(tx, restaurantId);
+      // Re-read inside the lock: the bank may have changed after the job selected restaurants.
+      const connection = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } });
+      if (connection?.status !== 'ACTIVE' || connection.bankVerificationStatus !== 'VERIFIED') return null;
+      bank = { accountNumberEncrypted: connection.settlementAccountNumberEncrypted, ifsc: connection.settlementIfsc };
       const restaurant = await tx.restaurant.findUnique({ where: { id: restaurantId }, select: { timezone: true } });
       const businessDate = businessDateOverride ?? businessDateIn(restaurant?.timezone ?? 'Asia/Kolkata');
+      if (await tx.restaurantPayout.findUnique({ where: { restaurantId_businessDate: { restaurantId, businessDate } } })) return null;
 
       const eligible = await tx.paymentTransaction.findMany({
         where: {
@@ -90,7 +98,7 @@ export class RestaurantPayoutsService {
           restaurantAmount: { not: null },
           // Conservative refund rule (no fee-adjustment policy has been defined yet): a payment that has any
           // successful refund is left out of the batch entirely rather than guessing what it should net to.
-          refunds: { none: { status: 'SUCCESS' } }
+          refunds: { none: { status: { in: ['SUCCESS', 'PENDING'] } } }
         },
         select: { id: true, amount: true, platformAmount: true, restaurantAmount: true }
       });
@@ -195,12 +203,22 @@ export class RestaurantPayoutsService {
     await requireStepUpPassword(actor, password);
     if (!utr.trim()) throw new BadRequestException('A UTR / transfer reference is required to mark a payout paid');
     return this.prisma.runAsPlatform(async (tx) => {
+      const initial = await tx.restaurantPayout.findUnique({ where: { id } });
+      if (!initial) throw new NotFoundException('Payout not found');
+      await lockSettlement(tx, initial.restaurantId);
+      await tx.$queryRaw`SELECT id FROM "RestaurantPayout" WHERE id = ${id} FOR UPDATE`;
       const payout = await tx.restaurantPayout.findUnique({ where: { id } });
       if (!payout) throw new NotFoundException('Payout not found');
       if (payout.status === 'PAID') throw new ConflictException('This payout is already marked paid');
-      if (payout.status !== 'PENDING' && payout.status !== 'APPROVED' && payout.status !== 'ON_HOLD') {
+      if (payout.status !== 'PENDING' && payout.status !== 'APPROVED') {
         throw new ForbiddenException(`Cannot mark a payout PAID from status ${payout.status}`);
       }
+      const bank = await tx.restaurantPaymentConnection.findUnique({ where: { restaurantId: payout.restaurantId } });
+      if (bank?.bankVerificationStatus !== 'VERIFIED') throw new ConflictException('Verify the payout bank details before recording the transfer');
+      const unsafe = await tx.paymentTransaction.count({ where: { payoutId: id, OR: [
+        { status: { not: 'SUCCESS' } }, { refunds: { some: { status: { in: ['PENDING', 'SUCCESS'] } } } }
+      ] } });
+      if (unsafe) throw new ConflictException('This batch includes refunds or unresolved payments. Reconcile it before recording a bank transfer.');
       const updated = await tx.restaurantPayout.update({
         where: { id },
         data: { status: 'PAID', utr: utr.trim(), paidAt: new Date(), paidByPlatformUserId: actor.id }
@@ -223,6 +241,7 @@ export class RestaurantPayoutsService {
   async hold(id: string, reason: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "RestaurantPayout" WHERE id = ${id} FOR UPDATE`;
       const payout = await tx.restaurantPayout.findUnique({ where: { id } });
       if (!payout) throw new NotFoundException('Payout not found');
       if (payout.status === 'PAID') throw new ConflictException('A paid payout cannot be put on hold');
@@ -238,9 +257,13 @@ export class RestaurantPayoutsService {
   async release(id: string, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     return this.prisma.runAsPlatform(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "RestaurantPayout" WHERE id = ${id} FOR UPDATE`;
       const payout = await tx.restaurantPayout.findUnique({ where: { id } });
       if (!payout) throw new NotFoundException('Payout not found');
       if (payout.status !== 'ON_HOLD') throw new ForbiddenException('Only an ON_HOLD payout can be released');
+      if (await tx.paymentTransaction.count({ where: { payoutId: id, refunds: { some: { status: { in: ['PENDING', 'SUCCESS'] } } } } })) {
+        throw new ConflictException('Refunds in this batch need reconciliation before it can be released');
+      }
       const updated = await tx.restaurantPayout.update({ where: { id }, data: { status: 'PENDING', holdReason: null } });
       await this.audit.log(
         { actorType: 'PLATFORM', actorId: actor.id, restaurantId: payout.restaurantId, action: 'PAYOUT_APPROVED', category: 'PAYMENTS', details: { payoutId: id } },
@@ -250,43 +273,56 @@ export class RestaurantPayoutsService {
     });
   }
 
-  /** Cross-restaurant totals for the Super Admin finance screen. */
+  private async collectionSummary(tx: Prisma.TransactionClient, restaurantId?: string) {
+    // One snapshot prevents a collection moving into an EOD batch between aggregates
+    // from appearing twice (or disappearing) in Pending.
+    await tx.$executeRawUnsafe('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    const tenant = restaurantId ? { restaurantId } : {};
+    const captured: Prisma.PaymentTransactionWhereInput = {
+      ...tenant, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'] }
+    };
+    const blockedPayment: Prisma.PaymentTransactionWhereInput = { OR: [
+      { status: { not: 'SUCCESS' } },
+      { refunds: { some: { status: { in: ['PENDING', 'SUCCESS'] } } } }
+    ] };
+    const blockedBatch: Prisma.RestaurantPayoutWhereInput = { OR: [
+      { status: { in: ['ON_HOLD', 'FAILED'] } }, { payments: { some: blockedPayment } }
+    ] };
+    const [collected, unbatched, heldUnbatched, pending, heldBatches, paid, refunds, unallocated] = await Promise.all([
+      tx.paymentTransaction.aggregate({ where: captured, _sum: { amount: true, platformAmount: true, restaurantAmount: true } }),
+      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, NOT: blockedPayment }, _sum: { restaurantAmount: true } }),
+      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, ...blockedPayment }, _sum: { restaurantAmount: true } }),
+      tx.restaurantPayout.aggregate({ where: { ...tenant, status: { not: 'PAID' }, NOT: blockedBatch }, _sum: { netAmount: true } }),
+      tx.restaurantPayout.aggregate({ where: { ...tenant, status: { not: 'PAID' }, ...blockedBatch }, _sum: { netAmount: true } }),
+      tx.restaurantPayout.aggregate({ where: { ...tenant, status: 'PAID' }, _sum: { netAmount: true } }),
+      tx.refund.aggregate({ where: { ...tenant, status: 'SUCCESS' }, _sum: { amount: true } }),
+      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, restaurantAmount: null }, _sum: { amount: true } })
+    ]);
+    const pendingPayout = (unbatched._sum.restaurantAmount ?? 0) + (pending._sum.netAmount ?? 0);
+    const paidPayout = paid._sum.netAmount ?? 0;
+    return {
+      grossCollection: collected._sum.amount ?? 0,
+      platformFee: collected._sum.platformAmount ?? 0,
+      netBeforeAdjustments: collected._sum.restaurantAmount ?? 0,
+      netPayable: pendingPayout + paidPayout,
+      pendingPayout, paidPayout,
+      heldPayable: (heldUnbatched._sum.restaurantAmount ?? 0) + (heldBatches._sum.netAmount ?? 0),
+      refundedAmount: refunds._sum.amount ?? 0,
+      unallocatedCollection: unallocated._sum.amount ?? 0,
+      payoutMode: 'MANUAL', routeStatus: 'PENDING'
+    };
+  }
+
+  /** Totals use frozen splits; refunds stay on hold until a fee-adjustment policy is defined. */
   async platformOverview() {
     return this.prisma.runAsPlatform(async (tx) => {
-      const [collected, pending, paid] = await Promise.all([
-        tx.paymentTransaction.aggregate({ where: { status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } }, _sum: { amount: true, platformAmount: true, restaurantAmount: true } }),
-        tx.restaurantPayout.aggregate({ where: { status: { in: ['PENDING', 'APPROVED', 'PROCESSING', 'ON_HOLD'] } }, _sum: { netAmount: true } }),
-        tx.restaurantPayout.aggregate({ where: { status: 'PAID' }, _sum: { netAmount: true } })
-      ]);
-      return {
-        grossCollection: collected._sum.amount ?? 0,
-        platformFee: collected._sum.platformAmount ?? 0,
-        restaurantPayable: collected._sum.restaurantAmount ?? 0,
-        pendingPayout: pending._sum.netAmount ?? 0,
-        paidPayout: paid._sum.netAmount ?? 0
-      };
+      const summary = await this.collectionSummary(tx);
+      return { ...summary, restaurantPayable: summary.netPayable };
     });
   }
 
-  /** One restaurant's own collection/payout summary — gross, fee, net, and how much of that net is pending vs paid. */
   async restaurantSummary(restaurantId: string) {
-    return this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const collected = await tx.paymentTransaction.aggregate({
-        where: { restaurantId, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } },
-        _sum: { amount: true, platformAmount: true, restaurantAmount: true }
-      });
-      const [pending, paid] = await Promise.all([
-        tx.restaurantPayout.aggregate({ where: { restaurantId, status: { in: ['PENDING', 'APPROVED', 'PROCESSING', 'ON_HOLD'] } }, _sum: { netAmount: true } }),
-        tx.restaurantPayout.aggregate({ where: { restaurantId, status: 'PAID' }, _sum: { netAmount: true } })
-      ]);
-      return {
-        grossCollection: collected._sum.amount ?? 0,
-        platformFee: collected._sum.platformAmount ?? 0,
-        netPayable: collected._sum.restaurantAmount ?? 0,
-        pendingPayout: pending._sum.netAmount ?? 0,
-        paidPayout: paid._sum.netAmount ?? 0
-      };
-    });
+    return this.prisma.runAsTenant(restaurantId, (tx) => this.collectionSummary(tx, restaurantId));
   }
 
   async restaurantPayoutHistory(restaurantId: string, page: number, limit: number) {

@@ -28,12 +28,14 @@ interface DayStatement {
   grossVolume: number;
   refundedAmount: number;
   platformCommission: number;
-  commissionReversed: number;
+  commissionReversed: number | null;
   restaurantGross: number;
-  restaurantRefundImpact: number;
+  restaurantRefundImpact: number | null;
+  heldPayable: number;
+  unallocatedCollection: number;
   netPayableToRestaurant: number;
   settlementNote: string;
-  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number; method: string | null; paidAt: string | null }>;
+  rows: Array<{ id: string; externalOrderId: string; amount: number; platformAmount: number; restaurantAmount: number | null; method: string | null; paidAt: string | null }>;
 }
 
 function formatRupees(paise: number): string {
@@ -45,11 +47,13 @@ const todayIst = () => new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString()
 function statementCsv(s: DayStatement, restaurantId: string) {
   const lines = [
     ['Order', 'Paid at', 'Method', 'Amount (INR)', 'Platform commission (INR)', 'Restaurant share (INR)'],
-    ...s.rows.map((r) => [r.externalOrderId, r.paidAt ?? '', r.method ?? '', (r.amount / 100).toFixed(2), (r.platformAmount / 100).toFixed(2), (r.restaurantAmount / 100).toFixed(2)]),
+    ...s.rows.map((r) => [r.externalOrderId, r.paidAt ?? '', r.method ?? '', (r.amount / 100).toFixed(2), (r.platformAmount / 100).toFixed(2), r.restaurantAmount === null ? '' : (r.restaurantAmount / 100).toFixed(2)]),
     [],
     ['Gross', (s.grossVolume / 100).toFixed(2)],
     ['Refunds', (s.refundedAmount / 100).toFixed(2)],
-    ['Platform commission (net of refunds)', ((s.platformCommission - s.commissionReversed) / 100).toFixed(2)],
+    ['Jamanvaar Fee (recorded snapshot)', (s.platformCommission / 100).toFixed(2)],
+    ['Held for refund review', (s.heldPayable / 100).toFixed(2)],
+    ['Historical collection needing split review', (s.unallocatedCollection / 100).toFixed(2)],
     ['Net payable to restaurant', (s.netPayableToRestaurant / 100).toFixed(2)]
   ];
   const csv = lines.map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -287,7 +291,9 @@ export function PlatformPaymentsDashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
               {tile(`Payments (${statement.paymentCount})`, formatRupees(statement.grossVolume))}
               {tile(`Refunds (${statement.refundCount})`, formatRupees(statement.refundedAmount), 'warn')}
-              {tile('Commission (net of refunds)', formatRupees(statement.platformCommission - statement.commissionReversed), 'good')}
+              {tile('Jamanvaar Fee (recorded snapshot)', formatRupees(statement.platformCommission), 'good')}
+              {tile('Held for refund review', formatRupees(statement.heldPayable), 'warn')}
+              {tile('Historical collection needing split review', formatRupees(statement.unallocatedCollection), 'warn')}
               {tile('Net payable to restaurant', formatRupees(statement.netPayableToRestaurant))}
               <div className="muted" style={{ fontSize: 12, gridColumn: '1 / -1' }}>{statement.settlementNote} Day = calendar day in India time.</div>
             </div>

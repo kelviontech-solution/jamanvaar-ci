@@ -2,7 +2,8 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { TenantAuthService } from '../src/modules/tenant-auth/tenant-auth.service';
 import { createTestApp, createTestPlatformUser, extractCookie, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
@@ -258,7 +259,8 @@ describe('Tenant authentication + authorization', () => {
     const kioskAdminLoginRes = await request(app.getHttpServer())
       .post('/api/v1/tenant-auth/login')
       .send({ restaurantId, email: staffEmail, password: staffPassword, deviceType: 'KIOSK_ADMIN' });
-    expect(kioskAdminLoginRes.status).toBe(403);
+    // Standalone Kiosk Admin is retired; the merged console logs in as POS_ADMIN.
+    expect(kioskAdminLoginRes.status).toBe(400);
 
     // A device type with no admin console (e.g. Captain) is unaffected by this rule.
     const captainLoginRes = await request(app.getHttpServer())
@@ -673,4 +675,17 @@ describe('Tenant authentication + authorization', () => {
       await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: famPlanId } }));
     });
   });
+  it('keeps the original refresh token usable when issuing its replacement fails', async () => {
+    const login = await request(app.getHttpServer()).post('/api/v1/tenant-auth/login').send({ restaurantId, email: ownerEmail, password: ownerPassword });
+    const cookie = extractCookie(login.headers['set-cookie'], 'jamanvaar_tenant_refresh');
+    expect(cookie).toBeTruthy();
+    const failure = vi.spyOn(app.get(TenantAuthService) as any, 'issueRefreshToken').mockRejectedValueOnce(new Error('simulated replacement write failure'));
+    try {
+      const failed = await request(app.getHttpServer()).post('/api/v1/tenant-auth/refresh').set('Cookie', `jamanvaar_tenant_refresh=${cookie}`);
+      expect(failed.status).toBe(500);
+    } finally { failure.mockRestore(); }
+    const retry = await request(app.getHttpServer()).post('/api/v1/tenant-auth/refresh').set('Cookie', `jamanvaar_tenant_refresh=${cookie}`);
+    expect(retry.status).toBe(200); expect(retry.body.accessToken).toBeTruthy();
+  });
+
 });

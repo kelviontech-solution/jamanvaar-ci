@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -43,7 +44,7 @@ const CATCH_UP_MAX_ROWS = 500;
  * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
  * the newer edit or bring the deleted record back.
  */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION']);
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
@@ -64,7 +65,7 @@ export interface EntitySyncPushResult {
 
 @Injectable()
 export class EntitySyncService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly realtime: RealtimeBus) {}
 
   async pushEvents(
     device: Device,
@@ -90,10 +91,17 @@ export class EntitySyncService {
     deviceType?: string
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
     const results: EntitySyncPushResult[] = [];
+    let changed = false;
 
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      // Acquire the entity counter before record locks so every entity writer uses the same lock order.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
       for (let evt of events) {
+        await tx.$executeRaw`SAVEPOINT entity_event`;
         try {
+          if (entityType === 'DINING_TABLE' && deviceBranchId && typeof evt.payload.branchId === 'string' && evt.payload.branchId !== deviceBranchId) {
+            throw new Error('BRANCH_FORBIDDEN: This table belongs to another branch');
+          }
           // A branch-owned record pushed by a branch-bound terminal is stamped with that branch, so other branches never receive it.
           if (entityType === 'DINING_TABLE' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deviceBranchId } };
@@ -131,6 +139,14 @@ export class EntitySyncService {
               }
             }
           });
+          const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
+          if (entityType === 'DINING_TABLE' && deviceBranchId && existing && existingBranch !== deviceBranchId) {
+            throw new Error('BRANCH_FORBIDDEN: This table is outside this device branch');
+          }
+          if (existing && JSON.stringify(existing.payload) === JSON.stringify(evt.payload)) {
+            results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
+            continue;
+          }
 
           if (existing && LAST_CHANGE_WINS_TYPES.has(entityType)) {
             const existingDeleted = isDeleted(existing.payload);
@@ -171,18 +187,24 @@ export class EntitySyncService {
                 }
               });
 
-          results.push({ externalId: evt.externalId, status: 'ok', syncVersion: saved.syncVersion });
           const change = sensitiveChange(entityType, (existing?.payload as Record<string, unknown> | null) ?? null, evt.payload);
           if (change) {
             await this.audit.log({ actorType: deviceId ? 'TENANT' : 'SYSTEM', actorId: deviceId, restaurantId, action: `SYNC_${entityType}_CHANGED`, category: 'SYNC', details: { entityId: evt.externalId, deviceType: deviceType ?? null, ...change } as never }, tx);
           }
           if (entityType === 'DINING_TABLE') await this.syncQrTableLink(tx, restaurantId, evt, deviceBranchId ?? null);
+          results.push({ externalId: evt.externalId, status: 'ok', syncVersion: saved.syncVersion });
+          changed = true;
         } catch (err: any) {
+          await tx.$executeRaw`ROLLBACK TO SAVEPOINT entity_event`;
           results.push({ externalId: evt.externalId, status: 'error', error: err?.message ?? 'Unknown error' });
         }
       }
     });
 
+    if (changed) {
+      this.realtime.publish({ restaurantId, branchId: entityType === 'DINING_TABLE' ? deviceBranchId ?? null : null,
+        kind: `entity:${entityType}`, originDeviceId: deviceId });
+    }
     return { results, serverTime: new Date().toISOString() };
   }
 
@@ -218,31 +240,38 @@ export class EntitySyncService {
       ON CONFLICT DO NOTHING`;
   }
 
-  async catchUp(device: Device, entityType: SyncableEntityType, since?: string) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (entityType === 'DINING_TABLE' || entityType === 'MENU_ITEM') ? device.branchId : null, device.type);
+  async catchUp(device: Device, entityType: SyncableEntityType, since?: string, afterSeq?: number) {
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (entityType === 'DINING_TABLE' || entityType === 'MENU_ITEM') ? device.branchId : null, device.type, afterSeq);
   }
 
   /**
    * `branchId` scopes branch-owned records (the floor plan): a branch terminal receives its own branch's tables and any table
    * that names no branch, never another branch's. Restaurant-wide types (menu, staff, customers) are not filtered.
    */
-  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string, branchId: string | null = null, deviceType?: string) {
+  async catchUpForRestaurant(restaurantId: string, entityType: SyncableEntityType, since?: string, branchId: string | null = null, deviceType?: string, afterSeq?: number) {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
+    if (Number.isNaN(sinceDate.getTime())) throw new BadRequestException('Invalid sync timestamp');
+    const readStartedAt = new Date().toISOString();
 
     // B2-029: same missing-filter bug as order-sync.service.ts — this returned every
     // restaurant's entities (menu items, customers, staff PIN hashes) to any device.
     // Explicit filter here is defense in depth on top of RLS.
     const entities = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.syncedEntity.findMany({
-        where: { restaurantId, entityType, updatedAt: { gt: sinceDate } },
-        orderBy: { updatedAt: 'asc' },
-        take: CATCH_UP_MAX_ROWS
+        where: { restaurantId, entityType, ...(afterSeq !== undefined ? { seq: { gt: afterSeq } } : { updatedAt: { gt: sinceDate } }) },
+        orderBy: afterSeq !== undefined ? { seq: 'asc' } : [{ updatedAt: 'asc' }, { id: 'asc' }],
+        take: CATCH_UP_MAX_ROWS + 1
       })
     );
+    const hasMore = entities.length > CATCH_UP_MAX_ROWS;
+    const page = entities.slice(0, CATCH_UP_MAX_ROWS);
+    const latestSeq = page.length ? page[page.length - 1].seq : afterSeq ?? 0;
+    // Advance over the scanned page, not the filtered response. An invisible page must not skip the following visible page.
+    const metadata = { latestSeq, hasMore, serverTime: readStartedAt };
 
     if (entityType === 'STAFF_USER' && deviceType) {
-      const staff = entities.filter((e) => staffVisibleTo(deviceType as never, e.payload as Record<string, unknown> | null));
-      return { entities: staff, serverTime: new Date().toISOString() };
+      const staff = page.filter((e) => staffVisibleTo(deviceType as never, e.payload as Record<string, unknown> | null));
+      return { entities: staff, ...metadata };
     }
     if (entityType === 'MENU_ITEM' && branchId) {
       // This branch's own price and availability, applied on the way out: POS, Kiosk and Captain of the branch receive the dish
@@ -253,20 +282,20 @@ export class EntitySyncService {
         const p = o.payload as { branchId?: string; itemId?: string; price?: number; isAvailable?: boolean } | null;
         if (p && p.branchId === branchId && typeof p.itemId === 'string') mine.set(p.itemId, { price: p.price, isAvailable: p.isAvailable });
       }
-      const applied = entities.map((e) => {
+      const applied = page.map((e) => {
         const o = mine.get(e.externalId);
         const p = e.payload as Record<string, unknown> | null;
         if (!o || !p || p.deleted === true) return e;
         return { ...e, payload: { ...p, ...(typeof o.price === 'number' ? { price: o.price } : {}), ...(o.isAvailable === false ? { isAvailable: false } : {}) } };
       });
-      return { entities: applied, serverTime: new Date().toISOString() };
+      return { entities: applied, ...metadata };
     }
     const visible = branchId
-      ? entities.filter((e) => {
+      ? page.filter((e) => {
           const b = (e.payload as { branchId?: unknown } | null)?.branchId;
           return typeof b !== 'string' || b === branchId;
         })
-      : entities;
-    return { entities: visible, serverTime: new Date().toISOString() };
+      : page;
+    return { entities: visible, ...metadata };
   }
 }
