@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
-import { MenuBuilderService } from '@jamanvaar/business';
+import { MenuBuilderService, previewMenuCsv, MENU_CSV_SAMPLE, type MenuCsvPreview } from '@jamanvaar/business';
+import { MenuCsvPreviewModal, MenuDuplicateModal, downloadMenuFile } from './MenuImportModals';
 import {
   Plus,
   Search,
@@ -93,72 +94,18 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 }) => {
   const [menuSearch, setMenuSearch] = useState('');
   const csvInputRef = React.useRef<HTMLInputElement>(null);
-  const [loadingDefaults, setLoadingDefaults] = useState(false);
+  const [csvPreview, setCsvPreview] = useState<MenuCsvPreview | null>(null);
+  const [csvError, setCsvError] = useState('');
+  const [cleanupOpen, setCleanupOpen] = useState(false);
 
-  // BUG-014: no CSV import existed anywhere for menus, and there was no one-click way to
-  // load a starter menu — an empty menu showed only "No menu dishes found" with no way out.
-  const handleCsvFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = ''; // allow re-selecting the same file after fixing it
+  const handleCsvFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; e.target.value = ''; setCsvError('');
     if (!file) return;
-    file.text().then((text) => {
-      const result = MenuBuilderService.importCSV(text);
-      AuditRepository.log({
-        action: 'MENU_CSV_IMPORTED',
-        category: 'MENU',
-        details: `Imported ${result.itemsImported} dish(es) and created ${result.categoriesCreated} categor${result.categoriesCreated === 1 ? 'y' : 'ies'} from "${file.name}"`,
-        username: 'Manager'
-      });
-      if (result.errors.length > 0) {
-        const preview = result.errors
-          .slice(0, 5)
-          .map((er) => `Row ${er.row}: ${er.message}`)
-          .join(' · ');
-        const more = result.errors.length > 5 ? ` (+${result.errors.length - 5} more)` : '';
-        showToast(
-          `Imported ${result.itemsImported} dish(es). ${result.errors.length} row(s) had problems and were skipped — ${preview}${more}`
-        );
-      } else {
-        showToast(`Imported ${result.itemsImported} dish(es) into ${result.categoriesCreated} new categor${result.categoriesCreated === 1 ? 'y' : 'ies'}.`);
-      }
-    });
+    if (!/\.csv$/i.test(file.name)) { setCsvError('Choose a .csv file.'); return; }
+    if (file.size > 2 * 1024 * 1024) { setCsvError('CSV must be under 2MB.'); return; }
+    try { setCsvPreview(previewMenuCsv(await file.text())); } catch (error) { setCsvError(`Could not read CSV: ${(error as Error).message}`); }
   };
-
-  const handleDownloadCsvTemplate = () => {
-    const templateRow = ['Category,Item Name,SKU,Price,Dietary Type,Spice Level,Description,Image URL', '"Starters","Veg Spring Roll","STR-001",180,VEG,MEDIUM,"Crispy vegetable rolls",""'].join('\n');
-    const csv = menuItems.length > 0 ? MenuBuilderService.exportCSV() : templateRow;
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'jamanvaar-menu-template.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // "One button that loads the default items" (owner's words). Loads every bundled cuisine
-  // template at once, skipping anything that already exists by name — the same trusted
-  // import path "Load 14 Templates" uses, just with no picker to click through first.
-  const handleLoadDefaultItems = () => {
-    setLoadingDefaults(true);
-    try {
-      const result = MenuBuilderService.importTemplates(
-        PREBUILT_MENU_TEMPLATES.map((t) => t.id),
-        {
-          importCategories: true,
-          importItems: true,
-          importImages: true,
-          importModifiers: true,
-          importCombos: true,
-          importSuggestedPrices: true,
-          duplicateStrategy: 'SKIP_DUPLICATE'
-        }
-      );
-      showToast(`Loaded ${result.importedItemsCount} default dish(es) across ${result.importedCategoriesCount} categories.`);
-    } finally {
-      setLoadingDefaults(false);
-    }
-  };
+  const handleDownloadCsvTemplate = () => downloadMenuFile('jamanvaar-menu-template.csv', MENU_CSV_SAMPLE);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
   // The category strip scrolls sideways; whichever category is selected is brought into view (and centred) on its own.
   const categoryStripRef = useRef<HTMLDivElement>(null);
@@ -185,11 +132,14 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   // Filtering a few hundred dishes on each render is cheap.
   const filteredMenuItems = (() => {
     return menuItems.filter((item) => {
+      if (item.archivedAt) return false;
       const matchesSearch =
         !menuSearch ||
         item.name.toLowerCase().includes(menuSearch.toLowerCase()) ||
         item.description.toLowerCase().includes(menuSearch.toLowerCase()) ||
-        item.sku.toLowerCase().includes(menuSearch.toLowerCase());
+        item.sku.toLowerCase().includes(menuSearch.toLowerCase()) ||
+        item.tags?.some(tag => tag.toLowerCase().includes(menuSearch.toLowerCase())) ||
+        item.subcategory?.toLowerCase().includes(menuSearch.toLowerCase());
 
       const matchesCat =
         selectedCategoryFilter === 'ALL' || item.categoryId === selectedCategoryFilter;
@@ -197,40 +147,29 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       const matchesDiet =
         dietaryFilter === 'ALL' ||
         (dietaryFilter === 'VEG' && item.dietaryType === 'VEG') ||
-        (dietaryFilter === 'NON_VEG' && item.dietaryType === 'NON_VEG');
+        item.dietaryType === dietaryFilter;
 
       return matchesSearch && matchesCat && matchesDiet;
     });
   })();
 
-  // A menu never keeps the same dish twice: any copies that arrive (a sync, an old import) are cleared, and the owner can also run it by hand.
-  const handleRemoveDuplicates = (quiet = false) => {
-    const { removed } = MenuRepository.removeDuplicateDishes();
-    if (removed > 0) showToast(`Removed ${removed} duplicate dish${removed === 1 ? '' : 'es'}.`);
-    else if (!quiet) showToast('No duplicate dishes found.');
-  };
-  useEffect(() => {
-    handleRemoveDuplicates(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuItems.length]);
-
   const handleDeleteDish = (dish: MenuItem) => {
     if (onRequestConfirm) {
       onRequestConfirm({
         isOpen: true,
-        title: 'Delete Menu Dish',
-        message: `Are you sure you want to permanently remove "${dish.name}" from your restaurant menu?`,
-        confirmText: 'Delete Dish',
+        title: 'Archive Menu Dish',
+        message: `Are you sure you want to archive "${dish.name}" and stop new orders for it from your restaurant menu?`,
+        confirmText: 'Archive Dish',
         isDanger: true,
         onConfirm: () => {
           MenuRepository.deleteMenuItem(dish.id);
-          showToast(`Deleted dish: ${dish.name}`);
+          showToast(`Archived dish: ${dish.name}`);
         }
       });
     } else {
       if (window.confirm(`Delete dish "${dish.name}"?`)) {
         MenuRepository.deleteMenuItem(dish.id);
-        showToast(`Deleted dish: ${dish.name}`);
+        showToast(`Archived dish: ${dish.name}`);
       }
     }
   };
@@ -262,12 +201,15 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {csvError && <p role="alert" className="text-rose-700">{csvError}</p>}
+      {csvPreview && <MenuCsvPreviewModal key={JSON.stringify(csvPreview)} preview={csvPreview} onClose={() => setCsvPreview(null)} />}
+      {cleanupOpen && <MenuDuplicateModal onClose={() => setCleanupOpen(false)} />}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy tracking-tight">Menu & Catalog Manager</h1>
             <span className="bg-orange-50 text-brand font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
-              {menuItems.length} ITEMS
+              {menuItems.filter(item => !item.archivedAt).length} ITEMS
             </span>
           </div>
           <p className="text-xs text-[#4A5568] mt-0.5">Create, edit dishes, adjust pricing, upload device photos, and import templates.</p>
@@ -294,17 +236,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             onClick={onOpenPrebuiltMenuModal}
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <span>Load 14 Templates</span>
-          </button>
-
-          <button
-            onClick={handleLoadDefaultItems}
-            disabled={loadingDefaults}
-            title="Load a full default starter menu in one click"
-            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
-          >
-            <Wand2 className="w-3.5 h-3.5 text-slate-500" />
-            <span>{loadingDefaults ? 'Loading…' : 'Load Default Items'}</span>
+            <span>Load Menu Template</span>
           </button>
 
           <input ref={csvInputRef} type="file" accept=".csv,text/csv" onChange={handleCsvFileSelected} style={{ display: 'none' }} />
@@ -324,6 +256,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Download CSV Template</span>
           </button>
+          <button onClick={() => downloadMenuFile('restaurant-menu.csv', '\uFEFF' + MenuBuilderService.exportCSV())} className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-xs font-bold">Export Menu CSV</button>
 
           <button
             onClick={onOpenBulkPriceModal}
@@ -334,12 +267,12 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
           </button>
 
           <button
-            onClick={() => handleRemoveDuplicates()}
+            onClick={() => setCleanupOpen(true)}
             className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold hover:bg-[#F8F6F0] transition-colors cursor-pointer flex items-center gap-1.5"
-            title="Remove dishes that appear more than once"
+            title="Scan, review and explicitly archive confirmed duplicates"
           >
             <Copy className="w-3.5 h-3.5 text-slate-500" />
-            <span>Remove Duplicates</span>
+            <span>Clean Duplicate Items</span>
           </button>
         </div>
       </div>
@@ -372,7 +305,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             {[
               { id: 'ALL', label: 'All Diets' },
               { id: 'VEG', label: 'Veg' },
-              { id: 'NON_VEG', label: 'Non-Veg' }
+              { id: 'NON_VEG', label: 'Non-Veg' }, { id: 'EGG', label: 'Egg' }, { id: 'JAIN', label: 'Jain' }, { id: 'VEGAN', label: 'Vegan' }
             ].map((d) => (
               <button
                 key={d.id}
@@ -401,7 +334,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                 : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
             }`}
           >
-            All Categories ({menuItems.length})
+            All Categories ({menuItems.filter(item => !item.archivedAt).length})
           </button>
 
           {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => (
@@ -464,12 +397,11 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               Upload CSV
             </button>
             <button
-              onClick={handleLoadDefaultItems}
-              disabled={loadingDefaults}
+              onClick={onOpenPrebuiltMenuModal}
               className="px-4 py-2 bg-white border border-jaman-border hover:bg-[#F8F6F0] text-jaman-navy text-xs font-bold rounded-xl cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
             >
               <Wand2 className="w-3.5 h-3.5 text-slate-500" />
-              {loadingDefaults ? 'Loading…' : 'Load Default Items'}
+              Load Menu Template
             </button>
             <button
               onClick={handleDownloadCsvTemplate}
@@ -538,12 +470,12 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                 <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-xs p-1 rounded-md shadow-2xs">
                   <div
                     className={`w-3.5 h-3.5 border-2 flex items-center justify-center rounded-xs ${
-                      item.dietaryType === 'NON_VEG' ? 'border-rose-600' : 'border-emerald-600'
+                      ['NON_VEG', 'EGG'].includes(item.dietaryType) ? 'border-rose-600' : 'border-emerald-600'
                     }`}
                   >
                     <div
                       className={`w-1.5 h-1.5 rounded-full ${
-                        item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'
+                        ['NON_VEG', 'EGG'].includes(item.dietaryType) ? 'bg-rose-600' : 'bg-emerald-600'
                       }`}
                     />
                   </div>
@@ -588,7 +520,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
                     </button>
                     <button
                       onClick={() => handleDeleteDish(item)}
-                      title="Delete Dish"
+                      title="Archive Dish"
                       className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -608,7 +540,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-jaman-navy tracking-tight">Combos & Meal Deals</h2>
               <span className="bg-orange-50 text-brand font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-orange-200/70">
-                {combos.length} ACTIVE
+                {combos.length} COMBOS
               </span>
             </div>
             <p className="text-xs text-[#4A5568] mt-0.5">Bundle dishes into a fixed-price deal with an automatic savings badge.</p>

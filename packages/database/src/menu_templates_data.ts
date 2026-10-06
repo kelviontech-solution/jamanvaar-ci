@@ -17,6 +17,9 @@ export interface MenuTemplateItem {
   kitchenStation?: string;
   tags?: string[];
   modifierGroupIds?: string[];
+  variants?: Array<{ name: string; price: number }>;
+  addons?: Array<{ name: string; price: number }>;
+  subcategory?: string;
 }
 
 export interface MenuTemplateCategory {
@@ -42,7 +45,7 @@ export interface MenuTemplate {
   version?: string;
   categories: MenuTemplateCategory[];
   modifierGroups?: ModifierGroup[];
-  combos?: Partial<ComboDeal>[];
+  combos?: Array<Partial<ComboDeal> & { itemSkus?: string[]; categorySlug?: string }>;
 }
 
 // 30 Comprehensive, Culturally Authentic Restaurant Menu Starter Templates

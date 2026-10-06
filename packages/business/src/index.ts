@@ -7,6 +7,8 @@ export * from './customer_chatbot';
 export * from './admin_chatbot';
 export * from './report_generator';
 export * from './menu_builder';
+export * from './menu_csv';
+export * from './menu_template_import';
 export * from './pos_assistant';
 export * from './license_entitlements';
 export * from './license_certificate';

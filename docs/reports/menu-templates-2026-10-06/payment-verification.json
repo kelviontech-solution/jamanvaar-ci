@@ -1,0 +1,11 @@
+{
+  "scope": "Isolated simulated QA payment; no real funds",
+  "orders": [
+    {
+      "status": "PAID",
+      "subtotal": 27524,
+      "taxAmount": 1376,
+      "totalAmount": 28900
+    }
+  ]
+}

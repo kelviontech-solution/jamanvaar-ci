@@ -2,6 +2,7 @@ import { db } from './db';
 import { KeyValueStore } from './key_value_store';
 import { InventoryItemSync, RecipeSync, SupplierSync } from './inventory_sync';
 import { AuditRepository } from './repositories';
+import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync } from './collection_sync';
 
 /**
  * One device, one restaurant. When a terminal is activated for a restaurant that is not the one whose data it
@@ -73,6 +74,8 @@ export class TenantIsolation {
     }
 
     db.users = [];
+    db.menuItems = []; db.categories = []; db.modifierGroups = []; db.taxGroups = []; db.combos = []; db.coupons = []; db.offers = []; db.menuImportHistory = [];
+    for (const sync of [MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync]) sync.reset();
     db.orders = [];
     db.kots = [];
     db.shifts = [];

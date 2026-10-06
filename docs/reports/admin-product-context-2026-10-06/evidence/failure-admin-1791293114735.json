@@ -1,0 +1,24 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "JAMANVAAR Apps\n\nQA kiosk product 1791293031878\n\nYour cloud session has expired. Sign in again to restore your restaurant modules.\n\nSign in againLog out",
+  "headings": [
+    "JAMANVAAR Apps"
+  ],
+  "buttons": [
+    {
+      "text": "Sign in again",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

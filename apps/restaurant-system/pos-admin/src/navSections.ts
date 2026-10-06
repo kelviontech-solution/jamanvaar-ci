@@ -28,6 +28,7 @@ import {
   Users
 } from 'lucide-react';
 import type { GatedNavSection, NavSectionItem } from './hooks/useEntitlements';
+import { PRODUCT_PAGES, type AdminProduct } from './adminProducts';
 
 /**
  * The sidebar's nav structure, as its own module so it's directly importable by a test (proving
@@ -89,3 +90,27 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
     ]
   }
 ];
+
+/** Product shells share components, not one combined list of tasks. */
+export function productNavSections(product: AdminProduct): Array<GatedNavSection<NavSectionItem>> {
+  if (product === 'POS_ADMIN') return NAV_SECTIONS
+    .filter(group => group.section !== 'KIOSK')
+    .map(group => ({ ...group, items: group.items.filter(item => Object.hasOwn(PRODUCT_PAGES.POS_ADMIN, item.id)) }));
+  const existing = new Map(NAV_SECTIONS.flatMap(group => group.items).map(item => [item.id, item]));
+  const sections = [
+    ['KIOSK OPERATIONS', ['DASHBOARD', 'KIOSKS', 'ORDERS', 'LIVE_KDS', 'TABLES']],
+    ['CUSTOMER EXPERIENCE', ['MENU', 'TEMPLATES', 'MENU_OPTIONS', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'COUPONS']],
+    ['PAYMENTS & SERVICE', ['KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'FEEDBACK', 'STAFF', 'REPORTS']],
+    ['SYSTEM', ['SETTINGS', 'SYNC', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT']]
+  ] as const;
+  const additions: Record<string, NavSectionItem> = {
+    TEMPLATES: { id: 'TEMPLATES', label: 'Menu Templates', icon: UtensilsCrossed },
+    KIOSK_PAYMENTS: { id: 'KIOSK_PAYMENTS', label: 'Payments & Payouts', icon: CreditCard },
+    FEEDBACK: { id: 'FEEDBACK', label: 'Customer Feedback', icon: Heart }
+  };
+  return sections.map(([section, ids]) => ({ section, items: ids.map(id => {
+    const item = existing.get(id) || additions[id];
+    return { ...item, label: id === 'SETTINGS' ? 'Kiosk Settings' : item.label,
+      requiresApp: 'KIOSK_ADMIN' as const, requiresAnyApp: undefined };
+  }) }));
+}

@@ -73,7 +73,8 @@ describe('JAMANVAAR POS — Advanced Menu CRUD, Categories & Preloaded Starter P
     // 5. DELETE Item
     const deleted = MenuRepository.deleteMenuItem(newItem.id);
     expect(deleted).toBe(true);
-    expect(MenuRepository.getMenuItemById(newItem.id)).toBeUndefined();
+    expect(MenuRepository.getMenuItemById(newItem.id)?.archivedAt).toBeTruthy();
+    expect(MenuRepository.getAllMenuItems().some(i => i.id === newItem.id)).toBe(false);
   });
 
   it('persists Hindi/Gujarati translations passed to createMenuItem (previously silently dropped)', () => {
@@ -135,7 +136,7 @@ describe('JAMANVAAR POS — Advanced Menu CRUD, Categories & Preloaded Starter P
       roundToNearest: 5
     });
 
-    expect(updatedCount).toBe(db.menuItems.length);
+    expect(updatedCount).toBe(db.menuItems.filter((item, i) => !item.archivedAt && item.price !== originalPrices[i]).length);
     const newPrices = db.menuItems.map((i) => i.price);
     expect(newPrices[0]).toBeGreaterThanOrEqual(originalPrices[0]);
   });

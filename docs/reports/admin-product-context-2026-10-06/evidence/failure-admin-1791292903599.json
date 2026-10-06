@@ -1,0 +1,303 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA both product 1791292870094\nKIOSK ADMIN\nQA both product 1791292870094\nSwitch application\nRestaurant Admin\nKiosk Admin\nCtrl+K\nAssistant\nLogout\nKIOSK OPERATIONS\nDashboard\nKiosk Terminals\nOrders\nLive Orders / KDS\nFloor / Tables\nCUSTOMER EXPERIENCE\nMenu & Categories\nMenu Templates\nCustomisations & Tax\nKiosk Appearance & Content\nKiosk Combos & Deals\nOffers & Coupons\nPAYMENTS & SERVICE\nPayments & Payouts\nReceipt & E-Bill\nPrinters & Devices\nCustomer Feedback\nStaff & Roles (RBAC)\nReports & Analytics\nSYSTEM\nKiosk Settings\nSync & Devices\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nKiosk Dashboard\n\nManage your customer kiosks for QA both product 1791292870094.\n\nActivated kiosks\n0\nOnline kiosks\n0\nAvailable menu items\n0\nGet your kiosks ready\n1. Set up your menu\n\nChoose a restaurant template or add your own dishes.\n\n2. Design the customer screen\n\nSet your logo, welcome screen and wording.\n\n3. Check payments\n\nReview collection, fees and settlement details.\n\n4. Connect your kiosks\n\nActivate the customer terminal with its own kiosk key.\n\nCollection and restaurant payouts\n\nCustomer collection is separate from money paid to your restaurant.\n\nLoading payout summary…\n\nOpen Payments & Payouts\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Kiosk Dashboard",
+    "Get your kiosks ready",
+    "Collection and restaurant payouts"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA both product 1791292870094",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CUSTOMER EXPERIENCE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu Templates",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PAYMENTS & SERVICE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customer Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Activated kiosks\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Online kiosks\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Available menu items\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1. Set up your menu\n\nChoose a restaurant template or add your own dishes.",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "2. Design the customer screen\n\nSet your logo, welcome screen and wording.",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "3. Check payments\n\nReview collection, fees and settlement details.",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "4. Connect your kiosks\n\nActivate the customer terminal with its own kiosk key.",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Open Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "POS_ADMIN",
+          "text": "Restaurant Admin"
+        },
+        {
+          "value": "KIOSK_ADMIN",
+          "text": "Kiosk Admin"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -46,7 +46,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { readActivePlatformNotice } from '../../common/platform-notice';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
-import { PublicAuthThrottle } from '../../common/throttle';
+import { PublicAuthThrottle, TenantRefreshThrottle } from '../../common/throttle';
 
 const REFRESH_COOKIE = 'jamanvaar_tenant_refresh';
 
@@ -182,7 +182,7 @@ export class TenantAuthController {
 
   @Post('refresh')
   @HttpCode(200)
-  @PublicAuthThrottle()
+  @TenantRefreshThrottle()
   @UsePipes(new ZodValidationPipe(tenantRefreshSchema))
   async refresh(
     @Req() req: Request,

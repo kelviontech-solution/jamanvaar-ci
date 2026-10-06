@@ -4,6 +4,7 @@ import { deviceHealth } from '../../common/device-health';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { enabledConsoleApps } from '../../common/security/admin-product-access';
 
 /**
  * Kiosk Pro's real differentiator: remote fleet management. Kiosk Standard keeps the safety
@@ -106,8 +107,11 @@ export class DeviceCommandsService {
       throw new BadRequestException(`${dto.commandType} cannot be sent from a restaurant console`);
     }
     const command = await this.prisma.runAsTenant(issuer.restaurantId, async (tx) => {
+      const apps = await enabledConsoleApps(tx, issuer.restaurantId);
       const target = await tx.device.findFirst({ where: { id: targetId, ...this.scopeWhere(issuer) } });
       if (!target) throw new NotFoundException('Device not found');
+      if (target.type === 'KIOSK' && !apps.includes('KIOSK_ADMIN')) throw new ForbiddenException('Kiosk Admin is not enabled.');
+      if (target.type !== 'KIOSK' && !apps.includes('POS_ADMIN')) throw new ForbiddenException('Kiosk Admin can only manage kiosks.');
       if (dto.commandType === DeviceCommandType.FORCE_LOGOUT && target.type !== 'KIOSK') throw new ForbiddenException('Restaurant consoles can remotely log out kiosks only');
       if (issuer.type === 'KIOSK_ADMIN' && target.type !== 'KIOSK') {
         throw new ForbiddenException('Kiosk Admin can only manage kiosks');
@@ -127,9 +131,11 @@ export class DeviceCommandsService {
     if (issuer.type !== 'KIOSK_ADMIN' && issuer.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only an admin console can list the device fleet');
     }
+    const apps = await this.prisma.runAsTenant(issuer.restaurantId, tx => enabledConsoleApps(tx, issuer.restaurantId));
+    const kioskOnly = issuer.type === 'KIOSK_ADMIN' || !apps.includes('POS_ADMIN');
     const rows = await this.prisma.runAsTenant(issuer.restaurantId, (tx) =>
       tx.device.findMany({
-        where: { ...this.scopeWhere(issuer), status: { not: 'REVOKED' }, ...(issuer.type === 'KIOSK_ADMIN' ? { type: { in: ['KIOSK', 'KIOSK_ADMIN'] as DeviceType[] } } : {}) },
+        where: { ...this.scopeWhere(issuer), status: { not: 'REVOKED' }, ...(kioskOnly ? { type: { in: ['KIOSK', 'KIOSK_ADMIN'] as DeviceType[] } } : {}) },
         select: {
           id: true, type: true, name: true, status: true, lastSeenAt: true, lastSyncAt: true, appVersion: true, isLocked: true,
           lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } },

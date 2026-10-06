@@ -15,11 +15,13 @@ npm run dev:all
 
 Or double-click `start-all-servers.bat`.
 
+Restaurant Admin and Kiosk Admin share port 5176 and owner login, with separate workspaces at `/restaurant-admin/dashboard` and `/kiosk-admin/dashboard`. The old `/pos-admin/` entry still works. Owners with both products can use **Switch application** in the header; a kiosk-only owner opens the complete Kiosk Admin automatically. See [Owner login and application flow](docs/reports/admin-product-context-2026-10-06/OWNER_FLOW.md).
+
 ### Local Core pairing (one time per app, restaurant and branch)
 
 Port 4000 is the cloud/backend API. Port 5178 is the separate development LAN relay. Starting both services does not pair a browser. **Not paired (cloud sync in use)** means the relay requires authorization; cloud login and cloud sync remain independent.
 
-1. Activate the app with the restaurant's activation key so its restaurant and branch are known. KIOSK_ADMIN keys are entered at the merged Restaurant Admin on port 5176; there is no separate Kiosk Admin app.
+1. Activate the app with the restaurant's activation key so its restaurant and branch are known. Enter KIOSK_ADMIN keys at the shared owner login on port 5176; this opens the separate Kiosk Admin workspace in the same deployed console.
 2. Start `npm run dev:sync`. Its console prints a six-digit pairing PIN. If the service was already running before the pairing fix, restart that service once to load the new code. Do not launch a second copy on the same port.
 3. On the Restaurant Admin, POS, Captain or KDS login screen, click **Pair** beside Local Core. Enter `http://localhost:5178` on this computer, or the restaurant server's LAN address on other devices, then enter the console PIN. Restaurant Admin also offers this form under **Printers & Devices** and **Sync Health**.
 4. For an activated kiosk, the installer can open `http://localhost:5174/?local-core-setup=1` to pair it. Close the setup dialog to return to normal ordering.

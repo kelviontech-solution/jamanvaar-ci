@@ -52,6 +52,7 @@ import {
 } from 'lucide-react';
 
 interface ReportsDashboardProps {
+  kioskMode?: boolean;
   showToast: (msg: string) => void;
 }
 
@@ -137,7 +138,8 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'ESTIMATED_GROSS_MARGIN', category: 'INVENTORY', title: 'Estimated Gross Margin', subtitle: 'Gross margin after raw material deductions (65-72%)', icon: Sparkles }
 ];
 
-export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast }) => {
+export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, kioskMode = false }) => {
+  const reports = useMemo(() => kioskMode ? ALL_REPORTS.filter(report => !['CUSTOMERS', 'INVENTORY'].includes(report.category) && !['LABOUR_COST', 'SHIFT_PERFORMANCE', 'CAPTAIN_PERFORMANCE', 'CASHIER_PERFORMANCE', 'SALES_BY_CAPTAIN', 'SALES_BY_CASHIER', 'OWNER_SUMMARY', 'LOSS_REPORT'].includes(report.id)) : ALL_REPORTS, [kioskMode]);
   // Navigation & Selection State
   const [onlineSummary, setOnlineSummary] = useState<PaymentsSummary | null>(null);
   const [onlineSummaryError, setOnlineSummaryError] = useState(false);
@@ -284,17 +286,17 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
 
   // Active Report Details
   const activeReport = useMemo(() => {
-    return ALL_REPORTS.find((r) => r.id === activeReportId) || ALL_REPORTS[0];
-  }, [activeReportId]);
+    return reports.find((r) => r.id === activeReportId) || reports[0];
+  }, [activeReportId, reports]);
 
   // Filtered Reports in current category or search
   const displayedReports = useMemo(() => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      return ALL_REPORTS.filter((r) => r.title.toLowerCase().includes(q) || r.subtitle.toLowerCase().includes(q) || r.category.toLowerCase().includes(q));
+      return reports.filter((r) => r.title.toLowerCase().includes(q) || r.subtitle.toLowerCase().includes(q) || r.category.toLowerCase().includes(q));
     }
-    return ALL_REPORTS.filter((r) => r.category === selectedCategory);
-  }, [selectedCategory, searchQuery]);
+    return reports.filter((r) => r.category === selectedCategory);
+  }, [selectedCategory, searchQuery, reports]);
 
   // Active Filter Count
   const activeFilterCount = Object.entries(filters).filter(([_, v]) => v && v !== 'ALL').length;
@@ -617,7 +619,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                 { id: 'OPERATIONS', label: 'Operations', icon: Clock },
                 { id: 'CUSTOMERS', label: 'Customers', icon: Users },
                 { id: 'INVENTORY', label: 'Inventory', icon: Package }
-              ].map((c) => {
+              ].filter(c => !kioskMode || !['CUSTOMERS', 'INVENTORY'].includes(c.id)).map((c) => {
                 const Icon = c.icon;
                 const isCatActive = selectedCategory === c.id && !searchQuery.trim();
                 return (
@@ -626,7 +628,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
                     onClick={() => {
                       setSelectedCategory(c.id as ReportCategoryKey);
                       setSearchQuery('');
-                      const firstInCat = ALL_REPORTS.find((r) => r.category === c.id);
+                      const firstInCat = reports.find((r) => r.category === c.id);
                       if (firstInCat) handleSelectReport(firstInCat.id);
                     }}
                     className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
@@ -664,7 +666,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast })
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {favoriteIds.map((favId) => {
-                  const rep = ALL_REPORTS.find((r) => r.id === favId);
+                  const rep = reports.find((r) => r.id === favId);
                   if (!rep) return null;
                   return (
                     <button

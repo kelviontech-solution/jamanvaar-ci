@@ -24,7 +24,7 @@ void bootDurableStorage({ appId: 'pos-admin', restaurantId: localStorage.getItem
     <React.StrictMode>
       <App />
       <PlatformNoticeBanner />
-      <DeviceGateOverlay appName="Restaurant Admin" />
+      <DeviceGateOverlay appName="Admin device" />
     </React.StrictMode>
   );
 });

@@ -36,6 +36,7 @@ import {
   CouponRepository,
   CustomerRepository,
   db,
+  KeyValueStore,
   FeedbackRepository,
   KioskDisplaySettingsRepository,
   KioskRepository,
@@ -964,7 +965,8 @@ export default function KioskUserApp() {
   // Categories & Items from DB
   const { categories, items: menuItems } = buildStandardMenu(
     MenuRepository.getAllCategories(),
-    MenuRepository.getAllMenuItems()
+    MenuRepository.getAllMenuItems(),
+    KeyValueStore.get('jamanvaar_bound_branch_id') || undefined
   );
   const combos = ComboRepository.getAllCombos().filter(combo => combo.isAvailable !== false);
   const isNonVegCombo = (combo: ComboDeal) => MenuRepository.getMenuItemById(`combo-${combo.id}`)?.dietaryType === 'NON_VEG' || [...combo.mainItemIds, ...combo.sideItemIds, ...combo.drinkItemIds, ...combo.dessertItemIds].some(id => MenuRepository.getMenuItemById(id)?.dietaryType === 'NON_VEG');
@@ -978,7 +980,10 @@ export default function KioskUserApp() {
     if (!item.isAvailable) return false;
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.sku.toLowerCase().includes(searchQuery.toLowerCase());
+      item.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      localizedName(item, lang).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.subcategory?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory =
       selectedCategoryId === 'ALL' || item.categoryId === selectedCategoryId;
     const matchesDietary =
@@ -3662,7 +3667,7 @@ export default function KioskUserApp() {
                 what they're customizing. */}
             <div className="relative -mx-6 -mt-6">
               <CachedImg
-                src={customizingItem.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
+                src={customizingItem.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                 alt={customizingItem.name}
                 className="w-full h-40 sm:h-48 object-cover"
               />
@@ -3692,7 +3697,7 @@ export default function KioskUserApp() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {group.options.map((opt) => {
+                  {group.options.filter(opt => opt.isAvailable !== false).map((opt) => {
                     const isSelected = selectedModifiers.some(
                       (m) => m.groupId === group.id && m.optionId === opt.id
                     );
@@ -3872,7 +3877,7 @@ export default function KioskUserApp() {
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <CachedImg
-                              src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
+                              src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                               alt={localizedName(item, lang)}
                               className="w-14 h-14 rounded-xl object-cover border border-jaman-border shrink-0"
                             />

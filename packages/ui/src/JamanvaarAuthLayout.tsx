@@ -38,6 +38,8 @@ export interface JamanvaarHeroImage {
 
 export interface JamanvaarAuthLayoutProps {
   appIdentity: AppIdentity | string;
+  /** A shared owner login can identify itself without pretending a product has been selected. */
+  applicationLabel?: string;
   appTitle: string;
   appSubtitle: string;
   isOnline?: boolean;
@@ -210,6 +212,7 @@ export const APP_HERO_IMAGES: Record<string, [JamanvaarHeroImage, JamanvaarHeroI
 
 export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   appIdentity,
+  applicationLabel,
   appTitle,
   appSubtitle,
   isOnline = true,
@@ -501,7 +504,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E66817]" />
-                  {appIdentity === 'POS'
+                  {applicationLabel || (appIdentity === 'POS'
                     ? 'POS TERMINAL'
                     : appIdentity === 'ADMIN'
                     ? 'RESTAURANT ADMIN'
@@ -513,7 +516,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                     ? 'KIOSK ADMIN'
                     : appIdentity === 'SUPER_ADMIN'
                     ? 'SUPER ADMIN'
-                    : 'KIOSK TERMINAL'}
+                    : 'KIOSK TERMINAL')}
                 </span>
               </div>
 

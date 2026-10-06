@@ -1,0 +1,504 @@
+{
+  "title": "JAMANVAAR | Restaurant Admin",
+  "text": "QA both product 1791293417448\nRESTAURANT ADMIN\nQA both product 1791293417448\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nLOCKED\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nMenu & Catalog Manager\n4 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories (4)\nGarlic Bread\n4\nPIZZA-GARLIC-BREAD\nGarlic Bread\n₹155\n\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-GARLIC-BREAD\nCheese Garlic Bread\n₹139\n\nCheese Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZ-004\nStuffed Garlic Bread\n₹169\n\nStuffed Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-CORN-BREADSTICKS\nCheese Corn Breadsticks\n₹159\n\nCheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nCombos & Meal Deals\n0 COMBOS\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nNo Combos Yet\n\nBundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.\n\n+ Create First Combo\nJAMAN AI\nACTIVE\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nYOUR RESTAURANT WORKSPACE\n\nRESTAURANT ADMIN\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Menu & Catalog Manager",
+    "Combos & Meal Deals",
+    "No Combos Yet"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA both product 1791293417448",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nLOCKED",
+      "aria": null,
+      "title": "Not included in your current plan — tap to see what it offers",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Garlic Bread\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹155",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹139",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹169",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹159",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Create First Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish by name, description, SKU or tag...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -1,5 +1,6 @@
 import { BranchCore } from './core';
 import { nextAttemptState } from '../../sync/src/sync_protocol';
+import { requiredConsoleApps } from '../../../cloud/api/src/common/security/admin-product-access';
 
 /** Entity types (menu, staff, tables...) the core mirrors in both directions. */
 export const MIRRORED_ENTITY_TYPES = ['TAX_GROUP', 'MODIFIER_GROUP', 'RESERVATION', 'MENU_CATEGORY', 'MENU_ITEM', 'COMBO', 'COUPON', 'STAFF_USER', 'DINING_TABLE', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'SERVICE_MESSAGE', 'CUSTOMER_FEEDBACK', 'KIOSK_CONFIGURATION'];
@@ -30,6 +31,7 @@ export class CloudUplink {
   private running = false;
   private cancelled = false;
   private activeRequest: AbortController | null = null;
+  private enabledApps = new Set<string>();
 
   resume(): void { this.cancelled = false; }
   cancel(): void { this.cancelled = true; this.activeRequest?.abort(); }
@@ -75,13 +77,14 @@ export class CloudUplink {
       if (roster.status !== 200) throw new Error(`roster ${roster.status}`);
       out.reachable = true;
       this.core.applyRoster(roster.data);
+      this.enabledApps = new Set(roster.data.subscription.enabledApps);
 
       out.uploaded += await this.uploadOrders();
-      out.uploaded += await this.uploadMovements();
+      if (this.enabledApps.has('POS_ADMIN')) out.uploaded += await this.uploadMovements();
       out.uploaded += await this.uploadEntities();
       await this.reportDevices();
       out.downloaded += await this.downloadOrders();
-      out.downloaded += await this.downloadMovements();
+      if (this.enabledApps.has('POS_ADMIN')) out.downloaded += await this.downloadMovements();
       out.downloaded += await this.downloadEntities();
       return out;
     } catch (err) {
@@ -145,6 +148,7 @@ export class CloudUplink {
     const byType = new Map<string, typeof dirty>();
     dirty.forEach((d) => byType.set(d.type, [...(byType.get(d.type) ?? []), d]));
     for (const [type, records] of byType) {
+      if (!requiredConsoleApps(`/api/v1/entity-sync/${type}`).some(app => this.enabledApps.has(app))) continue;
       for (let offset = 0; offset < records.length; offset += 200) {
       const list = records.slice(offset, offset + 200);
       const res = await this.request('POST', `/api/v1/entity-sync/${type}`, { events: list.map((e) => ({ externalId: e.externalId, payload: e.payload })) });
@@ -220,6 +224,7 @@ export class CloudUplink {
   private async downloadEntities(): Promise<number> {
     let total = 0;
     for (const type of MIRRORED_ENTITY_TYPES) {
+      if (!requiredConsoleApps(`/api/v1/entity-sync/${type}`).some(app => this.enabledApps.has(app))) continue;
       const key = `cloud_seq_${type}`;
       for (let page = 0; page < 50; page++) {
         const after = Number(this.cursor(key) ?? 0);

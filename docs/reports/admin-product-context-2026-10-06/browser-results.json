@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Kiosk-only owner signs in and activates on one form; complete Kiosk Admin opens automatically",
+    "passed": true
+  },
+  {
+    "title": "Every recovered Kiosk Admin navigation page mounts under its own route",
+    "passed": true
+  },
+  {
+    "title": "Refresh, deep links, browser back/forward and rotated cloud token preserve kiosk context",
+    "passed": true
+  },
+  {
+    "title": "All-products owner with kiosk key opens full Kiosk Admin and switches to distinct Restaurant Admin",
+    "passed": true
+  },
+  {
+    "title": "Shared menu edits from Restaurant Admin reach full Kiosk Admin and a separate customer kiosk",
+    "passed": true
+  },
+  {
+    "title": "Appearance and receipt edits in Kiosk Admin publish to the separate customer kiosk",
+    "passed": true
+  },
+  {
+    "title": "Restaurant-only owner opens Restaurant Admin; typing kiosk route does not grant access",
+    "passed": true
+  },
+  {
+    "title": "Kiosk-only shared device cannot read/write POS-only resources; tenant fleet isolation holds",
+    "passed": true
+  },
+  {
+    "title": "Logout/login and browser reopen restore kiosk workspace without consuming another activation key",
+    "passed": true
+  },
+  {
+    "title": "Disabling kiosk entitlement removes kiosk context while Restaurant Admin remains usable",
+    "passed": true
+  }
+]

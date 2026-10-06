@@ -1,0 +1,56 @@
+{
+  "routes": 3,
+  "errors": [],
+  "assets": [
+    {
+      "url": "/kiosk-admin/assets/index-Yy6YSlmL.css",
+      "status": 200,
+      "contentType": "text/css"
+    },
+    {
+      "url": "/kiosk-admin/assets/index-Dujv_6wX.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/kiosk-admin/assets/sqlite_worker-DajsRP2C.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/kiosk-admin/assets/sqlite_worker-DajsRP2C.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/restaurant-admin/assets/index-Yy6YSlmL.css",
+      "status": 200,
+      "contentType": "text/css"
+    },
+    {
+      "url": "/restaurant-admin/assets/index-Dujv_6wX.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/restaurant-admin/assets/sqlite_worker-DajsRP2C.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/pos-admin/assets/index-Yy6YSlmL.css",
+      "status": 200,
+      "contentType": "text/css"
+    },
+    {
+      "url": "/pos-admin/assets/index-Dujv_6wX.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    },
+    {
+      "url": "/pos-admin/assets/sqlite_worker-DajsRP2C.js",
+      "status": 200,
+      "contentType": "application/javascript"
+    }
+  ]
+}

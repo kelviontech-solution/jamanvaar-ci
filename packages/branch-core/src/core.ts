@@ -4,6 +4,7 @@ import { BranchStore } from './store';
 import { mergeOrderItems, paymentViolation } from './rules';
 import { canonicalCommand } from '../../sync/src/command_signing';
 import { kioskConfigurationSchema } from '../../../cloud/api/src/modules/entity-sync/kiosk-configuration-schema';
+import { requiredConsoleApps } from '../../../cloud/api/src/common/security/admin-product-access';
 
 /** Version of the shared sync protocol this core speaks (bump on any wire-format change). */
 export const SYNC_PROTOCOL_VERSION = 1;
@@ -180,6 +181,12 @@ export class BranchCore {
   lastCloudContact(): number | null {
     const v = this.store.getConfig('last_cloud_contact');
     return v ? Number(v) : null;
+  }
+
+  assertConsoleResource(device: AuthedDevice, path: string): void {
+    if (device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') return;
+    const apps = (JSON.parse(this.store.getConfig('subscription') ?? '{}') as { enabledApps?: string[] }).enabledApps ?? [];
+    if (!requiredConsoleApps(path).some(app => apps.includes(app))) throw new CoreError(403, 'PRODUCT_ACCESS_DENIED', 'This application resource is not enabled for the restaurant.');
   }
 
   /** Who is calling? Enforces credentials, branch and restaurant isolation, and the cached entitlements. */
@@ -478,12 +485,17 @@ export class BranchCore {
     };
   }
 
+  private isKioskOnlyConsole(issuer: AuthedDevice): boolean {
+    const apps = (JSON.parse(this.store.getConfig('subscription') ?? '{}') as { enabledApps?: string[] }).enabledApps ?? [];
+    return issuer.type === 'KIOSK_ADMIN' || (issuer.type === 'POS_ADMIN' && apps.includes('KIOSK_ADMIN') && !apps.includes('POS_ADMIN'));
+  }
+
   fleet(issuer: AuthedDevice) {
     if (issuer.type !== 'KIOSK_ADMIN' && issuer.type !== 'POS_ADMIN') throw new CoreError(403, 'FORBIDDEN', 'Only an admin console can list the device fleet');
     const now = this.now();
     const rows = this.store.all<Record<string, any>>("SELECT * FROM devices WHERE status != 'REVOKED' ORDER BY type, id");
     const devices = rows
-      .filter((d) => issuer.type !== 'KIOSK_ADMIN' || d.type === 'KIOSK' || d.type === 'KIOSK_ADMIN')
+      .filter((d) => !this.isKioskOnlyConsole(issuer) || d.type === 'KIOSK' || d.type === 'KIOSK_ADMIN')
       .map((d) => {
         const silent = d.last_seen_at === null ? null : now - d.last_seen_at;
         const health = silent === null ? 'never_seen' : silent <= 120_000 ? 'online' : silent <= 900_000 ? 'degraded' : 'offline';
@@ -497,7 +509,9 @@ export class BranchCore {
     if (!FLEET_COMMANDS.has(dto.commandType)) throw new CoreError(400, 'BAD_REQUEST', `${dto.commandType} cannot be sent from a restaurant console`);
     const target = this.store.get<Record<string, any>>("SELECT * FROM devices WHERE id = ? AND status != 'REVOKED'", targetId);
     if (!target) throw new CoreError(404, 'NOT_FOUND', 'Device not found');
-    if (issuer.type === 'KIOSK_ADMIN' && target.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Kiosk Admin can only manage kiosks');
+    if (this.isKioskOnlyConsole(issuer) && target.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Kiosk Admin can only manage kiosks');
+    const subscription = this.store.getConfig('subscription');
+    if (target.type === 'KIOSK' && subscription && !(JSON.parse(subscription).enabledApps ?? []).includes('KIOSK_ADMIN')) throw new CoreError(403, 'PRODUCT_ACCESS_DENIED', 'Kiosk Admin is not enabled for the restaurant.');
     if (dto.commandType === 'FORCE_LOGOUT' && target.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Remote logout is available for customer kiosks only');
     if (dto.idempotencyKey) {
       const prior = this.store.get<Record<string, any>>('SELECT * FROM commands WHERE device_id = ? AND idempotency_key = ?', targetId, dto.idempotencyKey);

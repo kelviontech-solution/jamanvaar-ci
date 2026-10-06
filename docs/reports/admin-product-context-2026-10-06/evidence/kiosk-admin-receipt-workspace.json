@@ -1,0 +1,331 @@
+{
+  "title": "JAMANVAAR | Kiosk Admin",
+  "text": "Receipt settings saved and published.\nQA both product 1791293417448\nKIOSK ADMIN\nQA both product 1791293417448\nSwitch application\nRestaurant Admin\nKiosk Admin\nCtrl+K\nAssistant\nLogout\nKIOSK OPERATIONS\nDashboard\nKiosk Terminals\nOrders\nLive Orders / KDS\nFloor / Tables\nCUSTOMER EXPERIENCE\nMenu & Categories\nMenu Templates\nCustomisations & Tax\nKiosk Appearance & Content\nKiosk Combos & Deals\nOffers & Coupons\nPAYMENTS & SERVICE\nPayments & Payouts\nReceipt & E-Bill\nPrinters & Devices\nCustomer Feedback\nStaff & Roles (RBAC)\nReports & Analytics\nSYSTEM\nKiosk Settings\nSync & Devices\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nReceipt & E-Bill System\n\nConfigure thermal paper dimensions (58mm vs 80mm), WhatsApp digital receipt templates, and audit history.\n\nReceipt settings published to connected kiosks.\n\nRestaurant name, GSTIN, FSSAI and address print from Settings → Report Branding.\nGo to Settings\nThank You & Footer\nThank You Closing Message\nFooter Heritage Tagline\nLogo\n\nShown on the on-screen and WhatsApp receipt and printed at the top of the physical slip.\n\nReceipt Logo\nNo logo\nClick to upload a logo (PNG/JPG, under 2MB)\nPaper Dimension & Display Rules\n80mm Standard POS\n58mm Compact POS\nTax Breakup (GST)\nEmail Bill (PDF)\nMark cash bills with a faint diagonal watermark (off by default)\nBills paid by cash at the counter show the word across the slip in four slanted lines, faint enough to read the bill through it. Card and UPI bills stay plain.\nSave Receipt Settings\nLive Receipt Preview (80mm)\n\nSample receipt: a real order appears here once a guest has ordered.\n\nQA BOTH PRODUCT 1791293417448\nBILL / RECEIPT\nTOKEN #101\nInvoice No:\nSAMPLE-0001\nOrder Type:\nTAKEAWAY\nDate: 06 Oct 2026\nTime: 07:01 pm\nPOS: POS-01\nITEM\nQTY\nRATE\nAMT\nSample dish\n2\n₹100\n₹200\nSample drink\n1\n₹60\n₹60\nSubtotal\n₹260\nCGST\n₹6.50\nSGST\n₹6.50\nTOTAL\n₹273\nPAID VIA:\nCASH\nQA Thank You 1791293417610\nFreshly Prepared • Zero Preservatives • Pure Heritage Taste\nPowered by JAMANVAAR\nDigital E-Bill Transmission Audit Log\n0 records\n\nNo digital receipts dispatched yet. Dispatched WhatsApp & SMS e-bills will appear here with masked privacy numbers.\n\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Receipt & E-Bill System",
+    "Thank You & Footer",
+    "Logo",
+    "Paper Dimension & Display Rules",
+    "Live Receipt Preview (80mm)",
+    "QA both product 1791293417448"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA both product 1791293417448",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CUSTOMER EXPERIENCE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu Templates",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PAYMENTS & SERVICE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customer Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Go to Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "80mm Standard POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "58mm Compact POS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save Receipt Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "POS_ADMIN",
+          "text": "Restaurant Admin"
+        },
+        {
+          "value": "KIOSK_ADMIN",
+          "text": "Kiosk Admin"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": "receipt-logo-upload-input"
+    },
+    {
+      "tag": "INPUT",
+      "type": "url",
+      "placeholder": "...or paste a logo image URL",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

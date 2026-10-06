@@ -1,0 +1,160 @@
+{
+  "scope": "Final stable-code Chromium run; isolated restaurant, explicitly configured 5% inclusive tax, simulated gateway",
+  "passed": 11,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "admin-1791290370736",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Merged kiosk-only console opens non-destructive template preview and category selection",
+      "result": "PASS",
+      "ms": 5283.91,
+      "evidence": {
+        "categorySelection": true,
+        "destructiveReplaceAbsent": true
+      }
+    },
+    {
+      "id": "admin-1791290376022",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Load complete Pizza template including real groups/combos; repeat skips existing without duplicates",
+      "result": "PASS",
+      "ms": 4392.29,
+      "evidence": {
+        "repeatCountUnchanged": true,
+        "itemCount": 40,
+        "variantsAndAddonsSynced": true
+      }
+    },
+    {
+      "id": "kiosk-1791290380418",
+      "app": "kiosk",
+      "role": "menu-template-1791290328891",
+      "page": "http://localhost:5284/",
+      "feature": "Activated customer kiosk shows real Pizza categories, actual photos/placeholders and required size choices",
+      "result": "PASS",
+      "ms": 10635.7,
+      "evidence": {
+        "realCategoryIds": true,
+        "sizeAndAddonTotalRupees": 289
+      }
+    },
+    {
+      "id": "kiosk-1791290391056",
+      "app": "kiosk",
+      "role": "menu-template-1791290328891",
+      "page": "http://localhost:5284/",
+      "feature": "SIMULATED checkout uses server-priced Medium pizza and cheese add-on, including tax",
+      "result": "PASS",
+      "ms": 20037.34,
+      "evidence": {
+        "realFunds": false,
+        "gateway": "SIMULATED",
+        "listedUnitPricePaise": 28900,
+        "subtotalExcludingTaxPaise": 27524,
+        "taxPaise": 1376,
+        "totalInclusiveOfFivePercentTaxPaise": 28900
+      }
+    },
+    {
+      "id": "admin-1791290411094",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Owner edits price in Admin and customer kiosk receives it without refresh",
+      "result": "PASS",
+      "ms": 323.05,
+      "evidence": {
+        "noKioskRefresh": true,
+        "priceRupees": 169,
+        "propagationMs": 138
+      }
+    },
+    {
+      "id": "admin-1791290411418",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "UTF-8 CSV preview imports Gujarati/Hindi, multiline commas and skips invalid rows after review",
+      "result": "PASS",
+      "ms": 1618.43,
+      "evidence": {
+        "validRows": 2,
+        "invalidRowsOmitted": 1,
+        "gujaratiHindiSynced": true
+      }
+    },
+    {
+      "id": "admin-1791290413037",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "CSV duplicate preview defaults to skip; wrong file type is refused",
+      "result": "PASS",
+      "ms": 918.05,
+      "evidence": {
+        "duplicateSkipped": true,
+        "wrongTypeRefused": true
+      }
+    },
+    {
+      "id": "admin-1791290413957",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Load Gujarati category independently and retain the existing Pizza menu",
+      "result": "PASS",
+      "ms": 2225.43,
+      "evidence": {
+        "gujaratiCategorySynced": true,
+        "pizzaRetained": true
+      }
+    },
+    {
+      "id": "admin-1791290416183",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Archive a menu item through confirmation; Kiosk excludes it while the original record remains",
+      "result": "PASS",
+      "ms": 1203.4,
+      "evidence": {
+        "softArchived": true,
+        "originalIdRetained": true,
+        "kioskHidden": true
+      }
+    },
+    {
+      "id": "admin-1791290417388",
+      "app": "admin",
+      "role": "menu-template-admin-1791290328891",
+      "page": "http://localhost:5286/",
+      "feature": "Duplicate cleanup scans, requires backup and confirmation, archives only verified copies, and supports undo",
+      "result": "PASS",
+      "ms": 3973.91,
+      "evidence": {
+        "requiresBackup": true,
+        "explicitConfirmation": true,
+        "archiveCount": 1,
+        "undoWorked": true,
+        "historicalPaidOrdersUnchanged": true
+      }
+    },
+    {
+      "id": "kiosk-1791290421368",
+      "app": "kiosk",
+      "role": "menu-template-1791290328891",
+      "page": "http://localhost:5284/",
+      "feature": "Offline browsing retains the real restaurant categories and previously synced menu",
+      "result": "PASS",
+      "ms": 31.91,
+      "evidence": {
+        "offlineLocalMenuRetained": true
+      }
+    }
+  ]
+}

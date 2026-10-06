@@ -1,10 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { TenantUserStatus } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 import { assertSessionStillAllowed } from '../security/session-state';
+import { enabledConsoleApps, requiredConsoleApps } from '../security/admin-product-access';
 import {
   TENANT_JWT_AUDIENCE,
   TENANT_JWT_ISSUER,
@@ -59,6 +60,11 @@ export class TenantAuthGuard implements CanActivate {
       await assertSessionStillAllowed(this.prisma, payload.restaurantId, payload.did, { allowSuspended: path.startsWith('/api/v1/tenant/billing') });
     }
 
+    const resourceApps = requiredConsoleApps(request.originalUrl ?? request.url ?? '');
+    if (resourceApps.length === 1) {
+      const apps = await this.prisma.runAsTenant(user.restaurantId, tx => enabledConsoleApps(tx, user.restaurantId));
+      if (!resourceApps.some(app => apps.includes(app))) throw new ForbiddenException({ statusCode: 403, code: 'PRODUCT_ACCESS_DENIED', message: 'Your subscription does not enable this application resource.' });
+    }
     (request as Request & { tenantUser: typeof user }).tenantUser = user;
     return true;
   }

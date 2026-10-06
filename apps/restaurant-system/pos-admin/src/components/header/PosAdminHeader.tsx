@@ -12,8 +12,14 @@ import {
 } from 'lucide-react';
 import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
 import { formatINR } from '@jamanvaar/utils';
+import { ADMIN_PRODUCTS, type AdminProduct } from '../../adminProducts';
 
 export interface PosAdminHeaderProps {
+  applicationName?: string;
+  availableProducts?: AdminProduct[];
+  selectedProduct?: AdminProduct;
+  onSwitchProduct?: (product: AdminProduct) => void;
+  showRestaurantActions?: boolean;
   restaurantName: string;
   outletName: string;
   isCloudConnected?: boolean;
@@ -36,6 +42,7 @@ export interface PosAdminHeaderProps {
 }
 
 export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
+  applicationName = 'Restaurant Admin', availableProducts = [], selectedProduct, onSwitchProduct, showRestaurantActions = true,
   restaurantName,
   outletName,
   isCloudConnected,
@@ -94,7 +101,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
               {restaurantName || 'Restaurant'}
             </span>
             <span className="shrink-0 px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider uppercase bg-jaman-navy/[0.05] text-jaman-navy border border-jaman-navy/15 shadow-2xs">
-              ADMIN
+              {applicationName}
             </span>
           </div>
           {isCloudConnected && onOpenBranchDirectory ? (
@@ -117,6 +124,13 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           )}
         </div>
       </div>
+
+      {availableProducts.length > 1 && onSwitchProduct && <label className="text-xs shrink-0">
+        <span className="sr-only">Switch application</span>
+        <select aria-label="Switch application" value={selectedProduct} onChange={e => onSwitchProduct(e.target.value as AdminProduct)} className="rounded-xl border border-jaman-border bg-white p-2 text-jaman-navy font-semibold max-w-40">
+          {availableProducts.map(app => <option key={app} value={app}>{ADMIN_PRODUCTS[app].name}</option>)}
+        </select>
+      </label>}
 
       {/* ── 2. Center: Dedicated Global Search ── */}
       <div className="hidden md:flex items-center flex-1 max-w-xs lg:max-w-sm xl:max-w-md mx-3 lg:mx-6">
@@ -164,7 +178,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         {/* BUG-012: this used to fall back to a fabricated "POS-01 · Amit Dave · Float ₹2,000"
             whenever no shift was open, so a brand-new restaurant's header looked like someone
             was already working a till. It now says plainly that no shift is open. */}
-        {activeShift ? (
+        {showRestaurantActions && (activeShift ? (
           <div className="hidden xl:flex items-center gap-2.5 bg-white border border-jaman-border px-3.5 py-1.5 rounded-xl text-xs select-none h-10 shadow-2xs">
             <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px] tracking-wide shrink-0">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -188,10 +202,10 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             <span className="w-2 h-2 rounded-full bg-slate-300" />
             <span className="text-slate-500 font-bold text-[11px]">No open shift</span>
           </div>
-        )}
+        ))}
 
         {/* 3B. Core Financial Actions (EOD Z-Report & Reconciliation) */}
-        <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+        {showRestaurantActions && <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
           {/* EOD Z-Report */}
           <button
             type="button"
@@ -213,7 +227,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             <Scale className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
             <span className="hidden sm:inline">Reconciliation</span>
           </button>
-        </div>
+        </div>}
 
         {/* 3C. Utilities Group (Assistant, Notifications, Local-First, Logout) */}
         <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-2 sm:border-l border-jaman-border">
@@ -257,7 +271,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
           <button
             type="button"
             onClick={onAdminLogout}
-            title="Sign out of Restaurant Admin"
+            title={`Sign out of ${applicationName}`}
             className="hidden sm:flex h-10 items-center gap-1.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-jaman-border hover:border-rose-200 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-2xs cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />

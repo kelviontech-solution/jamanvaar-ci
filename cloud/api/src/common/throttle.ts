@@ -41,6 +41,18 @@ export const PUBLIC_AUTH_REQUESTS_PER_MINUTE = Number(process.env.PUBLIC_AUTH_RP
 
 export const PublicAuthThrottle = () => Throttle({ default: { limit: PUBLIC_AUTH_REQUESTS_PER_MINUTE, ttl: 60_000 } });
 
+/** Refresh presents an opaque session credential, not an owner password. Keep an IP ceiling
+ * for invalid-cookie spraying and a tighter credential bucket without exhausting one branch's
+ * shared password-login budget when its devices legitimately restore their sessions. */
+export function tenantRefreshTracker(req: Record<string, any>): string {
+  const credential = req.cookies?.jamanvaar_tenant_refresh || req.body?.refreshToken;
+  return typeof credential === 'string' && credential ? createHash('sha256').update(credential).digest('hex') : req.ip;
+}
+export const TenantRefreshThrottle = () => Throttle({
+  default: { limit: 120, ttl: 60_000 },
+  tenantRefresh: { limit: 20, ttl: 60_000, getTracker: tenantRefreshTracker }
+});
+
 /** One bucket per device credential, so a whole restaurant behind one IP does not share a single budget. */
 export function deviceTracker(req: Record<string, any>): string {
   const auth = typeof req.headers?.authorization === 'string' ? req.headers.authorization : '';

@@ -12,6 +12,9 @@ export * from './inventory_control';
 export * from './accounting_service';
 export * from './local_core';
 export * from './menu_templates';
+export * from './menu_identity';
+export * from './menu_transaction';
+export * from './menu_cleanup';
 export * from './image_library';
 
 export * from './tender';

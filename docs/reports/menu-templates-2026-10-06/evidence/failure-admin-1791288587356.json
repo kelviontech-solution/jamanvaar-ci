@@ -1,0 +1,500 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA Menu Template Restaurant 1791288537118\nADMIN\nQA Menu Template Restaurant 1791288537118\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nDIGITAL ORDERING\nQR Table Ordering\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nPEOPLE & CASH\nOffers & Coupons\nKIOSK\nKiosk Terminals\nKiosk Appearance & Content\nKiosk Combos & Deals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\n\nChoose a .csv file.\n\nClean Duplicate Items\n\n44 active records · 0 duplicate groups · 0 missing categories · 41 missing photos · 0 invalid prices · 0 invalid food types\n\nShared photos alone do not prove a duplicate. Only groups with matching configuration and additional SKU, template or content evidence may be archived. Historical orders, KOTs and invoices retain their original item IDs.\n\nScan Again\nDownload Cleanup Report\nDownload Backup\n I reviewed the selected groups and confirm archiving the duplicate records.\n\nRestaurant, menu or relationships changed. Automatic undo is no longer safe; retain the downloaded backup for reviewed recovery.\n\nUndo This Cleanup\nClose\nArchive Confirmed Duplicates\nMenu & Catalog Manager\n46 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\n×\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories (46)\nGarlic Bread\n5\nPizzas\n12\nSides\n5\nPasta\n5\nBurgers\n4\nBeverages\n5\nDesserts\n4\nCombos\n1\nQA Gujarati Farsan\n1\nQA Hindi Breads\n1\nDal & Kadhi\n3\nNo Dishes Match Filters\n\nNo menu dishes found matching the current search, category, or dietary filter.\n\nClear Filters\n+ Add New Dish\nCombos & Meal Deals\n1 ACTIVE\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nPizza Meal Deal\n\nGarlic Bread with Cheese Garlic Bread. Fixed portions; individual item customisations are not included.\n\n₹214\n₹238\n2 mains\n● Active\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Clean Duplicate Items",
+    "Menu & Catalog Manager",
+    "No Dishes Match Filters",
+    "Combos & Meal Deals"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Menu Template Restaurant 1791288537118",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Scan Again",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download Cleanup Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download Backup",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Undo This Cleanup",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Close",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Archive Confirmed Duplicates",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false
+    },
+    {
+      "text": "×",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories (46)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Garlic Bread\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pizzas\n12",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sides\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pasta\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Burgers\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Beverages\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Desserts\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Combos\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Gujarati Farsan\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Hindi Breads\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dal & Kadhi\n3",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clear Filters",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Add New Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "● Active",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Combo",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Delete Combo",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish by name, description, SKU or tag...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

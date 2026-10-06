@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, MenuRepository } from '@jamanvaar/database';
+import { db, MenuRepository, scanMenuDuplicates, archiveConfirmedDuplicates } from '@jamanvaar/database';
 
 describe('a menu never keeps the same dish twice', () => {
   beforeEach(() => db.resetToDefaultSeed());
@@ -12,17 +12,15 @@ describe('a menu never keeps the same dish twice', () => {
     expect(db.menuItems.length).toBe(count);
   });
 
-  it('removeDuplicateDishes keeps the best copy, drops the rest, and re-points combos', () => {
+  it('archives confirmed copies only after review and leaves questionable copies for verification', () => {
     const cat = db.categories[0].id;
-    const keep = { ...MenuRepository.createMenuItem({ name: 'Veg Seekh Kebab', sku: 'A-1', categoryId: cat, imageUrl: 'https://x/y.jpg' }) };
-    db.menuItems.push({ ...keep, id: 'dup-1', imageUrl: '', sku: 'A-2' } as never, { ...keep, id: 'dup-2', imageUrl: '', sku: 'A-1' } as never);
-    db.combos.push({ id: 'cmb', name: 'C', mainItemIds: ['dup-1'], sideItemIds: [], drinkItemIds: [], dessertItemIds: ['dup-2'] } as never);
-    const res = MenuRepository.removeDuplicateDishes();
-    expect(res.removed).toBe(2);
-    expect(db.menuItems.filter((i) => i.name === 'Veg Seekh Kebab')).toHaveLength(1);
-    const combo = db.combos.find((c) => c.id === 'cmb')!;
-    expect(combo.mainItemIds).toEqual([keep.id]);
-    expect(combo.dessertItemIds).toEqual([keep.id]);
-    expect(MenuRepository.removeDuplicateDishes().removed).toBe(0);
+    const keep = { ...MenuRepository.createMenuItem({ name: 'Veg Seekh Kebab', sku: 'A-1', categoryId: cat, description: 'Freshly grilled kebab', imageUrl: 'https://x/y.jpg' }) };
+    db.menuItems.push({ ...keep, id: 'dup-1', imageUrl: '', sku: 'A-2' } as never, { ...keep, id: 'dup-2' } as never);
+    // The group includes an unrelated SKU/content pair: it is not confirmed, so no automatic removal.
+    const report = scanMenuDuplicates();
+    const group = report.groups.find(g => g.itemIds.includes(keep.id))!;
+    expect(group.confirmed).toBe(false);
+    expect(() => archiveConfirmedDuplicates(report, [group.id])).toThrow(/confirmed/);
+    expect(db.menuItems.filter(i => i.name === 'Veg Seekh Kebab')).toHaveLength(3);
   });
 });

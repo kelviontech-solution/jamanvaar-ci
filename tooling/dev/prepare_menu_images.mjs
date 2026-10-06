@@ -17,13 +17,14 @@ const APPS_PUBLIC_DIRS = [
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'captain', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'kds', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-user', 'public', 'assets', 'menu'),
-  path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-admin', 'public', 'assets', 'menu')
+  path.join(ROOT_DIR, 'cloud', 'super-admin-web', 'public', 'assets', 'menu')
 ];
 
 const CENTRAL_ASSET_DIR = path.join(ROOT_DIR, 'packages', 'assets', 'menu');
 
 // SVG Fallback template generator with rich culinary gradients & icons
 function generateDishSvg(title, emoji, color1 = '#0B253A', color2 = '#E66817') {
+  if (title === 'Fresh Dish') return '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" rx="16" fill="#f5f3ee"/><g fill="none" stroke="#9ca3af" stroke-width="3"><rect x="162" y="93" width="76" height="56" rx="9"/><path d="m176 93 7-12h34l7 12"/><circle cx="200" cy="120" r="15"/></g><text x="200" y="184" text-anchor="middle" fill="#475569" font-family="Arial,sans-serif" font-size="17">Restaurant photo needed</text><text x="200" y="209" text-anchor="middle" fill="#64748b" font-family="Arial,sans-serif" font-size="12">Add your dish photo in Menu &amp; Categories</text></svg>';
   return `<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">

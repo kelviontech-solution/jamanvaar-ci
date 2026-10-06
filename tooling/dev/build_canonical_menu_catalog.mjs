@@ -2,7 +2,7 @@
  * JAMANVAAR Canonical Menu Catalog & Asset Pipeline Builder
  * Enforces single source of truth for POS Admin & POS Terminal,
  * generates image_manifest.json, updates live_db.json and seed databases,
- * and audits all preloaded template mappings.
+ * Bundled sample data is used only for image metadata. Restaurant databases are never overwritten.
  */
 import fs from 'fs';
 import path from 'path';
@@ -306,79 +306,21 @@ export const CANONICAL_CATEGORIES = [
   { id: 'cat-desserts', name: 'Desserts', slug: 'desserts', iconName: 'IceCream', sortOrder: 7, isActive: true }
 ];
 
-console.log('🚀 [JAMANVAAR] Building Canonical Menu Catalog & Updating Databases...');
-
-// 1. Generate image_manifest.json
-const imageManifest = {
-  version: '2.0.0',
-  updatedAt: new Date().toISOString(),
-  totalDishes: CANONICAL_MASTER_DISHES.length,
-  items: {}
-};
-
-for (const dish of CANONICAL_MASTER_DISHES) {
-  imageManifest.items[dish.sku] = {
-    id: dish.id,
-    sku: dish.sku,
-    name: dish.name,
-    category: dish.categoryName,
-    description: dish.description,
-    price: dish.price,
-    localAsset: dish.imageUrl,
-    kitchenStation: dish.kitchenStation,
-    dietaryType: dish.dietaryType,
-    verified: true,
-    status: 'BUNDLED_OFFLINE'
+/** Build image metadata only. A production build must never replace a restaurant's stored menu. */
+export function buildImageManifest(targetPath = MANIFEST_PATH) {
+  const manifest = { version: '2.0.0', updatedAt: new Date().toISOString(), totalDishes: CANONICAL_MASTER_DISHES.length, items: {} };
+  for (const dish of CANONICAL_MASTER_DISHES) manifest.items[dish.sku] = {
+    id: dish.id, sku: dish.sku, name: dish.name, category: dish.categoryName,
+    description: dish.description, price: dish.price, localAsset: dish.imageUrl,
+    kitchenStation: dish.kitchenStation, dietaryType: dish.dietaryType, verified: true, status: 'BUNDLED_OFFLINE'
   };
+  fs.writeFileSync(targetPath, JSON.stringify(manifest, null, 2), 'utf-8');
+  return manifest;
 }
-
-fs.writeFileSync(MANIFEST_PATH, JSON.stringify(imageManifest, null, 2), 'utf-8');
-console.log(`✓ Generated ${MANIFEST_PATH} with ${CANONICAL_MASTER_DISHES.length} verified dish mappings.`);
-
-// 2. Synchronize live_db.json
-function updateLiveDatabaseFile(targetFile) {
-  if (!fs.existsSync(targetFile)) return;
-  try {
-    const dbData = JSON.parse(fs.readFileSync(targetFile, 'utf-8'));
-    
-    // Overwrite menuItems with canonical dishes
-    dbData.menuItems = CANONICAL_MASTER_DISHES.map(d => ({
-      id: d.id,
-      categoryId: d.categoryId,
-      sku: d.sku,
-      name: d.name,
-      description: d.description,
-      price: d.price,
-      imageUrl: d.imageUrl,
-      dietaryType: d.dietaryType,
-      spiceLevel: d.spiceLevel,
-      isPopular: d.isPopular,
-      isNew: d.isNew,
-      isFeatured: d.isFeatured,
-      isAvailable: d.isAvailable,
-      prepTimeMinutes: d.prepTimeMinutes,
-      allergens: d.allergens,
-      modifierGroupIds: d.modifierGroupIds,
-      taxGroupId: d.taxGroupId,
-      sortOrder: d.sortOrder,
-      kitchenStation: d.kitchenStation,
-      imageApproved: true
-    }));
-
-    // Ensure categories exist
-    dbData.categories = CANONICAL_CATEGORIES;
-
-    fs.writeFileSync(targetFile, JSON.stringify(dbData, null, 2), 'utf-8');
-    console.log(`✓ Synchronized ${targetFile} with ${CANONICAL_MASTER_DISHES.length} canonical dishes.`);
-  } catch (err) {
-    // If file was corrupted, overwrite with clean live_db
-    const cleanContent = fs.readFileSync(LIVE_DB_PATH, 'utf-8');
-    fs.writeFileSync(targetFile, cleanContent, 'utf-8');
-    console.log(`✓ Restored and synchronized ${targetFile} from clean master database.`);
-  }
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  const outputIndex = process.argv.indexOf('--manifest-output');
+  const target = outputIndex >= 0 ? process.argv[outputIndex + 1] : MANIFEST_PATH;
+  if (!target) throw Error('Supply a path after --manifest-output.');
+  const manifest = buildImageManifest(path.resolve(target));
+  console.log(`Generated image metadata for ${manifest.totalDishes} bundled sample dishes. Restaurant databases were not modified.`);
 }
-
-updateLiveDatabaseFile(LIVE_DB_PATH);
-updateLiveDatabaseFile(DESKTOP_DB_PATH);
-
-console.log('🎉 Canonical menu catalog built & synchronized successfully!');

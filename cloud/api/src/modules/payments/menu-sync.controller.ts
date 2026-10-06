@@ -16,7 +16,7 @@ export class MenuSyncController {
   @Post()
   @UsePipes(new ZodValidationPipe(menuSyncSchema))
   async sync(@Body() body: MenuSyncDto, @CurrentDevice() device: Device) {
-    if (device.type !== 'KIOSK_ADMIN') {
+    if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only a Kiosk Admin device can push a menu snapshot');
     }
     return this.menuSync.upsertItems(device.restaurantId, body.items);

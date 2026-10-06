@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
-import { ComboRepository, AuditRepository } from '@jamanvaar/database';
+import { ComboRepository, AuditRepository, KioskComboAuthoring, MenuRepository } from '@jamanvaar/database';
 import type { ComboDeal } from '@jamanvaar/types';
 
 interface ComboModalProps {
@@ -94,11 +94,9 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
     setter((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const savingsAmount = useMemo(() => {
-    const base = Number(basePrice) || 0;
-    const orig = Number(originalPrice) || 0;
-    return Math.max(0, orig - base);
-  }, [basePrice, originalPrice]);
+  const chosenIds = new Set([...mainItemIds, ...sideItemIds, ...drinkItemIds, ...dessertItemIds]);
+  const componentTotal = Math.round(menuItems.filter(item => chosenIds.has(item.id)).reduce((sum, item) => sum + item.price, 0) * 100) / 100;
+  const savingsAmount = Math.max(0, componentTotal - (Number(basePrice) || 0));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,10 +112,6 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
       setFormError('Combo price must be a number greater than zero.');
       return;
     }
-    if (!originalPrice || isNaN(orig) || orig <= 0) {
-      setFormError('Original (à la carte) price must be a number greater than zero.');
-      return;
-    }
     if (mainItemIds.length === 0) {
       setFormError('Select at least one main dish for this combo.');
       return;
@@ -127,7 +121,7 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
       name: name.trim(),
       description: description.trim(),
       basePrice: base,
-      originalPrice: orig,
+      originalPrice: componentTotal,
       savingsAmount,
       mainItemIds,
       sideItemIds,
@@ -138,23 +132,9 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
       featured
     };
 
-    if (comboToEdit) {
-      ComboRepository.updateCombo(comboToEdit.id, payload);
-      AuditRepository.log({
-        action: 'COMBO_UPDATED',
-        category: 'MENU',
-        details: `Updated combo "${name}" (Price: ₹${base})`,
-        username: 'Manager'
-      });
-    } else {
-      const created = ComboRepository.createCombo(payload);
-      AuditRepository.log({
-        action: 'COMBO_CREATED',
-        category: 'MENU',
-        details: `Created combo "${created.name}" (Price: ₹${created.basePrice})`,
-        username: 'Manager'
-      });
-    }
+    try {
+      KioskComboAuthoring.save({ ...payload, id: comboToEdit?.id, taxGroupId: comboToEdit ? MenuRepository.getMenuItemById(`combo-${comboToEdit.id}`)?.taxGroupId : undefined });
+    } catch (error) { setFormError((error as Error).message); return; }
 
     onSaved();
     onClose();
@@ -214,8 +194,8 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
             <input
               type="number"
               min="1"
-              value={originalPrice}
-              onChange={(e) => setOriginalPrice(e.target.value)}
+              value={componentTotal}
+              readOnly
               placeholder="e.g. 550"
               className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
             />
@@ -229,10 +209,10 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <ItemPicker label="Main Dishes *" items={menuItems} selectedIds={mainItemIds} onToggle={toggle(setMainItemIds)} />
-          <ItemPicker label="Sides (optional)" items={menuItems} selectedIds={sideItemIds} onToggle={toggle(setSideItemIds)} />
-          <ItemPicker label="Drinks (optional)" items={menuItems} selectedIds={drinkItemIds} onToggle={toggle(setDrinkItemIds)} />
-          <ItemPicker label="Desserts (optional)" items={menuItems} selectedIds={dessertItemIds} onToggle={toggle(setDessertItemIds)} />
+          <ItemPicker label="Main Dishes *" items={menuItems.filter(item => !item.archivedAt && !item.id.startsWith('combo-'))} selectedIds={mainItemIds} onToggle={toggle(setMainItemIds)} />
+          <ItemPicker label="Sides (optional)" items={menuItems.filter(item => !item.archivedAt && !item.id.startsWith('combo-'))} selectedIds={sideItemIds} onToggle={toggle(setSideItemIds)} />
+          <ItemPicker label="Drinks (optional)" items={menuItems.filter(item => !item.archivedAt && !item.id.startsWith('combo-'))} selectedIds={drinkItemIds} onToggle={toggle(setDrinkItemIds)} />
+          <ItemPicker label="Desserts (optional)" items={menuItems.filter(item => !item.archivedAt && !item.id.startsWith('combo-'))} selectedIds={dessertItemIds} onToggle={toggle(setDessertItemIds)} />
         </div>
 
         <div className="flex items-center gap-5 pt-1">

@@ -48,6 +48,7 @@ function stable(value: unknown): string {
   }
   return JSON.stringify(value) ?? 'null';
 }
+export { stable as stableCollectionSignature };
 
 function time(value: unknown): number {
   const ms = typeof value === 'string' ? Date.parse(value) : NaN;

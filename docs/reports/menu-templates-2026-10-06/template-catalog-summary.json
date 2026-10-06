@@ -1,0 +1,302 @@
+[
+  {
+    "id": "tpl-north-indian",
+    "name": "North Indian Restaurant",
+    "categories": 15,
+    "items": 45,
+    "variants": 4,
+    "addons": 2,
+    "combos": 1,
+    "missingPhotos": 36
+  },
+  {
+    "id": "tpl-gujarati",
+    "name": "Gujarati Restaurant",
+    "categories": 15,
+    "items": 52,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 51
+  },
+  {
+    "id": "tpl-south-indian",
+    "name": "South Indian Restaurant",
+    "categories": 13,
+    "items": 42,
+    "variants": 0,
+    "addons": 18,
+    "combos": 1,
+    "missingPhotos": 40
+  },
+  {
+    "id": "tpl-punjabi",
+    "name": "Punjabi Dhaba & Restaurant",
+    "categories": 12,
+    "items": 44,
+    "variants": 2,
+    "addons": 1,
+    "combos": 1,
+    "missingPhotos": 36
+  },
+  {
+    "id": "tpl-mughlai",
+    "name": "Mughlai & Awadhi Restaurant",
+    "categories": 4,
+    "items": 7,
+    "variants": 2,
+    "addons": 1,
+    "combos": 1,
+    "missingPhotos": 7
+  },
+  {
+    "id": "tpl-kathiyawadi",
+    "name": "Kathiyawadi Dhaba & Bhojanalaya",
+    "categories": 10,
+    "items": 37,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 37
+  },
+  {
+    "id": "tpl-rajasthani",
+    "name": "Rajasthani Marwari Bhojanalaya",
+    "categories": 3,
+    "items": 4,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 4
+  },
+  {
+    "id": "tpl-south-tiffin",
+    "name": "South Indian Tiffin & Breakfast",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-pure-veg",
+    "name": "Pure Vegetarian Family Restaurant",
+    "categories": 1,
+    "items": 1,
+    "variants": 0,
+    "addons": 0,
+    "combos": 0,
+    "missingPhotos": 1
+  },
+  {
+    "id": "tpl-jain",
+    "name": "Jain Satvik Bhojanalaya",
+    "categories": 10,
+    "items": 31,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 31
+  },
+  {
+    "id": "tpl-multicuisine",
+    "name": "Indian Multi-Cuisine Diner",
+    "categories": 12,
+    "items": 60,
+    "variants": 38,
+    "addons": 87,
+    "combos": 1,
+    "missingPhotos": 46
+  },
+  {
+    "id": "tpl-family-diner",
+    "name": "Indian Family Restaurant & Banquet",
+    "categories": 1,
+    "items": 1,
+    "variants": 0,
+    "addons": 0,
+    "combos": 0,
+    "missingPhotos": 1
+  },
+  {
+    "id": "tpl-thali",
+    "name": "Grand Indian Thali Restaurant",
+    "categories": 11,
+    "items": 38,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 37
+  },
+  {
+    "id": "tpl-chinese",
+    "name": "Authentic Chinese & Wok",
+    "categories": 10,
+    "items": 32,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 30
+  },
+  {
+    "id": "tpl-indo-chinese",
+    "name": "Desi Indo-Chinese Food Corner",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-fast-food",
+    "name": "Fast Food & Quick Service Restaurant",
+    "categories": 10,
+    "items": 35,
+    "variants": 0,
+    "addons": 4,
+    "combos": 1,
+    "missingPhotos": 29
+  },
+  {
+    "id": "tpl-burger-sandwich",
+    "name": "Burger & Grilled Sandwich Bar",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-cafe",
+    "name": "Artisan Café & Coffee Bar",
+    "categories": 9,
+    "items": 34,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 31
+  },
+  {
+    "id": "tpl-bakery",
+    "name": "Bakery, Patisserie & Cafe",
+    "categories": 9,
+    "items": 32,
+    "variants": 10,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 29
+  },
+  {
+    "id": "tpl-pizza",
+    "name": "Pizza Restaurant",
+    "categories": 8,
+    "items": 39,
+    "variants": 36,
+    "addons": 82,
+    "combos": 1,
+    "missingPhotos": 35
+  },
+  {
+    "id": "tpl-chaat",
+    "name": "Street Food Restaurant",
+    "categories": 9,
+    "items": 36,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 34
+  },
+  {
+    "id": "tpl-snacks",
+    "name": "Snacks & Quick Bites Corner",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-biryani",
+    "name": "Biryani & Kebab Darbar",
+    "categories": 9,
+    "items": 31,
+    "variants": 30,
+    "addons": 15,
+    "combos": 1,
+    "missingPhotos": 26
+  },
+  {
+    "id": "tpl-tandoor",
+    "name": "Tandoori Grills & Clay-Oven Specialist",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-sweets",
+    "name": "Royal Indian Sweets & Mithai",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-juice-beverages",
+    "name": "Fresh Juice & Mocktail Bar",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  },
+  {
+    "id": "tpl-desserts",
+    "name": "Dessert / Ice Cream",
+    "categories": 8,
+    "items": 32,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 29
+  },
+  {
+    "id": "tpl-south-north-combo",
+    "name": "South & North Indian Fusion Diner",
+    "categories": 3,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 1
+  },
+  {
+    "id": "tpl-fine-dining",
+    "name": "Fine Dining Gourmet Indian",
+    "categories": 1,
+    "items": 1,
+    "variants": 0,
+    "addons": 0,
+    "combos": 0,
+    "missingPhotos": 1
+  },
+  {
+    "id": "tpl-cloud-kitchen",
+    "name": "Cloud Kitchen Multi-Brand Menu",
+    "categories": 2,
+    "items": 2,
+    "variants": 0,
+    "addons": 0,
+    "combos": 1,
+    "missingPhotos": 2
+  }
+]

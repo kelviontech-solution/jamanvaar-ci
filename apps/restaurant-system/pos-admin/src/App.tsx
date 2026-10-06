@@ -47,7 +47,11 @@ import {
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
-import { NAV_SECTIONS } from './navSections';
+import { productNavSections } from './navSections';
+import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts } from './adminProducts';
+import { useAdminProduct } from './hooks/useAdminProduct';
+import { KioskDashboard } from './components/kiosk/KioskDashboard';
+import { OnlinePaymentsPanel } from './components/payments/OnlinePaymentsPanel';
 import {
   CentralReportingService,
   ReportGeneratorService,
@@ -174,7 +178,10 @@ export type PosAdminTab =
   | 'KIOSK_COMBOS'
   | 'KIOSKS'
   | 'COUPONS'
-  | 'RECEIPTS';
+  | 'RECEIPTS'
+  | 'TEMPLATES'
+  | 'KIOSK_PAYMENTS'
+  | 'FEEDBACK';
 
 /** The real production tab list, as a runtime array -- restoreActiveTab validates against this
  *  (not a hardcoded fixture), so a test can prove every actual tab round-trips, and the array
@@ -183,17 +190,12 @@ export const ALL_POS_ADMIN_TABS: readonly PosAdminTab[] = [
   'DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS',
   'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS',
   'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT',
-  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS'
+  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK'
 ];
 
-const ACTIVE_TAB_STORAGE_KEY = 'jamanvaar_pos_admin_active_tab';
 
-/**
- * No client-side router exists in this app -- activeTab was a plain useState with no
- * persistence, so refreshing the browser on ANY tab (not just Kiosk ones) always landed back on
- * DASHBOARD. This restores whatever tab was last active, falling back to DASHBOARD for a
- * genuinely first-ever visit or a stale value left over from a since-removed tab id.
- */
+
+/** Compatibility validator for callers of the old tab API. Routing now restores product and page together. */
 export function restoreActiveTab(stored: string | null): PosAdminTab {
   return stored && (ALL_POS_ADMIN_TABS as readonly string[]).includes(stored) ? (stored as PosAdminTab) : 'DASHBOARD';
 }
@@ -208,10 +210,6 @@ export default function PosAdminApp() {
     return <LegacyGuestRedirect />;
   }
 
-  const [activeTab, setActiveTab] = useState<PosAdminTab>(() => restoreActiveTab(localStorage.getItem(ACTIVE_TAB_STORAGE_KEY)));
-  useEffect(() => {
-    localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, activeTab);
-  }, [activeTab]);
   const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
   const coupons = CouponRepository.getAllCoupons();
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
@@ -263,7 +261,6 @@ export default function PosAdminApp() {
   const [authRestaurantCode, setAuthRestaurantCode] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
   const [authError, setAuthError] = useState('');
   const [isOnline, setIsOnline] = useState(true);
 
@@ -295,7 +292,20 @@ export default function PosAdminApp() {
   // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
   // Keyed on cloudConnected so a fresh device activation (which flips this true after this hook's
   // own initial mount-time fetch already 401'd) re-fetches instead of staying wrong until reload.
-  const { hasApp, refetch: refetchEntitlements, error: entitlementError, authRequired } = useEntitlements(cloudConnected);
+  const tenantId = localStorage.getItem('jamanvaar_cloud_restaurant_id');
+  const { enabledApps, hasApp, loading: entitlementsLoading, refetch: refetchEntitlements, error: entitlementError, authRequired } = useEntitlements(`${isAdminLoggedIn}:${cloudConnected}:${tenantId}`, isAdminLoggedIn);
+  const availableProducts = availableAdminProducts(enabledApps);
+  const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
+  const context = useAdminProduct(tenantId, availableProducts, contextReady);
+  const product = context.product;
+  const isKioskAdmin = product === 'KIOSK_ADMIN';
+  const activeTab: PosAdminTab = context.page || 'DASHBOARD';
+  const setActiveTab: React.Dispatch<React.SetStateAction<PosAdminTab>> = next => {
+    const page = typeof next === 'function' ? next(activeTab) : next;
+    if (product && Object.hasOwn(PRODUCT_PAGES[product], page)) context.navigate(product, page);
+  };
+  const appName = product ? ADMIN_PRODUCTS[product].name : 'Jamanvaar Apps';
+  useEffect(() => { document.title = `JAMANVAAR | ${isAdminLoggedIn ? appName : 'Owner Sign-in'}`; }, [appName, isAdminLoggedIn]);
 
   const completeLogin = (
     user: { id: string; fullName: string; role: string; restaurantId: string },
@@ -306,6 +316,7 @@ export default function PosAdminApp() {
     setAuthPassword('');
     setAuthScreenState('LOGIN');
     setCloudConnected(true);
+    refetchEntitlements();
 
     if (restaurant) {
       // BUG-110: the header kept showing the demo branch "Ahmedabad Flagship Store".
@@ -338,7 +349,13 @@ export default function PosAdminApp() {
       const authResult = await cloudLoginOwner(authRestaurantCode.trim(), authPassword);
 
       if (authResult.requiresActivation) {
-        // First-time login on this device -> Prompt for Welcome Kit activation key
+        if (activationKeyInput.trim()) {
+          const activated = await cloudActivateDevice(authResult.activationSessionToken, activationKeyInput.trim());
+          setActivationKeyInput('');
+          completeLogin(activated.user, activated.restaurant);
+          return;
+        }
+        // Ask for a key only when this device has not been connected yet.
         setActivationSessionToken(authResult.activationSessionToken);
         setPendingTenant({
           restaurantId: authResult.restaurant.id,
@@ -378,6 +395,7 @@ export default function PosAdminApp() {
 
     try {
       const res = await cloudActivateDevice(activationSessionToken, activationKeyInput.trim());
+      setActivationKeyInput('');
       completeLogin(res.user, res.restaurant);
     } catch (err) {
       setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
@@ -472,6 +490,18 @@ export default function PosAdminApp() {
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [reportSubTab, setReportSubTab] = useState<string>('DAILY');
 
+  // A product/tenant switch must not retain an editor or order detail from the previous workspace.
+  useEffect(() => {
+    setSelectedOrderDetail(null); setItemToEdit(null); setCategoryToEdit(null); setTableToEdit(null);
+    setStaffToEdit(null); setCustomerToEdit(null); setInventoryToEdit(null); setRecipeToEdit(null);
+    setIsGlobalSearchOpen(false); setIsItemModalOpen(false); setIsCategoryModalOpen(false);
+    setIsTableModalOpen(false); setIsStaffModalOpen(false); setIsCustomerModalOpen(false);
+    setIsInventoryModalOpen(false); setIsRecipeModalOpen(false); setIsPrinterModalOpen(false);
+    setIsPrebuiltMenuModalOpen(false); setIsBulkPriceModalOpen(false); setIsAddCouponModalOpen(false);
+    setIsRestoreModalOpen(false); setIsEodModalOpen(false); setIsReconModalOpen(false);
+    setConfirmDialog(previous => ({ ...previous, isOpen: false })); setNavOpen(false);
+  }, [tenantId, product, isAdminLoggedIn]);
+
   // Whether JAMAN AI works, is locked or is hidden is decided by the platform for THIS restaurant (delivered
   // with the heartbeat and cached), not by the local licence record, which every fresh install set to PRO.
   const handleOpenAssistant = () => setIsAssistantOpen(true);
@@ -507,20 +537,23 @@ export default function PosAdminApp() {
   // the device token specifically (not cloudConnected/the user session),
   // since entity-sync is a DeviceAuthGuard endpoint.
   useEffect(() => {
-    if (!getStoredDeviceToken()) return;
+    if (!isAdminLoggedIn || entitlementsLoading || entitlementError || !getStoredDeviceToken()) return;
+    const restaurantAccess = hasApp('POS_ADMIN');
+    const kioskAccess = hasApp('KIOSK_ADMIN');
+    if (!restaurantAccess && !kioskAccess) return;
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
     // Restaurant Admin is the owner's live window onto the restaurant: it must
     // receive every order, payment and kitchen ticket the other devices create.
     // It used to have no order-sync client at all (BUG-034).
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_cloud_device_id') });
-    InventoryLedgerSync.configureTransport({ push: pushInventoryMovements, pull: pullInventoryMovements });
+    InventoryLedgerSync.configureTransport(restaurantAccess ? { push: pushInventoryMovements, pull: pullInventoryMovements } : null);
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
-    void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
+    if (restaurantAccess) void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
     void syncDiningTables();
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
-      void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
+      if (restaurantAccess) void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
       void SyncOutboxEngine.catchUpFromCloud();
       // BUG-096/097: the floor plan built here, and each table's live state, are shared with POS and Captain.
       void syncDiningTables();
@@ -536,33 +569,32 @@ export default function PosAdminApp() {
     // still applies whatever it pulls back in case another admin device edited a record first.
     const syncStaff = () => syncStaffUsers({ push: true });
 
-    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true, inventory: true });
+    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true, inventory: restaurantAccess });
     void syncMenuCatalog({ push: true });
     void syncPromotions({ pushCombos: true, pushCoupons: true });
-    void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
+    if (restaurantAccess) void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
     void syncStaff();
     // B2-056: POS's own cash-drawer shift and its cash movements, so the Shift & Cash Drawer
     // Ledger, Reconciliation and EOD Z-Report pages here actually see them. Restaurant Admin never
     // opens or edits a shift itself, so this device only ever pulls.
-    void syncShifts({ push: false });
-    void syncReservations({ push: true });
+    if (restaurantAccess) void syncShifts({ push: false });
+    if (restaurantAccess) void syncReservations({ push: true });
     // B2-055: keeps LicenseRepository (plan tier, sidebar badges, JAMAN AI button) in step with a
     // Super Admin plan change regardless of which screen is open — was only ever refreshed when
     // the Subscription Plans screen itself happened to be mounted.
     void refreshCloudEntitlementsIntoLicense();
-    refetchEntitlements();
     void reportDeviceHeartbeat();
     void syncRestaurantIdentity();
     void syncKioskConfiguration({ push: true }).catch(() => {});
     const interval = setInterval(() => {
       void syncMenuCatalog({ push: true });
       void syncPromotions({ pushCombos: true, pushCoupons: true });
-    void syncCustomers({ push: true });
+    if (restaurantAccess) void syncCustomers({ push: true });
       void syncStaff();
-      void syncShifts({ push: false });
+      if (restaurantAccess) void syncShifts({ push: false });
       // Guests who did not come free their table, then the change goes out with the rest.
       ReservationRepository.releaseOverdue();
-      void syncReservations({ push: true });
+      if (restaurantAccess) void syncReservations({ push: true });
       void refreshCloudEntitlementsIntoLicense();
       // Same self-healing reason: picks up a Super Admin entitlement change made while this
       // console is already open, not just the fresh-activation case the cloudConnected key covers.
@@ -576,8 +608,9 @@ export default function PosAdminApp() {
       clearInterval(interval);
       clearInterval(orderInterval);
       SyncOutboxEngine.configureTransport(null);
+      InventoryLedgerSync.configureTransport(null);
     };
-  }, [cloudConnected]);
+  }, [cloudConnected, isAdminLoggedIn, entitlementsLoading, entitlementError, hasApp]);
 
   // Kiosk fleet polling for the Kiosk Terminals tab. Deliberately its own effect, not merged into
   // the sync effect above: that effect already calls SyncOutboxEngine/EntitySyncEngine
@@ -585,7 +618,7 @@ export default function PosAdminApp() {
   // kiosk-admin's original fleet-polling code did, for ITS OWN sync needs) would silently
   // overwrite this console's already-configured transport.
   useEffect(() => {
-    if (!hasApp('KIOSK_ADMIN')) return;
+    if (!isAdminLoggedIn || !hasApp('KIOSK_ADMIN')) { setKiosks([]); return; }
     let cancelled = false;
     let inFlight = false;
     const refresh = async () => {
@@ -606,7 +639,7 @@ export default function PosAdminApp() {
       cancelled = true;
       clearInterval(kioskInterval);
     };
-  }, [hasApp]);
+  }, [hasApp, isAdminLoggedIn]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -709,11 +742,12 @@ export default function PosAdminApp() {
 
   if (!isAdminLoggedIn) {
     return (
-      <JAMANVAARStartup appName="Restaurant Admin" appType="ADMIN" subtitle="Restaurant Operations Platform">
+      <JAMANVAARStartup appName="Owner Sign-in" appType="OWNER" subtitle="Your restaurant account">
         <JamanvaarAuthLayout
           appIdentity="ADMIN"
+          applicationLabel="Owner Sign-in"
           appTitle="JAMANVAAR"
-          appSubtitle="Restaurant Operations SaaS"
+          appSubtitle="One account for your restaurant and kiosk apps"
           isOnline={isOnline}
           onToggleNetwork={() => setIsOnline((prev) => !prev)}
           isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
@@ -723,7 +757,7 @@ export default function PosAdminApp() {
           healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
-          heroDescription="Centralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions."
+          heroDescription="Sign in once. Open the apps included in your plan, with a separate workspace for each."
           heroImages={APP_HERO_IMAGES.ADMIN}
           capabilities={[
             { label: 'Restaurant Management', icon: 'dashboard' },
@@ -731,7 +765,7 @@ export default function PosAdminApp() {
             { label: 'Menu Management', icon: 'table' },
             { label: 'Inventory & Staff', icon: 'package' }
           ]}
-          footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
+          footerNote="Plan-Based Access • Instant Offline Boot • 100% Secure"
         >
           <ActivationNoticeBanner />
           {authScreenState === 'ACTIVATE' ? (
@@ -825,15 +859,7 @@ export default function PosAdminApp() {
                 )}
 
                 <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
-                  <label className="flex items-center gap-2 cursor-pointer select-none font-medium">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded accent-brand"
-                    />
-                    <span>Remember this device</span>
-                  </label>
+                  <span>Your owner account</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -847,12 +873,14 @@ export default function PosAdminApp() {
                   </button>
                 </div>
 
+                <details className="text-sm text-slate-600"><summary className="cursor-pointer">Connecting a new device? Add your admin key</summary><label className="block mt-3">Admin activation key (first connection only)<input aria-label="Admin activation key (optional)" type="text" value={activationKeyInput} onChange={e => setActivationKeyInput(e.target.value.toUpperCase())} placeholder="JMV-XXXX-XXXX-XXXX" className="block w-full mt-1 rounded-xl border border-jaman-border p-3 font-mono" /></label><p className="text-xs mt-2">Use your Restaurant Admin or Kiosk Admin key. Customer kiosks still use their own kiosk activation screen.</p></details>
+
                 <button
                   type="submit"
                   disabled={loginBusy}
                   className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-50 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
                 >
-                  {loginBusy ? 'Signing In…' : 'Sign In to Admin'}
+                  {loginBusy ? 'Signing In…' : 'Sign In'}
                 </button>
 
                 <div className="text-center pt-1">
@@ -866,7 +894,7 @@ export default function PosAdminApp() {
                     }}
                     className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
                   >
-                    First time? Activate account
+                    Set your password from the welcome email
                   </button>
                 </div>
               </form>
@@ -879,10 +907,10 @@ export default function PosAdminApp() {
                   <span>FIRST-TIME DEVICE ACTIVATION</span>
                 </div>
                 <h3 className="text-base font-bold text-jaman-navy pt-1">
-                  Activate Restaurant Admin Console
+                  Connect this admin device
                 </h3>
                 <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  Enter the hardware activation key from your Super Admin Welcome Kit to bind this terminal.
+                  Enter your admin activation key once on this device. Your plan determines which apps open after sign-in.
                 </p>
               </div>
 
@@ -897,8 +925,8 @@ export default function PosAdminApp() {
                     <span className="font-mono text-jaman-navy text-[11px]">{pendingTenant.ownerEmail}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Device Role:</span>
-                    <span className="font-bold text-brand">POS_ADMIN (Management Console)</span>
+                    <span className="text-slate-500 font-medium">Apps:</span>
+                    <span className="font-bold text-brand">Restaurant Admin / Kiosk Admin</span>
                   </div>
                 </div>
               )}
@@ -906,7 +934,7 @@ export default function PosAdminApp() {
               <form onSubmit={handleActivateSubmit} className="space-y-3">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-                    Hardware Activation Key *
+                    Admin Activation Key *
                   </label>
                   <input
                     type="text"
@@ -934,7 +962,7 @@ export default function PosAdminApp() {
                   disabled={activationBusy || !activationKeyInput.trim()}
                   className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
                 >
-                  {activationBusy ? 'Activating Terminal…' : 'Activate & Enter Portal'}
+                  {activationBusy ? 'Activating Terminal…' : 'Connect & Continue'}
                 </button>
 
                 <button
@@ -955,8 +983,27 @@ export default function PosAdminApp() {
     );
   }
 
+  if (!contextReady || !product) {
+    return <div className="min-h-screen bg-jaman-cream flex items-center justify-center p-6">
+      <section className="bg-white border border-jaman-border rounded-2xl p-8 max-w-xl w-full space-y-5">
+        <h1 className="text-2xl font-bold text-jaman-navy">JAMANVAAR Apps</h1>
+        <p className="text-sm text-slate-600">{db.restaurant.name}</p>
+        {entitlementsLoading && <p role="status">Loading your applications?</p>}
+        {entitlementError && <><p role="alert">{entitlementError}</p><button onClick={authRequired ? handleAdminLogout : refetchEntitlements} className="underline font-bold">{authRequired ? 'Sign in again' : 'Retry'}</button></>}
+        {contextReady && <>
+          {context.denied && <p role="alert">This application is not enabled in your restaurant's current plan.</p>}
+          {context.invalid && <p role="alert">This page was not found. Choose an application below.</p>}
+          {!context.denied && !context.invalid && <p>Choose what you want to manage.</p>}
+          {availableProducts.map(app => <button key={app} onClick={() => context.navigate(app)} className="w-full text-left rounded-xl border p-4 hover:border-orange-500"><strong>{ADMIN_PRODUCTS[app].name}</strong><p className="text-sm text-slate-600 mt-1">{ADMIN_PRODUCTS[app].description}</p></button>)}
+          {!availableProducts.length && <p role="alert">No admin application is enabled. Ask your platform administrator to check your subscription.</p>}
+        </>}
+        <button onClick={handleAdminLogout} className="text-sm underline">Log out</button>
+      </section>
+    </div>;
+  }
+
   return (
-    <JAMANVAARStartup appName="Restaurant Admin" appType="ADMIN" subtitle="Restaurant Operations Platform">
+    <JAMANVAARStartup appName={appName} appType={isKioskAdmin ? 'KIOSK_ADMIN' : 'ADMIN'} subtitle="Your restaurant workspace">
       <div className="h-screen w-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans select-none antialiased overflow-hidden">
         {/* Toast Notification Banner */}
         {toastMessage && (
@@ -968,6 +1015,11 @@ export default function PosAdminApp() {
 
         {/* UNIFIED SAAS HEADER */}
         <PosAdminHeader
+          applicationName={appName}
+          availableProducts={availableProducts}
+          selectedProduct={product}
+          onSwitchProduct={app => context.navigate(app)}
+          showRestaurantActions={!isKioskAdmin}
           restaurantName={db.restaurant.name}
           outletName={db.outlet.name}
           isCloudConnected={cloudConnected}
@@ -1003,7 +1055,7 @@ export default function PosAdminApp() {
             className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
           >
             <div className="space-y-4">
-              {filterNavSections(NAV_SECTIONS, hasApp).map((grp) => {
+              {filterNavSections(productNavSections(product), hasApp).map((grp) => {
                 const hasActiveTab = grp.items.some((it) => it.id === activeTab);
                 // A section holding the currently-open tab always shows,
                 // regardless of its remembered collapse state — you should
@@ -1102,8 +1154,8 @@ export default function PosAdminApp() {
 
             {/* The header actions that do not fit a phone's header live here on small screens */}
             <div className="sm:hidden mt-4 pt-3 border-t border-[#EAE3D6] grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-brand/[0.07] border border-brand/30 text-brand text-xs font-bold cursor-pointer">EOD Report</button>
-              <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>
+              {!isKioskAdmin && <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-brand/[0.07] border border-brand/30 text-brand text-xs font-bold cursor-pointer">EOD Report</button>}
+              {!isKioskAdmin && <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>}
               <button type="button" onClick={() => { setNavOpen(false); handleOpenAssistant(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold cursor-pointer">Assistant</button>
               <button type="button" onClick={() => { setNavOpen(false); handleAdminLogout(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-rose-700 text-xs font-bold cursor-pointer">Log out</button>
             </div>
@@ -1112,7 +1164,8 @@ export default function PosAdminApp() {
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
           <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
-            {activeTab === 'DASHBOARD' && (
+            {activeTab === 'DASHBOARD' && isKioskAdmin && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}
+            {activeTab === 'DASHBOARD' && !isKioskAdmin && (
               <RestaurantDashboard
                 dashFilter={dashFilter}
                 setDashFilter={setDashFilter}
@@ -1305,7 +1358,7 @@ export default function PosAdminApp() {
             {/* TAB 11: PAYMENTS & SPLIT LEDGER */}
             {activeTab === 'PAYMENTS' && (
               <PaymentsSplitModule
-                showKioskPayments={hasApp('KIOSK_ADMIN')}
+                showKioskPayments={false}
                 orders={orders}
                 dashPeriodReport={dashPeriodReport}
                 onSelectOrderDetail={(ord) => setSelectedOrderDetail(ord)}
@@ -1313,6 +1366,9 @@ export default function PosAdminApp() {
               />
             )}
 
+            {activeTab === 'KIOSK_PAYMENTS' && <div className="space-y-6"><OnlinePaymentsPanel /><KioskPaymentSettingsPanel /></div>}
+            {activeTab === 'FEEDBACK' && <FeedbackPanel orders={orders} />}
+            {activeTab === 'TEMPLATES' && <h1 className="text-2xl font-bold">Menu Templates</h1>}
             {activeTab === 'KIOSK_DESIGN' && hasApp('KIOSK_ADMIN') && <KioskContentPanel showToast={showToast} />}
             {activeTab === 'KIOSK_COMBOS' && hasApp('KIOSK_ADMIN') && <KioskComboPanel showToast={showToast} />}
             {/* TAB: KIOSK TERMINAL FLEET (relocated from kiosk-admin, gated on KIOSK_ADMIN) */}
@@ -1344,6 +1400,7 @@ export default function PosAdminApp() {
                           <div className="font-semibold text-jaman-navy font-mono">{k.appVersion ?? '—'}</div>
                         </div>
                       </div>
+                      <dl className="text-xs space-y-1 text-slate-600"><div>Terminal ID: <span className="font-mono">{k.id}</span></div><div>Branch: {k.branchName || db.outlet.name}</div><div>Last seen: {k.lastSeenAt ? new Date(k.lastSeenAt).toLocaleString() : 'Never seen'}</div><div>Last sync: {k.lastSyncAt ? new Date(k.lastSyncAt).toLocaleString() : 'Not synced yet'}</div></dl>
                       {k.syncError && (
                         <div role="alert" className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">
                           {k.syncError}
@@ -1367,7 +1424,7 @@ export default function PosAdminApp() {
                   ))}
                 </div>
 
-                <FeedbackPanel orders={orders} />
+
               </div>
             )}
 
@@ -1427,7 +1484,7 @@ export default function PosAdminApp() {
             )}
 
             {/* TAB 12: FINANCIAL & SALES REPORTS */}
-            {activeTab === 'REPORTS' && <ReportsDashboard showToast={showToast} />}
+            {activeTab === 'REPORTS' && <ReportsDashboard kioskMode={isKioskAdmin} showToast={showToast} />}
 
             {/* TAB 13: SHIFT & CASH DRAWER RECONCILIATION */}
             {activeTab === 'SHIFTS' && (
@@ -1467,13 +1524,12 @@ export default function PosAdminApp() {
             {activeTab === 'SETTINGS' && (
               <>
                 <TerminalDisplaySettings showToast={showToast} />
-                <WhatsAppChannelPanel showToast={showToast} />
+                {!isKioskAdmin && hasApp('WHATSAPP_ORDERING') && <WhatsAppChannelPanel showToast={showToast} />}
                 <ReportBrandingSettings
                   showToast={showToast}
                   onUpdated={() => setDbTick((t) => t + 1)}
                 />
-                {hasApp('KIOSK_ADMIN') && <KioskDisplaySettingsPanel showToast={showToast} />}
-                {hasApp('KIOSK_ADMIN') && <KioskPaymentSettingsPanel />}
+                {isKioskAdmin && <KioskDisplaySettingsPanel showToast={showToast} />}
               </>
             )}
 
@@ -1511,10 +1567,11 @@ export default function PosAdminApp() {
         {/* ALL SPECIALIZED MODAL DIALOGS */}
         <GlobalSearchModal
           isOpen={isGlobalSearchOpen}
+          showCustomers={!isKioskAdmin}
           onClose={() => setIsGlobalSearchOpen(false)}
           onSelectOrder={(ord) => {
             setSelectedOrderDetail(ord);
-            setActiveTab('BILLING_SALES');
+            setActiveTab(isKioskAdmin ? 'ORDERS' : 'BILLING_SALES');
           }}
           onSelectMenuItem={(item) => {
             setItemToEdit(item);
@@ -1608,8 +1665,8 @@ export default function PosAdminApp() {
         />
 
         <PrebuiltMenuModal
-          isOpen={isPrebuiltMenuModalOpen}
-          onClose={() => setIsPrebuiltMenuModalOpen(false)}
+          isOpen={isPrebuiltMenuModalOpen || activeTab === 'TEMPLATES'}
+          onClose={() => { setIsPrebuiltMenuModalOpen(false); if (activeTab === 'TEMPLATES') setActiveTab('MENU'); }}
           onImported={(count) => showToast(`Successfully imported ${count} dishes!`)}
         />
 

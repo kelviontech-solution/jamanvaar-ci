@@ -1,0 +1,138 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nCart\n0\n₹0\nAll Menu\nCombos & Deals\nGarlic Bread\nAll Menu\nPure Veg\n🌱 Pure Jain\nAll Dishes & Specialities\nPure Veg\nGarlic Bread\n\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n\n₹155\nPure Veg\nCheese Garlic Bread\n\nCheese Garlic Bread, oven-baked bread with garlic butter and herbs.\n\n₹139\nPure Veg\nStuffed Garlic Bread\n\nStuffed Garlic Bread, oven-baked bread with garlic butter and herbs.\n\n₹169\nPure Veg\nCheese Corn Breadsticks\n\nCheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.\n\n₹159",
+  "headings": [
+    "All Dishes & Specialities",
+    "Garlic Bread",
+    "Cheese Garlic Bread",
+    "Stuffed Garlic Bread",
+    "Cheese Corn Breadsticks"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false
+    },
+    {
+      "text": "Cart\n0\n₹0",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Garlic Bread",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add Garlic Bread to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add Cheese Garlic Bread to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add Stuffed Garlic Bread to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Add Cheese Corn Breadsticks to cart",
+      "title": "Add to Cart",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -1,0 +1,1579 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA Menu Template Restaurant 1791287384477\nADMIN\nQA Menu Template Restaurant 1791287384477\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nDIGITAL ORDERING\nQR Table Ordering\nLOCKED\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nPEOPLE & CASH\nOffers & Coupons\nKIOSK\nKiosk Terminals\nKiosk Appearance & Content\nKiosk Combos & Deals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nClean Duplicate Items\n\n45 active records · 1 duplicate groups · 0 missing categories · 42 missing photos · 0 invalid prices · 0 invalid food types\n\nShared photos alone do not prove a duplicate. Only groups with matching configuration and additional SKU, template or content evidence may be archived. Historical orders, KOTs and invoices retain their original item IDs.\n\nScan Again\n Garlic Bread — Confirmed duplicate\n\nSame restaurant scope, category and normalized name · Same SKU · Same template provenance · Same description and image\n\nKeep canonical item\nGarlic Bread — PIZZA-GARLIC-BREAD — ₹99 — tplitem-w64nav-1a4ytx5\nGarlic Bread — PIZZA-GARLIC-BREAD — ₹99 — qa-menu-duplicate-1791287434421\nDownload Cleanup Report\nDownload Backup\n I reviewed the selected groups and confirm archiving the duplicate records.\nClose\nArchive Confirmed Duplicates\nMenu & Catalog Manager\n46 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories (46)\nGarlic Bread\n5\nPizzas\n12\nSides\n5\nPasta\n5\nBurgers\n4\nBeverages\n5\nDesserts\n4\nCombos\n1\nQA Gujarati Farsan\n1\nQA Hindi Breads\n1\nDal & Kadhi\n3\nPIZZA-GARLIC-BREAD\nGarlic Bread\n₹99\n\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-GARLIC-BREAD\nCheese Garlic Bread\n₹139\n\nCheese Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZ-004\nStuffed Garlic Bread\n₹169\n\nStuffed Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-CORN-BREADSTICKS\nCheese Corn Breadsticks\n₹159\n\nCheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZ-002\nFarmhouse Pizza\n₹199\n\nFarmhouse Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZ-003\nPaneer Tikka Pizza\n₹229\n\nPaneer Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-VEGGIE-SUPREME-PIZZA\nVeggie Supreme Pizza\n₹219\n\nVeggie Supreme Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-MEXICAN-GREEN-WAVE-PIZZA\nMexican Green Wave Pizza\n₹229\n\nMexican Green Wave Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-PERI-PERI-PANEER-PIZZA\nPeri Peri Paneer Pizza\n₹249\n\nPeri Peri Paneer Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-CHEESE-BURST-MARGHERITA\nCheese Burst Margherita\n₹249\n\nCheese Burst Margherita, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-CHEESE-BURST-FARMHOUSE\nCheese Burst Farmhouse\n₹299\n\nCheese Burst Farmhouse, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-JALAPENO-CORN-PIZZA\nJalapeno Corn Pizza\n₹199\n\nJalapeno Corn Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-MUSHROOM-PIZZA\nMushroom Pizza\n₹219\n\nMushroom Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-CHICKEN-TIKKA-PIZZA\nChicken Tikka Pizza\n₹279\n\nChicken Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-PEPPER-CHICKEN-PIZZA\nPepper Chicken Pizza\n₹269\n\nPepper Chicken Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\n\nIn Stock\nPIZZA-FRENCH-FRIES\nFrench Fries\n₹89\n\nFrench Fries, freshly fried sides with seasoning served separately.\n\nIn Stock\nPIZZA-PERI-PERI-FRIES\nPeri Peri Fries\n₹109\n\nPeri Peri Fries, freshly fried sides with seasoning served separately.\n\nIn Stock\nPIZZA-POTATO-WEDGES\nPotato Wedges\n₹119\n\nPotato Wedges, freshly fried sides with seasoning served separately.\n\nIn Stock\nPIZZA-CHEESE-DIP\nCheese Dip\n₹39\n\nCheese Dip, freshly fried sides with seasoning served separately.\n\nIn Stock\nPIZZA-JALAPENO-DIP\nJalapeno Dip\n₹39\n\nJalapeno Dip, freshly fried sides with seasoning served separately.\n\nIn Stock\nPIZ-005\nWhite Sauce Pasta\n₹199\n\nWhite Sauce Pasta, penne tossed in a freshly prepared sauce.\n\nIn Stock\nPIZZA-RED-SAUCE-PASTA\nRed Sauce Pasta\n₹189\n\nRed Sauce Pasta, penne tossed in a freshly prepared sauce.\n\nIn Stock\nPIZZA-PINK-SAUCE-PASTA\nPink Sauce Pasta\n₹219\n\nPink Sauce Pasta, penne tossed in a freshly prepared sauce.\n\nIn Stock\nPIZZA-PESTO-PASTA\nPesto Pasta\n₹249\n\nPesto Pasta, penne tossed in a freshly prepared sauce.\n\nIn Stock\nPIZZA-CHICKEN-ALFREDO-PASTA\nChicken Alfredo Pasta\n₹279\n\nChicken Alfredo Pasta, penne tossed in a freshly prepared sauce.\n\nIn Stock\nPIZZA-CLASSIC-VEG-BURGER\nClassic Veg Burger\n₹119\n\nClassic Veg Burger, toasted buns, fresh vegetables and house dressing.\n\nIn Stock\nPIZZA-CHEESE-VEG-BURGER\nCheese Veg Burger\n₹139\n\nCheese Veg Burger, toasted buns, fresh vegetables and house dressing.\n\nIn Stock\nPIZZA-PANEER-BURGER\nPaneer Burger\n₹179\n\nPaneer Burger, toasted buns, fresh vegetables and house dressing.\n\nIn Stock\nPIZZA-CHICKEN-BURGER\nChicken Burger\n₹199\n\nChicken Burger, toasted buns, fresh vegetables and house dressing.\n\nIn Stock\nPIZZA-COLD-COFFEE\nCold Coffee\n₹119\n\nCold Coffee, made-to-order drinks or sealed beverages.\n\nIn Stock\nPIZZA-LEMON-ICED-TEA\nLemon Iced Tea\n₹89\n\nLemon Iced Tea, made-to-order drinks or sealed beverages.\n\nIn Stock\nPIZZA-FRESH-LIME-SODA\nFresh Lime Soda\n₹79\n\nFresh Lime Soda, made-to-order drinks or sealed beverages.\n\nIn Stock\nPIZZA-COLA-250ML\nCola 250ml\n₹40\n\nCola 250ml, made-to-order drinks or sealed beverages.\n\nIn Stock\nPIZZA-MINERAL-WATER-500ML\nMineral Water 500ml\n₹20\n\nMineral Water 500ml, made-to-order drinks or sealed beverages.\n\nIn Stock\nPIZZA-CHOCOLATE-BROWNIE\nChocolate Brownie\n₹99\n\nChocolate Brownie, individually portioned sweet finishes.\n\nIn Stock\nPIZZA-CHOCOLATE-LAVA-CAKE\nChocolate Lava Cake\n₹119\n\nChocolate Lava Cake, individually portioned sweet finishes.\n\nIn Stock\nPIZZA-VANILLA-ICE-CREAM\nVanilla Ice Cream\n₹69\n\nVanilla Ice Cream, individually portioned sweet finishes.\n\nIn Stock\nPIZZA-BROWNIE-WITH-ICE-CREAM\nBrownie with Ice Cream\n₹149\n\nBrownie with Ice Cream, individually portioned sweet finishes.\n\nIn Stock\nDEAL-tpldeal-w64nav-10en7pl\nPizza Meal Deal\n₹214\n\nGarlic Bread with Cheese Garlic Bread. Fixed portions; individual item customisations are not included.\n\nIn Stock\nQA-GUJ-MENU\nખમણ\n₹80.5\n\nનરમ ખમણ, ચટણી સાથે\n\nIn Stock\nQA-HIN-MENU\nबटर नान\n₹50\n\nताजा नान\n\nIn Stock\nGUJ-011\nSweet Gujarati Toor Dal\n₹150\n\nThin pigeon pea lentil soup balanced with kokum, peanuts, jaggery and mustard tempering\n\nIn Stock\nGUJ-012\nTraditional Gujarati Kadhi\n₹150\n\nSilky smooth yogurt and besan soup tempered with cinnamon, cloves, curry leaves and ginger\n\nIn Stock\nGUJARATI-DAL-DHOKLI\nDal Dhokli\n₹150\n\nDal Dhokli, sweet-sour Gujarati tempering, served hot.\n\nIn Stock\nPIZZA-GARLIC-BREAD\nGarlic Bread\n₹99\n\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nCombos & Meal Deals\n1 ACTIVE\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nPizza Meal Deal\n\nGarlic Bread with Cheese Garlic Bread. Fixed portions; individual item customisations are not included.\n\n₹214\n₹238\n2 mains\n● Active\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Clean Duplicate Items",
+    "Menu & Catalog Manager",
+    "Combos & Meal Deals"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Menu Template Restaurant 1791287384477",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nLOCKED",
+      "aria": null,
+      "title": "Not included in your current plan — tap to see what it offers",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Scan Again",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download Cleanup Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download Backup",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Close",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Archive Confirmed Duplicates",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories (46)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Garlic Bread\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pizzas\n12",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sides\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Pasta\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Burgers\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Beverages\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Desserts\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Combos\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Gujarati Farsan\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Hindi Breads\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dal & Kadhi\n3",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹99",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹139",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹169",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹159",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹199",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹229",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹219",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹229",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹249",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹249",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹299",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹199",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹219",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹279",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹269",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹89",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹109",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹119",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹39",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹39",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹199",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹189",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹219",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹249",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹279",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹119",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹139",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹179",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹199",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹119",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹89",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹79",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹40",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹20",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹99",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹119",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹69",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹149",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹214",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹80.5",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹50",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹150",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹150",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹150",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹99",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "● Active",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Combo",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Delete Combo",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "tplitem-w64nav-1a4ytx5",
+          "text": "Garlic Bread — PIZZA-GARLIC-BREAD — ₹99 — tplitem-w64nav-1a4ytx5"
+        },
+        {
+          "value": "qa-menu-duplicate-1791287434421",
+          "text": "Garlic Bread — PIZZA-GARLIC-BREAD — ₹99 — qa-menu-duplicate-1791287434421"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish by name, description, SKU or tag...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

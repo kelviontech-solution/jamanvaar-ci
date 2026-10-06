@@ -34,12 +34,13 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
     >
       <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
         <img
-          src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
+          src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
           alt={displayName || item.name}
           className="w-full h-full object-cover"
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+            (e.target as HTMLImageElement).onerror = null;
+            (e.target as HTMLImageElement).src = '/assets/menu/common/menu-placeholder-v2.svg';
           }}
         />
         <div className="absolute bottom-2 left-2">
@@ -51,6 +52,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
         <h3 className="text-base font-bold text-jaman-navy leading-snug line-clamp-2 min-h-[2.75rem]">
           {displayName || item.name}
         </h3>
+        {item.subcategory && <span className="text-xs font-semibold text-slate-600">{item.subcategory}</span>}
         {description && (
           <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{description}</p>
         )}

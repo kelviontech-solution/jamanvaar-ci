@@ -227,6 +227,8 @@ export interface Category {
   translations?: Record<string, { name: string; description?: string }>;
   /** When this category was last changed on any device (cross-device sync: the newer change wins). */
   updatedAt?: string;
+  parentId?: string;
+  templateCategoryKey?: string;
 }
 
 export interface ModifierOption {
@@ -257,6 +259,7 @@ export interface ModifierGroup {
 export interface MenuItem {
   id: string;
   categoryId: string;
+  subcategory?: string;
   outletId?: string;
   sku: string;
   name: string;
@@ -303,6 +306,10 @@ export interface MenuItem {
   translations?: Record<string, { name: string; description?: string }>;
   /** When this dish was last changed on any device (cross-device sync: the newer change wins). */
   updatedAt?: string;
+  tags?: string[];
+  templateItemKey?: string;
+  archivedAt?: string;
+  archiveReason?: string;
 }
 
 export interface ComboItemSlot {

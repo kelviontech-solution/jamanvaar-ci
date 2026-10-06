@@ -1,0 +1,1932 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA kiosk product 1791292869813\nKIOSK ADMIN\nQA kiosk product 1791292869813\nCtrl+K\nAssistant\nLogout\nKIOSK OPERATIONS\nDashboard\nKiosk Terminals\nOrders\nLive Orders / KDS\nFloor / Tables\nCUSTOMER EXPERIENCE\nMenu & Categories\nMenu Templates\nCustomisations & Tax\nKiosk Appearance & Content\nKiosk Combos & Deals\nOffers & Coupons\nPAYMENTS & SERVICE\nPayments & Payouts\nReceipt & E-Bill\nPrinters & Devices\nCustomer Feedback\nStaff & Roles (RBAC)\nReports & Analytics\nSYSTEM\nKiosk Settings\nSync & Devices\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nKiosk Appearance & Content\n\nCustomize this branch's customer kiosk. Menu images, prices, availability and modifiers are managed in Menu & Categories and Customisations & Tax. Receipt content and layout are managed in Receipt & E-Bill.\n\nRestaurant logo URL\nUpload kiosk logo (PNG, JPEG or WebP, under 2MB)\nKiosk accent color\nWelcome heading\nWelcome subtitle\nStart order button\nSupporting text\nPromotion banner text\nWelcome background image URL\nShow welcome artwork\nShow promotion banner\nIdle warning after (seconds)\nIdle reset countdown (seconds)\nCustomer screen wording by language\n\nEdit welcome, menu, cart, checkout, payment, confirmation and help labels. Empty values use the default wording. Values containing placeholders should retain those placeholders.\n\nEN\nHI\nGU\nMR\nTA\nTE\nKN\nwelcome\nwelcomeLine1\nwelcomeLine2\nheritageBadge\ntagline\nstartOrder\ntouchToBegin\ndineIn\ndineInDesc\ntakeaway\ntakeawayDesc\ndelivery\ntokenQr\nselectOrderType\nselectOrderTypeSub\nbannerBiryaniTag\nbannerBiryaniTitle\nbannerBiryaniSub\nbannerBiryaniCta\nbannerThaliTag\nbannerThaliTitle\nbannerThaliSub\nbannerThaliCta\nbannerCoffeeTag\nbannerCoffeeTitle\nbannerCoffeeSub\nbannerCoffeeCta\nchefSpecialCombos\nsaveUpTo\npureVegCombo\naddCombo\nselectTable\nguests\ntable\nsearchDishPlaceholder\nallMenu\npureVeg\nnonVeg\njain\npopular\nnew\nchefSpecial\nspicy\nmild\nmedium\nadd\nadded\nviewCart\ncart\norderSummary\nclearCart\nemptyCart\nemptyCartSub\nsubtotal\ndiscount\ncgst\nsgst\ntax\nroundOff\ntotalPayable\nproceedToPayment\ncontinueShopping\ncustomize\nselectModifiers\nrequired\noptional\nspecialInstructions\nnotesPlaceholder\napplyCoupon\ncouponPlaceholder\napply\ncouponApplied\ninvalidCoupon\ncallStaff\nstaffAssistance\nstaffOnTheWay\ncancel\nconfirm\nback\npaymentTitle\nupiQr\nupiSubtitle\ncardTerminal\ncardSubtitle\ncashAtCounter\ncashSubtitle\nscanQrToPay\npaymentExpiresIn\nverifyingPayment\npaymentSuccess\npaymentFailed\nretryPayment\nchangePaymentMethod\norderConfirmed\norderNumber\ntoken\nestimatedWait\nminutes\ntrackOrder\nprintReceipt\ncollectAtCounter\nnewOrder\norderStatus\nstatusConfirmed\nstatusKitchen\nstatusPreparing\nstatusReady\nstatusCollected\nidleWarningTitle\nidleWarningText\nseconds\nkeepOrdering\nhighContrast\nlargeText\nofflineNotice\nchatWelcome\nnonVegCombo\nchatSuggestionOrder\nchatSuggestionVeg\nchatSuggestionJain\nchatSuggestionOffers\nchatSuggestionPay\nscreen_pts__f501d5\nscreen_need_help__5c799f\nscreen_network__760113\nscreen_simulate_b9efe3\nscreen_order_on_phone_a6b0af\nscreen_loyalty_points_d9d154\nscreen_loyalty_login_eceb65\nscreen_choose_your_language_8e2d06\nscreen_you_can_change_this_anytime_from_the_header_d8f222\nscreen_terminal_e0926f\nscreen_staff_mode_35c0cd\nscreen_tap_the_table_number_where_you_are_seated__5e0202\nscreen_no_dining_tables_are_set_up_for_this_kiosk_yet_continue_5dc39c\nscreen_skip_table_selection_pick_up_at_counter__b68635\nscreen_combos_deals_e531d6\nscreen__pure_jain_521c29\nscreen__chef_signature_093f51\nscreen__cold_beverage_f926d2\nscreen_save__2eaea5\nscreen_clear_all_ddceb7\nscreen_add_ons_suggested__fa91bb\nscreen_add_9fd728\nscreen_coupon_applied__194992\nscreen_remove_c3812f\nscreen_apply_31e392\nscreen_redeem_loyalty_points_8591d3\nscreen_balance__e03512\nscreen_pts_52ee19\nscreen_remove__4a816f\nscreen_redeem__324583\nscreen_loyalty_reward_points_fe7dc0\nscreen_staff_manager_discount_10__c08554\nscreen_total_payable__6577c8\nscreen_offline_online_99d685\nscreen_payment_session_expired_4c8564\nscreen_this_qr_timed_out_if_you_already_paid_please_wait_a_few_4226ae\nscreen_try_again_df0fe9\nscreen_cancel_19766e\nscreen_scan_with_any_upi_app_to_pay_ca123c\nscreen_waiting_for_your_payment_your_token_prints_automaticall_2a6f9b\nscreen_pay_at_pickup_counter_c8a1db\nscreen_you_will_receive_your_token_now_please_pay_at_counter_1_df2bd4\nscreen_confirm_get_token_a40e2d\nscreen_pickup_at__e0c9b2\nscreen_digital_delivery_e_bill_options_91fcfc\nscreen_print_receipt_98bad4\nscreen_email_bill_64ee94\nscreen_qr_invoice_39afac\nscreen_how_was_your_ordering_experience__ae5150\nscreen_submit_rating_79a8aa\nscreen__feedback_recorded_thank_you__632564\nscreen_receipt_dad5a9\nscreen_kitchen_order_ticket_a68e9c\nscreen__kot__58647b\nscreen_live_updates_from_jamanvaar_kitchen_for_token_e65167\nscreen_order_items__cc32cc\nscreen_x_2d7116\nscreen_enter_your_email_address_to_receive_your_official_jaman_350fe2\nscreen_email_address_09bf25\nscreen_email_my_bill_dd97a2\nscreen_add_to_cart__7aa3dd\nscreen_included_ba829a\nscreen_jaman_ai_8a6f7b\nscreen_live_ai_a0e6e8\nscreen_complete_conversational_food_ordering_dietary_guide_22ba6d\nscreen__popular_74fe96\nscreen__add_to_cart_927657\nscreen_deal_ae642d\nscreen__add_combo_618900\nscreen_items_added_to_order_e5a5e3\nscreen_total__18e872\nscreen_view_cart_708640\nscreen__checkout_now_c53cf8\nscreen_tap_any_preloaded_option_below__a407c3\nscreen_1_tap_instant_response_55bf08\nscreen_best_sellers_f4b25b\nscreen_value_combos_e99d11\nscreen_pure_jain_food_e0750a\nscreen_gujarati_thali_4acbef\nscreen_dum_biryani_04dea4\nscreen_drinks_sweets_c3d7d4\nscreen_offers_coupons_9520f2\nscreen_payment_help_c652c4\nscreen_scan_this_qr_code_with_your_phone_camera_to_browse_the__fb1a74\nscreen_https_kiosk_jamanvaar_com_m__ef0f32\nscreen_close_7d9eb7\nscreen_enter_your_mobile_number_to_check_loyalty_points_re_ord_08e4ca\nscreen_mobile_number_34975e\nscreen_send_otp_9c4566\nscreen_enter_the_4_digit_code_for_91_cea004\nscreen__no_sms_gateway_is_configured_on_this_kiosk_so_the_code_efb4a3\nscreen_verify_login_91ef55\nscreen_enter_4_digit_staff_authorization_pin_to_unlock_manager_b6b3eb\nscreen_verify_pin_d4d945\nscreen_calling_a_team_member__484ef0\nscreen_please_wait_a_moment__11ee54\nscreen_team_member_notified_0a21d5\nscreen_please_ask_at_the_counter_73be27\nscreen_we_could_not_reach_our_team_from_this_kiosk_right_now_p_92b60f\nscreen_cancel_reset_screen_a5c397\nSave & Publish Kiosk Settings\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Kiosk Appearance & Content",
+    "Customer screen wording by language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA kiosk product 1791292869813",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CUSTOMER EXPERIENCE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu Templates",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PAYMENTS & SERVICE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customer Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save & Publish Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "https://… or /assets/…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "en",
+          "text": "EN"
+        },
+        {
+          "value": "hi",
+          "text": "HI"
+        },
+        {
+          "value": "gu",
+          "text": "GU"
+        },
+        {
+          "value": "mr",
+          "text": "MR"
+        },
+        {
+          "value": "ta",
+          "text": "TA"
+        },
+        {
+          "value": "te",
+          "text": "TE"
+        },
+        {
+          "value": "kn",
+          "text": "KN"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search text or screen label",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Welcome to JAMANVAAR",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Welcome to",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "{{name}}",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Authentic Indian Heritage Flavors • Freshly Prepared",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Authentic Flavors, Seamless Dining",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Start Order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Touch screen to begin your order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Dine-In",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enjoy your meal freshly served at your table",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Takeaway",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pick up fresh packed food at Counter 1",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Delivery",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Token / QR",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "How would you like to enjoy your meal?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Select whether you are dining in our restaurant or packing your feast for takeaway.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "👑 1-Tap Combo Add",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Royal Veg Biryani Feast",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Free Shahi Gulab Jamun & Raita • Save ₹111",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add Combo @ ₹449 ➔",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "✨ Chef Signature",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Gujarati Heritage Thali",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "12 Authentic Items Special Gujarati Feast",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add Thali @ ₹280 ➔",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "☕ Cold Beverage",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cold Coffee with Ice Cream",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Velvety Ice Cream Scoop • 100% Arabica",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add Coffee @ ₹120 ➔",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Chef's Special Combo Meals",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Save up to",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pure Veg Combo",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add Combo",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Select Your Table",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Guests",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Table",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "All Menu",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pure Veg",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Non-Veg",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Jain",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Popular",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "New",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Chef Special",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Spicy",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Mild",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Medium",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "ADD",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "ADDED",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "View Cart",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cart",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order Summary",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Clear Cart",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Your cart is empty",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Explore our delicious menu items and add them to your feast!",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Subtotal",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Discount",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "CGST",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "SGST",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Tax (GST)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Round Off",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Total Payable",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Proceed to Payment",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Add More Items",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Customize",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Select Options & Customizations",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Required",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Optional",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Special Kitchen Instructions",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "E.g., Less spicy, no onion/garlic, extra chutney...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Apply Coupon",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter Promo Code",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Apply",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Coupon Applied Successfully!",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Invalid or Expired Coupon Code",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Call Staff",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Staff Assistance Requested",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "The counter has been notified and will assist you shortly.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cancel",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Confirm",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Back",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Choose Payment Method",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "UPI QR Payment",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Scan & Pay via GPay, PhonePe, Paytm, BHIM",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Card / POS Terminal",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Insert, swipe or tap debit/credit card",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cash at Counter",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pay at billing counter when collecting order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Scan QR Code with any UPI App to Pay",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Payment window closes in",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Verifying your payment transaction...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Payment Received Successfully!",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Payment Failed or Timed Out",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Retry Payment",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Try Another Method",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order Confirmed!",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "TOKEN",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Estimated Prep Time",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Minutes",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Track Order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Print Receipt",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Please collect your order at Pickup Counter 1 when your token is displayed.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Place New Order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Live Kitchen Tracking",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order Received",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Accepted by Chef",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Preparing in Kitchen",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Ready for Pickup / Serving",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order Collected",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Are You Still Ordering?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "For your security, this session will reset automatically in",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "seconds",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Continue Ordering",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "High Contrast",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Large Text",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Offline Mode Active - Orders queued locally",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Namaste! How can I help you choose your meal today?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Non-Vegetarian Combo",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "What should I order?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Show vegetarian dishes",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Show Jain food",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Show today's offers",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "How do I pay?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pts (₹",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Need Help?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Network:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "simulate",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order on Phone",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Loyalty Points",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Loyalty / Login",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Choose your language",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "You can change this anytime from the header",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Terminal",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Staff Mode",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Tap the table number where you are seated.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "No dining tables are set up for this kiosk yet. Continue without a table, or ask staff to add tables.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Skip Table Selection (Pick up at counter)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Combos & Deals",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "🌱 Pure Jain",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "· Chef Signature",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "· Cold Beverage",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Save ₹",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Clear All",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Add-ons (Suggested)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Add",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Coupon Applied:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Remove",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Apply",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Redeem Loyalty Points",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Balance:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pts",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Remove (₹",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Redeem ₹",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Loyalty Reward Points",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Staff Manager Discount (10%)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Total Payable:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Offline & Online",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Payment Session Expired",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "This QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Try Again",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cancel",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Scan with any UPI app to pay",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Waiting for your payment… your token prints automatically once it is received.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pay at Pickup Counter",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "You will receive your token now. Please pay at Counter 1.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Confirm & Get Token",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pickup at:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Digital Delivery & E-Bill Options",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Print Receipt",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Email Bill",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "QR Invoice",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "How was your ordering experience?",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Submit Rating",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "✓ Feedback recorded. Thank you!",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Receipt",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Kitchen Order Ticket",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "(KOT)",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Live updates from JAMANVAAR Kitchen for Token",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Order Items:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "x",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter your email address to receive your official JAMANVAAR tax invoice as a PDF.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Email Address",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Email My Bill",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Add to Cart •",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Included",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "JAMAN AI",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Live AI",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Complete conversational food ordering & dietary guide",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "★ Popular",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add to Cart",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Deal",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "+ Add Combo",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "items added to order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Total:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "View Cart",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "⚡ Checkout Now",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Tap Any Preloaded Option Below:",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "1-Tap Instant Response",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Best Sellers",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Value Combos",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Pure Jain Food",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Gujarati Thali",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Dum Biryani",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Drinks & Sweets",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Offers & Coupons",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Payment Help",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Scan this QR code with your phone camera to browse the menu and order directly from your mobile browser.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "https://kiosk.jamanvaar.com/m/",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Close",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Mobile Number",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Send OTP",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter the 4-digit code for +91",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": ". No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Verify & Login",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Verify PIN",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Calling a team member…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Please wait a moment.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Team Member Notified",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Please ask at the counter",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "We could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Cancel & Reset Screen",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

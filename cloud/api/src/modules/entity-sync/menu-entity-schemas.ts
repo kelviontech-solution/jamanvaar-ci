@@ -15,6 +15,12 @@ const IMAGE = z.string().max(4_000_000); // an inline picture is re-checked (typ
 const menuItem = z
   .object({
     name: nonEmpty(200),
+    sku: text(128).optional(),
+    dietaryType: z.enum(['VEG', 'NON_VEG', 'EGG', 'JAIN', 'VEGAN']).optional(),
+    subcategory: text(120).optional(),
+    tags: z.array(text(120)).max(100).optional(),
+    templateItemKey: text(500).optional(),
+    archivedAt: z.string().datetime().optional(),
     price: money.optional(),
     categoryId: text(128).optional(),
     description: text(2000).optional(),

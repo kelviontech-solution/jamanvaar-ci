@@ -1,0 +1,24 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "JAMANVAAR Apps\n\nQA restaurant product 1791292870204\n\nThis application is not enabled in your restaurant's current plan.\n\nRestaurant Admin\n\nRestaurant operations, floor, inventory and billing\n\nLog out",
+  "headings": [
+    "JAMANVAAR Apps"
+  ],
+  "buttons": [
+    {
+      "text": "Restaurant Admin\n\nRestaurant operations, floor, inventory and billing",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

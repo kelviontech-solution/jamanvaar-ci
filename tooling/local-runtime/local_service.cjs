@@ -776,14 +776,15 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname === '/pos') { res.writeHead(302, { Location: '/pos/' }); res.end(); return; }
+  if (pathname === '/restaurant-admin' || pathname === '/kiosk-admin') { res.writeHead(302, { Location: pathname + '/' }); res.end(); return; }
   if (pathname === '/admin' || pathname === '/pos-admin') { res.writeHead(302, { Location: '/pos-admin/' }); res.end(); return; }
   if (pathname === '/kiosk') { res.writeHead(302, { Location: '/kiosk/' }); res.end(); return; }
 
   if (pathname.startsWith('/pos/')) {
     return serveStatic(posDir, pathname.replace(/^\/pos\//, '') || 'index.html');
   }
-  if (pathname.startsWith('/pos-admin/')) {
-    return serveStatic(posAdminDir, pathname.replace(/^\/pos-admin\//, '') || 'index.html');
+  if (/^\/(?:pos-admin|restaurant-admin|kiosk-admin)\//.test(pathname)) {
+    return serveStatic(posAdminDir, pathname.replace(/^\/(?:pos-admin|restaurant-admin|kiosk-admin)\//, '') || 'index.html');
   }
   if (pathname.startsWith('/kiosk/')) {
     return serveStatic(kioskDir, pathname.replace(/^\/kiosk\//, '') || 'index.html');

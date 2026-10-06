@@ -8,7 +8,7 @@ export interface FoodImageAsset {
   tags: string[];
 }
 
-export const FOOD_IMAGE_LIBRARY: FoodImageAsset[] = [
+const BUNDLED_FOOD_IMAGE_LIBRARY: FoodImageAsset[] = [
   // Flagship Verified Indian Dishes
   {
     id: 'img-hbk-01',
@@ -315,5 +315,9 @@ export const FOOD_IMAGE_LIBRARY: FoodImageAsset[] = [
     tags: ['choco lava', 'cake', 'chocolate', 'dessert']
   }
 ];
+
+// Only photo entries reviewed against their dish names are offered automatically.
+const reviewedPhotoIds = new Set(['img-hbk-01','img-cc-02','img-ccr-03','img-pt-04','img-dm-05','img-pbm-06','img-bn-07','img-gn-08','img-vgb-09','img-cc-10','img-gj-11','img-thl-12','img-piz-1']);
+export const FOOD_IMAGE_LIBRARY = BUNDLED_FOOD_IMAGE_LIBRARY.filter(image => image.url.endsWith('.svg') || reviewedPhotoIds.has(image.id));
 
 export const FALLBACK_FOOD_IMAGE = '/assets/menu/common/fallback-dish.svg';

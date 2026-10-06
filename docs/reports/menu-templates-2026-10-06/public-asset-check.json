@@ -1,0 +1,27 @@
+[
+  {
+    "path": "pizza/margherita.jpg",
+    "platformRootAssetExists": true,
+    "platformRootMatchesCanonical": true
+  },
+  {
+    "path": "north-indian/butter-naan.jpg",
+    "platformRootAssetExists": true,
+    "platformRootMatchesCanonical": true
+  },
+  {
+    "path": "north-indian/garlic-naan.jpg",
+    "platformRootAssetExists": true,
+    "platformRootMatchesCanonical": true
+  },
+  {
+    "path": "pizza/alfredo-pasta.jpg",
+    "platformRootAssetExists": true,
+    "platformRootMatchesCanonical": true
+  },
+  {
+    "path": "common/menu-placeholder-v2.svg",
+    "platformRootAssetExists": true,
+    "platformRootMatchesCanonical": true
+  }
+]

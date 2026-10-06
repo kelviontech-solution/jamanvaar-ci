@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
-const BRAIN_DIR = 'C:\\Users\\OM Sanjhira\\.gemini\\antigravity-ide\\brain\\bb5f9ef3-93a7-4d0a-a23a-576df56af20b';
+const BRAIN_DIR = process.env.JAMANVAAR_CORE_PHOTO_SOURCE || '';
 
 const CORE_DISH_PHOTOS = [
   {
@@ -123,7 +123,7 @@ const TARGET_APP_DIRS = [
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos-admin', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-user', 'public', 'assets', 'menu'),
-  path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-admin', 'public', 'assets', 'menu'),
+  path.join(ROOT_DIR, 'cloud', 'super-admin-web', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'captain', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'kds', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'JAMANVAAR_DESKTOP_PACKAGE', 'assets', 'menu')
@@ -131,11 +131,12 @@ const TARGET_APP_DIRS = [
 
 console.log('🚀 [JAMANVAAR] Packaging & Synchronizing Verified Authentic Food Photos...');
 
-const brainFiles = fs.readdirSync(BRAIN_DIR);
+const brainFiles = BRAIN_DIR && fs.existsSync(BRAIN_DIR) ? fs.readdirSync(BRAIN_DIR) : [];
 
 for (const dish of CORE_DISH_PHOTOS) {
   const matchedFile = brainFiles.find(f => f.startsWith(dish.sourcePattern) && f.endsWith('.jpg'));
   if (!matchedFile) {
+    if (fs.existsSync(path.join(ROOT_DIR, 'packages', 'assets', 'menu', dish.relPath))) continue;
     console.warn(`⚠️ Warning: Source image for ${dish.name} (${dish.sourcePattern}) not found.`);
     continue;
   }

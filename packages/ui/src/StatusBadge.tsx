@@ -14,6 +14,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 }) => {
   // Dietary indicator
   if (type === 'dietary' || status === 'VEG' || status === 'NON_VEG' || status === 'JAIN') {
+    if (status === 'EGG' || status === 'VEGAN') return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${status === 'EGG' ? 'bg-amber-50 text-amber-900 border-amber-300' : 'bg-green-50 text-green-800 border-green-300'} ${className}`}><span className={`w-2 h-2 rounded-full ${status === 'EGG' ? 'bg-amber-800' : 'bg-green-700'}`} />{status === 'EGG' ? 'Egg' : 'Vegan'}</span>;
     if (status === 'VEG') {
       return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#ECFDF5] text-[#16A34A] border border-[#A7F3D0] ${className}`}>

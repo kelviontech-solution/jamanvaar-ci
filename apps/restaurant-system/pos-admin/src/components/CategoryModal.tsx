@@ -17,6 +17,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   onSaved
 }) => {
   const [name, setName] = useState('');
+  const [sortOrder, setSortOrder] = useState(1);
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [iconName, setIconName] = useState('UtensilsCrossed');
@@ -27,7 +28,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
   useEffect(() => {
     if (categoryToEdit) {
-      setName(categoryToEdit.name);
+      setName(categoryToEdit.name); setSortOrder(categoryToEdit.sortOrder);
       setSlug(categoryToEdit.slug);
       setDescription(categoryToEdit.description || '');
       setIconName(categoryToEdit.iconName || 'UtensilsCrossed');
@@ -35,7 +36,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       setQrVisible(categoryToEdit.qrVisible !== false);
       setImageUrl(categoryToEdit.imageUrl || '');
     } else {
-      setName('');
+      setName(''); setSortOrder(1);
       setSlug('');
       setDescription('');
       setIconName('UtensilsCrossed');
@@ -73,14 +74,15 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-    if (!name) {
+    if (!Number.isInteger(sortOrder) || sortOrder < 0) { setFormError('Display order must be a non-negative integer.'); return; }
+    if (!name.trim()) {
       setFormError('Category name is required.');
       return;
     }
 
     if (categoryToEdit) {
       MenuRepository.updateCategory(categoryToEdit.id, {
-        name,
+        name: name.trim(), sortOrder,
         slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
         description,
         iconName,
@@ -96,7 +98,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       });
     } else {
       MenuRepository.createCategory({
-        name,
+        name: name.trim(), sortOrder,
         slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
         description,
         iconName,
@@ -163,6 +165,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </div>
         </div>
 
+        <label className="block text-xs font-bold">Category display order<input aria-label="Category display order" type="number" min={0} value={sortOrder} onChange={e => setSortOrder(Number(e.target.value))} className="block w-full border p-2 rounded-xl" /></label>
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Description (Optional)</label>
           <input

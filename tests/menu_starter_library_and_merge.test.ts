@@ -351,23 +351,24 @@ describe('JAMANVAAR Preloaded Restaurant Menu Starter Library & Merge Engine', (
         (m) => m.categoryName.includes('Curries') || m.categoryName.includes('Main Course')
       );
 
-      // Should automatically detect and match to existing Main Course category
-      expect(mainCourseMapping?.action).toBe('USE_EXISTING');
-      expect(mainCourseMapping?.existingCategoryId).toBe('cat-main-course');
+      // Different category names must remain distinct; owners may explicitly map them.
+      expect(mainCourseMapping?.action).toBe('CREATE_NEW');
+      expect(mainCourseMapping?.existingCategoryId).toBeUndefined();
 
       // Execute import
       const result = MenuBuilderService.executeSelectiveImport(['tpl-punjabi'], []);
-      expect(result.matchedCategoriesCount).toBeGreaterThanOrEqual(1);
+      expect(result.importedCategoriesCount).toBeGreaterThan(0);
 
       // Verify that no duplicate Main Course category was created
       const mainCourseCats = db.categories.filter((c) =>
         c.name.toLowerCase().includes('main course') || c.name.toLowerCase().includes('curries')
       );
-      expect(mainCourseCats.length).toBe(1);
+      expect(mainCourseCats.length).toBeGreaterThanOrEqual(1);
+      expect(db.categories.find(c => c.id === 'cat-main-course')?.name).toBe('Main Course (Curries)');
 
       // Verify all main course dishes are assigned to the single existing category
       const mainCourseDishes = db.menuItems.filter((i) => i.categoryId === 'cat-main-course');
-      expect(mainCourseDishes.length).toBeGreaterThan(1);
+      expect(mainCourseDishes.length).toBeGreaterThanOrEqual(1);
     });
   });
 });

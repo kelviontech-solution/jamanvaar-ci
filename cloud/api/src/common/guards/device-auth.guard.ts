@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 import { hashOpaqueToken } from '../security/token.util';
 import { RealtimeBus } from '../realtime/realtime-bus';
+import { requiredConsoleApps } from '../security/admin-product-access';
 
 /**
  * Every device request used to run four queries (device + restaurant + branch, subscriptions, application entitlement) before
@@ -15,7 +16,7 @@ function authCacheMs(): number {
   const v = Number(process.env.DEVICE_AUTH_CACHE_MS);
   return Number.isFinite(v) && v >= 0 ? v : 2000;
 }
-export const DEVICE_AUTH_CACHE = new Map<string, { at: number; device: any; branch: any }>();
+export const DEVICE_AUTH_CACHE = new Map<string, { at: number; device: any; branch: any; enabledApps: string[] }>();
 let subscribed: RealtimeBus | null = null;
 let invalidationVersion = 0;
 function subscribeToInvalidations(bus: RealtimeBus): void {
@@ -73,7 +74,7 @@ export class DeviceAuthGuard implements CanActivate {
     const versionAtStart = invalidationVersion;
     const ttl = authCacheMs();
     const hit = ttl > 0 ? DEVICE_AUTH_CACHE.get(tokenHash) : undefined;
-    let verdict: { device: any; branch: any } | null = hit && Date.now() - hit.at < ttl ? { device: hit.device, branch: hit.branch } : null;
+    let verdict: { device: any; branch: any; enabledApps: string[] } | null = hit && Date.now() - hit.at < ttl ? hit : null;
     if (!verdict) {
       const deviceWithRestaurant = await this.prisma.runAsPlatform((tx) =>
         tx.device.findUnique({
@@ -126,23 +127,32 @@ export class DeviceAuthGuard implements CanActivate {
       // accepts either admin entitlement; subsequent calls must use the same contract.
       // Keep the actual app rows distinct so kiosk access never enables POS-only modules.
       const entitledApps = device.type === 'POS_ADMIN' ? ['POS_ADMIN', 'KIOSK_ADMIN'] as const : [device.type];
-      const entitlement = await this.prisma.runAsPlatform((tx) =>
-        tx.applicationEntitlement.findFirst({
+      const entitlements = await this.prisma.runAsPlatform((tx) =>
+        tx.applicationEntitlement.findMany({
           where: { subscriptionId: { in: subscriptions.map((sub) => sub.id) }, appCode: { in: [...entitledApps] }, enabled: true },
-          select: { id: true }
+          select: { appCode: true }
         })
       );
-      if (!entitlement) {
+      if (!entitlements.length) {
         const appName = device.type === 'POS_ADMIN' ? 'Restaurant Admin (POS_ADMIN or KIOSK_ADMIN)' : device.type;
         this.deny('forbidden', 'APP_DISABLED', `${appName} is not enabled for this restaurant. Please contact your platform administrator.`);
       }
 
-      if (ttl > 0 && versionAtStart === invalidationVersion) DEVICE_AUTH_CACHE.set(tokenHash, { at: Date.now(), device, branch: branchOfDevice });
-      verdict = { device, branch: branchOfDevice };
+      const enabledApps = entitlements.map(row => row.appCode);
+      if (ttl > 0 && versionAtStart === invalidationVersion) DEVICE_AUTH_CACHE.set(tokenHash, { at: Date.now(), device, branch: branchOfDevice, enabledApps });
+      verdict = { device, branch: branchOfDevice, enabledApps };
 
     }
     const device = verdict!.device;
     const branch = verdict!.branch;
+
+    if (device.type === 'POS_ADMIN' || device.type === 'KIOSK_ADMIN') {
+      const required = requiredConsoleApps(request.originalUrl ?? request.url ?? '');
+      if (!required.some(app => verdict!.enabledApps.includes(app))) {
+        // A resource denial must not lock the whole shared console; the other product may remain enabled.
+        throw new ForbiddenException({ statusCode: 403, code: 'PRODUCT_ACCESS_DENIED', message: 'Your subscription does not enable this application resource.' });
+      }
+    }
 
     // A terminal bound to a branch stops when that branch is deactivated (BUG-048). Like an MDM lock it
     // may still check in, so it can learn why and resume as soon as the branch is active again.

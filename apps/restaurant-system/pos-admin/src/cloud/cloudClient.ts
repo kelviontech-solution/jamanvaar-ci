@@ -420,6 +420,7 @@ export async function cloudActivateDevice(
     deviceId: string;
     deviceToken: string;
     branchId?: string | null;
+    activatedProduct?: 'POS_ADMIN' | 'KIOSK_ADMIN' | null;
   }>('/api/v1/tenant-auth/activate-device', {
     method: 'POST',
     body: {
@@ -436,6 +437,11 @@ export async function cloudActivateDevice(
   KeyValueStore.set('jamanvaar_bound_branch_id', result.branchId ?? '');
   saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
   setRestaurantId(result.restaurant.id);
+
+  if (result.activatedProduct) {
+    // The server resolved the redeemed key. This is never used as authorization.
+    try { localStorage.setItem(`jamanvaar:admin-context:${result.restaurant.id}`, JSON.stringify({ product: result.activatedProduct, pages: { [result.activatedProduct]: 'DASHBOARD' } })); } catch {}
+  }
 
   return {
     user: result.user,
@@ -513,12 +519,15 @@ export async function cloudResetPasswordOwner(restaurantCode: string, otp: strin
  */
 export async function cloudLogout(): Promise<void> {
   sessionEpoch++;
+  // Capture the authenticated request, then clear locally before waiting. A slow logout
+  // response must not erase an access token obtained by a subsequent login.
+  const revoke = request('/api/v1/tenant-auth/logout', { method: 'POST', skipAuthRetry: true });
+  accessToken = null;
   try {
-    await request('/api/v1/tenant-auth/logout', { method: 'POST', skipAuthRetry: true });
+    await revoke;
   } catch {
     // Best-effort — local sign-out must proceed either way.
   }
-  accessToken = null;
 }
 
 /**

@@ -46,8 +46,9 @@ export function filterNavSections<T extends GatedNavItem>(
  * value that changes when auth state does (e.g. `cloudConnected`) — mirrors how this app already
  * re-fetches `refreshCloudEntitlementsIntoLicense` keyed on that same signal.
  */
-export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) => boolean; loading: boolean; error: string | null; authRequired: boolean; refetch: () => void } {
+export function useEntitlements(refreshKey?: unknown, enabled = true): { enabledApps: AppCode[]; hasApp: (app: AppCode) => boolean; loading: boolean; error: string | null; authRequired: boolean; refetch: () => void } {
   const [enabledApps, setEnabledApps] = useState<AppCode[] | null>(null);
+  const [loadedKey, setLoadedKey] = useState<unknown>(Symbol('not loaded'));
   const [error, setError] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [revision, setRevision] = useState(0);
@@ -55,7 +56,10 @@ export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) 
 
   const load = useCallback(() => setRevision(n => n + 1), []);
 
+  useEffect(() => { setEnabledApps(null); setError(null); setAuthRequired(false); }, [refreshKey]);
+
   useEffect(() => {
+    if (!enabled) { setEnabledApps([]); setLoadedKey(refreshKey); return; }
     let cancelled = false;
     const requestGeneration = ++generation.current;
     fetchMyEnabledApps()
@@ -64,6 +68,7 @@ export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) 
           setEnabledApps(previous => previous && previous.length === apps.length && previous.every(app => apps.includes(app)) ? previous : apps);
           setError(null);
           setAuthRequired(false);
+          setLoadedKey(refreshKey);
         }
       })
       .catch((err) => {
@@ -72,20 +77,22 @@ export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) 
           setEnabledApps([]); // Fail closed, with explicit recovery instead of implying an empty plan.
           setAuthRequired(denied);
           setError(denied ? 'Your cloud session has expired. Sign in again to restore your restaurant modules.' : 'Restaurant modules could not be loaded. Check your connection and try again.');
+          setLoadedKey(refreshKey);
         }
       });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey, revision]);
+  }, [refreshKey, revision, enabled]);
 
-  const hasApp = useCallback((app: AppCode) => (enabledApps ?? []).includes(app), [enabledApps]);
+  const hasApp = useCallback((app: AppCode) => enabled && loadedKey === refreshKey && (enabledApps ?? []).includes(app), [enabledApps, loadedKey, refreshKey, enabled]);
 
   return {
-    loading: enabledApps === null,
-    error,
-    authRequired,
+    enabledApps: loadedKey === refreshKey ? enabledApps ?? [] : [],
+    loading: enabledApps === null || loadedKey !== refreshKey,
+    error: loadedKey === refreshKey ? error : null,
+    authRequired: loadedKey === refreshKey && authRequired,
     hasApp,
     refetch: load
   };

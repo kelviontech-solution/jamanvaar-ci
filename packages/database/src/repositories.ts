@@ -1,3 +1,5 @@
+import { normalizeMenuText } from './menu_identity';
+import { scanMenuDuplicates, archiveConfirmedDuplicates } from './menu_cleanup';
 import { KioskConfigurationRepository } from './kiosk_configuration';
 import { PaymentPolicy } from './payment_policy';
 import { NumberAllocator } from './number_allocator';
@@ -125,10 +127,10 @@ export class MenuRepository {
       description: category.description || '',
       iconName: category.iconName || 'Utensils',
       imageUrl: category.imageUrl,
-      sortOrder: category.sortOrder || db.categories.length + 1,
+      sortOrder: category.sortOrder ?? db.categories.length + 1,
       isActive: category.isActive ?? true,
       ...(category.qrVisible !== undefined ? { qrVisible: category.qrVisible } : {}),
-      translations: category.translations
+      translations: category.translations, updatedAt: new Date().toISOString()
     };
     db.categories.push(newCat);
     db.notify();
@@ -138,7 +140,7 @@ export class MenuRepository {
   public static updateCategory(id: string, updates: Partial<Category>): Category | null {
     const idx = db.categories.findIndex((c) => c.id === id);
     if (idx === -1) return null;
-    db.categories[idx] = { ...db.categories[idx], ...updates };
+    db.categories[idx] = { ...db.categories[idx], ...updates, updatedAt: new Date().toISOString() };
     db.notify();
     return db.categories[idx];
   }
@@ -336,7 +338,7 @@ export class MenuRepository {
   }
 
   public static getAllMenuItems(): MenuItem[] {
-    return db.menuItems.map((item) => ({
+    return db.menuItems.filter(item => !item.archivedAt).map((item) => ({
       ...item,
       modifierGroups: (item.modifierGroupIds || [])
         .map((gId) => db.modifierGroups.find((g) => g.id === gId))
@@ -360,14 +362,14 @@ export class MenuRepository {
     const already = this.findDuplicateDish(itemData.name || 'New Dish', { sku: itemData.sku, categoryId: itemData.categoryId });
     if (already) return already;
     const newItem: MenuItem = {
-      id: itemData.id || `item-${Date.now()}`,
+      id: itemData.id || generateUUID(),
       categoryId: itemData.categoryId || db.categories[0]?.id || '',
       sku: itemData.sku || `SKU-${Math.floor(100 + Math.random() * 900)}`,
       name: itemData.name || 'New Dish',
       description: itemData.description || '',
       translations: itemData.translations,
-      price: itemData.price || 100,
-      imageUrl: itemData.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+      price: itemData.price ?? 100,
+      imageUrl: itemData.imageUrl,
       dietaryType: itemData.dietaryType || 'VEG',
       spiceLevel: itemData.spiceLevel || 'NONE',
       isPopular: !!itemData.isPopular,
@@ -387,7 +389,8 @@ export class MenuRepository {
       ...(itemData.maxQuantity !== undefined ? { maxQuantity: itemData.maxQuantity } : {}),
       ...(itemData.allowInstructions !== undefined ? { allowInstructions: itemData.allowInstructions } : {}),
       sortOrder: itemData.sortOrder ?? db.menuItems.length + 1,
-      kitchenStation: itemData.kitchenStation || 'Main Kitchen'
+      kitchenStation: itemData.kitchenStation || 'Main Kitchen',
+      subcategory: itemData.subcategory, tags: itemData.tags, updatedAt: new Date().toISOString()
     };
     db.menuItems.push(newItem);
     db.notify();
@@ -397,7 +400,7 @@ export class MenuRepository {
   public static updateMenuItem(id: string, updates: Partial<MenuItem>): MenuItem | null {
     const idx = db.menuItems.findIndex((i) => i.id === id);
     if (idx === -1) return null;
-    db.menuItems[idx] = { ...db.menuItems[idx], ...updates };
+    db.menuItems[idx] = { ...db.menuItems[idx], ...updates, updatedAt: new Date().toISOString() };
     const linkedCombo = db.combos.find(combo => `combo-${combo.id}` === id);
     if (linkedCombo) {
       const item = db.menuItems[idx];
@@ -409,7 +412,7 @@ export class MenuRepository {
 
   /** Dish names compare without case, spaces or punctuation, so "Paneer Tikka Angara" and "paneer-tikka  angara!" are one dish. */
   public static normalizeDishName(name: string): string {
-    return (name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    return normalizeMenuText(name);
   }
 
   /** The dish already on the menu with this name (or, when given, the same SKU in the same category), if any. */
@@ -417,8 +420,8 @@ export class MenuRepository {
     const norm = this.normalizeDishName(name);
     return db.menuItems.find(
       (i) =>
-        i.id !== opts.excludeId &&
-        ((norm !== '' && this.normalizeDishName(i.name) === norm) || (!!opts.sku && !!i.sku && i.sku === opts.sku && i.categoryId === opts.categoryId))
+        !i.archivedAt && i.id !== opts.excludeId &&
+        ((norm !== '' && this.normalizeDishName(i.name) === norm && (!opts.categoryId || i.categoryId === opts.categoryId)) || (!!opts.sku && !!i.sku && i.sku === opts.sku && i.categoryId === opts.categoryId))
     );
   }
 
@@ -428,46 +431,23 @@ export class MenuRepository {
    * at a removed copy are re-pointed at the one that stays, and every removal is recorded so other devices drop it too.
    */
   public static removeDuplicateDishes(): { removed: number; kept: number } {
-    const groups = new Map<string, MenuItem[]>();
-    const add = (key: string, item: MenuItem) => groups.set(key, [...(groups.get(key) ?? []), item]);
-    for (const item of db.menuItems) {
-      const norm = this.normalizeDishName(item.name);
-      if (norm) add(`n:${norm}`, item);
-      if (item.sku) add(`s:${item.categoryId}:${item.sku}`, item);
-    }
-    const doomed = new Map<string, string>(); // removed id -> kept id
-    const score = (i: MenuItem) => (i.imageUrl && !i.imageUrl.includes('fallback') ? 2 : 0) + (i.isAvailable ? 1 : 0);
-    for (const items of groups.values()) {
-      const live = items.filter((i) => !doomed.has(i.id));
-      if (live.length < 2) continue;
-      const keep = [...live].sort((a, b) => score(b) - score(a) || db.menuItems.indexOf(a) - db.menuItems.indexOf(b))[0];
-      for (const other of live) if (other.id !== keep.id) doomed.set(other.id, keep.id);
-    }
-    if (doomed.size === 0) return { removed: 0, kept: db.menuItems.length };
-    for (const combo of db.combos ?? []) {
-      for (const field of ['mainItemIds', 'sideItemIds', 'drinkItemIds', 'dessertItemIds'] as const) {
-        const ids = (combo as unknown as Record<string, string[] | undefined>)[field];
-        if (Array.isArray(ids)) (combo as unknown as Record<string, string[]>)[field] = [...new Set(ids.map((id) => doomed.get(id) ?? id))];
-      }
-    }
-    for (const id of doomed.keys()) {
-      const idx = db.menuItems.findIndex((i) => i.id === id);
-      if (idx !== -1) {
-        db.menuItems.splice(idx, 1);
-        MenuItemSync.recordDeletion(id);
-      }
-    }
-    db.notify();
-    return { removed: doomed.size, kept: db.menuItems.length };
+    // Legacy callers must opt in; opening a page never runs destructive cleanup.
+    const report = scanMenuDuplicates();
+    const groups = report.groups.filter(g => g.confirmed).map(g => g.id);
+    const result = archiveConfirmedDuplicates(report, groups);
+    return { removed: result.archived, kept: db.menuItems.filter(i => !i.archivedAt).length };
   }
 
   public static deleteMenuItem(id: string): boolean {
-    const idx = db.menuItems.findIndex((i) => i.id === id);
-    if (idx === -1) return false;
-    db.menuItems.splice(idx, 1);
-    MenuItemSync.recordDeletion(id);
-    db.notify();
-    return true;
+    const item = db.menuItems.find(i => i.id === id);
+    if (!item || item.archivedAt) return false;
+    item.archivedAt = new Date().toISOString(); item.archiveReason = 'Archived by restaurant admin'; item.isAvailable = false; item.updatedAt = item.archivedAt;
+    const combo = db.combos.find(c => `combo-${c.id}` === id); if (combo) combo.isAvailable = false;
+    for (const related of db.combos) if ([...related.mainItemIds, ...related.sideItemIds, ...related.drinkItemIds, ...related.dessertItemIds].includes(id)) {
+      related.isAvailable = false; related.updatedAt = item.archivedAt;
+      const bundle = db.menuItems.find(i => i.id === `combo-${related.id}`); if (bundle) { bundle.isAvailable = false; bundle.updatedAt = item.archivedAt; }
+    }
+    db.notify(); return true;
   }
 
   public static toggleItemAvailability(
@@ -2082,6 +2062,7 @@ export class ComboRepository {
   public static deleteCombo(id: string): boolean {
     const idx = db.combos.findIndex((c) => c.id === id);
     if (idx !== -1) {
+      MenuRepository.deleteMenuItem(`combo-${id}`);
       db.combos.splice(idx, 1);
       ComboSync.recordDeletion(id); // so the deletion reaches the kiosks (BUG-130)
       db.notify();

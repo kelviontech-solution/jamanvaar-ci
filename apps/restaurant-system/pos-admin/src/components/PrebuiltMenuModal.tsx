@@ -1,169 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
-import { PREBUILT_MENU_TEMPLATES, db, MenuRepository, AuditRepository } from '@jamanvaar/database';
-import { Check } from 'lucide-react';
-
-interface PrebuiltMenuModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onImported: (count: number) => void;
-}
-
-export const PrebuiltMenuModal: React.FC<PrebuiltMenuModalProps> = ({
-  isOpen,
-  onClose,
-  onImported
-}) => {
-  const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>(['tpl-north-indian', 'tpl-gujarati']);
-  const [importMode, setImportMode] = useState<'ADD' | 'REPLACE'>('ADD');
-
-  const handleToggleTemplate = (id: string) => {
-    setSelectedTemplateIds((prev) =>
-      prev.includes(id) ? prev.filter((tId) => tId !== id) : [...prev, id]
-    );
+import { PREBUILT_MENU_TEMPLATES, db, AuditRepository, KeyValueStore } from '@jamanvaar/database';
+import { MenuBuilderService, templateItemKey, existingTemplateItem, exactCategory } from '@jamanvaar/business';
+import { publishCatalogNow } from '@jamanvaar/sync';
+interface Props { isOpen: boolean; onClose: () => void; onImported: (count: number) => void }
+// Keep old miniature presets compatible with saved IDs, but offer complete restaurant catalogs for onboarding.
+const onboardingTemplates = PREBUILT_MENU_TEMPLATES.filter(template => template.approxItemCount >= 25);
+export const PrebuiltMenuModal: React.FC<Props> = ({ isOpen, onClose, onImported }) => {
+  const [templateId, setTemplateId] = useState('tpl-pizza'); const [selected, setSelected] = useState<string[]>([]); const [categories, setCategories] = useState<string[]>([]);
+  const [strategy, setStrategy] = useState<'SKIP_DUPLICATE' | 'UPDATE_EXISTING' | 'IMPORT_AS_NEW'>('SKIP_DUPLICATE');
+  const [taxId, setTaxId] = useState(''); const [busy, setBusy] = useState(false); const [message, setMessage] = useState(''); const [tenant, setTenant] = useState<string | null>(null);
+  const template = PREBUILT_MENU_TEMPLATES.find(t => t.id === templateId)!;
+  const entries = template.categories.flatMap(c => c.items.map(item => ({ item, cat: c, key: templateItemKey(template.id, c.slug, item.sku) })));
+  useEffect(() => { if (isOpen) { setSelected([]); setCategories([]); setMessage(''); setTenant(KeyValueStore.get('jamanvaar_tenant_id')); } }, [isOpen, templateId]);
+  const chooseAll = () => { setSelected(entries.map(e => e.key)); setCategories(template.categories.map(c => `${template.id}::${c.slug}`)); };
+  const selectedEntries = entries.filter(e => selected.includes(e.key));
+  const duplicateCount = selectedEntries.filter(e => existingTemplateItem(e.key, e.item, exactCategory(e.cat.name))).length;
+  const toggleCategory = (slug: string, checked: boolean) => {
+    const key = `${template.id}::${slug}`;
+    const dependencies = slug === 'combos' && checked ? new Set(template.combos?.flatMap(c => c.itemSkus || [])) : null;
+    const matching = entries.filter(e => dependencies ? dependencies.has(e.item.sku) : e.cat.slug === slug);
+    const itemKeys = matching.map(e => e.key);
+    setCategories(current => checked ? [...new Set([...current, key, ...matching.map(e => `${template.id}::${e.cat.slug}`)])] : current.filter(k => k !== key));
+    setSelected(current => checked ? [...new Set([...current, ...itemKeys])] : current.filter(k => !itemKeys.includes(k)));
   };
-
-  const handleSelectAll = () => {
-    if (selectedTemplateIds.length === PREBUILT_MENU_TEMPLATES.length) {
-      setSelectedTemplateIds([]);
-    } else {
-      setSelectedTemplateIds(PREBUILT_MENU_TEMPLATES.map((t) => t.id));
-    }
-  };
-
-  const handleImport = () => {
-    const tpls = PREBUILT_MENU_TEMPLATES.filter((t) => selectedTemplateIds.includes(t.id));
-    if (tpls.length === 0) return;
-
-    if (importMode === 'REPLACE') {
-      db.menuItems = [];
-      db.categories = [];
-    }
-
-    let addedItemsCount = 0;
-    tpls.forEach((tpl) => {
-      tpl.categories.forEach((cat: any) => {
-        let existingCat = db.categories.find((c) => c.name.toLowerCase() === cat.name.toLowerCase());
-        if (!existingCat) {
-          existingCat = {
-            id: `cat-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-            name: cat.name,
-            slug: cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            iconName: 'UtensilsCrossed',
-            sortOrder: db.categories.length + 1,
-            isActive: true
-          };
-          db.categories.push(existingCat);
-        }
-
-        cat.items.forEach((it: any) => {
-          MenuRepository.createMenuItem({
-            name: it.name,
-            sku: it.sku || `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
-            price: it.suggestedPrice || 220,
-            categoryId: existingCat!.id,
-            description: it.description || '',
-            dietaryType: it.dietaryType || 'VEG',
-            spiceLevel: it.spiceLevel || 'NONE',
-            imageUrl: it.imageUrl || '/assets/menu/common/fallback-dish.svg',
-            kitchenStation: it.station || 'Main Kitchen',
-            isAvailable: true
-          });
-          addedItemsCount++;
-        });
-      });
-    });
-
-    AuditRepository.log({
-      action: 'PRELOADED_MENU_IMPORTED',
-      category: 'MENU',
-      details: `Imported ${addedItemsCount} dishes from ${tpls.length} templates (${importMode} mode)`,
-      username: 'Manager'
-    });
-
-    db.notify();
-    onImported(addedItemsCount);
-    onClose();
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`${PREBUILT_MENU_TEMPLATES.length} Preloaded Starter Menu Templates`} maxWidth="2xl">
-      <div className="space-y-4 py-1">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-slate-500">
-            Select one or more restaurant cuisines to import prebuilt categories, items, and pricing:
-          </p>
-          <button
-            onClick={handleSelectAll}
-            className="text-xs font-bold text-brand hover:underline"
-          >
-            {selectedTemplateIds.length === PREBUILT_MENU_TEMPLATES.length ? 'Deselect All' : `Select All ${PREBUILT_MENU_TEMPLATES.length}`}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto pr-1">
-          {PREBUILT_MENU_TEMPLATES.map((tpl) => {
-            const isSelected = selectedTemplateIds.includes(tpl.id);
-            return (
-              <div
-                key={tpl.id}
-                onClick={() => handleToggleTemplate(tpl.id)}
-                className={`p-3 rounded-2xl border-2 cursor-pointer transition-all ${
-                  isSelected
-                    ? 'border-brand bg-brand/[0.07]'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-jaman-navy block">{tpl.name}</span>
-                  {isSelected && <span className="text-xs text-brand font-bold"><Check className="w-3 h-3" /></span>}
-                </div>
-                <span className="text-[11px] text-slate-500 block mt-0.5">
-                  {tpl.approxItemCount || 20} dishes • {tpl.cuisine}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Import Mode */}
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs">
-          <span className="font-bold text-amber-900">Import Mode:</span>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-1.5 font-bold cursor-pointer text-slate-700">
-              <input
-                type="radio"
-                name="impMode"
-                checked={importMode === 'ADD'}
-                onChange={() => setImportMode('ADD')}
-              />
-              Add to Existing Menu
-            </label>
-            <label className="flex items-center gap-1.5 font-bold cursor-pointer text-rose-700">
-              <input
-                type="radio"
-                name="impMode"
-                checked={importMode === 'REPLACE'}
-                onChange={() => setImportMode('REPLACE')}
-              />
-              Replace Entire Menu
-            </label>
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
-          <Button variant="outline" size="sm" onClick={onClose}>
-            Cancel
-          </Button>
-          <button
-            disabled={selectedTemplateIds.length === 0}
-            onClick={handleImport}
-            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
-          >
-            Import Selected ({selectedTemplateIds.length} Cuisines)
-          </button>
-        </div>
-      </div>
-    </Modal>
-  );
+  return <Modal isOpen={isOpen} onClose={busy ? () => {} : onClose} title="Load Restaurant Menu Template" maxWidth="3xl">
+    <div className="space-y-4">
+      <p className="text-sm text-slate-600">Choose a niche, review the complete starter menu, then load all or individual categories and items. Your current menu is retained.</p>
+      <label className="block font-semibold">Restaurant type / template<select aria-label="Restaurant menu template" className="block w-full rounded-xl border p-3 mt-1" value={templateId} disabled={busy} onChange={e => setTemplateId(e.target.value)}>{onboardingTemplates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
+      <p>{template.description}</p>
+      <div data-testid="template-counts" className="rounded-xl bg-orange-50 p-3 text-sm">{template.categories.length} categories · {entries.length} items · {entries.reduce((n, e) => n + (e.item.variants?.length || 0), 0)} variants · {entries.reduce((n, e) => n + (e.item.addons?.length || 0), 0)} add-ons · {template.combos?.length || 0} combos</div>
+      <div className="flex gap-3"><Button variant="outline" onClick={chooseAll} disabled={busy}>Select Complete Template</Button><Button variant="outline" onClick={() => { setSelected([]); setCategories([]); }} disabled={busy}>Clear Selection</Button></div>
+      <div className="max-h-[420px] overflow-auto space-y-3">{template.categories.map(cat => <fieldset key={cat.slug} className="rounded-xl border p-3">
+        <legend className="font-bold px-2"><label><input type="checkbox" aria-label={`Select category ${cat.name}`} disabled={busy} checked={categories.includes(`${template.id}::${cat.slug}`)} onChange={e => toggleCategory(cat.slug, e.target.checked)} /> {cat.name} ({cat.items.length || (cat.slug === 'combos' ? template.combos?.length : 0)})</label></legend>
+        {cat.slug === 'combos' && <p className="text-xs text-slate-600">Selecting Combos also selects their component dishes for review. They use fixed portions and an authoritative bundle price.</p>}
+        {cat.items.map(item => { const key = templateItemKey(template.id, cat.slug, item.sku); const existing = existingTemplateItem(key, item, exactCategory(cat.name)); return <label key={key} className="flex gap-3 items-start py-2 border-b last:border-0">
+          <input aria-label={`Select item ${item.name}`} type="checkbox" disabled={busy} checked={selected.includes(key)} onChange={e => { setSelected(current => e.target.checked ? [...new Set([...current, key])] : current.filter(k => k !== key)); if (e.target.checked) setCategories(current => [...new Set([...current, `${template.id}::${cat.slug}`])]); }} />
+          <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/assets/menu/common/menu-placeholder-v2.svg'; }} />
+          <span className="flex-1 text-sm"><strong>{item.name}</strong> · ₹{item.suggestedPrice} · {item.dietaryType}{item.subcategory && ` · ${item.subcategory}`}<span className="block text-xs text-slate-600">{item.description}</span><span className="block text-xs">{item.variants?.map(v => `${v.name} ₹${v.price}`).join(' / ')}{item.addons?.length ? ` · ${item.addons.length} add-ons` : ''}{item.imageUrl?.includes('placeholder') ? ' · Photo needed' : ''}{existing ? ' · Already exists' : ''}</span></span>
+        </label>; })}
+      </fieldset>)}</div>
+      <div className="grid sm:grid-cols-2 gap-3"><label className="text-sm">Existing items<select aria-label="Template duplicate strategy" className="block w-full border rounded-xl p-2" disabled={busy} value={strategy} onChange={e => setStrategy(e.target.value as typeof strategy)}><option value="SKIP_DUPLICATE">Skip Existing (recommended)</option><option value="UPDATE_EXISTING">Update Existing</option><option value="IMPORT_AS_NEW">Create New Copy</option></select></label>
+      <label className="text-sm">Restaurant tax group<select aria-label="Template tax group" className="block w-full border rounded-xl p-2" disabled={busy} value={taxId} onChange={e => setTaxId(e.target.value)}><option value="">Keep existing / use sole active group</option>{db.taxGroups.filter(t => t.isActive).map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label></div>
+      <p className="text-sm">Selected: {selected.length} items. Potential duplicates: {duplicateCount}. Suggested prices and tax assignment should be reviewed before trading.</p>
+      {message && <p role="status" className="rounded-xl bg-slate-50 p-3 text-sm">{message}</p>}
+      <div className="flex justify-end gap-3"><Button variant="outline" disabled={busy} onClick={onClose}>Close</Button><Button disabled={busy || !selected.length} onClick={async () => {
+        setBusy(true); setMessage('');
+        try {
+          if (tenant !== KeyValueStore.get('jamanvaar_tenant_id')) throw Error('Restaurant changed. Close and preview again.');
+          const result = MenuBuilderService.executeSelectiveImport([template.id], selected, {}, {}, { selectedOnly: true, selectedCategoryKeys: categories, duplicateStrategy: strategy, ...(taxId ? { taxGroupId: taxId } : {}) });
+          AuditRepository.log({ action: 'MENU_TEMPLATE_IMPORTED', category: 'MENU', details: `${template.name}: ${result.summaryMessage}`, username: 'Manager' });
+          onImported(result.importedItemsCount + result.updatedItemsCount);
+          try { const sync = await publishCatalogNow(); setMessage(result.summaryMessage + (sync.delivered ? ' Published to connected terminals.' : ` ${sync.pending} changes await synchronization.`)); }
+          catch (error) { setMessage(`${result.summaryMessage} Saved locally; publication pending: ${(error as Error).message}`); }
+        } catch (error) { setMessage((error as Error).message); } finally { setBusy(false); }
+      }}>{busy ? 'Loading…' : `Load ${selected.length} Selected Items`}</Button></div>
+    </div>
+  </Modal>;
 };

@@ -79,7 +79,8 @@ import { validateEnv } from './config/env.validation';
       { name: 'paymentOrder', ttl: 60_000, limit: 1_000_000 },
       { name: 'paymentQr', ttl: 60_000, limit: 1_000_000 },
       { name: 'paymentStatus', ttl: 60_000, limit: 1_000_000 },
-      { name: 'paymentRefund', ttl: 60_000, limit: 1_000_000 }
+      { name: 'paymentRefund', ttl: 60_000, limit: 1_000_000 },
+      { name: 'tenantRefresh', ttl: 60_000, limit: 1_000_000 }
     ]),
     PrismaModule,
     NotificationsModule,

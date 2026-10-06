@@ -250,7 +250,8 @@ export class DevicesService {
         subscription: { active: subs.length > 0, expiresAt: latestExpiry?.toISOString() ?? null, enabledApps: [...enabledApps] },
         devices: devices.map((d) => ({
           id: d.id, type: d.type, name: d.name, branchId: d.branchId, status: d.status, isLocked: d.isLocked,
-          tokenHash: d.deviceTokenHash, appEnabled: enabledApps.has(d.type)
+          tokenHash: d.deviceTokenHash, appEnabled: d.type === 'POS_ADMIN'
+            ? enabledApps.has('POS_ADMIN') || enabledApps.has('KIOSK_ADMIN') : enabledApps.has(d.type)
         })),
         serverTime: new Date().toISOString()
       };

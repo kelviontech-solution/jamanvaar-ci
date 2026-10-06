@@ -20,7 +20,7 @@ const APPS_PUBLIC_DIRS = [
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos-admin', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-user', 'public', 'assets', 'menu'),
-  path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-admin', 'public', 'assets', 'menu'),
+  path.join(ROOT_DIR, 'cloud', 'super-admin-web', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'captain', 'public', 'assets', 'menu'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'kds', 'public', 'assets', 'menu')
 ];

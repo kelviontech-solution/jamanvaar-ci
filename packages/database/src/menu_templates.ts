@@ -1,4 +1,5 @@
 import { Category, ComboDeal, DietaryType, MenuItem, ModifierGroup, SpiceLevel } from '@jamanvaar/types';
+import { enrichRestaurantTemplates } from './restaurant_template_catalog';
 import { PREBUILT_MENU_TEMPLATES_ALL, MenuTemplate, MenuTemplateCategory, MenuTemplateItem } from './menu_templates_data';
 
 export * from './menu_templates_data';
@@ -10,8 +11,8 @@ export interface MenuImportRecord {
   importedAt: string;
   importedCategoriesCount: number;
   importedItemsCount: number;
-  strategy: 'KEEP_EXISTING' | 'REPLACE_DUPLICATE' | 'IMPORT_AS_NEW' | 'SKIP_DUPLICATE';
+  strategy: 'KEEP_EXISTING' | 'REPLACE_DUPLICATE' | 'UPDATE_EXISTING' | 'IMPORT_AS_NEW' | 'SKIP_DUPLICATE';
   version: string;
 }
 
-export const PREBUILT_MENU_TEMPLATES: MenuTemplate[] = PREBUILT_MENU_TEMPLATES_ALL;
+export const PREBUILT_MENU_TEMPLATES: MenuTemplate[] = enrichRestaurantTemplates(PREBUILT_MENU_TEMPLATES_ALL);

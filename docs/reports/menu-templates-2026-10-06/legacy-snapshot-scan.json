@@ -1,0 +1,12 @@
+{
+  "source": "packages/database/src/live_db.json",
+  "scope": "Legacy local snapshot, ownership not established; not a production database audit",
+  "readOnly": true,
+  "totalItems": 12,
+  "totalCategories": 7,
+  "sameCategoryNormalizedNameGroups": 0,
+  "missingCategoryItems": 0,
+  "missingImages": 0,
+  "invalidPrices": 0,
+  "recordsChanged": 0
+}

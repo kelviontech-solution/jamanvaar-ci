@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      // The same deployed bundle serves both product roots. Relative build assets must resolve
+      // from the application root when opening a deep link, not from the nested page directory.
+      const adminRoot = location.pathname.split('/')[1];
+      const adminBase = document.createElement('base');
+      adminBase.href = ['pos-admin', 'restaurant-admin', 'kiosk-admin'].includes(adminRoot) ? '/' + adminRoot + '/' : '/';
+      document.head.appendChild(adminBase);
+    </script>
     <link rel="manifest" href="/manifest.json?v=1788235787033" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1788235787033" />
     <link rel="apple-touch-icon" href="/app-icon.png?v=1788235787033" />

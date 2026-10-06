@@ -1,0 +1,23 @@
+{
+  "fullRuntimeCheckpoint": {
+    "passed": 1453,
+    "failed": 0,
+    "source": "logs/menu-templates-final-runtime.json"
+  },
+  "finalFocusedRuntime": {
+    "passed": 100,
+    "failed": 0,
+    "source": "logs/menu-templates-final-focused.json"
+  },
+  "backend": {
+    "passed": 34,
+    "failed": 0,
+    "source": "logs/menu-templates-api-tests.json"
+  },
+  "browser": {
+    "passed": 11,
+    "failed": 0,
+    "source": "browser-results.json"
+  },
+  "note": "Full-runtime and focused counts overlap; full-runtime checkpoint preceded final cleanup signature and asset refinements. Final focused and browser runs cover those paths."
+}

@@ -1,0 +1,927 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "Successfully imported 4 dishes!\nQA Menu Template Restaurant 1791290328891\nADMIN\nQA Menu Template Restaurant 1791290328891\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nDIGITAL ORDERING\nQR Table Ordering\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nPEOPLE & CASH\nOffers & Coupons\nKIOSK\nKiosk Terminals\nKiosk Appearance & Content\nKiosk Combos & Deals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nMenu & Catalog Manager\n4 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories (4)\nGarlic Bread\n4\nPIZZA-GARLIC-BREAD\nGarlic Bread\n₹99\n\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-GARLIC-BREAD\nCheese Garlic Bread\n₹139\n\nCheese Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZ-004\nStuffed Garlic Bread\n₹169\n\nStuffed Garlic Bread, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nPIZZA-CHEESE-CORN-BREADSTICKS\nCheese Corn Breadsticks\n₹159\n\nCheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.\n\nIn Stock\nCombos & Meal Deals\n0 ACTIVE\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nNo Combos Yet\n\nBundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.\n\n+ Create First Combo\nLoad Restaurant Menu Template\n\nChoose a niche, review the complete starter menu, then load all or individual categories and items. Your current menu is retained.\n\nRestaurant type / template\nNorth Indian Restaurant\nGujarati Restaurant\nSouth Indian Restaurant\nPunjabi Dhaba & Restaurant\nKathiyawadi Dhaba & Bhojanalaya\nJain Satvik Bhojanalaya\nIndian Multi-Cuisine Diner\nGrand Indian Thali Restaurant\nAuthentic Chinese & Wok\nFast Food & Quick Service Restaurant\nArtisan Café & Coffee Bar\nBakery, Patisserie & Cafe\nPizza Restaurant\nStreet Food Restaurant\nBiryani & Kebab Darbar\nDessert / Ice Cream\n\nHand-tossed pan pizzas, gourmet cheese burst varieties, garlic breads, Italian red & white pastas & dips.\n\n8 categories · 39 items · 36 variants · 82 add-ons · 1 combos\nSelect Complete Template\nClear Selection\n Pizzas (12)\nMargherita Pizza · ₹149 · VEG · Veg Pizza\nMargherita Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹149 / Medium ₹249 / Large ₹349 · 6 add-ons\nFarmhouse Pizza · ₹199 · VEG · Veg Pizza\nFarmhouse Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹199 / Medium ₹299 / Large ₹399 · 6 add-ons · Photo needed\nPaneer Tikka Pizza · ₹229 · VEG · Paneer Pizza\nPaneer Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹229 / Medium ₹329 / Large ₹429 · 6 add-ons · Photo needed\nVeggie Supreme Pizza · ₹219 · VEG · Veg Pizza\nVeggie Supreme Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹219 / Medium ₹319 / Large ₹419 · 6 add-ons · Photo needed\nMexican Green Wave Pizza · ₹229 · VEG · Veg Pizza\nMexican Green Wave Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹229 / Medium ₹329 / Large ₹429 · 6 add-ons · Photo needed\nPeri Peri Paneer Pizza · ₹249 · VEG · Paneer Pizza\nPeri Peri Paneer Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹249 / Medium ₹349 / Large ₹449 · 6 add-ons · Photo needed\nCheese Burst Margherita · ₹249 · VEG · Cheese Burst Pizza\nCheese Burst Margherita, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹249 / Medium ₹349 / Large ₹449 · 6 add-ons · Photo needed\nCheese Burst Farmhouse · ₹299 · VEG · Cheese Burst Pizza\nCheese Burst Farmhouse, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹299 / Medium ₹399 / Large ₹499 · 6 add-ons · Photo needed\nJalapeno Corn Pizza · ₹199 · VEG · Veg Pizza\nJalapeno Corn Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹199 / Medium ₹299 / Large ₹399 · 6 add-ons · Photo needed\nMushroom Pizza · ₹219 · VEG · Veg Pizza\nMushroom Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹219 / Medium ₹319 / Large ₹419 · 6 add-ons · Photo needed\nChicken Tikka Pizza · ₹279 · NON_VEG · Non-Veg Pizza\nChicken Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹279 / Medium ₹379 / Large ₹479 · 6 add-ons · Photo needed\nPepper Chicken Pizza · ₹269 · NON_VEG · Non-Veg Pizza\nPepper Chicken Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.\nRegular ₹269 / Medium ₹369 / Large ₹469 · 6 add-ons · Photo needed\n Garlic Bread (4)\nGarlic Bread · ₹99 · VEG\nGarlic Bread, oven-baked bread with garlic butter and herbs.\n· Photo needed · Already exists\nCheese Garlic Bread · ₹139 · VEG\nCheese Garlic Bread, oven-baked bread with garlic butter and herbs.\n· Photo needed · Already exists\nStuffed Garlic Bread · ₹169 · VEG\nStuffed Garlic Bread, oven-baked bread with garlic butter and herbs.\n· Photo needed · Already exists\nCheese Corn Breadsticks · ₹159 · VEG\nCheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.\n· Photo needed · Already exists\n Sides (5)\nFrench Fries · ₹89 · VEG\nFrench Fries, freshly fried sides with seasoning served separately.\n· Photo needed\nPeri Peri Fries · ₹109 · VEG\nPeri Peri Fries, freshly fried sides with seasoning served separately.\n· Photo needed\nPotato Wedges · ₹119 · VEG\nPotato Wedges, freshly fried sides with seasoning served separately.\n· Photo needed\nCheese Dip · ₹39 · VEG\nCheese Dip, freshly fried sides with seasoning served separately.\n· Photo needed\nJalapeno Dip · ₹39 · VEG\nJalapeno Dip, freshly fried sides with seasoning served separately.\n· Photo needed\n Pasta (5)\nWhite Sauce Pasta · ₹199 · VEG\nWhite Sauce Pasta, penne tossed in a freshly prepared sauce.\n· 2 add-ons\nRed Sauce Pasta · ₹189 · VEG\nRed Sauce Pasta, penne tossed in a freshly prepared sauce.\n· 2 add-ons · Photo needed\nPink Sauce Pasta · ₹219 · VEG\nPink Sauce Pasta, penne tossed in a freshly prepared sauce.\n· 2 add-ons · Photo needed\nPesto Pasta · ₹249 · VEG\nPesto Pasta, penne tossed in a freshly prepared sauce.\n· 2 add-ons · Photo needed\nChicken Alfredo Pasta · ₹279 · NON_VEG\nChicken Alfredo Pasta, penne tossed in a freshly prepared sauce.\n· 2 add-ons · Photo needed\n Burgers (4)\nClassic Veg Burger · ₹119 · VEG\nClassic Veg Burger, toasted buns, fresh vegetables and house dressing.\n· Photo needed\nCheese Veg Burger · ₹139 · VEG\nCheese Veg Burger, toasted buns, fresh vegetables and house dressing.\n· Photo needed\nPaneer Burger · ₹179 · VEG\nPaneer Burger, toasted buns, fresh vegetables and house dressing.\n· Photo needed\nChicken Burger · ₹199 · NON_VEG\nChicken Burger, toasted buns, fresh vegetables and house dressing.\n· Photo needed\n Beverages (5)\nCold Coffee · ₹119 · VEG\nCold Coffee, made-to-order drinks or sealed beverages.\nLemon Iced Tea · ₹89 · VEG\nLemon Iced Tea, made-to-order drinks or sealed beverages.\n· Photo needed\nFresh Lime Soda · ₹79 · VEG\nFresh Lime Soda, made-to-order drinks or sealed beverages.\n· Photo needed\nCola 250ml · ₹40 · VEG\nCola 250ml, made-to-order drinks or sealed beverages.\n· Photo needed\nMineral Water 500ml · ₹20 · VEG\nMineral Water 500ml, made-to-order drinks or sealed beverages.\n· Photo needed\n Desserts (4)\nChocolate Brownie · ₹99 · VEG\nChocolate Brownie, individually portioned sweet finishes.\nChocolate Lava Cake · ₹119 · VEG\nChocolate Lava Cake, individually portioned sweet finishes.\n· Photo needed\nVanilla Ice Cream · ₹69 · VEG\nVanilla Ice Cream, individually portioned sweet finishes.\n· Photo needed\nBrownie with Ice Cream · ₹149 · VEG\nBrownie with Ice Cream, individually portioned sweet finishes.\n· Photo needed\n Combos (1)\n\nSelecting Combos also selects their component dishes for review. They use fixed portions and an authoritative bundle price.\n\nExisting items\nSkip Existing (recommended)\nUpdate Existing\nCreate New Copy\nRestaurant tax group\nKeep existing / use sole active group\nQA configured GST 5% inclusive\n\nSelected: 4 items. Potential duplicates: 4. Suggested prices and tax assignment should be reviewed before trading.\n\n4 new items, 0 updated, 0 existing skipped, 1 categories, 0 variants, 0 add-ons and 0 combos saved. Published to connected terminals.\n\nClose\nLoad 4 Selected Items\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Menu & Catalog Manager",
+    "Combos & Meal Deals",
+    "No Combos Yet",
+    "Load Restaurant Menu Template"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Menu Template Restaurant 1791290328891",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Categories (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Garlic Bread\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "₹99",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹139",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹169",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "₹159",
+      "aria": null,
+      "title": "Click to change the price",
+      "disabled": false
+    },
+    {
+      "text": "In Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Dish",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Archive Dish",
+      "disabled": false
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "+ Create First Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Select Complete Template",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clear Selection",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Close",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Load 4 Selected Items",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search dish by name, description, SKU or tag...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "tpl-north-indian",
+          "text": "North Indian Restaurant"
+        },
+        {
+          "value": "tpl-gujarati",
+          "text": "Gujarati Restaurant"
+        },
+        {
+          "value": "tpl-south-indian",
+          "text": "South Indian Restaurant"
+        },
+        {
+          "value": "tpl-punjabi",
+          "text": "Punjabi Dhaba & Restaurant"
+        },
+        {
+          "value": "tpl-kathiyawadi",
+          "text": "Kathiyawadi Dhaba & Bhojanalaya"
+        },
+        {
+          "value": "tpl-jain",
+          "text": "Jain Satvik Bhojanalaya"
+        },
+        {
+          "value": "tpl-multicuisine",
+          "text": "Indian Multi-Cuisine Diner"
+        },
+        {
+          "value": "tpl-thali",
+          "text": "Grand Indian Thali Restaurant"
+        },
+        {
+          "value": "tpl-chinese",
+          "text": "Authentic Chinese & Wok"
+        },
+        {
+          "value": "tpl-fast-food",
+          "text": "Fast Food & Quick Service Restaurant"
+        },
+        {
+          "value": "tpl-cafe",
+          "text": "Artisan Café & Coffee Bar"
+        },
+        {
+          "value": "tpl-bakery",
+          "text": "Bakery, Patisserie & Cafe"
+        },
+        {
+          "value": "tpl-pizza",
+          "text": "Pizza Restaurant"
+        },
+        {
+          "value": "tpl-chaat",
+          "text": "Street Food Restaurant"
+        },
+        {
+          "value": "tpl-biryani",
+          "text": "Biryani & Kebab Darbar"
+        },
+        {
+          "value": "tpl-desserts",
+          "text": "Dessert / Ice Cream"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "SKIP_DUPLICATE",
+          "text": "Skip Existing (recommended)"
+        },
+        {
+          "value": "UPDATE_EXISTING",
+          "text": "Update Existing"
+        },
+        {
+          "value": "IMPORT_AS_NEW",
+          "text": "Create New Copy"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "",
+          "text": "Keep existing / use sole active group"
+        },
+        {
+          "value": "qa-template-gst-inclusive",
+          "text": "QA configured GST 5% inclusive"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

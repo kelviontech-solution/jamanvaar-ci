@@ -6,6 +6,7 @@ import { formatINR, formatTime } from '@jamanvaar/utils';
 import { Order, MenuItem, CustomerAccount, DiningTable, User as UserType } from '@jamanvaar/types';
 
 interface GlobalSearchModalProps {
+  showCustomers?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSelectOrder: (order: Order) => void;
@@ -16,6 +17,7 @@ interface GlobalSearchModalProps {
 }
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
+  showCustomers = true,
   isOpen,
   onClose,
   onSelectOrder,
@@ -32,7 +34,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       return {
         orders: db.orders.slice(0, 4),
         items: db.menuItems.slice(0, 4),
-        customers: db.customerAccounts.slice(0, 4),
+        customers: showCustomers ? db.customerAccounts.slice(0, 4) : [],
         tables: db.tables.slice(0, 4),
         staff: db.users.slice(0, 4)
       };
@@ -75,11 +77,11 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     return {
       orders: matchedOrders,
       items: matchedItems,
-      customers: matchedCustomers,
+      customers: showCustomers ? matchedCustomers : [],
       tables: matchedTables,
       staff: matchedStaff
     };
-  }, [query]);
+  }, [query, showCustomers]);
 
   const totalResults =
     results.orders.length +

@@ -86,6 +86,7 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
       // ---- everything below needs a device credential
       const allowLocked = p === '/api/v1/devices/me/heartbeat' || p.startsWith('/api/v1/devices/me/commands');
       const device = core.authenticate(bearer, { allowLocked });
+      core.assertConsoleResource(device, p);
 
       if (p === '/api/v1/branch-core/status' && req.method === 'GET') {
         if (device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') throw new CoreError(403, 'FORBIDDEN', 'Only an admin console can view the core status');

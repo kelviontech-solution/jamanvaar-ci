@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
 import { Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
-import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
+import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
 import { Upload, Sparkles, Image as ImageIcon, Sliders } from 'lucide-react';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
@@ -32,6 +32,8 @@ export const ItemModal: React.FC<ItemModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
+  const [subcategory, setSubcategory] = useState('');
+  const [tags, setTags] = useState('');
   const [price, setPrice] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [kitchenStation, setKitchenStation] = useState('Main Kitchen');
@@ -57,7 +59,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   useEffect(() => {
     if (itemToEdit) {
       setName(itemToEdit.name);
-      setSku(itemToEdit.sku);
+      setSku(itemToEdit.sku); setSubcategory(itemToEdit.subcategory || ''); setTags((itemToEdit.tags || []).join('; '));
       setPrice(itemToEdit.price.toString());
       setCategoryId(itemToEdit.categoryId);
       setKitchenStation(itemToEdit.kitchenStation || 'Main Kitchen');
@@ -81,7 +83,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         )
       );
     } else {
-      setName('');
+      setName(''); setSubcategory(''); setTags('');
       setSku(`SKU-${Math.floor(100 + Math.random() * 900)}`);
       setPrice('');
       setCategoryId(categories[0]?.id || '');
@@ -107,6 +109,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   }, [itemToEdit, categories, isOpen]);
 
   const handleDeviceImageUpload = (file: File) => {
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) { setFormError('Choose a PNG, JPEG or WebP under 2MB.'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
@@ -137,6 +140,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       };
       img.src = ev.target?.result as string;
     };
+    reader.onerror = () => setFormError('Could not read this image.');
     reader.readAsDataURL(file);
   };
 
@@ -150,6 +154,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    if (!safeMenuImage(imageUrl)) { setFormError('Use an HTTP(S), local asset or raster image URL.'); return; }
     const trimmedName = name.trim();
     if (!trimmedName || !price) {
       setFormError('Dish name and price are required.');
@@ -188,7 +193,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
     // that happens to share it.
     const nameChanged = !itemToEdit || MenuRepository.normalizeDishName(itemToEdit.name) !== MenuRepository.normalizeDishName(trimmedName);
     const nameCollision = nameChanged
-      ? db.menuItems.find((i) => MenuRepository.normalizeDishName(i.name) === MenuRepository.normalizeDishName(trimmedName) && i.id !== itemToEdit?.id)
+      ? db.menuItems.find((i) => MenuRepository.normalizeDishName(i.name) === MenuRepository.normalizeDishName(trimmedName) && i.id !== itemToEdit?.id && !i.archivedAt && i.categoryId === categoryId)
       : undefined;
     if (nameCollision) {
       setFormError(`"${trimmedName}" already exists on the menu — edit that dish instead of creating a duplicate.`);
@@ -206,7 +211,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
     if (itemToEdit) {
       MenuRepository.updateMenuItem(itemToEdit.id, {
         name: trimmedName,
-        sku,
+        sku, subcategory: subcategory.trim() || undefined, tags: tags.split(';').map(t => t.trim()).filter(Boolean),
         price: numPrice,
         categoryId,
         kitchenStation: kitchenStation.trim() || 'Main Kitchen',
@@ -236,7 +241,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
     } else {
       MenuRepository.createMenuItem({
         name: trimmedName,
-        sku,
+        sku, subcategory: subcategory.trim() || undefined, tags: tags.split(';').map(t => t.trim()).filter(Boolean),
         price: numPrice,
         categoryId: categoryId || categories[0]?.id,
         kitchenStation: kitchenStation.trim() || 'Main Kitchen',
@@ -331,6 +336,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </div>
         </div>
 
+        <div className="grid sm:grid-cols-2 gap-3"><label className="text-xs font-bold text-slate-600">Subcategory<input aria-label="Dish subcategory" maxLength={120} value={subcategory} onChange={e => setSubcategory(e.target.value)} className="block w-full border p-2 rounded-xl" /></label><label className="text-xs font-bold text-slate-600">Food tags (separate with semicolons)<input aria-label="Dish tags" value={tags} onChange={e => setTags(e.target.value)} className="block w-full border p-2 rounded-xl" /></label></div>
         {/* Station & Dietary */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
@@ -360,7 +366,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               <option value="VEG">Veg</option>
               <option value="JAIN">Jain</option>
               <option value="VEGAN">Vegan</option>
-              <option value="NON_VEG">Non-Veg</option>
+              <option value="NON_VEG">Non-Veg</option><option value="EGG">Egg</option>
             </select>
           </div>
           <div>
@@ -515,7 +521,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             <div className="flex-1 space-y-1.5">
               <input
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (f) handleDeviceImageUpload(f);
@@ -529,6 +535,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
                 placeholder="Or paste direct image URL..."
                 className="w-full bg-white border border-jaman-border rounded-xl px-2.5 py-1 text-[11px] font-mono"
               />
+              <button type="button" onClick={() => setImageUrl('')} className="text-xs text-rose-700">Remove Image</button>
             </div>
           </div>
 

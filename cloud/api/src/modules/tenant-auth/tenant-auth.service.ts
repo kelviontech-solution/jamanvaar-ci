@@ -691,6 +691,10 @@ export class TenantAuthService {
         refreshTokenExpiresAt: expiresAt,
         user: publicUser(user),
         restaurant: restaurantProfile(key.restaurant),
+        // A shared physical device can open a distinct product experience after activation.
+        // This is a preference hint only; every request still checks active entitlements.
+        activatedProduct: key.allowedDeviceType === 'KIOSK_ADMIN' ? 'KIOSK_ADMIN'
+          : key.allowedDeviceType === 'POS_ADMIN' ? 'POS_ADMIN' : null,
         deviceId: device.id,
         branchId: device.branchId,
         deviceToken

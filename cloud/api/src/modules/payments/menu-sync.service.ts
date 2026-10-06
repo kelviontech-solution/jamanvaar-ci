@@ -44,7 +44,7 @@ export class MenuSyncService {
       const legacy = await tx.menuSnapshotItem.findMany({ where: { restaurantId, externalItemId: { in: externalItemIds } } });
       const rows = await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'MENU_ITEM', externalId: { in: externalItemIds } } });
       if (!rows.length) return legacy.map(item => ({ ...item, taxInclusive: false, taxGroupId: undefined as string | undefined }));
-      const groups = await tx.syncedEntity.findMany({ where: { restaurantId, entityType: { in: ['MODIFIER_GROUP', 'TAX_GROUP', 'BRANCH_MENU_OVERRIDE'] } } });
+      const groups = await tx.syncedEntity.findMany({ where: { restaurantId, entityType: { in: ['MODIFIER_GROUP', 'TAX_GROUP', 'BRANCH_MENU_OVERRIDE', 'MENU_CATEGORY'] } } });
       const branchId = deviceId ? (await tx.device.findFirst({ where: { id: deviceId, restaurantId }, select: { branchId: true } }))?.branchId : null;
       const byId = new Map(groups.map((g) => [`${g.entityType}:${g.externalId}`, g.payload as Record<string, any>]));
       const result = new Map<string, (typeof legacy)[number] & { taxInclusive?: boolean; taxGroupId?: string }>(legacy.map((item) => [item.externalItemId, item]));
@@ -52,11 +52,12 @@ export class MenuSyncService {
         const item = row.payload as Record<string, any>;
         if (item.deleted === true) { result.delete(row.externalId); continue; }
         const tax = byId.get(`TAX_GROUP:${item.taxGroupId}`);
+        const category = byId.get(`MENU_CATEGORY:${item.categoryId}`);
         const override = branchId ? byId.get(`BRANCH_MENU_OVERRIDE:${branchId}:${row.externalId}`) : undefined;
         const modifierGroups = (item.modifierGroups ?? (item.modifierGroupIds ?? []).map((id: string) => byId.get(`MODIFIER_GROUP:${id}`))).filter(Boolean)
           .filter((g: any) => !g.deleted && g.isActive !== false).map((g: any) => ({
             id: g.id, name: g.name, isRequired: g.isRequired === true, minSelections: g.minSelections ?? 0, maxSelections: g.maxSelections ?? 1,
-            options: (g.options ?? []).filter((o: any) => o.isActive !== false).map((o: any) => ({ id: o.id, name: o.name, priceDelta: Math.round((o.priceDelta ?? 0) * 100) }))
+            options: (g.options ?? []).filter((o: any) => o.isActive !== false && o.isAvailable !== false).map((o: any) => ({ id: o.id, name: o.name, priceDelta: Math.round((o.priceDelta ?? 0) * 100) }))
           }));
         result.set(row.externalId, {
           id: row.id, restaurantId, externalItemId: row.externalId, name: item.name, category: item.categoryId ?? null,
@@ -64,7 +65,7 @@ export class MenuSyncService {
           modifierGroups, taxRate: tax?.isActive === false ? 0 : Math.round(((tax?.cgstPercent ?? 0) + (tax?.sgstPercent ?? 0)) * 100),
           taxInclusive: tax?.isInclusive === true && tax?.isActive !== false,
           taxGroupId: item.taxGroupId,
-          isAvailable: item.isAvailable !== false && item.isKioskEnabled !== false && override?.isAvailable !== false,
+          isAvailable: !item.archivedAt && !category?.deleted && category?.isActive !== false && item.isAvailable !== false && item.isKioskEnabled !== false && override?.isAvailable !== false && (!item.salesChannels || item.salesChannels.includes('KIOSK')) && (!item.branchIds?.length || (!!branchId && item.branchIds.includes(branchId))),
           syncedAt: row.updatedAt, createdAt: row.createdAt, updatedAt: row.updatedAt
         });
       }
