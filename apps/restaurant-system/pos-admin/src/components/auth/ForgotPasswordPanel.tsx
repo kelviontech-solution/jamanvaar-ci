@@ -80,8 +80,8 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
       {step === 'RESTAURANT_ID' ? (
         <form onSubmit={sendCode} className="space-y-3">
           <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Restaurant ID *</label>
-            <input type="text" value={restaurantCode} onChange={(e) => { setRestaurantCode(e.target.value); setError(''); }} placeholder="e.g. JM9876543210" autoFocus required className={`${inputClass} font-mono`} />
+            <label htmlFor="forgot-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Restaurant ID *</label>
+            <input id="forgot-restaurant-id" type="text" value={restaurantCode} onChange={(e) => { setRestaurantCode(e.target.value); setError(''); }} placeholder="e.g. JM9876543210" autoFocus required className={`${inputClass} font-mono`} />
           </div>
           {error && error.includes('not activated yet') && (
             <button type="button" onClick={onActivate} className="w-full py-2.5 rounded-2xl bg-jaman-navy text-white text-xs font-bold cursor-pointer">
@@ -107,16 +107,16 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
             </div>
           )}
           <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">6-digit code *</label>
-            <input type="text" inputMode="numeric" maxLength={6} value={otp} onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '')); setError(''); }} placeholder="123456" autoFocus required className={`${inputClass} text-center font-mono tracking-[0.4em]`} />
+            <label htmlFor="forgot-6-digit-code" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">6-digit code *</label>
+            <input id="forgot-6-digit-code" type="text" inputMode="numeric" maxLength={6} value={otp} onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '')); setError(''); }} placeholder="123456" autoFocus required className={`${inputClass} text-center font-mono tracking-[0.4em]`} />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">New password *</label>
-            <input type="password" value={newPassword} onChange={(e) => { setNewPassword(e.target.value); setError(''); }} placeholder="At least 8 characters" required className={inputClass} />
+            <label htmlFor="forgot-new-password" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">New password *</label>
+            <input id="forgot-new-password" type="password" value={newPassword} onChange={(e) => { setNewPassword(e.target.value); setError(''); }} placeholder="At least 8 characters" required className={inputClass} />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Confirm new password *</label>
-            <input type="password" value={confirm} onChange={(e) => { setConfirm(e.target.value); setError(''); }} placeholder="Type it again" required className={inputClass} />
+            <label htmlFor="forgot-confirm-new-password" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Confirm new password *</label>
+            <input id="forgot-confirm-new-password" type="password" value={confirm} onChange={(e) => { setConfirm(e.target.value); setError(''); }} placeholder="Type it again" required className={inputClass} />
           </div>
           {error && (
             <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">

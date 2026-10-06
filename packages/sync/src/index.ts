@@ -21,6 +21,7 @@ export * from './realtime_client';
 export * from './resume';
 export * from './connection_level';
 export * from './endpoint_resolver';
+export * from './device_cloud_client';
 export * from './command_signing';
 export * from './diagnostics';
 export * from './qr_order_desk';

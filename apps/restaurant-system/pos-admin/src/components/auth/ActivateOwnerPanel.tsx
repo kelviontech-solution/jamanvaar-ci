@@ -60,24 +60,24 @@ export const ActivateOwnerPanel: React.FC<Props> = ({ defaultRestaurantCode = ''
       </p>
 
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
-        <input className={`${inputClass} font-mono`} value={restaurantCode} onChange={(e) => setRestaurantCode(e.target.value)} placeholder="e.g. JM9876543210" required />
+        <label htmlFor="owner-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5">Restaurant ID *</label>
+        <input id="owner-restaurant-id" className={`${inputClass} font-mono`} value={restaurantCode} onChange={(e) => setRestaurantCode(e.target.value)} placeholder="e.g. JM9876543210" required />
       </div>
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">Owner email *</label>
-        <input type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <label htmlFor="owner-owner-email" className="text-xs font-bold text-slate-700 block mb-1.5">Owner email *</label>
+        <input id="owner-owner-email" type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">Invitation token *</label>
-        <input className={`${inputClass} font-mono`} value={token} onChange={(e) => setToken(e.target.value)} required />
+        <label htmlFor="owner-invitation-token" className="text-xs font-bold text-slate-700 block mb-1.5">Invitation token *</label>
+        <input id="owner-invitation-token" className={`${inputClass} font-mono`} value={token} onChange={(e) => setToken(e.target.value)} required />
       </div>
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">New password *</label>
-        <input type="password" className={inputClass} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={8} required />
+        <label htmlFor="owner-new-password" className="text-xs font-bold text-slate-700 block mb-1.5">New password *</label>
+        <input id="owner-new-password" type="password" className={inputClass} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={8} required />
       </div>
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">Confirm new password *</label>
-        <input type="password" className={inputClass} value={confirm} onChange={(e) => setConfirm(e.target.value)} minLength={8} required />
+        <label htmlFor="owner-confirm-new-password" className="text-xs font-bold text-slate-700 block mb-1.5">Confirm new password *</label>
+        <input id="owner-confirm-new-password" type="password" className={inputClass} value={confirm} onChange={(e) => setConfirm(e.target.value)} minLength={8} required />
       </div>
 
       {error && (

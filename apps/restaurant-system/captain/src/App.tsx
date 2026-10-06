@@ -182,15 +182,15 @@ export const App: React.FC = () => {
   if (!entitlement.allowed) {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-6 text-center select-none font-sans">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-amber-200 shadow-xl space-y-6">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-amber-200 shadow-md space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-3xl shadow-xs">
             👑
           </div>
           <div className="space-y-2">
-            <span className="inline-block text-[11px] font-black uppercase tracking-widest text-jaman-saffron bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
+            <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-jaman-saffron bg-[#FFF4ED] px-3 py-1 rounded-full border border-[#FDBA74]">
               JAMANVAAR PRO (₹7,000) Exclusive
             </span>
-            <h1 className="text-2xl font-black text-jaman-navy tracking-tight">Captain App Locked</h1>
+            <h1 className="text-2xl font-bold text-jaman-navy tracking-tight">Captain App Locked</h1>
             <p className="text-sm text-slate-600 leading-relaxed font-medium">
               {entitlement.message || 'Wireless Table Ordering and Captain Service workflows are available only on the JAMANVAAR PRO (₹7,000) subscription plan.'}
             </p>
@@ -296,15 +296,15 @@ export const App: React.FC = () => {
           <div className="space-y-5">
             <ActivationNoticeBanner />
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate this Tablet</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">Activate this Tablet</h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
                 One-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.
               </p>
             </div>
             <form onSubmit={handleActivateSubmit} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
-                <input
+                <label htmlFor="captain-activation-key" className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
+                <input id="captain-activation-key"
                   type="text"
                   value={activationKeyInput}
                   onChange={(e) => setActivationKeyInput(e.target.value)}
@@ -315,7 +315,7 @@ export const App: React.FC = () => {
                 />
               </div>
               {activationError && (
-                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{activationError}</span>
                 </div>
@@ -323,7 +323,7 @@ export const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={activationBusy || !activationKeyInput.trim()}
-                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-100 disabled:bg-[#5F6F80] disabled:shadow-none disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>{activationBusy ? 'Activating…' : 'Activate Tablet'}</span>
                 {!activationBusy && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
@@ -369,7 +369,7 @@ export const App: React.FC = () => {
         >
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">
                 Floor Captain Sign In
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
@@ -380,7 +380,7 @@ export const App: React.FC = () => {
             {/* Authorized Staff Help Notice */}
             <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-jaman-border flex items-center justify-between">
               <div>
-                <span className="text-xs font-black text-jaman-navy block">🔒 Registered Staff Access</span>
+                <span className="text-xs font-bold text-jaman-navy block">🔒 Registered Staff Access</span>
                 <span className="text-[11px] text-slate-600 font-medium">Ask your manager for your 4-digit staff PIN</span>
               </div>
             </div>
@@ -388,11 +388,12 @@ export const App: React.FC = () => {
             {/* PIN Input & Keypad */}
             <form onSubmit={handlePinSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider mb-2">
+                <label htmlFor="captain-pin" className="block text-xs font-bold text-jaman-navy uppercase tracking-wider mb-2">
                   Staff 4-Digit PIN
                 </label>
                 <div className="relative">
                   <input
+                    id="captain-pin"
                     type="password"
                     maxLength={4}
                     value={pinInput}
@@ -428,7 +429,7 @@ export const App: React.FC = () => {
                         }
                       }
                     }}
-                    className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-black font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+                    className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-bold font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
                   >
                     {num}
                   </button>
@@ -439,7 +440,7 @@ export const App: React.FC = () => {
                     setPinInput('');
                     setPinError(false);
                   }}
-                  className="h-14 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-black uppercase tracking-wider active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                  className="h-14 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider active:scale-95 transition-all cursor-pointer flex items-center justify-center"
                 >
                   Clear
                 </button>
@@ -455,7 +456,7 @@ export const App: React.FC = () => {
                       }
                     }
                   }}
-                  className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-black font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
+                  className="h-14 rounded-2xl bg-jaman-cream hover:bg-[#FFF4ED] hover:border-jaman-saffron border border-jaman-border text-lg font-bold font-mono text-jaman-navy active:scale-95 transition-all cursor-pointer flex items-center justify-center shadow-2xs"
                 >
                   0
                 </button>
@@ -471,7 +472,7 @@ export const App: React.FC = () => {
               <button
                 type="submit"
                 disabled={pinInput.length === 0}
-                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-100 disabled:bg-[#5F6F80] disabled:shadow-none disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Unlock Captain Terminal</span>
                 <ArrowRight className="w-4 h-4 text-jaman-saffron" />
@@ -565,7 +566,7 @@ export const App: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAiAssistantOpen(true)}
-          className="fixed bottom-16 md:bottom-6 right-4 md:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-jaman-navy to-[#1a4a6e] text-white flex items-center justify-center shadow-2xl border-2 border-jaman-saffron hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+          className="fixed bottom-16 md:bottom-6 right-4 md:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-jaman-navy to-[#1a4a6e] text-white flex items-center justify-center shadow-md border-2 border-jaman-saffron hover:scale-105 active:scale-95 transition-all cursor-pointer group"
           title="JAMAN AI Floor Intelligence Assistant"
           aria-label="Open JAMAN AI Floor Intelligence Assistant"
         >

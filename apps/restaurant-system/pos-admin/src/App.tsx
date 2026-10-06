@@ -802,11 +802,13 @@ export default function PosAdminApp() {
             <>
               <form onSubmit={handleAdminLogin} className="space-y-3.5 pt-2">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
+                  <label htmlFor="admin-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
                     Restaurant ID *
                   </label>
                   <input
+                    id="admin-restaurant-id"
                     type="text"
+                    autoComplete="off"
                     value={authRestaurantCode}
                     onChange={(e) => {
                       setAuthRestaurantCode(e.target.value);
@@ -822,18 +824,21 @@ export default function PosAdminApp() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700">Owner Password *</label>
+                    <label htmlFor="admin-password" className="text-xs font-bold text-slate-700">Owner Password *</label>
                     <button
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
-                      className="text-xs text-[#B8500C] hover:underline font-semibold"
+                      aria-controls="admin-password"
+                      className="text-xs text-[#B8500C] hover:underline font-semibold inline-flex items-center min-h-11 -my-3.5 px-2 -mx-2"
                     >
                       {showPassword ? 'Hide Password' : 'Show Password'}
                     </button>
                   </div>
                   <div className="relative">
                     <input
+                      id="admin-password"
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
                       value={authPassword}
                       onChange={(e) => {
                         setAuthPassword(e.target.value);
@@ -852,7 +857,7 @@ export default function PosAdminApp() {
                 )}
 
                 {authError && (
-                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                     <span>{authError}</span>
                   </div>
@@ -867,7 +872,7 @@ export default function PosAdminApp() {
                       setPasswordResetNotice(false);
                       setAuthScreenState('FORGOT');
                     }}
-                    className="font-semibold text-[#B8500C] hover:underline cursor-pointer"
+                    className="font-semibold text-[#B8500C] hover:underline cursor-pointer inline-flex items-center min-h-11 -my-3.5 px-2 -mx-2"
                   >
                     Forgot password?
                   </button>
@@ -892,7 +897,7 @@ export default function PosAdminApp() {
                       setActivatePrefill(null);
                       setAuthScreenState('ACTIVATE');
                     }}
-                    className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer"
+                    className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer inline-flex items-center min-h-11 -my-3.5 px-2"
                   >
                     Set your password from the welcome email
                   </button>

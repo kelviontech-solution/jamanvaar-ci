@@ -100,10 +100,10 @@ export const PosLogin: React.FC = () => {
           </p>
         </div>
       ) : (
-      <div className="space-y-1.5 pt-1">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block text-left">
+      <div className="space-y-1.5 pt-1" role="group" aria-labelledby="pos-staff-label">
+        <p id="pos-staff-label" className="text-[10px] font-black uppercase tracking-wider text-slate-600 block text-left">
           Select Staff Profile
-        </label>
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-48 overflow-y-auto pr-0.5">
           {activeStaff.map((user, idx) => {
             const isSelected = selectedUser?.id === user.id;

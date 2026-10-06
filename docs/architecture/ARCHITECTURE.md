@@ -133,3 +133,16 @@ Both applications share a centralized package architecture under `/shared`:
 ```
 
 > **Note:** This directory diagram predates the current app set (it originally listed only `kiosk-admin`/`kiosk-user`; the repo now also includes `pos`, `pos-admin`, `captain`, and `kds` under `apps/kiosk-system/` and `apps/restaurant-system/`) and predates the `shared/` → `packages/` rename. See [`monorepo-structure.md`](./monorepo-structure.md) for the current, verified structure.
+
+## Device cloud client
+POS, KDS and Captain share `createDeviceCloudClient` (`packages/sync/src/device_cloud_client.ts`):
+Bearer-token requests via `EndpointResolver`, order/entity sync push and pull, heartbeat, identity sync and number leases.
+Each app's `cloud/cloudClient.ts` keeps only what is app-specific (activation side effects, payments, AI) and
+re-exports the factory's functions under the same names. Tests: `tests/device_cloud_client.test.ts`.
+
+## Known debt (not changed in this pass)
+- Very large files: `packages/database/src/repositories.ts`, `kiosk-user/src/App.tsx`.
+- `pos-admin/src/cloudClient.ts` has a similar but different request layer.
+- No ESLint configured; `noUnusedLocals` is off.
+- Declared-but-unused deps (clsx, tailwind-merge, zustand, @tauri-apps/api) left to avoid lockfile churn.
+- Cross-workspace relative imports in super-admin.

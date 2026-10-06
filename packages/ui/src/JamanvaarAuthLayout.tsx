@@ -382,14 +382,18 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           </div>}
 
           {/* Network Status Toggle Button */}
+          {/* The button is 46px tall (a real tap target) while the visible pill stays 30px; the negative margin cancels the extra height. */}
           <button
             type="button"
             onClick={onToggleNetwork}
             title="Click to toggle simulated network mode"
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs transition-colors cursor-pointer ${
-              dark ? 'bg-white/5 border border-white/10 hover:border-[#E66817]/50' : 'bg-white border border-[#EBE6DD] hover:border-[#E66817]/50'
-            }`}
+            className="group py-2 -my-2 cursor-pointer"
           >
+            <span
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs transition-colors ${
+                dark ? 'bg-white/5 border border-white/10 group-hover:border-[#E66817]/50' : 'bg-white border border-[#EBE6DD] group-hover:border-[#E66817]/50'
+              }`}
+            >
             {isOnline ? (
               <>
                 <Wifi className={`w-3.5 h-3.5 shrink-0 ${dark ? 'text-emerald-400' : 'text-emerald-600'}`} />
@@ -405,6 +409,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 </span>
               </>
             )}
+            </span>
           </button>
 
           {/* Live Date Pill */}
@@ -535,7 +540,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
           </div>
 
           {/* Below-Card Assurance Badges */}
-          <div className={`mt-3.5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px] font-bold ${dark ? 'text-[#8CA0B3]' : 'text-slate-500'}`}>
+          <div className={`mt-3.5 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px] font-bold ${dark ? 'text-[#8CA0B3]' : 'text-slate-600'}`}>
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#E66817]" />
               <span>Role-Based Security</span>
@@ -555,7 +560,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
       </main>
 
       {/* Footer Copyright */}
-      <footer className={`w-full text-center text-xs font-medium pt-4 shrink-0 ${dark ? 'text-[#5E7893]' : 'text-slate-400'}`}>
+      <footer className={`w-full text-center text-xs font-medium pt-4 shrink-0 ${dark ? 'text-[#8CA0B3]' : 'text-slate-600'}`}>
         © {new Date().getFullYear()} JAMANVAAR by KELVIONTECH — All rights reserved.
       </footer>
     </div>

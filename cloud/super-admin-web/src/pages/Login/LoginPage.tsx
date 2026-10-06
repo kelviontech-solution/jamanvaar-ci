@@ -146,10 +146,11 @@ export function LoginPage() {
         {step === 'CREDENTIALS' ? (
           <form onSubmit={handleCredentialsSubmit} className="space-y-3.5 pt-2 text-left">
             <div>
-              <label className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">
+              <label htmlFor="sa-email" className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">
                 Super Admin Email *
               </label>
               <input
+                id="sa-email"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -166,17 +167,19 @@ export function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-[var(--jv-text-secondary)]">Password *</label>
+                <label htmlFor="sa-password" className="text-xs font-bold text-[var(--jv-text-secondary)]">Password *</label>
                 <button
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="text-[11px] text-[var(--jv-accent-text)] hover:underline font-bold cursor-pointer"
+                  aria-controls="sa-password"
+                  className="text-[11px] text-[var(--jv-accent-text)] hover:underline font-bold cursor-pointer inline-flex items-center min-h-11 -my-3.5 px-2 -mx-2"
                 >
                   {showPassword ? 'Hide Password' : 'Show Password'}
                 </button>
               </div>
               <div className="relative">
                 <input
+                  id="sa-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => {
@@ -199,7 +202,7 @@ export function LoginPage() {
             )}
 
             <div className="flex items-center justify-between text-xs text-[var(--jv-text-muted)] pt-0.5">
-              <label className="flex items-center gap-2 cursor-pointer select-none font-medium">
+              <label className="flex items-center gap-2 cursor-pointer select-none font-medium min-h-11 -my-3.5">
                 <input
                   type="checkbox"
                   checked={rememberMe}
@@ -246,8 +249,8 @@ export function LoginPage() {
             )}
 
             <div>
-              <label className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">6-digit code *</label>
-              <input
+              <label htmlFor="sa-6-digit-code" className="text-xs font-bold text-[var(--jv-text-secondary)] block mb-1.5 text-left">6-digit code *</label>
+              <input id="sa-6-digit-code"
                 ref={otpInputRef}
                 type="text"
                 inputMode="numeric"

@@ -135,7 +135,7 @@ export function PlatformActivatePage() {
             <CheckCircle2 className="w-6 h-6" style={{ margin: '0 auto 6px' }} />
             Your account is activated.
           </div>
-          <Button variant="primary" onClick={() => navigate('/login', { replace: true })} style={{ width: '100%' }}>
+          <Button variant="primary" size="lg" onClick={() => navigate('/login', { replace: true })} style={{ width: '100%' }}>
             Sign in
           </Button>
         </div>
@@ -167,7 +167,7 @@ export function PlatformActivatePage() {
           <div style={{ color: link.kind === 'used' ? 'var(--jv-success)' : 'var(--jv-warning)', display: 'flex', justifyContent: 'center' }}>{content.icon}</div>
           <h1 className="auth-title">{content.title}</h1>
           <p className="auth-subtitle">{content.text}</p>
-          <Button variant="primary" onClick={() => navigate('/login', { replace: true })} style={{ width: '100%' }}>
+          <Button variant="primary" size="lg" onClick={() => navigate('/login', { replace: true })} style={{ width: '100%' }}>
             Go to sign in
           </Button>
         </div>

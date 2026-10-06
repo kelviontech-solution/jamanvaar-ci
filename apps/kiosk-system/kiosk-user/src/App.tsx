@@ -1860,7 +1860,8 @@ export default function KioskUserApp() {
                 <button
                   type="button"
                   onClick={() => setShowKeyHint((v) => !v)}
-                  className="text-xs font-bold text-jaman-navy/70 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-bold text-jaman-navy/80 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer min-h-11 -my-3.5"
+                  aria-expanded={showKeyHint}
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                   Where can I find this?
@@ -1892,7 +1893,7 @@ export default function KioskUserApp() {
             <button
               type="submit"
               disabled={activationStep !== 'form' || !activationCode.trim() || !restaurantCodeInput.trim()}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF8A00] to-[#F97316] hover:brightness-105 disabled:opacity-50 disabled:grayscale text-white font-extrabold text-base shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#C2570C] to-[#B8500C] hover:brightness-105 disabled:opacity-100 disabled:grayscale-0 disabled:bg-none disabled:bg-[#5F6F80] disabled:shadow-none text-white font-extrabold text-base shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
             >
               <span>
                 {activationStep === 'verifying' && 'Verifying restaurant…'}

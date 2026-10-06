@@ -621,8 +621,8 @@ export const App: React.FC = () => {
           </div>
           <form onSubmit={handleActivate} className="space-y-3.5">
             <div>
-              <label className="text-xs font-bold text-slate-500 block mb-1.5">Activation Key *</label>
-              <input
+              <label htmlFor="kds-activation-key" className="text-xs font-bold text-slate-500 block mb-1.5">Activation Key *</label>
+              <input id="kds-activation-key"
                 type="text"
                 value={activationCode}
                 onChange={(e) => setActivationCode(e.target.value)}
@@ -633,7 +633,7 @@ export const App: React.FC = () => {
               />
             </div>
             {activationError && (
-              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>{activationError}</span>
               </div>
@@ -641,7 +641,7 @@ export const App: React.FC = () => {
             <button
               type="submit"
               disabled={isActivating || !activationCode.trim()}
-              className="w-full py-4 rounded-2xl bg-jaman-saffron hover:bg-[#D45E0F] disabled:opacity-50 text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-[#BF540F] hover:bg-[#A9480C] disabled:opacity-100 disabled:bg-[#5F6F80] disabled:shadow-none disabled:cursor-not-allowed text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
               <span>{isActivating ? 'Activating…' : 'Activate Terminal'}</span>
               {!isActivating && <ArrowRight className="w-4 h-4 text-white" />}
@@ -694,8 +694,8 @@ export const App: React.FC = () => {
             </div>
 
             {/* Station: the ones on this restaurant's menu. A station assigned to this screen in Restaurant Admin is fixed. */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Kitchen Station</label>
+            <div className="space-y-2" role="group" aria-labelledby="kds-station-label">
+              <p id="kds-station-label" className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Kitchen Station</p>
               {getAssignedStation() ? (
                 <div className="p-3.5 rounded-2xl bg-[#FDFBF7] border border-jaman-border text-xs font-bold text-jaman-navy">
                   This screen is assigned to <span className="text-jaman-saffron">{getAssignedStation()}</span> by your restaurant admin.
@@ -725,8 +725,9 @@ export const App: React.FC = () => {
 
             {/* PIN Input & Numpad */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Staff 4-Digit PIN</label>
+              <label htmlFor="kds-pin" className="block text-xs font-bold text-jaman-navy uppercase tracking-wider">Staff 4-Digit PIN</label>
               <input
+                id="kds-pin"
                 type="password"
                 maxLength={4}
                 value={kdsPin}
@@ -735,7 +736,7 @@ export const App: React.FC = () => {
                 className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3.5 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron outline-none text-jaman-navy"
               />
               {kdsPinError && (
-                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5">
+                <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
                   <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{kdsPinDenied ?? 'Incorrect PIN. Please try again.'}</span>
                 </div>

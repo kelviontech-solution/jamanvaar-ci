@@ -10,9 +10,7 @@ import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
  * this terminal does.
  */
 
-import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from '@jamanvaar/sync';
-
-import { DeviceGate, sendHeartbeat, pullRestaurantIdentity, orderSyncPullQuery, EndpointResolver, getDevicePublicKeyJwk } from '@jamanvaar/sync';
+import { DeviceGate, EndpointResolver, CloudApiError, parseJsonResponse, createDeviceCloudClient, getDevicePublicKeyJwk } from '@jamanvaar/sync';
 import { MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
@@ -20,41 +18,16 @@ const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:40
 EndpointResolver.setTransport((url, init) => DeviceGate.gatedFetch(url, init));
 EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_BRANCH_CORE_URL });
 
-const RESTAURANT_ID_KEY = 'jamanvaar_kds_restaurant_id';
-const DEVICE_ID_KEY = 'jamanvaar_kds_device_id';
-const DEVICE_TOKEN_KEY = 'jamanvaar_kds_device_token';
+const client = createDeviceCloudClient({
+  keyPrefix: 'jamanvaar_kds',
+  apiBase: API_BASE,
+  appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'
+});
+const { restaurantId: RESTAURANT_ID_KEY, deviceId: DEVICE_ID_KEY, deviceToken: DEVICE_TOKEN_KEY } = client.keys;
 
-export class CloudApiError extends Error {
-  constructor(
-    message: string,
-    public status: number
-  ) {
-    super(message);
-  }
-}
+export { CloudApiError };
 
-async function parseJsonResponse(res: Response): Promise<any> {
-  const contentType = res.headers.get('content-type') ?? '';
-  const data = contentType.includes('application/json') ? await res.json() : undefined;
-  if (data && typeof data === 'object' && !Array.isArray(data)) data.serverKey = EndpointResolver.responderFor(res);
-  return data;
-}
-
-export function isKdsDeviceConnected(): boolean {
-  try {
-    return localStorage.getItem(DEVICE_TOKEN_KEY) !== null;
-  } catch {
-    return false;
-  }
-}
-
-function getKdsDeviceToken(): string | null {
-  try {
-    return localStorage.getItem(DEVICE_TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
+export const isKdsDeviceConnected = client.isDeviceConnected;
 
 /**
  * Unbinds this terminal (BUG-145 follow-up): a device the cloud no longer recognises, or has revoked, was
@@ -107,88 +80,13 @@ export async function activateKdsDevice(code: string): Promise<void> {
   }
 }
 
-function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
-  const token = getKdsDeviceToken();
-  if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
-  return EndpointResolver.fetch(path, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
-  });
-}
-
-export async function pushOrderSync(
-  events: OrderSyncPushEvent[]
-): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
-  const res = await deviceFetch('/api/v1/orders/sync', {
-    method: 'POST',
-    body: JSON.stringify({ events })
-  });
-  const data = await parseJsonResponse(res);
-  if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Order sync push failed (${res.status})`, res.status);
-  }
-  return data;
-}
-
-export async function pullOrderSync(cursor?: string): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
-  const query = orderSyncPullQuery(cursor);
-  const res = await deviceFetch(`/api/v1/orders/sync${query}`);
-  const data = await parseJsonResponse(res);
-  if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Order sync pull failed (${res.status})`, res.status);
-  }
-  return data;
-}
-
-/** BUG-019/034/035: pulls whatever another device pushed (currently just staff, from Restaurant Admin). */
-export async function pushEntitySync(entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
-  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}`, {
-    method: 'POST',
-    body: JSON.stringify({ events })
-  });
-  const data = await parseJsonResponse(res);
-  if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Entity sync push failed (${res.status})`, res.status);
-  }
-  return data;
-}
-
-export async function pullEntitySync(entityType: string, since?: string): Promise<{ entities: CloudSyncedEntity[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> {
-  const query = since?.startsWith('seq:') ? `?afterSeq=${encodeURIComponent(since.slice(4))}` : since ? `?since=${encodeURIComponent(since)}` : '?afterSeq=0';
-  const res = await deviceFetch(`/api/v1/entity-sync/${entityType}${query}`);
-  const data = await parseJsonResponse(res);
-  if (!res.ok) {
-    throw new CloudApiError(data?.message ?? `Entity sync pull failed (${res.status})`, res.status);
-  }
-  return data;
-}
-
-export async function reportHeartbeat(): Promise<void> {
-  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
-  if (!deviceToken) return;
-  // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
-  // notice, update offer and any signed offline extension.
-  await sendHeartbeat({
-    apiBase: API_BASE,
-    deviceToken,
-    appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
-    restaurantId: localStorage.getItem(RESTAURANT_ID_KEY),
-    deviceId: localStorage.getItem(DEVICE_ID_KEY)
-  });
-}
-
-/** B2-054: picks up a restaurant-identity edit made on another device (or by Super Admin). */
-export async function syncRestaurantIdentity(): Promise<void> {
-  const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
-  const restaurantId = localStorage.getItem(RESTAURANT_ID_KEY);
-  if (!deviceToken || !restaurantId) return;
-  await pullRestaurantIdentity({ apiBase: API_BASE, deviceToken, restaurantId });
-}
-
-/** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
-export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
-  const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
-  return data;
-}
+export const {
+  deviceFetch,
+  pushOrderSync,
+  pullOrderSync,
+  pushEntitySync,
+  pullEntitySync,
+  reportHeartbeat,
+  syncRestaurantIdentity,
+  leaseNumberBlock
+} = client;

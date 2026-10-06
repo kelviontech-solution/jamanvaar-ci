@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { DiningTable, Order } from '@jamanvaar/types';
 import { TableRepository } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
@@ -11,8 +12,124 @@ import {
   QrCode,
   CheckCircle2,
   Clock,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  Check
 } from 'lucide-react';
+
+type TableStatusValue = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'CLEANING';
+
+const TABLE_STATUS_OPTIONS: { value: TableStatusValue; label: string; dot: string }[] = [
+  { value: 'AVAILABLE', label: 'Available', dot: 'bg-emerald-500' },
+  { value: 'OCCUPIED', label: 'Occupied', dot: 'bg-brand' },
+  { value: 'RESERVED', label: 'Reserved', dot: 'bg-sky-500' },
+  { value: 'CLEANING', label: 'Cleaning', dot: 'bg-amber-500' }
+];
+
+/** Styled replacement for the native status <select>, whose popup cannot be themed. Keyboard and screen-reader friendly. */
+function TableStatusMenu({ value, label, onChange }: { value: string; label: string; onChange: (v: TableStatusValue) => void }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ left: number; width: number; top?: number; bottom?: number } | null>(null);
+  const [active, setActive] = useState(0);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const current = TABLE_STATUS_OPTIONS.find((o) => o.value === value) ?? TABLE_STATUS_OPTIONS[0];
+
+  useLayoutEffect(() => {
+    if (!open || !btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    const menuH = TABLE_STATUS_OPTIONS.length * 36 + 12;
+    const flip = window.innerHeight - r.bottom < menuH + 12 && r.top > menuH + 12;
+    setPos({ left: r.left, width: Math.max(r.width, 168), ...(flip ? { bottom: window.innerHeight - r.top + 6 } : { top: r.bottom + 6 }) });
+    setActive(Math.max(0, TABLE_STATUS_OPTIONS.findIndex((o) => o.value === value)));
+  }, [open, value]);
+
+  useEffect(() => {
+    if (!open) return;
+    listRef.current?.focus();
+    const close = () => setOpen(false);
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!listRef.current?.contains(t) && !btnRef.current?.contains(t)) close();
+    };
+    document.addEventListener('mousedown', onDown);
+    window.addEventListener('resize', close);
+    window.addEventListener('scroll', close, true);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      window.removeEventListener('resize', close);
+      window.removeEventListener('scroll', close, true);
+    };
+  }, [open]);
+
+  const choose = (v: TableStatusValue) => {
+    setOpen(false);
+    btnRef.current?.focus();
+    if (v !== value) onChange(v);
+  };
+
+  const onListKey = (e: React.KeyboardEvent) => {
+    const n = TABLE_STATUS_OPTIONS.length;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => (a + 1) % n); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => (a - 1 + n) % n); }
+    else if (e.key === 'Home') { e.preventDefault(); setActive(0); }
+    else if (e.key === 'End') { e.preventDefault(); setActive(n - 1); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(TABLE_STATUS_OPTIONS[active].value); }
+    else if (e.key === 'Escape') { e.preventDefault(); setOpen(false); btnRef.current?.focus(); }
+    else if (e.key === 'Tab') setOpen(false);
+  };
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`${label}: ${current.label}`}
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); setOpen(true); }
+        }}
+        className="flex-1 min-w-0 flex items-center gap-2 text-[11px] font-bold bg-jaman-cream hover:bg-[#F4EFE6] text-jaman-navy border border-jaman-border rounded-lg px-2.5 py-1.5 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+      >
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${current.dot}`} aria-hidden="true" />
+        <span className="flex-1 text-left truncate">{current.label}</span>
+        <ChevronDown className={`w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+      </button>
+      {open && pos && createPortal(
+        <ul
+          ref={listRef}
+          role="listbox"
+          tabIndex={-1}
+          aria-label={label}
+          aria-activedescendant={`tsm-${TABLE_STATUS_OPTIONS[active].value}`}
+          onKeyDown={onListKey}
+          style={{ position: 'fixed', left: pos.left, top: pos.top, bottom: pos.bottom, width: pos.width, zIndex: 1000 }}
+          className="p-1.5 bg-white border border-jaman-border rounded-xl shadow-[0_12px_32px_-8px_rgba(31,41,55,0.25)] focus:outline-none animate-[tsmIn_140ms_ease-out]"
+        >
+          {TABLE_STATUS_OPTIONS.map((o, i) => (
+            <li
+              key={o.value}
+              id={`tsm-${o.value}`}
+              role="option"
+              aria-selected={o.value === value}
+              onMouseEnter={() => setActive(i)}
+              onClick={() => choose(o.value)}
+              className={`flex items-center gap-2 h-9 px-2.5 rounded-lg text-[12px] cursor-pointer ${i === active ? 'bg-brand/10 text-brand' : 'text-jaman-navy'} ${o.value === value ? 'font-bold' : 'font-medium'}`}
+            >
+              <span className={`w-2 h-2 rounded-full shrink-0 ${o.dot}`} aria-hidden="true" />
+              <span className="flex-1">{o.label}</span>
+              {o.value === value && <Check className="w-3.5 h-3.5" aria-hidden="true" />}
+            </li>
+          ))}
+        </ul>,
+        document.body
+      )}
+      <style>{`@keyframes tsmIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){[role=listbox]{animation:none!important}}`}</style>
+    </>
+  );
+}
 
 interface FloorTablesModuleProps {
   tables: DiningTable[];
@@ -314,19 +431,14 @@ export const FloorTablesModule: React.FC<FloorTablesModuleProps> = ({
 
                 {/* Table Status Switcher & Actions */}
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <select
+                  <TableStatusMenu
                     value={tbl.status}
-                    onChange={(e) => {
-                      TableRepository.updateTableStatus(tbl.id, e.target.value as any);
-                      showToast(`Table ${tbl.tableNumber} status set to ${e.target.value}`);
+                    label={`Status of table ${tbl.tableNumber}`}
+                    onChange={(v) => {
+                      TableRepository.updateTableStatus(tbl.id, v as any);
+                      showToast(`Table ${tbl.tableNumber} status set to ${v}`);
                     }}
-                    className="text-[11px] font-bold bg-jaman-cream hover:bg-[#F4EFE6] text-jaman-navy border border-jaman-border rounded-lg px-2 py-1 focus:outline-none cursor-pointer flex-1"
-                  >
-                    <option value="AVAILABLE">Available</option>
-                    <option value="OCCUPIED">Occupied</option>
-                    <option value="RESERVED">Reserved</option>
-                    <option value="CLEANING">Cleaning</option>
-                  </select>
+                  />
 
                   <div className="flex items-center gap-1">
                     <button
