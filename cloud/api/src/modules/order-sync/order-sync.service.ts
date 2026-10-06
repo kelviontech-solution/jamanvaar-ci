@@ -261,11 +261,16 @@ export class OrderSyncService {
           const header = staleHeader && existing
             ? { orderType: existing.orderType, tableId: existing.tableId, tableLabel: existing.tableLabel, subtotal: existing.subtotal, taxAmount: existing.taxAmount, discountAmount: existing.discountAmount, totalAmount: existing.totalAmount, notes: existing.notes }
             : { orderType: evt.orderType, tableId: evt.tableId, tableLabel: evt.tableLabel, subtotal: evt.subtotal, taxAmount: evt.taxAmount, discountAmount: evt.discountAmount, totalAmount: evt.totalAmount, notes: evt.notes };
+          // A captured kiosk payment owns its financial snapshot. A stale terminal cannot rewrite the receipt/tax later.
+          const capturedKiosk = (device.type === 'KIOSK' || existing?.source === 'KIOSK')
+            ? await tx.order.findFirst({ where: { restaurantId: device.restaurantId, externalOrderId: evt.externalOrderId, source: 'KIOSK', status: 'PAID' }, select: { subtotal: true, taxAmount: true, discountAmount: true, totalAmount: true } })
+            : null;
+          if (capturedKiosk) Object.assign(header, capturedKiosk);
 
           // Device-priced orders are believed (devices work offline on an older menu) but checked; problems are flagged, never rejected.
           let reviewFlags: string[] = [];
           if (!existing) {
-            const ids = (evt.items as Array<{ externalItemId: string }>).map((i) => i.externalItemId);
+            const ids = evt.items.map((i) => i.menuItemId || i.externalItemId);
             const menuRows = await tx.syncedEntity.findMany({ where: { restaurantId: device.restaurantId, entityType: 'MENU_ITEM', externalId: { in: ids } }, select: { externalId: true, payload: true } });
             const base = new Map<string, number>();
             for (const r of menuRows) {
@@ -290,6 +295,10 @@ export class OrderSyncService {
             ...(staleHeader ? { needsTotalsReview: true } : {})
           };
           const finalMeta = { ...(mergedMeta ?? {}), ...serverMeta, ...(existing && Array.isArray(priorMeta.reviewFlags) && reviewFlags.length === 0 ? { reviewFlags: priorMeta.reviewFlags } : {}) };
+          if (capturedKiosk) Object.assign(finalMeta, {
+            cgstPaise: Math.round(capturedKiosk.taxAmount / 2), sgstPaise: capturedKiosk.taxAmount - Math.round(capturedKiosk.taxAmount / 2),
+            roundOffPaise: 0, serviceChargePaise: 0, tipPaise: 0
+          });
           delete (finalMeta as Record<string, unknown>).statusCorrection;
 
           // Only the counter (POS, POS Admin) may declare an order paid or refunded. Any other terminal may report a payment only when it

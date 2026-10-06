@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-06",
+  "environment": "Isolated local PostgreSQL, Playwright Chromium, simulated payment provider; production not deployed",
+  "runtime": {
+    "tests": 1382,
+    "passed": 1382,
+    "files": 188,
+    "evidence": "runtime-complete-tests.json"
+  },
+  "backendPrimary": {
+    "tests": 103,
+    "passed": 103,
+    "files": 8,
+    "evidence": "api-complete-tests.json"
+  },
+  "backendExtended": {
+    "tests": 104,
+    "passed": 104,
+    "files": 12,
+    "evidence": "api-extended-tests-final.json"
+  },
+  "backendDeduplicated": {
+    "files": 19,
+    "tests": 186,
+    "passed": 186,
+    "note": "Latest results by suite file; overlapping entity-sync suite counted once. Targeted backend suites, not the entire API test catalogue."
+  },
+  "browser": {
+    "attempts": 120,
+    "rawFailedAttempts": 15,
+    "distinctScenarios": 35,
+    "latestPassed": 35,
+    "reviewedMatrix": "TEST_MATRIX.csv",
+    "history": "ATTEMPT_DISPOSITIONS.csv"
+  },
+  "typechecks": [
+    {
+      "command": "node node_modules/typescript/bin/tsc -b",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p cloud/api/tsconfig.json",
+      "exitCode": 0,
+      "output": ""
+    }
+  ],
+  "apiBuild": {
+    "command": "npm run build --workspace=@jamanvaar/cloud-api",
+    "exitCode": 0
+  },
+  "frontendBuilds": [
+    {
+      "workspace": "@jamanvaar/pos",
+      "exitCode": 0
+    },
+    {
+      "workspace": "@jamanvaar/captain",
+      "exitCode": 0
+    },
+    {
+      "workspace": "@jamanvaar/kds",
+      "exitCode": 0
+    },
+    {
+      "workspace": "@jamanvaar/kiosk-user",
+      "exitCode": 0,
+      "initialExitCode": 2,
+      "recheckEvidence": "kiosk-user-build-final.log",
+      "note": "Initial undefined setter compile error corrected; subsequent build exited 0."
+    },
+    {
+      "workspace": "@jamanvaar/qr-guest",
+      "exitCode": 0
+    },
+    {
+      "workspace": "@jamanvaar/super-admin-web",
+      "exitCode": 0
+    },
+    {
+      "workspace": "@jamanvaar/pos-admin",
+      "exitCode": 0
+    }
+  ],
+  "adminMainJavascript": {
+    "beforeGzipKB": 3293.35,
+    "afterGzipKB": 403.01,
+    "reductionPercent": 87.76,
+    "caveat": "External image requests and other chunks excluded; not a measured WAN speed improvement."
+  },
+  "productionCertification": false
+}

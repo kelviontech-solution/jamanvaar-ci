@@ -1,5 +1,6 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
+import { StaffSession } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 /**
  * POS's only connection to cloud/api. Single-call activation, same pattern
@@ -162,10 +163,12 @@ export async function getPaymentStatus(paymentId: string): Promise<{ status: str
   return data;
 }
 
-export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, idempotencyKey?: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+  const scope = StaffSession.approvalScope();
+  const key = idempotencyKey ?? (scope?.paymentId === paymentId && scope.amountPaise === amountPaise ? scope.idempotencyKey : crypto.randomUUID());
   const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
-    body: JSON.stringify({ amountPaise, reason, requestedBy })
+    body: JSON.stringify({ amountPaise, reason, requestedBy, staffSession: StaffSession.sessionToken(), approvalSession: StaffSession.approvalToken(), idempotencyKey: key })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
@@ -278,5 +281,19 @@ export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Pr
   const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });
   const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error((data && data.message) || `Number lease failed (${res.status})`);
+  return data;
+}
+
+export async function pushInventoryMovements(movements: import('@jamanvaar/sync').PushedMovement[]): Promise<{ results: Array<{ movementId: string; status: 'ok' | 'error'; duplicate?: boolean; error?: string }> }> {
+  const res = await deviceFetch('/api/v1/inventory/movements', { method: 'POST', body: JSON.stringify({ movements }) });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? 'Stock movement sync failed', res.status);
+  return data;
+}
+
+export async function pullInventoryMovements(afterSeq: number): Promise<{ movements: import('@jamanvaar/sync').RemoteMovement[]; latestSeq: number; hasMore: boolean; serverKey?: 'cloud' | 'core' }> {
+  const res = await deviceFetch(`/api/v1/inventory/movements?afterSeq=${afterSeq}`);
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? 'Stock ledger recovery failed', res.status);
   return data;
 }

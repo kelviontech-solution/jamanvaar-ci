@@ -36,6 +36,16 @@ describe('device-priced order integrity flags', () => {
   it('a consistent order has no flags', () => {
     expect(integrityFlags([line('a', 2, 500)], 1000, new Map([['a', 500]]))).toEqual([]);
   });
+  it('uses net subtotal for an inclusive-tax line and still flags a wrong subtotal', () => {
+    const inclusive = { ...line('line-a', 1, 11800), snapshot: { taxInclusive: true, lineTax: 1800 } };
+    expect(integrityFlags([inclusive, line('zero-tax', 1, 29900)], 39900, new Map())).toEqual([]);
+    expect(integrityFlags([inclusive], 11800, new Map())).toEqual(['SUBTOTAL_MISMATCH:10000!=11800']);
+    expect(integrityFlags([{ ...inclusive, snapshot: { taxInclusive: true, lineTax: -1800 } }], 10000, new Map())).toEqual(['SUBTOTAL_MISMATCH:11800!=10000']);
+  });
+  it('looks up a menu item independently of its unique order-line ID', () => {
+    const priced = { ...line('unique-line', 1, 300), menuItemId: 'dish-a' };
+    expect(integrityFlags([priced], 300, new Map([['dish-a', 500]]))).toEqual(['BELOW_MENU_PRICE:unique-line:300<500']);
+  });
   it('flags a wrong line total, a wrong subtotal and a price below the menu price', () => {
     expect(integrityFlags([line('a', 2, 500, 900)], 900, new Map())).toEqual(['LINE_TOTAL_MISMATCH:a']);
     expect(integrityFlags([line('a', 1, 500)], 600, new Map())).toEqual(['SUBTOTAL_MISMATCH:500!=600']);

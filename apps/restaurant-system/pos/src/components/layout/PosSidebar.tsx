@@ -54,7 +54,7 @@ export const PosSidebar: React.FC = () => {
   const activeOrdersCount = db.orders.filter(
     (o) =>
       (o.orderStatus === 'PREPARING' || o.orderStatus === 'READY' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW') &&
-      o.businessDayId === activeDay.id
+      BusinessDayRepository.orderBelongsToBusinessDay(o, activeDay)
   ).length;
 
   const activeKotsCount = db.kots.filter((k) => k.status === 'PREPARING' || k.status === 'PENDING').length;

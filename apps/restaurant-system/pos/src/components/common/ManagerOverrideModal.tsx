@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { ManagerOverrideRepository, StaffRepository } from '@jamanvaar/database';
 import { StaffSession } from '@jamanvaar/sync';
@@ -16,6 +16,8 @@ export const ManagerOverrideModal: React.FC = () => {
   const { pendingOverride, closeOverrideModal, currentUser } = usePosStore();
   const [pin, setPin] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const verifyingRef = useRef(false);
+  const [verifying, setVerifying] = useState(false);
 
   if (!pendingOverride) return null;
 
@@ -36,13 +38,19 @@ export const ManagerOverrideModal: React.FC = () => {
   };
 
   const handleVerify = async () => {
-    if (pin.length !== 4) return;
+    if (pin.length !== 4 || verifyingRef.current) return;
+    verifyingRef.current = true; setVerifying(true);
+    try {
 
     const res = await ManagerOverrideRepository.verifyPin(pin);
     if (res.success && res.isManager) {
       const managerName = res.user?.fullName || 'Manager';
       // The server confirms the manager and gives a short approval that travels with the action this unlocks (best effort offline).
-      await StaffSession.approve(pin, deviceFetch);
+      const approvedOnline = await StaffSession.approve(pin, deviceFetch, pendingOverride.approvalScope);
+      if (pendingOverride.approvalScope && !approvedOnline) {
+        setErrorMessage('This online refund needs a current manager approval. Check the connection and authorize again.');
+        return;
+      }
       ManagerOverrideRepository.requestOverride({
         action: pendingOverride.action,
         reason: pendingOverride.details || 'Manager authorized sensitive action',
@@ -50,7 +58,7 @@ export const ManagerOverrideModal: React.FC = () => {
         approvedBy: managerName
       });
 
-      pendingOverride.onApprove(managerName);
+      await pendingOverride.onApprove(managerName);
       closeOverrideModal();
     } else {
       const lockoutMs = StaffRepository.pinLockoutRemainingMs();
@@ -61,6 +69,7 @@ export const ManagerOverrideModal: React.FC = () => {
       );
       setPin('');
     }
+    } finally { verifyingRef.current = false; setVerifying(false); }
   };
 
   return (
@@ -129,7 +138,7 @@ export const ManagerOverrideModal: React.FC = () => {
         <div className="w-full flex gap-2">
           <button
             onClick={handleVerify}
-            disabled={pin.length !== 4}
+            disabled={pin.length !== 4 || verifying}
             className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-600/25 disabled:opacity-50"
           >
             <Unlock className="w-4 h-4" />

@@ -427,6 +427,7 @@ export interface CartItem {
   seat?: number;
   /** How many of this line's quantity have already been sent to the kitchen (KOT). */
   kotSentQty?: number;
+  taxSnapshot?: OrderItem['snapshot'];
 }
 
 export interface Cart {
@@ -1335,6 +1336,8 @@ export interface InventoryItem {
   category: string;
   unit: string; // 'kg', 'ltr', 'pcs', 'grams', 'boxes'
   currentStock: number;
+  /** Immutable stock before ledger movements; synced masters never overwrite the live balance. */
+  openingStock?: number;
   minStockLevel: number;
   reorderLevel: number;
   costPerUnit: number;

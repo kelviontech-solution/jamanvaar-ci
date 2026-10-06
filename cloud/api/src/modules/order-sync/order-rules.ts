@@ -5,6 +5,7 @@
 
 /** Position of each order status in the order's life. Statuses not listed are unknown to the server and are never blocked. */
 const RANK: Record<string, number> = {
+  DRAFT: -1,
   NEW: 0, PENDING: 0, CONFIRMED: 0, ACCEPTED: 0,
   PREPARING: 1, COOKING: 1,
   READY: 2,
@@ -51,7 +52,14 @@ export function decideStatus(current: string | null | undefined, incoming: strin
   return { apply: true, status: incoming };
 }
 
-export interface IntegrityLine { externalItemId: string; quantity: number; unitPrice: number; lineTotal: number }
+export interface IntegrityLine {
+  externalItemId: string;
+  menuItemId?: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  snapshot?: { taxInclusive?: boolean; lineTax?: number };
+}
 
 /**
  * Sanity checks on a device-priced order. Devices price offline, so a stale menu is legitimate and the order is never
@@ -61,9 +69,11 @@ export function integrityFlags(lines: IntegrityLine[], subtotal: number, menuBas
   const flags: string[] = [];
   let sum = 0;
   for (const l of lines) {
-    sum += l.lineTotal;
+    const embeddedTax = l.snapshot?.taxInclusive === true && Number.isSafeInteger(l.snapshot.lineTax)
+      && l.snapshot.lineTax! >= 0 && l.snapshot.lineTax! <= l.lineTotal ? l.snapshot.lineTax! : 0;
+    sum += l.lineTotal - embeddedTax;
     if (l.lineTotal !== l.unitPrice * l.quantity) flags.push(`LINE_TOTAL_MISMATCH:${l.externalItemId}`);
-    const base = menuBasePaise.get(l.externalItemId);
+    const base = menuBasePaise.get(l.menuItemId || l.externalItemId);
     if (base !== undefined && l.unitPrice < base) flags.push(`BELOW_MENU_PRICE:${l.externalItemId}:${l.unitPrice}<${base}`);
   }
   if (sum !== subtotal) flags.push(`SUBTOTAL_MISMATCH:${sum}!=${subtotal}`);

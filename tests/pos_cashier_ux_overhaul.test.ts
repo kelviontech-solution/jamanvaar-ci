@@ -5,6 +5,8 @@ import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 describe('JAMANVAAR POS — Cashier UX Polish & Workflows', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
+    db.taxGroups.forEach(group => { group.isInclusive = false; });
     usePosStore.getState().clearCart();
   });
 

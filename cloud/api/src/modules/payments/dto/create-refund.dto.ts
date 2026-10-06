@@ -5,6 +5,9 @@ import { z } from 'zod';
 export const createRefundSchema = z.object({
   amountPaise: z.number().int().min(1),
   reason: z.string().min(1).max(500),
+  staffSession: z.string().max(1200).optional(),
+  approvalSession: z.string().max(1200).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
   // security-audit LOW-02: the terminal authenticates with a device token
   // only (the cloud has no notion of the local staff identity that
   // authorized this on the POS UI's own manager-approval prompt) — this is

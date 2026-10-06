@@ -242,12 +242,12 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           )}
 
           <div className="flex justify-between text-[#718096] text-[10px]">
-            <span>CGST (2.5%)</span>
+            <span>CGST</span>
             <span>₹{(order.cgstAmount ?? splitTax(order.taxAmount || 0).cgst).toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between text-[#718096] text-[10px]">
-            <span>SGST (2.5%)</span>
+            <span>SGST</span>
             <span>₹{(order.sgstAmount ?? splitTax(order.taxAmount || 0).sgst).toFixed(2)}</span>
           </div>
 
@@ -453,8 +453,8 @@ export function printThermalReceipt(
 
         <div class="row"><span>Subtotal:</span><span>₹${(order.subtotal || 0).toFixed(2)}</span></div>
         ${(order.discountAmount || 0) > 0 ? `<div class="row"><span>Discount:</span><span>-₹${order.discountAmount.toFixed(2)}</span></div>` : ''}
-        <div class="row"><span>CGST (2.5%):</span><span>₹${(order.cgstAmount ?? splitTax(order.taxAmount || 0).cgst).toFixed(2)}</span></div>
-        <div class="row"><span>SGST (2.5%):</span><span>₹${(order.sgstAmount ?? splitTax(order.taxAmount || 0).sgst).toFixed(2)}</span></div>
+        <div class="row"><span>CGST:</span><span>₹${(order.cgstAmount ?? splitTax(order.taxAmount || 0).cgst).toFixed(2)}</span></div>
+        <div class="row"><span>SGST:</span><span>₹${(order.sgstAmount ?? splitTax(order.taxAmount || 0).sgst).toFixed(2)}</span></div>
         ${(order.roundOffAmount || 0) !== 0 ? `<div class="row"><span>Round Off:</span><span>₹${order.roundOffAmount.toFixed(2)}</span></div>` : ''}
 
         <div class="double-divider"></div>

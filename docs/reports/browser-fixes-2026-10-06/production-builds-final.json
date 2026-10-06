@@ -1,0 +1,33 @@
+[
+  {
+    "workspace": "@jamanvaar/pos",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/captain",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/kds",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/kiosk-user",
+    "exitCode": 0,
+    "initialExitCode": 2,
+    "recheckEvidence": "kiosk-user-build-final.log",
+    "note": "Initial undefined setter compile error corrected; subsequent build exited 0."
+  },
+  {
+    "workspace": "@jamanvaar/qr-guest",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/super-admin-web",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/pos-admin",
+    "exitCode": 0
+  }
+]

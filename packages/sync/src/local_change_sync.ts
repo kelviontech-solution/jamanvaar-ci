@@ -2,9 +2,10 @@ import { db, MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboS
 import { pendingCatalogChanges, syncMenuCatalog, syncPromotions } from './menu_sync';
 import { pendingStaffChanges, syncStaffUsers } from './staff_sync';
 import { syncDiningTables } from './floor_sync';
+import { pendingInventoryMasterChanges, syncInventoryMasters } from './inventory_master_sync';
 
 /** Publish actual local edits immediately. Remote application updates the collection acknowledgements first. */
-export function startLocalChangeSync(opts: { menu?: boolean; promotions?: boolean; staff?: boolean; tables?: boolean }): () => void {
+export function startLocalChangeSync(opts: { menu?: boolean; promotions?: boolean; staff?: boolean; tables?: boolean; inventory?: boolean }): () => void {
   let queued = false;
   let stopped = false;
   const unsubscribe = db.subscribe(() => {
@@ -13,6 +14,7 @@ export function startLocalChangeSync(opts: { menu?: boolean; promotions?: boolea
     queueMicrotask(() => {
       queued = false;
       if (stopped) return;
+      if (opts.inventory && pendingInventoryMasterChanges()) void syncInventoryMasters({ push: true }).catch(() => undefined);
       if (opts.menu) {
         [MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync].forEach((s) => s.stampChanges());
         if (pendingCatalogChanges()) void syncMenuCatalog({ push: true }).catch(() => undefined);

@@ -3,7 +3,8 @@ const path = require('node:path');
 const { chromium, expect } = require('playwright/test');
 const root = path.resolve(__dirname, '../..');
 const privateDir = path.join(root, '.jamanvaar/browser-audit');
-const reportDir = path.join(root, 'docs/reports/browser-qa-2026-10-06');
+const reportDir = path.resolve(root, process.env.JAMANVAAR_QA_REPORT_DIR || 'docs/reports/browser-qa-2026-10-06');
+if (!reportDir.startsWith(path.join(root, 'docs', 'reports') + path.sep)) throw Error('QA evidence must stay within workspace docs/reports');
 fs.mkdirSync(path.join(reportDir, 'evidence'), { recursive: true });
 let state = JSON.parse(fs.readFileSync(path.join(privateDir, 'private-state.json')));
 const ports = { super: 5180, admin: 5176, adminprod: 5286, pos: 5175, captain: 5177, kds: 5179, kiosk: 5174, qr: 5190 };
@@ -48,13 +49,14 @@ async function open(app, role = app, viewport = { width: 1440, height: 960 }) {
     append('network.jsonl', { at: new Date().toISOString(), app, role, method: r.method(), endpoint: new URL(r.url()).pathname, status: response?.status(), ms: +ms.toFixed(2), bytes: size.responseBodySize });
   });
   p._audit = { app, role, pending, ctx };
-  await p.goto(`http://localhost:${ports[app]}`, { waitUntil: 'domcontentloaded' });
+  // Cold Vite compilation is harness startup, not a production interaction SLA.
+  await p.goto(`http://localhost:${ports[app]}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await p.waitForTimeout(2500);
   return p;
 }
 async function snap(p, label) {
   const file = `${label.replace(/[^a-z0-9_-]/gi, '-')}.png`;
-  await p.screenshot({ path: path.join(reportDir, 'evidence', file), fullPage: true });
+  await p.screenshot({ path: path.join(reportDir, 'evidence', file), fullPage: true, mask: [p.getByText(/JMV-[A-Z0-9]{4}-[A-Z0-9-]+/), p.locator('input[placeholder="JMV-XXXX-XXXX-XXXX"]')] });
   const info = await p.evaluate(() => ({ title: document.title, text: document.body.innerText, headings: [...document.querySelectorAll('h1,h2,h3')].map(e => e.textContent), buttons: [...document.querySelectorAll('button')].map(e => ({ text: e.innerText, aria: e.getAttribute('aria-label'), title: e.title, disabled: e.disabled })), inputs: [...document.querySelectorAll('input,select,textarea')].map(e => ({ tag: e.tagName, type: e.type, placeholder: e.getAttribute('placeholder'), name: e.name, id: e.id, options: e.tagName === 'SELECT' ? [...e.options].map(o => ({ value: o.value, text: o.text })) : undefined })), links: [...document.querySelectorAll('a[href]')].map(e => ({ text: e.textContent, href: e.getAttribute('href') })), overflow: document.documentElement.scrollWidth > innerWidth }));
   fs.writeFileSync(path.join(reportDir, 'evidence', file.replace('.png', '.json')), scrub(JSON.stringify(info, null, 2)));
   return info;
@@ -72,6 +74,7 @@ async function test(p, feature, fn, extra = {}) {
     await snap(p, shot).catch(() => {});
     append('test-matrix.jsonl', { id, app: p._audit.app, role: p._audit.role, page: p.url(), feature, result: 'FAIL', ms: +(performance.now() - start).toFixed(2), error: scrub(err.message), screenshot: `evidence/${shot}.png`, ...extra });
     console.log(`FAIL ${p._audit.app}: ${feature}: ${scrub(err.message).slice(0, 230)}`);
+    process.exitCode = 1;
     return false;
   }
 }

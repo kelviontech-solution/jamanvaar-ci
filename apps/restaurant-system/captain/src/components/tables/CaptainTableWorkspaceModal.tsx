@@ -1,3 +1,4 @@
+import { db } from '@jamanvaar/database';
 import React, { useState, useMemo } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
@@ -92,7 +93,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const multiCourse = unfiredByCourse.length > 1;
 
   // The same pricing rules as the order itself and POS (CGST + SGST, round-off). A cancelled dish is at no charge.
-  const priced = priceOrderLines(billable.map((ci) => ({ unitPrice: ci.unitPrice, quantity: ci.quantity })));
+  const priced = priceOrderLines(billable.map((ci) => ({ unitPrice: ci.unitPrice, quantity: ci.quantity, menuItemId: ci.menuItem.id })), { menuItems: db.menuItems, taxGroups: db.taxGroups });
   const subtotal = priced.subtotal;
   const gst = priced.taxAmount;
   const roundOff = priced.roundOffAmount;

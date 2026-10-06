@@ -5,10 +5,11 @@
  * connection the terminal still works from its local sign-in, and the server records those actions as "not proven".
  */
 const KEY = 'jamanvaar_staff_session';
+export interface RefundApprovalScope { action: 'REFUND'; paymentId: string; amountPaise: number; idempotencyKey: string }
 
 interface Held {
   session?: { token: string; expiresAt: string; staffId: string; staffName: string; roleId: string };
-  approval?: { token: string; expiresAt: string; staffName: string };
+  approval?: { token: string; expiresAt: string; staffName: string; scope?: RefundApprovalScope };
 }
 
 type Fetcher = (path: string, init?: RequestInit) => Promise<Response>;
@@ -31,9 +32,9 @@ function save(h: Held): void {
 
 const alive = (expiresAt: string | undefined) => !!expiresAt && Date.parse(expiresAt) > Date.now();
 
-async function post(fetcher: Fetcher, path: string, pin: string): Promise<Record<string, unknown> | null> {
+async function post(fetcher: Fetcher, path: string, pin: string, scope?: RefundApprovalScope): Promise<Record<string, unknown> | null> {
   try {
-    const res = await fetcher(path, { method: 'POST', body: JSON.stringify({ pin }) });
+    const res = await fetcher(path, { method: 'POST', body: JSON.stringify({ pin, ...(scope ? { scope } : {}) }) });
     if (!res.ok) return null;
     return (await res.json()) as Record<string, unknown>;
   } catch {
@@ -54,6 +55,10 @@ export class StaffSession {
     return a && alive(a.expiresAt) ? a.token : undefined;
   }
 
+  static approvalScope(): RefundApprovalScope | undefined {
+    const a = load().approval; return a && alive(a.expiresAt) ? a.scope : undefined;
+  }
+
   /** Called after the local PIN check succeeds. Asks the server to sign the person in; a manager session is also a standing approval. */
   static async signIn(pin: string, fetcher: Fetcher): Promise<boolean> {
     const r = await post(fetcher, '/api/v1/staff/sign-in', pin);
@@ -66,10 +71,10 @@ export class StaffSession {
   }
 
   /** Called after a manager override PIN is accepted on the terminal: asks the server for the approval to stamp onto that action. */
-  static async approve(pin: string, fetcher: Fetcher): Promise<boolean> {
-    const r = await post(fetcher, '/api/v1/staff/verify-manager-pin', pin);
+  static async approve(pin: string, fetcher: Fetcher, scope?: RefundApprovalScope): Promise<boolean> {
+    const r = await post(fetcher, '/api/v1/staff/verify-manager-pin', pin, scope);
     if (!r || typeof r.approvalToken !== 'string') return false;
-    save({ ...load(), approval: { token: r.approvalToken, expiresAt: String(r.approvalExpiresAt), staffName: String(r.staffName ?? '') } });
+    save({ ...load(), approval: { token: r.approvalToken, expiresAt: String(r.approvalExpiresAt), staffName: String(r.staffName ?? ''), scope } });
     return true;
   }
 

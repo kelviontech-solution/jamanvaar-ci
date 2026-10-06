@@ -34,8 +34,8 @@ describe('Super Admin app addresses (BUG-018)', () => {
   it('the addresses are configurable, with a working default for local development', () => {
     const src = readFileSync(join(SRC, 'lib/appUrls.ts'), 'utf8');
     expect(src).toContain('VITE_RESTAURANT_ADMIN_URL');
-    expect(src).toContain('VITE_KIOSK_ADMIN_URL');
+    expect(src).toContain('KIOSK_ADMIN_URL = RESTAURANT_ADMIN_URL');
     expect(src).toContain('http://localhost:5176');
-    expect(src).toContain('http://localhost:5173');
+    expect(src).not.toContain('http://localhost:5173');
   });
 });

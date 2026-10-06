@@ -151,7 +151,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           <div className="text-xl sm:text-2xl font-black font-mono text-blue-700">
             {formatINR(s.totalTax)}
           </div>
-          <span className="text-[10px] text-slate-400 block">CGST 2.5% + SGST 2.5%</span>
+          <span className="text-[10px] text-slate-400 block">CGST + SGST</span>
         </div>
       </div>
 
@@ -178,11 +178,11 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             {/* B2-036: derived from the same total as "Total Tax Collected" below via
                 formatSplitTax, so all three figures on this document always agree. */}
             <div className="flex justify-between text-slate-600">
-              <span>CGST (2.5%):</span>
+              <span>CGST:</span>
               <strong className="font-mono text-slate-800">{formatSplitTax(s.totalTax, s.cgstAmount, s.sgstAmount).cgst}</strong>
             </div>
             <div className="flex justify-between text-slate-600">
-              <span>SGST (2.5%):</span>
+              <span>SGST:</span>
               <strong className="font-mono text-slate-800">{formatSplitTax(s.totalTax, s.cgstAmount, s.sgstAmount).sgst}</strong>
             </div>
             <div className="flex justify-between text-slate-600">

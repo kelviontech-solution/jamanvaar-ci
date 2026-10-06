@@ -1,4 +1,4 @@
-import { syncStaffUsers, startLocalChangeSync, syncPromotions } from '@jamanvaar/sync';
+import { syncStaffUsers, startLocalChangeSync, syncPromotions, syncInventoryMasters } from '@jamanvaar/sync';
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   AuditRepository,
@@ -265,7 +265,7 @@ export default function PosAdminApp() {
   // Which AppCodes (e.g. KIOSK_ADMIN) this restaurant has enabled, to gate nav sections below.
   // Keyed on cloudConnected so a fresh device activation (which flips this true after this hook's
   // own initial mount-time fetch already 401'd) re-fetches instead of staying wrong until reload.
-  const { hasApp, refetch: refetchEntitlements } = useEntitlements(cloudConnected);
+  const { hasApp, refetch: refetchEntitlements, error: entitlementError, authRequired } = useEntitlements(cloudConnected);
 
   const completeLogin = (
     user: { id: string; fullName: string; role: string; restaurantId: string },
@@ -486,11 +486,11 @@ export default function PosAdminApp() {
     InventoryLedgerSync.configureTransport({ push: pushInventoryMovements, pull: pullInventoryMovements });
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
-    void InventoryLedgerSync.sync();
+    void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
     void syncDiningTables();
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
-      void InventoryLedgerSync.sync();
+      void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
       void SyncOutboxEngine.catchUpFromCloud();
       // BUG-096/097: the floor plan built here, and each table's live state, are shared with POS and Captain.
       void syncDiningTables();
@@ -506,7 +506,7 @@ export default function PosAdminApp() {
     // still applies whatever it pulls back in case another admin device edited a record first.
     const syncStaff = () => syncStaffUsers({ push: true });
 
-    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true });
+    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true, inventory: true });
     void syncMenuCatalog({ push: true });
     void syncPromotions({ pushCombos: true, pushCoupons: true });
     void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
@@ -555,12 +555,17 @@ export default function PosAdminApp() {
   useEffect(() => {
     if (!hasApp('KIOSK_ADMIN')) return;
     let cancelled = false;
+    let inFlight = false;
     const refresh = async () => {
+      if (cancelled || inFlight) return;
+      inFlight = true;
       try {
         const fleet = await fetchCloudKiosks();
         if (!cancelled) setKiosks(fleet);
       } catch {
         // Fleet view just stays on its last-known data; this is a background refresh, not a user action.
+      } finally {
+        inFlight = false;
       }
     };
     void refresh();
@@ -945,6 +950,14 @@ export default function PosAdminApp() {
         />
 
         {/* BODY WITH FULL SIDEBAR & MAIN CONTENT */}
+        {entitlementError && (
+          <div role="alert" className="px-4 py-3 bg-amber-50 text-amber-900 flex items-center justify-between gap-3">
+            <span>{entitlementError}</span>
+            <button type="button" className="font-bold underline" onClick={authRequired ? handleAdminLogout : refetchEntitlements}>
+              {authRequired ? 'Sign in again' : 'Retry'}
+            </button>
+          </div>
+        )}
         <div className="flex-1 flex overflow-hidden min-h-0">
           {/* Behind the open drawer: tap anywhere outside it to close it */}
           {navOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setNavOpen(false)} aria-hidden="true" />}

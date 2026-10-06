@@ -589,7 +589,7 @@ export function OnboardRestaurantPage() {
       `3. Enter your login credentials to verify your live menu and POS terminals.`,
       ...(hasKioskAdmin
         ? [
-            `4. To manage your self-order kiosks, open the Kiosk Admin console (${KIOSK_ADMIN_URL}) and enter your KIOSK_ADMIN key.`,
+            `4. To manage your self-order kiosks, open Restaurant Admin (${KIOSK_ADMIN_URL}) and enter your KIOSK_ADMIN key.`,
             `5. For assistance, contact KELVIONTECH Platform Support.`
           ]
         : [`4. For assistance, contact KELVIONTECH Platform Support.`])

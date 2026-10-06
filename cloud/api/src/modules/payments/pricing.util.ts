@@ -93,12 +93,13 @@ export function priceCart(cartLines: CartLineInput[], menuItems: Map<string, Men
     const selectedOptions = resolveSelectedOptions(menuItem, line.selectedOptionIds);
     const modifierSum = selectedOptions.reduce((sum, opt) => sum + opt.priceDelta, 0);
     const unitPrice = menuItem.basePrice + modifierSum;
-    const lineSubtotal = unitPrice * line.quantity;
+    const listedSubtotal = unitPrice * line.quantity;
     // Tax-inclusive prices already contain the tax: it is extracted for the invoice, not added on top.
     const lineTax = menuItem.taxInclusive
-      ? Math.round((lineSubtotal * menuItem.taxRate) / (10000 + menuItem.taxRate))
-      : Math.round((lineSubtotal * menuItem.taxRate) / 10000);
-    const lineTotal = menuItem.taxInclusive ? lineSubtotal : lineSubtotal + lineTax;
+      ? Math.round((listedSubtotal * menuItem.taxRate) / (10000 + menuItem.taxRate))
+      : Math.round((listedSubtotal * menuItem.taxRate) / 10000);
+    const lineSubtotal = listedSubtotal - (menuItem.taxInclusive ? lineTax : 0);
+    const lineTotal = lineSubtotal + lineTax;
 
     return {
       externalItemId: line.externalItemId,

@@ -192,8 +192,8 @@ export class PdfReportBuilder {
     const finRows = [
       ['Gross Food Sales', `Rs. ${s.grossSales.toLocaleString('en-IN')}`],
       ['Discounts Granted', `- Rs. ${s.discountAmount.toLocaleString('en-IN')}`],
-      ['CGST (2.5%)', `Rs. ${s.cgstAmount.toLocaleString('en-IN')}`],
-      ['SGST (2.5%)', `Rs. ${s.sgstAmount.toLocaleString('en-IN')}`],
+      ['CGST', `Rs. ${s.cgstAmount.toLocaleString('en-IN')}`],
+      ['SGST', `Rs. ${s.sgstAmount.toLocaleString('en-IN')}`],
       ['Total Collected (incl. GST)', `Rs. ${s.netSales.toLocaleString('en-IN')}`]
     ];
     finRows.forEach((r, idx) => {

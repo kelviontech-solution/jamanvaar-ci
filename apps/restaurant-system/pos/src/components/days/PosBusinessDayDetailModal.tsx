@@ -335,7 +335,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 {formatINR(businessDay.tax)}
               </div>
               <span className="text-[10px] text-slate-400 font-medium mt-1 inline-block">
-                CGST 2.5% + SGST 2.5%
+                CGST + SGST
               </span>
             </div>
           </div>
@@ -365,11 +365,11 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                   <strong className="font-mono text-jaman-navy">{formatINR(businessDay.grossSales - businessDay.discounts)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>CGST (2.5%):</span>
+                  <span>CGST:</span>
                   <strong className="font-mono text-slate-800">{formatINR(splitTax(businessDay.tax, 0).cgst)}</strong>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>SGST (2.5%):</span>
+                  <span>SGST:</span>
                   <strong className="font-mono text-slate-800">{formatINR(splitTax(businessDay.tax, 0).sgst)}</strong>
                 </div>
                 {Math.round((businessDay.netSales - (businessDay.grossSales - businessDay.discounts + businessDay.tax)) * 100) !== 0 && (

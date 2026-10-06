@@ -1049,9 +1049,9 @@ export class PosAssistantService {
           sender: 'ASSISTANT',
           timestamp,
           intent,
-          summaryText: `Total GST collected today is ${formatINR(totalTax)} (CGST @ 2.5%: ${formatINR(cgst)}, SGST @ 2.5%: ${formatINR(sgst)}).`,
+          summaryText: `Total GST collected today is ${formatINR(totalTax)} (CGST: ${formatINR(cgst)}, SGST: ${formatINR(sgst)}).`,
           card: {
-            title: 'Statutory GST Tax Summary (5% GST)',
+            title: 'Configured GST Tax Summary',
             badge: 'Tax Ledger',
             badgeType: 'default',
             highlightNumber: formatINR(totalTax),
@@ -1059,8 +1059,8 @@ export class PosAssistantService {
             metrics: [
               { label: 'Gross Turnaround', value: formatINR(totalSales) },
               { label: 'Taxable Base Turnover', value: formatINR(taxable), isBold: true },
-              { label: 'CGST (2.5%)', value: formatINR(cgst), color: 'text-slate-700' },
-              { label: 'SGST (2.5%)', value: formatINR(sgst), color: 'text-slate-700' },
+              { label: 'CGST', value: formatINR(cgst), color: 'text-slate-700' },
+              { label: 'SGST', value: formatINR(sgst), color: 'text-slate-700' },
               ...(db.restaurant.gstin ? [{ label: 'GSTIN', value: db.restaurant.gstin }] : []),
               ...(db.restaurant.fssaiNumber ? [{ label: 'FSSAI License', value: db.restaurant.fssaiNumber }] : [])
             ],
@@ -1461,9 +1461,9 @@ Cash at Counter:        ${formatINR(cashSales)}
 UPI Dynamic QR:         ${formatINR(upiSales)}
 Card Terminal POS:      ${formatINR(cardSales)}
 ----------------------------------------
-STATUTORY TAX (5% GST):
-CGST (2.5%):            ${formatINR(cgst)}
-SGST (2.5%):            ${formatINR(sgst)}
+CONFIGURED GST:
+CGST:            ${formatINR(cgst)}
+SGST:            ${formatINR(sgst)}
 ----------------------------------------
 Printed from POS Smart Assistant
 ========================================

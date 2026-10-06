@@ -1,4 +1,5 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, Query, Req, UseGuards, UsePipes } from '@nestjs/common';
+import { RefundAuthorizationGuard } from './refund-authorization.guard';
 import { Device } from '@prisma/client';
 import { PaymentsService } from './payments.service';
 import { RestaurantPayoutsService } from './restaurant-payouts.service';
@@ -103,11 +104,12 @@ export class PaymentOrdersController {
 
   @Throttle({ paymentRefund: { limit: 10, ttl: 60_000, getTracker: deviceTracker } })
   @Post(':paymentId/refund')
+  @UseGuards(RefundAuthorizationGuard)
   @UsePipes(new ZodValidationPipe(createRefundSchema))
-  async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device) {
+  async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device, @Req() request: { refundActor: string; refundActorId: string }) {
     if (device.type !== 'POS' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') {
       throw new ForbiddenException('Only POS, POS Admin or Kiosk Admin can initiate a refund');
     }
-    return this.payments.createRefund(device.restaurantId, paymentId, body, { id: device.id, type: device.type });
+    return this.payments.createRefund(device.restaurantId, paymentId, { ...body, requestedBy: request.refundActor }, { id: device.id, type: device.type, actorId: request.refundActorId });
   }
 }

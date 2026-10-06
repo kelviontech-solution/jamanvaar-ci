@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession, admitPaidKioskOrder } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
@@ -224,6 +224,8 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect((await authed('post', `/api/v1/payments/${order.paymentId}/fulfilled`, kioskToken)).status).toBe(400);
 
     await prisma.runAsPlatform((tx) => tx.paymentTransaction.update({ where: { id: order.paymentId }, data: { status: 'SUCCESS', paidAt: new Date() } }));
+    expect((await authed('post', `/api/v1/payments/${order.paymentId}/fulfilled`, kioskToken)).status).toBe(409);
+    await admitPaidKioskOrder(prisma, order.paymentId);
     const first = await authed('post', `/api/v1/payments/${order.paymentId}/fulfilled`, kioskToken);
     expect(first.status).toBe(201);
     const row1 = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: order.paymentId } }));
@@ -264,6 +266,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   it('staff can mark a stuck payment fulfilled from Kiosk Admin, which clears the attention flag', async () => {
     const stale = await seedPayment(restaurantId, { amount: 4500, paidAt: new Date(Date.now() - 10 * 60_000) });
+    await admitPaidKioskOrder(prisma, stale.id);
     expect((await authed('post', `/api/v1/payments/${stale.id}/fulfilled`, kioskAdminToken)).status).toBe(201);
     const res = await authed('get', '/api/v1/payments/tenant-recent', kioskAdminToken);
     expect(res.body.rows.find((r: { id: string }) => r.id === stale.id).needsAttention).toBe(false);
@@ -273,7 +276,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   it('a Kiosk Admin device can refund an online payment (POS and POS Admin already could)', async () => {
     const p = await seedPayment(restaurantId, { amount: 10000, fulfilled: true });
-    const res = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 2500, reason: 'wrong dish', requestedBy: 'Owner' });
+    const res = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 2500, reason: 'wrong dish', requestedBy: 'Owner', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
     expect(res.status).toBe(201);
     expect(gateway.createRefund).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: 2500, razorpayPaymentId: p.providerPaymentId }));
     // a plain kiosk (customer-facing) still can not
@@ -384,7 +387,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     const payout = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.create({ data: { restaurantId, businessDate: '20261006', grossAmount: 10000, feeAmount: 300, netAmount: 9700, paymentCount: 1 } }));
     await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.update({ where: { id: p.id }, data: { payoutId: payout.id } }));
     gateway.createRefund.mockResolvedValueOnce({ refundId: `rfnd_batch_${p.id}`, status: 'processed', amountPaise: 1000 });
-    const result = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 1000, reason: 'wrong dish after batch', requestedBy: 'Owner' });
+    const result = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 1000, reason: 'wrong dish after batch', requestedBy: 'Owner', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
     expect(result.status).toBe(201);
     const held = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.findUniqueOrThrow({ where: { id: payout.id } }));
     expect(held.status).toBe('ON_HOLD');

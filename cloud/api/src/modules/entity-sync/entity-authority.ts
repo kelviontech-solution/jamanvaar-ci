@@ -27,6 +27,8 @@ export const ENTITY_WRITE_AUTHORITY: Record<SyncableEntityType, readonly DeviceT
   CUSTOMER_FEEDBACK: ['KIOSK', 'KIOSK_ADMIN', 'POS_ADMIN'],
   STAFF_USER: ['POS', 'POS_ADMIN'],
   INVENTORY_ITEM: CONSOLES,
+  RECIPE: CONSOLES,
+  SUPPLIER: CONSOLES,
   PAYMENT_TRANSACTION: ['POS', 'POS_ADMIN'],
   SHIFT: ['POS', 'POS_ADMIN'],
   CASH_MOVEMENT: ['POS', 'POS_ADMIN'],
@@ -41,7 +43,9 @@ export const ENTITY_READ_AUTHORITY: Partial<Record<SyncableEntityType, readonly 
   SHIFT: ['POS', 'POS_ADMIN'],
   CASH_MOVEMENT: ['POS', 'POS_ADMIN'],
   PAYMENT_TRANSACTION: ['POS', 'POS_ADMIN'],
-  INVENTORY_ITEM: ['POS', 'POS_ADMIN']
+  INVENTORY_ITEM: ['POS', 'POS_ADMIN'],
+  RECIPE: ['POS', 'POS_ADMIN'],
+  SUPPLIER: ['POS', 'POS_ADMIN']
 };
 
 /** Which staff roles may sign in on which terminal. Mirrors `StaffRepository.TERMINAL_ROLES`; a role not listed is not restricted. */

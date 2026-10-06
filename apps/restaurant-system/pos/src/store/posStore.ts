@@ -36,7 +36,7 @@ import {
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
-import { lanMeshSync, SyncOutboxEngine, StaffSession } from '@jamanvaar/sync';
+import { lanMeshSync, SyncOutboxEngine, StaffSession, type RefundApprovalScope } from '@jamanvaar/sync';
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
@@ -142,7 +142,8 @@ interface PosState {
     action: ManagerOverrideAction;
     title: string;
     details?: string;
-    onApprove: (managerName: string) => void;
+    onApprove: (managerName: string) => void | Promise<void>;
+    approvalScope?: RefundApprovalScope;
   } | null;
 
   // Data Actions
@@ -239,7 +240,8 @@ interface PosState {
     action: ManagerOverrideAction,
     title: string,
     details?: string,
-    onApprove?: (managerName: string) => void
+    onApprove?: (managerName: string) => void | Promise<void>,
+    approvalScope?: RefundApprovalScope
   ) => void;
   closeOverrideModal: () => void;
 
@@ -310,6 +312,7 @@ function recomputeCart(
 ): Cart {
   return calculateCart({
     items,
+    taxGroups: db.taxGroups,
     discountType,
     discountValue,
     discountScope,
@@ -343,6 +346,7 @@ function cartLinesToOrderItems(items: CartItem[], existing?: Order['items']): Or
       modifiers: ci.selectedModifiers,
       specialInstructions: ci.specialInstructions,
       totalPrice: ci.itemTotal,
+      snapshot: ci.taxSnapshot ?? prior?.snapshot,
       itemDiscountPercent: ci.itemDiscountPercent,
       itemDiscountAmount: ci.itemDiscountAmount,
       discountReason: ci.discountReason,
@@ -1342,12 +1346,13 @@ export const usePosStore = create<PosState>((set, get) => {
       );
     },
 
-    requestManagerOverride: (action, title, details, onApprove) => {
+    requestManagerOverride: (action, title, details, onApprove, approvalScope) => {
       set({
         pendingOverride: {
           action,
           title,
           details,
+          approvalScope,
           onApprove: onApprove || (() => {})
         }
       });
@@ -1621,19 +1626,10 @@ export const usePosStore = create<PosState>((set, get) => {
       set({ isInstantBillProcessing: true });
 
       try {
-        const orderItems = state.cart.items.map((ci, idx) => ({
-          id: `oi-${Date.now()}-${idx}`,
-          orderId: '',
-          menuItemId: ci.menuItemId,
-          name: ci.item.name,
-          sku: ci.item.sku,
-          quantity: ci.quantity,
-          unitPrice: ci.unitPrice,
-          modifiers: ci.selectedModifiers,
-          specialInstructions: ci.specialInstructions,
-          totalPrice: ci.itemTotal,
-          kitchenStatus: 'PREPARING' as const
-        }));
+        const running = findRunningOrder(state);
+        const linked = linkCartItems(state.cart.items);
+        const orderItems = cartLinesToOrderItems(linked, running?.items);
+        if (running) syncOrderToCart(running, { ...state.cart, items: linked });
 
         // A quick counter sale with no table is takeaway (the setting's default), not a dine-in with no table
         // (BUG-153): the cart's order type is DINE_IN by default, so only a type the cashier deliberately
@@ -1646,7 +1642,7 @@ export const usePosStore = create<PosState>((set, get) => {
           : (cfg.defaultOrderType || 'TAKEAWAY');
 
         // 1. Create order in Database
-        const order = OrderRepository.createOrder({
+        const order = running ?? OrderRepository.createOrder({
           orderType: resolvedOrderType,
           tableId: state.selectedTable?.id,
           tableNumber: state.selectedTable?.tableNumber,
@@ -1663,23 +1659,25 @@ export const usePosStore = create<PosState>((set, get) => {
           totalAmount: state.cart.totalPayable,
           roundOffAmount: state.cart.roundOffAmount,
           paymentMethod: method,
-          paymentStatus: 'SUCCESS',
-          orderStatus: 'COMPLETED',
+          paymentStatus: 'PENDING',
+          orderStatus: 'CONFIRMED',
           source_type: 'POS'
         });
 
         // 2. If sendKotBeforeBill is enabled, create KOT & dispatch to kitchen
         if (cfg.sendKotBeforeBill) {
-          const kotItems = state.cart.items.map((ci, idx) => ({
+          const kotItems = linked.map((ci, idx) => ({
             id: `koti-${Date.now()}-${idx}`,
             menuItemId: ci.menuItemId,
             name: ci.item.name,
-            quantity: ci.quantity,
+            quantity: Math.max(0, ci.quantity - (ci.kotSentQty ?? 0)),
             modifiers: ci.selectedModifiers,
             specialInstructions: ci.specialInstructions,
             kitchenStation: ci.item.kitchenStation || 'Main Kitchen',
-            status: 'PREPARING' as const
-          }));
+            status: 'PREPARING' as const,
+            orderItemId: ci.orderItemId
+          })).filter(it => it.quantity > 0);
+          for (const item of order.items) if (kotItems.some(k => k.orderItemId === item.id)) item.sentAt = new Date().toISOString();
 
           const kots = KOTRepository.generateKOT({
             orderId: order.id,

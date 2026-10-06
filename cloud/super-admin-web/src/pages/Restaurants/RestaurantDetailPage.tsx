@@ -915,8 +915,8 @@ export function RestaurantDetailPage() {
                   {restaurant.activationKeys.some((k) => k.allowedDeviceType === 'KIOSK_ADMIN') && (
                     <>
                       {' '}
-                      A <strong>KIOSK_ADMIN</strong> key must instead be entered at the{' '}
-                      <strong>Kiosk Admin console ({KIOSK_ADMIN_URL})</strong>.
+                      A <strong>KIOSK_ADMIN</strong> key is also entered at the{' '}
+                      <strong>merged Restaurant Admin ({KIOSK_ADMIN_URL})</strong>.
                     </>
                   )}
                 </p>

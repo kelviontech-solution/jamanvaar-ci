@@ -23,6 +23,7 @@ interface NeedsAttentionSectionProps {
     cashierName?: string;
     openingCash?: number;
     status?: string;
+    cashVariance?: number;
   };
   onNavigateToKitchen: () => void;
   onNavigateToInventory: () => void;
@@ -184,23 +185,29 @@ export const NeedsAttentionSection: React.FC<NeedsAttentionSectionProps> = ({
                 <Coins className="w-3.5 h-3.5 text-emerald-700" />
                 Shift Drawer
               </span>
-              {reconciled ? (
+              {!activeShift ? (
+                <span className="text-[10px] font-bold text-slate-600">No shift recorded</span>
+              ) : activeShift.status !== 'CLOSED' ? (
+                <span className="text-[10px] font-bold text-amber-700">Open · Not yet counted</span>
+              ) : activeShift.cashVariance === undefined ? (
+                <span className="text-[10px] font-bold text-amber-700">Closing count missing</span>
+              ) : activeShift.cashVariance === 0 ? (
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   100% Reconciled
                 </span>
               ) : (
                 <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded-full">
-                  Variance ₹{varianceAmount}
+                  Variance {formatINR(activeShift.cashVariance)}
                 </span>
               )}
             </div>
 
             <div className="mt-2.5">
               <h4 className="font-bold text-sm text-jaman-navy">
-                {activeShift?.cashierName || 'Cashier'} • Float ₹{activeShift?.openingCash || 2000}
+                {activeShift ? `${activeShift.cashierName || 'Cashier'} · Float ${formatINR(activeShift.openingCash ?? 0)}` : 'No cashier shift'}
               </h4>
               <p className="text-xs text-slate-500 mt-1">
-                Active cash drawer register. Single-source audit verified.
+                {activeShift?.status === 'CLOSED' ? 'Closed register. Review the recorded count and variance.' : 'Reconciliation requires a recorded closing cash count.'}
               </p>
             </div>
           </div>

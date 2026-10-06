@@ -18,6 +18,8 @@ describe('Captain: courses, held dishes and cancelling a sent dish', () => {
     memory.clear();
     g.localStorage = { getItem: (k: string) => memory.get(k) ?? null, setItem: (k: string, v: string) => void memory.set(k, v), removeItem: (k: string) => void memory.delete(k) };
     db.resetToDefaultSeed();
+    // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
+    db.taxGroups.forEach(group => { group.isInclusive = false; });
     db.users = [];
     db.orders = [];
     db.kots = [];

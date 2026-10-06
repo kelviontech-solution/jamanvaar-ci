@@ -1,0 +1,325 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nTerminal ONLINE\nQA Cashier\nFloat: ₹0\nEOD Report\nReconciliation\nAssistant\nLogout\nYour cloud session has expired. Sign in again to restore your restaurant modules.\nSign in again\nOPERATIONS\nDashboard\nDIGITAL ORDERING\nQR Table Ordering\nON\nPEOPLE & CASH\nOffers & Coupons\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nRestaurant Operations\nLive Command Center\n\nMonitor today's sales, orders, cash flow, and restaurant activity.• Showing: Today (06 Oct 2026)\n\nToday\nYesterday\n7 Days\n30 Days\nThis Month\nThis Year\nRefresh\nGet Your Restaurant Ready\n\n6 of 7 steps complete\n\nNEXT STEP\n\nConnect a receipt printer\n\nAdd the counter printer and any kitchen printers so bills and kitchen tickets print.\n\nAdd dishes to your menu\nSet up your floor & tables\nConnect a receipt printer\nAdd your team members\nTake a practice order on a Captain tablet\nSee it on the kitchen screen and mark it ready\nTake your first payment at the counter\nTODAY (06 OCT 2026) TOTAL BILLED (INCL. GST)\n₹16485\nRecorded sales and payments\nCOMPLETED ORDERS\n61\n2 dine-in • 59 takeaway\nAVERAGE ORDER (AOV)\n₹270\nNet sales ÷ orders\nTOTAL COLLECTIONS\n₹16485\nCash ₹14825 • UPI ₹1660\nOperational Snapshot\n\nReal-time kitchen velocity, floor capacity, and operational health\n\nLIVE KOT QUEUE\n46\nTickets active\nIn Kitchen\nOpen Kitchen\nDINING OCCUPANCY\n50% load\n3 / 6\nTables\nFloor status\nView Floor\nLOW STOCK ALERT\nHealthy\n0\nItems low\nBelow threshold\nReview Inventory\nGST TAX COLLECTED (5%)\n₹960\nCGST ₹480\nSGST ₹480\nDISCOUNTS GIVEN\n-₹0\nCoupons & bill cuts\nPromotions\nHourly Sales Velocity\n\nTrack revenue movement throughout operating hours\n\nPeak: 11 AM – Next Hour\n9AM\n10AM\n11AM\n12PM\n1PM\n2PM\n3PM\n4PM\n5PM\n6PM\n7PM\n8PM\n9PM\n10PM\n11PM\nTotal Today: ₹1652\nActive Operating Window: 9:00 AM – 11:00 PM\nTop Dishes\n\nHighest volume items ordered\n\nTOP 5\n#1\n\nQA Pizza 01\n\n83 servings ordered\n\n₹24817\nRevenue\n#2\n\nQA GST18 Pizza\n\n23 servings ordered\n\n₹2318\nRevenue\nView All Ranked Dishes\nNeeds Attention & Quick Triage\n\nDirect operational shortcuts and alerts requiring manager intervention\n\nKITCHEN LINE\nAction Required\n46 Tickets In Preparation\n\nActive orders being cooked on KDS display.\n\nOpen Kitchen KDS\nRAW MATERIALS\nOptimal\nInventory Well Stocked\n\nAll recipes and inventory items are within safe levels.\n\nReview Inventory\nDINING FLOOR\n3 / 6 Occupied\n3 Tables Available\n\nGuests currently dining. Tap to manage bills and transfers.\n\nManage Floor & Tables\nSHIFT DRAWER\n100% Reconciled\nQA Cashier · Float ₹0\n\nClosed register. Review the recorded count and variance.\n\nRun Financial Audit\nJAMAN AI\nACTIVE\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nRESTAURANT OPERATIONS PLATFORM\n\nRESTAURANT ADMIN\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Restaurant Operations",
+    "Get Your Restaurant Ready",
+    "Operational Snapshot",
+    "Hourly Sales Velocity",
+    "Top Dishes",
+    "Needs Attention & Quick Triage"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "Sign in again",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "Refresh dashboard metrics",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Dismiss checklist",
+      "disabled": false
+    },
+    {
+      "text": "Add dishes to your menu",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Set up your floor & tables",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Connect a receipt printer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Add your team members",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Take a practice order on a Captain tablet",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "See it on the kitchen screen and mark it ready",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Take your first payment at the counter",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "View All Ranked Dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Open Kitchen KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Review Inventory",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Manage Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Run Financial Audit",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

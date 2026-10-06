@@ -29,7 +29,7 @@ export const PLAN_DEFINITIONS: Record<PlanTier, PlanDefinition> = {
       { name: 'Kitchen KOT & Multi-Station Routing', included: true },
       { name: '58mm & 80mm ESC/POS Thermal Receipt Printing', included: true },
       { name: 'Cash Drawer Kick & Cashier Shift Float', included: true },
-      { name: 'Daily Sales & Statutory 5% GST Reports', included: true },
+      { name: 'Daily Sales & Configured GST Reports', included: true },
       { name: 'Inventory & 86 Dish Availability', included: true },
       { name: 'JAMAN AI Local Assistant & Intelligence', included: true },
       { name: 'Restaurant Admin Management Portal', included: true },

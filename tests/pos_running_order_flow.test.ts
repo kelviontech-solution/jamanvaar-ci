@@ -106,6 +106,7 @@ describe('POS running order — Send KOT then Pay (BUG-032)', () => {
       categoryId: category.id,
       name: 'Round-Off Test Dish',
       sku: 'B2019-01',
+      taxGroupId: db.taxGroups.find(group => group.isActive)?.id,
       price: 111,
       dietaryType: 'VEG',
       spiceLevel: 'MILD',
@@ -113,6 +114,7 @@ describe('POS running order — Send KOT then Pay (BUG-032)', () => {
       isAvailable: true
     } as any);
 
+    db.taxGroups.forEach(group => { group.isInclusive = false; });
     usePosStore.getState().addItemToCart(db.menuItems.find((m) => m.id === 'menu-item-b2019-test')!);
     const cartRoundOff = usePosStore.getState().cart.roundOffAmount;
     expect(cartRoundOff).not.toBe(0); // sanity check: this price really does produce a non-zero round-off

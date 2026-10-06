@@ -494,7 +494,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
             </div>
 
             <div className="flex justify-between text-slate-500 text-[11px]">
-              <span>GST (CGST 2.5% + SGST 2.5%):</span>
+              <span>GST (CGST + SGST):</span>
               <span className="font-mono font-bold">{formatINR(preview.totalTax)}</span>
             </div>
 

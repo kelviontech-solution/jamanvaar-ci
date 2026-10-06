@@ -6,6 +6,8 @@ import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 describe('POS Fast Cashier UX, Receipt & Ordering Tests', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
+    db.taxGroups.forEach(group => { group.isInclusive = false; });
     db.printJobs = [];
     usePosStore.getState().clearCart();
   });

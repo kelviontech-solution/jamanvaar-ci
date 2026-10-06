@@ -1,0 +1,901 @@
+{
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "text": "QA-Restaurant-A-1791252294734\nADMIN\nQA-Restaurant-A-1791252294734\nCtrl+K\nTerminal ONLINE\nQA Cashier\nFloat: ₹0\nEOD Report\nReconciliation\nAssistant\nLogout\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\n81\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nKIOSK\nKiosk Terminals\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nKiosk payment settings\nRefresh\n\nKiosk QR payments collect into Jamanvaar's account. Your net payable is transferred manually after your bank details are verified.\n\nOnline payments: ACTIVE\n\nJamanvaar Fee: 3.00% on kiosk QR payments only. Super Admin controls this rate.\n\nCurrent collection account: Jamanvaar\n\nCurrent payout mode: Manual bank transfer\n\nRequest direct settlement to my bank\n\nRazorpay Route is pending. This toggle saves your request for later activation; payments continue through Jamanvaar with manual payouts. Save your bank details before enabling it.\n\nDirect settlement requested - awaiting Route activation and linked account verification.\n\nPayout bank: PENDING\n\nQA Owner A | QA Bank - Simulated | •••• 0001 | HDFC0000001\n\nUpdate bank details\nOnline payments\n\nOnline collection and manual payouts. New kiosk QR payments carry the Jamanvaar fee.\n\nRefresh\nGross Collection / Jamanvaar Fee / Net Payable (all time)\nGross Collection\n₹1,660.00\n− Jamanvaar Fee (kiosk QR only; rate saved per payment)\n− ₹54.52\n= Net Payable after holds\n₹743.15\nAlready paid to your bank\n₹0.00\nPending (not yet transferred)\n₹743.15\nRazorpay Route is pending, so Jamanvaar collects payments on your behalf and pays your net amount to your bank by manual transfer once verified — this is not money already in your account.\nHeld for refund or payout review: ₹862.33. This amount is excluded from Net Payable and Pending until reconciled.\nOrder\tAmount\tCustomer payment\tRefunded\t\n0-tz6pqtw4\t₹118.00\tPartly refunded\t₹0.01\t\nRefund\n\n9-5g0nfg8u\t₹118.00\tCustomer paid\t—\t\nRefund\n\n2-d2jkl2jo\t₹118.00\tCustomer paid\t—\t\nRefund\n\n4-h8tw3n9r\t₹118.00\tCustomer paid\t—\t\nRefund\n\n2-95hxg78p\t₹118.00\tPartly refunded\t₹0.01\t\nRefund\n\n5-to22ydl6\t₹118.00\tWaiting\t—\t\n4-85iqe2wz\t₹118.00\tCustomer paid\t—\t\nRefund\n\n1-ce82xawn\t₹118.00\tPartly refunded\t₹0.01\t\nRefund\n\n2-xat0piod\t₹118.00\tPartly refunded\t₹0.01\t\nRefund\n\n6-64ezwsgv\t₹118.00\tPartly refunded\t₹0.01\t\nRefund\n\n5-pcy97go7\t₹118.00\tWaiting\t—\t\n5-m0ffi3j7\t₹299.00\tPartly refunded\t₹0.01\t\nRefund\n\n4-lqsugous\t₹299.00\tCustomer paid\t—\t\nRefund\n\n1-fehxxlhj\t₹299.00\tWaiting\t—\t\n6-ezdpi2at\t₹299.00\tWaiting\t—\t\nToday's Gross Collection / Fee / Net Payable\nShow\nDownload CSV\nGross Collection (11 payments)\n₹1,660.00\nJamanvaar Fee (kiosk QR only)\n₹54.52\nRefunds (0)\n₹0.00\nHeld for refund review\n₹862.33\nNet Payable after holds (before payouts)\n₹743.15\nJamanvaar collects payments; verified bank accounts receive manual payouts. Refund-related shares are held for reconciliation while the refund fee policy is pending. Route is not enabled yet. Day = calendar day in India time.\nPayments & Split Tenders Ledger\nMULTI-TENDER AUDIT\n\nBreakdown of Cash, UPI Bharat QR, Card Swipe EDC, and Split-Tender reconciliations across all cashier counters.\n\nGROSS SALES RECEIVED\n₹22764\nAll Payment Modes Combined\nCASH IN DRAWER\n₹21104\n93% of Total Volume\nUPI / BHARAT QR\n₹1660\n7% Digital QR Volume\nCARD SWIPE EDC\n₹0\nBank EDC Settlements\nUnderstanding Split Multi-Tender Payments\n\nHow JAMANVAAR POS handles split payment allocations seamlessly\n\nSmart Settlement Active\n1. FLEXIBLE ALLOCATION\n\nFor any bill (e.g. ₹756), the cashier can allocate part of the amount to Cash (e.g. ₹500) and the remaining balance to UPI QR (e.g. ₹256).\n\n2. EXACT CASH DRAWER MATH\n\nThe Cash portion is strictly recorded in the Cash Drawer Shift Ledger, preventing float discrepancies during end-of-day reconciliation.\n\n3. ITEMIZED TAX RECEIPT\n\nThe printed 80mm/58mm thermal receipt and WhatsApp e-Bill itemize the breakdown clearly: Cash: ₹500 | UPI: ₹256.\n\nCompleted Payment Transactions (82)\nReal-Time Sync\nORDER / INVOICE\tTABLE / TYPE\tCUSTOMER\tTOTAL SETTLED\tPAYMENT METHOD\tTIMESTAMP\tRECEIPT\n#QAA-20261006-604\nToken: 209\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-603\nToken: 208\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-602\nToken: 207\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-601\nToken: 206\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-200\nToken: 205\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-199\nToken: 204\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-198\nToken: 203\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-197\nToken: 202\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-196\nToken: 201\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-195\nToken: 200\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-194\nToken: 199\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-193\nToken: 198\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-192\nToken: 197\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-191\nToken: 196\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-190\nToken: 195\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-189\nToken: 194\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-188\nToken: 193\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-187\nToken: 192\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-186\nToken: 191\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-185\nToken: 190\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-184\nToken: 189\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tCASH\t11:34\tView Bill →\n#QAA-20261006-415\nToken: K-115\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:32\tView Bill →\n#QAA-20261006-183\nToken: 188\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tCASH\t11:31\tView Bill →\n#QAA-20261006-414\nToken: K-114\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:30\tView Bill →\n#QAA-20261006-205\nToken: 187\n\t\nDINE_IN\nTable QF367404\n\t\nWalk-in Guest\nCounter\t₹118\tCASH\t11:29\tView Bill →\n#QAA-20261006-413\nToken: K-113\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:26\tView Bill →\n#QAA-20261006-412\nToken: K-112\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:24\tView Bill →\n#QAA-20261006-411\nToken: K-111\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:19\tView Bill →\n#QAA-20261006-182\nToken: 184\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tCASH\t11:18\tView Bill →\n#QAA-20261006-409\nToken: K-109\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t11:02\tView Bill →\n#QAA-20261006-408\nToken: K-108\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t10:48\tView Bill →\n#QAA-20261006-181\nToken: 182\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tCASH\t10:48\tView Bill →\n#QAA-20261006-407\nToken: K-107\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t10:43\tView Bill →\n#QAA-20261006-180\nToken: 181\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tCASH\t10:42\tView Bill →\n#QAA-20261006-406\nToken: K-106\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹118\tUPI\t10:34\tView Bill →\n#QAA-20261006-178\nToken: 179\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:27\tView Bill →\n#QAA-20261006-177\nToken: 178\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:23\tView Bill →\n#QAA-20261006-145\nToken: 146\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-144\nToken: 145\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-143\nToken: 144\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-142\nToken: 143\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-141\nToken: 142\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-140\nToken: 141\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-139\nToken: 140\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-138\nToken: 139\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-137\nToken: 138\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-136\nToken: 137\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-135\nToken: 136\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-134\nToken: 135\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-133\nToken: 134\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-132\nToken: 133\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-131\nToken: 132\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-130\nToken: 131\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-129\nToken: 130\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-128\nToken: 129\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-127\nToken: 128\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-126\nToken: 127\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-125\nToken: 126\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:14\tView Bill →\n#QAA-20261006-122\nToken: 123\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-121\nToken: 122\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-120\nToken: 121\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-119\nToken: 120\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-118\nToken: 119\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-117\nToken: 118\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-116\nToken: 117\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-115\nToken: 116\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-114\nToken: 115\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-113\nToken: 114\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-112\nToken: 113\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-111\nToken: 112\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-110\nToken: 111\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-109\nToken: 110\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-108\nToken: 109\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-107\nToken: 108\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-106\nToken: 107\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-105\nToken: 106\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-104\nToken: 105\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-103\nToken: 104\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t08:11\tView Bill →\n#QAA-20261006-102\nToken: 103\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹419\tCASH\t08:11\tView Bill →\n#QAA-20261006-404\nToken: K-104\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tUPI\t08:02\tView Bill →\n#QAA-20261006-403\nToken: K-103\n\t\nTAKEAWAY\n\t\nWalk-in Guest\nCounter\t₹299\tUPI\t07:59\tView Bill →\n#QAA-20261006-201\nToken: 101\n\t\nDINE_IN\nTable QA01\n\t\nWalk-in Guest\nCounter\t₹314\tCASH\t07:48\tView Bill →\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Kiosk payment settings",
+    "Online payments",
+    "Payments & Split Tenders Ledger",
+    "Understanding Split Multi-Tender Payments"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA-Restaurant-A-1791252294734",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS\n81",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Update bank details",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Refund",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Show",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Download CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "View Bill →",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -38,9 +38,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
   const [paymentFilter, setPaymentFilter] = useState<string>('ALL');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const dayOrders = useMemo(() => {
-    return BusinessDayRepository.getOrdersForBusinessDay(businessDay.id);
-  }, [businessDay.id]);
+  const dayOrders = BusinessDayRepository.getOrdersForBusinessDay(businessDay.id);
 
   const filteredOrders = useMemo(() => {
     return dayOrders.filter((o) => {
@@ -318,11 +316,11 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                   {/* B2-036: derived via formatSplitTax so the two halves always sum to the
                       displayed Grand Total, instead of formatINR-rounding each stored half on its own. */}
                   <div className="flex justify-between">
-                    <span>CGST (2.5%):</span>
+                    <span>CGST:</span>
                     <span className="font-mono">{formatSplitTax(selectedOrder.taxAmount ?? 0, selectedOrder.cgstAmount, selectedOrder.sgstAmount).cgst}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>SGST (2.5%):</span>
+                    <span>SGST:</span>
                     <span className="font-mono">{formatSplitTax(selectedOrder.taxAmount ?? 0, selectedOrder.cgstAmount, selectedOrder.sgstAmount).sgst}</span>
                   </div>
                   <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black text-sm text-jaman-navy">

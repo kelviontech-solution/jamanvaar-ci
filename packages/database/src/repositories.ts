@@ -75,6 +75,7 @@ import { kitchenRank, resolveKitchenState, deriveTicketStatus } from './kitchen_
 import { TableSync } from './table_sync';
 import { canMoveTable } from './table_state';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
+import { InventoryItemSync, RecipeSync, SupplierSync } from './inventory_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin, pinFingerprint } from './pin';
 
@@ -592,7 +593,13 @@ export class OrderRepository {
   public static updateOrder(id: string, updates: Partial<Order>): Order | null {
     const idx = db.orders.findIndex((o) => o.id === id);
     if (idx === -1) return null;
-    db.orders[idx] = { ...db.orders[idx], ...updates };
+    const previous = db.orders[idx];
+    db.orders[idx] = { ...previous, ...updates, updatedAt: new Date().toISOString(), syncStatus: 'SAVED_LOCALLY', isSynced: false };
+    if (previous.orderStatus === 'DRAFT' && db.orders[idx].orderStatus !== 'DRAFT') {
+      InventoryRepository.reconcileOrder(db.orders[idx]);
+      const table = db.tables.find(t => t.id === db.orders[idx].tableId);
+      if (table && db.orders[idx].orderStatus === 'CONFIRMED') { table.status = 'OCCUPIED'; table.currentOrderId = id; }
+    }
     db.notify();
     return db.orders[idx];
   }
@@ -631,7 +638,12 @@ export class OrderRepository {
     const items = orderData.items || [];
     const expectedSubtotal = items.reduce((sum, it) => {
       const lineTotal = typeof it.totalPrice === 'number' ? it.totalPrice : (it.unitPrice || 0) * (it.quantity || 0);
-      return sum + lineTotal;
+      const menuItem = db.menuItems.find(m => m.id === it.menuItemId);
+      const group = db.taxGroups.find(g => g.id === menuItem?.taxGroupId && g.isActive);
+      const inclusive = it.snapshot?.taxInclusive ?? (typeof orderData.subtotal === 'number' && (orderData.taxAmount ?? 0) > 0 && group?.isInclusive);
+      const rate = it.snapshot?.taxRateBp ?? Math.round(((group?.cgstPercent ?? 0) + (group?.sgstPercent ?? 0)) * 100);
+      const embedded = inclusive ? it.snapshot?.lineTax !== undefined ? it.snapshot.lineTax / 100 : Math.round(lineTotal * 100 * rate / (10000 + rate)) / 100 : 0;
+      return sum + lineTotal - embedded;
     }, 0);
 
     if (items.length === 0) {
@@ -755,8 +767,8 @@ export class OrderRepository {
           actor: creatorActor
         },
         {
-          status: 'CONFIRMED',
-          title: `Payment Confirmed (${orderData.paymentMethod || 'UPI_QR'})`,
+          status: orderData.paymentStatus === 'SUCCESS' ? 'CONFIRMED' : 'PENDING',
+          title: orderData.paymentStatus === 'SUCCESS' ? `Payment Confirmed (${orderData.paymentMethod || 'UPI_QR'})` : 'Awaiting payment or cash acceptance',
           timestamp: nowIso
         }
       ],
@@ -774,7 +786,7 @@ export class OrderRepository {
     BusinessDayRepository.recalculateMetrics(businessDayId);
 
     // If dine in, update table occupancy
-    if (newOrder.tableId) {
+    if (newOrder.tableId && newOrder.orderStatus !== 'DRAFT') {
       const tbl = db.tables.find((t) => t.id === newOrder.tableId || t.tableNumber === newOrder.tableNumber);
       if (tbl) {
         tbl.status = 'OCCUPIED';
@@ -2839,7 +2851,10 @@ export class KOTRepository {
         changed += 1;
         continue;
       }
-      if (order.orderStatus === 'COMPLETED' || order.orderStatus === 'REFUNDED') {
+      // A paid counter bill can be financially completed while its submitted dishes are still cooking.
+      // Kitchen completion comes from item-level served states, not from payment settlement.
+      const submittedUnserved = order.items.some(item => item.sentAt && !['SERVED', 'CANCELLED'].includes(item.kitchenStatus ?? 'PENDING'));
+      if ((order.orderStatus === 'COMPLETED' && !submittedUnserved) || order.orderStatus === 'REFUNDED') {
         if (kot.status !== 'SERVED') {
           kot.status = 'SERVED';
           if (!kot.readyAt) kot.readyAt = now;
@@ -3259,6 +3274,7 @@ export class InventoryRepository {
       category: data.category || 'General',
       unit: data.unit || 'kg',
       currentStock: data.currentStock,
+      openingStock: data.currentStock,
       minStockLevel: data.minStockLevel,
       reorderLevel: data.reorderLevel,
       costPerUnit: data.costPerUnit,
@@ -3288,7 +3304,11 @@ export class InventoryRepository {
     if (!this.validateItemInput({ currentStock: merged.currentStock, minStockLevel: merged.minStockLevel, costPerUnit: merged.costPerUnit, sku: merged.sku, excludeId: id }, false)) {
       return null;
     }
-    Object.assign(item, updates);
+    item.openingStock ??= item.currentStock - db.stockMovements.filter(m => m.itemId === id).reduce((sum, m) => sum + m.quantityDelta, 0);
+    const difference = updates.currentStock === undefined ? 0 : updates.currentStock - item.currentStock;
+    const { currentStock: _balance, openingStock: _opening, ...metadata } = updates;
+    Object.assign(item, metadata);
+    if (difference !== 0) this.recordMovement({ itemId: id, itemName: item.name, type: 'ADJUSTMENT', quantityDelta: difference, unit: item.unit, reason: 'Stock balance edited', performedBy: 'Manager' });
     if (typeof updates.currentStock === 'number') {
       item.status = item.currentStock <= 0 ? 'OUT_OF_STOCK' : item.currentStock <= item.minStockLevel ? 'LOW_STOCK' : 'IN_STOCK';
     }
@@ -3307,6 +3327,7 @@ export class InventoryRepository {
     const idx = db.inventoryItems.findIndex((i) => i.id === id);
     if (idx === -1) return false;
     const name = db.inventoryItems[idx].name;
+    InventoryItemSync.recordDeletion(id);
     db.inventoryItems.splice(idx, 1);
     AuditRepository.log({
       action: 'INVENTORY_DELETED',
@@ -3451,7 +3472,7 @@ export class InventoryRepository {
    * whole order every time it was created and never again.
    */
   public static reconcileOrder(order: Order): void {
-    if (!order.items) return;
+    if (!order.items || ['DRAFT', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
     const consumed = (order.stockConsumedQty = order.stockConsumedQty || {});
     const actor = order.cashierName || order.captainName || 'System';
 
@@ -3566,6 +3587,7 @@ export class InventoryRepository {
     db.goodsReceipts = [];
     db.inventoryBatches = [];
     db.stockCounts = [];
+    InventoryItemSync.reset(); RecipeSync.reset(); SupplierSync.reset();
     AuditRepository.log({
       action: 'INVENTORY_CLEARED_ON_ACTIVATION',
       category: 'INVENTORY',
@@ -3617,6 +3639,7 @@ export class RecipeRepository {
     const idx = db.recipes.findIndex((r) => r.id === id);
     if (idx === -1) return false;
     const name = db.recipes[idx].menuItemName;
+    RecipeSync.recordDeletion(id);
     db.recipes.splice(idx, 1);
     AuditRepository.log({
       action: 'RECIPE_DELETED',
@@ -4142,7 +4165,7 @@ export class BusinessDayRepository {
     if (!active) {
       const now = new Date();
       const previousDay = db.businessDays.find((d) => d.status === 'CLOSED');
-      const openingCash = previousDay ? (previousDay.closingCash || 2000) : 2000;
+      const openingCash = previousDay?.closingCash ?? 0;
 
       active = {
         id: currentCanonical.dayId,
@@ -4191,23 +4214,16 @@ export class BusinessDayRepository {
     return db.businessDays.find((d) => d.id === id);
   }
 
+  /** Imported orders retain their originating terminal's day ID; local session IDs are not a cross-device date. */
+  public static orderBelongsToBusinessDay(order: Order, day: BusinessDay): boolean {
+    if (order.businessDayId === day.id) return true;
+    if (order.businessDayId && order.kioskId !== 'CLOUD-SYNC') return false;
+    return this.getCanonicalBusinessDate(new Date(order.createdAt)).dateKey === day.businessDate;
+  }
+
   public static getOrdersForBusinessDay(businessDayId: string): Order[] {
     const day = this.getBusinessDayById(businessDayId);
-    return db.orders.filter((o) => {
-      if (o.businessDayId) {
-        return o.businessDayId === businessDayId;
-      }
-      if (day) {
-        // Match using the same local-time, 5:00 AM-cutoff canonical date the
-        // rest of this class uses — comparing raw UTC calendar dates here
-        // (the previous toISOString().slice(0,10)) silently misclassified
-        // any order created in the small hours local time, since UTC and a
-        // 5 AM cutoff disagree about which calendar day "now" is on.
-        const oDate = this.getCanonicalBusinessDate(new Date(o.createdAt)).dateKey;
-        return oDate === day.businessDate;
-      }
-      return false;
-    });
+    return db.orders.filter(o => day ? this.orderBelongsToBusinessDay(o, day) : o.businessDayId === businessDayId);
   }
 
   public static recalculateMetrics(businessDayId: string): BusinessDay | null {
@@ -4591,10 +4607,8 @@ export class NotificationRepository {
  */
 export class KioskDisplaySettingsRepository {
   public static getSettings(): KioskDisplaySettings {
-    if (!db.kioskDisplaySettings) {
-      db.kioskDisplaySettings = { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
-    }
-    return db.kioskDisplaySettings;
+    // Reads occur during render; initialization must not notify other mounted components.
+    return db.kioskDisplaySettings ?? { ...DEFAULT_KIOSK_DISPLAY_SETTINGS };
   }
 
   public static updateSettings(partial: Partial<KioskDisplaySettings>, actor: string = 'Kiosk Admin'): KioskDisplaySettings {

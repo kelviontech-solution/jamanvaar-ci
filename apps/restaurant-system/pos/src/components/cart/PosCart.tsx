@@ -130,10 +130,9 @@ export const PosCart: React.FC = () => {
         sound.play('warning');
       }
     } finally {
-      setTimeout(() => {
-        sendingKotRef.current = false;
-        setIsSendingKot(false);
-      }, 1200);
+      // sendKOT updates sent quantities synchronously. That identity is the duplicate guard; a new cart need not wait on a timer.
+      sendingKotRef.current = false;
+      setIsSendingKot(false);
     }
   };
 
@@ -145,7 +144,7 @@ export const PosCart: React.FC = () => {
   const unsentCount = cart.items.reduce((n, ci) => n + Math.max(0, ci.quantity - (ci.kotSentQty || 0)), 0);
   const hasSentItems = cart.items.some((ci) => (ci.kotSentQty || 0) > 0);
   const canSendKot = hasItems && unsentCount > 0 && !isSendingKot;
-  const kotLabel = kotSentState
+  const kotLabel = kotSentState && unsentCount === 0
     ? '✓ KOT SENT'
     : hasSentItems && unsentCount === 0
       ? '✓ SENT TO KITCHEN'
@@ -547,7 +546,7 @@ export const PosCart: React.FC = () => {
           )}
 
           <div className="flex justify-between text-[11px] text-slate-500">
-            <span>GST (CGST 2.5% + SGST 2.5%)</span>
+            <span>GST (CGST + SGST)</span>
             <span className="font-mono">₹{cart.taxAmount}</span>
           </div>
 

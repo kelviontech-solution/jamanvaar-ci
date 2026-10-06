@@ -314,6 +314,8 @@ export const PosBillsView: React.FC = () => {
 
     const amt = Number(refundAmountInput) || refundModalBill.totalAmount;
     const bill = refundModalBill;
+    const isGatewayPayment = bill.paymentMethod === 'UPI' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(bill.paymentTransactionId ?? '');
+    const approvalScope = isGatewayPayment ? { action: 'REFUND' as const, paymentId: bill.paymentTransactionId!, amountPaise: Math.round(amt * 100), idempotencyKey: crypto.randomUUID() } : undefined;
 
     requestManagerOverride(
       'REFUND',
@@ -324,9 +326,14 @@ export const PosBillsView: React.FC = () => {
         // matches a cloud PaymentTransaction — a locally-generated cash
         // receipt id never does, so cash/card orders fall straight through
         // to the existing local-only refund, unchanged.
-        if (bill.paymentMethod === 'UPI' && bill.paymentTransactionId) {
+        if (isGatewayPayment && bill.paymentTransactionId) {
           try {
-            await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput, mgr);
+            const refund = await createRefund(bill.paymentTransactionId, Math.round(amt * 100), refundReasonInput, mgr, approvalScope?.idempotencyKey);
+            if (refund.status !== 'processed') {
+              setRefundModalBill(null);
+              showToast(`Refund requested for Invoice #${bill.orderNumber}. Awaiting payment-provider confirmation.`);
+              return;
+            }
           } catch (err) {
             const message = err instanceof CloudApiError ? err.message : 'Refund request failed';
             showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${message}`);
@@ -348,7 +355,8 @@ export const PosBillsView: React.FC = () => {
         });
         setRefundModalBill(null);
         showToast(`✓ Refund of ₹${amt} processed for Invoice #${bill.orderNumber}`);
-      }
+      },
+      approvalScope
     );
   };
 
@@ -392,8 +400,8 @@ export const PosBillsView: React.FC = () => {
       'Items Count',
       'Subtotal',
       'Discount',
-      'CGST (2.5%)',
-      'SGST (2.5%)',
+      'CGST',
+      'SGST',
       'Total Net',
       'Payment Method',
       'Transaction ID',
@@ -1045,11 +1053,11 @@ export const PosBillsView: React.FC = () => {
                     formatSplitTax's own doc comment for why independently formatting the stored
                     halves (5.5 → "6" each) broke that next to "Total Amount Paid" below. */}
                 <div className="flex justify-between">
-                  <span>CGST (2.5%):</span>
+                  <span>CGST:</span>
                   <strong className="font-mono text-jaman-navy">{formatSplitTax(detailModalBill.taxAmount ?? 0, detailModalBill.cgstAmount, detailModalBill.sgstAmount).cgst}</strong>
                 </div>
                 <div className="flex justify-between">
-                  <span>SGST (2.5%):</span>
+                  <span>SGST:</span>
                   <strong className="font-mono text-jaman-navy">{formatSplitTax(detailModalBill.taxAmount ?? 0, detailModalBill.cgstAmount, detailModalBill.sgstAmount).sgst}</strong>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-black text-jaman-navy">

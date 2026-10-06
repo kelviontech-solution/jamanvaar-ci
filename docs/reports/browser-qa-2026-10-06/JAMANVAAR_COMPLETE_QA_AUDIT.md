@@ -1,5 +1,7 @@
 # JAMANVAAR COMPLETE QA AUDIT
 
+**Follow-up:** This document preserves the discovery state. Authorized fixes and later evidence are in the [implementation report](../browser-fixes-2026-10-06/IMPLEMENTATION_REPORT.md) and [post-fix scores](../browser-fixes-2026-10-06/SCORES.md). The original twelve demonstrated defects are locally resolved; production certification remains outstanding.
+
 **Date:** 2026-10-06. **Release decision: NOT READY.** Twelve confirmed findings: five Critical, two High, four Medium and one Low. No application, configuration, schema or business-logic fix was applied in this discovery audit. Only QA scripts and reports were added.
 
 This is a substantial local browser audit, **not certification that every page control or every requested functionality passed**. All 38 inventoried protected Super Admin routes and 27 Restaurant Admin navigation entries were rendered; POS/Captain/KDS/Kiosk/QR views are listed below. Functional assertions, unexecuted scenarios and blocked dependencies are separated explicitly. Existing production issues cannot be attributed quantitatively to AWS without deployed telemetry.

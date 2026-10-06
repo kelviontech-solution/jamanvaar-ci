@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 export type StaffTokenKind = 'session' | 'approval';
+export interface RefundApprovalScope { action: 'REFUND'; paymentId: string; amountPaise: number; idempotencyKey: string }
 
 export interface StaffClaims {
   v: 1;
@@ -14,6 +15,7 @@ export interface StaffClaims {
   name: string;
   iat: number; // ms
   exp: number; // ms
+  scope?: RefundApprovalScope;
 }
 
 export const SESSION_TTL_MS = 12 * 60 * 60_000;
@@ -40,8 +42,8 @@ export class StaffSessionService {
     return createHmac('sha256', this.key()).update(body).digest('base64url');
   }
 
-  issue(kind: StaffTokenKind, who: { restaurantId: string; deviceId: string; staffId: string; role: string; name: string }, now = Date.now()): { token: string; expiresAt: string } {
-    const claims: StaffClaims = { v: 1, kind, rid: who.restaurantId, did: who.deviceId, sid: who.staffId, role: who.role, name: who.name, iat: now, exp: now + (kind === 'session' ? SESSION_TTL_MS : APPROVAL_TTL_MS) };
+  issue(kind: StaffTokenKind, who: { restaurantId: string; deviceId: string; staffId: string; role: string; name: string; scope?: RefundApprovalScope }, now = Date.now()): { token: string; expiresAt: string } {
+    const claims: StaffClaims = { v: 1, kind, rid: who.restaurantId, did: who.deviceId, sid: who.staffId, role: who.role, name: who.name, iat: now, exp: now + (kind === 'session' ? SESSION_TTL_MS : who.scope ? 2 * 60_000 : APPROVAL_TTL_MS), ...(kind === 'approval' && who.scope ? { scope: who.scope } : {}) };
     const body = Buffer.from(JSON.stringify(claims)).toString('base64url');
     return { token: `${body}.${this.sign(body)}`, expiresAt: new Date(claims.exp).toISOString() };
   }

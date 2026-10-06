@@ -1,0 +1,224 @@
+{
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "text": "CAPTAIN APP\nJAMANVAAR\nLIVE\nQ\nPRIORITY ACTIONS:\nFood Ready (1)\nBills (0)\nDelayed KOTs (36)\nDiner Requests (0)\nMessages (0)\n1\nMy Tables\nOrders\n1\nFood Ready\nMessages\nMore\nMY TABLES\n0\nTables\nSEATED / DINING\n0\nActive\nFOOD READY\n1\nDeliver\nBILL REQUESTED\n0\nBilling\nAVAILABLE TABLES\n1\nof 1\nZONE:\nAll Sections\nQA Main Hall\nFILTER:\nAll Floor Tables\nMy Tables\nSeated & Dining\nFood Ready\nBill Requested\nReset\nNo tables match your current filter\n\nTry adjusting your zone or search criteria to view more floor tables.\n\nShow All 1 Floor Tables\nJAMAN AI",
+  "headings": [
+    "No tables match your current filter"
+  ],
+  "buttons": [
+    {
+      "text": "LIVE",
+      "aria": "Connection and alert settings",
+      "title": "Connection and alert settings",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Compose quick operational message to Kitchen, POS, or Manager",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Floor Notifications & Alerts",
+      "disabled": false
+    },
+    {
+      "text": "Q",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Food Ready (1)",
+      "aria": null,
+      "title": "Dishes ready in kitchen waiting for pickup and delivery",
+      "disabled": false
+    },
+    {
+      "text": "Bills (0)",
+      "aria": null,
+      "title": "Tables asking for bill and settlement",
+      "disabled": false
+    },
+    {
+      "text": "Delayed KOTs (36)",
+      "aria": null,
+      "title": "Kitchen orders exceeding 15 min preparation time",
+      "disabled": false
+    },
+    {
+      "text": "Diner Requests (0)",
+      "aria": null,
+      "title": "Guest service requests: Water, Extra Plates, Cutlery, Cleaning",
+      "disabled": false
+    },
+    {
+      "text": "Messages (0)",
+      "aria": null,
+      "title": "Staff and Kitchen communications",
+      "disabled": false
+    },
+    {
+      "text": "My Tables1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Active Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Food Ready1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Messages",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "More Options",
+      "aria": null,
+      "title": "Open More Tools: Live KOTs, Guest Requests, Diners CRM, Shift Stats, Settings",
+      "disabled": false
+    },
+    {
+      "text": "1\nMy Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "1\nFood Ready",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Messages",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "More",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MY TABLES\n0\nTables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SEATED / DINING\n0\nActive",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "FOOD READY\n1\nDeliver",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BILL REQUESTED\n0\nBilling",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "AVAILABLE TABLES\n1\nof 1",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Sections",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QA Main Hall",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "All Floor Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "My Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Seated & Dining",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Food Ready",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Bill Requested",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reset",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Show All 1 Floor Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Floor Intelligence Assistant",
+      "title": "JAMAN AI Floor Intelligence Assistant",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search table, order, dish...",
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

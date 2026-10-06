@@ -1,0 +1,18 @@
+{
+  "title": "Order",
+  "text": "QA-Restaurant-A-1791252294734\nQA-Branch-A · Table QA01\nDine-in ordering\nThank you!\n\nQR-2\n\nReference JQ-KR22XH9WF7CCRHUT4ENCXGQSW2 · Table QA01 · ₹118\n\nOrder received\nPreparing\nReady\nCompleted\n\nPay at the counter when you are done.\n\nOrder more",
+  "headings": [
+    "Thank you!"
+  ],
+  "buttons": [
+    {
+      "text": "Order more",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

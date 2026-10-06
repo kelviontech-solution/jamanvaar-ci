@@ -1,6 +1,6 @@
-import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
+import { syncStaffUsers, startLocalChangeSync, syncInventoryMasters, InventoryLedgerSync } from '@jamanvaar/sync';
 import React, { useEffect, useState } from 'react';
-import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
+import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
 import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
 import type { MenuItem, Category } from '@jamanvaar/types';
@@ -127,10 +127,13 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!isDeviceActivated) {
       SyncOutboxEngine.configureTransport(null);
+      InventoryLedgerSync.configureTransport(null);
       return;
     }
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_pos_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+    InventoryLedgerSync.configureTransport({ push: pushInventoryMovements, pull: pullInventoryMovements });
+    void syncInventoryMasters({ push: false }).then(() => InventoryLedgerSync.sync());
 
     // Guests registered here reach Restaurant Admin's CRM and back (BUG-159): only what changed is sent, and the
     // newer change wins, so a stale copy cannot overwrite loyalty points changed elsewhere.
@@ -173,6 +176,7 @@ export const App: React.FC = () => {
       void SyncOutboxEngine.processOutbox();
       void SyncOutboxEngine.catchUpFromCloud();
       void syncDiningTables();
+      void InventoryLedgerSync.sync();
       // BUG-099/100: bill requests and messages from Captain arrive as notifications.
       void syncServiceMessages('POS');
     }, 4000);
@@ -191,6 +195,7 @@ export const App: React.FC = () => {
       void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
       void SyncOutboxEngine.catchUpFromCloud();
       void syncDiningTables();
+      void InventoryLedgerSync.sync();
     });
 
     return () => {

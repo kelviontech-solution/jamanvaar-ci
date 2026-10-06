@@ -94,7 +94,7 @@ import {
   ActivationHelpNote,
   CachedImg
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
@@ -482,6 +482,7 @@ export default function KioskUserApp() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('CREATED');
   const [paymentTimeLeft, setPaymentTimeLeft] = useState<number>(180);
   const [realPaymentId, setRealPaymentId] = useState<string | null>(null);
+  const [quotedPayable, setQuotedPayable] = useState<number | null>(null);
   const [localOrderIdForPayment, setLocalOrderIdForPayment] = useState<string | null>(null);
   const [onlinePaymentUnavailable, setRazorpayUnavailable] = useState(false);
   // The restaurant's online payments are switched on only once its Razorpay vendor is verified. Until then the guest is told so.
@@ -885,6 +886,7 @@ export default function KioskUserApp() {
     setSpecialInstructions('');
     setPaymentStatus('CREATED');
     setRealPaymentId(null);
+    setQuotedPayable(null);
     setLocalOrderIdForPayment(null);
     setRazorpayUnavailable(false);
     setPlacedOrder(null);
@@ -920,11 +922,14 @@ export default function KioskUserApp() {
   // Cart Calculations with loyalty redemption & staff override discounts
   const rawCalculated = calculateCart({
     items: cartItems,
+    taxGroups: db.taxGroups,
+    roundToRupee: false,
     coupon: appliedCoupon
   });
 
   const staffDiscount = staffOverrideActive ? Math.round(rawCalculated.subtotal * 0.1) : 0;
-  const netTotalPayable = Math.max(0, rawCalculated.totalPayable - redeemedPoints - staffDiscount);
+  const netTotalPayable = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && quotedPayable !== null
+    ? quotedPayable : Math.max(0, rawCalculated.totalPayable - redeemedPoints - staffDiscount);
 
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
@@ -1210,6 +1215,7 @@ export default function KioskUserApp() {
     const orderId = localOrderIdForPayment;
     clearPendingPayment();
     setRealPaymentId(null);
+    setQuotedPayable(null);
     setQrImageSrc(null);
     setQrExpiresAt(null);
     setQrSecondsLeft(0);
@@ -1265,7 +1271,7 @@ export default function KioskUserApp() {
       guestCount,
       customerPhone: loggedInAccount?.phone || undefined,
       customerName: loggedInAccount?.name || undefined,
-      items: cartItems.map((ci) => ({
+      items: rawCalculated.items.map((ci) => ({
         id: generateUUID(),
         orderId: '',
         menuItemId: ci.menuItemId,
@@ -1276,6 +1282,7 @@ export default function KioskUserApp() {
         modifiers: ci.selectedModifiers,
         specialInstructions: ci.specialInstructions,
         totalPrice: ci.itemTotal,
+        snapshot: ci.taxSnapshot,
         kitchenStatus: 'PENDING'
       })),
       subtotal: rawCalculated.subtotal,
@@ -1288,7 +1295,7 @@ export default function KioskUserApp() {
       totalAmount: netTotalPayable,
       paymentMethod: effectiveMethod,
       paymentStatus: 'PENDING',
-      orderStatus: 'CONFIRMED',
+      orderStatus: 'DRAFT',
       estimatedWaitMinutes: APP_CONSTANTS.DEFAULT_ESTIMATED_PREP_MINUTES,
       // Being online is not the same as having actually reached the cloud —
       // only SyncOutboxEngine.processOutbox() flipping this to SYNCED after
@@ -1320,6 +1327,7 @@ export default function KioskUserApp() {
 
     try {
       const result = await createPaymentOrder(pendingOrder.id, lines);
+      setQuotedPayable(result.amount / 100);
       setRealPaymentId(result.paymentId);
       reconciliationDeadlineRef.current = Date.now() + 5 * 60 * 1000; // 5 minutes total from order creation
 
@@ -1331,8 +1339,24 @@ export default function KioskUserApp() {
       // cache (LAN sync lag) — the cloud amount is always the one actually
       // charged, so it wins.
       const localAmountPaise = Math.round(pendingOrder.totalAmount * 100);
-      if (result.amount !== localAmountPaise) {
-        OrderRepository.updateOrder(pendingOrder.id, { totalAmount: result.amount / 100 });
+      if (result.quote) {
+        const { cgst: cgstPaise, sgst: sgstPaise } = splitTaxPaise(result.quote.taxAmount);
+        OrderRepository.updateOrder(pendingOrder.id, {
+          subtotal: result.quote.subtotal / 100, taxAmount: result.quote.taxAmount / 100,
+          cgstAmount: cgstPaise / 100, sgstAmount: sgstPaise / 100,
+          totalAmount: result.amount / 100, discountAmount: 0, couponCode: undefined, roundOffAmount: 0,
+          items: pendingOrder.items.map((item, index) => {
+            const line = result.quote.lines[index];
+            return line ? { ...item, unitPrice: line.unitPrice / 100, totalPrice: line.unitPrice * item.quantity / 100,
+              snapshot: { taxGroupId: line.taxGroupId, taxRateBp: line.taxRate, taxInclusive: line.taxInclusive, lineTax: line.lineTax } } : item;
+          })
+        });
+      }
+      // The online quote currently has no coupon/points discount contract. Never consume a benefit the gateway did not apply.
+      if (appliedCoupon || redeemedPoints > 0 || staffDiscount > 0) {
+        setAppliedCoupon(null); setRedeemedPoints(0); setStaffOverrideActive(false);
+        showToast('Discounts were not applied to this online payment. No coupon or points will be used; check the updated total before paying.');
+      } else if (result.amount !== localAmountPaise) {
         showToast('Your order total was updated to match the latest price.');
       }
 
@@ -1389,7 +1413,11 @@ export default function KioskUserApp() {
         return;
       }
       if (order.paymentStatus !== 'SUCCESS') {
-        OrderRepository.settleOrder(localOrderId, 'UPI', undefined, paymentId, 'Razorpay UPI');
+        // Payment acceptance is not kitchen completion. Keep the order active until food is served.
+        OrderRepository.updateOrder(localOrderId, {
+          paymentMethod: 'UPI', paymentStatus: 'SUCCESS', paymentTransactionId: paymentId,
+          orderStatus: 'CONFIRMED'
+        });
         order = OrderRepository.getOrderById(localOrderId) ?? order;
       }
       if (KOTRepository.getKOTsForOrder(localOrderId).length > 0) {
@@ -1452,11 +1480,11 @@ export default function KioskUserApp() {
     if (printTickets) kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
-    if (paymentId) void acknowledgeFulfilled(paymentId);
+    if (paymentId) void SyncOutboxEngine.processOutbox().then(() => acknowledgeFulfilled(paymentId));
 
     // If logged in, award points (10% back in points) & record order
     if (loggedInAccount) {
-      const earned = Math.floor(netTotalPayable * 0.1);
+      const earned = Math.floor(order.totalAmount * 0.1);
       CustomerRepository.addPoints(loggedInAccount.phone, earned);
       if (redeemedPoints > 0) {
         CustomerRepository.redeemPoints(loggedInAccount.phone, redeemedPoints);
@@ -1464,8 +1492,8 @@ export default function KioskUserApp() {
     }
 
     // Update coupon usage
-    if (appliedCoupon) {
-      CouponRepository.incrementUsage(appliedCoupon.code);
+    if (order.couponCode && order.discountAmount > 0) {
+      CouponRepository.incrementUsage(order.couponCode);
     }
 
     AuditRepository.log({
@@ -1489,10 +1517,10 @@ export default function KioskUserApp() {
       setAutoPrintStatus({
         printed: printRes.success,
         message: printRes.message,
-        printerName: activePrn.name
+        printerName: activePrn?.name ?? 'No printer configured'
       });
       if (printRes.success) {
-        showToast(`🖨️ Receipt automatically printed on ${activePrn.name}`);
+        showToast(`Receipt dispatch: ${printRes.message}`);
       }
     } catch (err) {
       console.warn('Auto print dispatch error:', err);
@@ -1530,6 +1558,7 @@ export default function KioskUserApp() {
       setIsProcessingPayment(false);
       return;
     }
+    OrderRepository.updateOrder(order.id, { orderStatus: 'CONFIRMED' });
     await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
@@ -2000,6 +2029,7 @@ export default function KioskUserApp() {
                   cancelAbandonedPendingOrder();
                   setLocalOrderIdForPayment(null);
                   setRealPaymentId(null);
+    setQuotedPayable(null);
                   setStep('MENU');
                 }
                 else if (step === 'TABLE_SELECT') setStep('ORDER_TYPE');
@@ -3049,11 +3079,11 @@ export default function KioskUserApp() {
                     )}
                     {/* B2-036: derived via formatSplitTax so the two halves always sum to the displayed Total Payable. */}
                     <div className="flex justify-between text-xs text-[#8C9BAE]">
-                      <span>{t('cgst')} (2.5%)</span>
+                      <span>{t('cgst')}</span>
                       <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span>
                     </div>
                     <div className="flex justify-between text-xs text-[#8C9BAE]">
-                      <span>{t('sgst')} (2.5%)</span>
+                      <span>{t('sgst')}</span>
                       <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span>
                     </div>
                     <div className="flex justify-between items-end text-base font-black text-jaman-navy pt-3 mt-1 border-t border-jaman-border">
@@ -3343,9 +3373,9 @@ export default function KioskUserApp() {
                         setAutoPrintStatus({
                           printed: true,
                           message: res.message,
-                          printerName: activePrn.name
+                          printerName: activePrn?.name ?? 'No printer configured'
                         });
-                        showToast(`Print job sent to ${activePrn.name}`);
+                        showToast(`Print job sent to ${activePrn?.name ?? 'the print queue'}`);
                       } else {
                         showToast(res.message);
                       }

@@ -18,6 +18,7 @@ export * from './tender';
 export * from './table_sync';
 export * from './table_state';
 export * from './collection_sync';
+export * from './inventory_sync';
 export * from './menu_authoring';
 export * from './service_messages';
 export * from './pin';

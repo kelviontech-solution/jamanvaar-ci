@@ -3,6 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { hashOpaqueToken } from '../src/common/security/token.util';
 
 /**
  * The generic sync bridge extension (Phase 5 of the remediation sequence) —
@@ -368,6 +369,45 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       expect(res.body.kiosks.every((k: { id: string }) => typeof k.id === 'string')).toBe(true);
     });
   });
+  it('syncs inventory masters with console authority, branch isolation and deletion recovery', async () => {
+    const admin = await prisma.runAsTenant(restaurantId, tx => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posAdminToken) } }));
+    const pos = await prisma.runAsTenant(restaurantId, tx => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posToken) } }));
+    const branches = await prisma.runAsTenant(restaurantId, tx => Promise.all(['Master A', 'Master B'].map(name => tx.branch.create({ data: { restaurantId, name, code: name.replaceAll(' ', '_') } }))));
+    try {
+      await prisma.runAsTenant(restaurantId, tx => Promise.all([
+        tx.device.update({ where: { id: admin.id }, data: { branchId: branches[0].id } }),
+        tx.device.update({ where: { id: pos.id }, data: { branchId: branches[1].id } })
+      ]));
+      for (const type of ['INVENTORY_ITEM', 'RECIPE', 'SUPPLIER']) {
+        const id = `master-fix-${type}`;
+        const event = { externalId: id, payload: { id, name: 'Master fixture', menuItemId: 'dish', ingredients: [], unit: 'kg', openingStock: 10, currentStock: 10, updatedAt: new Date().toISOString() } };
+        const denied = await authed('post', `/api/v1/entity-sync/${type}`, posToken).send({ events: [event] });
+        expect(denied.status).toBe(403);
+        const saved = await authed('post', `/api/v1/entity-sync/${type}`, posAdminToken).send({ events: [event] });
+        expect(saved.status).toBe(201); expect(saved.body.results[0].status).toBe('ok');
+        const otherBranch = await authed('get', `/api/v1/entity-sync/${type}`, posToken);
+        expect(otherBranch.status).toBe(200);
+        expect(otherBranch.body.entities.some((row: any) => row.externalId === id)).toBe(type === 'SUPPLIER');
+        if (type !== 'SUPPLIER') {
+          const spoof = await authed('post', `/api/v1/entity-sync/${type}`, posAdminToken).send({ events: [{ ...event, payload: { ...event.payload, branchId: branches[1].id } }] });
+          expect(spoof.body.results[0].status).toBe('error');
+        }
+        const removed = await authed('post', `/api/v1/entity-sync/${type}`, posAdminToken).send({ events: [{ externalId: id, payload: { id, deleted: true, updatedAt: new Date().toISOString() } }] });
+        expect(removed.body.results[0].status).toBe('ok');
+        const tombstone = (await authed('get', `/api/v1/entity-sync/${type}`, posAdminToken)).body.entities.find((row: any) => row.externalId === id);
+        expect(tombstone.payload.deleted).toBe(true);
+        if (type !== 'SUPPLIER') expect(tombstone.payload.branchId).toBe(branches[0].id);
+      }
+    } finally {
+      await prisma.runAsTenant(restaurantId, tx => Promise.all([
+        tx.device.update({ where: { id: admin.id }, data: { branchId: admin.branchId } }),
+        tx.device.update({ where: { id: pos.id }, data: { branchId: pos.branchId } })
+      ]));
+      await prisma.runAsTenant(restaurantId, tx => tx.syncedEntity.deleteMany({ where: { restaurantId, externalId: { startsWith: 'master-fix-' } } }));
+      await prisma.runAsTenant(restaurantId, tx => tx.branch.deleteMany({ where: { id: { in: branches.map(branch => branch.id) } } }));
+    }
+  });
+
   it('replays 501 old entities with tied timestamps without skipping the second page', async () => {
     const baseline = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.aggregate({ where: { restaurantId }, _max: { seq: true } }));
     const after = baseline._max.seq ?? 0;

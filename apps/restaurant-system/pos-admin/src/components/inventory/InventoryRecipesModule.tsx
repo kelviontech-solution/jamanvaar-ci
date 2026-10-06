@@ -53,12 +53,9 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>('ALL');
 
-  const inventoryCategories = useMemo(() => {
-    return Array.from(new Set(inventoryItems.map((i) => i.category).filter(Boolean)));
-  }, [inventoryItems]);
+  const inventoryCategories = Array.from(new Set(inventoryItems.map((i) => i.category).filter(Boolean)));
 
-  const filteredInventoryItems = useMemo(() => {
-    return inventoryItems.filter((it) => {
+  const filteredInventoryItems = inventoryItems.filter((it) => {
       const matchesSearch =
         !inventorySearch ||
         it.name.toLowerCase().includes(inventorySearch.toLowerCase()) ||
@@ -67,7 +64,6 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         inventoryCategoryFilter === 'ALL' || it.category === inventoryCategoryFilter;
       return matchesSearch && matchesCat;
     });
-  }, [inventoryItems, inventorySearch, inventoryCategoryFilter]);
 
   const handleDeleteInventory = (stock: InventoryItem) => {
     if (onRequestConfirm) {

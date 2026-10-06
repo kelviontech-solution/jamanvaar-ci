@@ -65,7 +65,7 @@ export const PrimaryMetricsGrid: React.FC<PrimaryMetricsGridProps> = ({
         <div className="flex items-center gap-2 text-xs shrink-0">
           <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-xl">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-            <span>{reconciled ? 'Reconciled Single Source' : 'Audited Register'}</span>
+            <span>Recorded sales and payments</span>
           </span>
         </div>
       </div>

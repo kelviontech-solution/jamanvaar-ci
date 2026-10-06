@@ -233,8 +233,8 @@ describe('JAMANVAAR Restaurant Admin Center — Full CRUD, Persistence & Reporti
     const csvData = ReportGeneratorService.exportTransactionsCsv(db.orders);
     expect(csvData).toContain('JAMANVAAR RESTAURANT');
     expect(csvData).toContain('Invoice / Order Number');
-    expect(csvData).toContain('CGST (2.5%)');
-    expect(csvData).toContain('SGST (2.5%)');
+    expect(csvData).toContain('CGST');
+    expect(csvData).toContain('SGST');
   });
 
   it('7. Licensing & Entitlements: Plan 1 (₹5,000) vs Plan 2 (₹7,000)', () => {

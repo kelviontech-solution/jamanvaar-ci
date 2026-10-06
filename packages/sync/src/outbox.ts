@@ -432,7 +432,10 @@ function qrKotIdentity(order: Order): { idBase: string; numberBase: string } {
 }
 
 function ensureKotsForOrder(order: Order): void {
-  if (['COMPLETED', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
+  if (['DRAFT', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
+  // A paid counter bill may still have submitted dishes being prepared; unsent historical bills must not become tickets.
+  if (order.orderStatus === 'COMPLETED' && order.source_type !== 'KIOSK' && !order.items.some(it => it.sentAt)) return;
+  if (order.source_type === 'KIOSK' && order.paymentMethod === 'UPI' && order.paymentStatus !== 'SUCCESS') return;
 
   // A ticket line that knows its order line covers exactly that line; older ones cover by dish and quantity.
   const coveredLineIds = new Set<string>();
@@ -445,7 +448,7 @@ function ensureKotsForOrder(order: Order): void {
     }));
 
   const missing = order.items
-    .filter((it) => it.kitchenStatus !== 'CANCELLED' && !coveredLineIds.has(it.id))
+    .filter((it) => !['CANCELLED', 'SERVED'].includes(it.kitchenStatus ?? 'PENDING') && !coveredLineIds.has(it.id))
     .map((it) => {
       const already = covered.get(it.menuItemId) || 0;
       const take = Math.min(already, it.quantity);
@@ -510,6 +513,8 @@ export class SyncOutboxEngine {
     EndpointResolver.setIdentity(deviceId ? `${deviceId}:${KeyValueStore.get('jamanvaar_bound_branch_id') || 'all'}` : null);
     if (transport && !this.isSyncing) {
       for (const order of db.orders) if (order.syncStatus === 'SYNCING') order.syncStatus = 'SAVED_LOCALLY';
+      // Rebuild a missing local projection at startup even if the cursor already acknowledged that order's latest version.
+      db.batch(() => db.orders.forEach(ensureKotsForOrder));
     }
     NumberAllocator.reload();
     this.unsubscribeNetwork?.();
@@ -766,7 +771,8 @@ export class SyncOutboxEngine {
             if (typeof remote.seq === 'number') existing.remoteSeq = remote.seq;
             if (typeof remote.syncVersion === 'number') existing.remoteSyncVersion = remote.syncVersion;
             const added = applyRemoteToLocalOrder(existing, remote);
-            if (added || remote.status === 'PREPARING' || remote.status === 'NEW') ensureKotsForOrder(existing);
+            // Admission can change without adding lines (online DRAFT -> paid CONFIRMED). Reconcile tickets on every accepted version.
+            ensureKotsForOrder(existing);
             if (existing.businessDayId) touchedDays.add(existing.businessDayId);
             // B2-045: a synced-in order used to never have its ingredients deducted anywhere —
             // buildLocalOrderFromRemote deliberately bypasses OrderRepository.createOrder()'s

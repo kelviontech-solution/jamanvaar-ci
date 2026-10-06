@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { fetchMyEnabledApps, type AppCode } from '../cloud/cloudClient';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { CloudApiError, fetchMyEnabledApps, type AppCode } from '../cloud/cloudClient';
 
 export interface GatedNavItem {
   id: string;
@@ -45,36 +45,47 @@ export function filterNavSections<T extends GatedNavItem>(
  * value that changes when auth state does (e.g. `cloudConnected`) — mirrors how this app already
  * re-fetches `refreshCloudEntitlementsIntoLicense` keyed on that same signal.
  */
-export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) => boolean; loading: boolean; refetch: () => void } {
+export function useEntitlements(refreshKey?: unknown): { hasApp: (app: AppCode) => boolean; loading: boolean; error: string | null; authRequired: boolean; refetch: () => void } {
   const [enabledApps, setEnabledApps] = useState<AppCode[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [revision, setRevision] = useState(0);
+  const generation = useRef(0);
 
-  const load = () => {
-    fetchMyEnabledApps()
-      .then((apps) => setEnabledApps(apps))
-      .catch(() => {
-        // Fail closed: an error hides gated tabs rather than guessing them open.
-        setEnabledApps([]);
-      });
-  };
+  const load = useCallback(() => setRevision(n => n + 1), []);
 
   useEffect(() => {
     let cancelled = false;
+    const requestGeneration = ++generation.current;
     fetchMyEnabledApps()
       .then((apps) => {
-        if (!cancelled) setEnabledApps(apps);
+        if (!cancelled && requestGeneration === generation.current) {
+          setEnabledApps(previous => previous && previous.length === apps.length && previous.every(app => apps.includes(app)) ? previous : apps);
+          setError(null);
+          setAuthRequired(false);
+        }
       })
-      .catch(() => {
-        if (!cancelled) setEnabledApps([]);
+      .catch((err) => {
+        if (!cancelled && requestGeneration === generation.current) {
+          const denied = err instanceof CloudApiError && (err.status === 401 || err.status === 403);
+          setEnabledApps([]); // Fail closed, with explicit recovery instead of implying an empty plan.
+          setAuthRequired(denied);
+          setError(denied ? 'Your cloud session has expired. Sign in again to restore your restaurant modules.' : 'Restaurant modules could not be loaded. Check your connection and try again.');
+        }
       });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey]);
+  }, [refreshKey, revision]);
+
+  const hasApp = useCallback((app: AppCode) => (enabledApps ?? []).includes(app), [enabledApps]);
 
   return {
     loading: enabledApps === null,
-    hasApp: (app: AppCode) => (enabledApps ?? []).includes(app),
+    error,
+    authRequired,
+    hasApp,
     refetch: load
   };
 }

@@ -1,5 +1,5 @@
 import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
-import { db, BusinessDayAccountingService , getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
+import { db, BusinessDayAccountingService, BusinessDayRepository, getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
 export type CentralDatePreset =
@@ -236,18 +236,7 @@ export class CentralReportingService {
       if (range && range.preset !== 'ALL') {
         if (range.preset === 'TODAY') {
           const activeDay = BusinessDayAccountingService.getActiveBusinessDay();
-          if (o.businessDayId) {
-            if (o.businessDayId !== activeDay.id) return false;
-          } else {
-            const oDateStr = new Date(o.createdAt).toISOString().slice(0, 10);
-            if (oDateStr !== activeDay.businessDate) {
-              const orderTime = new Date(o.createdAt).getTime();
-              if (isNaN(orderTime)) return false;
-              if (orderTime < range.startDate.getTime() || orderTime > range.endDate.getTime()) {
-                return false;
-              }
-            }
-          }
+          if (!BusinessDayRepository.orderBelongsToBusinessDay(o, activeDay)) return false;
         } else {
           const orderTime = new Date(o.createdAt).getTime();
           if (isNaN(orderTime)) return false;
@@ -353,10 +342,10 @@ export class CentralReportingService {
       completedOrdersCount++;
 
       // Gross Sales is based on item subtotals (or order subtotal if present)
-      const subtotal = Number(o.subtotal || orderTotal);
+      const subtotal = Number(o.subtotal ?? orderTotal);
       const discount = Number(o.discountAmount || 0);
-      const cgst = Number(o.cgstAmount || Math.round((subtotal - discount) * 0.025 * 100) / 100);
-      const sgst = Number(o.sgstAmount || Math.round((subtotal - discount) * 0.025 * 100) / 100);
+      const cgst = Number(o.cgstAmount ?? (o.taxAmount ?? 0) / 2);
+      const sgst = Number(o.sgstAmount ?? (o.taxAmount ?? 0) - cgst);
 
       grossSales += subtotal;
       discountAmount += discount;

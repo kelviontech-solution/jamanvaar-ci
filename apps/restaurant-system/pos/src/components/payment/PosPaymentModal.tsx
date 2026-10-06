@@ -1119,7 +1119,7 @@ export const PosPaymentModal: React.FC = () => {
                 )}
 
                 <div className="flex justify-between text-[11px] text-slate-500">
-                  <span>GST (CGST 2.5% + SGST 2.5%):</span>
+                  <span>GST (CGST + SGST):</span>
                   <span className="font-mono">{formatINR(cart.taxAmount)}</span>
                 </div>
 

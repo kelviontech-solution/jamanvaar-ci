@@ -1,5 +1,6 @@
 import { lockSettlement } from './settlement-lock.util';
-import { randomUUID } from 'crypto';
+import { kitchenMatchesPaidBasket } from './kitchen-admission.util';
+import { createHash, randomUUID } from 'crypto';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -115,6 +116,8 @@ export class PaymentsService {
           name: item.name,
           basePrice: item.basePrice,
           taxRate: item.taxRate,
+          taxInclusive: item.taxInclusive,
+          taxGroupId: item.taxGroupId,
           isAvailable: item.isAvailable,
           modifierGroups: (item.modifierGroups as unknown as MenuSnapshotItemLookup['modifierGroups']) ?? []
         }
@@ -223,7 +226,7 @@ export class PaymentsService {
   }
 
   private toChannelOrderResponse(
-    order: { id: string; totalAmount: number; currency: string },
+    order: { id: string; subtotal: number; taxAmount: number; totalAmount: number; currency: string; items: Prisma.JsonValue },
     payment: { id: string; status: string; providerResponse: Prisma.JsonValue }
   ) {
     const linkUrl = payment.providerResponse && typeof payment.providerResponse === 'object' && !Array.isArray(payment.providerResponse)
@@ -304,10 +307,11 @@ export class PaymentsService {
   }
 
   private toOrderResponse(
-    order: { id: string; totalAmount: number; currency: string },
+    order: { id: string; subtotal: number; taxAmount: number; totalAmount: number; currency: string; items: Prisma.JsonValue },
     payment: { id: string; status: string }
   ) {
-    return { orderId: order.id, paymentId: payment.id, amount: order.totalAmount, currency: order.currency, status: payment.status };
+    return { orderId: order.id, paymentId: payment.id, amount: order.totalAmount, currency: order.currency, status: payment.status,
+      quote: { subtotal: order.subtotal, taxAmount: order.taxAmount, totalAmount: order.totalAmount, lines: order.items } };
   }
 
   async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
@@ -416,10 +420,19 @@ export class PaymentsService {
     if (!PAID_STATUSES.includes(payment.status)) {
       throw new BadRequestException(`Cannot mark a payment in status ${payment.status} as fulfilled`);
     }
-    if (payment.fulfilledAt) return { fulfilledAt: payment.fulfilledAt };
-
     const stamp = new Date();
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      // A locally printed ticket is not cloud fulfilment. The authoritative order must be durably admitted to kitchen sync.
+      const paidOrder = await tx.order.findUniqueOrThrow({ where: { id: payment.orderId } });
+      if (paidOrder.source === 'KIOSK') {
+        const synced = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: paidOrder.externalOrderId } } });
+        if (!synced || synced.status === 'DRAFT' || synced.paymentStatus !== 'SUCCESS' || synced.totalAmount !== payment.amount || !Array.isArray(synced.items) || synced.items.length === 0) {
+          throw new ConflictException('Kitchen delivery is still pending. Sync the accepted paid order before confirming fulfilment.');
+        }
+        if (!kitchenMatchesPaidBasket(paidOrder.items as unknown as Parameters<typeof kitchenMatchesPaidBasket>[0], synced.items as unknown as Parameters<typeof kitchenMatchesPaidBasket>[1])) {
+          throw new ConflictException('Kitchen delivery does not match the paid order items.');
+        }
+      }
       const changed = await tx.paymentTransaction.updateMany({ where: { id: paymentId, fulfilledAt: null }, data: { fulfilledAt: stamp, fulfilledByDeviceId: device.id } });
       if (changed.count > 0 && device.type !== 'KIOSK') {
         await this.audit.log(
@@ -503,7 +516,9 @@ export class PaymentsService {
     return { paymentId: payment.id, orderId: payment.orderId, status: payment.status, amount: payment.amount, currency: payment.currency, orderStatus: payment.order.status };
   }
 
-  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto, device: { id: string; type: string }, actorType: 'TENANT' | 'PLATFORM' = 'TENANT') {
+  async createRefund(restaurantId: string, paymentId: string, dto: CreateRefundDto, device: { id: string; type: string; actorId?: string }, actorType: 'TENANT' | 'PLATFORM' = 'TENANT') {
+    const digest = dto.idempotencyKey ? createHash('sha256').update(JSON.stringify([restaurantId, paymentId, device.id, dto.idempotencyKey])).digest('hex') : null;
+    const refundId = digest ? `${digest.slice(0, 8)}-${digest.slice(8, 12)}-4${digest.slice(13, 16)}-a${digest.slice(17, 20)}-${digest.slice(20, 32)}` : randomUUID();
     // security-audit LOW-02: the status check, the remaining-balance
     // aggregate, and the refund insert used to be three separate
     // runAsTenant calls — three separate transactions — so two concurrent
@@ -512,8 +527,13 @@ export class PaymentsService {
     // transaction that takes a row lock on the PaymentTransaction first
     // (`FOR UPDATE`), so a second concurrent request blocks until the first
     // commits and then sees its refund in the aggregate.
-    const { refund, providerOrderId, provider, providerPaymentId } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+    const { refund, providerOrderId, provider, providerPaymentId, replay } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       await lockSettlement(tx, restaurantId);
+      const previous = await tx.refund.findFirst({ where: { id: refundId, restaurantId, paymentId } });
+      if (previous) {
+        if (previous.amount !== dto.amountPaise || previous.reason !== dto.reason) throw new ConflictException('Refund idempotency key was already used for a different request');
+        return { refund: previous, providerOrderId: '', provider: '', providerPaymentId: null, replay: true };
+      }
       const locked = await tx.$queryRaw<{ id: string; status: string; amount: number; providerOrderId: string; provider: string; providerPaymentId: string | null }[]>`
         SELECT id, status, amount, "providerOrderId", provider::text AS provider, "providerPaymentId" FROM "PaymentTransaction" WHERE id = ${paymentId} AND "restaurantId" = ${restaurantId} FOR UPDATE
       `;
@@ -539,6 +559,7 @@ export class PaymentsService {
 
       const created = await tx.refund.create({
         data: {
+          id: refundId,
           paymentId: payment.id,
           restaurantId,
           amount: dto.amountPaise,
@@ -563,13 +584,15 @@ export class PaymentsService {
           restaurantId,
           action: 'REFUND_REQUESTED',
           category: 'PAYMENTS',
-          details: { paymentId: payment.id, refundId: created.id, amountPaise: dto.amountPaise, requestedBy: dto.requestedBy, deviceType: device.type, reason: dto.reason }
+          details: { paymentId: payment.id, refundId: created.id, amountPaise: dto.amountPaise, requestedBy: dto.requestedBy, verifiedActorId: device.actorId, deviceType: device.type, reason: dto.reason }
         },
         tx
       );
 
-      return { refund: created, providerOrderId: payment.providerOrderId, provider: payment.provider, providerPaymentId: payment.providerPaymentId };
+      return { refund: created, providerOrderId: payment.providerOrderId, provider: payment.provider, providerPaymentId: payment.providerPaymentId, replay: false };
     });
+
+    if (replay) return { refundId: refund.id, providerRefundId: refund.providerRefundId ?? '', status: refund.status === 'SUCCESS' ? 'processed' : refund.status.toLowerCase(), amount: refund.amount };
 
     if (provider === 'RAZORPAY') {
       if (!providerPaymentId) {

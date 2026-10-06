@@ -52,22 +52,13 @@ export const PosOrdersView: React.FC = () => {
   const allOrders = db.orders;
 
   // Filter orders according to active business day vs historical archive
-  const scopedOrders = useMemo(() => {
+  const scopedOrders = (() => {
     if (scopeFilter === 'ALL_DAYS') {
       return allOrders;
     }
     // ACTIVE_DAY: Show orders belonging to the currently open business day
-    return allOrders.filter((o) => {
-      if (o.businessDayId) {
-        return o.businessDayId === activeDay.id;
-      }
-      // Fallback for orders created on the same business date — matches
-      // BusinessDayRepository's own 5:00 AM-cutoff canonical date instead of
-      // a raw UTC calendar-date string, which disagreed with it near midnight.
-      const oDate = BusinessDayRepository.getCanonicalBusinessDate(new Date(o.createdAt)).dateKey;
-      return oDate === activeDay.businessDate;
-    });
-  }, [allOrders, scopeFilter, activeDay.id, activeDay.businessDate]);
+    return allOrders.filter(o => BusinessDayRepository.orderBelongsToBusinessDay(o, activeDay));
+  })();
 
   const filteredOrders = useMemo(() => {
     return scopedOrders.filter((o) => {

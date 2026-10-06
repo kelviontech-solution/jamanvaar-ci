@@ -1,0 +1,10 @@
+{
+  "command": "npm run build --workspace=@jamanvaar/cloud-api",
+  "exitCode": 0,
+  "output": "",
+  "previousInvocationError": {
+    "command": "npm run build --workspace=@jamanvaar/cloud-api",
+    "exitCode": 1,
+    "output": "node:internal/modules/cjs/loader:1520\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\cloud\\api\\node_modules\\@nestjs\\cli\\bin\\nest.js'\r\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1517:15)\r\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1071:27)\r\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1095:10)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1122:12)\r\n    at Module._load (node:internal/modules/cjs/loader:1294:5)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\r\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\r\n    at node:internal/main/run_main_module:33:47 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v24.19.0\r\n"
+  }
+}

@@ -68,10 +68,11 @@ describe('Kitchen tickets follow the order they belong to (BUG-098/113)', () => 
     expect(kot.servedAt).toBeTruthy();
   });
 
-  it('tickets of an order that was completed or cancelled elsewhere leave the kitchen', () => {
+  it('tickets whose dishes were served, or whose order was cancelled, leave the kitchen', () => {
     const done = seedOrder([item('a', 'A')], 'COMPLETED');
     const cancelled = seedOrder([item('b', 'B')], 'CANCELLED');
     const kotDone = kotFor(done, ['a']);
+    done.items[0].kitchenStatus = 'SERVED';
     const kotCancelled = kotFor(cancelled, ['b']);
 
     KOTRepository.reconcileWithOrders();
@@ -183,6 +184,10 @@ describe('Order catch-up updates this device\'s tickets (BUG-098/113)', () => {
 
     next = remote('COMPLETED', 'READY');
     (next as { updatedAt: string }).updatedAt = new Date(Date.now() + 120_000).toISOString();
+    await SyncOutboxEngine.catchUpFromCloud();
+    expect(kot.status).toBe('READY'); // Financial completion does not claim food was served.
+    next = remote('COMPLETED', 'SERVED');
+    next.updatedAt = new Date(Date.now() + 180_000).toISOString();
     await SyncOutboxEngine.catchUpFromCloud();
     expect(kot.status).toBe('SERVED');
     SyncOutboxEngine.configureTransport(null);

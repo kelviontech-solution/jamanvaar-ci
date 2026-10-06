@@ -6,7 +6,7 @@ async function main() {
   const pid = Number(process.argv[2]);
   if (!Number.isInteger(pid) || pid < 1) throw Error('Supply the verified isolated QA API PID');
   const command = execFileSync('powershell.exe', ['-NoProfile', '-Command', `(Get-CimInstance Win32_Process -Filter 'ProcessId = ${pid}').CommandLine`], { encoding: 'utf8', windowsHide: true });
-  if (!command.includes('tooling/qa/browser-audit-server.cjs')) throw Error('Refusing to stop a process that is not the isolated QA API');
+  if (!command.replaceAll('\\', '/').includes('tooling/qa/browser-audit-server.cjs')) throw Error('Refusing to stop a process that is not the isolated QA API');
   const pages = await Promise.all(['pos', 'kds'].map(async app => { const p = await q.open(app); await login(p, app, app === 'pos' ? 'Cashier' : 'Kitchen'); return p; }));
   const observed = pages.map(p => ({ p, response: p.waitForResponse(r => new URL(r.url()).pathname === '/api/v1/realtime/stream' && r.status() === 200, { timeout: 45000 }).then(r => ({ ok: true, contentType: r.headers()['content-type'], at: Date.now() }), e => ({ ok: false, error: e.message })) }));
   const start = Date.now();

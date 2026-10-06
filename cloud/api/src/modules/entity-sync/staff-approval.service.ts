@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { DbCounters } from '../../common/db-counters';
 import { MANAGER_ROLES, roleMaySignInOn } from './entity-authority';
-import { StaffSessionService } from './staff-session.service';
+import { StaffSessionService, RefundApprovalScope } from './staff-session.service';
 
 const WINDOW_MS = 10 * 60_000;
 const MAX_FAILURES_PER_DEVICE = 5;
@@ -61,13 +61,13 @@ export class StaffApprovalService {
   }
 
   /** Is this a manager PIN? Also returns a short approval token the terminal stamps onto the sensitive action it just unlocked. */
-  async verifyManagerPin(device: Device, pin: string): Promise<{ approved: true; staffName: string; roleId: string; approvalToken: string; approvalExpiresAt: string }> {
+  async verifyManagerPin(device: Device, pin: string, scope?: RefundApprovalScope): Promise<{ approved: true; staffName: string; roleId: string; approvalToken: string; approvalExpiresAt: string; approvalScope?: RefundApprovalScope }> {
     await this.assertNotLocked(device);
     const staff = await this.findStaff(device, pin, (r) => MANAGER_ROLES.includes(r));
     if (!staff) return this.reject(device, 'MANAGER_PIN_REJECTED');
     await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: 'MANAGER_PIN_APPROVED', category: 'AUTH', details: { deviceType: device.type, staff: staff.fullName } });
-    const t = this.sessions.issue('approval', { restaurantId: device.restaurantId, deviceId: device.id, staffId: staff.id, role: staff.roleId, name: staff.fullName });
-    return { approved: true, staffName: staff.fullName, roleId: staff.roleId, approvalToken: t.token, approvalExpiresAt: t.expiresAt };
+    const t = this.sessions.issue('approval', { restaurantId: device.restaurantId, deviceId: device.id, staffId: staff.id, role: staff.roleId, name: staff.fullName, scope });
+    return { approved: true, staffName: staff.fullName, roleId: staff.roleId, approvalToken: t.token, approvalExpiresAt: t.expiresAt, approvalScope: scope };
   }
 
   /** A staff member signs in on a terminal: the server checks the PIN and that the role may use this kind of terminal, then issues the session. */

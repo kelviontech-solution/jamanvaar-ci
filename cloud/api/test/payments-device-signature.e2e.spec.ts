@@ -2,7 +2,7 @@ import { generateKeyPairSync, sign as cryptoSign } from 'crypto';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
@@ -260,7 +260,7 @@ describe('Device-bound kiosk signatures on payment routes', () => {
     expect(unsigned.status).toBe(401);
     expect(unsigned.body.code).toBe('DEVICE_SIGNATURE_REQUIRED');
 
-    const body = JSON.stringify({ amountPaise: 100, reason: 'x', requestedBy: 'x' });
+    const body = JSON.stringify({ amountPaise: 100, reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
     const { signature, timestamp } = signPos('POST', path, body);
     const signed = await authed('post', path, posToken).set('x-device-signature', signature).set('x-device-timestamp', timestamp).set('Content-Type', 'application/json').send(body);
     expect(signed.status).toBe(201);
@@ -274,7 +274,7 @@ describe('Device-bound kiosk signatures on payment routes', () => {
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_sig_pos_legacy_${stamp}`, orderId: order.id, restaurantId, providerOrderId: `pay_sig_pos_legacy_${stamp}`, amount: 5000, currency: 'INR', status: 'SUCCESS' } })
     );
-    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x' });
+    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
     expect(res.status).toBe(201);
   });
 

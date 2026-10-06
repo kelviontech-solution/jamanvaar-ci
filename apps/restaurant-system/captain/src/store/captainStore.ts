@@ -649,7 +649,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     if (secondaryOrder) {
       primaryOrder.items = [...primaryOrder.items, ...secondaryOrder.items.map((it) => ({ ...it, orderId: primaryOrder.id }))];
-      const priced = priceOrderLines(primaryOrder.items.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity })));
+      const priced = priceOrderLines(primaryOrder.items.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups });
       Object.assign(primaryOrder, priced, { updatedAt: new Date().toISOString(), syncStatus: 'SAVED_LOCALLY' as const });
 
       // The second table's dishes are still being cooked: their tickets now belong to the merged order.
@@ -863,7 +863,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       }));
 
       // Same pricing rules as POS (CGST + SGST, round-off), so both show the same bill (BUG-102).
-      const priced = priceOrderLines(orderItems.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity })));
+      const priced = priceOrderLines(orderItems.map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups });
 
       order = OrderRepository.createOrder({
         orderType: 'DINE_IN',
@@ -905,7 +905,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
       order.items = [...(order.items || []), ...newItems];
       // Cancelled dishes are at no charge, so they add nothing to the bill.
-      Object.assign(order, priceOrderLines(order.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
+      Object.assign(order, priceOrderLines(order.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups }));
       order.captainName = order.captainName || captain?.name;
       order.orderStatus = 'PREPARING';
       order.updatedAt = new Date().toISOString();
@@ -1000,7 +1000,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     const updated = KOTRepository.cancelOrderLine(order.id, orderItemId, cleanReason, `${approver ?? 'Manager'} (for ${state.currentCaptain?.name ?? 'Captain'})`);
     if (!updated) return { ok: false, error: 'This dish can no longer be cancelled.' };
-    Object.assign(updated, priceOrderLines(updated.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity }))));
+    Object.assign(updated, priceOrderLines(updated.items.filter((i) => i.kitchenStatus !== 'CANCELLED').map((i) => ({ unitPrice: i.unitPrice, quantity: i.quantity, menuItemId: i.menuItemId })), { menuItems: db.menuItems, taxGroups: db.taxGroups }));
 
     set({
       selectedTableOrder: updated,

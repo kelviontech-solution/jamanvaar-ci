@@ -284,6 +284,7 @@ export interface PaymentOrderResult {
   amount: number; // paise
   currency: string;
   status: string;
+  quote: { subtotal: number; taxAmount: number; totalAmount: number; lines: Array<{ externalItemId: string; unitPrice: number; lineSubtotal: number; lineTax: number; taxRate: number; taxInclusive: boolean; taxGroupId?: string }> };
 }
 
 export interface CartLinePayload {

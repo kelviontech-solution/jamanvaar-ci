@@ -78,7 +78,7 @@ export const PosHeader: React.FC = () => {
   const newOrderRef = useRef<HTMLDivElement>(null);
 
   // Subscribe to db mutations
-  const [, setTick] = useState(0);
+  const [tick, setTick] = useState(0);
   useEffect(() => {
     const unsub = db.subscribe(() => setTick((n) => n + 1));
     return unsub;
@@ -129,8 +129,15 @@ export const PosHeader: React.FC = () => {
   }, []);
 
   // Single authoritative business day summary
-  const activeDay = BusinessDayAccountingService.getActiveBusinessDay();
-  const daySummary: BusinessDaySummary = BusinessDayAccountingService.getBusinessDaySummary(activeDay.id);
+  const [dayState, setDayState] = useState<{ day: ReturnType<typeof BusinessDayAccountingService.getActiveBusinessDay>; summary: BusinessDaySummary } | null>(null);
+  useEffect(() => {
+    // Opening/rolling a business day can write to the database; do it after render, never while another component renders.
+    const day = BusinessDayAccountingService.getActiveBusinessDay();
+    setDayState({ day, summary: BusinessDayAccountingService.getBusinessDaySummary(day.id) });
+  }, [tick]);
+  if (!dayState) return null;
+  const activeDay = dayState.day;
+  const daySummary = dayState.summary;
   const activeShift = ShiftRepository.getActiveShift();
   const unreadNotifsCount = NotificationRepository.getUnreadCount('POS');
   const failedJobsCount = db.printJobs.filter((j) => j.status === 'FAILED').length;

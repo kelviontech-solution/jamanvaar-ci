@@ -124,6 +124,27 @@ describe('Order sync payload fidelity and per-order validation', () => {
     expect(order.items[0].specialInstructions).toBe('no onion please');
   });
 
+  it('accepts valid inclusive subtotals and reviews prices by menu identity', async () => {
+    await prisma.runAsTenant(restaurantId, tx => tx.syncedEntity.create({ data: {
+      restaurantId, entityType: 'MENU_ITEM', externalId: 'inclusive-menu', syncVersion: 1,
+      payload: { name: 'Inclusive dish', price: 118 }
+    } }));
+    const event = { ...fullEvent('inclusive-review'), items: [{
+      externalItemId: 'unique-inclusive-line', menuItemId: 'inclusive-menu', name: 'Inclusive dish',
+      quantity: 1, unitPrice: 11800, lineTotal: 11800, modifiers: [],
+      snapshot: { taxInclusive: true, lineTax: 1800, taxRateBp: 1800 }
+    }], subtotal: 10000, taxAmount: 1800, totalAmount: 11800 };
+    const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [event] });
+    expect(push.body.results[0].status).toBe('ok');
+    const pull = await authed('get', '/api/v1/orders/sync', adminDeviceToken);
+    expect(pull.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === event.externalOrderId).meta.reviewFlags).toBeUndefined();
+    const underpriced = { ...event, externalOrderId: 'inclusive-underpriced-review', items: [{ ...event.items[0], unitPrice: 10000, lineTotal: 10000, snapshot: { taxInclusive: false, lineTax: 0, taxRateBp: 0 } }], subtotal: 10000, taxAmount: 0, totalAmount: 10000 };
+    const cheaper = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [underpriced] });
+    expect(cheaper.body.results[0].status).toBe('ok');
+    const after = await authed('get', '/api/v1/orders/sync', adminDeviceToken);
+    expect(after.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === underpriced.externalOrderId).meta.reviewFlags).toContain('BELOW_MENU_PRICE:unique-inclusive-line:10000<11800');
+  });
+
   describe('per-dish kitchen status: course, undo and cancellation', () => {
     const dishOrder = (id: string, items: Array<Record<string, unknown>>) => ({
       ...fullEvent(id), status: 'PREPARING', paymentStatus: 'PENDING', paymentMethod: 'CASH', meta: { orderNumber: `N-${id}`, tokenNumber: '1' },

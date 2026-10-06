@@ -1,6 +1,7 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { db } from '@jamanvaar/database';
 import type { StockMovement } from '@jamanvaar/types';
+import { syncInventoryMasters } from './inventory_master_sync';
 
 /**
  * Client half of cloud/api's inventory ledger. Stock is never overwritten: every local stock change is
@@ -72,6 +73,7 @@ export class InventoryLedgerSync {
     let pushed = 0;
     let applied = 0;
     try {
+      await syncInventoryMasters({ push: false });
       pushed = await this.pushPending(t);
       applied = await this.pullAndApply(t);
     } finally {

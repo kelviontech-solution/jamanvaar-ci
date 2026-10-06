@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { RazorpayGatewayService } from '../src/modules/payments/razorpay-gateway.service';
 
@@ -16,9 +16,12 @@ describe('Refund creation', () => {
   let kioskToken: string;
   let planId: string;
   let createRefundMock: ReturnType<typeof vi.fn>;
+  let managerSession: string;
 
-  const authed = (method: 'get' | 'post', url: string, token: string) =>
-    request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+  const authed = (method: 'get' | 'post', url: string, token: string) => {
+    const req = request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+    return url.endsWith('/refund') && token === posToken ? req.send({ staffSession: managerSession }) : req;
+  };
 
   beforeAll(async () => {
     createRefundMock = vi.fn().mockResolvedValue({ refundId: 'rfnd_mock', status: 'pending', amountPaise: 100 });
@@ -55,6 +58,7 @@ describe('Refund creation', () => {
     const posKeyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const posRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: posKeyRes.body.code, deviceType: 'POS' });
     posToken = posRedeemRes.body.deviceToken;
+    managerSession = await refundManagerSession(app, prisma, posToken);
 
     const kioskKeyRes = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const kioskRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kioskKeyRes.body.code, deviceType: 'KIOSK' });
@@ -65,6 +69,15 @@ describe('Refund creation', () => {
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
     await app.close();
+  });
+
+  beforeEach(async () => {
+    // Isolate each scenario's device rate budget; production refund throttling stays enabled.
+    const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const device = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'POS' });
+    expect(device.status).toBe(201);
+    posToken = device.body.deviceToken;
+    managerSession = await refundManagerSession(app, prisma, posToken);
   });
 
   const seedPaidOrder = async (amount: number) => {
@@ -136,10 +149,30 @@ describe('Refund creation', () => {
     const otherRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: otherKeyRes.body.code, deviceType: 'POS' });
     const otherPosToken = otherRedeemRes.body.deviceToken;
 
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, otherPosToken).send({ amountPaise: 10000, reason: 'Cross-tenant attempt', requestedBy: 'Test Manager' });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, otherPosToken).send({ amountPaise: 10000, reason: 'Cross-tenant attempt', requestedBy: 'Test Manager', staffSession: await refundManagerSession(app, prisma, otherPosToken) });
     expect(res.status).toBe(404); // tenant-scoped lookup finds nothing, not a 403 that would confirm the payment exists
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
+  });
+
+  it('rejects a device-only cashier request even if it claims a manager name', async () => {
+    const paymentId = await seedPaidOrder(10000);
+    const res = await request(app.getHttpServer()).post(`/api/v1/payments/${paymentId}/refund`).set('Authorization', `Bearer ${posToken}`).send({ amountPaise: 1, reason: 'Bypass probe', requestedBy: 'Manager' });
+    expect(res.status).toBe(403);
+    expect(await prisma.runAsTenant(restaurantId, tx => tx.refund.count({ where: { paymentId } }))).toBe(0);
+  });
+
+  it('replays one refund idempotency key without another provider request', async () => {
+    const paymentId = await seedPaidOrder(10000);
+    const payload = { amountPaise: 100, reason: 'One intended refund', requestedBy: 'Untrusted Name', idempotencyKey: `qa-refund-${paymentId}` };
+    const before = createRefundMock.mock.calls.length;
+    const first = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send(payload);
+    const repeat = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send(payload);
+    expect(first.status).toBe(201); expect(repeat.status).toBe(201);
+    expect(repeat.body.refundId).toBe(first.body.refundId);
+    expect(createRefundMock.mock.calls.length - before).toBe(1);
+    const changed = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ ...payload, amountPaise: 101 });
+    expect(changed.status).toBe(409);
   });
 
   // security-audit LOW-02 regressions
@@ -155,14 +188,14 @@ describe('Refund creation', () => {
     expect(res.status).toBe(201);
 
     const refund = await prisma.runAsPlatform((tx) => tx.refund.findUniqueOrThrow({ where: { id: res.body.refundId } }));
-    expect(refund.requestedBy).toBe('Priya Manager');
+    expect(refund.requestedBy).toBe('Verified Refund Manager');
 
     const auditRows = await prisma.runAsPlatform((tx) =>
       tx.auditLog.findMany({ where: { restaurantId, action: 'REFUND_REQUESTED' }, orderBy: { createdAt: 'desc' } })
     );
     expect(auditRows.length).toBeGreaterThan(0);
     const details = auditRows[0].details as Record<string, unknown>;
-    expect(details.requestedBy).toBe('Priya Manager');
+    expect(details.requestedBy).toBe('Verified Refund Manager');
     expect(details.paymentId).toBe(paymentId);
   });
 

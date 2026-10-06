@@ -65,7 +65,9 @@ export class CollectionSync<T extends Syncable> {
     /** Whether a remote payload is a record of this kind at all. */
     private readonly accepts: (remote: Record<string, unknown>) => boolean,
     /** The field that identifies a record: `id`, or `phone` for a customer. */
-    private readonly idKey: string = 'id'
+    private readonly idKey: string = 'id',
+    private readonly serialize?: (record: T) => Record<string, unknown>,
+    private readonly materialize?: (record: T) => T
   ) {}
 
   private idOf(record: T): string {
@@ -97,7 +99,7 @@ export class CollectionSync<T extends Syncable> {
 
   /** What counts as a change: every field except the change time itself. */
   private signature(record: Record<string, unknown>): string {
-    const { updatedAt: _ignored, ...rest } = record;
+    const { updatedAt: _ignored, ...rest } = this.serialize ? this.serialize(record as unknown as T) : record;
     return stable(rest);
   }
 
@@ -131,7 +133,7 @@ export class CollectionSync<T extends Syncable> {
     for (const record of this.list()) {
       const asRecord = record as unknown as Record<string, unknown>;
       if (state.pushed[this.idOf(record)] !== this.signature(asRecord)) {
-        records.push({ externalId: this.idOf(record), payload: { ...asRecord, updatedAt: record.updatedAt ?? EPOCH } });
+        records.push({ externalId: this.idOf(record), payload: { ...(this.serialize ? this.serialize(record) : asRecord), updatedAt: record.updatedAt ?? EPOCH } });
       }
     }
     for (const [id, at] of Object.entries(state.tombstones)) {
@@ -179,7 +181,8 @@ export class CollectionSync<T extends Syncable> {
     const deletedAt = state.tombstones[id];
     if (deletedAt && time(deletedAt) >= remoteTime) return;
 
-    const incoming = { ...remote } as unknown as T;
+    const parsed = { ...remote } as unknown as T;
+    const incoming = this.materialize ? this.materialize(parsed) : parsed;
     if (typeof remote.updatedAt !== 'string') incoming.updatedAt = EPOCH;
 
     if (idx < 0) {

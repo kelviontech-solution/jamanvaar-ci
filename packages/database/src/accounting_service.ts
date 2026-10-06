@@ -89,13 +89,7 @@ export class BusinessDayAccountingService {
     const targetDayRecord: BusinessDay = db.businessDays.find((b) => b.id === targetId) || activeDay;
 
     // Filter all orders belonging to this business_day_id
-    const dayOrders = db.orders.filter((o) => {
-      if (o.businessDayId) {
-        return o.businessDayId === targetId;
-      }
-      const oDate = formatRestaurantDate(o.createdAt, 'ISO_DATE');
-      return oDate === targetDayRecord.businessDate;
-    });
+    const dayOrders = db.orders.filter(o => BusinessDayRepository.orderBelongsToBusinessDay(o, targetDayRecord));
 
     let gross_sales = 0;
     let discounts = 0;
@@ -207,7 +201,7 @@ export class BusinessDayAccountingService {
     // Check Active KOTs and Held Carts for Day Close Blocking
     const activeKots = (db.kots || []).filter((k: KOTRecord) => {
       const kotOrder = db.orders.find((o) => o.id === k.orderId);
-      const belongs = kotOrder ? kotOrder.businessDayId === targetId : true;
+      const belongs = kotOrder ? BusinessDayRepository.orderBelongsToBusinessDay(kotOrder, targetDayRecord) : true;
       return belongs && k.status !== 'SERVED' && k.status !== 'CANCELLED';
     });
     const active_kots_count = activeKots.length;

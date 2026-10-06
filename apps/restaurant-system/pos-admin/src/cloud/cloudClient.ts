@@ -982,9 +982,12 @@ export async function saveRestaurantIdentity(identity: RestaurantIdentityFields)
 export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
+  // The device credential alone cannot authorize money movement. This also refreshes expired owner access once.
+  await request('/api/v1/tenant/me/applications');
+  if (!accessToken) throw new CloudApiError('Sign in again before issuing a refund', 401);
 
   const path = `/api/v1/payments/${paymentId}/refund`;
-  const body = JSON.stringify({ amountPaise, reason, requestedBy });
+  const body = JSON.stringify({ amountPaise, reason, requestedBy, idempotencyKey: crypto.randomUUID() });
   const signed = await signDeviceRequest('POS_ADMIN', 'POST', path, body).catch((err) => {
     console.error('Could not sign device request; sending unsigned:', err);
     return null;
@@ -994,6 +997,7 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
+      'x-owner-authorization': accessToken,
       ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {})
     },
     body

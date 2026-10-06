@@ -1,5 +1,6 @@
 import { db } from './db';
 import { KeyValueStore } from './key_value_store';
+import { InventoryItemSync, RecipeSync, SupplierSync } from './inventory_sync';
 import { AuditRepository } from './repositories';
 
 /**
@@ -19,7 +20,7 @@ const CURSOR_KEYS = [
   'jamanvaar_inventory_ledger_cursor:core',
   'jamanvaar_menu_applied_version'
 ];
-const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION'];
+const ENTITY_TYPES = ['CUSTOMER', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'PAYMENT_TRANSACTION', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP', 'STAFF_USER', 'DINING_TABLE', 'SERVICE_MESSAGE', 'COMBO', 'COUPON', 'CUSTOMER_FEEDBACK', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION'];
 
 export interface TenantEntry {
   /** True when data from another restaurant (or of unknown ownership) was removed. */
@@ -57,6 +58,12 @@ export class TenantIsolation {
 
     const previous = this.current() ?? 'unknown';
     const unsynced = db.orders.filter((o) => o.syncStatus !== 'SYNCED' && o.syncStatus !== undefined);
+    const unsyncedStock = db.stockMovements.filter(m => !m.syncedAt && !m.remote);
+    if (unsyncedStock.length) {
+      try {
+        KeyValueStore.set(`jamanvaar_quarantine_inventory_${previous}_${Date.now()}`, JSON.stringify({ movements: unsyncedStock, definitions: db.inventoryItems, recipes: db.recipes, suppliers: db.suppliers }));
+      } catch { /* Same best-effort quarantine policy as orders; foreign inventory must never remain visible. */ }
+    }
     if (unsynced.length > 0) {
       try {
         KeyValueStore.set(`jamanvaar_quarantine_${previous}_${Date.now()}`, JSON.stringify(unsynced));
@@ -87,6 +94,8 @@ export class TenantIsolation {
     db.feedbacks = [];
     db.customerAccounts = [];
     db.stockMovements = [];
+    db.inventoryItems = []; db.recipes = []; db.suppliers = []; db.goodsReceipts = []; db.inventoryBatches = []; db.stockCounts = [];
+    InventoryItemSync.reset(); RecipeSync.reset(); SupplierSync.reset();
     db.printJobs = [];
     db.devices = [];
     db.kiosks = [];

@@ -20,7 +20,7 @@ describe('JAMANVAAR — Branded Startup / Splash → Login Experience Matrix', (
     expect(JAMANVAAR_LOGOS.horizontal).toBeDefined();
     expect(JAMANVAAR_LOGOS.full).toBeDefined();
     expect(JAMANVAAR_LOGOS.mark).toBeDefined();
-    expect(JAMANVAAR_LOGOS.horizontal.startsWith('data:image/png;base64,')).toBe(true);
+    expect(JAMANVAAR_LOGOS.horizontal).toMatch(/brand-assets\/.*\.png$/);
   });
 
   // TEST 2: Session Key Guard Isolation

@@ -1,0 +1,12 @@
+[
+  {
+    "command": "node node_modules/typescript/bin/tsc -b",
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": "node node_modules/typescript/bin/tsc --noEmit -p cloud/api/tsconfig.json",
+    "exitCode": 0,
+    "output": ""
+  }
+]

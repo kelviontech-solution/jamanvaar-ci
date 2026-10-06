@@ -1,0 +1,26 @@
+[
+  {
+    "workspace": "@jamanvaar/pos",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/captain",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/kds",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/kiosk-user",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/qr-guest",
+    "exitCode": 0
+  },
+  {
+    "workspace": "@jamanvaar/super-admin-web",
+    "exitCode": 0
+  }
+]

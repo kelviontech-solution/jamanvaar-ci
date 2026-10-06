@@ -17,9 +17,11 @@ import { PaymentsService } from './payments.service';
 import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformPaymentsService } from './platform-payments.service';
 import { RestaurantPayoutsService } from './restaurant-payouts.service';
+import { StaffAuthModule } from '../entity-sync/staff-auth.module';
+import { RefundAuthorizationGuard } from './refund-authorization.guard';
 
 @Module({
-  imports: [PrismaModule, AuditModule, TenantAuthModule, OrderSyncModule, WhatsAppOutboundWebhookModule],
+  imports: [PrismaModule, AuditModule, TenantAuthModule, StaffAuthModule, OrderSyncModule, WhatsAppOutboundWebhookModule],
   controllers: [
     MenuSyncController,
     PaymentOrdersController,
@@ -33,7 +35,7 @@ import { RestaurantPayoutsService } from './restaurant-payouts.service';
     RestaurantPayoutsController,
     PlatformPaymentsController
   ],
-  providers: [PaymentsService, RazorpayGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, RestaurantPayoutsService],
+  providers: [PaymentsService, RazorpayGatewayService, MenuSyncService, PaymentConnectionsService, PlatformPaymentsService, RestaurantPayoutsService, RefundAuthorizationGuard],
   exports: [PaymentsService, RazorpayGatewayService, RestaurantPayoutsService]
 })
 export class PaymentsModule {}
