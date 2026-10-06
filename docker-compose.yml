@@ -61,6 +61,12 @@ services:
       - PRIVILEGED_REFRESH_TTL_DAYS=${PRIVILEGED_REFRESH_TTL_DAYS:-7}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:?CORS_ALLOWED_ORIGINS must list the real console origin(s) in production}
       - TRUST_PROXY=${TRUST_PROXY:-2}
+      # The address a table's QR code opens (qr-admin.service.ts's publicBaseUrl()) -- unset
+      # in production, every QR code's url comes back null: View QR shows nothing, Print
+      # refuses with "This code has no address to print.". nginx already routes /q/<token> on
+      # PUBLIC_ORIGIN itself to the qr-guest container (see nginx/system.kelviontech.in.conf's
+      # `location /q/`), so this is the same origin every other app above builds against.
+      - QR_ORDER_BASE_URL=${PUBLIC_ORIGIN:-}
       - QR_SESSION_SECRET=${QR_SESSION_SECRET:-}
       - JAMANVAAR_SERVICE_SECRET=${JAMANVAAR_SERVICE_SECRET:-}
       - WHATSAPP_CONNECTOR_BASE_URL=${WHATSAPP_CONNECTOR_BASE_URL:-}
