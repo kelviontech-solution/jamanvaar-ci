@@ -1,6 +1,25 @@
 import { z } from 'zod';
 import { strongPassword } from '../../../common/validation/password';
 
+// KIOSK_ADMIN was retired as a device/activation-key type (Phase 2 Task 10): that console's
+// functionality now lives inside Restaurant Admin (pos-admin), gated by the KIOSK_ADMIN
+// entitlement rather than a separate device type, and the standalone kiosk-admin app it
+// belonged to has been deleted. A plain z.enum() would still reject a stray 'KIOSK_ADMIN'
+// value, just with a generic "invalid enum value" message — this error map names the one
+// retired value explicitly, since anyone still sending it needs to know why, not just that
+// their value isn't in some unlisted set.
+const DEVICE_TYPE_VALUES = ['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN'] as const;
+function deviceTypeEnum() {
+  return z.enum(DEVICE_TYPE_VALUES, {
+    errorMap: (issue, ctx) => {
+      if (issue.code === 'invalid_enum_value' && issue.received === 'KIOSK_ADMIN') {
+        return { message: 'KIOSK_ADMIN is no longer a supported device type — use POS_ADMIN instead.' };
+      }
+      return { message: ctx.defaultError };
+    }
+  });
+}
+
 // Tenant login accepts email + password, and optionally a restaurantId (if already known)
 // and deviceId/deviceToken (for checking whether this device has already been activated).
 export const tenantLoginSchema = z.object({
@@ -9,7 +28,7 @@ export const tenantLoginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
   deviceId: z.string().optional(),
   deviceToken: z.string().optional(),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).optional(),
+  deviceType: deviceTypeEnum().optional(),
   appVersion: z.string().optional(),
   // Opt-in: include the refresh token directly in the response body, for
   // cross-origin non-browser clients (e.g. Kiosk Admin's Tauri webview) that
@@ -30,7 +49,7 @@ export const loginOwnerSchema = z.object({
   password: z.string().min(1, 'Password is required'),
   deviceId: z.string().optional(),
   deviceToken: z.string().optional(),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).optional(),
+  deviceType: deviceTypeEnum().optional(),
   appVersion: z.string().optional(),
   returnRefreshToken: z.boolean().optional()
 }).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
@@ -67,7 +86,7 @@ export const activateDeviceSchema = z.object({
   activationSessionToken: z.string().min(1, 'Activation session token is required'),
   activationKey: z.string().trim().min(1, 'Activation key is required'),
   deviceId: z.string().optional(),
-  deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']).default('POS_ADMIN'),
+  deviceType: deviceTypeEnum().default('POS_ADMIN'),
   deviceName: z.string().optional(),
   appVersion: z.string().optional(),
   publicKeyJwk: devicePublicKeyJwkSchema.optional()

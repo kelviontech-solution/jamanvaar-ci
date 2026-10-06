@@ -348,11 +348,13 @@ export class TenantAuthService {
 
     // security-audit HIGH-04: `dto.adminOnly` is client-supplied and was the ONLY thing
     // gating this — pos-admin's own client never sent it, so any tenant role (including
-    // STAFF) got a full admin-console session. POS_ADMIN and KIOSK_ADMIN are the two
-    // device types with a real staff/PIN/billing/backup admin console behind them, so
-    // the OWNER/MANAGER requirement is now enforced server-side for those device types
-    // unconditionally — the client can no longer opt out of it by omitting the flag.
-    const isAdminConsoleDevice = deviceType === 'POS_ADMIN' || deviceType === 'KIOSK_ADMIN';
+    // STAFF) got a full admin-console session. POS_ADMIN is the one device type with a
+    // real staff/PIN/billing/backup admin console behind it (KIOSK_ADMIN was retired as
+    // its own device type — that console now lives inside pos-admin, gated by the
+    // KIOSK_ADMIN entitlement instead, see activateDevice below), so the OWNER/MANAGER
+    // requirement is enforced server-side for it unconditionally — the client can no
+    // longer opt out of it by omitting the flag.
+    const isAdminConsoleDevice = deviceType === 'POS_ADMIN';
     if ((opts.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
       throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
     }
