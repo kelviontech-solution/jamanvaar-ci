@@ -15,7 +15,10 @@ import {
   ChefHat,
   Smartphone,
   CheckCircle2,
-  Calendar
+  Calendar,
+  LayoutDashboard,
+  BarChart3,
+  Package
 } from 'lucide-react';
 
 export interface JamanvaarCapabilityItem {
@@ -276,6 +279,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   }, [healthCheckUrl]);
 
   const apiBadgeConnected = healthCheckUrl ? apiReachable !== false : true;
+  // Restaurant Admin is an owner/manager console: pairing plumbing is noise there unless the server is actually unreachable.
+  const showCoreBadge = appIdentity !== 'ADMIN' || !apiBadgeConnected;
 
   const defaultCapabilities: JamanvaarCapabilityItem[] = [
     { label: 'Fast Billing', icon: 'zap' },
@@ -286,22 +291,29 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
 
   const activeCapabilities = capabilities || defaultCapabilities;
 
+  // One icon style for every tile: stroke icons, same size, same brand colour.
   const renderCapabilityIcon = (icon?: string) => {
+    const cls = 'w-5 h-5 text-[#E66817]';
     switch (icon) {
-      case 'zap':
-        return <Zap className="w-5 h-5 text-[#E66817] fill-[#E66817]" />;
       case 'printer':
-        return <Printer className="w-5 h-5 text-[#0B253A]" />;
+        return <Printer className={cls} />;
       case 'table':
-        return <Utensils className="w-5 h-5 text-[#0B253A]" />;
+        return <Utensils className={cls} />;
       case 'cloud':
-        return <Cloud className="w-5 h-5 text-[#059669]" />;
+        return <Cloud className={cls} />;
       case 'chef':
-        return <ChefHat className="w-5 h-5 text-[#E66817]" />;
+        return <ChefHat className={cls} />;
       case 'mobile':
-        return <Smartphone className="w-5 h-5 text-[#0B253A]" />;
+        return <Smartphone className={cls} />;
+      case 'dashboard':
+        return <LayoutDashboard className={cls} />;
+      case 'chart':
+        return <BarChart3 className={cls} />;
+      case 'package':
+        return <Package className={cls} />;
+      case 'zap':
       default:
-        return <Zap className="w-5 h-5 text-[#E66817]" />;
+        return <Zap className={cls} />;
     }
   };
 
@@ -330,6 +342,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
         {/* Real-time Connection Status Pills (Matching Reference Mockup) */}
         <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-bold ml-auto">
           {/* Local Core / Cloud API Status Badge */}
+          {showCoreBadge && (
           <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs ${dark ? 'bg-white/5 border border-white/10' : 'bg-white border border-[#EBE6DD]'}`}>
             {/* The local relay needs a pairing no screen performs yet; once it refuses this browser, say so instead of "Connected" (BUG-156). */}
             <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${!apiBadgeConnected ? 'bg-rose-500' : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
@@ -346,6 +359,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
               )}
             </span>
           </div>
+          )}
 
           {/* Network Status Toggle Button */}
           <button
@@ -382,22 +396,22 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
       </header>
 
       {/* Main Split Authentication Layout */}
-      <main className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 my-auto items-center py-4 sm:py-6">
+      <main className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 my-auto items-center py-2 sm:py-4">
         {/* LEFT COLUMN: BRAND & RESTAURANT PRESENTATION */}
-        <div className="lg:col-span-6 flex flex-col justify-center items-center lg:items-start space-y-5 sm:space-y-6 text-center lg:text-left pr-0 lg:pr-4">
+        <div className="order-2 lg:order-1 lg:col-span-6 flex flex-col justify-center items-center lg:items-start space-y-5 sm:space-y-6 text-center lg:text-left pr-0 lg:pr-4">
           {/* Official JAMANVAAR by KELVIONTECH Brand Logo — Prominent & Balanced */}
-          <div className="w-full flex justify-center lg:justify-start pb-1">
+          <div className="hidden lg:flex w-full justify-center lg:justify-start pb-1">
             <JamanvaarLogo
               variant={dark ? 'light' : 'horizontal'}
               size="2xl"
-              imgStyle={{ height: '180px', maxHeight: '180px', width: 'auto' }}
+              imgStyle={{ height: 'clamp(104px, 19vh, 180px)', width: 'auto' }}
               className="drop-shadow-md hover:scale-[1.02] transition-transform duration-300"
             />
           </div>
 
           {/* Brand Headline */}
           <div className="w-full max-w-md">
-            <h1 className={`text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight leading-[1.12] ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
+            <h1 className={`text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight leading-[1.12] ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
               {heroHeadline}{' '}
               {heroHighlightWord && (
                 <span className="block text-[#E66817]">{heroHighlightWord}</span>
@@ -420,7 +434,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${dark ? 'bg-white/10' : 'bg-[#FAF7F2]'}`}>
                   {renderCapabilityIcon(cap.icon || cap.iconName)}
                 </div>
-                <span className={`text-[11px] font-extrabold leading-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
+                <span className={`text-xs font-semibold leading-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
                   {cap.label}
                 </span>
               </div>
@@ -440,7 +454,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                     (e.target as HTMLImageElement).src = img.fallbackSrc;
                   }}
                 />
-                <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
                   {img.label}
                 </span>
               </div>
@@ -449,9 +463,9 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
         </div>
 
         {/* RIGHT COLUMN: AUTHENTICATION CARD */}
-        <div className="lg:col-span-6 w-full max-w-md mx-auto lg:max-w-none">
+        <div className="order-1 lg:order-2 lg:col-span-6 w-full max-w-md mx-auto lg:max-w-none">
           <div
-            className={`rounded-3xl p-6 sm:p-8 lg:p-9 relative overflow-hidden ${
+            className={`rounded-2xl p-6 sm:p-8 lg:p-9 relative overflow-hidden ${
               dark ? 'bg-[#0F2940] border border-white/10 shadow-xl shadow-black/30' : 'bg-white border border-[#EBE6DD] shadow-xl shadow-slate-200/60'
             }`}
           >
@@ -461,11 +475,11 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
             {/* Card Header */}
             <div className="mb-5 space-y-1 text-left">
               <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#E66817]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8500C]">
                   Welcome to
                 </span>
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 text-[#E66817] border ${
+                  className={`inline-flex items-center gap-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 text-[#B8500C] border ${
                     dark ? 'bg-[#E66817]/10 border-[#E66817]/25' : 'bg-[#FFF7ED] border-[#FFEDD5]'
                   }`}
                 >
@@ -486,7 +500,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 </span>
               </div>
 
-              <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
+              <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
                 {appTitle}
               </h2>
               <p className={`text-xs sm:text-sm font-medium ${dark ? 'text-[#8CA0B3]' : 'text-slate-500'}`}>
