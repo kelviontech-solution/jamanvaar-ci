@@ -624,11 +624,18 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
           </div>
 
           {/* Daily Reconciled Financials & Metrics Ribbon */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
               <span className="text-[11px] font-bold uppercase text-slate-500 block">GROSS SALES</span>
               <span className="text-xl font-bold font-mono text-jaman-navy">
                 {formatINR(currentDaySummary.grossSales)}
+              </span>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
+              <span className="text-[11px] font-bold uppercase text-sky-600 block">OPEN (UNPAID) BILLS</span>
+              <span className="text-xl font-bold font-mono text-sky-700">
+                {formatINR(currentDaySummary.openBills)}
               </span>
             </div>
 

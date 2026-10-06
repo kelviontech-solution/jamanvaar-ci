@@ -150,3 +150,19 @@ describe('JAMANVAAR Restaurant Admin — Day-Wise Orders Module & Drill-Down', (
     expect(multiDayCsv).toContain('2026-08-28');
   });
 });
+
+describe('Open (unpaid) bills are shown beside gross sales, not inside them', () => {
+  it('a bill still open and unpaid is counted as open, and left out of gross sales', () => {
+    const when = new Date(2026, 7, 29, 12, 0, 0).toISOString();
+    const paid = {
+      id: 'paid-1', orderNumber: 'P1', tokenNumber: '1', restaurantId: 'r', outletId: 'o', kioskId: 'POS-01', sessionId: 's1', idempotencyKey: 'i1',
+      orderType: 'DINE_IN', items: [], subtotal: 400, discountAmount: 0, cgstAmount: 10, sgstAmount: 10, taxAmount: 20,
+      serviceChargeAmount: 0, tipAmount: 0, roundOffAmount: 0, totalAmount: 420, paymentMethod: 'CASH', paymentStatus: 'SUCCESS',
+      orderStatus: 'COMPLETED', estimatedWaitMinutes: 15, createdAt: when, updatedAt: when, isSynced: true
+    } as never;
+    const open = { ...(paid as object), id: 'open-1', orderNumber: 'O1', paymentStatus: 'PENDING', paymentMethod: 'UPI_QR', orderStatus: 'CONFIRMED', totalAmount: 300, subtotal: 300, taxAmount: 0, cgstAmount: 0, sgstAmount: 0 } as never;
+    const summary = DayOrdersService.getDaySummary([paid, open], '2026-08-29', 6);
+    expect(summary.openBills).toBe(300);
+    expect(summary.grossSales).toBe(400);
+  });
+});

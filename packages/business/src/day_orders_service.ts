@@ -12,6 +12,7 @@ export interface DaySummary {
   isLive: boolean; // active current business day
   totalSales: number;
   grossSales: number;
+  openBills: number;
   netSales: number;
   orderCount: number;
   completedOrders: number;
@@ -128,6 +129,7 @@ export class DayOrdersService {
 
     let totalSales = 0;
     let grossSales = 0;
+    let openBills = 0;
     let discounts = 0;
     let refunds = 0;
     let tax = 0;
@@ -199,7 +201,10 @@ export class DayOrdersService {
 
       // Still open and unpaid (in the kitchen, bill requested, pay-at-counter): listed as an order, but it is
       // not a sale and not collected money until it is settled (BUG-151/161).
-      if (isUnpaidOpenOrder(o)) return;
+      if (isUnpaidOpenOrder(o)) {
+        openBills += o.totalAmount;
+        return;
+      }
 
       // Reconciled accounting sums
       totalSales += o.totalAmount;
@@ -321,6 +326,7 @@ export class DayOrdersService {
       isLive: isToday,
       totalSales,
       grossSales,
+      openBills,
       netSales,
       orderCount: dayOrders.length,
       completedOrders,
