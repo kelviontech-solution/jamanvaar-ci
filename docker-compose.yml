@@ -141,7 +141,7 @@ services:
 
   # ── Terminal / customer-facing apps ─────────────────────────────────────────────────
   # None of these existed as Docker images before this pass -- only cloud/api and
-  # cloud/super-admin-web were ever deployed anywhere (see AWS_DEPLOYMENT_MASTER_PLAN.md
+  # cloud/super-admin-web were ever deployed anywhere (see docs/deployment/AWS_DEPLOYMENT_MASTER_PLAN.md
   # section 4). Added here so the whole platform can be exercised online, not just the
   # admin console -- same shared-nginx-front-door pattern as `frontend` above, each on
   # its own 172.17.0.1 port (new nginx/system.kelviontech.in.conf location blocks map

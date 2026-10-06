@@ -1,7 +1,7 @@
 # ==============================================================================
 # kiosk (system.kelviontech.in) — Deployment & Operations Automation Makefile
 # Same AWS EC2 bridge box as amitkhatri / Wrench / kelviontech.in -- see
-# AWS_DEPLOYMENT_MASTER_PLAN.md. Mirrors Wrench's own Makefile shape so both stacks are
+# docs/deployment/AWS_DEPLOYMENT_MASTER_PLAN.md. Mirrors Wrench's own Makefile shape so both stacks are
 # operated the same way.
 # ==============================================================================
 
