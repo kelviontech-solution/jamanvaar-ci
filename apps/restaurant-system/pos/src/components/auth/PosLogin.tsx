@@ -57,7 +57,13 @@ export const PosLogin: React.FC = () => {
 
     setIsVerifying(true);
     setTimeout(async () => {
-      const res = await loginWithPin(pinToUse);
+      if (!selectedUser) {
+        setIsVerifying(false);
+        setErrorMessage('Select your name first.');
+        setPin('');
+        return;
+      }
+      const res = await loginWithPin(pinToUse, selectedUser.id);
       setIsVerifying(false);
       if (!res.success) {
         setErrorMessage(res.error || 'Incorrect PIN. Please try again.');

@@ -54,9 +54,9 @@ export function syncStaffUsers(opts: { push: boolean }): Promise<void> {
  * only on a miss does it pull once and check again, so the one real strike is charged
  * against the final, synced answer.
  */
-export async function verifyPinWithSync(pin: string, restaurantId?: string): Promise<{ user: User; isManager: boolean } | null> {
-  const first = await StaffRepository.verifyPin(pin, restaurantId, { countFailure: false });
+export async function verifyPinWithSync(pin: string, restaurantId?: string, userId?: string): Promise<{ user: User; isManager: boolean } | null> {
+  const first = await StaffRepository.verifyPin(pin, restaurantId, { countFailure: false, userId });
   if (first) return first;
   await syncStaffUsers({ push: false }).catch(() => undefined);
-  return StaffRepository.verifyPin(pin, restaurantId);
+  return StaffRepository.verifyPin(pin, restaurantId, { userId });
 }

@@ -147,7 +147,7 @@ interface PosState {
   } | null;
 
   // Data Actions
-  loginWithPin: (pin: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithPin: (pin: string, userId: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   /** Called once on app start to restore persisted session (no PIN required) */
   restoreSession: () => void;
@@ -499,8 +499,9 @@ export const usePosStore = create<PosState>((set, get) => {
       }
     },
 
-    loginWithPin: async (pin: string) => {
-      const result = await verifyPinWithSync(pin);
+    loginWithPin: async (pin: string, userId: string) => {
+      // The PIN opens only the staff member who was selected on the screen, never whoever else shares it.
+      const result = await verifyPinWithSync(pin, undefined, userId);
       const user = result?.user;
 
       if (user && !StaffRepository.canUseTerminal(user.roleId, 'POS')) {
