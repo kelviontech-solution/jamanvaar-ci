@@ -14,8 +14,7 @@ import {
   Sparkles,
   RefreshCw,
   Flame,
-  Check
-} from 'lucide-react';
+  Check, StickyNote } from 'lucide-react';
 
 export const PosKotView: React.FC = () => {
   const { currentUser, requestManagerOverride } = usePosStore();
@@ -194,7 +193,7 @@ export const PosKotView: React.FC = () => {
                   {/* Order-level Chef Note (distinct from per-item specialInstructions) */}
                   {kot.orderNotes && (
                     <div className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded-md mb-2.5">
-                      ⚡ Note: {kot.orderNotes}
+                      <StickyNote className="w-3 h-3 inline -mt-0.5 mr-1" />Note: {kot.orderNotes}
                     </div>
                   )}
 

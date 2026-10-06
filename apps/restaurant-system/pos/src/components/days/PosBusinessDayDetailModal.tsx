@@ -133,9 +133,9 @@ export const PosBusinessDayDetailModal: React.FC<PosBusinessDayDetailModalProps>
         };
 
         PdfReportBuilder.downloadPdfFile(fullData, `JAMANVAAR_Business_Day_${businessDay.businessDate}.pdf`, 'CLASSIC');
-        setFeedback('✓ PDF Downloaded successfully!');
+        setFeedback('PDF Downloaded successfully!');
       } catch (err: any) {
-        setFeedback('⚠ Could not generate PDF');
+        setFeedback('Could not generate PDF');
       } finally {
         setIsDownloadingPdf(false);
         setTimeout(() => setFeedback(''), 3500);
@@ -180,7 +180,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
       paperSize: printer.paperSize || '80mm'
     });
 
-    setFeedback(`✓ Report dispatched to ${printer.name}`);
+    setFeedback(`Report dispatched to ${printer.name}`);
     setTimeout(() => setFeedback(''), 3500);
   };
 
@@ -188,7 +188,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
     if (!reopenReason.trim()) return;
     BusinessDayRepository.reopenBusinessDay(businessDay.id, 'Restaurant Manager', reopenReason.trim());
     setReopenModalOpen(false);
-    setFeedback('✓ Business Day reopened for corrections.');
+    setFeedback('Business Day reopened for corrections.');
     if (onRefresh) onRefresh();
     setTimeout(() => setFeedback(''), 3500);
   };
@@ -215,7 +215,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                     ? 'bg-slate-100 text-slate-700 border border-slate-300'
                     : 'bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse'
                 }`}>
-                  {isClosed ? '🔒 CLOSED (READ-ONLY)' : '🟢 ACTIVE DAY'}
+                  {isClosed ? (<span className="inline-flex items-center gap-1"><Lock className="w-3 h-3" />CLOSED (READ-ONLY)</span>) : 'ACTIVE DAY'}
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono">
@@ -394,7 +394,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
                   (businessDay.cashVariance || 0) === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'
                 }`}>
-                  {(businessDay.cashVariance || 0) === 0 ? '✓ BALANCED' : `VARIANCE: ${formatINR(businessDay.cashVariance || 0)}`}
+                  {(businessDay.cashVariance || 0) === 0 ? 'BALANCED' : `VARIANCE: ${formatINR(businessDay.cashVariance || 0)}`}
                 </span>
               </div>
 

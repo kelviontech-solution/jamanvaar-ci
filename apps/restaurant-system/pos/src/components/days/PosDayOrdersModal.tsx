@@ -227,7 +227,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
                     </div>
 
                     <div className={`text-xs flex items-center gap-2 truncate ${isSelected ? 'text-slate-300' : 'text-slate-500'}`}>
-                      <span>🕒 {formattedTime}</span>
+                      <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{formattedTime}</span>
                       <span>•</span>
                       <span>{o.orderType}</span>
                       {o.tableNumber && <span>• Table {o.tableNumber}</span>}

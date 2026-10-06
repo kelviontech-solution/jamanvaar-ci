@@ -20,8 +20,7 @@ import {
   Banknote,
   QrCode,
   Layers,
-  ShieldCheck
-} from 'lucide-react';
+  ShieldCheck, Smartphone } from 'lucide-react';
 
 interface PosCloseDayModalProps {
   businessDay: BusinessDay;
@@ -196,15 +195,15 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <span className="font-bold text-jaman-navy block">Payment Collections Breakdown:</span>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-bold">💵 Cash</span>
+                    <span className="text-[10px] text-slate-400 block font-bold inline-flex items-center justify-center gap-1"><Banknote className="w-3 h-3" />Cash</span>
                     <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.cash_sales)}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-bold">📱 UPI / QR</span>
+                    <span className="text-[10px] text-slate-400 block font-bold inline-flex items-center justify-center gap-1"><Smartphone className="w-3 h-3" />UPI / QR</span>
                     <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.upi_sales)}</strong>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-bold">💳 Card</span>
+                    <span className="text-[10px] text-slate-400 block font-bold inline-flex items-center justify-center gap-1"><CreditCard className="w-3 h-3" />Card</span>
                     <strong className="font-mono text-xs font-black text-jaman-navy">{formatINR(summary.card_sales)}</strong>
                   </div>
                 </div>
@@ -369,7 +368,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <span className={`font-mono font-black text-sm ${
                     variance === 0 ? 'text-emerald-600' : variance > 0 ? 'text-blue-600' : 'text-rose-600'
                   }`}>
-                    {variance === 0 ? '✓ Balanced (₹0)' : variance > 0 ? `+ ₹${variance} (Over)` : `- ₹${Math.abs(variance)} (Short)`}
+                    {variance === 0 ? 'Balanced (₹0)' : variance > 0 ? `+ ₹${variance} (Over)` : `- ₹${Math.abs(variance)} (Short)`}
                   </span>
                 </div>
 
@@ -553,7 +552,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
               {/* 1. Closed Business Day Summary */}
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-jaman-navy text-xs font-black">
-                  <span>✓ BUSINESS DAY CLOSED</span>
+                  <span>BUSINESS DAY CLOSED</span>
                 </div>
                 <h3 className="text-lg font-black text-jaman-navy">
                   {closedResult.closedDay.displayDate}
@@ -584,7 +583,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
               <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-left space-y-1">
                 <div className="flex items-center gap-2 text-emerald-800 text-xs font-black">
                   <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>✓ NEXT BUSINESS DAY ACTIVE — {closedResult.newDay.displayDate}</span>
+                  <span>NEXT BUSINESS DAY ACTIVE — {closedResult.newDay.displayDate}</span>
                 </div>
                 <p className="text-[11px] text-emerald-700">
                   Business Day {closedResult.newDay.id} opened with ₹{closedResult.newDay.openingCash} float. Order counters reset for the new session while past day history is safely preserved.

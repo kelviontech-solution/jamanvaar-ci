@@ -126,7 +126,7 @@ export const PosShiftModal: React.FC = () => {
         {/* Feedback alert */}
         {feedback && (
           <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold text-center border-b border-emerald-200">
-            ✓ {feedback}
+            {feedback}
           </div>
         )}
 

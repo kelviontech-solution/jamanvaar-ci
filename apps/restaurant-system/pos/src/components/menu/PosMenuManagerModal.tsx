@@ -366,7 +366,7 @@ export const PosMenuManagerModal: React.FC<{
   const handlePublishMenu = () => {
     try {
       const snapshot = MenuBuilderService.publishMenu('POS Manager', 'Published updated menu from POS Menu Manager');
-      setFeedback(`✓ Published ${snapshot.itemsCount} dishes across ${snapshot.categoriesCount} categories to live POS & Kiosk!`);
+      setFeedback(`Published ${snapshot.itemsCount} dishes across ${snapshot.categoriesCount} categories to live POS & Kiosk!`);
       setTimeout(() => setFeedback(''), 4000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Could not publish menu.');
@@ -551,7 +551,7 @@ export const PosMenuManagerModal: React.FC<{
               {feedback}
             </span>
             <button onClick={() => setFeedback('')} className="text-emerald-600 hover:text-emerald-900 font-black">
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -563,7 +563,7 @@ export const PosMenuManagerModal: React.FC<{
               {errorMsg}
             </span>
             <button onClick={() => setErrorMsg('')} className="text-rose-600 hover:text-rose-900 font-black">
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -1686,10 +1686,10 @@ export const PosMenuManagerModal: React.FC<{
                     onChange={(e) => setEditingItem({ ...editingItem, dietaryType: e.target.value as DietaryType })}
                     className="w-full bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy"
                   >
-                    <option value="VEG">🟢 Vegetarian</option>
-                    <option value="JAIN">🌾 Jain Safe</option>
-                    <option value="NON_VEG">🔴 Non-Vegetarian</option>
-                    <option value="EGG">🟡 Egg</option>
+                    <option value="VEG">Vegetarian</option>
+                    <option value="JAIN">Jain Safe</option>
+                    <option value="NON_VEG">Non-Vegetarian</option>
+                    <option value="EGG">Egg</option>
                   </select>
                 </div>
 
@@ -1773,7 +1773,7 @@ export const PosMenuManagerModal: React.FC<{
                         <span className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
                           isChecked ? 'bg-jaman-saffron text-white' : 'bg-slate-100 text-slate-500'
                         }`}>
-                          {isChecked ? '✓ Active' : '+ Add'}
+                          {isChecked ? 'Active' : '+ Add'}
                         </span>
                       </div>
                     );
@@ -2009,7 +2009,7 @@ export const PosMenuManagerModal: React.FC<{
                 </div>
                 <div>
                   <h3 className="font-extrabold text-base text-jaman-navy">Image Quality & License Review</h3>
-                  <p className="text-[11px] text-slate-500">Dish Name ➔ Description ➔ Food Photo ➔ License Agreement</p>
+                  <p className="text-[11px] text-slate-500">Dish Name → Description → Food Photo → License Agreement</p>
                 </div>
               </div>
               <button
@@ -2143,7 +2143,7 @@ export const PosMenuManagerModal: React.FC<{
                       };
                       MenuRepository.updateMenuItem(reviewingDish.id, updated);
                       setReviewingDish(updated);
-                      setFeedback(`✓ Updated photo for "${reviewingDish.name}"`);
+                      setFeedback(`Updated photo for "${reviewingDish.name}"`);
                     }}
                     className={`p-1.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
                       reviewingDish.imageUrl === preset.url
@@ -2189,7 +2189,7 @@ export const PosMenuManagerModal: React.FC<{
                     };
                     MenuRepository.updateMenuItem(reviewingDish.id, updated);
                     setReviewingDish(updated);
-                    setFeedback(`✓ Photo approved for "${reviewingDish.name}"`);
+                    setFeedback(`Photo approved for "${reviewingDish.name}"`);
                     setIsReviewModalOpen(false);
                   }}
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"

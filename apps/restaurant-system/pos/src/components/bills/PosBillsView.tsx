@@ -300,7 +300,7 @@ export const PosBillsView: React.FC = () => {
     PosPrinterService.reprintReceipt(bill, 'Counter reprint request', currentUser?.fullName || 'Cashier');
     setLastCompletedOrder(bill);
     setIsReceiptOpen(true);
-    showToast(`✓ Dispatched reprint for Invoice #${bill.orderNumber}`);
+    showToast(`Dispatched reprint for Invoice #${bill.orderNumber}`);
   };
 
   const handleOpenRefundModal = (bill: Order) => {
@@ -336,7 +336,7 @@ export const PosBillsView: React.FC = () => {
             }
           } catch (err) {
             const message = err instanceof CloudApiError ? err.message : 'Refund request failed';
-            showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${message}`);
+            showToast(`Refund failed for Invoice #${bill.orderNumber}: ${message}`);
             return; // never flip local status on a failed cloud refund
           }
         }
@@ -344,7 +344,7 @@ export const PosBillsView: React.FC = () => {
         try {
           OrderRepository.refundOrder(bill.id, amt, refundReasonInput, mgr);
         } catch (err: any) {
-          showToast(`✗ Refund failed for Invoice #${bill.orderNumber}: ${err?.message || 'Unknown error'}`);
+          showToast(`Refund failed for Invoice #${bill.orderNumber}: ${err?.message || 'Unknown error'}`);
           return;
         }
         AuditRepository.log({
@@ -354,7 +354,7 @@ export const PosBillsView: React.FC = () => {
           username: mgr
         });
         setRefundModalBill(null);
-        showToast(`✓ Refund of ₹${amt} processed for Invoice #${bill.orderNumber}`);
+        showToast(`Refund of ₹${amt} processed for Invoice #${bill.orderNumber}`);
       },
       approvalScope
     );
@@ -381,7 +381,7 @@ export const PosBillsView: React.FC = () => {
           username: mgr
         });
         setReopenModalBill(null);
-        showToast(`✓ Invoice #${reopenModalBill.orderNumber} reopened and returned to active queue`);
+        showToast(`Invoice #${reopenModalBill.orderNumber} reopened and returned to active queue`);
       }
     );
   };
@@ -439,7 +439,7 @@ export const PosBillsView: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('✓ Exported invoices to CSV');
+    showToast('Exported invoices to CSV');
   };
 
   const handleDownloadPdf = () => {
@@ -485,9 +485,9 @@ export const PosBillsView: React.FC = () => {
       };
 
       PdfReportBuilder.downloadPdfFile(fullData, `JAMANVAAR_Invoices_${selectedPeriod}.pdf`, 'CLASSIC');
-      showToast('✓ Downloaded invoices PDF statement');
+      showToast('Downloaded invoices PDF statement');
     } catch {
-      showToast('⚠ Error creating PDF file');
+      showToast('Error creating PDF file');
     }
   };
 

@@ -111,9 +111,9 @@ export const PosReportsView: React.FC = () => {
         const cleanPeriod = reportData.periodLabel.replace(/[^a-zA-Z0-9_-]/g, '_');
         const filename = `JAMANVAAR_${reportData.title.replace(/\s+/g, '_')}_${cleanPeriod}.pdf`;
         PdfReportBuilder.downloadPdfFile(reportData, filename, selectedDesign);
-        setFeedback('✓ PDF Downloaded successfully!');
+        setFeedback('PDF Downloaded successfully!');
       } catch (err: any) {
-        setFeedback('⚠ Could not generate PDF');
+        setFeedback('Could not generate PDF');
       } finally {
         setIsDownloadingPdf(false);
         setTimeout(() => setFeedback(''), 3500);
@@ -151,7 +151,7 @@ Dispatched to ${printer.name}
       paperSize: printer.paperSize || '80mm'
     });
 
-    setFeedback(`✓ Report dispatched to ${printer.name}`);
+    setFeedback(`Report dispatched to ${printer.name}`);
     setTimeout(() => setFeedback(''), 3500);
   };
 

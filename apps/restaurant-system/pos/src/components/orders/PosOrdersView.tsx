@@ -22,8 +22,7 @@ import {
   History,
   Flame,
   Undo2,
-  Ban
-} from 'lucide-react';
+  Ban, QrCode, Smartphone, Monitor } from 'lucide-react';
 
 export const PosOrdersView: React.FC = () => {
   const {
@@ -250,10 +249,10 @@ export const PosOrdersView: React.FC = () => {
         <div className="flex items-center gap-1 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs overflow-x-auto">
           {[
             { id: 'ALL', label: 'All Sources' },
-            { id: 'QR_TABLE', label: '🟠 QR Table' },
-            { id: 'POS', label: '🖥️ Counter POS' },
-            { id: 'KIOSK', label: '📱 Self-Order Kiosk' },
-            { id: 'CAPTAIN', label: '🧑‍🍳 Floor Captain' }
+            { id: 'QR_TABLE', label: 'QR Table' },
+            { id: 'POS', label: 'Counter POS' },
+            { id: 'KIOSK', label: 'Self-Order Kiosk' },
+            { id: 'CAPTAIN', label: 'Floor Captain' }
           ].map((src) => (
             <button
               key={src.id}
@@ -337,19 +336,19 @@ export const PosOrdersView: React.FC = () => {
                       </span>
                       {isQr ? (
                         <span className="text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded">
-                          🟠 QR Table {order.tableNumber ? `(T-${order.tableNumber})` : ''}
+                          <QrCode className="w-3 h-3 inline -mt-0.5 mr-1" />QR Table {order.tableNumber ? `(T-${order.tableNumber})` : ''}
                         </span>
                       ) : isKiosk ? (
                         <span className="text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded">
-                          📱 Kiosk ({order.kioskId || 'KIOSK-01'})
+                          <Smartphone className="w-3 h-3 inline -mt-0.5 mr-1" />Kiosk ({order.kioskId || 'KIOSK-01'})
                         </span>
                       ) : isCaptain ? (
                         <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded">
-                          🧑‍🍳 Captain {order.tableNumber ? `(T-${order.tableNumber})` : ''}
+                          <ChefHat className="w-3 h-3 inline -mt-0.5 mr-1" />Captain {order.tableNumber ? `(T-${order.tableNumber})` : ''}
                         </span>
                       ) : (
                         <span className="text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">
-                          🖥️ Counter POS
+                          <Monitor className="w-3 h-3 inline -mt-0.5 mr-1" />Counter POS
                         </span>
                       )}
                     </div>
@@ -398,7 +397,7 @@ export const PosOrdersView: React.FC = () => {
                       <div className="flex flex-col items-end gap-1">
                         {isUnconfirmedKioskUpi && (
                           <p className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded max-w-[220px] text-right">
-                            ⚠ Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.
+                            Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.
                           </p>
                         )}
                         <button

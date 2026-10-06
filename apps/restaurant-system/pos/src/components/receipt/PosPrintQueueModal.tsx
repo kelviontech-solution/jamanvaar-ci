@@ -128,7 +128,7 @@ export const PosPrintQueueModal: React.FC = () => {
 
         {retryFeedback && (
           <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs font-bold text-center border-b border-emerald-200">
-            ✓ {retryFeedback}
+            {retryFeedback}
           </div>
         )}
 
@@ -202,7 +202,7 @@ export const PosPrintQueueModal: React.FC = () => {
             <div className="bg-white rounded-2xl max-w-lg w-full p-5 space-y-3">
               <div className="flex items-center justify-between border-b pb-2">
                 <h3 className="text-sm font-bold text-jaman-navy">Raw ESC/POS Thermal Payload</h3>
-                <button onClick={() => setSelectedJob(null)} className="text-slate-400 hover:text-slate-600">✕</button>
+                <button onClick={() => setSelectedJob(null)} className="text-slate-400 hover:text-slate-600" aria-label="Close"><X className="w-4 h-4" /></button>
               </div>
 
               <pre className="bg-slate-900 text-emerald-400 font-mono text-[11px] p-4 rounded-xl max-h-72 overflow-y-auto whitespace-pre-wrap leading-tight">

@@ -285,7 +285,7 @@ export const PosDayHistoryView: React.FC = () => {
                       ? 'bg-slate-100 text-slate-700 border border-slate-300'
                       : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                   }`}>
-                    {isClosed ? '✓ CLOSED' : '🟢 ACTIVE'}
+                    {isClosed ? 'CLOSED' : 'ACTIVE'}
                   </span>
                 </div>
 

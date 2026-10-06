@@ -108,7 +108,7 @@ export const App: React.FC = () => {
       sound.play('kot');
       NotificationRepository.createNotification({
         type: 'MANAGER_ALERT' as any,
-        title: `🧾 Bill Requested — Table ${tableNumber}`,
+        title: `Bill Requested — Table ${tableNumber}`,
         message: `${captainName || 'Captain'} requested the bill for Table ${tableNumber}.`,
         priority: 'HIGH',
         targetRoles: ['POS', 'POS_ADMIN', 'ALL'],
@@ -369,7 +369,7 @@ export const App: React.FC = () => {
 
   return (
     <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
-      <div className="h-screen w-screen flex flex-col bg-jaman-cream overflow-hidden select-none">
+      <div className="h-screen w-screen flex flex-col gap-2.5 p-2.5 bg-jaman-cream overflow-hidden select-none">
         {/* Top Application Header */}
         <PosHeader />
 
@@ -377,14 +377,14 @@ export const App: React.FC = () => {
       <CrashRecoveryBanner />
 
       {/* Main Workspace Body */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex gap-2.5 overflow-hidden relative min-h-0">
         {/* Left Navigation Sidebar */}
         <PosSidebar />
 
         {/* Dynamic Center Stage */}
-        <main className="flex-1 flex overflow-hidden relative">
+        <main className={`flex-1 flex overflow-hidden relative min-w-0 ${activeTab === 'MENU' ? '' : 'rounded-2xl border border-jaman-border bg-white'}`}>
           {activeTab === 'MENU' && (
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex gap-2.5 overflow-hidden min-w-0">
               <PosCatalog />
               <PosCart />
             </div>
@@ -470,7 +470,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
                 }}
                 className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-lg shadow-jaman-saffron/30 transition-all cursor-pointer"
               >
-                ↻ Restore POS Workspace
+                Restore POS Workspace
               </button>
             </div>
           </div>

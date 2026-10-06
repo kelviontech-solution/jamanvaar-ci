@@ -179,7 +179,7 @@ export const PosShiftAndCashView: React.FC = () => {
     setOpenShiftModalOpen(false);
     setOpeningNotesInput('');
     setRefreshKey((k) => k + 1);
-    showToast(`✓ Shift opened with opening float of ₹${openingVal}`);
+    showToast(`Shift opened with opening float of ₹${openingVal}`);
   };
 
   // B2-046: this used to just `return` on an invalid amount or missing shift — no message, the
@@ -188,11 +188,11 @@ export const PosShiftAndCashView: React.FC = () => {
   // returns null if bypassed), so a cashier can no longer take out more than the drawer holds.
   const handleCashMovementSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeShift) { showToast('✗ No shift is open.'); return; }
+    if (!activeShift) { showToast('No shift is open.'); return; }
     const amountVal = Number(movementAmount);
-    if (!amountVal || amountVal <= 0) { showToast('✗ Enter an amount greater than ₹0.'); return; }
+    if (!amountVal || amountVal <= 0) { showToast('Enter an amount greater than ₹0.'); return; }
     if (movementType === 'CASH_OUT' && amountVal > activeShift.expectedCash) {
-      showToast(`✗ Cash Out of ₹${amountVal} exceeds the drawer's current balance of ₹${activeShift.expectedCash}.`);
+      showToast(`Cash Out of ₹${amountVal} exceeds the drawer's current balance of ₹${activeShift.expectedCash}.`);
       return;
     }
 
@@ -206,7 +206,7 @@ export const PosShiftAndCashView: React.FC = () => {
       movementNotes.trim() || undefined
     );
     if (!recorded) {
-      showToast('✗ Could not record this movement — the shift may have closed. Refresh and try again.');
+      showToast('Could not record this movement — the shift may have closed. Refresh and try again.');
       return;
     }
 
@@ -214,7 +214,7 @@ export const PosShiftAndCashView: React.FC = () => {
     setMovementAmount('');
     setMovementNotes('');
     setRefreshKey((k) => k + 1);
-    showToast(`✓ Recorded ${movementType === 'CASH_IN' ? 'Cash In' : 'Cash Out'} of ₹${amountVal}`);
+    showToast(`Recorded ${movementType === 'CASH_IN' ? 'Cash In' : 'Cash Out'} of ₹${amountVal}`);
   };
 
   const handleCloseShiftSubmit = (e: React.FormEvent) => {
@@ -266,7 +266,7 @@ CARD SALES:        Rs. ${shiftCardSales}
 
     setCloseShiftModalOpen(false);
     setRefreshKey((k) => k + 1);
-    showToast(`✓ Shift closed successfully. Closing report sent to ${printer.name}`);
+    showToast(`Shift closed successfully. Closing report sent to ${printer.name}`);
   };
 
   const handlePrintShiftTicket = (shift: ShiftRecord) => {
@@ -303,7 +303,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       paperSize: printer.paperSize || '80mm'
     });
 
-    showToast(`✓ Dispatched shift audit ticket to ${printer.name}`);
+    showToast(`Dispatched shift audit ticket to ${printer.name}`);
   };
 
   const handleDownloadShiftPdf = (shift: ShiftRecord) => {
@@ -363,9 +363,9 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
       };
 
       PdfReportBuilder.downloadPdfFile(fullData, `JAMANVAAR_Shift_${shift.id}.pdf`, 'STATEMENT');
-      showToast('✓ Shift PDF Report downloaded');
+      showToast('Shift PDF Report downloaded');
     } catch {
-      showToast('⚠ Could not generate PDF');
+      showToast('Could not generate PDF');
     }
   };
 
@@ -714,7 +714,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                         ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-amber-100 text-amber-900'
                     }`}>
-                      {!hasVariance ? '✓ BALANCED' : `VARIANCE: ${formatINR(shift.cashVariance || 0)}`}
+                      {!hasVariance ? 'BALANCED' : `VARIANCE: ${formatINR(shift.cashVariance || 0)}`}
                     </span>
                   </div>
 
@@ -1093,7 +1093,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
                     <span className={`font-mono font-black text-xs ${
                       cashVariance === 0 ? 'text-emerald-700' : cashVariance > 0 ? 'text-blue-700' : 'text-rose-700'
                     }`}>
-                      {cashVariance === 0 ? '✓ MATCHED (₹0)' : cashVariance > 0 ? `+ ₹${cashVariance} (OVER)` : `- ₹${Math.abs(cashVariance)} (SHORT)`}
+                      {cashVariance === 0 ? 'MATCHED (₹0)' : cashVariance > 0 ? `+ ₹${cashVariance} (OVER)` : `- ₹${Math.abs(cashVariance)} (SHORT)`}
                     </span>
                   </div>
                 </div>

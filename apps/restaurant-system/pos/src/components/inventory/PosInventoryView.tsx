@@ -135,8 +135,8 @@ export const PosInventoryView: React.FC = () => {
 
     showToast(
       targetAvailability
-        ? `✓ "${item.name}" marked as AVAILABLE for billing.`
-        : `✓ "${item.name}" marked as UNAVAILABLE.`
+        ? `"${item.name}" marked as AVAILABLE for billing.`
+        : `"${item.name}" marked as UNAVAILABLE.`
     );
 
     setPendingItemAction(null);
@@ -155,7 +155,7 @@ export const PosInventoryView: React.FC = () => {
     );
 
     showToast(
-      `✓ Updated ${selectedItemIds.length} dishes to ${
+      `Updated ${selectedItemIds.length} dishes to ${
         bulkTargetAvailability ? 'AVAILABLE' : 'UNAVAILABLE'
       }.`
     );
@@ -189,7 +189,7 @@ export const PosInventoryView: React.FC = () => {
             <span>{toastMessage}</span>
           </div>
           <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white">
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -265,7 +265,7 @@ export const PosInventoryView: React.FC = () => {
               onClick={() => setSearch('')}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>

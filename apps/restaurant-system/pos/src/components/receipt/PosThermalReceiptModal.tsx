@@ -207,13 +207,13 @@ export const PosThermalReceiptModal: React.FC = () => {
         {/* Status Banners */}
         {shareToast && (
           <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs font-bold text-center border-t border-emerald-200">
-            ✓ {shareToast}
+            {shareToast}
           </div>
         )}
 
         {sendError && (
           <div className="p-2.5 bg-rose-50 text-rose-900 text-xs font-bold text-center border-t border-rose-200">
-            ⚠ {sendError}
+            {sendError}
           </div>
         )}
 
@@ -228,7 +228,7 @@ export const PosThermalReceiptModal: React.FC = () => {
           <div className="p-3 bg-rose-50 border-t border-rose-200 text-rose-900 text-xs flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 font-bold">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>⚠ Printer unavailable ({errorMessage || 'Check USB/LAN connection'})</span>
+              <span>Printer unavailable ({errorMessage || 'Check USB/LAN connection'})</span>
             </div>
             <div className="flex items-center gap-1.5">
               <button

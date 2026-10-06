@@ -16,8 +16,7 @@ import {
   CheckCircle2,
   Layers,
   Award,
-  Sparkles
-} from 'lucide-react';
+  Sparkles, CalendarDays } from 'lucide-react';
 
 interface PosReportDocumentProps {
   data: ReportFullData;
@@ -76,7 +75,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
           </div>
           <div className="text-left sm:text-right">
             <span className="text-xs font-mono font-bold bg-white border border-jaman-border px-3 py-1 rounded-xl inline-block shadow-2xs">
-              📅 {data.periodLabel}
+              <CalendarDays className="w-3 h-3 inline -mt-0.5 mr-1" />{data.periodLabel}
             </span>
             <span className="text-[10px] text-slate-400 block mt-1">
               Generated: {data.generatedAt}

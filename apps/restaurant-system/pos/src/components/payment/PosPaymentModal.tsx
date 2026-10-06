@@ -400,15 +400,15 @@ export const PosPaymentModal: React.FC = () => {
 
     if (totalAllocated !== totalPayable) {
       if (isUnderAllocated) {
-        setErrorMessage(`⚠ ₹${remainingDue} still remaining to be allocated.`);
+        setErrorMessage(`₹${remainingDue} still remaining to be allocated.`);
       } else {
-        setErrorMessage(`⚠ Allocation exceeds bill total by ₹${Number((totalAllocated - totalPayable).toFixed(2))}.`);
+        setErrorMessage(`Allocation exceeds bill total by ₹${Number((totalAllocated - totalPayable).toFixed(2))}.`);
       }
       return;
     }
 
     if (cashPortion > 0 && cashReceived < cashPortion) {
-      setErrorMessage(`⚠ Cash received (₹${cashReceived}) is less than cash due (₹${cashPortion}).`);
+      setErrorMessage(`Cash received (₹${cashReceived}) is less than cash due (₹${cashPortion}).`);
       return;
     }
 
@@ -426,7 +426,7 @@ export const PosPaymentModal: React.FC = () => {
     // using it unsupervised — same treatment as HIGH_DISCOUNT in PosDiscountModal.tsx.
     const usesHouseAccount = activeEntries.some(([channel]) => channel === 'HOUSE_ACCOUNT');
     if (usesHouseAccount && !selectedCustomer) {
-      setErrorMessage('⚠ House Account requires a customer to be attached first — use "Attach Customer" on the cart.');
+      setErrorMessage('House Account requires a customer to be attached first — use "Attach Customer" on the cart.');
       return;
     }
 
@@ -578,17 +578,17 @@ export const PosPaymentModal: React.FC = () => {
               {isFullyAllocated ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>✓ FULLY ALLOCATED ({formatINR(totalAllocated)} / {formatINR(totalPayable)})</span>
+                  <span>FULLY ALLOCATED ({formatINR(totalAllocated)} / {formatINR(totalPayable)})</span>
                 </>
               ) : isOverAllocated ? (
                 <>
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>⚠ EXCEEDS BILL BY {formatINR(totalAllocated - totalPayable)}</span>
+                  <span>EXCEEDS BILL BY {formatINR(totalAllocated - totalPayable)}</span>
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>⚠ REMAINING: {formatINR(remainingDue)}</span>
+                  <span>REMAINING: {formatINR(remainingDue)}</span>
                 </>
               )}
             </div>
@@ -709,7 +709,7 @@ export const PosPaymentModal: React.FC = () => {
 
                   <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between">
                     <span className="font-mono font-black text-xs text-jaman-saffron">
-                      {isSplitMode ? '⚡ Split Active' : 'Multi-Tender'}
+                      {isSplitMode ? 'Split Active' : 'Multi-Tender'}
                     </span>
                     {isSplitMode && (
                       <span className="text-[9px] font-extrabold text-indigo-700 bg-indigo-100 px-1.5 py-0.2 rounded-md uppercase">
@@ -748,7 +748,7 @@ export const PosPaymentModal: React.FC = () => {
                     className="px-2.5 py-1 bg-white border border-jaman-border hover:border-jaman-saffron rounded-lg text-xs font-bold text-jaman-navy flex items-center gap-1 shadow-2xs"
                   >
                     <Sparkles className="w-3 h-3 text-jaman-saffron" />
-                    <span>⚡ 50/50 Split</span>
+                    <span>50/50 Split</span>
                   </button>
                 </div>
 
@@ -878,7 +878,7 @@ export const PosPaymentModal: React.FC = () => {
                             upiConfirmed ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
                           }`}
                         >
-                          {upiConfirmed ? '✓ UPI Verified' : 'Mark UPI Paid'}
+                          {upiConfirmed ? 'UPI Verified' : 'Mark UPI Paid'}
                         </button>
                       </div>
                     )}
@@ -898,7 +898,7 @@ export const PosPaymentModal: React.FC = () => {
                             cardConfirmed ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
                           }`}
                         >
-                          {cardConfirmed ? '✓ Card Approved' : 'Mark Card Paid'}
+                          {cardConfirmed ? 'Card Approved' : 'Mark Card Paid'}
                         </button>
                       </div>
                     )}
@@ -1019,7 +1019,7 @@ export const PosPaymentModal: React.FC = () => {
                             : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
                         }`}
                       >
-                        {upiConfirmed ? '✓ UPI Verified' : 'Mark UPI Paid'}
+                        {upiConfirmed ? 'UPI Verified' : 'Mark UPI Paid'}
                       </button>
                     </div>
                   </div>
@@ -1045,7 +1045,7 @@ export const PosPaymentModal: React.FC = () => {
                             : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
                         }`}
                       >
-                        {cardConfirmed ? '✓ Card Approved' : 'Mark Card Paid'}
+                        {cardConfirmed ? 'Card Approved' : 'Mark Card Paid'}
                       </button>
                     </div>
                   </div>
@@ -1103,7 +1103,7 @@ export const PosPaymentModal: React.FC = () => {
                         className="w-4 h-4 rounded-full bg-emerald-200/80 hover:bg-rose-100 hover:text-rose-700 text-emerald-800 flex items-center justify-center text-[10px] cursor-pointer"
                         title="Remove discount"
                       >
-                        ✕
+                        <X className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

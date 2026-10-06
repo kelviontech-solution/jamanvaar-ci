@@ -1733,7 +1733,7 @@ export const usePosStore = create<PosState>((set, get) => {
           AuditRepository.log({
             action: 'INSTANT_BILL_CREATED',
             category: 'FINANCIAL',
-            details: `⚡ Instant Bill #${settled.orderNumber} settled via ${method} for ₹${settled.totalAmount} by ${state.currentUser?.fullName || 'Cashier'}`,
+            details: `Instant Bill #${settled.orderNumber} settled via ${method} for ₹${settled.totalAmount} by ${state.currentUser?.fullName || 'Cashier'}`,
             username: state.currentUser?.fullName || 'Cashier'
           });
 

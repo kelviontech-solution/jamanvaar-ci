@@ -131,7 +131,7 @@ export const PosSettingsView: React.FC = () => {
     if (pr) {
       pr.role = role;
       db.notify();
-      setTestPrintFeedback(`✓ Assigned "${pr.name}" to role: ${role} PRINTER`);
+      setTestPrintFeedback(`Assigned "${pr.name}" to role: ${role} PRINTER`);
       setTimeout(() => setTestPrintFeedback(''), 3000);
     }
   };
@@ -256,7 +256,7 @@ ESC/POS Command Engine Verified OK
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
-            <span>⚡ Instant Bill</span>
+            <span>Instant Bill</span>
           </button>
           <button
             onClick={() => setActiveSettingsTab('DATABASE')}
@@ -285,32 +285,32 @@ ESC/POS Command Engine Verified OK
       {/* Global Feedback Toasts */}
       {reportFeedback && (
         <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          ✓ {reportFeedback}
+          {reportFeedback}
         </div>
       )}
       {instantBillFeedback && (
         <div className="p-3 bg-amber-50 text-amber-900 text-xs font-bold rounded-2xl border border-amber-200 animate-in fade-in">
-          ✓ {instantBillFeedback}
+          {instantBillFeedback}
         </div>
       )}
       {testPrintFeedback && (
         <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          ✓ {testPrintFeedback}
+          {testPrintFeedback}
         </div>
       )}
       {syncFeedback && (
         <div className="p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-2xl border border-blue-200 animate-in fade-in">
-          ✓ {syncFeedback}
+          {syncFeedback}
         </div>
       )}
       {licenseFeedback && (
         <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          ✓ {licenseFeedback}
+          {licenseFeedback}
         </div>
       )}
       {licenseError && (
         <div className="p-3 bg-rose-50 text-rose-800 text-xs font-bold rounded-2xl border border-rose-200 animate-in fade-in">
-          ⚠ {licenseError}
+          {licenseError}
         </div>
       )}
 
@@ -382,7 +382,7 @@ ESC/POS Command Engine Verified OK
                           : 'bg-jaman-cream border-jaman-border text-slate-600 hover:bg-white hover:border-slate-400'
                       }`}
                     >
-                      {vol === 'LOW' ? '🔈 Low' : vol === 'MEDIUM' ? '🔉 Medium' : '🔊 High'}
+                      {vol === 'LOW' ? 'Low' : vol === 'MEDIUM' ? 'Medium' : 'High'}
                     </button>
                   ))}
                 </div>
@@ -556,7 +556,7 @@ ESC/POS Command Engine Verified OK
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-jaman-saffron" />
-                <h3 className="font-bold text-sm text-jaman-navy">⚡ Instant Bill / Quick Checkout</h3>
+                <h3 className="font-bold text-sm text-jaman-navy">Instant Bill / Quick Checkout</h3>
               </div>
               <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
                 1-TAP BILLING
@@ -763,7 +763,7 @@ ESC/POS Command Engine Verified OK
                 className="w-full py-2.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white font-black text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span>⚡ Test Instant Bill Print (Safe Simulation)</span>
+                <span>Test Instant Bill Print (Safe Simulation)</span>
               </button>
               <span className="text-[10px] text-slate-400 text-center block mt-1.5">
                 Safe hardware simulation: queues test ticket without creating real accounting invoices.
@@ -1055,7 +1055,7 @@ ESC/POS Command Engine Verified OK
                       {currentLicense.planName}
                     </h2>
                     <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                      ✓ {currentLicense.status}
+                      {currentLicense.status}
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1546,16 +1546,16 @@ ESC/POS Command Engine Verified OK
                   <div className="space-y-2">
                     <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-black text-emerald-900 flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>✓ EVERYTHING IN CORE IS INCLUDED (183 Base Features)</span>
+                      <span>EVERYTHING IN CORE IS INCLUDED (183 Base Features)</span>
                     </div>
 
                     <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 rounded-xl border border-amber-300 text-xs text-jaman-navy flex items-center justify-between gap-2 font-black">
                       <div className="flex items-center gap-1.5 text-jaman-saffron">
                         <Sparkles className="w-4 h-4 text-jaman-saffron shrink-0" />
-                        <span>⭐ ONLY ₹2,000 MORE THAN CORE</span>
+                        <span>ONLY ₹2,000 MORE THAN CORE</span>
                       </div>
                       <span className="text-[11px] font-bold text-jaman-saffron bg-white px-2.5 py-0.5 rounded-full shadow-2xs border border-amber-200">
-                        ⭐ RECOMMENDED • BEST VALUE
+                        RECOMMENDED • BEST VALUE
                       </span>
                     </div>
                   </div>
@@ -1564,7 +1564,7 @@ ESC/POS Command Engine Verified OK
                   <div className="space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase text-jaman-saffron tracking-wider block">
-                        ⭐ PRO CONNECTED MODULES (173 EXCLUSIVE CAPABILITIES):
+                        PRO CONNECTED MODULES (173 EXCLUSIVE CAPABILITIES):
                       </span>
                       <button
                         type="button"
@@ -1929,7 +1929,7 @@ ESC/POS Command Engine Verified OK
                     01
                   </div>
                   <strong className="text-xs font-black text-jaman-navy block">
-                    📱 SERVE FROM THE TABLE
+                    SERVE FROM THE TABLE
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
                     Wireless Captain App for waiters. Take orders table-side and fire KOT tickets directly to the kitchen.
@@ -1941,7 +1941,7 @@ ESC/POS Command Engine Verified OK
                     02
                   </div>
                   <strong className="text-xs font-black text-jaman-navy block">
-                    📲 LET CUSTOMERS ORDER
+                    LET CUSTOMERS ORDER
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
                     QR Table Ordering and Self-Service Kiosks. Increase average ticket size without hiring extra staff.
@@ -1953,7 +1953,7 @@ ESC/POS Command Engine Verified OK
                     03
                   </div>
                   <strong className="text-xs font-black text-jaman-navy block">
-                    ⚡ CONNECT FLOOR & KITCHEN
+                    CONNECT FLOOR & KITCHEN
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
                     POS ↔ Captain ↔ KDS real-time mesh sync. Zero miscommunication between waiters, kitchen, and billing.
@@ -1965,7 +1965,7 @@ ESC/POS Command Engine Verified OK
                     04
                   </div>
                   <strong className="text-xs font-black text-jaman-navy block">
-                    📊 RUN WITH INTELLIGENCE
+                    RUN WITH INTELLIGENCE
                   </strong>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
                     Advanced analytics, staff tracking, and JAMAN AI Assistant to answer sales and operational questions in seconds.
@@ -1995,23 +1995,23 @@ ESC/POS Command Engine Verified OK
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {[
-                      { cap: 'Counter POS & Fast Billing', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Payments, Multi-Tender & Split Bill', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Interactive Table Management & Floor Plan', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Kitchen KOT & Basic KDS Spooling', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Kitchen Inventory & Stock Alerts', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Daily Sales & Operational Reports', core: '✓ Included', pro: '✓ Included' },
-                      { cap: '100% Offline Local Engine', core: '✓ Included', pro: '✓ Included' },
-                      { cap: 'Wireless Captain App for Waiters', core: '—', pro: '✓ Full Captain Suite' },
-                      { cap: 'Table-Side QR Code Ordering', core: '—', pro: '✓ Included' },
-                      { cap: 'Self-Service Customer Touch Kiosk', core: '—', pro: '✓ Included' },
-                      { cap: 'Real-Time POS ↔ Captain ↔ KDS Mesh Sync', core: '—', pro: '✓ Instant Mesh Sync' },
-                      { cap: 'Advanced Multi-Station KDS', core: '—', pro: '✓ Station Routing' },
-                      { cap: 'Advanced Restaurant Analytics & Heatmaps', core: 'Basic', pro: '✓ Advanced Enterprise' },
-                      { cap: 'JAMAN AI Restaurant Assistant', core: 'Basic', pro: '✓ Full Conversational AI' },
-                      { cap: 'Customer CRM & Lifetime Value (LTV)', core: 'Basic', pro: '✓ Advanced Intelligence' },
-                      { cap: 'Smart Automation & Exception Alerts', core: 'Basic', pro: '✓ Real-Time Notifications' },
-                      { cap: 'Connected Multi-Device Health Monitoring', core: 'Basic', pro: '✓ Live 6-Node Mesh' }
+                      { cap: 'Counter POS & Fast Billing', core: 'Included', pro: 'Included' },
+                      { cap: 'Payments, Multi-Tender & Split Bill', core: 'Included', pro: 'Included' },
+                      { cap: 'Interactive Table Management & Floor Plan', core: 'Included', pro: 'Included' },
+                      { cap: 'Kitchen KOT & Basic KDS Spooling', core: 'Included', pro: 'Included' },
+                      { cap: 'Kitchen Inventory & Stock Alerts', core: 'Included', pro: 'Included' },
+                      { cap: 'Daily Sales & Operational Reports', core: 'Included', pro: 'Included' },
+                      { cap: '100% Offline Local Engine', core: 'Included', pro: 'Included' },
+                      { cap: 'Wireless Captain App for Waiters', core: '—', pro: 'Full Captain Suite' },
+                      { cap: 'Table-Side QR Code Ordering', core: '—', pro: 'Included' },
+                      { cap: 'Self-Service Customer Touch Kiosk', core: '—', pro: 'Included' },
+                      { cap: 'Real-Time POS ↔ Captain ↔ KDS Mesh Sync', core: '—', pro: 'Instant Mesh Sync' },
+                      { cap: 'Advanced Multi-Station KDS', core: '—', pro: 'Station Routing' },
+                      { cap: 'Advanced Restaurant Analytics & Heatmaps', core: 'Basic', pro: 'Advanced Enterprise' },
+                      { cap: 'JAMAN AI Restaurant Assistant', core: 'Basic', pro: 'Full Conversational AI' },
+                      { cap: 'Customer CRM & Lifetime Value (LTV)', core: 'Basic', pro: 'Advanced Intelligence' },
+                      { cap: 'Smart Automation & Exception Alerts', core: 'Basic', pro: 'Real-Time Notifications' },
+                      { cap: 'Connected Multi-Device Health Monitoring', core: 'Basic', pro: 'Live 6-Node Mesh' }
                     ].map((row, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/80">
                         <td className="py-2.5 px-3 font-bold text-jaman-navy">{row.cap}</td>

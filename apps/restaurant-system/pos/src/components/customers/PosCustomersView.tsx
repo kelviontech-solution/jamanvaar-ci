@@ -11,8 +11,7 @@ import {
   ShoppingBag,
   CheckCircle2,
   Calendar,
-  Sparkles
-} from 'lucide-react';
+  Sparkles, X } from 'lucide-react';
 
 export const PosCustomersView: React.FC = () => {
   const { setSelectedCustomer, setActiveTab } = usePosStore();
@@ -144,7 +143,7 @@ export const PosCustomersView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-jaman-navy">Register New Customer</h3>
               <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600">
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
