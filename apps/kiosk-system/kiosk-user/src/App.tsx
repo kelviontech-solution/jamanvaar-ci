@@ -1342,6 +1342,20 @@ export default function KioskUserApp() {
       return;
     }
 
+    await requestUpiPayment(pendingOrder);
+  };
+
+  /**
+   * B2-XXX: picking the "UPI QR Payment" tile on the CHECKOUT_PAYMENT screen only ever called
+   * setPaymentMethod('UPI') — a pure local state toggle with no network call. The QR was only
+   * ever requested once, automatically, inside handleProceedToPayment, at the moment the guest
+   * first reached this screen. A guest who arrived with Cash selected (or switched away from UPI
+   * and back) saw the UPI tile highlight normally but the QR panel stuck on the generic
+   * "Preparing…" message forever, with nothing happening server-side. createOrGetPaymentOrder is
+   * idempotent by the local order's id, so re-requesting here for an already-created order is
+   * safe — it returns the existing attempt rather than double-charging.
+   */
+  const requestUpiPayment = async (order: { id: string; totalAmount: number; items: Order['items'] }) => {
     const restaurantId = getKioskRestaurantId();
     if (!restaurantId) {
       setRazorpayUnavailable(true);
@@ -1355,7 +1369,7 @@ export default function KioskUserApp() {
     }));
 
     try {
-      const result = await createPaymentOrder(pendingOrder.id, lines);
+      const result = await createPaymentOrder(order.id, lines);
       setQuotedPayable(result.amount / 100);
       setRealPaymentId(result.paymentId);
       reconciliationDeadlineRef.current = Date.now() + 5 * 60 * 1000; // 5 minutes total from order creation
@@ -1367,14 +1381,14 @@ export default function KioskUserApp() {
       // reached the cloud before it reached this terminal's own local menu
       // cache (LAN sync lag) — the cloud amount is always the one actually
       // charged, so it wins.
-      const localAmountPaise = Math.round(pendingOrder.totalAmount * 100);
+      const localAmountPaise = Math.round(order.totalAmount * 100);
       if (result.quote) {
         const { cgst: cgstPaise, sgst: sgstPaise } = splitTaxPaise(result.quote.taxAmount);
-        OrderRepository.updateOrder(pendingOrder.id, {
+        OrderRepository.updateOrder(order.id, {
           subtotal: result.quote.subtotal / 100, taxAmount: result.quote.taxAmount / 100,
           cgstAmount: cgstPaise / 100, sgstAmount: sgstPaise / 100,
           totalAmount: result.amount / 100, discountAmount: 0, couponCode: undefined, roundOffAmount: 0,
-          items: pendingOrder.items.map((item, index) => {
+          items: order.items.map((item, index) => {
             const line = result.quote.lines[index];
             return line ? { ...item, unitPrice: line.unitPrice / 100, totalPrice: line.unitPrice * item.quantity / 100,
               snapshot: { taxGroupId: line.taxGroupId, taxRateBp: line.taxRate, taxInclusive: line.taxInclusive, lineTax: line.lineTax } } : item;
@@ -1396,7 +1410,7 @@ export default function KioskUserApp() {
 
       // Remember this payment on the terminal until its token/KOT are confirmed, so a crash or reload
       // between "customer paid" and "token printed" is recovered on the next start.
-      savePendingPayment({ paymentId: result.paymentId, localOrderId: pendingOrder.id, startedAt: Date.now() });
+      savePendingPayment({ paymentId: result.paymentId, localOrderId: order.id, startedAt: Date.now() });
       await showPaymentQr(result.paymentId);
     } catch (err) {
       // A 403 here means this restaurant's Razorpay connection isn't ACTIVE
@@ -3135,6 +3149,15 @@ export default function KioskUserApp() {
                 }
                 SoundService.playTap();
                 setPaymentMethod('UPI');
+                // No QR has ever been requested yet for this order (guest arrived with Cash
+                // selected, or switched away from UPI and back) -- without this, the tile just
+                // highlights and the QR panel is stuck on "Preparing…" forever. Safe to call even
+                // if a QR already exists/is loading: createOrGetPaymentOrder is idempotent by the
+                // local order's id, but skip the redundant call in that case anyway.
+                if (!realPaymentId && !qrLoading && localOrderIdForPayment) {
+                  const order = OrderRepository.getOrderById(localOrderIdForPayment);
+                  if (order) void requestUpiPayment(order);
+                }
               }}
               className={`p-6 rounded-3xl border-2 text-left space-y-4 transition-all duration-200 ${
                 paymentMethod === 'UPI'
