@@ -176,6 +176,28 @@ export type PosAdminTab =
   | 'COUPONS'
   | 'RECEIPTS';
 
+/** The real production tab list, as a runtime array -- restoreActiveTab validates against this
+ *  (not a hardcoded fixture), so a test can prove every actual tab round-trips, and the array
+ *  can't silently drift out of sync with the PosAdminTab type above (TS flags it if they diverge). */
+export const ALL_POS_ADMIN_TABS: readonly PosAdminTab[] = [
+  'DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS',
+  'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS',
+  'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT',
+  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS'
+];
+
+const ACTIVE_TAB_STORAGE_KEY = 'jamanvaar_pos_admin_active_tab';
+
+/**
+ * No client-side router exists in this app -- activeTab was a plain useState with no
+ * persistence, so refreshing the browser on ANY tab (not just Kiosk ones) always landed back on
+ * DASHBOARD. This restores whatever tab was last active, falling back to DASHBOARD for a
+ * genuinely first-ever visit or a stale value left over from a since-removed tab id.
+ */
+export function restoreActiveTab(stored: string | null): PosAdminTab {
+  return stored && (ALL_POS_ADMIN_TABS as readonly string[]).includes(stored) ? (stored as PosAdminTab) : 'DASHBOARD';
+}
+
 export default function PosAdminApp() {
   const ai = useAiAccess();
   // Check URL parameters for direct guest QR table ordering
@@ -186,7 +208,10 @@ export default function PosAdminApp() {
     return <LegacyGuestRedirect />;
   }
 
-  const [activeTab, setActiveTab] = useState<PosAdminTab>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<PosAdminTab>(() => restoreActiveTab(localStorage.getItem(ACTIVE_TAB_STORAGE_KEY)));
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, activeTab);
+  }, [activeTab]);
   const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
   const coupons = CouponRepository.getAllCoupons();
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
