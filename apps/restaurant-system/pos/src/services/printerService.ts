@@ -360,6 +360,11 @@ export class PosPrinterService {
     const queued = PrintQueueRepository.retryJob(jobId);
     if (!queued) return null;
     const printer = db.configuredPrinters.find((p) => p.id === queued.printerId) || this.getPrinterForRole('RECEIPT');
+    if (!printer) {
+      // A job that failed because no printer exists has no printerId to look up, so a retry used to hand
+      // `undefined` to the transport and surface "Cannot read properties of undefined (reading 'interfaceType')".
+      return PrintQueueRepository.updateJobStatus(queued.id, 'FAILED', 'No printer is configured. Add one in Restaurant Admin → Printers.') || queued;
+    }
     return this.dispatchAndFinalize(queued, printer, queued.rawPayload || queued.formattedText || '');
   }
 

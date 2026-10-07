@@ -3,7 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { db, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../../services/printerService';
 import { EBillService } from '@jamanvaar/api';
-import { sendReceipt } from '../../cloud/cloudClient';
+import { sendReceipt, whatsappReceipt } from '../../cloud/cloudClient';
 import { ThermalReceiptView } from '@jamanvaar/ui';
 import {
   X,
@@ -35,6 +35,7 @@ export const PosThermalReceiptModal: React.FC = () => {
   const [sendError, setSendError] = useState('');
   const [phonePromptOpen, setPhonePromptOpen] = useState(false);
   const [inputPhone, setInputPhone] = useState('');
+  const [isSendingDigital, setIsSendingDigital] = useState(false);
   const [pendingChannel, setPendingChannel] = useState<'WHATSAPP' | 'SMS'>('WHATSAPP');
   const hasInteracted = useRef(false);
 
@@ -95,8 +96,11 @@ export const PosThermalReceiptModal: React.FC = () => {
 
   const handleWhatsAppClick = () => {
     hasInteracted.current = true;
-    if (!order.customerPhone) {
+    // No number on the order, or one that isn't a real mobile number: ask the cashier for it
+    // (pre-filled) rather than firing a send that is bound to fail.
+    if (!order.customerPhone || !EBillService.validateIndianPhone(order.customerPhone)) {
       setPendingChannel('WHATSAPP');
+      setInputPhone(EBillService.sanitizePhoneInput(order.customerPhone ?? ''));
       setPhonePromptOpen(true);
     } else {
       dispatchDigitalReceipt('WHATSAPP', order.customerPhone);
@@ -105,16 +109,23 @@ export const PosThermalReceiptModal: React.FC = () => {
 
   const dispatchDigitalReceipt = async (channel: 'WHATSAPP' | 'SMS', targetPhone: string) => {
     hasInteracted.current = true;
+    if (isSendingDigital) return;
     if (!EBillService.validateIndianPhone(targetPhone)) {
       setSendError('Enter a valid 10-digit Indian mobile number');
       setTimeout(() => setSendError(''), 4000);
       return;
     }
     setPhonePromptOpen(false);
-    const res =
-      channel === 'WHATSAPP'
-        ? await EBillService.sendWhatsAppEBill(order, targetPhone, config, sendReceipt)
-        : await EBillService.sendSmsEBill(order, targetPhone, sendReceipt);
+    setIsSendingDigital(true);
+    let res;
+    try {
+      res =
+        channel === 'WHATSAPP'
+          ? await EBillService.sendWhatsAppBill(order, targetPhone, whatsappReceipt)
+          : await EBillService.sendSmsEBill(order, targetPhone, sendReceipt);
+    } finally {
+      setIsSendingDigital(false);
+    }
     ReceiptRepository.addRecord(res.record);
     if (res.success) {
       setShareToast(res.message);
@@ -261,14 +272,19 @@ export const PosThermalReceiptModal: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <input
                 type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                autoFocus
                 placeholder="10-digit mobile"
                 value={inputPhone}
-                onChange={(e) => setInputPhone(e.target.value)}
+                onChange={(e) => setInputPhone(EBillService.sanitizePhoneInput(e.target.value))}
+                onKeyDown={(e) => { if (e.key === 'Enter') dispatchDigitalReceipt(pendingChannel, inputPhone); }}
                 className="bg-jaman-deepNavy border border-jaman-darkBorder rounded-lg px-2 py-1 text-xs text-white w-36 font-mono focus:outline-hidden focus:border-jaman-saffron"
               />
               <button
                 onClick={() => dispatchDigitalReceipt(pendingChannel, inputPhone)}
-                className="px-3 py-1 bg-jaman-saffron text-white rounded-lg font-bold text-xs"
+                disabled={isSendingDigital || !EBillService.validateIndianPhone(inputPhone)}
+                className="px-3 py-1 bg-jaman-saffron text-white rounded-lg font-bold text-xs disabled:opacity-50"
               >
                 Send
               </button>

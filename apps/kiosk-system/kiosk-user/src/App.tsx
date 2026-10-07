@@ -28,6 +28,7 @@ import {
   getPaymentOrderStatus,
   sendReceipt,
   emailReceipt,
+  whatsappReceipt,
   pushOrderSync,
   pullOrderSync,
   reportHeartbeat, reportCustomerAiQuery,
@@ -581,6 +582,10 @@ export default function KioskUserApp() {
   const [eBillSuccessMessage, setEBillSuccessMessage] = useState<string | null>(null);
   const [eBillError, setEBillError] = useState<string | null>(null);
   const [eBillSending, setEBillSending] = useState(false);
+  const [isWhatsAppBillModalOpen, setIsWhatsAppBillModalOpen] = useState(false);
+  const [whatsAppBillPhone, setWhatsAppBillPhone] = useState('');
+  const [isSendingWhatsAppBill, setIsSendingWhatsAppBill] = useState(false);
+  const [whatsAppBillError, setWhatsAppBillError] = useState<string | null>(null);
 
   // Modals for Extra Features
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
@@ -933,6 +938,9 @@ export default function KioskUserApp() {
     setEBillEmailInput('');
     setIsChatbotOpen(false);
     setIsEBillModalOpen(false);
+    setIsWhatsAppBillModalOpen(false);
+    setWhatsAppBillPhone('');
+    setWhatsAppBillError(null);
     setEBillSuccessMessage(null);
     setChatMessages([
       {
@@ -1666,6 +1674,29 @@ export default function KioskUserApp() {
       }
     } finally {
       setEBillSending(false);
+    }
+  };
+
+  // Send the bill to the guest's WhatsApp. The server builds it from the real order and sends it from
+  // the restaurant's own WhatsApp number — the guest only types a mobile number.
+  const handleDispatchWhatsAppBill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!placedOrder || isSendingWhatsAppBill) return;
+    setWhatsAppBillError(null);
+    setIsSendingWhatsAppBill(true);
+    try {
+      const res = await EBillService.sendWhatsAppBill(placedOrder, whatsAppBillPhone, whatsappReceipt);
+      ReceiptRepository.addRecord(res.record);
+      if (res.success) {
+        setEBillSuccessMessage(res.message);
+        showToast(res.message);
+        setIsWhatsAppBillModalOpen(false);
+        setWhatsAppBillPhone('');
+      } else {
+        setWhatsAppBillError(res.message);
+      }
+    } finally {
+      setIsSendingWhatsAppBill(false);
     }
   };
 
@@ -3372,7 +3403,7 @@ export default function KioskUserApp() {
             {/* GET THE BILL */}
             <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-5 sm:p-6 space-y-4">
               <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy text-center">{kioskCopy('screen_digital_delivery_e_bill_options_91fcfc', 'Get your bill')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <button
                   type="button"
                   onClick={async () => {
@@ -3394,6 +3425,12 @@ export default function KioskUserApp() {
                   <button type="button" onClick={() => { setEBillError(null); setIsEBillModalOpen(true); }} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
                     <Mail className="w-7 h-7 text-emerald-600" />
                     <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_email_bill_64ee94', 'Email Bill')}</span>
+                  </button>
+                )}
+                {receiptConfig.enableWhatsApp && (
+                  <button type="button" onClick={() => { setWhatsAppBillError(null); setIsWhatsAppBillModalOpen(true); }} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-green-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                    <MessageCircle className="w-7 h-7 text-green-600" />
+                    <span className="text-sm font-bold text-jaman-navy">WhatsApp Bill</span>
                   </button>
                 )}
                 {receiptConfig.enableQrReceipt && (
@@ -3491,6 +3528,41 @@ export default function KioskUserApp() {
             <Button variant="ghost" type="button" disabled={eBillSending} onClick={() => setIsEBillModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
             <Button variant="accent" type="submit" disabled={eBillSending} leftIcon={<Send className="w-3.5 h-3.5" />}>
               {eBillSending ? 'Sending…' : kioskCopy("screen_email_my_bill_dd97a2", "Email My Bill")}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* MODAL: WHATSAPP BILL */}
+      <Modal
+        isOpen={isWhatsAppBillModalOpen}
+        onClose={() => setIsWhatsAppBillModalOpen(false)}
+        title="Get Your Bill on WhatsApp"
+      >
+        <form onSubmit={handleDispatchWhatsAppBill} className="space-y-4 py-2">
+          <p className="text-xs text-[#4A5568]">Enter your mobile number and we will send your bill to your WhatsApp right away.</p>
+          <div>
+            <label className="block text-xs font-bold text-jaman-navy mb-1">WhatsApp Number</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-jaman-navy bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2">+91</span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                autoComplete="off"
+                required
+                maxLength={10}
+                value={whatsAppBillPhone}
+                onChange={(e) => setWhatsAppBillPhone(EBillService.sanitizePhoneInput(e.target.value))}
+                placeholder="98765 43210"
+                className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+              />
+            </div>
+          </div>
+          {whatsAppBillError && <p role="alert" className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{whatsAppBillError}</p>}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="ghost" type="button" onClick={() => setIsWhatsAppBillModalOpen(false)}>Cancel</Button>
+            <Button variant="accent" type="submit" disabled={isSendingWhatsAppBill || !/^[6-9]\d{9}$/.test(whatsAppBillPhone)} leftIcon={<Send className="w-3.5 h-3.5" />}>
+              {isSendingWhatsAppBill ? 'Sending…' : 'Send Bill'}
             </Button>
           </div>
         </form>

@@ -121,5 +121,11 @@ describe('POS Thermal Print Queue & Hardware HAL Tests', () => {
     expect(receipt.errorMessage).toMatch(/no printer/i);
     const slip = await PosPrinterService.printTestSlip('nope');
     expect(slip.status).toBe('FAILED');
+
+    // Retry Print on that failed job must repeat the real reason, not a raw TypeError about `interfaceType`.
+    const retried = await PosPrinterService.retryJob(receipt.id);
+    expect(retried?.status).toBe('FAILED');
+    expect(retried?.errorMessage).toMatch(/no printer/i);
+    expect(retried?.errorMessage).not.toMatch(/interfaceType/);
   });
 });
