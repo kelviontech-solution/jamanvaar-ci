@@ -190,6 +190,60 @@ export class EBillService {
     };
   }
 
+  /** Keep only digits, at most 10 — used by every phone input so letters can never be typed or pasted in. */
+  public static sanitizePhoneInput(raw: string): string {
+    let digits = raw.replace(/\D/g, '');
+    if (digits.length > 10 && digits.startsWith('91')) digits = digits.slice(2);
+    return digits.slice(0, 10);
+  }
+
+  /**
+   * WhatsApp bill: the server builds the bill from its own order rows and sends it from the
+   * restaurant's connected WhatsApp number — `sendFn` is the app's device-authed call to
+   * cloud/api's POST /api/v1/receipts/whatsapp.
+   */
+  public static async sendWhatsAppBill(
+    order: Order,
+    phoneNumber: string,
+    sendFn: (orderId: string, phone: string) => Promise<{ success: boolean; errorMessage?: string }>,
+    retryDelayMs = 2500
+  ): Promise<{ success: boolean; record: ReceiptRecord; message: string }> {
+    const phone = this.sanitizePhoneInput(phoneNumber);
+    const base = { orderId: order.id, orderNumber: order.orderNumber, tokenNumber: order.tokenNumber, deliveryMethod: 'WHATSAPP' as const, content: '' };
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      const message = 'Enter a valid 10-digit mobile number';
+      return { success: false, message, record: { ...base, id: `rec-err-${Date.now()}`, deliveryStatus: 'FAILED', recipient: phoneNumber, createdAt: new Date().toISOString(), errorMessage: message } };
+    }
+
+    const masked = this.maskRecipient(phone);
+    // A bill requested seconds after the order was placed can beat the order's sync to the cloud (404). Give the
+    // sync a few seconds rather than telling a customer to retry by hand; any other failure is reported as-is.
+    let result: { success: boolean; errorMessage?: string } = { success: false };
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        result = await sendFn(order.id, phone);
+        break;
+      } catch (err: any) {
+        result = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
+        if (err?.status !== 404 || attempt === 3) break;
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
+    }
+
+    order.eBillMethod = 'WHATSAPP';
+    order.eBillRecipient = masked;
+    if (!result.success) {
+      order.eBillStatus = 'FAILED';
+      db.notify();
+      const reason = result.errorMessage || 'send failed';
+      return { success: false, message: `WhatsApp bill not sent — ${reason}`, record: { ...base, id: `rec-err-${Date.now()}`, deliveryStatus: 'FAILED', recipient: masked, createdAt: new Date().toISOString(), errorMessage: reason } };
+    }
+    order.eBillStatus = 'SENT';
+    db.notify();
+    const now = new Date().toISOString();
+    return { success: true, message: `Bill sent on WhatsApp to ${masked}`, record: { ...base, id: `rec-${Date.now()}`, deliveryStatus: 'SENT', recipient: masked, createdAt: now, sentAt: now } };
+  }
+
   /**
    * Email the real bill as a PDF, generated and sent entirely server-side from the restaurant's
    * own order/payment rows — `sendFn` is the app's device-authed call to cloud/api's POST

@@ -128,3 +128,60 @@ describe('EBillService', () => {
     expect(res.record.errorMessage).toBe('DLT template mismatch');
   });
 });
+
+describe('EBillService WhatsApp bill (server-built)', () => {
+  it('sanitizePhoneInput keeps digits only, max 10, and drops a pasted +91 prefix', () => {
+    expect(EBillService.sanitizePhoneInput('kje5465')).toBe('5465');
+    expect(EBillService.sanitizePhoneInput('98a76-54 32 10x')).toBe('9876543210');
+    expect(EBillService.sanitizePhoneInput('+91 98765 43210')).toBe('9876543210');
+    expect(EBillService.sanitizePhoneInput('98765432109999')).toBe('9876543210');
+  });
+
+  it('sends the order id and clean number, and records a SENT bill', async () => {
+    const order = { ...mockOrder };
+    const sendFn = vi.fn().mockResolvedValue({ success: true });
+    const res = await EBillService.sendWhatsAppBill(order, '+91 98765 43210', sendFn);
+    expect(sendFn).toHaveBeenCalledWith('ord-test-1', '9876543210');
+    expect(res.success).toBe(true);
+    expect(res.record.deliveryStatus).toBe('SENT');
+    expect(res.record.recipient).toBe('******3210');
+    expect(order.eBillStatus).toBe('SENT');
+  });
+
+  it('never calls the server for a letters-only or non-mobile number', async () => {
+    const sendFn = vi.fn();
+    for (const bad of ['kje5465', '12345', '5876543210', '']) {
+      const res = await EBillService.sendWhatsAppBill({ ...mockOrder }, bad, sendFn);
+      expect(res.success).toBe(false);
+    }
+    expect(sendFn).not.toHaveBeenCalled();
+  });
+
+  it('waits for an order that has not synced yet (404) and then succeeds, without bothering the customer', async () => {
+    const notSynced = Object.assign(new Error('Order not found'), { status: 404 });
+    const sendFn = vi.fn().mockRejectedValueOnce(notSynced).mockRejectedValueOnce(notSynced).mockResolvedValue({ success: true });
+    const res = await EBillService.sendWhatsAppBill({ ...mockOrder }, '9876543210', sendFn, 1);
+    expect(sendFn).toHaveBeenCalledTimes(3);
+    expect(res.success).toBe(true);
+  });
+
+  it('gives up after a few tries if the order never syncs, and does not retry other errors', async () => {
+    const notSynced = Object.assign(new Error('Order not found'), { status: 404 });
+    const never = vi.fn().mockRejectedValue(notSynced);
+    expect((await EBillService.sendWhatsAppBill({ ...mockOrder }, '9876543210', never, 1)).success).toBe(false);
+    expect(never).toHaveBeenCalledTimes(4);
+    const serverError = vi.fn().mockRejectedValue(Object.assign(new Error('boom'), { status: 503 }));
+    await EBillService.sendWhatsAppBill({ ...mockOrder }, '9876543210', serverError, 1);
+    expect(serverError).toHaveBeenCalledTimes(1);
+  });
+
+  it('surfaces the WhatsApp service failure reason, and a thrown network error', async () => {
+    const refused = await EBillService.sendWhatsAppBill({ ...mockOrder }, '9876543210', vi.fn().mockResolvedValue({ success: false, errorMessage: 'no template' }));
+    expect(refused.success).toBe(false);
+    expect(refused.message).toContain('no template');
+    const thrown = await EBillService.sendWhatsAppBill({ ...mockOrder }, '9876543210', vi.fn().mockRejectedValue(new Error('offline')));
+    expect(thrown.success).toBe(false);
+    expect(thrown.record.deliveryStatus).toBe('FAILED');
+    expect(thrown.message).toContain('offline');
+  });
+});

@@ -428,6 +428,23 @@ export async function emailReceipt(orderId: string, email: string): Promise<{ su
   return data;
 }
 
+/**
+ * Sends the guest/customer their real bill on WhatsApp. The server builds the bill from its own
+ * order rows (never from text sent here) and the restaurant's connected WhatsApp number sends it.
+ * `errorMessage` carries the reason when WhatsApp itself refused; HTTP errors throw.
+ */
+export async function whatsappReceipt(orderId: string, phone: string): Promise<{ success: boolean; errorMessage?: string }> {
+  const res = await deviceFetch('/api/v1/receipts/whatsapp', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, phone })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Sending the bill on WhatsApp failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
 /** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
 export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
   const res = await deviceFetch('/api/v1/sync/number-leases', { method: 'POST', body: JSON.stringify({ kind, count }) });

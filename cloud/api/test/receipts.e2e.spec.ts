@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { NotificationGatewayService } from '../src/modules/notifications/notification-gateway.service';
@@ -287,6 +287,116 @@ describe('Receipt e-bill delivery', () => {
     it('no device token at all is rejected 401', async () => {
       const res = await request(app.getHttpServer()).post('/api/v1/receipts/email').send({ orderId: paidOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(401);
+    });
+  });
+
+  describe('WhatsApp bill (via the WhatsApp service)', () => {
+    let fetchSpy: MockInstance<typeof fetch>;
+    const waSecret = 'dev-only-jamanvaar-whatsapp-shared-secret-change-in-prod';
+
+    beforeEach(() => {
+      process.env.WHATSAPP_CONNECTOR_BASE_URL = 'http://wa.test';
+      process.env.JAMANVAAR_SERVICE_SECRET = waSecret;
+      // Only the outbound call to the WhatsApp service is faked; supertest's own traffic goes via http, not global fetch.
+      fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ success: true, via: 'text' }), { status: 200 }));
+    });
+
+    afterAll(() => fetchSpy?.mockRestore());
+
+    const send = (token: string, orderId: string, phone: string) => authed('post', '/api/v1/receipts/whatsapp', token).send({ orderId, phone });
+
+    it('sends a cash-at-counter bill, built server-side from the real order, signed for the WhatsApp service', async () => {
+      const res = await send(posToken, cashOrderId, '+91 98765 43210');
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual({ success: true });
+      const [url, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('http://wa.test/api/v1/webhooks/jamanvaar/send-bill');
+      const body = JSON.parse(init.body as string);
+      expect(body.restaurantId).toBe(restaurantId);
+      expect(body.phone).toBe('9876543210');
+      expect(body.billText).toContain('Masala Dosa');
+      expect(body.billText).toContain('₹157.50'); // 15750 paise
+      expect(body.templateParams[2]).toBe('₹157.50');
+      const headers = init.headers as Record<string, string>;
+      const { createHash, createHmac } = await import('crypto');
+      const expected = createHmac('sha256', waSecret)
+        .update(`POST\n/api/v1/webhooks/jamanvaar/send-bill\n${headers['X-Timestamp']}\n${createHash('sha256').update(init.body as string).digest('hex')}`)
+        .digest('hex');
+      expect(headers['X-Signature']).toBe(expected);
+    });
+
+    it('sends a bill for a paid online order from the kiosk', async () => {
+      const res = await send(kioskToken, paidOrderId, '9876543210');
+      expect(res.status).toBe(201);
+      expect(JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string).billText).toContain('Paneer Tikka');
+    });
+
+    it('rejects letters / short / non-Indian numbers before calling anything', async () => {
+      for (const phone of ['kje5465', '12345', '5876543210', '98765abcde']) {
+        expect((await send(kioskToken, cashOrderId, phone)).status).toBe(400);
+      }
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('passes the WhatsApp service\'s own failure reason back instead of a 500', async () => {
+      fetchSpy.mockResolvedValueOnce(new Response(JSON.stringify({ success: false, errorMessage: 'no template' }), { status: 200 }));
+      const res = await send(kioskToken, cashOrderId, '9876543210');
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual({ success: false, errorMessage: 'no template' });
+    });
+
+    it('503s when the WhatsApp service is unreachable', async () => {
+      fetchSpy.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+      expect((await send(kioskToken, cashOrderId, '9876543210')).status).toBe(503);
+    });
+
+    it('refuses when the restaurant has switched WhatsApp bills off, and works again when switched back on', async () => {
+      const kioskDevice = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findFirst({ where: { restaurantId, type: 'KIOSK' } }));
+      const branch = kioskDevice!.branchId!;
+      const externalId = `kiosk-config-${branch}`;
+      const config = (enableWhatsApp: boolean, branchId?: string) => ({
+        branchId,
+        updatedAt: new Date().toISOString(),
+        display: { enabledLanguages: ['en'], defaultLanguage: 'en', idleWarningAfterSeconds: 30, idleResetCountdownSeconds: 10 },
+        welcome: { showHeritageArtwork: false, showPromoBanner: false },
+        receipt: {
+          restaurantName: 'R', address: 'A', phone: '1', gstin: 'G', fssaiNumber: 'F', footerMessage: 'f', thankYouMessage: 't', paperSize: '80mm',
+          showCustomerPhone: true, showTaxBreakup: true, showTokenBig: true, enableWhatsApp, enableSms: true, enableEmail: true, enableQrReceipt: true
+        }
+      });
+      const save = (enableWhatsApp: boolean) =>
+        prisma.runAsTenant(restaurantId, (tx) =>
+          tx.syncedEntity.upsert({
+            where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'KIOSK_CONFIGURATION', externalId } },
+            create: { restaurantId, entityType: 'KIOSK_CONFIGURATION', externalId, payload: config(enableWhatsApp, branch) },
+            update: { payload: config(enableWhatsApp, branch) }
+          })
+        );
+      try {
+        await save(false);
+        const off = await send(kioskToken, cashOrderId, '9876543210');
+        expect(off.status).toBe(400);
+        expect(off.body.message).toMatch(/turned off/i);
+        expect(fetchSpy).not.toHaveBeenCalled();
+        await save(true);
+        expect((await send(kioskToken, cashOrderId, '9876543210')).status).toBe(201);
+      } finally {
+        await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'KIOSK_CONFIGURATION' } }));
+      }
+    });
+
+    it('a customer asking for the same bill twice just gets it twice (idempotent, no state change)', async () => {
+      expect((await send(kioskToken, cashOrderId, '9876543210')).status).toBe(201);
+      expect((await send(kioskToken, cashOrderId, '9876543210')).status).toBe(201);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('refuses unpaid online orders and cancelled cash orders, unknown orders 404, KDS 403', async () => {
+      expect((await send(kioskToken, pendingOrderId, '9876543210')).status).toBe(400);
+      expect((await send(kioskToken, cancelledCashOrderId, '9876543210')).status).toBe(400);
+      expect((await send(kioskToken, 'no-such-order', '9876543210')).status).toBe(404);
+      expect((await send(kdsToken, cashOrderId, '9876543210')).status).toBe(403);
+      expect(fetchSpy).not.toHaveBeenCalled();
     });
   });
 });

@@ -2,7 +2,8 @@ import { Body, Controller, ForbiddenException, Post, UseGuards, UsePipes } from 
 import { Device } from '@prisma/client';
 import { NotificationGatewayService } from './notification-gateway.service';
 import { ReceiptEmailService } from './receipt-email.service';
-import { sendReceiptSchema, SendReceiptDto, emailReceiptSchema, EmailReceiptDto } from './dto/send-receipt.dto';
+import { ReceiptWhatsAppService } from './receipt-whatsapp.service';
+import { sendReceiptSchema, SendReceiptDto, emailReceiptSchema, EmailReceiptDto, whatsappReceiptSchema, WhatsappReceiptDto } from './dto/send-receipt.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
@@ -14,7 +15,8 @@ const RECEIPT_SENDER_DEVICE_TYPES = ['KIOSK', 'KIOSK_ADMIN', 'POS', 'POS_ADMIN']
 export class ReceiptsController {
   constructor(
     private readonly notifications: NotificationGatewayService,
-    private readonly receiptEmail: ReceiptEmailService
+    private readonly receiptEmail: ReceiptEmailService,
+    private readonly receiptWhatsApp: ReceiptWhatsAppService
   ) {}
 
   @Post('send')
@@ -36,5 +38,14 @@ export class ReceiptsController {
       throw new ForbiddenException('This device type cannot send receipts');
     }
     return this.receiptEmail.sendBillEmail(device.restaurantId, body.orderId, body.email, device.branchId);
+  }
+
+  @Post('whatsapp')
+  @UsePipes(new ZodValidationPipe(whatsappReceiptSchema))
+  async whatsapp(@Body() body: WhatsappReceiptDto, @CurrentDevice() device: Device) {
+    if (!RECEIPT_SENDER_DEVICE_TYPES.includes(device.type)) {
+      throw new ForbiddenException('This device type cannot send receipts');
+    }
+    return this.receiptWhatsApp.sendBillWhatsApp(device.restaurantId, body.orderId, body.phone, device.branchId);
   }
 }

@@ -17,3 +17,11 @@ export const emailReceiptSchema = z.object({
 });
 
 export type EmailReceiptDto = z.infer<typeof emailReceiptSchema>;
+
+export const whatsappReceiptSchema = z.object({
+  orderId: z.string().min(1),
+  // Digits only (optionally +91 / 91 prefix, spaces or dashes); anything with letters is refused.
+  phone: z.string().trim().regex(/^(\+?91[\s-]?)?[6-9][\d\s-]{9,12}$/, 'Enter a valid 10-digit Indian mobile number')
+});
+
+export type WhatsappReceiptDto = z.infer<typeof whatsappReceiptSchema>;

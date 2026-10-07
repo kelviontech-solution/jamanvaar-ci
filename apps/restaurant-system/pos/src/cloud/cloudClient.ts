@@ -159,6 +159,23 @@ export async function sendReceipt(
   return data;
 }
 
+/**
+ * Sends the guest/customer their real bill on WhatsApp. The server builds the bill from its own
+ * order rows (never from text sent here) and the restaurant's connected WhatsApp number sends it.
+ * `errorMessage` carries the reason when WhatsApp itself refused; HTTP errors throw.
+ */
+export async function whatsappReceipt(orderId: string, phone: string): Promise<{ success: boolean; errorMessage?: string }> {
+  const res = await deviceFetch('/api/v1/receipts/whatsapp', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, phone })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    throw new CloudApiError(data?.message ?? `Sending the bill on WhatsApp failed (${res.status})`, res.status);
+  }
+  return data;
+}
+
 /** Tell the cloud a JAMAN AI question was answered (usage + measured latency) and honour its daily limit. */
 export async function reportAiQueryNow(intent: string, latencyMs: number): Promise<void> {
   const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
