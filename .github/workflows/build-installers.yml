@@ -82,3 +82,65 @@ jobs:
           name: ${{ matrix.app.name }}-installer
           path: ${{ matrix.app.path }}/src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
+
+  build-android:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - name: POS
+            path: apps/restaurant-system/pos
+          - name: RestaurantAdmin
+            path: apps/restaurant-system/pos-admin
+          - name: Kiosk
+            path: apps/kiosk-system/kiosk-user
+          - name: Captain
+            path: apps/restaurant-system/captain
+          - name: KDS
+            path: apps/restaurant-system/kds
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager --install "ndk;27.0.12077973"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Build frontend (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: npm run build
+
+      - name: Init Android project (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
+        run: npx --yes "@tauri-apps/cli@2.11.4" android init
+
+      - name: Build Android APK (${{ matrix.app.name }}, debug-signed)
+        working-directory: ${{ matrix.app.path }}
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
+        run: npx --yes "@tauri-apps/cli@2.11.4" android build --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app.name }}-apk
+          path: ${{ matrix.app.path }}/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error

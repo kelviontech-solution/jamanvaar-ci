@@ -5,6 +5,10 @@ description = "JAMANVAAR Self-Ordering Kiosk Desktop Application"
 authors = ["Kelviontech Systems <info@kelviontech.com>"]
 edition = "2021"
 
+[lib]
+name = "jamanvaar_kiosk_user_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2.0.0", features = [] }
 
