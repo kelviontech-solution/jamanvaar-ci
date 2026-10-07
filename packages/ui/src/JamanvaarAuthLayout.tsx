@@ -363,6 +363,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 <strong className={dark ? 'text-rose-400 font-extrabold' : 'text-rose-700 font-extrabold'}>Unreachable</strong>
               ) : appIdentity !== 'SUPER_ADMIN' && isLocalCoreUnauthorized ? (
                 <strong className={dark ? 'text-amber-400 font-extrabold' : 'text-amber-700 font-extrabold'}>Not paired (cloud sync in use)</strong>
+              ) : isLocalCoreConnected === false && !healthCheckUrl ? (
+                <strong className="text-slate-700 font-extrabold">Not set up (cloud sync in use)</strong>
               ) : isLocalCoreConnected === false ? (
                 <strong className="text-amber-700 font-extrabold">Connecting (cloud sync in use)</strong>
               ) : (

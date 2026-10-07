@@ -287,7 +287,7 @@ export const App: React.FC = () => {
           isLocalCoreConnected={captainDb.isLocalCoreConnected()}
           localCoreUrl={captainDb.getSyncServerUrl()}
           onPairLocalCore={(pin, url) => captainDb.pairLocalCore(pin, url)}
-          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
+          healthCheckUrl={captainDb.localCoreHealthUrl()}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."
@@ -361,7 +361,7 @@ export const App: React.FC = () => {
           isLocalCoreConnected={captainDb.isLocalCoreConnected()}
           localCoreUrl={captainDb.getSyncServerUrl()}
           onPairLocalCore={(pin, url) => captainDb.pairLocalCore(pin, url)}
-          healthCheckUrl={`${captainDb.getSyncServerUrl()}/api/health`}
+          healthCheckUrl={captainDb.localCoreHealthUrl()}
           heroHeadline="Touch-First Restaurant Floor Command"
           heroHighlightWord="Instant KOT"
           heroDescription="Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency."

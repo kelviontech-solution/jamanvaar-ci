@@ -656,6 +656,11 @@ export class JamanvaarDatabase {
     return 'http://localhost:5178';
   }
 
+  /** Health address of this app's Local Core, or undefined when no Local Core is set up here (cloud sync is used alone). */
+  public localCoreHealthUrl(): string | undefined {
+    return this.legacySyncEnabled() ? `${this.getSyncServerUrl()}/api/health` : undefined;
+  }
+
   public setSyncServerUrl(url: string): void {
     const cleanUrl = url.trim().replace(/\/+$/, '');
     this.customSyncServerUrl = cleanUrl;

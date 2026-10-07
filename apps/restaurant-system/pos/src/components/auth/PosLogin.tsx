@@ -83,7 +83,7 @@ export const PosLogin: React.FC = () => {
           isLocalCoreConnected={db.isLocalCoreConnected()}
           localCoreUrl={db.getSyncServerUrl()}
           onPairLocalCore={(pin, url) => db.pairLocalCore(pin, url)}
-      healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
+      healthCheckUrl={db.localCoreHealthUrl()}
       heroHeadline="Smart Billing."
       heroHighlightWord="Better Dining."
       heroDescription="Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants."

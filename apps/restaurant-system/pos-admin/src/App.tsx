@@ -754,7 +754,7 @@ export default function PosAdminApp() {
           isLocalCoreConnected={db.isLocalCoreConnected()}
           localCoreUrl={db.getSyncServerUrl()}
           onPairLocalCore={(pin, url) => db.pairLocalCore(pin, url)}
-          healthCheckUrl={`${db.getSyncServerUrl()}/api/health`}
+          healthCheckUrl={db.localCoreHealthUrl()}
           heroHeadline="Restaurant Control."
           heroHighlightWord="Live Intelligence."
           heroDescription="Sign in once. Open the apps included in your plan, with a separate workspace for each."

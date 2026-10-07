@@ -681,7 +681,7 @@ export const App: React.FC = () => {
           isLocalCoreConnected={kdsDb.isLocalCoreConnected()}
           localCoreUrl={kdsDb.getSyncServerUrl()}
           onPairLocalCore={(pin, url) => kdsDb.pairLocalCore(pin, url)}
-          healthCheckUrl={`${kdsDb.getSyncServerUrl()}/api/health`}
+          healthCheckUrl={kdsDb.localCoreHealthUrl()}
           heroHeadline="Real-Time Kitchen Production Command"
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."
