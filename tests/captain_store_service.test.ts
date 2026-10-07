@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, StaffRepository, KOTRepository, OrderRepository, ServiceMessages } from '@jamanvaar/database';
+import { db, StaffRepository, KOTRepository, OrderRepository, ServiceMessages, CustomerRepository } from '@jamanvaar/database';
 import { useCaptainStore, guestCountOptions, selectMyTables } from '../apps/restaurant-system/captain/src/store/captainStore';
 
 /**
@@ -366,6 +366,64 @@ describe('Captain service workflow', () => {
       expect(requests[0]).toMatchObject({ tableNumber: '5', type: 'HELP', notes: 'A guest at Table 5 asked for help.', isResolved: false });
       expect(store().messages.some((m) => m.id === 'svc-call-1')).toBe(false);
       expect(store().notifications.some((n) => n.type === 'GUEST_HELP' && n.message.includes('Table 5'))).toBe(true);
+    });
+  });
+
+  describe('attaching a guest reaches the real order and the CRM (SaaS flow: Restaurant Admin loyalty program, on the floor)', () => {
+    it('attaching a guest before the first KOT puts their phone on the order the moment it is created', async () => {
+      await signIn();
+      store().openTable('1', 2);
+      const priya = CustomerRepository.getOrCreateAccount('9000000010', 'Priya');
+      store().setAttachedCustomer(priya);
+      addDish(0, 1);
+      store().sendKOT();
+
+      const order = OrderRepository.getOrderById(table('1').currentOrderId!)!;
+      expect(order.customerPhone).toBe('9000000010');
+      expect(order.customerName).toBe('Priya');
+    });
+
+    it('attaching a guest to a table that already has a running order updates that order immediately', async () => {
+      await signIn();
+      store().openTable('1', 2);
+      addDish(0, 1);
+      store().sendKOT();
+      const orderId = table('1').currentOrderId!;
+      expect(OrderRepository.getOrderById(orderId)!.customerPhone).toBeUndefined();
+
+      const raj = CustomerRepository.getOrCreateAccount('9000000011', 'Raj');
+      store().setAttachedCustomer(raj);
+
+      expect(OrderRepository.getOrderById(orderId)!.customerPhone).toBe('9000000011');
+      expect(store().selectedTableOrder?.customerPhone).toBe('9000000011');
+    });
+
+    it('switching tables shows the guest that table\'s own order actually has, never one left over from the last table', async () => {
+      await signIn();
+      store().openTable('1', 2);
+      addDish(0, 1);
+      store().sendKOT();
+      store().setAttachedCustomer(CustomerRepository.getOrCreateAccount('9000000012', 'Meera'));
+
+      store().openTable('2', 2); // a fresh table with no order and no guest of its own
+      expect(store().attachedCustomer).toBeNull();
+
+      store().selectTable(table('1')); // back to table 1: its own order still carries Meera
+      expect(store().attachedCustomer?.phone).toBe('9000000012');
+    });
+
+    it('a detach clears the guest from the order, not just the screen', async () => {
+      await signIn();
+      store().openTable('1', 2);
+      addDish(0, 1);
+      store().sendKOT();
+      const orderId = table('1').currentOrderId!;
+      store().setAttachedCustomer(CustomerRepository.getOrCreateAccount('9000000013', 'Dev'));
+      expect(OrderRepository.getOrderById(orderId)!.customerPhone).toBe('9000000013');
+
+      store().setAttachedCustomer(null);
+      expect(store().attachedCustomer).toBeNull();
+      expect(OrderRepository.getOrderById(orderId)!.customerPhone).toBeUndefined();
     });
   });
 });

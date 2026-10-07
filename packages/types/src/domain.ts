@@ -598,6 +598,9 @@ export interface Order {
   guestCount?: number;
   customerPhone?: string;
   customerName?: string;
+  /** Loyalty points this order has already credited to customerPhone, if any — also the idempotency
+   *  marker, so a re-settlement attempt or a page reload never credits the same order twice. */
+  loyaltyPointsEarned?: number;
   cashierName?: string;
   captainName?: string;
   items: OrderItem[];
@@ -759,7 +762,7 @@ export interface KioskDisplaySettings {
  * which is an intentional trade-off: it's the simplest way to let an admin
  * customize this screen without building a full per-language CMS for it.
  */
-export interface WelcomeScreenSettings {
+export interface WelcomeScreenPresentation {
   headingText?: string;
   subtitleText?: string;
   startOrderButtonText?: string;
@@ -773,6 +776,21 @@ export interface WelcomeScreenSettings {
   /** Full-bleed photo behind the welcome screen. Unset falls back to the bundled default
    *  (/language-selection-bg.png) so an existing install sees no change until an admin picks one. */
   backgroundImageUrl?: string;
+  backgroundLandscapeImageUrl?: string;
+  backgroundId?: string;
+  backgroundFit?: 'cover' | 'contain';
+  backgroundPositionX?: number;
+  backgroundPositionY?: number;
+  backgroundZoom?: number;
+  restaurantName?: string;
+  logoUrl?: string;
+  overlayOpacity?: number;
+}
+
+export interface WelcomeScreenSettings extends WelcomeScreenPresentation {
+  customBackgrounds?: Array<{ id: string; name: string; imageUrl: string; width: number; height: number }>;
+  /** Overrides are carried in the existing authenticated branch configuration. */
+  deviceOverrides?: Record<string, WelcomeScreenPresentation>;
 }
 
 export interface VoiceConfig {
@@ -928,6 +946,20 @@ export interface LoyaltyReward {
   description: string;
   pointsCost: number;
   isActive: boolean;
+}
+
+/**
+ * The base earn rate before any tier multiplier — the admin's direct answer to "how many points do I
+ * give". A single-row collection (id is always 'default') synced the same way as every other admin-edited
+ * list (tiers, rewards), so it gets the same diffing and conflict resolution for free instead of a second,
+ * bespoke single-object sync mechanism.
+ */
+export interface LoyaltyProgramSettings {
+  id: 'default';
+  /** Points earned per perRupeesSpent of the bill, e.g. earnPoints: 1, perRupeesSpent: 10 -> "1 point per ₹10 spent". */
+  earnPoints: number;
+  perRupeesSpent: number;
+  updatedAt?: string;
 }
 
 export type PlanTier = 'CORE' | 'PRO';

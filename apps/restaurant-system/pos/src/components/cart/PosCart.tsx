@@ -2,7 +2,7 @@ import { CachedImg } from '@jamanvaar/ui';
 import React, { useState, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
-import { db, InventoryRepository } from '@jamanvaar/database';
+import { db, InventoryRepository, CustomerRepository } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, sound } from '@jamanvaar/ui';
 import { PosOrderNotesModal } from './PosOrderNotesModal';
 import { PosDiscountModal } from './PosDiscountModal';
@@ -40,7 +40,7 @@ import {
   Zap,
   Bike,
   Ticket,
-  ShoppingBag as TakeawayBag, X } from 'lucide-react';
+  ShoppingBag as TakeawayBag, Gift, X } from 'lucide-react';
 
 export const PosCart: React.FC = () => {
   const {
@@ -55,6 +55,7 @@ export const PosCart: React.FC = () => {
     updateItemQuantity,
     removeItemFromCart,
     applyBillDiscountPercent,
+    applyDiscount,
     billDiscountPercent,
     clearCart,
     holdCurrentOrder,
@@ -82,6 +83,8 @@ export const PosCart: React.FC = () => {
     });
 
   const [discountInputOpen, setDiscountInputOpen] = useState(false);
+  const [redeemConfirming, setRedeemConfirming] = useState(false);
+  const [redeemNeedsManager, setRedeemNeedsManager] = useState(false);
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false);
   const [repeatModalOpen, setRepeatModalOpen] = useState(false);
@@ -92,6 +95,29 @@ export const PosCart: React.FC = () => {
   // before React commits the `disabled` attribute from setState, so the
   // guard that actually blocks re-entry has to be a synchronous flag.
   const sendingKotRef = useRef(false);
+
+  // Redeems the attached customer's own earned points as a flat bill discount — the thing the CRM
+  // screen's "Redeemable Value" has promised all along with no way to actually do it at the till.
+  // Goes through the normal applyDiscount gate (SEC-013), same as any other bill discount: a balance
+  // small enough to apply outright (the overwhelming common case) redeems immediately; one large
+  // enough to need a manager's approval is left for a manager, rather than deducting the customer's
+  // points before knowing the discount actually landed.
+  const handleRedeemPoints = () => {
+    if (!selectedCustomer || selectedCustomer.loyaltyPoints <= 0 || cart.items.length === 0) return;
+    const points = Math.min(selectedCustomer.loyaltyPoints, Math.floor(cart.subtotal));
+    if (points <= 0) return;
+    applyDiscount({ scope: 'BILL', type: 'FIXED', value: points, reason: 'Loyalty points redeemed' });
+    const applied = usePosStore.getState().cart;
+    if (applied.discountType === 'FIXED' && applied.discountValue === points) {
+      CustomerRepository.redeemPoints(selectedCustomer.phone, points);
+      setRedeemConfirming(false);
+      setRedeemNeedsManager(false);
+    } else {
+      // applyDiscount routed this to manager approval instead of applying it — nothing changed yet,
+      // so nothing is deducted. The cashier is told plainly rather than left wondering why it didn't work.
+      setRedeemNeedsManager(true);
+    }
+  };
 
   const orderTypes: { id: OrderType; label: string; icon: React.ElementType }[] = [
     { id: 'DINE_IN', label: 'Dine-In', icon: Utensils },
@@ -240,6 +266,49 @@ export const PosCart: React.FC = () => {
               {selectedCustomer ? selectedCustomer.name : 'Attach Customer'}
             </span>
           </button>
+
+          {selectedCustomer && selectedCustomer.loyaltyPoints > 0 && (
+            cart.discountType && cart.discountType !== 'NONE' ? (
+              <span
+                className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 h-9 rounded-xl text-xs text-slate-400 shrink-0"
+                title="Remove the current discount to redeem points instead"
+              >
+                <Gift className="w-3.5 h-3.5 shrink-0" />
+                {selectedCustomer.loyaltyPoints} pts
+              </span>
+            ) : redeemConfirming ? (
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={handleRedeemPoints}
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 h-9 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Redeem ₹{Math.min(selectedCustomer.loyaltyPoints, Math.floor(cart.subtotal))}
+                </button>
+                <button
+                  onClick={() => { setRedeemConfirming(false); setRedeemNeedsManager(false); }}
+                  className="flex items-center justify-center bg-white border border-jaman-border h-9 w-9 rounded-xl text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
+                  aria-label="Cancel redeeming points"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setRedeemConfirming(true)}
+                className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 hover:border-emerald-500 text-emerald-700 px-2.5 h-9 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0"
+                title="Use this guest's own earned loyalty points as a bill discount"
+              >
+                <Gift className="w-3.5 h-3.5 shrink-0" />
+                Redeem {selectedCustomer.loyaltyPoints} pts
+              </button>
+            )
+          )}
+          {redeemNeedsManager && (
+            <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 px-2.5 h-9 rounded-xl text-[11px] font-bold text-amber-800 shrink-0">
+              Ask a manager — this redemption needs approval
+            </span>
+          )}
 
           <button
             onClick={() => setNotesModalOpen(true)}

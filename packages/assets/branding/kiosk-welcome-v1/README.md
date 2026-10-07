@@ -1,0 +1,7 @@
+# Kiosk welcome backgrounds
+
+Sixteen distinct restaurant scenes generated with the built-in `image_gen` tool. The original ten are preserved. Six additions use different visual families: dark slate, rustic terracotta, sculptural teal, botanical watercolor, pastel café and street-food collage. The exact portrait and landscape prompts for every image are preserved in `manifest.json`. Artwork contains no branding or interface text; the center is reserved for the shared live welcome renderer.
+
+The optimized masters are 1080 × 1920 WebP. Each has a 270 × 480 thumbnail and a separately composed 1920 × 1080 landscape companion so food stays visible on wide displays. The shared renderer selects the composition from its actual container dimensions, including the Admin device preview. Runtime uses cover or contain with a soft backdrop, focal position and zoom; no fixed kiosk resolution is imposed. Custom uploads retain their own composition and fit controls.
+
+`tooling/dev/sync_welcome_backgrounds.mjs` verifies hashes and packages identical copies in Kiosk, Restaurant/Kiosk Admin and Super Admin during development/build preparation. The generated public copies are ignored by Git; this canonical folder is versioned. Deploy the API and all three frontends together for design access controls and uploaded platform designs. Super Admin adds designs in Platform Settings → Kiosk Welcome Designs. Restaurant owners edit live names/messages and choose branch defaults or individual terminal designs in Kiosk Admin → Kiosk Welcome Screen.

@@ -1,0 +1,151 @@
+{
+  "success": true,
+  "passed": 30,
+  "failed": 0,
+  "suites": [
+    {
+      "name": "cloud/api/test/admin-product-access.e2e.spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "shared POS_ADMIN device retains separate product authority checks resource permission on each cached verdict, not just the first request",
+          "status": "passed"
+        },
+        {
+          "name": "shared POS_ADMIN device retains separate product authority rejects POS-only mutations without persisting data",
+          "status": "passed"
+        },
+        {
+          "name": "shared POS_ADMIN device retains separate product authority retains valid Restaurant Admin reads and shared receipt configuration",
+          "status": "passed"
+        },
+        {
+          "name": "shared POS_ADMIN device retains separate product authority allows more than 20 legitimate session restorations behind one IP without weakening owner password login throttling",
+          "status": "passed"
+        },
+        {
+          "name": "shared POS_ADMIN device retains separate product authority keeps kiosk-only fleet and commands tenant-bound even though its physical device is POS_ADMIN",
+          "status": "passed"
+        },
+        {
+          "name": "shared POS_ADMIN device retains separate product authority marks a kiosk-only shared console enabled in the offline Branch Core roster",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "cloud/api/test/device-command-fleet.e2e.spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin Kiosk Admin sees the whole kiosk fleet with health, backlog and errors",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin Kiosk Admin can command a kiosk of its own restaurant; the kiosk receives it",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin the same idempotency key never creates a second command",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin Kiosk Admin cannot command a non-kiosk device or another restaurant's device, and cannot send destructive commands",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin only an admin console can issue commands, never a terminal",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin a delivered but unacknowledged command is redelivered, then failed after the last redelivery",
+          "status": "passed"
+        },
+        {
+          "name": "Device fleet and commands issued by Kiosk Admin an acknowledged command is not redelivered",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "cloud/api/test/kiosk-management.e2e.spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout publishes a kiosk-only console edit that the same branch kiosk can read",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout blocks public kiosk writes and another branch reading or overwriting configuration",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout rejects unsafe images and payment policy fields",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout preserves a newer edit when an offline console submits an old snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout accepts branch welcome designs and a registered same-branch kiosk override",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout rejects unknown devices, other-branch overrides, non-kiosk targets and incorrect scope ids",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout uses this branch receipt settings in the server-built emailed PDF and honours disabled email receipts",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout rejects a logout command for another branch or a console",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout keeps a busy kiosk authenticated after a failed logout acknowledgement",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout does not repopulate the auth cache with an ACTIVE verdict from a request that started before revocation",
+          "status": "passed"
+        },
+        {
+          "name": "Merged kiosk management: configuration and safe remote logout queues idempotently, then revokes credentials only after successful kiosk acknowledgement",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "cloud/api/test/welcome-design-access.e2e.spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Platform welcome collection and restaurant access preserves all ten originals and exposes six distinct additions",
+          "status": "passed"
+        },
+        {
+          "name": "Platform welcome collection and restaurant access lets Super Admin set counts and restaurant selections without granting generic settings writes",
+          "status": "passed"
+        },
+        {
+          "name": "Platform welcome collection and restaurant access rejects invalid limits, duplicates, unknown designs and non-existent restaurant overrides",
+          "status": "passed"
+        },
+        {
+          "name": "Platform welcome collection and restaurant access enforces selection on the server and carries separate terminal backgrounds and editable live text",
+          "status": "passed"
+        },
+        {
+          "name": "Platform welcome collection and restaurant access preserves a previously selected design after revocation while rejecting new use on another terminal",
+          "status": "passed"
+        },
+        {
+          "name": "Platform welcome collection and restaurant access adds a decoded durable design, serves immutable public images and blocks malformed uploads and tenant additions",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

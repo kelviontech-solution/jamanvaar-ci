@@ -4,8 +4,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BrandingService } from './branding.service';
 import { SETTING_DEFAULTS, SETTING_SCHEMAS } from './setting-schemas';
+import { WelcomeDesignsService } from './welcome-designs.service';
+import { WelcomePolicy, WELCOME_POLICY_KEY } from './welcome-policy';
 
 const SETTING_CATEGORY: Record<string, { category: string; description: string }> = {
+  'platform.kioskWelcome': { category: 'CATALOG', description: 'Kiosk welcome design access and restaurant limits' },
   'platform.billing': { category: 'BILLING', description: 'Seller details printed on invoices and receipts' }
 };
 
@@ -14,12 +17,14 @@ export class PlatformSettingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly branding: BrandingService
+    private readonly branding: BrandingService,
+    private readonly welcome: WelcomeDesignsService
   ) {}
 
   async getAll() {
     return this.prisma.runAsPlatform(async (tx) => {
       const settings = await tx.platformSetting.findMany({
+        where: { NOT: [{ key: { startsWith: 'welcome.asset.' } }, { key: { startsWith: 'welcome.design.' } }] },
         orderBy: { category: 'asc' }
       });
       // Settings added after an install was seeded show their defaults until first saved.
@@ -66,6 +71,7 @@ export class PlatformSettingsService {
         });
       }
       const value = parsed.data;
+      if (key === WELCOME_POLICY_KEY) await this.welcome.validatePolicy(value as WelcomePolicy);
 
       const updated = await tx.platformSetting.update({
         where: { key },

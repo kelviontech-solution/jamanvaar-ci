@@ -66,6 +66,7 @@ export const ROLE_ACCESS: Record<PlatformRoleName, Partial<Record<Area, AccessLe
 
 /** Ordered: the first matching prefix wins, so the more specific ones come first. */
 const AREA_RULES: Array<{ test: (p: string) => boolean; area: Area }> = [
+  { test: (p) => /^\/api\/v1\/platform\/settings\/(platform\.kioskWelcome|kiosk-welcome\/designs)(\/|$)/.test(p), area: 'catalog' },
   { test: (p) => /^\/api\/v1\/restaurants\/[^/]+\/backups(\/|$)/.test(p), area: 'ops' },
   { test: (p) => /^\/api\/v1\/restaurants\/[^/]+\/license-certificate(\/|$)/.test(p), area: 'licensing' },
   { test: (p) => /^\/api\/v1\/restaurants\/[^/]+\/payment-connection(\/|$)/.test(p), area: 'billing' },

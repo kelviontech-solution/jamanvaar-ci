@@ -1,4 +1,4 @@
-import { KeyValueStore } from '@jamanvaar/database';
+import { KeyValueStore, KioskConfigurationRepository } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
@@ -70,7 +70,7 @@ interface CachedEntitlements {
 
 let accessToken: string | null = null;
 let sessionEpoch = 0;
-let refreshInFlight: Promise<boolean> | null = null;
+let refreshInFlight: Promise<RefreshOutcome> | null = null;
 
 /** The restaurant this console is connected to (shown so the owner can give it to Kiosk Admin or Captain). */
 export function getStoredRestaurantId(): string | null {
@@ -181,30 +181,50 @@ export function isCloudConnected(): boolean {
   return getRestaurantId() !== null;
 }
 
-function refreshAccessToken(): Promise<boolean> { return withSessionLock('tenant-cookie', refreshAccessTokenLocked); }
+/**
+ * 'ok': a new access token was obtained — retry the original request.
+ * 'invalid': the refresh session itself is genuinely dead (its own call got a 401: the refresh
+ * token was rejected, expired, revoked, or reused) — this, and only this, is a real "sign in
+ * again" moment.
+ * 'transient': the refresh call failed for a reason that says nothing about whether the
+ * session is still good (a 429 from the platform-wide rate limiter, a 5xx, a timed-out or
+ * dropped connection). Found live: with the reverse proxy in front of cloud/api, every
+ * restaurant's traffic can land on Express under one shared address unless the deployment's
+ * TRUST_PROXY is set, so the refresh endpoint's own per-address throttle tier was being spent
+ * by the whole platform's traffic, not just this one session — an unrelated restaurant's burst
+ * of requests could 429 THIS owner's refresh call. Treating that the same as "invalid" signed
+ * a perfectly valid owner out and showed "your cloud session has expired," when nothing was
+ * actually wrong with their session.
+ */
+type RefreshOutcome = 'ok' | 'invalid' | 'transient';
 
-async function refreshAccessTokenLocked(): Promise<boolean> {
+function refreshAccessToken(): Promise<RefreshOutcome> { return withSessionLock('tenant-cookie', refreshAccessTokenLocked); }
+
+async function refreshAccessTokenLocked(): Promise<RefreshOutcome> {
   const epoch = sessionEpoch;
   const restaurantId = getRestaurantId();
-  if (!restaurantId) return false;
+  if (!restaurantId) return 'invalid';
   try {
     const res = await fetchWithDeadline(`${API_BASE}/api/v1/tenant-auth/refresh`, {
       method: 'POST',
       credentials: 'include'
     });
-    if (epoch !== sessionEpoch) return false;
+    if (epoch !== sessionEpoch) return 'invalid';
     if (!res.ok) {
-      accessToken = null;
-      return false;
+      if (res.status === 401) {
+        accessToken = null;
+        return 'invalid';
+      }
+      return 'transient';
     }
     const body = await res.json();
-    if (epoch !== sessionEpoch) return false;
+    if (epoch !== sessionEpoch) return 'invalid';
     accessToken = body.accessToken;
-    return true;
+    return 'ok';
   } catch {
-    if (epoch !== sessionEpoch) return false;
-    accessToken = null;
-    return false;
+    if (epoch !== sessionEpoch) return 'invalid';
+    // Network error or fetchWithDeadline's own timeout — the session may well still be fine.
+    return 'transient';
   }
 }
 
@@ -231,10 +251,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
         refreshInFlight = null;
       });
     }
-    const refreshed = await refreshInFlight;
-    if (refreshed) {
+    const outcome = await refreshInFlight;
+    if (outcome === 'ok') {
       return request<T>(path, { ...options, skipAuthRetry: true });
     }
+    if (outcome === 'transient') {
+      // Not a real session problem — the original 401 must not be reported as one.
+      throw new CloudApiError('Could not reach JAMANVAAR Cloud to restore your session. Check your connection and try again.', 0);
+    }
+    // outcome === 'invalid': fall through — the original 401 below is the real, final answer.
   }
 
   const contentType = res.headers.get('content-type') ?? '';
@@ -435,7 +460,7 @@ export async function cloudActivateDevice(
 
   sessionEpoch++;
   accessToken = result.accessToken;
-  KeyValueStore.set('jamanvaar_bound_branch_id', result.branchId ?? '');
+  KioskConfigurationRepository.bindBranch(result.branchId);
   saveDeviceRegistration(result.deviceId, result.deviceToken, result.restaurant.id);
   setRestaurantId(result.restaurant.id);
 
@@ -1229,6 +1254,7 @@ async function jsonOrThrowCloud<T>(res: Response, what: string): Promise<T> {
 
 export interface CloudKiosk {
   id: string;
+  branchId?: string;
   name: string;
   appVersion: string | null;
   lastSeenAt: string | null;
@@ -1239,7 +1265,7 @@ export interface CloudKiosk {
   pendingSyncCount: number;
   syncError: string | null;
   lastSyncAt: string | null;
-    lastCommand?: { commandType: string; status: string; errorMessage: string | null } | null;
+    lastCommand?: { commandType: string; status: string; errorMessage: string | null; payload?: { scope?: string; configVersion?: string }; result?: { configVersion?: string } } | null;
 }
 
 /** The self-order kiosks this restaurant has really activated: health, backlog and errors. */
@@ -1248,16 +1274,24 @@ export async function fetchCloudKiosks(): Promise<CloudKiosk[]> {
     devices: Array<{
       id: string; type: string; name: string | null; appVersion: string | null; lastSeenAt: string | null; lastSyncAt: string | null;
       health: CloudKiosk['health']; isLocked: boolean; lockReason: string | null; pendingSyncCount: number | null;
-        syncError: string | null; branch: { name: string } | null; lastCommand?: CloudKiosk['lastCommand'];
+        syncError: string | null; branch: { id: string; name: string } | null; lastCommand?: CloudKiosk['lastCommand'];
     }>;
   }>(await deviceFetch('/api/v1/devices/me/fleet'), 'Kiosk fleet');
   return data.devices
     .filter((d) => d.type === 'KIOSK')
     .map((d) => ({
-      id: d.id, name: d.name ?? 'Kiosk', appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, health: d.health,
+      id: d.id, branchId: d.branch?.id, name: d.name ?? 'Kiosk', appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, health: d.health,
       isLocked: d.isLocked, lockReason: d.lockReason, branchName: d.branch?.name ?? null,
         pendingSyncCount: d.pendingSyncCount ?? 0, syncError: d.syncError, lastSyncAt: d.lastSyncAt, lastCommand: d.lastCommand
     }));
+}
+
+export interface WelcomeDesignCatalog {
+  designs: Array<{ id: string; name: string; category: string; imageUrl: string; landscapeImageUrl: string; thumbnailUrl: string }>;
+  maxDesigns: number;
+}
+export async function fetchWelcomeDesignCatalog(): Promise<WelcomeDesignCatalog> {
+  return jsonOrThrowCloud<WelcomeDesignCatalog>(await deviceFetch('/api/v1/devices/me/welcome-designs'), 'Welcome designs');
 }
 
 export type KioskCommandType = 'REQUEST_SYNC' | 'REQUEST_DIAGNOSTICS' | 'RESTART_APP' | 'CLEAR_CACHE' | 'LOCK' | 'UNLOCK' | 'FORCE_LOGOUT';

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { SystemHealthController } from './system-health.controller';
+import { PublicHealthController, SystemHealthController } from './system-health.controller';
 import { PlatformAuthModule } from '../platform-auth/platform-auth.module';
 
 @Module({
   imports: [PlatformAuthModule],
-  controllers: [SystemHealthController]
+  controllers: [SystemHealthController, PublicHealthController]
 })
 export class SystemHealthModule {}

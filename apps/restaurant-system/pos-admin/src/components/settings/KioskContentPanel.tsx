@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { db, KioskDisplaySettingsRepository, WelcomeScreenSettingsRepository } from '@jamanvaar/database';
+import { db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { getTranslation, KIOSK_CONTENT_CATALOG, type SupportedLanguage } from '@jamanvaar/i18n';
 
 export function KioskContentPanel({ showToast }: { showToast: (message: string) => void }) {
   const [display, setDisplay] = useState(() => structuredClone(db.kioskDisplaySettings));
-  const [welcome, setWelcome] = useState(() => structuredClone(db.welcomeScreenSettings));
   const [language, setLanguage] = useState<SupportedLanguage>('en');
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const catalog: Record<string, string> = { ...Object.fromEntries(Object.entries(getTranslation(language)).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), ...KIOSK_CONTENT_CATALOG };
   const inputClass = 'w-full rounded-xl border border-slate-300 p-2 text-sm';
-  const welcomeFields = [ ['headingText', 'Welcome heading'], ['subtitleText', 'Welcome subtitle'], ['startOrderButtonText', 'Start order button'], ['supportingText', 'Supporting text'], ['promoBannerText', 'Promotion banner text'], ['backgroundImageUrl', 'Welcome background image URL'] ] as const;
   return <div className="space-y-5" data-testid="kiosk-content-panel">
     <div className="rounded-2xl border bg-white p-6 space-y-4">
       <h2 className="text-xl font-bold">Kiosk Appearance & Content</h2>
@@ -25,8 +23,7 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
       }} /></label>
       <label className="block text-sm font-semibold">Kiosk accent color<input aria-label="Kiosk accent color" type="color" value={display.accentColor || '#EF6A0B'} onChange={e => setDisplay({ ...display, accentColor: e.target.value })} /></label>
       {display.logoUrl && <img src={display.logoUrl} alt="Kiosk logo preview" className="h-20 max-w-full object-contain" />}
-      <div className="grid gap-4 sm:grid-cols-2">{welcomeFields.map(([key, label]) => <label key={key} className="text-sm font-semibold">{label}<input aria-label={label} className={inputClass} maxLength={key === 'backgroundImageUrl' ? 4000000 : 2000} value={welcome[key] || ''} onChange={e => setWelcome({ ...welcome, [key]: e.target.value })} /></label>)}</div>
-      {(['showHeritageArtwork', 'showPromoBanner'] as const).map(key => <label key={key} className="flex gap-2 text-sm"><input type="checkbox" checked={welcome[key]} onChange={e => setWelcome({ ...welcome, [key]: e.target.checked })} />{key === 'showHeritageArtwork' ? 'Show welcome artwork' : 'Show promotion banner'}</label>)}
+      <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">Choose backgrounds, preview the welcome screen and edit its message in <a href="/kiosk-admin/welcome-screen" className="font-bold underline">Kiosk Welcome Screen</a>.</div>
       <label className="block text-sm font-semibold">Idle warning after (seconds)<input aria-label="Kiosk idle warning" type="number" min={5} max={3600} className={inputClass} value={display.idleWarningAfterSeconds} onChange={e => setDisplay({ ...display, idleWarningAfterSeconds: Number(e.target.value) })} /></label>
       <label className="block text-sm font-semibold">Idle reset countdown (seconds)<input aria-label="Kiosk idle countdown" type="number" min={3} max={120} className={inputClass} value={display.idleResetCountdownSeconds} onChange={e => setDisplay({ ...display, idleResetCountdownSeconds: Number(e.target.value) })} /></label>
     </div>
@@ -40,7 +37,7 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
       setBusy(true); setMessage('');
       try {
         if (!Number.isInteger(display.idleWarningAfterSeconds) || display.idleWarningAfterSeconds < 5 || display.idleWarningAfterSeconds > 3600 || !Number.isInteger(display.idleResetCountdownSeconds) || display.idleResetCountdownSeconds < 3 || display.idleResetCountdownSeconds > 120) throw new Error('Use an idle warning of 5–3600 seconds and countdown of 3–120 seconds.');
-        KioskDisplaySettingsRepository.updateSettings(display); WelcomeScreenSettingsRepository.updateSettings(welcome);
+        KioskDisplaySettingsRepository.updateSettings(display);
         await syncKioskConfiguration({ push: true }); setMessage('Kiosk settings published. Connected kiosks receive them automatically.'); showToast('Kiosk settings published.');
       } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not publish kiosk settings.'); }
       finally { setBusy(false); }

@@ -9,6 +9,7 @@ import { captainDb, isBillWaiting } from '@jamanvaar/database';
 import { CachedImg, EmptyState } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import { CaptainCancelDishModal } from '../modals/CaptainCancelDishModal';
+import { CaptainCustomerModal } from '../customers/CaptainCustomerModal';
 import { matchesCaptainDiet } from '../../captainWorkflow';
 import {
   X,
@@ -24,7 +25,9 @@ import {
   UtensilsCrossed,
   ChevronUp,
   ChevronDown,
-  Ban
+  Ban,
+  User,
+  Star
 } from 'lucide-react';
 
 interface CaptainTableWorkspaceModalProps {
@@ -60,7 +63,9 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     sendKOT,
     requestBill,
     repeatPreviousOrder,
-    markItemServed
+    markItemServed,
+    attachedCustomer,
+    setIsCustomerModalOpen
   } = useCaptainStore();
 
   // A freshly-opened table with nothing ordered yet should land straight on the menu.
@@ -238,6 +243,16 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             >
               <MessageSquare className="w-4 h-4 text-jaman-saffron" />
               <span className="hidden sm:inline">Kitchen Note</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsCustomerModalOpen(true)}
+              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              title={attachedCustomer ? `${attachedCustomer.name} · ${attachedCustomer.loyaltyPoints || 0} pts` : 'Attach a guest for CRM & loyalty points'}
+              aria-label="Attach guest"
+            >
+              <User className="w-4 h-4 text-jaman-saffron" />
+              <span className="hidden sm:inline">{attachedCustomer ? (attachedCustomer.name || attachedCustomer.phone).split(' ')[0] : 'Guest'}</span>
             </button>
             <button
               type="button"
@@ -471,6 +486,22 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-3 md:p-5 flex flex-col gap-2.5 md:gap-4 shrink-0 max-h-[42dvh] md:max-h-none overflow-y-auto">
                 <div className="hidden md:block space-y-3">
                   <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">Table Financial Summary</h3>
+                  {attachedCustomer && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomerModalOpen(true)}
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-white border border-jaman-border text-left cursor-pointer hover:border-jaman-saffron"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-xs font-black text-jaman-navy truncate">{attachedCustomer.name || attachedCustomer.phone}</span>
+                        <span className="block text-[10px] font-mono text-slate-400">{attachedCustomer.phone}</span>
+                      </span>
+                      <span className="shrink-0 flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                        {attachedCustomer.loyaltyPoints || 0} pts
+                      </span>
+                    </button>
+                  )}
                   <div className="space-y-2 text-xs font-semibold text-slate-600 bg-white p-3.5 rounded-2xl border border-jaman-border">
                     <div className="flex justify-between"><span>Subtotal</span><span className="font-mono text-jaman-navy">{formatINR(subtotal)}</span></div>
                     <div className="flex justify-between"><span>{gstLabels.combined}</span><span className="font-mono text-jaman-navy">{formatINR(gst)}</span></div>
@@ -679,6 +710,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       />
 
       <CaptainCancelDishModal dish={cancelling} onClose={() => setCancelling(null)} onCancelled={() => setCancelling(null)} />
+      <CaptainCustomerModal />
     </div>
   );
 };

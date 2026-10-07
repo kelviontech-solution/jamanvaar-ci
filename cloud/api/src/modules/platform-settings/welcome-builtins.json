@@ -1,0 +1,130 @@
+[
+  {
+    "id": "royal-indian-dining",
+    "name": "Royal Indian Dining",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining-landscape-thumb.webp"
+  },
+  {
+    "id": "modern-indian-dining",
+    "name": "Modern Indian Dining",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining-landscape-thumb.webp"
+  },
+  {
+    "id": "gujarati-thali",
+    "name": "Gujarati Thali",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali-landscape-thumb.webp"
+  },
+  {
+    "id": "north-indian-cuisine",
+    "name": "North Indian Cuisine",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine-landscape-thumb.webp"
+  },
+  {
+    "id": "south-indian-cuisine",
+    "name": "South Indian Cuisine",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine-landscape-thumb.webp"
+  },
+  {
+    "id": "indian-street-food",
+    "name": "Indian Street Food",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food-landscape-thumb.webp"
+  },
+  {
+    "id": "premium-biryani",
+    "name": "Premium Biryani",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani-landscape-thumb.webp"
+  },
+  {
+    "id": "vegetarian-garden",
+    "name": "Vegetarian Garden",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden-landscape-thumb.webp"
+  },
+  {
+    "id": "cafe-casual-dining",
+    "name": "Café & Casual Dining",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining-landscape-thumb.webp"
+  },
+  {
+    "id": "heritage-desserts",
+    "name": "Heritage Sweets",
+    "category": "Indian Dining",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts-landscape-thumb.webp"
+  },
+  {
+    "id": "midnight-spice",
+    "name": "Midnight Spice",
+    "category": "Dark & Dramatic",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/midnight-spice.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/midnight-spice-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/midnight-spice-landscape-thumb.webp"
+  },
+  {
+    "id": "terracotta-table",
+    "name": "Terracotta Table",
+    "category": "Rustic & Earthy",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/terracotta-table.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/terracotta-table-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/terracotta-table-landscape-thumb.webp"
+  },
+  {
+    "id": "teal-pop-kitchen",
+    "name": "Teal Pop Kitchen",
+    "category": "Modern & Playful",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/teal-pop-kitchen.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/teal-pop-kitchen-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/teal-pop-kitchen-landscape-thumb.webp"
+  },
+  {
+    "id": "botanical-bistro",
+    "name": "Botanical Bistro",
+    "category": "Botanical & Fresh",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/botanical-bistro.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/botanical-bistro-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/botanical-bistro-landscape-thumb.webp"
+  },
+  {
+    "id": "pastel-patisserie",
+    "name": "Pastel Patisserie",
+    "category": "Café & Pastel",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/pastel-patisserie.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/pastel-patisserie-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/pastel-patisserie-landscape-thumb.webp"
+  },
+  {
+    "id": "urban-street-kitchen",
+    "name": "Urban Street Kitchen",
+    "category": "Bold & Urban",
+    "imageUrl": "/assets/branding/kiosk-welcome-v1/urban-street-kitchen.webp",
+    "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/urban-street-kitchen-landscape.webp",
+    "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/urban-street-kitchen-landscape-thumb.webp"
+  }
+]

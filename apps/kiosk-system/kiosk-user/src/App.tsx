@@ -1,4 +1,8 @@
 import { DeviceCommandRunner } from '@jamanvaar/sync';
+import { KioskWelcomeScreen } from '@jamanvaar/ui';
+import { KioskConfigurationRepository } from '@jamanvaar/database';
+import { welcomePresentation, welcomeBackgroundUrl, welcomeLandscapeUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
+import { kioskActivationError } from './activationErrors';
 import { resetTerminal } from './cloud/cloudClient';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers } from '@jamanvaar/sync';
@@ -103,8 +107,8 @@ import {
 } from '@jamanvaar/ui';
 import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
-import { EBillService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
+import { EBillService, NetworkStatusService, PrinterService, VoiceService, Platform, isOrderStillSyncingMessage } from '@jamanvaar/api';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
   AlertCircle,
@@ -256,7 +260,7 @@ export default function KioskUserApp() {
     try {
       resolved = await resolveRestaurantByCode(typedCode);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Could not verify that Restaurant ID');
+      setActivationError(kioskActivationError(err, 'restaurant', navigator.onLine));
       setActivationStep('form');
       return;
     }
@@ -266,7 +270,7 @@ export default function KioskUserApp() {
     try {
       result = await activateKioskDevice(activationCode);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+      setActivationError(kioskActivationError(err, 'key', navigator.onLine));
       setActivationStep('form');
       return;
     }
@@ -313,6 +317,27 @@ export default function KioskUserApp() {
     }
     SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_kiosk_user_device_id') });
     EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
+    DeviceCommandRunner.registerHandler('REQUEST_SYNC', async command => {
+      const payload = command.payload as { scope?: string; configVersion?: string } | undefined;
+      if (payload?.scope === 'WELCOME') {
+        await syncKioskConfiguration();
+        const configuration = KioskConfigurationRepository.snapshot();
+        if (!payload.configVersion || Date.parse(configuration.updatedAt) < Date.parse(payload.configVersion)) throw Error('Welcome configuration has not arrived yet. Retry sync after the connection is restored.');
+        const presentation = welcomePresentation(configuration.welcome, kioskId);
+        const image = welcomeBackgroundUrl(presentation, configuration.welcome.customBackgrounds);
+        for (const source of new Set([image, welcomeLandscapeUrl(image, presentation.backgroundLandscapeImageUrl)])) {
+          const cached = await WelcomeImageCache.source(source);
+          if (!cached.startsWith('blob:') && !cached.startsWith('data:')) throw Error('Welcome background could not be cached. Check the asset and connection, then retry sync.');
+          if (cached.startsWith('blob:')) URL.revokeObjectURL(cached);
+        }
+        return { scope: 'WELCOME', configVersion: configuration.updatedAt, imageCached: true };
+      }
+      if (payload?.scope === 'MENU') { await syncMenuCatalog({ push: false }); return { scope: 'MENU' }; }
+      const pushed = await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+      const pulled = await SyncOutboxEngine.catchUpFromCloud();
+      await syncKioskConfiguration();
+      return { scope: payload?.scope || 'ALL', ...pushed, ...pulled };
+    });
     DeviceCommandRunner.registerHandler('FORCE_LOGOUT', async () => {
       if (remoteLogoutSafety.current || loadPendingPayment()) throw new Error('A payment is in progress or awaiting fulfilment. Finish or cancel it before logging out this kiosk.');
       remoteLogoutInProgressRef.current = true; setRemoteLogoutInProgress(true);
@@ -345,6 +370,10 @@ export default function KioskUserApp() {
     // and "call staff" requests go back.
     void syncPromotions({ pushCombos: false, pushCoupons: true });
     void syncFeedback({ push: true });
+    // The admin's loyalty program (tier multipliers, base earn rate) — this device only ever reads it.
+    void syncLoyaltyTiers({ push: false });
+    void syncLoyaltyRewards({ push: false });
+    void syncLoyaltyProgramSettings({ push: false });
     void pushServiceMessages();
     void syncStaff();
     void reportHeartbeat();
@@ -379,6 +408,9 @@ export default function KioskUserApp() {
     void syncKioskConfiguration().catch(() => {});
       void syncPromotions({ pushCombos: false, pushCoupons: true });
       void syncFeedback({ push: true });
+      void syncLoyaltyTiers({ push: false });
+      void syncLoyaltyRewards({ push: false });
+      void syncLoyaltyProgramSettings({ push: false });
       void pushServiceMessages();
       void syncStaff();
       void reportHeartbeat();
@@ -547,6 +579,8 @@ export default function KioskUserApp() {
   const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
   const [eBillEmailInput, setEBillEmailInput] = useState('');
   const [eBillSuccessMessage, setEBillSuccessMessage] = useState<string | null>(null);
+  const [eBillError, setEBillError] = useState<string | null>(null);
+  const [eBillSending, setEBillSending] = useState(false);
 
   // Modals for Extra Features
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
@@ -932,7 +966,7 @@ export default function KioskUserApp() {
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
   const kioskSettings = KioskDisplaySettingsRepository.getSettings();
-  const welcomeSettings = WelcomeScreenSettingsRepository.getSettings();
+  const welcomeSettings = welcomePresentation(WelcomeScreenSettingsRepository.getSettings(), kioskId);
 
   // Categories & Items from DB
   const { categories, items: menuItems } = buildStandardMenu(
@@ -1519,10 +1553,14 @@ export default function KioskUserApp() {
     // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
     if (paymentId) void confirmationSync.then(() => acknowledgeFulfilled(paymentId));
 
-    // If logged in, award points (10% back in points) & record order
-    if (loggedInAccount) {
-      const earned = Math.floor(order.totalAmount * 0.1);
-      CustomerRepository.addPoints(loggedInAccount.phone, earned);
+    // If logged in, earn loyalty points on the same tiered program POS and Captain use (base rate ×
+    // tier multiplier, both set by the restaurant admin) — this used to be its own separate, disconnected
+    // flat 10% rule, so a kiosk guest's tier, multiplier and even the admin's own configured rate never
+    // applied to a kiosk purchase. Guarded by loyaltyPointsEarned the same way settleOrder is, so a kiosk
+    // order (which, unlike POS, can legitimately re-run this confirmation tail on a crash-recovery retry)
+    // can never be credited twice for one purchase.
+    if (loggedInAccount && order.loyaltyPointsEarned === undefined) {
+      order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(loggedInAccount.phone, order.totalAmount, order.id);
       if (redeemedPoints > 0) {
         CustomerRepository.redeemPoints(loggedInAccount.phone, redeemedPoints);
       }
@@ -1605,14 +1643,29 @@ export default function KioskUserApp() {
   const handleDispatchEBill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!placedOrder || !eBillEmailInput) return;
-
-    const res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
-    ReceiptRepository.addRecord(res.record);
-    if (res.success) {
-      setEBillSuccessMessage(res.message);
-      showToast(res.message);
-    } else {
-      alert(res.message);
+    setEBillSending(true);
+    setEBillError(null);
+    try {
+      // The order's cloud copy is pushed in the background, after the receipt already printed, so it can
+      // still be a few seconds behind when the guest emails the bill right away. Retry through that window
+      // (driving the push ourselves each time) instead of failing on the server's first honest "not yet" —
+      // the guest never sees this, the modal just takes a moment longer on a fresh order.
+      let res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
+      for (let attempt = 0; !res.success && isOrderStillSyncingMessage(res.message) && attempt < 4; attempt++) {
+        await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
+      }
+      ReceiptRepository.addRecord(res.record);
+      if (res.success) {
+        setIsEBillModalOpen(false);
+        setEBillSuccessMessage(res.message);
+        showToast(res.message);
+      } else {
+        setEBillError(res.message);
+      }
+    } finally {
+      setEBillSending(false);
     }
   };
 
@@ -1807,7 +1860,7 @@ export default function KioskUserApp() {
     return (
       <JAMANVAARStartup appName="Self-Order Kiosk" appType="KIOSK" subtitle="Customer Self-Ordering Terminal">
         <JamanvaarKioskAuthLayout
-          backgroundPhoto="https://images.unsplash.com/photo-1538334421852-687c439c92f4?auto=format&fit=crop&w=1800&q=80"
+          backgroundPhoto={welcomeBackgroundUrl({ backgroundId: 'modern-indian-dining', showHeritageArtwork: false, showPromoBanner: false })}
           foodPhoto="/assets/menu/biryani/royal-veg-biryani.jpg"
           heroHeadline={['Guests order.', 'Kitchen fires', 'instantly.']}
           heroDescription="A modern self-ordering kiosk for a smoother and happier dining experience."
@@ -1820,7 +1873,7 @@ export default function KioskUserApp() {
         >
           <ActivationNoticeBanner />
           <div className="space-y-1 mb-5">
-            <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Activate This Kiosk</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy tracking-tight">Activate Your Kiosk</h2>
             <p className="text-sm sm:text-base text-[#52677A] font-medium">
               Enter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.
             </p>
@@ -2289,7 +2342,7 @@ export default function KioskUserApp() {
                signboard) sits in its bottom third at full width; the rest
                is mostly open sky, so bg-bottom keeps the crop on that
                detail instead of the blank middle/top. */
-            .kiosk-lang-bg { background-image: url('/language-selection-bg.png'); }
+            .kiosk-lang-bg { background-image: url(${JSON.stringify(resolveMenuImage('/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp'))}); }
           `}</style>
 
           {/* Photo as its own layer (not the page's own background) so it
@@ -2345,106 +2398,20 @@ export default function KioskUserApp() {
         </div>
       )}
 
-      {/* STEP 1: WELCOME SCREEN */}
-      {step === 'WELCOME' && (
-        <div
-          className="flex-1 w-full h-full relative isolate bg-jaman-ivory bg-cover bg-bottom bg-no-repeat flex flex-col overflow-hidden"
-          style={{ backgroundImage: `url('${welcomeSettings.backgroundImageUrl || '/language-selection-bg.png'}')` }}
-        >
-
-          {/* Light legibility wash — flat opacity (no gradient stops, so no
-              possible boundary line), inset-0 over the full w-full h-full
-              container guarantees 100% screen coverage. */}
-          <div className="absolute inset-0 -z-10 bg-white/50" />
-
-          {/* 3-COLUMN LAYOUT — perfectly symmetric */}
-          <div className="flex-1 flex flex-row items-center justify-center">
-
-            {/* LEFT FOOD PANEL — fixed same width as right */}
-            <div className={`kiosk-food-panel kiosk-food-panel-left flex justify-end items-center h-full flex-shrink-0 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '38vw' }}>
-              <img
-                src="/left-food-panel.png"
-                alt=""
-                className="h-[60vh] w-auto max-w-full object-contain pointer-events-none"
-              />
-            </div>
-
-            {/* CENTER SAFE AREA */}
-            <div className={`kiosk-welcome-center flex-shrink-0 flex flex-col items-center text-center space-y-6 relative z-10 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '440px' }}>
-              <div className="flex justify-center pb-2">
-                {kioskSettings.logoUrl ? <img src={kioskSettings.logoUrl} alt="Restaurant logo" style={{height: 110, maxWidth: '100%', objectFit: 'contain'}} /> : <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '110px', width: 'auto' }} className="drop-shadow-sm hover:scale-105 transition-transform" />}
-              </div>
-
-              <div className="inline-flex items-center gap-2 bg-jaman-saffron/10 border border-jaman-saffron/25 px-4 py-2 rounded-full text-sm font-bold text-jaman-saffron shadow-sm animate-pulse text-center">
-                <Sparkles className="w-4 h-4 flex-shrink-0" />
-                <span>{t('heritageBadge')}</span>
-              </div>
-
-              <div className="space-y-3">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-jaman-navy tracking-tight font-serif">
-                  {lang === 'en' && welcomeSettings.headingText ? (
-                    welcomeSettings.headingText
-                  ) : (
-                    <>
-                      <span className="block whitespace-nowrap">{t('welcomeLine1').replace('{{name}}', db.restaurant.name)}</span>
-                      <span className="block whitespace-nowrap">{t('welcomeLine2').replace('{{name}}', db.restaurant.name)}</span>
-                    </>
-                  )}
-                </h1>
-                <p className="text-base sm:text-xl text-[#4A5568] font-medium leading-relaxed">
-                  {(lang === 'en' && welcomeSettings.subtitleText) || t('tagline')}
-                </p>
-              </div>
-
-              {/* Kiosk Admin-configurable promo banner — off by default; a
-                  restaurant opts in from Kiosk Admin rather than this screen
-                  always carrying an offer. */}
-              {welcomeSettings.showPromoBanner && welcomeSettings.promoBannerText && (
-                <div className="inline-flex items-center gap-2 bg-jaman-navy/5 border border-jaman-navy/15 px-5 py-2 rounded-full text-sm font-bold text-jaman-navy">
-                  <span>{welcomeSettings.promoBannerText}</span>
-                </div>
-              )}
-
-              {/* Giant Touch Button */}
-              <div className="pt-4 w-full">
-                <button
-                  onClick={handleStartOrder}
-                  disabled={startOrderTapped}
-                  className={`kiosk-start-order-btn w-full py-6 px-10 bg-jaman-saffron hover:bg-[#F27A2B] active:bg-[#D1560D] text-white text-2xl sm:text-3xl font-black rounded-3xl shadow-2xl shadow-jaman-saffron/40 flex items-center justify-center gap-4 transition-all duration-300 transform active:scale-95 pulse-glow ${startOrderTapped ? 'kiosk-tapped' : ''}`}
-                >
-                  <span>{(lang === 'en' && welcomeSettings.startOrderButtonText) || t('startOrder')}</span>
-                  <ChevronRight className="w-8 h-8 stroke-[3]" />
-                </button>
-                <p className="text-sm font-semibold text-[#8C9BAE] mt-4 tracking-wider uppercase">
-                  {(lang === 'en' && welcomeSettings.supportingText) || t('touchToBegin')}
-                </p>
-              </div>
-            </div>
-
-            {/* RIGHT FOOD PANEL — fixed same width as left */}
-            <div className={`kiosk-food-panel kiosk-food-panel-right flex justify-start items-center h-full flex-shrink-0 ${welcomeExiting ? 'kiosk-welcome-exiting' : ''}`} style={{ width: '38vw' }}>
-              <img
-                src="/right-food-panel.png"
-                alt=""
-                className="h-[60vh] w-auto max-w-full object-contain pointer-events-none"
-              />
-            </div>
-
-          </div>
-
-          {/* Footer Information */}
-          <footer className="flex items-center justify-between text-xs text-[#8C9BAE] font-medium px-8 pb-4 relative z-10">
-            <span>{kioskCopy("screen_terminal_e0926f", "Terminal")}{kioskId}</span>
-            <button
-              onClick={() => setIsStaffPinModalOpen(true)}
-              className="text-[11px] text-[#8C9BAE] hover:text-jaman-navy flex items-center gap-1 opacity-60 hover:opacity-100"
-            >
-              <Lock className="w-3 h-3" />
-              <span>{kioskCopy("screen_staff_mode_35c0cd", "Staff Mode")}</span>
-            </button>
-          </footer>
-        </div>
-      )}
+      {/* One renderer for the real kiosk and the owner's preview. */}
+      {step === 'WELCOME' && <KioskWelcomeScreen
+        settings={welcomeSettings}
+        backgroundUrl={welcomeBackgroundUrl(welcomeSettings, WelcomeScreenSettingsRepository.getSettings().customBackgrounds)}
+        restaurantName={db.restaurant.name}
+        logoUrl={kioskSettings.logoUrl}
+        accentColor={kioskSettings.accentColor}
+        heading={(lang === 'en' && welcomeSettings.headingText) || t('welcomeLine1').replace('{{name}}', '')}
+        subtitle={(lang === 'en' && welcomeSettings.subtitleText) || t('tagline')}
+        buttonText={(lang === 'en' && welcomeSettings.startOrderButtonText) || t('startOrder')}
+        instruction={(lang === 'en' && welcomeSettings.supportingText) || t('touchToBegin')}
+        terminalId={kioskId} busy={startOrderTapped}
+        onStart={handleStartOrder} onStaff={() => setIsStaffPinModalOpen(true)}
+      />}
 
       {/* STEP 2: ORDER TYPE SELECTION */}
       {step === 'ORDER_TYPE' && (
@@ -3339,7 +3306,10 @@ export default function KioskUserApp() {
             </div>
 
             {/* BILL + KITCHEN: side by side on wide landscape screens, one stacked column on a portrait kiosk */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+            {/* lg (1024px), not xl (1280px): the kiosk's own landscape target is 1024×768 (see the
+                per-app device matrix), where a single stacked column needs more scrolling than this
+                short viewport should. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
               <section className="rounded-[28px] bg-white border border-jaman-border shadow-md overflow-hidden">
                 <header className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 bg-jaman-ivory border-b border-jaman-border">
                   <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy">{kioskCopy('screen_receipt_dad5a9', 'Your bill')}</h3>
@@ -3421,7 +3391,7 @@ export default function KioskUserApp() {
                   <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_print_receipt_98bad4', 'Print Receipt')}</span>
                 </button>
                 {receiptConfig.enableEmail && (
-                  <button type="button" onClick={() => setIsEBillModalOpen(true)} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                  <button type="button" onClick={() => { setEBillError(null); setIsEBillModalOpen(true); }} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
                     <Mail className="w-7 h-7 text-emerald-600" />
                     <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_email_bill_64ee94', 'Email Bill')}</span>
                   </button>
@@ -3513,9 +3483,15 @@ export default function KioskUserApp() {
             />
           </div>
 
+          {eBillError && (
+            <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5">{eBillError}</p>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setIsEBillModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
-            <Button variant="accent" type="submit" leftIcon={<Send className="w-3.5 h-3.5" />}>{kioskCopy("screen_email_my_bill_dd97a2", "Email My Bill")}</Button>
+            <Button variant="ghost" type="button" disabled={eBillSending} onClick={() => setIsEBillModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
+            <Button variant="accent" type="submit" disabled={eBillSending} leftIcon={<Send className="w-3.5 h-3.5" />}>
+              {eBillSending ? 'Sending…' : kioskCopy("screen_email_my_bill_dd97a2", "Email My Bill")}
+            </Button>
           </div>
         </form>
       </Modal>

@@ -13,7 +13,7 @@ export function appShellCache(): Plugin {
     closeBundle() {
       const output = path.resolve(config.root, config.build.outDir);
       const assets = readdirSync(path.join(output, 'assets'), { withFileTypes: true })
-        .filter((entry) => entry.isFile() && /\.(js|css|wasm|woff2?)$/.test(entry.name))
+        .filter((entry) => entry.isFile() && /\.(js|css|wasm|woff2?|png|jpe?g|svg|webp)$/.test(entry.name))
         .map((entry) => `./assets/${entry.name}`).sort();
       const buildId = createHash('sha256').update(assets.join('\n'))
         .update(readFileSync(path.join(output, 'index.html'))).digest('hex').slice(0, 12);

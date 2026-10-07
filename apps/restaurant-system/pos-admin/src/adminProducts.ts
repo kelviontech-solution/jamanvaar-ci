@@ -20,7 +20,7 @@ export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, str
   },
   KIOSK_ADMIN: {
     DASHBOARD: 'dashboard', KIOSKS: 'terminals', MENU: 'menu', TEMPLATES: 'templates', MENU_OPTIONS: 'options',
-    KIOSK_DESIGN: 'appearance', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
+    KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
     LIVE_KDS: 'kitchen', TABLES: 'tables', STAFF: 'staff', KIOSK_PAYMENTS: 'payments',
     FEEDBACK: 'feedback', REPORTS: 'reports', HARDWARE: 'printers', RECEIPTS: 'receipts', SYNC: 'sync',
     SETTINGS: 'settings', LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support'

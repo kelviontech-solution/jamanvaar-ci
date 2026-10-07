@@ -1,0 +1,364 @@
+{
+  "at": "2026-10-07T11:02:07.323Z",
+  "environment": "compiled apps; real isolated API/auth/DB; disposable fixture",
+  "results": [
+    {
+      "name": "Activation layout at seven sizes, key help, invalid Restaurant ID and safe network/server/expired/used-key states",
+      "status": "PASS",
+      "ms": 11384,
+      "evidence": {
+        "sizes": [
+          [
+            768,
+            1024
+          ],
+          [
+            800,
+            1280
+          ],
+          [
+            820,
+            1180
+          ],
+          [
+            1024,
+            768
+          ],
+          [
+            1280,
+            800
+          ],
+          [
+            1366,
+            768
+          ],
+          [
+            1920,
+            1080
+          ]
+        ],
+        "negativeStates": "invalid ID is local validation; expired/used/server are explicitly injected HTTP replies; offline is real browser offline"
+      }
+    },
+    {
+      "name": "Real owner activation opens the entitled Kiosk Welcome Screen with sixteen thumbnails",
+      "status": "PASS",
+      "ms": 2789,
+      "evidence": {
+        "backgrounds": 16,
+        "actualOwnerAuth": true
+      }
+    },
+    {
+      "name": "Three real kiosks activate across two branches and show the bundled welcome screen",
+      "status": "PASS",
+      "ms": 18566,
+      "evidence": {
+        "kiosks": 3,
+        "branches": 2
+      }
+    },
+    {
+      "name": "Immediate preview without publishing; portrait/landscape controls; all backgrounds load",
+      "status": "PASS",
+      "ms": 3488,
+      "evidence": {
+        "tenDecodedImages": true,
+        "previewDidNotPublish": true
+      }
+    },
+    {
+      "name": "Apply persists to the real backend, updates both branch kiosks and receives version acknowledgements",
+      "status": "PASS",
+      "ms": 1292,
+      "evidence": {
+        "databasePersisted": true,
+        "twoKiosksUpdated": true,
+        "otherBranchUnchanged": true,
+        "configAcknowledged": true,
+        "applyToVisibleMs": 347
+      }
+    },
+    {
+      "name": "Cover, contain, focal position and zoom change the real preview without stretching the image",
+      "status": "PASS",
+      "ms": 422,
+      "evidence": {
+        "fitSynced": true,
+        "positionSynced": true,
+        "previewUsesSameRenderer": true
+      }
+    },
+    {
+      "name": "Single kiosk override stays isolated; branch inheritance can be restored",
+      "status": "PASS",
+      "ms": 4799,
+      "evidence": {
+        "deviceOverrideIsolated": true,
+        "inheritanceRestored": true
+      }
+    },
+    {
+      "name": "Real upload optimization, apply, custom replacement and persistence after reload",
+      "status": "PASS",
+      "ms": 1016,
+      "evidence": {
+        "optimizedWebp": true,
+        "originalNotStored": true,
+        "replacement": true,
+        "reloadPersistence": true
+      }
+    },
+    {
+      "name": "Wrong upload type is refused; active custom designs cannot be deleted",
+      "status": "PASS",
+      "ms": 66,
+      "evidence": {
+        "invalidUploadRefused": true,
+        "activeDeleteBlocked": true
+      }
+    },
+    {
+      "name": "Reset confirmation restores bundled defaults and custom deletion works after removing references",
+      "status": "PASS",
+      "ms": 464,
+      "evidence": {
+        "resetConfirmed": true,
+        "contentCleared": true,
+        "unusedCustomDeleted": true
+      }
+    },
+    {
+      "name": "Responsive welcome and Admin layouts at all requested sizes; long restaurant name stays within the card",
+      "status": "PASS",
+      "ms": 3400,
+      "evidence": {
+        "names": [
+          "Royal Foods",
+          "Royal Gujarati Restaurant",
+          "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers"
+        ],
+        "findings": [
+          {
+            "width": 768,
+            "height": 1024,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 800,
+            "height": 1280,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 820,
+            "height": 1180,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 1280,
+            "height": 800,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 1366,
+            "height": 768,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "overflow": false,
+            "nameOverflow": false,
+            "buttonVisible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "Missing legacy background safely falls back to the cached default scene",
+      "status": "PASS",
+      "ms": 985,
+      "evidence": {
+        "missingImageFallback": true,
+        "defaultFromCache": true
+      }
+    },
+    {
+      "name": "Offline reload and browser restart retain the background; reconnect receives the latest saved design",
+      "status": "PASS",
+      "ms": 23693,
+      "evidence": {
+        "offlineReload": true,
+        "httpCacheDisabled": true,
+        "reconnectCaughtUp": true,
+        "persistedReload": true,
+        "browserRestart": true
+      }
+    },
+    {
+      "name": "Two kiosks simultaneously use different designs, hotel names and welcome messages across reload and offline",
+      "status": "PASS",
+      "ms": 19705,
+      "evidence": {
+        "differentDesigns": true,
+        "separateLiveContent": true,
+        "offlineReload": true,
+        "branchIsolation": true,
+        "inheritanceRestored": true
+      }
+    },
+    {
+      "name": "Real Super Admin login and controls restrict restaurant gallery without blanking active kiosks",
+      "status": "PASS",
+      "ms": 4819,
+      "evidence": {
+        "realPlatformOtpLogin": true,
+        "defaultCount": 3,
+        "restaurantCount": 2,
+        "selectedDesignIds": [
+          "midnight-spice",
+          "botanical-bistro"
+        ],
+        "currentDesignPreserved": true,
+        "directApiBypassRejected": true
+      }
+    },
+    {
+      "name": "Super Admin adds a durable design; restaurant publishes it to two kiosks with offline portrait and landscape support",
+      "status": "PASS",
+      "ms": 18395,
+      "evidence": {
+        "superUpload": true,
+        "databaseStorage": true,
+        "twoKiosksUpdated": true,
+        "offlineBothOrientations": true,
+        "accessRestored": true
+      }
+    },
+    {
+      "name": "Backend rejects other-branch/device override writes and kiosk configuration authorship",
+      "status": "PASS",
+      "ms": 46,
+      "evidence": {
+        "branchWriteRejected": true,
+        "unknownDeviceRejected": true,
+        "kioskWriteForbidden": true
+      }
+    },
+    {
+      "name": "Start Order still enters the actual language/order flow",
+      "status": "PASS",
+      "ms": 2393,
+      "evidence": {
+        "existingOrderingFlowIntact": true
+      }
+    },
+    {
+      "name": "Reactivating the same browser in another branch clears its old welcome configuration",
+      "status": "PASS",
+      "ms": 2479,
+      "evidence": {
+        "actualSameTenantBranchReactivation": true,
+        "oldBranchConfigurationCleared": true
+      }
+    }
+  ],
+  "errors": [],
+  "expectedNetworkFailures": [
+    {
+      "app": "kiosk",
+      "method": "POST",
+      "status": 400,
+      "path": "/api/v1/activation/redeem"
+    },
+    {
+      "app": "kiosk",
+      "method": "POST",
+      "status": 400,
+      "path": "/api/v1/activation/redeem"
+    },
+    {
+      "app": "kiosk",
+      "method": "POST",
+      "status": 409,
+      "path": "/api/v1/activation/redeem"
+    },
+    {
+      "app": "kiosk",
+      "method": "POST",
+      "status": 503,
+      "path": "/api/v1/activation/redeem"
+    },
+    {
+      "app": "kiosk",
+      "method": "POST",
+      "status": 503,
+      "path": "/api/v1/activation/redeem"
+    },
+    {
+      "app": "kiosk",
+      "method": "GET",
+      "status": 404,
+      "path": "/kiosk/assets/branding/missing-welcome-qa.webp"
+    },
+    {
+      "app": "kiosk",
+      "method": "GET",
+      "status": 404,
+      "path": "/kiosk/assets/branding/missing-welcome-qa.webp"
+    },
+    {
+      "app": "kiosk",
+      "method": "GET",
+      "status": 404,
+      "path": "/kiosk/assets/branding/missing-welcome-qa.webp"
+    },
+    {
+      "app": "kiosk",
+      "method": "GET",
+      "status": 404,
+      "path": "/kiosk/assets/branding/missing-welcome-qa.webp"
+    },
+    {
+      "app": "admin",
+      "method": "GET",
+      "status": 401,
+      "path": "/api/v1/tenant/me/applications"
+    },
+    {
+      "app": "super",
+      "method": "GET",
+      "status": 404,
+      "path": "/api/v1/health"
+    },
+    {
+      "app": "super",
+      "method": "POST",
+      "status": 401,
+      "path": "/api/v1/platform-auth/refresh"
+    },
+    {
+      "app": "super",
+      "method": "GET",
+      "status": 401,
+      "path": "/api/v1/platform/me"
+    }
+  ]
+}

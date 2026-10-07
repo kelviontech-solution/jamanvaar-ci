@@ -33,6 +33,56 @@ describe('pos-admin fetchMyEnabledApps', () => {
   }, 60000);
 });
 
+describe('an expired access token is handled by what actually went wrong, not treated as "sign in again" by default', () => {
+  const originalFetch = global.fetch;
+  afterEach(() => { global.fetch = originalFetch; });
+
+  it('silently renews via the refresh cookie and the original call succeeds, with no visible interruption', async () => {
+    vi.resetModules();
+    localStorage.setItem('jamanvaar_cloud_restaurant_id', 'rest-1');
+    let applicationsCalls = 0;
+    global.fetch = vi.fn().mockImplementation(async (url: string) => {
+      if (String(url).includes('/tenant-auth/refresh')) {
+        return new Response(JSON.stringify({ accessToken: 'fresh-token' }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      applicationsCalls++;
+      // Expired access token: the first attempt 401s, the retry (with the refreshed token) succeeds.
+      if (applicationsCalls === 1) return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
+      return new Response(JSON.stringify({ enabledApps: ['POS_ADMIN'] }), { status: 200, headers: { 'content-type': 'application/json' } });
+    }) as unknown as typeof fetch;
+
+    const { fetchMyEnabledApps } = await import('../apps/restaurant-system/pos-admin/src/cloud/cloudClient');
+    await expect(fetchMyEnabledApps()).resolves.toEqual(['POS_ADMIN']);
+    expect(applicationsCalls).toBe(2);
+  }, 60000);
+
+  it('a refresh call rejected for a platform reason (429 rate limit, 5xx, network blip) — not because the session is dead — is reported as a transient problem, not a logout', async () => {
+    vi.resetModules();
+    localStorage.setItem('jamanvaar_cloud_restaurant_id', 'rest-1');
+    global.fetch = vi.fn().mockImplementation(async (url: string) => {
+      if (String(url).includes('/tenant-auth/refresh')) {
+        return new Response(JSON.stringify({ message: 'Too Many Requests' }), { status: 429, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
+    }) as unknown as typeof fetch;
+
+    const { fetchMyEnabledApps, CloudApiError } = await import('../apps/restaurant-system/pos-admin/src/cloud/cloudClient');
+    await expect(fetchMyEnabledApps()).rejects.toBeInstanceOf(CloudApiError);
+    await expect(fetchMyEnabledApps()).rejects.toMatchObject({ status: 0 });
+  }, 60000);
+
+  it('a refresh call genuinely rejected (401: the refresh token itself is expired, revoked, or reused) is the real "sign in again" case', async () => {
+    vi.resetModules();
+    localStorage.setItem('jamanvaar_cloud_restaurant_id', 'rest-1');
+    global.fetch = vi.fn().mockImplementation(async () =>
+      new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } })
+    ) as unknown as typeof fetch;
+
+    const { fetchMyEnabledApps } = await import('../apps/restaurant-system/pos-admin/src/cloud/cloudClient');
+    await expect(fetchMyEnabledApps()).rejects.toMatchObject({ status: 401 });
+  }, 60000);
+});
+
 describe('filterNavSections (pure gating logic)', () => {
   const sections = [
     {

@@ -1,0 +1,24 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Freshly prepared · Served with care\n\nA warm welcome\n\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nTerminal 4b9647bf-0e5\nStaff Mode",
+  "headings": [
+    "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers"
+  ],
+  "buttons": [
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff Mode",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

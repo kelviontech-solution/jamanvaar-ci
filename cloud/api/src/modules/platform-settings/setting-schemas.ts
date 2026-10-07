@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { gstinStateCodeMatches, isValidGstinFormat } from '../../common/validation/gstin';
+import { DEFAULT_WELCOME_POLICY, welcomePolicySchema } from './welcome-policy';
 
 const isoDate = z.string().refine((v) => !Number.isNaN(Date.parse(v)), 'must be a valid date-time');
 
@@ -8,6 +9,7 @@ const isoDate = z.string().refine((v) => !Number.isNaN(Date.parse(v)), 'must be 
  * cannot be written (the API used to store any JSON for any existing key).
  */
 export const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
+  'platform.kioskWelcome': welcomePolicySchema,
   'platform.branding': z.object({
     platformName: z.string().trim().min(1, 'Platform name is required').max(80),
     companyName: z.string().trim().min(1, 'Company name is required').max(80),
@@ -63,6 +65,7 @@ export const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
  * that an older, unvalidated API left with missing fields is repaired by the next valid save.
  */
 export const SETTING_DEFAULTS: Record<string, Record<string, unknown>> = {
+  'platform.kioskWelcome': DEFAULT_WELCOME_POLICY,
   'platform.branding': {
     platformName: 'JAMANVAAR SaaS Control Plane',
     companyName: 'Kelviontech',

@@ -6,6 +6,7 @@ import { Sliders, Save, ShieldCheck, Wrench, Building2, Bell, AlertTriangle } fr
 import '../../components/shared.css';
 import './settings.css';
 import { InvoiceSellerCard } from './InvoiceSellerCard';
+import { KioskWelcomeDesignsCard } from './KioskWelcomeDesignsCard';
 
 /** ISO timestamp -> the value a datetime-local input wants (local time, no seconds). */
 function isoToLocalInput(iso?: string | null): string {
@@ -175,6 +176,7 @@ export function PlatformSettingsPage() {
         <div className="page-loading">Loading platform configuration…</div>
       ) : (
         <div className="settings-grid">
+          <KioskWelcomeDesignsCard />
           {/* Platform Branding */}
           <Card className="settings-card">
             <div className="settings-card-header">

@@ -8,6 +8,17 @@ export type SendReceiptFn = (
   templateParams: string[]
 ) => Promise<{ success: boolean; providerMessageId?: string; errorMessage?: string }>;
 
+/**
+ * A fresh order's cloud copy can still be a few seconds behind its printed receipt (the push happens in the
+ * background, after the receipt already printed) — the server's own "Order not found" message says so
+ * explicitly (see cloud/api's ReceiptEmailService.sendBillEmail). A caller should retry through that window
+ * rather than failing the guest's first tap; any other failure (bad email, no payment, email not configured)
+ * is real and should not be retried.
+ */
+export function isOrderStillSyncingMessage(message: string): boolean {
+  return /wait a few seconds|sync and try again/i.test(message);
+}
+
 export class EBillService {
   /**
    * Mask sensitive phone numbers for customer privacy (e.g. +91 9876543210 -> ******3210)

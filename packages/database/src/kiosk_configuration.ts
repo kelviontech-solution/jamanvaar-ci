@@ -13,6 +13,19 @@ const VERSION = 'jamanvaar_kiosk_configuration_version';
 const DIRTY = 'jamanvaar_kiosk_configuration_dirty';
 const scopedKey = (key: string) => `${key}:${JSON.stringify([KeyValueStore.get('jamanvaar_tenant_id'), KeyValueStore.get('jamanvaar_bound_branch_id')])}`;
 export class KioskConfigurationRepository {
+  /** Reactivating a terminal in another branch must not carry the previous branch's design or pull cursor. */
+  static bindBranch(branchId?: string | null): void {
+    const next = branchId || undefined;
+    const previous = KeyValueStore.get('jamanvaar_bound_branch_id') || undefined;
+    if (previous !== next) {
+      KeyValueStore.remove(scopedKey(DIRTY));
+      db.resetKioskConfiguration();
+      const cursor = 'jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION';
+      for (const key of KeyValueStore.keys()) if (key === cursor || key.startsWith(cursor + ':')) KeyValueStore.remove(key);
+      KeyValueStore.set('jamanvaar_bound_branch_id', next || '');
+      KeyValueStore.remove(scopedKey(VERSION)); KeyValueStore.remove(scopedKey(DIRTY));
+    } else KeyValueStore.set('jamanvaar_bound_branch_id', next || '');
+  }
   static markChanged(): void {
     const previous = Date.parse(KeyValueStore.get(scopedKey(VERSION)) || '') || 0;
     KeyValueStore.set(scopedKey(VERSION), new Date(Math.max(Date.now(), previous + 1)).toISOString());
@@ -29,7 +42,7 @@ export class KioskConfigurationRepository {
     if (!remote.display || !remote.welcome || !remote.receipt || !Number.isFinite(Date.parse(remote.updatedAt))) return false;
     if (Date.parse(remote.updatedAt) < (Date.parse(KeyValueStore.get(scopedKey(VERSION)) || '') || 0)) return false;
     db.kioskDisplaySettings = { ...remote.display };
-    db.welcomeScreenSettings = { ...remote.welcome };
+    db.welcomeScreenSettings = structuredClone(remote.welcome);
     db.receiptConfig = { ...remote.receipt };
     KeyValueStore.set(scopedKey(VERSION), remote.updatedAt); KeyValueStore.remove(scopedKey(DIRTY));
     db.notify(); return true;

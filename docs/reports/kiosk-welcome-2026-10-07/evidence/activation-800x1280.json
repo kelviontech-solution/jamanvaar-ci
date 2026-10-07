@@ -1,0 +1,47 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "KIOSK\nSELF ORDERING\nDevice:\nActivation required\nNetwork:\nConnected\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nCrave\nTap\nEnjoy!\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART DINING · BETTER EXPERIENCE\n\nActivate Your Kiosk\n\nEnter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.\n\nRestaurant ID *\nActivation Key *\nWhere can I find this?\nActivate Kiosk\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per kiosk and shares it with you.\nSecure & Reliable\n|\nWorks Offline\n|\nAuto Sync\n\nMore than a POS — it's your partner\n\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\n\nBuilt for Modern Restaurants ♥",
+  "headings": [
+    "Guests order.Kitchen firesinstantly.",
+    "JAMANVAAR KIOSK",
+    "Activate Your Kiosk"
+  ],
+  "buttons": [
+    {
+      "text": "Need Help?",
+      "aria": "Need help?",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Where can I find this?",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Activate Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "JM9876543210",
+      "name": "",
+      "id": "kiosk-restaurant-code"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "[ACTIVATION KEY REDACTED]",
+      "name": "",
+      "id": "kiosk-activation-key"
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

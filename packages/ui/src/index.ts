@@ -23,6 +23,7 @@ export * from './JamanAiAssistantModal';
 export * from './SoundManager';
 export * from './VirtualKeyboard';
 export * from './ActivationWelcomeScreen';
+export * from './KioskWelcomeScreen';
 export * from './DeviceGateOverlay';
 export * from './ActivationNoticeBanner';
 export * from './ActivationHelpNote';

@@ -29,6 +29,7 @@ import {
   QrUsageSnapshot,
   LoyaltyTier,
   LoyaltyReward,
+  LoyaltyProgramSettings,
   StaffShiftSchedule,
   AttendanceRecord,
   AttendanceStatus,
@@ -908,8 +909,12 @@ export class OrderRepository {
     // Automated loyalty earn — previously nothing credited points or
     // advanced totalSpend/totalVisits on an actual paid order; only a
     // manual addPoints() call existed, never wired to checkout.
-    if (order.customerPhone) {
-      CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
+    // The loyaltyPointsEarned check makes this safe on a re-settlement attempt of the same order
+    // (settleOrder is itself idempotent above, but this block previously was not): without it, a
+    // retried settle — the same real-world path a flaky sync or a double-tap can produce — credited
+    // the account a second time for one purchase.
+    if (order.customerPhone && order.loyaltyPointsEarned === undefined) {
+      order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
     }
 
     db.notify();
@@ -1662,6 +1667,24 @@ export class CustomerRepository {
 
   // ── Loyalty Tiers ──────────────────────────────────────────────────────
 
+  /** The base rate every tier's multiplier is applied on top of — the admin's direct answer to "how many points do I give". */
+  public static getProgramSettings(): LoyaltyProgramSettings {
+    return db.loyaltyProgramSettings[0] ?? { id: 'default', earnPoints: 1, perRupeesSpent: 10 };
+  }
+
+  public static updateProgramSettings(updates: { earnPoints: number; perRupeesSpent: number }): LoyaltyProgramSettings {
+    const updated: LoyaltyProgramSettings = { id: 'default', earnPoints: updates.earnPoints, perRupeesSpent: updates.perRupeesSpent, updatedAt: new Date().toISOString() };
+    db.loyaltyProgramSettings = [updated];
+    AuditRepository.log({
+      action: 'LOYALTY_PROGRAM_RATE_CHANGED',
+      category: 'CUSTOMER',
+      details: `Loyalty earn rate set to ${updated.earnPoints} point(s) per ₹${updated.perRupeesSpent} spent`,
+      username: 'Manager'
+    });
+    db.notify();
+    return updated;
+  }
+
   public static getTiers(): LoyaltyTier[] {
     return [...db.loyaltyTiers].sort((a, b) => a.minLifetimeSpend - b.minLifetimeSpend);
   }
@@ -1748,11 +1771,10 @@ export class CustomerRepository {
   }
 
   /**
-   * Automated earn rule, called on order settlement: base rate of 1 point
-   * per ₹10 spent, multiplied by the customer's current tier. Also advances
-   * totalSpend/totalVisits/lastVisitAt, which previously were seed-only
-   * fields nothing ever updated — a customer's tier could never actually
-   * change from real activity.
+   * Automated earn rule, called on order settlement: the restaurant's own configured base rate
+   * (getProgramSettings — an admin setting, not a fixed number), multiplied by the customer's current
+   * tier. Also advances totalSpend/totalVisits/lastVisitAt, which previously were seed-only fields
+   * nothing ever updated — a customer's tier could never actually change from real activity.
    */
   public static earnPointsForOrder(phone: string, orderTotal: number, orderId?: string): number {
     const account = this.getOrCreateAccount(phone);
@@ -1770,7 +1792,8 @@ export class CustomerRepository {
     }
 
     const tier = this.getTierForAccount(account) || tierBefore;
-    const basePoints = Math.floor(orderTotal / 10);
+    const rate = this.getProgramSettings();
+    const basePoints = rate.perRupeesSpent > 0 ? Math.floor(orderTotal / rate.perRupeesSpent) * rate.earnPoints : 0;
     const earned = Math.floor(basePoints * (tier?.pointsMultiplier ?? 1));
     account.loyaltyPoints += earned;
 

@@ -1,4 +1,4 @@
-import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, ShiftSync, CashMovementSync, ReservationSync, type CollectionSync } from '@jamanvaar/database';
+import { MenuItemSync, CategorySync, ModifierGroupSync, TaxGroupSync, ComboSync, CouponSync, CustomerSync, FeedbackSync, LoyaltyTierSync, LoyaltyRewardSync, LoyaltyProgramSettingsSync, ShiftSync, CashMovementSync, ReservationSync, type CollectionSync } from '@jamanvaar/database';
 import { EntitySyncEngine } from './entity_sync';
 
 /** The server accepts at most this many records per push. */
@@ -85,6 +85,25 @@ let feedbackInFlight: Promise<void> | null = null;
 export function syncFeedback(opts: { push: boolean }): Promise<void> {
   if (!feedbackInFlight) feedbackInFlight = syncCollection('CUSTOMER_FEEDBACK', FeedbackSync, opts.push).finally(() => { feedbackInFlight = null; });
   return feedbackInFlight;
+}
+
+/** Restaurant Admin configures these; POS and Captain only ever read them (see LoyaltyTierSync/LoyaltyRewardSync). */
+let loyaltyTierInFlight: Promise<void> | null = null;
+export function syncLoyaltyTiers(opts: { push: boolean }): Promise<void> {
+  if (!loyaltyTierInFlight) loyaltyTierInFlight = syncCollection('LOYALTY_TIER', LoyaltyTierSync, opts.push).finally(() => { loyaltyTierInFlight = null; });
+  return loyaltyTierInFlight;
+}
+
+let loyaltyRewardInFlight: Promise<void> | null = null;
+export function syncLoyaltyRewards(opts: { push: boolean }): Promise<void> {
+  if (!loyaltyRewardInFlight) loyaltyRewardInFlight = syncCollection('LOYALTY_REWARD', LoyaltyRewardSync, opts.push).finally(() => { loyaltyRewardInFlight = null; });
+  return loyaltyRewardInFlight;
+}
+
+let loyaltyProgramSettingsInFlight: Promise<void> | null = null;
+export function syncLoyaltyProgramSettings(opts: { push: boolean }): Promise<void> {
+  if (!loyaltyProgramSettingsInFlight) loyaltyProgramSettingsInFlight = syncCollection('LOYALTY_PROGRAM_SETTINGS', LoyaltyProgramSettingsSync, opts.push).finally(() => { loyaltyProgramSettingsInFlight = null; });
+  return loyaltyProgramSettingsInFlight;
 }
 
 /** How many menu, category, combo and coupon changes have not reached the cloud yet (0 = everything is delivered). */

@@ -6,7 +6,7 @@ import { db, CustomerRepository, NotificationRepository, StaffRepository, BILL_R
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, onAppResume } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, onAppResume } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -168,6 +168,11 @@ export const App: React.FC = () => {
     const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: false });
     void syncMenuCatalog({ push: true });
     void syncStaff();
+    // Restaurant Admin is the only place the Loyalty Program (tier multipliers, rewards catalog) is
+    // edited — this terminal only ever reads it, so a real reward can actually be redeemed at the till.
+    void syncLoyaltyTiers({ push: false });
+    void syncLoyaltyRewards({ push: false });
+    void syncLoyaltyProgramSettings({ push: false });
     void syncDiningTables();
     // B2-056: this POS's own cash-drawer shift and its cash movements, so Restaurant Admin's
     // Shift & Cash Drawer Ledger/Reconciliation/EOD Z-Report can see them. Only POS edits its own
@@ -191,6 +196,9 @@ export const App: React.FC = () => {
       void syncCrm();
       void syncMenuCatalog({ push: true });
       void syncStaff();
+      void syncLoyaltyTiers({ push: false });
+      void syncLoyaltyRewards({ push: false });
+      void syncLoyaltyProgramSettings({ push: false });
       void syncShifts({ push: true });
       void syncReservations({ push: true });
       void reportHeartbeat();

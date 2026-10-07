@@ -50,6 +50,25 @@ describe('kiosk configuration', () => {
     expect(KioskConfigurationRepository.pending()).toBeNull();
     KeyValueStore.set('jamanvaar_bound_branch_id', 'br-A'); expect(KioskConfigurationRepository.pending()).not.toBeNull();
   });
+  it('clears a previous branch design and cursor when a terminal is reactivated in another branch', () => {
+    db.welcomeScreenSettings.headingText = 'Branch A only'; KioskConfigurationRepository.markChanged();
+    KeyValueStore.set('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION', 'seq:77');
+    KeyValueStore.set('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION:device:kiosk:core', 'seq:99');
+    KioskConfigurationRepository.bindBranch('br-B');
+    expect(db.welcomeScreenSettings.headingText).toBeUndefined();
+    expect(KioskConfigurationRepository.pending()).toBeNull();
+    expect(KeyValueStore.get('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION')).toBeNull();
+    expect(KeyValueStore.get('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION:device:kiosk:core')).toBeNull();
+    expect(KioskConfigurationRepository.snapshot().branchId).toBe('br-B');
+  });
+  it('preserves pending edits and the cursor on a same-branch activation refresh', () => {
+    db.welcomeScreenSettings.headingText = 'Keep my design'; KioskConfigurationRepository.markChanged();
+    KeyValueStore.set('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION', 'seq:77');
+    KioskConfigurationRepository.bindBranch('br-A');
+    expect(db.welcomeScreenSettings.headingText).toBe('Keep my design');
+    expect(KioskConfigurationRepository.pending()).not.toBeNull();
+    expect(KeyValueStore.get('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION')).toBe('seq:77');
+  });
   it('removes presentation, legal receipt details and config cursors on a tenant switch', () => {
     db.receiptConfig.gstin = 'OLD TENANT GSTIN'; db.kioskDisplaySettings.logoUrl = 'https://old.invalid/logo.png';
     KioskConfigurationRepository.markChanged(); KeyValueStore.set('jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION', 'seq:50');

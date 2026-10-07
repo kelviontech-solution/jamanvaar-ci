@@ -221,6 +221,25 @@ describe('Receipt e-bill delivery', () => {
       expect(attachments[0].content.subarray(0, 4).toString()).toBe('%PDF');
     });
 
+    it('the email body itself is a real message with the bill in it — what was ordered and what it came to — not just "see attached"', async () => {
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: paidOrderId, email: 'guest@example.com' });
+      expect(res.status).toBe(201);
+
+      const [, , html] = emailSendMock.mock.calls[0];
+      expect(html).toContain('Thank you for dining with TEST Receipts Restaurant');
+      // the item and its amount, correctly converted from paise (50000 paise = ₹500.00) — not the raw paise figure
+      expect(html).toContain('Paneer Tikka');
+      expect(html).toContain('× 2');
+      expect(html).toContain('₹500.00');
+      expect(html).not.toContain('₹50000');
+      // the order's total (52500 paise = ₹525.00), also correctly converted
+      expect(html).toContain('Total Paid');
+      expect(html).toContain('₹525.00');
+      expect(html).not.toContain('₹52500');
+      expect(html).toContain('attached to this email as a PDF');
+      expect(html).toContain('We hope to serve you again soon');
+    });
+
     it('a cash-at-counter order (no online payment at all) can also be emailed as a PDF bill', async () => {
       const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: cashOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(201);

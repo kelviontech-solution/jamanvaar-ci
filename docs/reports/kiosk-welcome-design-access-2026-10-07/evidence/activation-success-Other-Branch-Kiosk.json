@@ -1,0 +1,18 @@
+{
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "text": "Kiosk Connected!\n\nThis terminal is now activated for Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers.\n\nTerminal ID: 6808a1c1\nContinue",
+  "headings": [
+    "Kiosk Connected!"
+  ],
+  "buttons": [
+    {
+      "text": "Continue",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [],
+  "links": [],
+  "overflow": false
+}

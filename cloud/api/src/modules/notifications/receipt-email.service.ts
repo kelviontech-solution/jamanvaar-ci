@@ -4,6 +4,13 @@ import { EmailService } from './email.service';
 import { buildReceiptPdfBuffer, ReceiptPdfOrderLine } from './receipt-pdf.util';
 import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
 
+const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+const esc = (v: string) => v.replace(/[&<>"]/g, (c) => ESCAPES[c]);
+// Matches receipt-pdf.util.ts's own local rupees() helper (same reason: a trivial paise->rupee
+// conversion is not worth a cross-package import, here from @jamanvaar/utils, whose barrel re-exports
+// sound.ts, which pulls in @jamanvaar/ui's JSX/import.meta files that this package's build cannot compile).
+const rupees = (paise: number): string => `₹${(paise / 100).toFixed(2)}`;
+
 /** Mirrors payments.service.ts's own PAID_STATUSES — kept as a local copy rather than a cross-module import. */
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
 const CLOSED_ORDER_STATUSES = ['CANCELLED', 'REFUNDED'];
@@ -103,11 +110,8 @@ export class ReceiptEmailService {
       throw new NotFoundException('Order not found — if you just placed this order, wait a few seconds for it to sync and try again');
     }
 
-    const { pdf, orderNo, restaurantName } = built;
-    const html = `
-      <p>Hi,</p>
-      <p>Thank you for your order at <strong>${restaurantName}</strong>. Your bill for order <strong>${orderNo}</strong> is attached as a PDF.</p>
-    `;
+    const { pdf, orderNo, restaurantName, lines, totalAmount, thankYouMessage } = built;
+    const html = this.buildEmailBody(restaurantName, orderNo, lines, totalAmount, thankYouMessage);
     await this.email.send(email, `Your invoice from ${restaurantName} — Order ${orderNo}`, html, [
       { filename: `invoice-${orderNo}.pdf`, content: pdf, contentType: 'application/pdf' }
     ]);
@@ -139,6 +143,42 @@ export class ReceiptEmailService {
       thankYouMessage: presentation?.thankYouMessage, footerMessage: presentation?.footerMessage, logoDataUrl: presentation?.logoUrl, showTaxBreakup: presentation?.showTaxBreakup
     });
 
-    return { pdf, orderNo: order.externalOrderId.slice(-10).toUpperCase(), restaurantName: restaurant.name };
+    return {
+      pdf,
+      orderNo: order.externalOrderId.slice(-10).toUpperCase(),
+      restaurantName: restaurant.name,
+      lines,
+      totalAmount: order.totalAmount,
+      thankYouMessage: presentation?.thankYouMessage
+    };
+  }
+
+  /**
+   * The email a guest actually reads before they ever open the PDF: what they ordered and what it came
+   * to, not just "see attached". Table-based layout (not flexbox) so it renders the same in Outlook as
+   * everywhere else — this is still read inside real inboxes, not just a modern browser.
+   */
+  private buildEmailBody(restaurantName: string, orderNo: string, lines: ReceiptPdfOrderLine[], totalAmountPaise: number, thankYouMessage?: string): string {
+    // lineTotal/totalAmount are paise throughout this service (see ReceiptPdfOrderLine and the PDF's own
+    // rupees() helper); formatINR takes rupees, so every amount here is divided by 100 before formatting.
+    const rows = lines
+      .map(
+        (l) =>
+          `<tr><td style="padding:5px 0;color:#334155;">${esc(l.name)} <span style="color:#94a3b8;">× ${l.quantity}</span></td><td style="padding:5px 0;text-align:right;color:#0B253A;font-weight:600;white-space:nowrap;">${esc(rupees(l.lineTotal))}</td></tr>`
+      )
+      .join('');
+    const intro = thankYouMessage ? esc(thankYouMessage) : 'We hope you enjoyed your meal. Here is your bill for order';
+    return `
+      <div style="font-family:'Segoe UI', Arial, sans-serif; max-width:480px; margin:0 auto; color:#0B253A;">
+        <h2 style="margin:0 0 6px; font-size:20px;">Thank you for dining with ${esc(restaurantName)}! 🙏</h2>
+        <p style="margin:0 0 18px; color:#475569; font-size:14px; line-height:1.5;">${intro} <strong>${esc(orderNo)}</strong>.</p>
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          ${rows}
+          <tr><td style="padding-top:12px; border-top:2px solid #0B253A; font-size:16px; font-weight:800;">Total Paid</td><td style="padding-top:12px; border-top:2px solid #0B253A; font-size:16px; font-weight:800; text-align:right; white-space:nowrap;">${esc(rupees(totalAmountPaise))}</td></tr>
+        </table>
+        <p style="margin-top:20px; font-size:13px; color:#64748b;">Your official tax invoice is attached to this email as a PDF, for your records.</p>
+        <p style="margin-top:18px; font-size:14px; color:#0B253A; font-weight:700;">We hope to serve you again soon! ✨</p>
+      </div>
+    `;
   }
 }

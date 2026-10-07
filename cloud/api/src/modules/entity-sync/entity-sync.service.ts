@@ -8,6 +8,7 @@ import { EntitySyncEventDto, SyncableEntityType } from './dto/push-entity-sync.d
 import { PUBLISHED_DEMO_QR_TOKENS } from './published-demo-qr-tokens';
 import { menuEntityProblem } from './menu-entity-schemas';
 import { staffVisibleTo } from './entity-authority';
+import { WelcomeDesignsService } from '../platform-settings/welcome-designs.service';
 
 /** What is worth an audit line when a synced record changes: money, tax, staff access and coupon value. Never the PIN hash itself. */
 export function sensitiveChange(entityType: string, before: Record<string, unknown> | null, after: Record<string, unknown>): Record<string, unknown> | null {
@@ -65,7 +66,7 @@ export interface EntitySyncPushResult {
 
 @Injectable()
 export class EntitySyncService {
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly realtime: RealtimeBus) {}
+  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService, private readonly realtime: RealtimeBus, private readonly welcomeDesigns: WelcomeDesignsService) {}
 
   async pushEvents(
     device: Device,
@@ -92,6 +93,7 @@ export class EntitySyncService {
   ): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> {
     const results: EntitySyncPushResult[] = [];
     let changed = false;
+    const welcomeCatalog = entityType === 'KIOSK_CONFIGURATION' ? await this.welcomeDesigns.forRestaurant(restaurantId) : undefined;
 
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
       // Acquire the entity counter before record locks so every entity writer uses the same lock order.
@@ -130,6 +132,15 @@ export class EntitySyncService {
             results.push({ externalId: evt.externalId, status: 'error', error: problem });
             continue;
           }
+          if (entityType === 'KIOSK_CONFIGURATION') {
+            if (evt.externalId !== `kiosk-config-${evt.payload.branchId || 'restaurant'}`) throw new Error('Invalid kiosk configuration scope');
+            const overrides = (evt.payload.welcome as { deviceOverrides?: Record<string, unknown> })?.deviceOverrides;
+            const ids = Object.keys(overrides || {});
+            if (ids.length) {
+              const devices = await tx.device.findMany({ where: { id: { in: ids }, restaurantId, type: 'KIOSK', branchId: typeof evt.payload.branchId === 'string' ? evt.payload.branchId : null }, select: { id: true } });
+              if (devices.length !== ids.length) throw new Error('Kiosk overrides must belong to this restaurant and branch');
+            }
+          }
           const existing = await tx.syncedEntity.findUnique({
             where: {
               restaurantId_entityType_externalId: {
@@ -140,6 +151,7 @@ export class EntitySyncService {
             }
           });
           const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
+          if (welcomeCatalog && evt.payload.deleted !== true) this.welcomeDesigns.validateSelection(evt.payload.welcome, (existing?.payload as any)?.welcome, welcomeCatalog.designs);
           if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && existing && existingBranch !== deviceBranchId) {
             throw new Error('BRANCH_FORBIDDEN: This table is outside this device branch');
           }

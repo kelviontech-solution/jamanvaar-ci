@@ -130,7 +130,7 @@ export function LoginPage() {
         appSubtitle="Enterprise Platform Control & SaaS Management"
         isOnline={isOnline}
         onToggleNetwork={() => setIsOnline((prev) => !prev)}
-        healthCheckUrl={`${API_BASE}/api/v1/platform-auth/login`}
+        healthCheckUrl={`${API_BASE}/api/v1/health`}
         heroHeadline="Platform Control."
         heroHighlightWord="Unified Cloud Engine."
         heroDescription="Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics."

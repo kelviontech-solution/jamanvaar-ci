@@ -1,0 +1,512 @@
+{
+  "title": "JAMANVAAR | Kiosk Admin",
+  "text": "Welcome screen updated\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers\nKIOSK ADMIN\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers\nCtrl+K\nAssistant\nLogout\nKIOSK OPERATIONS\nDashboard\nKiosk Terminals\nOrders\nLive Orders / KDS\nFloor / Tables\nCUSTOMER EXPERIENCE\nMenu & Categories\nMenu Templates\nCustomisations & Tax\nKiosk Welcome Screen\nKiosk Appearance & Content\nKiosk Combos & Deals\nOffers & Coupons\nPAYMENTS & SERVICE\nPayments & Payouts\nReceipt & E-Bill\nPrinters & Devices\nCustomer Feedback\nStaff & Roles (RBAC)\nReports & Analytics\nSYSTEM\nKiosk Settings\nSync & Devices\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\n\nKIOSK · APPEARANCE\n\nWelcome Screen\n\nCustomize the experience guests see before they start ordering.\n\nReset to Default\nApply to Kiosk\nApply to\nAll kiosks in this branch\n\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers\n\nBranch settings stay within this branch. Individual kiosks can use their own design. Switch branch before configuring another location.\n\nWelcome screen published. Waiting for kiosk acknowledgements; offline kiosks receive it when they reconnect.\n\nBackground collection\n\nTen original designs. Live text always stays editable.\n\nUpload Custom Background\n\nRecommended: 1080 × 1920 portrait. PNG, JPG or WebP, up to 12 MB. Uploads are optimized before saving. Three custom designs per branch.\n\nDefault\nRoyal Indian Dining\n\nIndian Heritage\n\nPreview\nDefault\nModern Indian Dining\n\nContemporary\n\nPreview\nDefault\nActive\nSelected\nGujarati Thali\n\nRegional Cuisine\n\nPreview\nDefault\nNorth Indian Cuisine\n\nRegional Cuisine\n\nPreview\nDefault\nSouth Indian Cuisine\n\nRegional Cuisine\n\nPreview\nDefault\nIndian Street Food\n\nCasual Dining\n\nPreview\nDefault\nPremium Biryani\n\nSignature Cuisine\n\nPreview\nDefault\nVegetarian Garden\n\nFresh & Vegetarian\n\nPreview\nDefault\nCafé & Casual Dining\n\nCafé\n\nPreview\nDefault\nHeritage Sweets\n\nDesserts\n\nPreview\nLive welcome content\n\nLeave a field empty to use the restaurant or language default.\n\nRestaurant name\nWelcome message\nSubtitle\nStart Order button\nTouch instruction\nRestaurant logo URL\n\nUpload your restaurant logo in Appearance & Content. Names and messages are live UI, never printed into a background.\n\nShow freshly prepared note\nShow promotion\nKiosk Preview\nSaved configuration\nPortrait\nLandscape\n768 × 1024\n800 × 1280\n820 × 1180\n1024 × 768\n1280 × 800\n1366 × 768\n1920 × 1080\nFreshly prepared · Served with care\n\nA warm welcome\n\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nSame renderer as the customer kiosk · English preview · 800 × 1280\n\nImage fit & position\nFit\nFill screen · Cover\nShow full photo · Soft backdrop\nHorizontal position · 50\nVertical position · 50\nZoom · 1\nReadability overlay · 0.2\nConfiguration delivery\n\nVersion: 2026-10-07T10:37:08.261Z\n\nPublished configuration\n\nOnline kiosks receive configuration events. Offline kiosks keep their last saved design and catch up after reconnecting.\n\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Welcome Screen",
+    "Background collection",
+    "Royal Indian Dining",
+    "Modern Indian Dining",
+    "Gujarati Thali",
+    "North Indian Cuisine",
+    "South Indian Cuisine",
+    "Indian Street Food",
+    "Premium Biryani",
+    "Vegetarian Garden",
+    "Café & Casual Dining",
+    "Heritage Sweets",
+    "Live welcome content",
+    "Kiosk Preview",
+    "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers",
+    "Image fit & position",
+    "Configuration delivery"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false
+    },
+    {
+      "text": "KIOSK OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "CUSTOMER EXPERIENCE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu Templates",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Welcome Screen",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PAYMENTS & SERVICE",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customer Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reset to Default",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Apply to Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Upload Custom Background",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nRoyal Indian Dining\n\nIndian Heritage\n\nPreview",
+      "aria": "Preview Royal Indian Dining",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nModern Indian Dining\n\nContemporary\n\nPreview",
+      "aria": "Preview Modern Indian Dining",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nActive\nSelected\nGujarati Thali\n\nRegional Cuisine\n\nPreview",
+      "aria": "Preview Gujarati Thali",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nNorth Indian Cuisine\n\nRegional Cuisine\n\nPreview",
+      "aria": "Preview North Indian Cuisine",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nSouth Indian Cuisine\n\nRegional Cuisine\n\nPreview",
+      "aria": "Preview South Indian Cuisine",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nIndian Street Food\n\nCasual Dining\n\nPreview",
+      "aria": "Preview Indian Street Food",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nPremium Biryani\n\nSignature Cuisine\n\nPreview",
+      "aria": "Preview Premium Biryani",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nVegetarian Garden\n\nFresh & Vegetarian\n\nPreview",
+      "aria": "Preview Vegetarian Garden",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nCafé & Casual Dining\n\nCafé\n\nPreview",
+      "aria": "Preview Café & Casual Dining",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Default\nHeritage Sweets\n\nDesserts\n\nPreview",
+      "aria": "Preview Heritage Sweets",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Portrait",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Landscape",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "branch",
+          "text": "All kiosks in this branch"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Welcome to",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Authentic flavors. A little moment of happiness.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Start Order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Touch the screen to begin your order",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "768x1024",
+          "text": "768 × 1024"
+        },
+        {
+          "value": "800x1280",
+          "text": "800 × 1280"
+        },
+        {
+          "value": "820x1180",
+          "text": "820 × 1180"
+        },
+        {
+          "value": "1024x768",
+          "text": "1024 × 768"
+        },
+        {
+          "value": "1280x800",
+          "text": "1280 × 800"
+        },
+        {
+          "value": "1366x768",
+          "text": "1366 × 768"
+        },
+        {
+          "value": "1920x1080",
+          "text": "1920 × 1080"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "cover",
+          "text": "Fill screen · Cover"
+        },
+        {
+          "value": "contain",
+          "text": "Show full photo · Soft backdrop"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

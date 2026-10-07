@@ -1,0 +1,554 @@
+{
+  "backgroundDesigns": 16,
+  "optimizedAssets": 64,
+  "uniqueAssetHashes": 64,
+  "bytes": 6891520,
+  "checkedCompiledCopies": 192,
+  "reportTextFilesCheckedForPrivateValues": 39,
+  "designs": [
+    {
+      "id": "royal-indian-dining",
+      "name": "Royal Indian Dining",
+      "assets": [
+        {
+          "file": "royal-indian-dining.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 165976,
+          "sha256": "1a0b3dbb771888de4ceec311f7a0626aa67e859e30449ff97e0f3a7c0526e784"
+        },
+        {
+          "file": "royal-indian-dining-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 200754,
+          "sha256": "e93f07b8fc9e6136d2c4f59dc9bc55ad8c5e33fe80395b34d1f5dd547f9acbc6"
+        },
+        {
+          "file": "royal-indian-dining-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 18158,
+          "sha256": "710e310d5d7a910ef16e828128dc0f96733db89a54a87a7011dd0693eaaf821e"
+        },
+        {
+          "file": "royal-indian-dining-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 14934,
+          "sha256": "910b5bb24fac02ff68c0227c1337fa45efce76f2abc9abe1d44dc7643db04e2f"
+        }
+      ]
+    },
+    {
+      "id": "modern-indian-dining",
+      "name": "Modern Indian Dining",
+      "assets": [
+        {
+          "file": "modern-indian-dining.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 146944,
+          "sha256": "57442cbfbc98a322c14ba56baa855d1c89b2638472736f4664a0a1fe5ac6e26a"
+        },
+        {
+          "file": "modern-indian-dining-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 152062,
+          "sha256": "e127277d0c76ea7864b6e6dab149eef5710f66a13792c74823042b773a9c1090"
+        },
+        {
+          "file": "modern-indian-dining-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 15292,
+          "sha256": "50772a371916aaced85e37c46be22e12a17ea0c97b46eed9b9949926bd05851c"
+        },
+        {
+          "file": "modern-indian-dining-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 12572,
+          "sha256": "7eb10e5e15399e2593eb65b2c0ab7680b6a18d2f4d140a6a2a5bd39597cdc82d"
+        }
+      ]
+    },
+    {
+      "id": "gujarati-thali",
+      "name": "Gujarati Thali",
+      "assets": [
+        {
+          "file": "gujarati-thali.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 209998,
+          "sha256": "81208b0767338cf5a7b313a8ea199f495fe34cb709aa4ec5431f1c744c4dc77a"
+        },
+        {
+          "file": "gujarati-thali-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 182554,
+          "sha256": "40b40ac0026823dfb297bdaebf81c1d314e45e000498f708b095521d185bd2c3"
+        },
+        {
+          "file": "gujarati-thali-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 19312,
+          "sha256": "9eb0ee9bc65cc4d92d282fd12bd6f36f2dec796326f9ed2e5e6bf84c2004a3ca"
+        },
+        {
+          "file": "gujarati-thali-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 14670,
+          "sha256": "66a2802660c5564ab5e72a33d35cfd6834c291786ab75da7ea025e67c2a54499"
+        }
+      ]
+    },
+    {
+      "id": "north-indian-cuisine",
+      "name": "North Indian Cuisine",
+      "assets": [
+        {
+          "file": "north-indian-cuisine.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 169878,
+          "sha256": "db7c21f4488703d5feb2223baecf96fac98dd2e5fa5731dbccc12b6874099ff6"
+        },
+        {
+          "file": "north-indian-cuisine-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 196488,
+          "sha256": "45b3e7e67b49cc29a01394afef7819880e7e76178fb4a2636c76df7e723a6f42"
+        },
+        {
+          "file": "north-indian-cuisine-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 16044,
+          "sha256": "b0a206b683a799a19391d29dfc5abe7927c1b5694797b7335f1c103c22848431"
+        },
+        {
+          "file": "north-indian-cuisine-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 14792,
+          "sha256": "80605fe48e5a6fc118d81dfec1abf0cf26c1480ecaa7d4a77220545bea5a74a6"
+        }
+      ]
+    },
+    {
+      "id": "south-indian-cuisine",
+      "name": "South Indian Cuisine",
+      "assets": [
+        {
+          "file": "south-indian-cuisine.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 189288,
+          "sha256": "be3e529b7e8f8698736f47e983f88625dcf32f622bc0609585359aeaae20d976"
+        },
+        {
+          "file": "south-indian-cuisine-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 184638,
+          "sha256": "8fccb113437c37afa6d08f5edd7f45873bebb141f054e6af8836d04337a49603"
+        },
+        {
+          "file": "south-indian-cuisine-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 19680,
+          "sha256": "c1f4fb1977d50f211633429c53127413c6be72e381933206c5464e3a4cf10e03"
+        },
+        {
+          "file": "south-indian-cuisine-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 14492,
+          "sha256": "8f73b8adcb4295a54364d1dd1ffa5592a850ca8dc09dcd826e1ad24369f8a274"
+        }
+      ]
+    },
+    {
+      "id": "indian-street-food",
+      "name": "Indian Street Food",
+      "assets": [
+        {
+          "file": "indian-street-food.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 159508,
+          "sha256": "6419373e7d9ba738a81321732ec98a9d7259339e7ec094a28565706b14a49ee1"
+        },
+        {
+          "file": "indian-street-food-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 158872,
+          "sha256": "3c49a3b33d2169f40d1fa678aec543b321c08116cb85bc319e2251cc415b1eec"
+        },
+        {
+          "file": "indian-street-food-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 16416,
+          "sha256": "d669951aee0b508f0e31ad317515f8a0d8d71022795b05a3598465a484adb973"
+        },
+        {
+          "file": "indian-street-food-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 13370,
+          "sha256": "2fed42cee372ca7f40edbd7bea86d367ba313a7b5f33d4d1d0b25d630203ffeb"
+        }
+      ]
+    },
+    {
+      "id": "premium-biryani",
+      "name": "Premium Biryani",
+      "assets": [
+        {
+          "file": "premium-biryani.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 125630,
+          "sha256": "971d07bb34b4ca7a175ba226ef0031d37005f55557145ea9d1716a176b338900"
+        },
+        {
+          "file": "premium-biryani-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 174372,
+          "sha256": "0fd35ed294b528451a208f304b9d84201bd305b43257ba1f5ea3157f5b529825"
+        },
+        {
+          "file": "premium-biryani-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 13070,
+          "sha256": "506361df70840dc034fde1e84d11ec993f9c9e4f96b5b866fa7be67f40eca97a"
+        },
+        {
+          "file": "premium-biryani-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 13462,
+          "sha256": "6e1e0e42be557cd39a90bf0ad5a74a1628620e8dedfed4ffa5e40056db5a5911"
+        }
+      ]
+    },
+    {
+      "id": "vegetarian-garden",
+      "name": "Vegetarian Garden",
+      "assets": [
+        {
+          "file": "vegetarian-garden.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 181608,
+          "sha256": "650e0dfca62f0cfafa0d7df231fde7575058596e04dcda963761dd3cb2c400e2"
+        },
+        {
+          "file": "vegetarian-garden-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 242902,
+          "sha256": "16d64fd6321580456b923c52da249c772f32e7f018d4ac44e9df25999e6f5679"
+        },
+        {
+          "file": "vegetarian-garden-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 18892,
+          "sha256": "ab36b476d539efbffa6f118fb40cba416c6a1ca7ca295345930d85c1beb9fc42"
+        },
+        {
+          "file": "vegetarian-garden-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 15646,
+          "sha256": "32333fc72b9a66566336420efe28ea9d9d6043462366123a52824f13a7fa4436"
+        }
+      ]
+    },
+    {
+      "id": "cafe-casual-dining",
+      "name": "Café & Casual Dining",
+      "assets": [
+        {
+          "file": "cafe-casual-dining.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 126540,
+          "sha256": "7200d4f4d2987cc52dd593076956c4706b19a1c1afc9e53084c357fc5f9424fc"
+        },
+        {
+          "file": "cafe-casual-dining-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 165850,
+          "sha256": "cc984bb3a015f786d332f287268a88a866b715b5a068f734c17cb77ec6b9fd31"
+        },
+        {
+          "file": "cafe-casual-dining-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 15334,
+          "sha256": "3256a023016ead061b10ef9274a7dd5ebe10f0fa2623fbba7dbdcf0eecad8e61"
+        },
+        {
+          "file": "cafe-casual-dining-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 13286,
+          "sha256": "6f3a606272e848a17ddd2d55b89e5d1943119dd91b39ba1d5bde74bb858a50a1"
+        }
+      ]
+    },
+    {
+      "id": "heritage-desserts",
+      "name": "Heritage Sweets",
+      "assets": [
+        {
+          "file": "heritage-desserts.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 150460,
+          "sha256": "b611a1f28c3c88bc56438461e40ca5ed82c7522415d0b64d2468647ae0a3d775"
+        },
+        {
+          "file": "heritage-desserts-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 201498,
+          "sha256": "ca85df021e3d43968fc5350990444eea116f8f8546fafc1dc5c0ac7bfd5bf6b3"
+        },
+        {
+          "file": "heritage-desserts-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 14594,
+          "sha256": "794737adba96a7d67e05a5f859a43418f231999f45f11b7a8c9aad4092655501"
+        },
+        {
+          "file": "heritage-desserts-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 13602,
+          "sha256": "80ac7b8fdf0f34d18b7afa5f88af74009200b217d09bdfdb7c176d50221feb94"
+        }
+      ]
+    },
+    {
+      "id": "midnight-spice",
+      "name": "Midnight Spice",
+      "assets": [
+        {
+          "file": "midnight-spice.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 193306,
+          "sha256": "27191277a0bfd0100daf863ddea39bd5d6a19e72725c52a53d1cbe929df8618b"
+        },
+        {
+          "file": "midnight-spice-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 225070,
+          "sha256": "d6c7d03e84762231bf6ef883ead88dc00b5cfaf3a4ff2727b32d6c1e2eb0e006"
+        },
+        {
+          "file": "midnight-spice-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 14388,
+          "sha256": "de5d7a3afcec4c3931df1b65d165178adae0a56299278db5c8ed4032068122c2"
+        },
+        {
+          "file": "midnight-spice-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 12650,
+          "sha256": "40ad40d4f18ed2d227e1646bc6c693b29e50099b9c72b08ced945fba4cbce8b8"
+        }
+      ]
+    },
+    {
+      "id": "terracotta-table",
+      "name": "Terracotta Table",
+      "assets": [
+        {
+          "file": "terracotta-table.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 346298,
+          "sha256": "d72223d6d8dc43caa4baa50b53fb5b0cc6205e9ee57c3fe8c2aa8f856d115686"
+        },
+        {
+          "file": "terracotta-table-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 368778,
+          "sha256": "5647e6a71b6a390b220ddba57c3b533222f98f779ee673a52b11f496a13c111c"
+        },
+        {
+          "file": "terracotta-table-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 20008,
+          "sha256": "6586c9c35512b0eb9757a04450712172e7bdecee53a7aa6e3e8359dac95cc033"
+        },
+        {
+          "file": "terracotta-table-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 17472,
+          "sha256": "6b22133ae4c5e1b9704ad6386a33d7fc0e3992d02e94ed865dfd65b7b751c97d"
+        }
+      ]
+    },
+    {
+      "id": "teal-pop-kitchen",
+      "name": "Teal Pop Kitchen",
+      "assets": [
+        {
+          "file": "teal-pop-kitchen.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 110520,
+          "sha256": "9493aac014d29ddf4fd60a7d9a4e56c045b69a6e1de6330d0dbe54e214ec91cb"
+        },
+        {
+          "file": "teal-pop-kitchen-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 131640,
+          "sha256": "f67f665de2dce423733d1c809f6486a25585a81296cf30bc87546c88640c8751"
+        },
+        {
+          "file": "teal-pop-kitchen-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 12354,
+          "sha256": "583bb67b8cb38eacb5663325c96d9e7c649947467d39bb3b79fc109a08c7554e"
+        },
+        {
+          "file": "teal-pop-kitchen-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 10020,
+          "sha256": "938fb4f9327d0c6c8150329ca91b3f8ef24e4734a39272df3164ad54bebb865f"
+        }
+      ]
+    },
+    {
+      "id": "botanical-bistro",
+      "name": "Botanical Bistro",
+      "assets": [
+        {
+          "file": "botanical-bistro.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 285012,
+          "sha256": "73c9f703201b5ef44c4986d2aedc1279b8d5ecb434a17c8359b0da10ae3ba27c"
+        },
+        {
+          "file": "botanical-bistro-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 305072,
+          "sha256": "287ebd78733b75e980e35f8c89ed6dce9cbb332d438dddeaa16ae7c56cb9019d"
+        },
+        {
+          "file": "botanical-bistro-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 23902,
+          "sha256": "630cde67e00d0327a720a2a2e5eaa09f50db5ffdbadd278efc8ddc986c596901"
+        },
+        {
+          "file": "botanical-bistro-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 19120,
+          "sha256": "ef069c8d293b91982e233a1bde3636353cc51170695259e818e87696803781b5"
+        }
+      ]
+    },
+    {
+      "id": "pastel-patisserie",
+      "name": "Pastel Patisserie",
+      "assets": [
+        {
+          "file": "pastel-patisserie.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 179080,
+          "sha256": "37a3bd81d0b82e14ae5e8957a7dd9a6c4ddaf5ef944490de341623ebb63bc174"
+        },
+        {
+          "file": "pastel-patisserie-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 171384,
+          "sha256": "e2614ff5fb942a874e20786a1536853011d247efb5c4b1b6f4cad1127f5c729c"
+        },
+        {
+          "file": "pastel-patisserie-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 14858,
+          "sha256": "e024140e56ca7ae3b60bacfc08b0f06dee698adc513ac0432e8993719f469f94"
+        },
+        {
+          "file": "pastel-patisserie-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 10936,
+          "sha256": "f57d23ceccbc94546fbe98a591789f6a359d05eef78baf8124829967d25b38ee"
+        }
+      ]
+    },
+    {
+      "id": "urban-street-kitchen",
+      "name": "Urban Street Kitchen",
+      "assets": [
+        {
+          "file": "urban-street-kitchen.webp",
+          "width": 1080,
+          "height": 1920,
+          "bytes": 279462,
+          "sha256": "197c909b5c907dada3ef9d23bddaf3c4b08615d2545bf4f7ec3254b5cb2710c5"
+        },
+        {
+          "file": "urban-street-kitchen-landscape.webp",
+          "width": 1920,
+          "height": 1080,
+          "bytes": 304934,
+          "sha256": "9977a88c0accb021aaeef459863fbda531835d83801ce64d257ad650d19a66e9"
+        },
+        {
+          "file": "urban-street-kitchen-thumb.webp",
+          "width": 270,
+          "height": 480,
+          "bytes": 23308,
+          "sha256": "0b17bbe771d995bb16e7972243891da9a320a9164133396682fe1dbb3d72d7fd"
+        },
+        {
+          "file": "urban-street-kitchen-landscape-thumb.webp",
+          "width": 400,
+          "height": 225,
+          "bytes": 18510,
+          "sha256": "fd5d26dddb70cc97878c9a91230540626fb01d556dbd9dd9ef65e65792b31904"
+        }
+      ]
+    }
+  ]
+}

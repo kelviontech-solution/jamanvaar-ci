@@ -1,0 +1,734 @@
+{
+  "title": "JAMANVAAR — Platform Control Center",
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Settings\n\nGlobal SaaS parameters, default onboarding quotas, statutory business metadata, and platform maintenance mode.\n\nKiosk Welcome Designs\n\nManage the collection, restaurant allowances, and new backgrounds.\n\nDesign access saved. Kiosk Admin refreshes when opened or focused. Existing kiosk selections keep working.\n\nDesign access scope\nPlatform default / all restaurants\nRoyal Gujarati Traditional Multi Cuisine Restaurant & Caterers · JM9370788744\nQA idle sync 1791306728613 · JM9876866412\nQA idle sync 1791306591420 · JM9862217385\nQA idle sync 1791303335560 · JM9815608075\nQA idle sync 1791303285198 · JM9866417157\nQA idle sync 1791303192365 · JM9864572072\nQA idle sync 1791303091189 · JM9821811658\nQA restaurant product 1791293417513 · JM9887686519\nQA both product 1791293417448 · JM9822780256\nQA kiosk product 1791293417229 · JM9855244830\nQA restaurant product 1791293247661 · JM9839283120\nQA both product 1791293247578 · JM9883710945\nQA kiosk product 1791293247349 · JM9894941182\nQA restaurant product 1791293032179 · JM9871175913\nQA both product 1791293032087 · JM9861458771\nQA kiosk product 1791293031878 · JM9867457326\nQA restaurant product 1791292870204 · JM9882215653\nQA both product 1791292870094 · JM9834079840\nQA kiosk product 1791292869813 · JM9854498547\nQA Menu Template Restaurant 1791290328891 · JM9837679431\nQA Menu Template Restaurant 1791289396334 · JM9844248979\nQA Menu Template Restaurant 1791288537118 · JM9830498859\nQA Menu Template Restaurant 1791287658390 · JM9860391575\nQA Menu Template Restaurant 1791287384477 · JM9852073886\nQA Menu Template Restaurant 1791286869452 · JM9821863319\nQA Menu Template Restaurant 1791286541762 · JM9840033818\nQA Menu Template Restaurant 1791286441961 · JM9863455131\nQA Kiosk Only Merged Admin 1791270507575 · JM9876852751\nQA-Restaurant-B-1791252294734 · JM9891000002\nQA-Restaurant-A-1791252294734 · JM9891000001\nRestaurant maximum designs\n\n2 designs available in this scope. The limit counts from collection order. Platform-disabled designs stay unavailable to every restaurant. Your existing ten designs are preserved.\n\nAllow all designs\nClear design selection\nUse platform defaults\nSave design access\n Royal Indian Dining\n\nIndian Dining\n\n Modern Indian Dining\n\nIndian Dining\n\n Gujarati Thali\n\nIndian Dining\n\n North Indian Cuisine\n\nIndian Dining\n\n South Indian Cuisine\n\nIndian Dining\n\n Indian Street Food\n\nIndian Dining\n\n Premium Biryani\n\nIndian Dining\n\n Vegetarian Garden\n\nIndian Dining\n\n Café & Casual Dining\n\nIndian Dining\n\n Heritage Sweets\n\nIndian Dining\n\n Midnight Spice\n\nDark & Dramatic\n\n Terracotta Table\n\nRustic & Earthy\n\n Teal Pop Kitchen\n\nModern & Playful\n\n Botanical Bistro\n\nBotanical & Fresh\n\n Pastel Patisserie\n\nCafé & Pastel\n\n Urban Street Kitchen\n\nBold & Urban\n\nAdd a platform design\n\nPNG, JPG or WebP. Portrait master recommended: 1080 × 1920. Optional wide companion: 1920 × 1080. Keep the centre clear and leave names, messages, and buttons out of the artwork. Images are optimized and stored durably on the server.\n\nDesign name\nCategory / style\nPortrait image\nLandscape image (optional)\nAdd welcome design\nPlatform Branding\n\nThe support email and phone appear on every invoice and at the foot of every email the platform sends.\n\nPlatform Name *\nParent Company *\nSupport Email *\nSupport Phone\nSave Branding\nInvoice seller details\n\nPrinted on every invoice and receipt. Check these are your real company and bank details before invoicing.\n\nTrade name\nShown as the seller on invoices\nLegal name\nAddress\nCity\nState\nDecides CGST + SGST (same state as the restaurant) or IGST\nPIN code\nGSTIN\nIts first two digits must match the state\nPAN\n10 characters, e.g. AAACK7890F (optional)\nSAC code\nBank\nAccount name\nAccount number\nIFSC\nUPI ID\nBilling email\nLeave empty to use the support email above\nSave seller details\nOnboarding Default Quotas\n\nDefault allocation when new restaurants are provisioned\n\nDefault Trial Duration (Days) *\nMax Outlets per Trial *\nMax Terminals per Trial *\nSave Quotas\nMaintenance & Alerts\n\nGlobal platform announcements and maintenance broadcast\n\nPlatform Maintenance Mode\n\nWhen saved as ON, every restaurant app (Restaurant Admin, POS, KDS, Captain, Kiosk) shows this notice at the top of the screen. It never stops billing: terminals keep working offline without losing local data.\n\nGlobal Status Banner Message\n0/500. Leave empty to show a standard maintenance message.\nStarts at (optional)\nEnds at (optional)\nWithout times the notice shows until you switch it off. With times it appears and disappears by itself.\nOff: no notice is being shown to restaurants.\nSave notice",
+  "headings": [
+    "Platform Settings",
+    "Kiosk Welcome Designs",
+    "Platform Branding",
+    "Invoice seller details",
+    "Onboarding Default Quotas",
+    "Maintenance & Alerts"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false
+    },
+    {
+      "text": "Allow all designs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Clear design selection",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Use platform defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save design access",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Add welcome design",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save seller details",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save Quotas",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Save notice",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search pages, restaurants, owners, devices, keys…",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "global",
+          "text": "Platform default / all restaurants"
+        },
+        {
+          "value": "f7e94190-3b5f-4ee2-84ba-fff8c5f5cdd9",
+          "text": "Royal Gujarati Traditional Multi Cuisine Restaurant & Caterers · JM9370788744"
+        },
+        {
+          "value": "1d6aa75f-7136-4eaf-9b56-66a39c9ce7c8",
+          "text": "QA idle sync 1791306728613 · JM9876866412"
+        },
+        {
+          "value": "b24d34be-340c-436c-808f-18eb92d06f58",
+          "text": "QA idle sync 1791306591420 · JM9862217385"
+        },
+        {
+          "value": "9e0f8d63-0b7f-4a02-93c2-f31883c03e39",
+          "text": "QA idle sync 1791303335560 · JM9815608075"
+        },
+        {
+          "value": "96bf9a5a-5d9a-450a-a458-e6131097bd51",
+          "text": "QA idle sync 1791303285198 · JM9866417157"
+        },
+        {
+          "value": "34a1fd70-8348-4b22-88b4-3ff3432c9dd8",
+          "text": "QA idle sync 1791303192365 · JM9864572072"
+        },
+        {
+          "value": "c1a07a85-c1a2-4b27-a6ad-5adf495414ee",
+          "text": "QA idle sync 1791303091189 · JM9821811658"
+        },
+        {
+          "value": "7ecfcecc-1056-48f6-9ecb-46475cbced41",
+          "text": "QA restaurant product 1791293417513 · JM9887686519"
+        },
+        {
+          "value": "8d7f49e9-b767-4efa-b588-9623a8110254",
+          "text": "QA both product 1791293417448 · JM9822780256"
+        },
+        {
+          "value": "1eebd4f5-81c3-462d-bae5-888e2be09769",
+          "text": "QA kiosk product 1791293417229 · JM9855244830"
+        },
+        {
+          "value": "9ad98d29-9806-4e2a-b3fb-148d373e4109",
+          "text": "QA restaurant product 1791293247661 · JM9839283120"
+        },
+        {
+          "value": "ce743306-96cf-48fc-b9f1-8ce75c2745da",
+          "text": "QA both product 1791293247578 · JM9883710945"
+        },
+        {
+          "value": "e99a58ed-c0d4-4fd2-b8f5-793b4084dcca",
+          "text": "QA kiosk product 1791293247349 · JM9894941182"
+        },
+        {
+          "value": "bf272686-0228-4e16-b30c-39246f4a9818",
+          "text": "QA restaurant product 1791293032179 · JM9871175913"
+        },
+        {
+          "value": "6629f023-89b5-4e4e-b541-c704fc32be9b",
+          "text": "QA both product 1791293032087 · JM9861458771"
+        },
+        {
+          "value": "5d579e4d-69f3-4a26-afcf-97d5b0aa6176",
+          "text": "QA kiosk product 1791293031878 · JM9867457326"
+        },
+        {
+          "value": "75c353e9-4300-49a0-a90f-b1ebde75b5cd",
+          "text": "QA restaurant product 1791292870204 · JM9882215653"
+        },
+        {
+          "value": "8555759d-33a7-4d92-b14f-05dab6a4e6e4",
+          "text": "QA both product 1791292870094 · JM9834079840"
+        },
+        {
+          "value": "0b19f4fa-e895-4e4e-ace4-33cc0eedf10d",
+          "text": "QA kiosk product 1791292869813 · JM9854498547"
+        },
+        {
+          "value": "14c6eeca-862d-4777-9a9b-eb950a8ca3dd",
+          "text": "QA Menu Template Restaurant 1791290328891 · JM9837679431"
+        },
+        {
+          "value": "242ddb0b-6257-402c-b39c-53514d887bf5",
+          "text": "QA Menu Template Restaurant 1791289396334 · JM9844248979"
+        },
+        {
+          "value": "16879c61-aace-4686-9a2b-23d487ea3774",
+          "text": "QA Menu Template Restaurant 1791288537118 · JM9830498859"
+        },
+        {
+          "value": "efe456ee-3717-433d-99b5-5320b681f39f",
+          "text": "QA Menu Template Restaurant 1791287658390 · JM9860391575"
+        },
+        {
+          "value": "f0ef1509-5d91-4f7f-9aad-849635853486",
+          "text": "QA Menu Template Restaurant 1791287384477 · JM9852073886"
+        },
+        {
+          "value": "5bf1370d-b0c7-41d4-970d-8b96d5bf413c",
+          "text": "QA Menu Template Restaurant 1791286869452 · JM9821863319"
+        },
+        {
+          "value": "7bd617b4-026b-4bea-8f5a-c37519439d48",
+          "text": "QA Menu Template Restaurant 1791286541762 · JM9840033818"
+        },
+        {
+          "value": "deef69e1-c41d-4cb6-b258-61bcf609a303",
+          "text": "QA Menu Template Restaurant 1791286441961 · JM9863455131"
+        },
+        {
+          "value": "69f845aa-57fd-4025-9f14-646e41faf5fd",
+          "text": "QA Kiosk Only Merged Admin 1791270507575 · JM9876852751"
+        },
+        {
+          "value": "f84751ce-d9bf-439b-8fd0-ead11c838fd5",
+          "text": "QA-Restaurant-B-1791252294734 · JM9891000002"
+        },
+        {
+          "value": "c5f75d1f-915e-4a3d-953b-a787fd76364f",
+          "text": "QA-Restaurant-A-1791252294734 · JM9891000001"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "email",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-tradeName"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-legalName"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-address"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-city"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-state"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-pincode"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-gstin"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-panNumber"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-sacCode"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-bankName"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-bankAccountName"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-bankAccountNumber"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-bankIfsc"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-upiId"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": null,
+      "name": "",
+      "id": "seller-billingEmail"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "placeholder": null,
+      "name": "",
+      "id": "maintenanceToggle"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "placeholder": "e.g. Scheduled database optimization on Sunday 2:00 AM IST. All offline devices remain operational.",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "placeholder": null,
+      "name": "",
+      "id": ""
+    }
+  ],
+  "links": [
+    {
+      "text": "",
+      "href": "/"
+    },
+    {
+      "text": "Executive Dashboard",
+      "href": "/"
+    },
+    {
+      "text": "Restaurants",
+      "href": "/restaurants"
+    },
+    {
+      "text": "Restaurant Owners",
+      "href": "/owners"
+    },
+    {
+      "text": "Branches",
+      "href": "/branches"
+    },
+    {
+      "text": "Subscriptions",
+      "href": "/subscriptions"
+    },
+    {
+      "text": "Invoices & Billing",
+      "href": "/billing"
+    },
+    {
+      "text": "Plans & Entitlements",
+      "href": "/plans"
+    },
+    {
+      "text": "Feature Catalog",
+      "href": "/feature-catalog"
+    },
+    {
+      "text": "QR Ordering Suite",
+      "href": "/qr-ordering"
+    },
+    {
+      "text": "WhatsApp Ordering",
+      "href": "/whatsapp-ordering"
+    },
+    {
+      "text": "JAMAN AI Engine",
+      "href": "/ai-assistant"
+    },
+    {
+      "text": "Master Menu Catalog",
+      "href": "/catalog"
+    },
+    {
+      "text": "Activation Keys",
+      "href": "/activation-keys"
+    },
+    {
+      "text": "Payment Gateways",
+      "href": "/payment-connections"
+    },
+    {
+      "text": "Platform Payments",
+      "href": "/platform-payments"
+    },
+    {
+      "text": "Restaurant Payouts",
+      "href": "/payouts"
+    },
+    {
+      "text": "Applications & Releases",
+      "href": "/applications"
+    },
+    {
+      "text": "Device Fleet / MDM",
+      "href": "/devices"
+    },
+    {
+      "text": "Sync & Conflict Monitor",
+      "href": "/sync-monitor"
+    },
+    {
+      "text": "Backups & Recovery",
+      "href": "/backups"
+    },
+    {
+      "text": "System Telemetry",
+      "href": "/system-health"
+    },
+    {
+      "text": "Staging Sandboxes",
+      "href": "/sandboxes"
+    },
+    {
+      "text": "Reports & Analytics",
+      "href": "/reports"
+    },
+    {
+      "text": "Audit Logs",
+      "href": "/audit-logs"
+    },
+    {
+      "text": "Emergency Offline Policy",
+      "href": "/offline-policy"
+    },
+    {
+      "text": "Platform Team",
+      "href": "/team"
+    },
+    {
+      "text": "Support Tickets",
+      "href": "/tickets"
+    },
+    {
+      "text": "Diagnostics & Support",
+      "href": "/support"
+    },
+    {
+      "text": "Platform Settings",
+      "href": "/settings/platform"
+    },
+    {
+      "text": "My Profile",
+      "href": "/profile"
+    },
+    {
+      "text": "",
+      "href": "/system-health"
+    },
+    {
+      "text": "J",
+      "href": "/profile"
+    }
+  ],
+  "overflow": false
+}

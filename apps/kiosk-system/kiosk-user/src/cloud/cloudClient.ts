@@ -1,5 +1,5 @@
 import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
-import { KeyValueStore } from '@jamanvaar/database';
+import { KeyValueStore, KioskConfigurationRepository } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 /**
@@ -147,7 +147,7 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
 
   try {
     TenantIsolation.enter(data.restaurantId);
-    KeyValueStore.set('jamanvaar_bound_branch_id', data.device?.branchId ?? ''); // a different restaurant's local data is never carried over
+    KioskConfigurationRepository.bindBranch(data.device?.branchId);
     localStorage.setItem(RESTAURANT_ID_KEY, data.restaurantId);
     localStorage.setItem(DEVICE_ID_KEY, data.device.id);
     localStorage.setItem(DEVICE_TOKEN_KEY, data.deviceToken);

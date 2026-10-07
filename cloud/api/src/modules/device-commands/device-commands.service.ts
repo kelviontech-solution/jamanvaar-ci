@@ -139,7 +139,7 @@ export class DeviceCommandsService {
         select: {
           id: true, type: true, name: true, status: true, lastSeenAt: true, lastSyncAt: true, appVersion: true, isLocked: true,
           lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } },
-          commands: { orderBy: { issuedAt: 'desc' }, take: 1, select: { commandType: true, status: true, errorMessage: true } }
+          commands: { orderBy: { issuedAt: 'desc' }, take: 1, select: { commandType: true, status: true, errorMessage: true, payload: true, result: true } }
         },
         orderBy: [{ type: 'asc' }, { createdAt: 'asc' }]
       })

@@ -425,6 +425,11 @@ export class BranchCore {
       for (const event of events) {
         if (event.payload.branchId !== this.cfg.branchId) throw new CoreError(403, 'WRONG_BRANCH', 'Kiosk configuration belongs to another branch');
         if (!kioskConfigurationSchema.safeParse(event.payload).success) throw new CoreError(400, 'BAD_REQUEST', 'Invalid kiosk configuration');
+        if (event.externalId !== `kiosk-config-${this.cfg.branchId}`) throw new CoreError(400, 'BAD_REQUEST', 'Invalid kiosk configuration scope');
+        if (origin === 'device') for (const id of Object.keys(event.payload.welcome?.deviceOverrides || {})) {
+          const target = this.store.get<{ type: string }>('SELECT type FROM devices WHERE id = ?', id);
+          if (target?.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Welcome override must target a kiosk registered to this branch');
+        }
       }
     }
     const results: Array<{ externalId: string; status: 'ok' | 'error'; syncVersion?: number }> = [];

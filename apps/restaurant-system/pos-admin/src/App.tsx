@@ -1,4 +1,5 @@
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
+import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
 import { KioskComboPanel } from './components/settings/KioskComboPanel';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers, startLocalChangeSync, syncPromotions, syncInventoryMasters } from '@jamanvaar/sync';
@@ -21,7 +22,7 @@ import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
 import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements, fetchCloudKiosks, sendKioskCommand, type CloudKiosk } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations } from '@jamanvaar/sync';
+import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings } from '@jamanvaar/sync';
 import {
   Category,
   Coupon,
@@ -45,12 +46,13 @@ import {
   NotificationDrawerModal,
   NotificationToastContainer,
   useAiAccess,
-  ActivationNoticeBanner
+  ActivationNoticeBanner,
+  Logo
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
 import { productNavSections } from './navSections';
-import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts } from './adminProducts';
+import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts, type AdminProduct } from './adminProducts';
 import { useAdminProduct } from './hooks/useAdminProduct';
 import { KioskDashboard } from './components/kiosk/KioskDashboard';
 import { OnlinePaymentsPanel } from './components/payments/OnlinePaymentsPanel';
@@ -177,6 +179,7 @@ export type PosAdminTab =
   | 'SUPPORT'
   | 'INVENTORY_CONTROL'
   | 'KIOSK_DESIGN'
+  | 'KIOSK_WELCOME'
   | 'KIOSK_COMBOS'
   | 'KIOSKS'
   | 'COUPONS'
@@ -192,7 +195,7 @@ export const ALL_POS_ADMIN_TABS: readonly PosAdminTab[] = [
   'DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS',
   'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS',
   'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT',
-  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK'
+  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_WELCOME', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK'
 ];
 
 
@@ -598,6 +601,13 @@ export default function PosAdminApp() {
     // Ledger, Reconciliation and EOD Z-Report pages here actually see them. Restaurant Admin never
     // opens or edits a shift itself, so this device only ever pulls.
     if (restaurantAccess) void syncShifts({ push: false });
+    // The Customer Experience & Feedback tab only ever reads ratings; the kiosk is the only place
+    // they're ever submitted, so this device only ever pulls, never pushes.
+    if (restaurantAccess) void syncFeedback({ push: false });
+    // The Loyalty Program modal (tiers, rewards catalog) is edited only here — POS and Captain only read it.
+    if (restaurantAccess) void syncLoyaltyTiers({ push: true });
+    if (restaurantAccess) void syncLoyaltyRewards({ push: true });
+    if (restaurantAccess) void syncLoyaltyProgramSettings({ push: true });
     if (restaurantAccess) void syncReservations({ push: true });
     // B2-055: keeps LicenseRepository (plan tier, sidebar badges, JAMAN AI button) in step with a
     // Super Admin plan change regardless of which screen is open — was only ever refreshed when
@@ -612,6 +622,10 @@ export default function PosAdminApp() {
     if (restaurantAccess) void syncCustomers({ push: true });
       void syncStaff();
       if (restaurantAccess) void syncShifts({ push: false });
+      if (restaurantAccess) void syncFeedback({ push: false });
+      if (restaurantAccess) void syncLoyaltyTiers({ push: true });
+      if (restaurantAccess) void syncLoyaltyRewards({ push: true });
+      if (restaurantAccess) void syncLoyaltyProgramSettings({ push: true });
       // Guests who did not come free their table, then the change goes out with the rest.
       ReservationRepository.releaseOverdue();
       if (restaurantAccess) void syncReservations({ push: true });
@@ -1009,20 +1023,66 @@ export default function PosAdminApp() {
   }
 
   if (!contextReady || !product) {
+    const PRODUCT_ICONS: Record<AdminProduct, React.ComponentType<{ className?: string }>> = { POS_ADMIN: UtensilsCrossed, KIOSK_ADMIN: Tablet };
     return <div className="min-h-screen bg-jaman-cream flex items-center justify-center p-6">
-      <section className="bg-white border border-jaman-border rounded-2xl p-8 max-w-xl w-full space-y-5">
-        <h1 className="text-2xl font-bold text-jaman-navy">JAMANVAAR Apps</h1>
-        <p className="text-sm text-slate-600">{db.restaurant.name}</p>
-        {entitlementsLoading && <p role="status">Loading your applications?</p>}
-        {entitlementError && <><p role="alert">{entitlementError}</p><button onClick={authRequired ? handleAdminLogout : refetchEntitlements} className="underline font-bold">{authRequired ? 'Sign in again' : 'Retry'}</button></>}
-        {contextReady && <>
-          {context.denied && <p role="alert">This application is not enabled in your restaurant's current plan.</p>}
-          {context.invalid && <p role="alert">This page was not found. Choose an application below.</p>}
-          {!context.denied && !context.invalid && <p>Choose what you want to manage.</p>}
-          {availableProducts.map(app => <button key={app} onClick={() => context.navigate(app)} className="w-full text-left rounded-xl border p-4 hover:border-orange-500"><strong>{ADMIN_PRODUCTS[app].name}</strong><p className="text-sm text-slate-600 mt-1">{ADMIN_PRODUCTS[app].description}</p></button>)}
-          {!availableProducts.length && <p role="alert">No admin application is enabled. Ask your platform administrator to check your subscription.</p>}
-        </>}
-        <button onClick={handleAdminLogout} className="text-sm underline">Log out</button>
+      <section className="bg-white border border-jaman-border rounded-3xl shadow-xl p-8 sm:p-10 max-w-md w-full space-y-6">
+        <div className="flex flex-col items-center text-center gap-3">
+          <Logo variant="horizontal" size="sm" />
+          <p className="text-sm font-bold text-jaman-navy">{db.restaurant.name}</p>
+        </div>
+
+        {entitlementsLoading && (
+          <div className="flex items-center justify-center gap-2.5 py-6 text-slate-500" role="status">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span className="text-sm font-medium">Loading your applications…</span>
+          </div>
+        )}
+
+        {entitlementError && (
+          <div className={`rounded-2xl border p-4 space-y-3 text-center ${authRequired ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200'}`} role="alert">
+            <div className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center ${authRequired ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'}`}>
+              {authRequired ? <Lock className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+            </div>
+            <p className={`text-sm font-semibold ${authRequired ? 'text-rose-800' : 'text-amber-800'}`}>{entitlementError}</p>
+            <button
+              type="button"
+              onClick={authRequired ? handleAdminLogout : refetchEntitlements}
+              className={`w-full py-2.5 rounded-xl font-bold text-sm transition-colors cursor-pointer ${authRequired ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-600 hover:bg-amber-700 text-white'}`}
+            >
+              {authRequired ? 'Sign in again' : 'Retry'}
+            </button>
+          </div>
+        )}
+
+        {contextReady && <div className="space-y-3">
+          {context.denied && <p className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center" role="alert">This application is not enabled in your restaurant's current plan.</p>}
+          {context.invalid && <p className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 text-center" role="alert">This page was not found. Choose an application below.</p>}
+          {!context.denied && !context.invalid && <p className="text-sm font-bold text-slate-500 uppercase tracking-wider text-center">Choose what you want to manage</p>}
+          {availableProducts.map(app => {
+            const Icon = PRODUCT_ICONS[app];
+            return (
+              <button
+                key={app}
+                onClick={() => context.navigate(app)}
+                className="w-full flex items-center gap-3.5 text-left rounded-2xl border border-jaman-border p-4 hover:border-jaman-saffron hover:bg-[#FFF8F2] transition-colors cursor-pointer group"
+              >
+                <div className="w-11 h-11 rounded-xl bg-jaman-cream text-jaman-navy flex items-center justify-center shrink-0 group-hover:bg-jaman-saffron group-hover:text-white transition-colors">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <strong className="text-sm font-bold text-jaman-navy">{ADMIN_PRODUCTS[app].name}</strong>
+                  <p className="text-xs text-slate-500 mt-0.5">{ADMIN_PRODUCTS[app].description}</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-jaman-saffron transition-colors shrink-0" />
+              </button>
+            );
+          })}
+          {!availableProducts.length && <p className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center" role="alert">No admin application is enabled. Ask your platform administrator to check your subscription.</p>}
+        </div>}
+
+        <button type="button" onClick={handleAdminLogout} className="w-full text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+          Log out
+        </button>
       </section>
     </div>;
   }
@@ -1395,6 +1455,7 @@ export default function PosAdminApp() {
             {activeTab === 'FEEDBACK' && <FeedbackPanel orders={orders} />}
             {activeTab === 'TEMPLATES' && <h1 className="text-2xl font-bold">Menu Templates</h1>}
             {activeTab === 'KIOSK_DESIGN' && hasApp('KIOSK_ADMIN') && <KioskContentPanel showToast={showToast} />}
+            {activeTab === 'KIOSK_WELCOME' && hasApp('KIOSK_ADMIN') && <KioskWelcomeScreenPanel kiosks={kiosks} showToast={showToast} />}
             {activeTab === 'KIOSK_COMBOS' && hasApp('KIOSK_ADMIN') && <KioskComboPanel showToast={showToast} />}
             {/* TAB: KIOSK TERMINAL FLEET (relocated from kiosk-admin, gated on KIOSK_ADMIN) */}
             {activeTab === 'KIOSKS' && (

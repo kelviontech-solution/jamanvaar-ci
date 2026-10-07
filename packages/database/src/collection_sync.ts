@@ -1,5 +1,5 @@
 import { KeyValueStore } from './key_value_store';
-import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, MenuItem, ModifierGroup, Reservation, ShiftRecord, TaxGroup } from '@jamanvaar/types';
+import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, LoyaltyTier, LoyaltyReward, LoyaltyProgramSettings, MenuItem, ModifierGroup, Reservation, ShiftRecord, TaxGroup } from '@jamanvaar/types';
 import { db } from './db';
 
 /**
@@ -280,6 +280,30 @@ export const FeedbackSync = new CollectionSync<CustomerFeedback>(
   'jamanvaar_feedback_sync_v1',
   () => db.feedbacks,
   (r) => typeof r.rating === 'number'
+);
+
+// Restaurant Admin configures these (tier point multipliers, the rewards catalog), but POS and Captain
+// only ever read them — nothing synced either collection before, so a customer's real tier or an active
+// reward never reached the counter where a purchase is actually rung up or a reward actually redeemed.
+export const LoyaltyTierSync = new CollectionSync<LoyaltyTier & { updatedAt?: string }>(
+  'jamanvaar_loyalty_tier_sync_v1',
+  () => db.loyaltyTiers as Array<LoyaltyTier & { updatedAt?: string }>,
+  (r) => typeof r.name === 'string' && r.name.length > 0
+);
+
+export const LoyaltyRewardSync = new CollectionSync<LoyaltyReward & { updatedAt?: string }>(
+  'jamanvaar_loyalty_reward_sync_v1',
+  () => db.loyaltyRewards as Array<LoyaltyReward & { updatedAt?: string }>,
+  (r) => typeof r.name === 'string' && r.name.length > 0 && typeof r.pointsCost === 'number'
+);
+
+// The base earn rate (points per ₹ spent, before any tier multiplier): a single-row "collection" (id is
+// always 'default'), reusing CollectionSync's diffing and conflict resolution instead of a second
+// single-object sync mechanism — see LoyaltyProgramSettings.
+export const LoyaltyProgramSettingsSync = new CollectionSync<LoyaltyProgramSettings>(
+  'jamanvaar_loyalty_program_settings_sync_v1',
+  () => db.loyaltyProgramSettings,
+  (r) => typeof r.earnPoints === 'number' && typeof r.perRupeesSpent === 'number'
 );
 
 // Guests (BUG-159): registered at the POS, but the owner's CRM in Restaurant Admin never saw them. A guest is

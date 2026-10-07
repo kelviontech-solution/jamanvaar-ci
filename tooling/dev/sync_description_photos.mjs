@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
+import './sync_welcome_backgrounds.mjs';
 import { fileURLToPath } from 'node:url';
 
 // Ship the same description-matched photos with every independently built frontend.

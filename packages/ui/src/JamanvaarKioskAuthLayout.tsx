@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '@jamanvaar/database';
 import { JamanvaarLogo } from './JamanvaarBrand';
+import { resolveMenuImage } from '@jamanvaar/utils';
 import { Wifi, WifiOff, Calendar, Headphones, MousePointer2, ChefHat, Heart, Users, ShieldCheck, Zap, Cloud } from 'lucide-react';
 
 export interface JamanvaarKioskFeature {
@@ -41,10 +41,18 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
   heroHeadline,
   heroDescription,
   features,
-  isOnline = true,
+  isOnline: suppliedOnline,
   children
 }) => {
   const [now, setNow] = useState(() => new Date());
+  const [networkOnline, setNetworkOnline] = useState(() => typeof navigator === 'undefined' || navigator.onLine);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const isOnline = suppliedOnline ?? networkOnline;
+  useEffect(() => {
+    const online = () => setNetworkOnline(true); const offline = () => setNetworkOnline(false);
+    window.addEventListener('online', online); window.addEventListener('offline', offline);
+    return () => { window.removeEventListener('online', online); window.removeEventListener('offline', offline); };
+  }, []);
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(t);
@@ -56,8 +64,8 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
     <div className="relative min-h-screen w-full overflow-x-hidden font-['Plus_Jakarta_Sans',_sans-serif] text-[#062A43] antialiased select-none">
       {/* Background: warm restaurant photography, softened so text stays readable */}
       <div className="fixed inset-0 -z-10">
-        <img src={backgroundPhoto} alt="" className="w-full h-full object-cover" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFF9F1]/90 via-[#FFF9F1]/90 to-[#F5EDE2]/92" />
+        <img src={resolveMenuImage(backgroundPhoto)} alt="" className="w-full h-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FFF9F1]/70 via-[#FFF9F1]/60 to-[#F5EDE2]/80" />
       </div>
 
       {/* Header */}
@@ -80,8 +88,8 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
 
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <div className="hidden sm:flex items-center gap-1.5 bg-white border border-[#EBE6DD] px-3 py-1.5 rounded-full text-[11px] font-bold text-[#52677A]">
-              <span className={`w-2 h-2 rounded-full ${db.isLocalCoreUnauthorized() ? 'bg-amber-500' : 'bg-[#10B981] animate-pulse'}`} />
-              Device: <strong className={db.isLocalCoreUnauthorized() ? 'text-amber-700' : 'text-[#047857]'}>{db.isLocalCoreUnauthorized() ? 'Not paired' : 'Online'}</strong>
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              Device: <strong className="text-amber-700">Activation required</strong>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 bg-white border border-[#EBE6DD] px-3 py-1.5 rounded-full text-[11px] font-bold text-[#52677A]">
               {isOnline ? <Wifi className="w-3.5 h-3.5 text-[#10B981]" /> : <WifiOff className="w-3.5 h-3.5 text-amber-600" />}
@@ -93,6 +101,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
             </div>
             <button
               type="button"
+              onClick={() => setHelpOpen(value => !value)}
               aria-label="Need help?" className="flex items-center justify-center gap-1.5 min-h-11 min-w-11 bg-white border border-[#EBE6DD] hover:border-[#F97316]/50 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#062A43] transition-colors cursor-pointer"
             >
               <Headphones className="w-3.5 h-3.5 text-[#F97316]" />
@@ -104,9 +113,9 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
 
       {/* Main */}
       <main className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-10">
-        <div className="grid xl:grid-cols-[48fr_52fr] gap-10 xl:gap-14 items-center">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)] gap-8 xl:gap-14 items-center">
           {/* LEFT: HERO */}
-          <div className="space-y-6">
+          <div className="space-y-6 order-2 lg:order-1">
             <p
               className="text-[#B8500C] text-xl -rotate-2 -mb-1"
               style={{ fontFamily: "'Caveat', cursive" }}
@@ -114,7 +123,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
               Crave. Tap. Enjoy! :)
             </p>
 
-            <h1 className="text-[38px] sm:text-[48px] lg:text-[58px] font-black leading-[0.98] tracking-tight">
+            <h1 className="text-[38px] sm:text-[48px] xl:text-[58px] font-black leading-[1.05] tracking-tight">
               <span className="text-[#062A43]">{heroHeadline[0]}</span>
               <br />
               <span className="text-[#D4580A]">{heroHeadline[1]}</span>
@@ -144,7 +153,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
             {/* Food composition */}
             <div className="relative max-w-[520px] pt-2">
               <div className="rounded-[28px] overflow-hidden shadow-[0_20px_45px_rgba(6,42,67,0.18)] border-4 border-white">
-                <img src={foodPhoto} alt="Freshly served biryani and curries" className="w-full h-56 sm:h-64 object-cover" />
+                <img src={resolveMenuImage(foodPhoto)} alt="Freshly served biryani and curries" className="w-full h-40 sm:h-52 xl:h-64 object-cover" />
               </div>
               <p
                 className="absolute -bottom-3 left-4 bg-white px-3 py-1 rounded-xl shadow-md text-[#062A43] text-lg -rotate-2"
@@ -162,7 +171,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
           </div>
 
           {/* RIGHT: ACTIVATION CARD */}
-          <div className="relative w-full max-w-[640px] mx-auto xl:mx-0 xl:ml-auto">
+          <div className="relative min-w-0 w-full max-w-[640px] mx-auto lg:mx-0 lg:ml-auto order-1 lg:order-2">
             {/* Decorative badge */}
             <div
               className="hidden sm:flex absolute -top-5 -right-4 w-24 h-24 rounded-full bg-gradient-to-br from-[#FFE8D1] to-[#FFF3E4] items-center justify-center text-center leading-none rotate-6 shadow-sm z-10 pointer-events-none"
@@ -182,7 +191,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
                 through to soften the text on top of it, so this stays
                 fully opaque for reliable contrast regardless of what's
                 behind it. */}
-            <div className="relative bg-white rounded-[28px] sm:rounded-[32px] border border-white shadow-[0_25px_70px_rgba(6,42,67,0.18)] p-6 sm:p-9 lg:p-10">
+            <div className="relative bg-white rounded-[28px] sm:rounded-[32px] border border-white shadow-[0_25px_70px_rgba(6,42,67,0.18)] p-6 sm:p-8 xl:p-10">
               {/* Kiosk branding */}
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF1E6] flex items-center justify-center mb-3">
@@ -212,6 +221,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
           </div>
         </div>
       </main>
+      {helpOpen && <div role="dialog" aria-modal="true" aria-label="Kiosk activation help" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-5"><div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-xl font-bold">Connect your kiosk</h2><p className="mt-3 text-sm text-slate-600">Ask your restaurant owner for the Restaurant ID and a customer kiosk activation key. The owner can find these in Restaurant Admin → Subscription Plans → Device & Staff Logins. Keep the kiosk connected to the internet during activation.</p><button type="button" onClick={() => setHelpOpen(false)} className="mt-5 w-full rounded-xl bg-orange-600 py-3 font-bold text-white">Got it</button></div></div>}
 
       {/* Footer */}
       <footer className="relative z-10 bg-[#F5EDE2]/95 backdrop-blur-xs rounded-t-[32px] mt-6">

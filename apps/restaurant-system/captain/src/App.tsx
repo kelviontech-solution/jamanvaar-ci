@@ -17,7 +17,7 @@ import {
   sound
 } from '@jamanvaar/ui';
 import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
-import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncReservations, onAppResume } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncReservations, syncCustomers, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, onAppResume } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
 import { CaptainHeader } from './components/layout/CaptainHeader';
@@ -140,11 +140,23 @@ export const App: React.FC = () => {
     // that the PIN would work here too. Captain never edits staff either — pull only.
     const syncStaff = () => syncStaffUsers({ push: false });
 
+    // Guests attached to a table here reach Restaurant Admin's CRM and back (same two-way sync as POS's own
+    // counter-registered guests): only what changed is sent, and the newer change wins. Loyalty tiers, the
+    // reward catalog and the admin's earn rate are configured in Restaurant Admin only — Captain just pulls them.
+    const syncCrm = () => syncCustomers({ push: true });
+    const syncLoyalty = () => {
+      void syncLoyaltyTiers({ push: false });
+      void syncLoyaltyRewards({ push: false });
+      void syncLoyaltyProgramSettings({ push: false });
+    };
+
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncMenuCatalog({ push: false });
     void syncReservations({ push: false });
     void syncStaff();
+    void syncCrm();
+    void syncLoyalty();
     void syncDiningTables();
     EntitySyncEngine.registerWakeUp('SERVICE_MESSAGE', async () => { const inbound = await syncServiceMessages('CAPTAIN'); useCaptainStore.getState().receiveMessages(inbound); });
     void reportHeartbeat();
@@ -164,6 +176,8 @@ export const App: React.FC = () => {
       void syncMenuCatalog({ push: false });
       void syncReservations({ push: false });
       void syncStaff();
+      void syncCrm();
+      void syncLoyalty();
       void reportHeartbeat();
     void syncRestaurantIdentity();
     }, 15000);

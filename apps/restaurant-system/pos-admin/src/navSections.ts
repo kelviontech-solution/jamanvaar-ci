@@ -99,11 +99,12 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
   const existing = new Map(NAV_SECTIONS.flatMap(group => group.items).map(item => [item.id, item]));
   const sections = [
     ['KIOSK OPERATIONS', ['DASHBOARD', 'KIOSKS', 'ORDERS', 'LIVE_KDS', 'TABLES']],
-    ['CUSTOMER EXPERIENCE', ['MENU', 'TEMPLATES', 'MENU_OPTIONS', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'COUPONS']],
+    ['CUSTOMER EXPERIENCE', ['MENU', 'TEMPLATES', 'MENU_OPTIONS', 'KIOSK_WELCOME', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'COUPONS']],
     ['PAYMENTS & SERVICE', ['KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'FEEDBACK', 'STAFF', 'REPORTS']],
     ['SYSTEM', ['SETTINGS', 'SYNC', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT']]
   ] as const;
   const additions: Record<string, NavSectionItem> = {
+    KIOSK_WELCOME: { id: 'KIOSK_WELCOME', label: 'Kiosk Welcome Screen', icon: Tablet },
     TEMPLATES: { id: 'TEMPLATES', label: 'Menu Templates', icon: UtensilsCrossed },
     KIOSK_PAYMENTS: { id: 'KIOSK_PAYMENTS', label: 'Payments & Payouts', icon: CreditCard },
     FEEDBACK: { id: 'FEEDBACK', label: 'Customer Feedback', icon: Heart }

@@ -9,7 +9,8 @@ import {
   Order,
   KOT,
   SelectedModifier,
-  DietaryType
+  DietaryType,
+  CustomerAccount
 } from '@jamanvaar/types';
 import {
   captainDb,
@@ -21,6 +22,7 @@ import {
   StaffRepository,
   ServiceMessages,
   projectTableBillState,
+  CustomerRepository,
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
@@ -199,7 +201,9 @@ interface CaptainState {
   tableFilter: 'MY_TABLES' | 'ALL_TABLES' | 'OCCUPIED' | 'FOOD_READY' | 'BILL_REQUESTED';
   selectedZone: string;
   guestCount: number;
-  attachedCustomer: { name: string; phone: string; tag?: string; notes?: string } | null;
+  /** The guest attached to the current table's order (CRM record, loyalty points) — redemption itself
+   *  still happens at the till in POS, where the manager-approval discount gate already lives. */
+  attachedCustomer: CustomerAccount | null;
 
   // Operational Messages & Customer Requests
   messages: InternalMessage[];
@@ -251,7 +255,7 @@ interface CaptainState {
   setDietaryFilter: (f: 'ALL' | 'VEG' | 'JAIN' | 'NON_VEG') => void;
   setQuickFilter: (qf: 'ALL' | 'POPULAR' | 'FAST_PREP' | 'BREADS') => void;
   setCustomizingItem: (item: MenuItem | null) => void;
-  setAttachedCustomer: (cust: { name: string; phone: string; tag?: string; notes?: string } | null) => void;
+  setAttachedCustomer: (cust: CustomerAccount | null) => void;
   setIsCustomerModalOpen: (open: boolean) => void;
   setIsNewMessageModalOpen: (open: boolean) => void;
 
@@ -452,14 +456,25 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   setDietaryFilter: (f) => set({ dietaryFilter: f }),
   setQuickFilter: (qf) => set({ quickFilter: qf }),
   setCustomizingItem: (item) => set({ customizingItem: item }),
-  setAttachedCustomer: (cust) => set({ attachedCustomer: cust }),
+  // Attaching reaches the order immediately if one already exists (a guest giving their number partway
+  // through the meal, after the first KOT) — sendKOT's own order-creation branch covers the case where
+  // nothing has been ordered yet. Either way it is the real order.customerPhone that settleOrder reads
+  // to actually earn points, not just something shown on this screen.
+  setAttachedCustomer: (cust) => {
+    set({ attachedCustomer: cust });
+    const order = get().selectedTableOrder;
+    if (order) {
+      const updated = OrderRepository.updateOrder(order.id, { customerPhone: cust?.phone, customerName: cust?.name });
+      if (updated) set({ selectedTableOrder: updated });
+    }
+  },
   setIsCustomerModalOpen: (open) => set({ isCustomerModalOpen: open }),
   setIsNewMessageModalOpen: (open) => set({ isNewMessageModalOpen: open }),
 
   // Table Selection & Management
   selectTable: (table) => {
     if (!table) {
-      set({ selectedTable: null, selectedTableOrder: null, cartItems: [] });
+      set({ selectedTable: null, selectedTableOrder: null, cartItems: [], attachedCustomer: null });
       return;
     }
 
@@ -520,11 +535,16 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     if (table.status === 'AVAILABLE' && !table.currentOrderId) saveHeld(table.tableNumber, []);
     else held = heldForTable(table.tableNumber);
 
+    // A table switched to carries whichever guest its own order already has (set earlier this visit, by
+    // this captain or another device) — never the previous table's guest left over in this screen's state.
+    const tableCustomer = activeOrder?.customerPhone ? CustomerRepository.getByPhone(activeOrder.customerPhone) ?? null : null;
+
     set({
       selectedTable: table,
       selectedTableOrder: activeOrder,
       guestCount: table.currentGuests || 2,
-      cartItems: [...loadedCart, ...held]
+      cartItems: [...loadedCart, ...held],
+      attachedCustomer: tableCustomer
     });
   },
 
@@ -872,6 +892,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         tableNumber,
         guestCount: state.guestCount,
         captainName: captain?.name,
+        customerPhone: state.attachedCustomer?.phone,
+        customerName: state.attachedCustomer?.name,
         items: orderItems,
         ...priced,
         paymentMethod: 'CASH',

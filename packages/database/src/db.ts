@@ -21,6 +21,7 @@ import {
   LicenseInfo,
   LoyaltyTier,
   LoyaltyReward,
+  LoyaltyProgramSettings,
   StaffShiftSchedule,
   AttendanceRecord,
   MarketingCampaign,
@@ -244,6 +245,12 @@ export class JamanvaarDatabase {
     { id: 'reward-starter', name: 'Free Starter', description: 'Any starter under ₹250', pointsCost: 200, isActive: true },
     { id: 'reward-meal', name: 'Free Meal for Two', description: 'A full meal for two guests', pointsCost: 800, isActive: true }
   ];
+
+  // The base earn rate every tier's multiplier is applied on top of — a single-row "collection" so it
+  // reuses the same sync mechanism as loyaltyTiers/loyaltyRewards. Default matches the rate that used to
+  // be hardcoded (1 point per ₹10 spent), so an existing restaurant's program behaves the same until an
+  // admin actually changes it.
+  public loyaltyProgramSettings: LoyaltyProgramSettings[] = [{ id: 'default', earnPoints: 1, perRupeesSpent: 10 }];
 
   // Staff scheduling & attendance — previously nonexistent; StaffRepository
   // only ever managed login accounts, not who's rostered to work when or
@@ -1119,6 +1126,7 @@ export class JamanvaarDatabase {
       put('combos', this.combos);
       put('loyalty_tiers', this.loyaltyTiers);
       put('loyalty_rewards', this.loyaltyRewards);
+      put('loyalty_program_settings', this.loyaltyProgramSettings);
       put('staff_schedules', this.staffSchedules);
       put('attendance_records', this.attendanceRecords);
       put('staff_pay_rates', this.staffPayRates);
@@ -1271,6 +1279,9 @@ export class JamanvaarDatabase {
 
       const storedLoyaltyRewards = localStorage.getItem(`${p}loyalty_rewards`);
       if (storedLoyaltyRewards) this.loyaltyRewards = JSON.parse(storedLoyaltyRewards);
+
+      const storedLoyaltyProgramSettings = localStorage.getItem(`${p}loyalty_program_settings`);
+      if (storedLoyaltyProgramSettings) this.loyaltyProgramSettings = JSON.parse(storedLoyaltyProgramSettings);
 
       const storedStaffSchedules = localStorage.getItem(`${p}staff_schedules`);
       if (storedStaffSchedules) this.staffSchedules = JSON.parse(storedStaffSchedules);

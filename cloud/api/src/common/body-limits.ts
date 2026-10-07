@@ -13,6 +13,7 @@ export const DEFAULT_BODY_LIMIT = 256 * KB;
 
 const PUBLIC_SMALL: RegExp = /^\/api\/v1\/(public\/qr|qr-guest)(\/|$)/;
 const LARGE: Array<{ test: RegExp; limit: number }> = [
+  { test: /^\/api\/v1\/platform\/settings\/kiosk-welcome\/designs$/, limit: 2 * MB },
   { test: /^\/api\/v1\/(devices\/me|tenant\/me)\/backups(\/|$)/, limit: 20 * MB },
   { test: /^\/api\/v1\/entity-sync\//, limit: 20 * MB },
   { test: /^\/api\/v1\/master-catalog\/(upload-image|import-starter-library|items|categories)/, limit: 8 * MB },

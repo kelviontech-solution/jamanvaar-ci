@@ -4,6 +4,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 const START_TIME = Date.now();
 
+/** Safe sign-in-screen liveness probe. Database and device details remain behind platform auth. */
+@Controller('api/v1/health')
+export class PublicHealthController {
+  @Get()
+  check() { return { status: 'ok' }; }
+}
+
 /**
  * Every field here is a fact this process can actually check right now —
  * no synthetic "99.9% uptime" numbers, and no sync/device health, since

@@ -18,6 +18,8 @@ interface LoyaltyProgramModalProps {
 export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen, onClose, showToast }) => {
   const [tiers, setTiers] = useState<LoyaltyTier[]>(() => CustomerRepository.getTiers());
   const [rewards, setRewards] = useState<LoyaltyReward[]>(() => CustomerRepository.getRewards());
+  const [rate, setRate] = useState(() => CustomerRepository.getProgramSettings());
+  const [rateDraft, setRateDraft] = useState({ earnPoints: String(rate.earnPoints), perRupeesSpent: String(rate.perRupeesSpent) });
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
   const [tierDraft, setTierDraft] = useState<{ name: string; minLifetimeSpend: string; pointsMultiplier: string; perks: string }>({
     name: '', minLifetimeSpend: '0', pointsMultiplier: '1', perks: ''
@@ -27,6 +29,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
   const refresh = () => {
     setTiers(CustomerRepository.getTiers());
     setRewards(CustomerRepository.getRewards());
+    setRate(CustomerRepository.getProgramSettings());
   };
 
   const startEditTier = (tier: LoyaltyTier) => {
@@ -84,9 +87,50 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
     showToast(`Removed reward: ${reward.name}`);
   };
 
+  const saveRate = () => {
+    const earnPoints = Number(rateDraft.earnPoints);
+    const perRupeesSpent = Number(rateDraft.perRupeesSpent);
+    if (!Number.isFinite(earnPoints) || earnPoints <= 0 || !Number.isFinite(perRupeesSpent) || perRupeesSpent <= 0) {
+      showToast('Enter a positive number for both fields');
+      return;
+    }
+    const saved = CustomerRepository.updateProgramSettings({ earnPoints, perRupeesSpent });
+    setRate(saved);
+    showToast(`Saved: ${earnPoints} point(s) per ₹${perRupeesSpent} spent`);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Loyalty Program Settings" maxWidth="lg">
       <div className="space-y-6 py-1">
+        {/* Base earn rate — this is the direct answer to "how many points do I give". Every tier below
+            multiplies this rate; it does not replace it. */}
+        <div className="space-y-2">
+          <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide">Earn Rate</h4>
+          <div className="p-3 bg-jaman-cream border border-jaman-border rounded-xl flex flex-wrap items-center gap-2 text-sm">
+            <span className="font-semibold text-jaman-navy">Earn</span>
+            <input
+              type="number" min={1} step={1}
+              value={rateDraft.earnPoints}
+              onChange={(e) => setRateDraft((d) => ({ ...d, earnPoints: e.target.value }))}
+              className="w-16 px-2 py-1.5 border border-jaman-border rounded-lg text-center font-mono"
+              aria-label="Points earned"
+            />
+            <span className="font-semibold text-jaman-navy">point(s) per ₹</span>
+            <input
+              type="number" min={1} step={1}
+              value={rateDraft.perRupeesSpent}
+              onChange={(e) => setRateDraft((d) => ({ ...d, perRupeesSpent: e.target.value }))}
+              className="w-20 px-2 py-1.5 border border-jaman-border rounded-lg text-center font-mono"
+              aria-label="Rupees spent per point"
+            />
+            <span className="font-semibold text-jaman-navy">spent</span>
+            <Button variant="accent" onClick={saveRate}>Save</Button>
+          </div>
+          <p className="text-[11px] text-slate-500">
+            Applies to every dine-in and takeaway sale, on top of which each tier below multiplies the result. Currently: {rate.earnPoints} point(s) per ₹{rate.perRupeesSpent} spent.
+          </p>
+        </div>
+
         {/* Tiers */}
         <div className="space-y-2">
           <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide">Spend Tiers</h4>

@@ -65,6 +65,24 @@ describe('Merged kiosk management: configuration and safe remote logout', () => 
     await push({ ...config('2020-01-01T00:00:00.000Z'), welcome: { ...config().welcome, headingText: 'Stale heading' } });
     const read = await authed('get', '/api/v1/entity-sync/KIOSK_CONFIGURATION?afterSeq=0', kiosk.token); expect(read.body.entities[0].payload.welcome.headingText).toBe('Newest heading');
   });
+  it('accepts branch welcome designs and a registered same-branch kiosk override', async () => {
+    const base = config(new Date(Date.now() + 2000).toISOString());
+    const design = { showHeritageArtwork: false, showPromoBanner: false, backgroundId: 'gujarati-thali', backgroundFit: 'cover', backgroundPositionX: 40, backgroundPositionY: 60, backgroundZoom: 1.1, overlayOpacity: 0.2 };
+    const response = await push({ ...base, welcome: { ...design, deviceOverrides: { [kiosk.id]: { ...design, backgroundId: 'premium-biryani' } } } });
+    expect(response.body.results[0].status).toBe('ok');
+    const read = await authed('get', '/api/v1/entity-sync/KIOSK_CONFIGURATION?afterSeq=0', kiosk.token);
+    expect(read.body.entities[0].payload.welcome.deviceOverrides[kiosk.id].backgroundId).toBe('premium-biryani');
+    const other = await authed('get', '/api/v1/entity-sync/KIOSK_CONFIGURATION?afterSeq=0', otherBranch.token);
+    expect(other.body.entities).toEqual([]);
+  });
+  it('rejects unknown devices, other-branch overrides, non-kiosk targets and incorrect scope ids', async () => {
+    const base=config();
+    for (const target of ['unknown-kiosk',otherBranch.id,admin.id]) {
+      const response=await push({ ...base,welcome:{...base.welcome,deviceOverrides:{[target]:base.welcome}} });
+      expect(response.body.results[0].status).toBe('error');
+    }
+    expect((await push(base,admin.token,'kiosk-config-wrong-scope')).body.results[0].status).toBe('error');
+  });
   it('uses this branch receipt settings in the server-built emailed PDF and honours disabled email receipts', async () => {
     const emailService = app.get(EmailService); const configured = vi.spyOn(emailService, 'configured', 'get').mockReturnValue(true);
     const build = vi.spyOn(app.get(ReceiptEmailService) as any, 'buildPdf');

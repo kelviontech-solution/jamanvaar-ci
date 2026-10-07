@@ -1,0 +1,401 @@
+{
+  "success": true,
+  "passed": 88,
+  "failed": 0,
+  "suites": [
+    {
+      "name": "tests/admin_product_branch_core.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "admin product permissions on Branch Core authenticates the shared physical admin on a kiosk-only plan and limits console resources",
+          "status": "passed"
+        },
+        {
+          "name": "admin product permissions on Branch Core enforces resource permissions over the real local HTTP boundary",
+          "status": "passed"
+        },
+        {
+          "name": "admin product permissions on Branch Core limits kiosk-only fleet and commands despite the shared POS_ADMIN device type",
+          "status": "passed"
+        },
+        {
+          "name": "admin product permissions on Branch Core skips unlicensed cloud resources and resumes them when the roster enables Restaurant Admin",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/admin_product_context.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "shared owner platform, separate authorized application contexts does not confuse customer kiosks or kitchen/captain terminals with owner consoles",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts auto-opens the sole enabled console at the legacy entry without pretending it is Restaurant Admin",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts offers a chooser with two products and no saved preference",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts restores a valid remembered product/page, never a disabled product",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts gives explicit URLs priority over preferences, leaving unauthorized routes for the access-denied screen",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts fails closed for /kiosk-admin/missing",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts fails closed for /kiosk-admin/menu/extra",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts fails closed for /kiosk-admin/inventory",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts fails closed for /random",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts fails closed for /restaurant-admin/appearance",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts all real POS_ADMIN routes round-trip without collision",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts all real KIOSK_ADMIN routes round-trip without collision",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts does not accept a poisoned storage object as permissions or page IDs",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts each kiosk page is reachable through its own real navigation and no restaurant-only page is exposed",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts restaurant navigation excludes kiosk appearance, terminals and settlement screens even on combined plans",
+          "status": "passed"
+        },
+        {
+          "name": "shared owner platform, separate authorized application contexts does not build links to a different product page accidentally",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/image_cache.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "offline menu pictures keeps a relative menu image cached when browser Cache.keys returns its absolute URL",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures does not cache an HTTP 200 HTML fallback as a dish photo",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures repairs a previously cached HTML response instead of keeping it permanently",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures downloads the menu pictures while online and serves them from the device when the internet is down",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures removes pictures that left the menu and does not refetch ones it already has",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures a picture that cannot be fetched is skipped, never thrown, and never cached as broken",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures with no cache available at all it does nothing and does not fail",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/kiosk_configuration.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "kiosk configuration accepts existing default settings without making payment policy editable",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration rejects executable image URLs and invalid idle/default language settings",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration tracks actual edits and preserves edits made while a previous publication is pending",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration ignores an older remote value and a different branch",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration applies wording, appearance and receipt settings together",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration keeps dirty versions separate across branches",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration clears a previous branch design and cursor when a terminal is reactivated in another branch",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration preserves pending edits and the cursor on a same-branch activation refresh",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration removes presentation, legal receipt details and config cursors on a tenant switch",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration retains unpublished changes when the cloud refuses a save",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration publishes edits once and keeps customer kiosks pull-only",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration enforces configuration authorship and branch scope on Branch Core too",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration revokes a Branch Core kiosk only after successful logout acknowledgement, preserving its orders",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk configuration mirrors only its own branch configuration while advancing past other branch records",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/kiosk_welcome.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "kiosk welcome configuration ships sixteen distinct portrait masters while preserving the original collection",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration selects wide companions for bundled scenes and leaves custom upload compositions unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration resolves branch default, one-device override, custom upload and unknown-id fallback",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration keeps uploaded platform companions separate from another terminal using a bundled design",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration preserves legacy custom background URLs when no library id was chosen",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration accepts scoped design settings and blocks unsafe images, huge libraries and invalid crops",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration retains library and per-device data without allowing a remote payload reference to mutate local settings",
+          "status": "passed"
+        },
+        {
+          "name": "kiosk welcome configuration rejects file types and oversize originals before decoding or saving anything",
+          "status": "passed"
+        },
+        {
+          "name": "welcome image cache coalesces simultaneous downloads while giving each renderer its own blob URL",
+          "status": "passed"
+        },
+        {
+          "name": "welcome image cache keeps welcome assets separate from menu pruning, repairs HTML and serves cached blobs offline",
+          "status": "passed"
+        },
+        {
+          "name": "welcome image cache returns the safe source when network or cache is unavailable, and preserves data images without fetching",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: db internals safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: Invalid safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: expired safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: already used safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: invalid token safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: network fetch safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states formats Error: rate limit safely",
+          "status": "passed"
+        },
+        {
+          "name": "activation states explains offline activation without leaking the underlying error",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/offline_menu_image_cache.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "offline menu pictures: one definition of what to cache, shared by every app collects dish, category and combo pictures into one deduplicated, sorted list",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures: one definition of what to cache, shared by every app a dish with no picture and no categories or combos yields an empty list, not an error",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures: one definition of what to cache, shared by every app what a device can show once the internet is down a picture synced while online is still available by its own address once offline",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures: one definition of what to cache, shared by every app what a device can show once the internet is down a dish removed from the menu is dropped from the cache on the next sync",
+          "status": "passed"
+        },
+        {
+          "name": "offline menu pictures: one definition of what to cache, shared by every app what a device can show once the internet is down a picture never cached (never seen while online) has no offline fallback — CachedImg then shows the placeholder",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "tests/pwa_alerts_and_small_screens.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "the Captain and KDS install like apps and open without signal captain has a manifest a phone can install from: name, standalone display, a start page and real icons",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal captain links the manifest, the theme colour and the home-screen icon from the page",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal captain registers the service worker in production builds only",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal captain the service worker caches only this app's own files: never the API, never a write",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal kds has a manifest a phone can install from: name, standalone display, a start page and real icons",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal kds links the manifest, the theme colour and the home-screen icon from the page",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal kds registers the service worker in production builds only",
+          "status": "passed"
+        },
+        {
+          "name": "the Captain and KDS install like apps and open without signal kds the service worker caches only this app's own files: never the API, never a write",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos registers the service worker in production builds only",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos the service worker caches only this app's own files: never the API, never a write",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos every file the service worker installs at startup actually exists, so the install can never silently fail",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos builds the shell from the Vite plugin that fills in the real asset list, not a hand-maintained one",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos-admin registers the service worker in production builds only",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos-admin the service worker caches only this app's own files: never the API, never a write",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos-admin every file the service worker installs at startup actually exists, so the install can never silently fail",
+          "status": "passed"
+        },
+        {
+          "name": "POS and Restaurant Admin open with no signal too, not just Captain and KDS pos-admin builds the shell from the Vite plugin that fills in the real asset list, not a hand-maintained one",
+          "status": "passed"
+        },
+        {
+          "name": "a waiter is told when food is ready, even with the phone in a pocket food ready buzzes longest, and a message the shortest",
+          "status": "passed"
+        },
+        {
+          "name": "a waiter is told when food is ready, even with the phone in a pocket buzzes by default, and stays still once the waiter turns vibration off",
+          "status": "passed"
+        },
+        {
+          "name": "a waiter is told when food is ready, even with the phone in a pocket never throws on a phone with no vibration motor",
+          "status": "passed"
+        },
+        {
+          "name": "a waiter is told when food is ready, even with the phone in a pocket alerts for the waiter's own tables and for tables nobody owns, not for another waiter's",
+          "status": "passed"
+        },
+        {
+          "name": "the connection light tells the truth is live while the server answers, slow after a quiet spell, lost after a long one or when offline",
+          "status": "passed"
+        },
+        {
+          "name": "the screens fit a phone Restaurant Admin's menu is a drawer on small screens with a button to open it, and full width content",
+          "status": "passed"
+        },
+        {
+          "name": "the screens fit a phone the Captain's connection badge is the real server link, not the same-browser mesh",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
