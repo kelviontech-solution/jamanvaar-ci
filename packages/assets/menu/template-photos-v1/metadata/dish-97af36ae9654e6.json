@@ -1,0 +1,33 @@
+{
+  "id": "dish-97af36ae9654e6",
+  "kind": "dish",
+  "name": "Ringna Bateta",
+  "description": "Ringna Bateta, gujarati vegetable preparations with fresh regional spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/ringna-bateta.webp"
+  ],
+  "file": "dish-97af36ae9654e6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114456,
+  "sha256": "b183d54d49f9bfa3a3adf2316eb11584a74f22202ba63b2cdb906875ce38558f"
+}

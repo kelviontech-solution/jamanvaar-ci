@@ -1,0 +1,25 @@
+{
+  "id": "dish-d02ec47fb6a42d",
+  "kind": "dish",
+  "name": "Sev Puri",
+  "description": "Sev Puri, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-d02ec47fb6a42d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92770,
+  "sha256": "9a81458451bcd90ea9c11770db9720e053ad8b3e6867bfc5d39880687778118c"
+}

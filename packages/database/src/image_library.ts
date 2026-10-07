@@ -1,3 +1,4 @@
+import { STARTER_DISH_PHOTOS, TEMPLATE_DISH_PHOTOS, starterDishPhoto, menuDishImage } from '../../utils/src/dish_photos';
 export interface FoodImageAsset {
   id: string;
   title: string;
@@ -318,6 +319,16 @@ const BUNDLED_FOOD_IMAGE_LIBRARY: FoodImageAsset[] = [
 
 // Only photo entries reviewed against their dish names are offered automatically.
 const reviewedPhotoIds = new Set(['img-hbk-01','img-cc-02','img-ccr-03','img-pt-04','img-dm-05','img-pbm-06','img-bn-07','img-gn-08','img-vgb-09','img-cc-10','img-gj-11','img-thl-12','img-piz-1']);
-export const FOOD_IMAGE_LIBRARY = BUNDLED_FOOD_IMAGE_LIBRARY.filter(image => image.url.endsWith('.svg') || reviewedPhotoIds.has(image.id));
+const photoCandidates: FoodImageAsset[] = [
+  ...TEMPLATE_DISH_PHOTOS.map(photo => ({ id: photo.id, title: photo.name, category: photo.category, cuisine: photo.cuisine, url: starterDishPhoto(photo.name)!, thumbnailUrl: starterDishPhoto(photo.name)!, tags: [photo.name, photo.category, photo.cuisine, 'AI generated starter image'] })),
+  ...STARTER_DISH_PHOTOS.map(photo => ({ id: `description-photo-${photo.file}`, title: photo.names[0], category: 'Description-matched starter photos', cuisine: photo.file === 'paneer-rice-meal' ? 'Indian' : 'Gujarati', url: starterDishPhoto(photo.names[0])!, thumbnailUrl: starterDishPhoto(photo.names[0])!, tags: [...photo.names, 'AI generated starter image'] })),
+  ...BUNDLED_FOOD_IMAGE_LIBRARY.filter(image => reviewedPhotoIds.has(image.id)).map(image => ({ ...image, url: starterDishPhoto(image.title) || menuDishImage(image.url, image.title)!, thumbnailUrl: starterDishPhoto(image.title) || menuDishImage(image.thumbnailUrl, image.title)! })).filter(image => !image.url.endsWith('.svg'))
+];
+// Different aliases can describe the same starter photo; offer it once and retain all search tags.
+export const FOOD_IMAGE_LIBRARY: FoodImageAsset[] = [...photoCandidates.reduce((photos, image) => {
+  const existing = photos.get(image.url);
+  photos.set(image.url, existing ? { ...existing, tags: [...new Set([...existing.tags, image.title, ...image.tags])] } : image);
+  return photos;
+}, new Map<string, FoodImageAsset>()).values()];
 
 export const FALLBACK_FOOD_IMAGE = '/assets/menu/common/fallback-dish.svg';

@@ -1,0 +1,33 @@
+{
+  "id": "dish-5dcbfe8c56f49c",
+  "kind": "dish",
+  "name": "Basundi",
+  "description": "Basundi, gujarati sweet portions for a meal finish.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Indian Sweets"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/basundi.webp"
+  ],
+  "file": "dish-5dcbfe8c56f49c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68790,
+  "sha256": "67db13980064cff57e623397357ea91159661cdca37d69050bcba828799ac6d7"
+}

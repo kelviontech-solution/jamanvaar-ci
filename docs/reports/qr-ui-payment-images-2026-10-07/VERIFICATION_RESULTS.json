@@ -1,0 +1,29 @@
+{
+  "api": {
+    "passed": 84,
+    "failed": 0
+  },
+  "unit": {
+    "passed": 27,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 27,
+    "failed": 0,
+    "provider": "SIMULATED",
+    "physicalDevices": false
+  },
+  "buildsPassed": [
+    "Cloud API",
+    "QR Guest",
+    "POS",
+    "Restaurant Admin",
+    "Captain",
+    "KDS",
+    "Kiosk",
+    "Super Admin"
+  ],
+  "prismaSchemaValid": true,
+  "productionDeployed": false,
+  "productionSettingsChanged": false
+}

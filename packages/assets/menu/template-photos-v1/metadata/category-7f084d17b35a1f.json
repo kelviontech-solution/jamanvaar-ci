@@ -1,0 +1,37 @@
+{
+  "id": "category-7f084d17b35a1f",
+  "kind": "category",
+  "name": "Kathiyawadi Special Shaak — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Kathiyawadi Special Shaak",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "kathiyawadi-shaak",
+  "description": "Fiery garlic and red chilli tempered village curries",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Special Shaak",
+  "components": [
+    {
+      "name": "Kathiyawadi Ringna No Olo",
+      "description": "Charcoal roasted smoked eggplants mashed and cooked with garlic, green chillies, spring onions and oil",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lasaniya Bateta (Garlic Potatoes)",
+      "description": "Baby potatoes simmered in a bold fiery garlic and Kashmiri chilli paste gravy",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sev Dungri Nu Shaak",
+      "description": "Caramelized onions cooked with crisp sev in a tangy rustic sauce",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-7f084d17b35a1f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 143592,
+  "sha256": "80f5695c05ffdeca011d3a9d161c8f9f77e9d4c5612785aa98e5b2c5787f4cd0"
+}

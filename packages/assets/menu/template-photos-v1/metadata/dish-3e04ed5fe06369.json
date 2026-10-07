@@ -1,0 +1,22 @@
+{
+  "id": "dish-3e04ed5fe06369",
+  "kind": "dish",
+  "name": "Malai Kofta Mughlai",
+  "description": "Paneer and potato dumplings stuffed with dry fruits in a velvety cashew and saffron sauce",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal & Heritage Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal & Heritage Curries"
+    }
+  ],
+  "file": "dish-3e04ed5fe06369.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108236,
+  "sha256": "cb6faf9180da31fdd0b4071e94112d51bd656a3330c287ff59e791707b0cc7b8"
+}

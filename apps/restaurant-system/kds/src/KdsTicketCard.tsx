@@ -1,6 +1,6 @@
 import React from 'react';
 import type { KOTItem, KOTRecord } from '@jamanvaar/types';
-import { Flame, Bell, CheckCheck, Check, Clock, AlertTriangle, AlertCircle, RotateCcw, X, Undo2 } from 'lucide-react';
+import { Flame, Bell, CheckCheck, Check, Clock, AlertTriangle, AlertCircle, RotateCcw, X, Undo2, Printer } from 'lucide-react';
 import { COURSE_LABEL, dishAllergy, effectiveItemStatus, allergyText, type TicketAge } from './kdsLogic';
 
 interface Props {
@@ -16,11 +16,14 @@ interface Props {
   onServe: (kot: KOTRecord) => void;
   onRecall: (kot: KOTRecord) => void;
   onDismiss: (kot: KOTRecord) => void;
+  priority: 'NORMAL' | 'URGENT';
+  onPriority: (kot: KOTRecord, priority: 'NORMAL' | 'URGENT') => void;
+  onReprint: (kot: KOTRecord) => void;
 }
 
-const BTN = 'w-full min-h-[48px] 2xl:min-h-[64px] rounded-2xl font-black text-xs sm:text-sm 2xl:text-lg uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer';
+const BTN = 'w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer';
 
-export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, onRecall, onDismiss }) => {
+export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, onRecall, onDismiss, priority, onPriority, onReprint }) => {
   const cancelled = kot.status === 'CANCELLED';
   const isReady = kot.status === 'READY';
   const isServed = kot.status === 'SERVED';
@@ -47,11 +50,12 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
     <article
       data-testid="kds-ticket"
       data-status={kot.status}
-      className={`bg-white rounded-3xl border-2 shadow-xs flex flex-col justify-between overflow-hidden relative select-none min-w-0 ${ring}`}
+      aria-label={`Token ${kot.tokenNumber}, ${kot.station}, ${kot.status.toLowerCase()}`}
+      className={`bg-white rounded-3xl border-2 shadow-xs flex flex-col justify-between overflow-hidden relative select-none min-w-0 kds-ticket ${ring}`}
     >
       <div className={`h-2 w-full ${bar}`} />
 
-      <div className="p-3 sm:p-4 space-y-3 min-w-0">
+      <div className="kds-ticket-body p-3 sm:p-4 space-y-3 min-w-0">
         {cancelled && (
           <div className="rounded-2xl bg-rose-600 text-white px-3 py-2 text-xs sm:text-sm font-black flex items-center gap-2 animate-pulse" role="alert">
             <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -65,13 +69,13 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           </div>
         )}
 
-        <div className="flex items-start justify-between gap-2 border-b border-jaman-border pb-2.5">
+        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-jaman-border pb-2.5">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-2xl sm:text-3xl 2xl:text-5xl font-black font-mono text-jaman-navy leading-none">#{kot.tokenNumber}</span>
-              <span className="text-[11px] font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">{kot.kotNumber}</span>
+              <span className="kds-token font-black font-mono break-words text-jaman-navy leading-none">#{kot.tokenNumber}</span>
+              <span className="text-[10px] break-all font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">{kot.kotNumber}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs 2xl:text-base text-slate-600 font-bold mt-1 flex-wrap">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1 flex-wrap">
               <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'No table'}</span>
               <span>•</span>
               <span className="uppercase text-[11px] bg-slate-100 px-1.5 py-0.5 rounded font-black text-slate-700">{orderTypeLabel}</span>
@@ -80,9 +84,18 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
             </div>
           </div>
 
+
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <select aria-label={`Priority for token ${kot.tokenNumber}`} value={priority} disabled={cancelled || isServed}
+            onChange={e => onPriority(kot, e.target.value as 'NORMAL' | 'URGENT')}
+            className={`min-h-[40px] min-w-0 rounded-xl border px-2 text-xs font-bold ${priority === 'URGENT' ? 'bg-rose-50 text-rose-800 border-rose-300' : 'bg-jaman-cream text-jaman-navy border-jaman-border'}`}>
+            <option value="NORMAL">Normal priority</option><option value="URGENT">Urgent · cook first</option>
+          </select>
           {!isServed && !cancelled && (
             <span
-              className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] 2xl:text-base font-black font-mono border ${
+              className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-black font-mono border ${
                 age.level === 'late'
                   ? 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
                   : age.level === 'warn'
@@ -95,8 +108,9 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
               {age.level === 'late' ? `Late ${age.mins}m` : age.timeStr}
             </span>
           )}
+          <button type="button" onClick={() => onReprint(kot)} aria-label={`Reprint KOT ${kot.kotNumber}`} title="Reprint this ticket without creating another order"
+            className="min-h-[40px] min-w-[40px] rounded-xl border border-jaman-border flex items-center justify-center text-jaman-navy bg-white hover:bg-jaman-cream"><Printer className="w-4 h-4" /></button>
         </div>
-
         {progress.tickets > 0 && progress.total > 0 && !cancelled && (progress.tickets > 1 || progress.ready > 0) && (
           <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
             <span className="inline-block h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
@@ -113,7 +127,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           </div>
         )}
 
-        <ul className="space-y-2">
+        <ul className="kds-dishes space-y-2" tabIndex={0} aria-label={`Dishes for token ${kot.tokenNumber}`}>
           {kot.items.map((it, idx) => {
             const status = cancelled ? 'CANCELLED' : effectiveItemStatus(kot, it);
             const done = status === 'READY';
@@ -148,23 +162,23 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
                     {gone ? <X className="w-4 h-4" /> : served || done ? <Check className="w-4 h-4" /> : <Flame className="w-3.5 h-3.5" />}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-baseline gap-1.5 flex-wrap">
-                      <span className="font-mono font-black text-base sm:text-lg 2xl:text-3xl text-jaman-saffron leading-none">{it.quantity}×</span>
-                      <span className={`font-black text-sm sm:text-base 2xl:text-2xl text-jaman-navy leading-snug break-words ${gone ? 'line-through text-rose-700' : ''}`}>{it.name}</span>
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="shrink-0 font-mono font-black text-lg text-jaman-saffron leading-none">{it.quantity}×</span>
+                      <span className={`min-w-0 flex-1 kds-dish-name font-extrabold text-jaman-navy leading-snug break-words ${gone ? 'line-through text-rose-700' : ''}`}>{it.name}</span>
                       {showCourses && it.course && !gone && (
                         <span className="text-[10px] font-black uppercase bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">{COURSE_LABEL[it.course] ?? it.course}</span>
                       )}
                     </span>
                     {gone && <span className="block text-xs font-black text-rose-700 mt-0.5">CANCELLED{it.cancelReason ? `: ${it.cancelReason}` : ''}</span>}
                     {!gone && it.modifiers && it.modifiers.length > 0 && (
-                      <span className="block text-sm 2xl:text-lg font-bold text-slate-800 pt-0.5">
+                      <span className="block text-sm font-bold text-slate-800 pt-0.5">
                         {it.modifiers.map((m, i) => (
                           <span key={i} className="block break-words">• {m.optionName}</span>
                         ))}
                       </span>
                     )}
                     {!gone && it.specialInstructions && (
-                      <span className={`mt-1 px-2 py-0.5 rounded-lg text-xs 2xl:text-base font-bold inline-flex items-start gap-1 border max-w-full ${allergy ? 'bg-rose-200 text-rose-900 border-rose-500' : 'bg-amber-100/80 text-amber-900 border-amber-300/60'}`}>
+                      <span className={`mt-1 px-2 py-0.5 rounded-lg text-xs font-bold inline-flex items-start gap-1 border max-w-full ${allergy ? 'bg-rose-200 text-rose-900 border-rose-500' : 'bg-amber-100/80 text-amber-900 border-amber-300/60'}`}>
                         <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
                         <span className="break-words min-w-0">{allergy ? 'ALLERGY / DIET: ' : ''}{it.specialInstructions}</span>
                       </span>
@@ -180,7 +194,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         )}
       </div>
 
-      <div className="p-3 sm:p-4 bg-jaman-cream border-t border-jaman-border space-y-2.5">
+      <div className="kds-ticket-footer p-3 sm:p-4 bg-jaman-cream border-t border-jaman-border space-y-2.5">
         <div className="flex items-center justify-between text-xs text-slate-600 font-bold gap-2">
           <span className="truncate">{takenBy ?? ''}</span>
           <span className="font-mono text-slate-400 shrink-0">#{kot.id.slice(-5)}</span>
@@ -206,7 +220,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
 
         {isReady && (
           <div className="flex gap-2">
-            <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Marked ready by mistake? Put it back to cooking">
+            <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Marked ready by mistake? Put it back to cooking">
               <Undo2 className="w-4 h-4" /> Undo
             </button>
             <button type="button" onClick={() => onServe(kot)} className={`${BTN} bg-gradient-to-r from-jaman-navy to-jaman-darkBorder text-white shadow-md shadow-slate-900/20`}>
@@ -220,7 +234,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
             <div className="flex-1 min-h-[44px] rounded-2xl bg-slate-100 text-slate-500 font-bold text-xs flex items-center justify-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-600" /> Served
             </div>
-            <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Served by mistake? Bring the ticket back">
+            <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Served by mistake? Bring the ticket back">
               <RotateCcw className="w-4 h-4" /> Recall
             </button>
           </div>

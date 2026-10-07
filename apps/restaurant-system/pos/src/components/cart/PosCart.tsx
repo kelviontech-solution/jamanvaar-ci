@@ -1,3 +1,4 @@
+import { CachedImg } from '@jamanvaar/ui';
 import React, { useState, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
@@ -271,7 +272,7 @@ export const PosCart: React.FC = () => {
                 className="py-1 border-b border-[#ECE8E2] last:border-b-0"
               >
                 <div className="flex items-start gap-2.5">
-                  <img
+                  <CachedImg
                     src={ci.item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
                     alt=""
                     className="w-10 h-10 rounded-lg object-cover bg-jaman-cream border border-jaman-border shrink-0"
@@ -410,7 +411,7 @@ export const PosCart: React.FC = () => {
           /* Clean Minimal Empty Cart State */
           <div className="h-full min-h-[120px] flex flex-col items-center justify-center p-3 text-center space-y-2">
             <div className="w-16 h-16 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-center shadow-xs p-2.5">
-              <img
+              <CachedImg
                 src={JAMANVAAR_LOGOS.mark}
                 alt="JAMANVAAR"
                 className="w-full h-full object-contain drop-shadow-xs"

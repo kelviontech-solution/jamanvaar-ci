@@ -1,0 +1,25 @@
+{
+  "id": "dish-c40dbcd6ab5ed8",
+  "kind": "dish",
+  "name": "Virgin Mint Mojito Cooler",
+  "description": "Crushed fresh mint, lime wedges, simple syrup topped with sparkling soda and ice",
+  "diet": "VEG",
+  "cuisine": "Cold-Pressed Juices & Shakes",
+  "category": "Fresh Cold Juices",
+  "occurrences": [
+    {
+      "templateId": "tpl-juice-beverages",
+      "category": "Fresh Cold Juices"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c40dbcd6ab5ed8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83194,
+  "sha256": "a8e8bcfa95443fef7776ed1c5e95d0ae702c30f95f6985e0809b05ae3fb76245"
+}

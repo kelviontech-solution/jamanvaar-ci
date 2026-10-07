@@ -1,0 +1,22 @@
+{
+  "id": "dish-1a5b79de95bc88",
+  "kind": "dish",
+  "name": "Tomato Uttapam",
+  "description": "Tomato Uttapam, thick rice-lentil pancakes with vegetable toppings.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam"
+    }
+  ],
+  "file": "dish-1a5b79de95bc88.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99498,
+  "sha256": "a1c31172ff371017aad1f776fba21ede94da5b2ecd5451f5b59d2fabda457da4"
+}

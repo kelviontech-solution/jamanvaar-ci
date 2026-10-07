@@ -1,20 +1,18 @@
 import { useSyncExternalStore } from 'react';
 import { AiConfig } from '@jamanvaar/business';
 
-/**
- * What the cloud allows JAMAN AI to do for this restaurant (BUG-057), as React state. `showButton` applies
- * the owner's local "show the button" preference only to an ON feature: it can hide, never enable, and it
- * never hides the lock on a LOCKED one.
- */
+/** Subscribe to the full access revision, including catalogue and quota changes. */
 export function useAiAccess() {
-  const state = useSyncExternalStore(
+  useSyncExternalStore(
     (cb) => AiConfig.subscribe(cb),
-    () => AiConfig.getState(),
-    () => AiConfig.getState()
+    () => AiConfig.getRevision(),
+    () => AiConfig.getRevision()
   );
+  const state = AiConfig.getState();
   return {
     state,
+    known: AiConfig.isKnown(),
     locked: state === 'LOCKED',
-    showButton: (ownerWantsIt: boolean) => AiConfig.shouldShowButton(ownerWantsIt)
+    showButton: (ownerWantsIt: boolean) => ownerWantsIt && (!AiConfig.isKnown() || AiConfig.shouldShowButton(ownerWantsIt))
   };
 }

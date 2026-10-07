@@ -1,0 +1,26 @@
+{
+  "id": "dish-c751b7e97cec20",
+  "kind": "dish",
+  "name": "Corn Cheese Sandwich",
+  "description": "Corn Cheese Sandwich, fresh fillings in toasted or grilled bread.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sandwiches"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Sandwiches"
+    }
+  ],
+  "file": "dish-c751b7e97cec20.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94744,
+  "sha256": "e1ac69c0c84b4753b3e7974ed789ccb747595f133c5fb5b8f88c10fd72a8f529"
+}

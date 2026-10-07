@@ -1,0 +1,29 @@
+{
+  "id": "combo-chaat",
+  "kind": "combo",
+  "name": "Street Food Meal Deal",
+  "description": "Pani Puri Platter (6 Pcs) with Bread Pakora. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Pani Puri Platter (6 Pcs)",
+      "description": "Crispy puris stuffed with spiced chickpea mash, tangy mint-coriander water and sweet date chutney",
+      "diet": "VEG"
+    },
+    {
+      "name": "Bread Pakora",
+      "description": "Bread Pakora, freshly fried snacks.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-chaat.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84116,
+  "sha256": "c4301372506cd875a72fb5cb7ece08f0430e86eb5d0cbb0c1084369f1e534da2"
+}

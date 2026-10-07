@@ -1,0 +1,42 @@
+{
+  "id": "dish-87c5f8566884f5",
+  "kind": "dish",
+  "name": "Chocolate Lava Cake",
+  "description": "Chocolate Lava Cake, desserts served warm.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Warm Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Warm Desserts"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Bakes & Desserts"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Warm Desserts"
+    }
+  ],
+  "file": "dish-87c5f8566884f5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 82258,
+  "sha256": "eaa6194c9ed010296efced3d71637930789ac565bc105cdd152d97f73769fdae"
+}

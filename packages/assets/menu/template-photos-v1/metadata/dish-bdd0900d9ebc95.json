@@ -1,0 +1,22 @@
+{
+  "id": "dish-bdd0900d9ebc95",
+  "kind": "dish",
+  "name": "Veg Manchurian Dry",
+  "description": "Veg Manchurian Dry, wok-tossed or crisp starters with house sauces.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Starters"
+    }
+  ],
+  "file": "dish-bdd0900d9ebc95.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111272,
+  "sha256": "50d314d13c16b3000cd5592bb2354b01b80dc65ef63bdafad161cfa0469a78c1"
+}

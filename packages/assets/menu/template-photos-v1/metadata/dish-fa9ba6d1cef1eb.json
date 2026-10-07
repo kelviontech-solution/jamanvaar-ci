@@ -1,0 +1,30 @@
+{
+  "id": "dish-fa9ba6d1cef1eb",
+  "kind": "dish",
+  "name": "Tandoori Roti",
+  "description": "Tandoori Roti, fresh tandoor or griddle breads.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Breads"
+    }
+  ],
+  "file": "dish-fa9ba6d1cef1eb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 130600,
+  "sha256": "60dee845f03cc95b6667d307ac78c3f13bbf6d45f37e5081d67bbfb90e9aebc4"
+}

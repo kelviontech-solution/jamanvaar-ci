@@ -1,0 +1,25 @@
+{
+  "id": "dish-4eb431db0421a9",
+  "kind": "dish",
+  "name": "Black Forest Pastry",
+  "description": "Black Forest Pastry, individual eggless pastry portions.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-4eb431db0421a9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86218,
+  "sha256": "70afe7e4c93b0592df8d861f9f60313cb592efefccdda9228740caf3a155a2d6"
+}

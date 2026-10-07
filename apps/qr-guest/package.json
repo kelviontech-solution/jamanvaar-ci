@@ -5,6 +5,8 @@
   "type": "module",
   "description": "The customer QR ordering web app: opened by scanning a table's QR code. Web only; it uses the public QR API and nothing from the restaurant apps.",
   "scripts": {
+    "predev": "node ../../tooling/dev/sync_description_photos.mjs",
+    "prebuild": "node ../../tooling/dev/sync_description_photos.mjs",
     "dev": "vite --port 5190",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"

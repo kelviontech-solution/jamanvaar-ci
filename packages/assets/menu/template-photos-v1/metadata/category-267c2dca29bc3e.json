@@ -1,0 +1,32 @@
+{
+  "id": "category-267c2dca29bc3e",
+  "kind": "category",
+  "name": "Combos — Burger & Grilled Sandwich Bar",
+  "categoryName": "Combos",
+  "templateId": "tpl-burger-sandwich",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Gourmet Burgers & Sandwiches",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Bombay Special Grilled Sandwich",
+      "description": "Spiced potato mash, beetroot, cucumber, tomato and processed cheese with spicy coriander chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Makhani Cheese Toastie",
+      "description": "Spiced cottage cheese tossed in makhani sauce loaded with mozzarella in golden toasted bread",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-267c2dca29bc3e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 124186,
+  "sha256": "6be0eb565adf1b2de1c6564ea282025c82c989f16f902a6d1f9948c51de22e43"
+}

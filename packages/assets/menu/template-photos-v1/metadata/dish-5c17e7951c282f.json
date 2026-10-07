@@ -1,0 +1,25 @@
+{
+  "id": "dish-5c17e7951c282f",
+  "kind": "dish",
+  "name": "Rose Falooda",
+  "description": "Rose Falooda, traditional chilled dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Kulfi & Falooda"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-5c17e7951c282f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75640,
+  "sha256": "5196b9725da5d5c37afa5a76e9c5f68344b48074c15d03ca7c05e79ad00d485a"
+}

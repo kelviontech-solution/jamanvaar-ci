@@ -1,0 +1,25 @@
+{
+  "id": "dish-799d0beb2e4754",
+  "kind": "dish",
+  "name": "Chicken Tikka Biryani",
+  "description": "Chicken Tikka Biryani, dum-cooked chicken and fragrant basmati rice.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Chicken Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-799d0beb2e4754.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113146,
+  "sha256": "cf84e9a9bf3124bf5cc886d3a73bad1622e36ed85af5cc19a73292904a3d3568"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-50b93cf2429348",
+  "kind": "dish",
+  "name": "Idli 2 Pieces",
+  "description": "Idli 2 Pieces, steamed rice cakes or crisp lentil fritters with chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada"
+    }
+  ],
+  "file": "dish-50b93cf2429348.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 62704,
+  "sha256": "e7fa25423b927fffbddf51701ef1e09cd407d54f893243c33e5cdb48b3fd0024"
+}

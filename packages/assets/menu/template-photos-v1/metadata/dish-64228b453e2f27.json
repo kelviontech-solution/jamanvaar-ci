@@ -1,0 +1,25 @@
+{
+  "id": "dish-64228b453e2f27",
+  "kind": "dish",
+  "name": "Fruit Sundae",
+  "description": "Fruit Sundae, ice cream with toppings and sauces.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-64228b453e2f27.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72000,
+  "sha256": "e411e9c2a10f323dd23ed7e1b1287671ef6b7280f703bfe629b9b3d47a83d6f3"
+}

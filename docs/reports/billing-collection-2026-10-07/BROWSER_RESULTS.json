@@ -1,0 +1,661 @@
+{
+  "at": "2026-10-07T03:35:03.638Z",
+  "provider": "NOT EXERCISED (cash-only)",
+  "physicalDevices": false,
+  "environment": "isolated local API/database; compiled apps",
+  "results": [
+    {
+      "title": "Paid baseline appears in admin as 5116 collected",
+      "passed": true,
+      "ms": 153,
+      "evidence": {
+        "collected": 5116
+      }
+    },
+    {
+      "title": "Actual kiosk 250 order appears in POS and admin immediately as pending",
+      "passed": true,
+      "ms": 195.57,
+      "evidence": {
+        "orderValue": 5366,
+        "collected": 5116,
+        "pending": 250,
+        "kioskToKdsMs": 220.95
+      }
+    },
+    {
+      "title": "Kiosk source and pending collection filters show only the unpaid kiosk order",
+      "passed": true,
+      "ms": 47.51,
+      "evidence": {
+        "source": "KIOSK",
+        "payment": "PENDING"
+      }
+    },
+    {
+      "title": "CSV uses the filtered kiosk row, restaurant details and payment state; JSON is absent",
+      "passed": true,
+      "ms": 363.18,
+      "evidence": {
+        "records": 1,
+        "restaurant": true,
+        "paymentStatus": true
+      }
+    },
+    {
+      "title": "POS cash settlement changes admin from pending to collected without duplicating the order",
+      "passed": true,
+      "ms": 249.12,
+      "evidence": {
+        "settlementToAdminMs": 223.06,
+        "collected": 5366,
+        "pending": 0
+      }
+    },
+    {
+      "title": "Cash tender filtering retains settled kiosk orders",
+      "passed": true,
+      "ms": 32.57,
+      "evidence": {
+        "cashAliasesIncluded": true
+      }
+    },
+    {
+      "title": "Order history provides a dedicated kiosk view",
+      "passed": true,
+      "ms": 84.98,
+      "evidence": {
+        "source": "KIOSK"
+      }
+    },
+    {
+      "title": "PDF exports all 32 filtered records beyond page one with branded restaurant identity",
+      "passed": true,
+      "ms": 1015.75,
+      "evidence": {
+        "printedRecords": 32,
+        "pagination": 25,
+        "restaurantIdentity": true,
+        "logo": true
+      }
+    }
+  ],
+  "errors": [],
+  "timings": [
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 27292.178
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 27326.0708
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 27875.9506
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 27959.6308
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 28013.849
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 28036.6688
+    },
+    {
+      "app": "pos",
+      "event": "request",
+      "method": "GET",
+      "at": 28786.9258
+    },
+    {
+      "app": "pos",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 28813.508
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 30290.3885
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 30315.3805
+    },
+    {
+      "app": "pos",
+      "event": "request",
+      "method": "GET",
+      "at": 32786.1023
+    },
+    {
+      "app": "pos",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 32807.3435
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 33295.3463
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 33321.0661
+    },
+    {
+      "app": "kiosk",
+      "event": "cash-confirm-click",
+      "at": 33822.2072
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "POST",
+      "at": 33911.854
+    },
+    {
+      "app": "kiosk",
+      "event": "click-return",
+      "at": 33915.7127
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 33945.7659
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "POST",
+      "status": 201,
+      "at": 33946.4511
+    },
+    {
+      "app": "pos",
+      "event": "request",
+      "method": "GET",
+      "at": 33947.1077
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 33961.8005
+    },
+    {
+      "app": "pos",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 33974.5526
+    },
+    {
+      "app": "pos",
+      "event": "request",
+      "method": "POST",
+      "at": 34763.6462
+    },
+    {
+      "app": "pos",
+      "event": "response",
+      "method": "POST",
+      "status": 201,
+      "at": 34796.4869
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 34798.8613
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 34799.5523
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 34820.5697
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 34821.0419
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35124.5017
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35124.9032
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35138.5419
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35140.1661
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35174.525
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35176.0169
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35191.0506
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35194.2007
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35227.671
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35229.334
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35243.4372
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35247.5414
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35283.7075
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35284.9872
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35304.1139
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35305.0394
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35340.199
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35341.9182
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35355.7435
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35372.0011
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35389.3835
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35391.1434
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35405.4189
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35406.9454
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35439.4911
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35444.5127
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35452.0594
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35457.629
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35491.0045
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35495.6502
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35506.2155
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35509.3558
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35543.4789
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35556.615
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35561.2645
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35576.1998
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35604.5307
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35621.257
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35633.2479
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35635.5799
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35657.6235
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35671.0073
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35672.7491
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35684.2962
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35714.1074
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35726.3719
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35733.1542
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35747.4908
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35764.7119
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35784.0708
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35793.0699
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35797.942
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35829.9661
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 35837.8133
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35843.2232
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35856.2294
+    },
+    {
+      "app": "kiosk",
+      "event": "request",
+      "method": "GET",
+      "at": 35874.4065
+    },
+    {
+      "app": "kiosk",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 35885.6461
+    },
+    {
+      "app": "kds",
+      "event": "request",
+      "method": "GET",
+      "at": 36300.915
+    },
+    {
+      "app": "kds",
+      "event": "response",
+      "method": "GET",
+      "status": 200,
+      "at": 36311.3817
+    },
+    {
+      "app": "pos",
+      "event": "request",
+      "method": "GET",
+      "at": 36820.6861
+    }
+  ]
+}

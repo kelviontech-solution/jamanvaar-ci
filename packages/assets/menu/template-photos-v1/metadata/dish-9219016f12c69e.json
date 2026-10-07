@@ -1,0 +1,25 @@
+{
+  "id": "dish-9219016f12c69e",
+  "kind": "dish",
+  "name": "Khandvi",
+  "description": "Khandvi, steamed or crisp Gujarati snacks with chutney.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Farsan",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Farsan"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/khandvi.webp"
+  ],
+  "file": "dish-9219016f12c69e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96368,
+  "sha256": "b571c50af328bb9b3bc785e403c877949de5185ebf821eb36a881ddad8ce76bc"
+}

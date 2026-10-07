@@ -1,0 +1,22 @@
+{
+  "id": "dish-ffcea6e4e3e46e",
+  "kind": "dish",
+  "name": "South Indian Thali Meal",
+  "description": "Rice, Sambar, Rasam, Kootu, Poriyal, Curd, Appalam, Pickle and Payasam",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "South Indian Rice Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "South Indian Rice Meals"
+    }
+  ],
+  "file": "dish-ffcea6e4e3e46e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79658,
+  "sha256": "5fe890dc27a0c72b00c792d972269158acbe40c159027a1163357cb80aefee8e"
+}

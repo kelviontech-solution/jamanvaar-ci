@@ -1,0 +1,37 @@
+{
+  "id": "category-c784599c506c7f",
+  "kind": "category",
+  "name": "Rice — Punjabi Dhaba & Restaurant",
+  "categoryName": "Rice",
+  "templateId": "tpl-punjabi",
+  "slug": "rice",
+  "description": "Steamed or tempered basmati rice",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Rice",
+  "components": [
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Peas Pulao",
+      "description": "Peas Pulao, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c784599c506c7f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115010,
+  "sha256": "ff1fee5bd196bc6fd37c2d201fc15296b3beefcc183822cd8e612932f9910bb5"
+}

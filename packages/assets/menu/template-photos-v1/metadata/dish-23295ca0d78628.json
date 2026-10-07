@@ -1,0 +1,25 @@
+{
+  "id": "dish-23295ca0d78628",
+  "kind": "dish",
+  "name": "Mutton Dum Biryani",
+  "description": "Mutton Dum Biryani, traditional dum rice preparations.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Mutton & Egg Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Mutton & Egg Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-23295ca0d78628.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118678,
+  "sha256": "67c37ddc36f9f12a802455085275d9c8e7fecb7117922719e40329ec3e2ba3c4"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-4c9819d635c060",
+  "kind": "category",
+  "name": "Tandoori Roti & Naan Breads — North Indian Restaurant",
+  "categoryName": "Tandoori Roti & Naan Breads",
+  "templateId": "tpl-north-indian",
+  "slug": "tandoori-breads",
+  "description": "Freshly baked clay oven flatbreads",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Roti & Naan Breads",
+  "components": [
+    {
+      "name": "Butter Naan",
+      "description": "Refined flour leavened flatbread brushed with molten butter from the clay tandoor",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Garlic Butter Naan",
+      "description": "Tandoori naan topped with roasted chopped garlic and fresh coriander leaves",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Roti (Butter)",
+      "description": "Whole wheat flatbread baked crisp in clay oven topped with butter",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4c9819d635c060.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 128564,
+  "sha256": "6706e45c7933176b7b21ace7040216fc751d026711b8d55c5c8718ae71a7adf4"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-542eb505adf44b",
+  "kind": "dish",
+  "name": "Gor Ghee",
+  "description": "Gor Ghee, regional meal accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-542eb505adf44b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 64152,
+  "sha256": "bac3c2c21f4fbb9e7be3dd6e0695743edaa2ab82f65b89a668df5c3299f8fd69"
+}

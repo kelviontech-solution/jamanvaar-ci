@@ -1,0 +1,37 @@
+{
+  "id": "category-e8ffaa64ca5ee1",
+  "kind": "category",
+  "name": "Starters — Indian Multi-Cuisine Diner",
+  "categoryName": "Starters",
+  "templateId": "tpl-multicuisine",
+  "slug": "starters",
+  "description": "Marinated starters grilled or shallow-fried to order",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Starters",
+  "components": [
+    {
+      "name": "Paneer Tikka",
+      "description": "Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Malai Paneer Tikka",
+      "description": "Malai Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Hara Bhara Kebab",
+      "description": "Hara Bhara Kebab, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e8ffaa64ca5ee1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117710,
+  "sha256": "fb55da00e9b4d32f70ff04566b6eb72cc496b3efeb8b93a3de74aa3f27988946"
+}

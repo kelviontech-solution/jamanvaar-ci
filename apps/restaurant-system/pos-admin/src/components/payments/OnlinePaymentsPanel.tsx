@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
+import { PaymentsOverview } from './PaymentsOverview';
 import {
   createRefund,
+  type RefundMethod,
   getDayStatement,
   getPayoutHistory,
   getPayoutSummary,
@@ -93,6 +95,7 @@ export function OnlinePaymentsPanel() {
   const [refundFor, setRefundFor] = useState<RecentPayment | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
+  const [refundMethod, setRefundMethod] = useState<RefundMethod>('CASH');
   const [date, setDate] = useState(todayIst());
   const statementSequence = useRef(0);
   const [statement, setStatement] = useState<DayStatement | null>(null);
@@ -174,8 +177,8 @@ export function OnlinePaymentsPanel() {
     setBusyId(refundFor.id);
     setMessage('');
     try {
-      await createRefund(refundFor.id, paise, refundReason.trim(), staff?.fullName ?? 'Restaurant Admin');
-      setMessage(`Refund of ${rupees(paise)} requested. It shows as refunded once Razorpay confirms it.`);
+      await createRefund(refundFor.id, paise, refundReason.trim(), staff?.fullName ?? 'Restaurant Admin', refundMethod);
+      setMessage(`Refund of ${rupees(paise)} recorded as paid to the customer by ${refundMethod === 'CASH' ? 'cash' : 'UPI from the owner account'}.`);
       setRefundFor(null);
       setRefundReason('');
       load(); loadPayouts(); loadStatement(date);
@@ -201,6 +204,8 @@ export function OnlinePaymentsPanel() {
       {error && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{error}</div>}
       {message && <div className="text-xs text-jaman-navy bg-jaman-ivory border border-jaman-border rounded-xl p-3">{message}</div>}
       {payoutError && <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">{payoutError}</div>}
+
+      {payoutSummary && <PaymentsOverview summary={payoutSummary} />}
 
       {payoutSummary && (
         <div className="p-4 bg-jaman-ivory rounded-xl border border-jaman-border space-y-2">
@@ -349,6 +354,15 @@ export function OnlinePaymentsPanel() {
               className="flex-1 px-2 py-1.5 rounded-lg border border-jaman-border"
               aria-label="Refund reason"
             />
+            <select
+              value={refundMethod}
+              onChange={(e) => setRefundMethod(e.target.value as RefundMethod)}
+              className="px-2 py-1.5 rounded-lg border border-jaman-border"
+              aria-label="How the customer was paid back"
+            >
+              <option value="CASH">Paid in cash</option>
+              <option value="UPI_TO_CUSTOMER">Paid by UPI from owner account</option>
+            </select>
           </div>
           <div className="flex gap-2 justify-end">
             <Button size="sm" variant="ghost" onClick={() => setRefundFor(null)}>Cancel</Button>

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
 import { DiningTable, MenuItem, Category } from '@jamanvaar/types';
 import { captainDb, StaffRepository } from '@jamanvaar/database';
+import { NetworkStatusService } from '@jamanvaar/api';
+import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import { EntitlementService } from '@jamanvaar/business';
 import {
   JamanvaarAuthLayout,
@@ -14,7 +16,7 @@ import {
   ActivationHelpNote,
   sound
 } from '@jamanvaar/ui';
-import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
+import { isDeviceConnected, activateCaptainWithKey, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import { SyncOutboxEngine, EntitySyncEngine, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncReservations, onAppResume } from '@jamanvaar/sync';
 
 // Captain Modular Layout & Views
@@ -69,6 +71,24 @@ export const App: React.FC = () => {
     const warm = () => sound.warmUp();
     window.addEventListener('pointerdown', warm, { once: true });
     return () => window.removeEventListener('pointerdown', warm);
+  }, []);
+
+  // Keep menu/category pictures on this device, so a dish still shows its real photo once the internet is
+  // down, instead of silently falling back to the placeholder icon. This only ever ran in the kiosk app; a
+  // waiter working through an outage never had the menu's pictures saved locally to fall back to.
+  useEffect(() => {
+    let lastKey = '';
+    const warmImages = () => {
+      if (!NetworkStatusService.isOnline()) return;
+      const list = collectMenuImageUrls(captainDb.menuItems, captainDb.categories);
+      const key = list.join('|');
+      if (key === lastKey) return;
+      lastKey = key;
+      void ImageCache.sync(list);
+    };
+    const unsubNet = NetworkStatusService.subscribe(warmImages);
+    const unsubDb = captainDb.subscribe(warmImages);
+    return () => { unsubNet(); unsubDb(); };
   }, []);
 
   // Local PIN keypad state for login
@@ -128,6 +148,7 @@ export const App: React.FC = () => {
     void syncDiningTables();
     EntitySyncEngine.registerWakeUp('SERVICE_MESSAGE', async () => { const inbound = await syncServiceMessages('CAPTAIN'); useCaptainStore.getState().receiveMessages(inbound); });
     void reportHeartbeat();
+    void syncRestaurantIdentity();
 
     const orderInterval = setInterval(() => {
       void SyncOutboxEngine.processOutbox();
@@ -144,6 +165,7 @@ export const App: React.FC = () => {
       void syncReservations({ push: false });
       void syncStaff();
       void reportHeartbeat();
+    void syncRestaurantIdentity();
     }, 15000);
 
     // Waking the tablet (screen unlocked, network back, tab visible again) catches up at once: no refresh needed.

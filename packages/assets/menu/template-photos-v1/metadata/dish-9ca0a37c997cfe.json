@@ -1,0 +1,22 @@
+{
+  "id": "dish-9ca0a37c997cfe",
+  "kind": "dish",
+  "name": "Chicken Fried Rice",
+  "description": "Chicken Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Fried Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Fried Rice"
+    }
+  ],
+  "file": "dish-9ca0a37c997cfe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87866,
+  "sha256": "8433d3cd26303ae9c6928c41c2c136bb67775cb5fb914cd4596c2802023db7e4"
+}

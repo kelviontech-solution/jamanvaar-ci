@@ -1,0 +1,26 @@
+{
+  "id": "dish-8e5dafcb91ed19",
+  "kind": "dish",
+  "name": "Vanilla Shake",
+  "description": "Vanilla Shake, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    }
+  ],
+  "file": "dish-8e5dafcb91ed19.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 36898,
+  "sha256": "e5aa4c0ef98b0e64c7fb3b8504f93d247fb471ea0899d16457eea5e6c7dcbc32"
+}

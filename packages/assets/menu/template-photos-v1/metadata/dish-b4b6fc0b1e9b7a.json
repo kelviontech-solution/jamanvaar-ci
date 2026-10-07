@@ -1,0 +1,25 @@
+{
+  "id": "dish-b4b6fc0b1e9b7a",
+  "kind": "dish",
+  "name": "Vada Pav",
+  "description": "Vada Pav, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-b4b6fc0b1e9b7a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100756,
+  "sha256": "a893aeea49d3cf4570fe966a63ca0af2d417c47be52a1ca4d099cb7da8f65371"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-3e69b75dc07cfd",
+  "kind": "dish",
+  "name": "Whole Wheat Bread",
+  "description": "Whole Wheat Bread, freshly baked breads.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Breads"
+    }
+  ],
+  "file": "dish-3e69b75dc07cfd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115592,
+  "sha256": "26a3178a804d70288ae1655c695035b621c81e218ffa66cd2a5e704a5cb33f8c"
+}

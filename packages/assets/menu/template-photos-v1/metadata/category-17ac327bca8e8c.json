@@ -1,0 +1,37 @@
+{
+  "id": "category-17ac327bca8e8c",
+  "kind": "category",
+  "name": "Dal & Kadhi — Gujarati Restaurant",
+  "categoryName": "Dal & Kadhi",
+  "templateId": "tpl-gujarati",
+  "slug": "dal-kadhi",
+  "description": "Authentic Gujarati sweet-tangy dal and spiced buttermilk kadhi",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Dal & Kadhi",
+  "components": [
+    {
+      "name": "Sweet Gujarati Toor Dal",
+      "description": "Thin pigeon pea lentil soup balanced with kokum, peanuts, jaggery and mustard tempering",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Traditional Gujarati Kadhi",
+      "description": "Silky smooth yogurt and besan soup tempered with cinnamon, cloves, curry leaves and ginger",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Dhokli",
+      "description": "Dal Dhokli, sweet-sour Gujarati tempering, served hot.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-17ac327bca8e8c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103358,
+  "sha256": "778b8be50ea4f694883d0a4249f894f8b57197af53072111581d5ea65ab170a3"
+}

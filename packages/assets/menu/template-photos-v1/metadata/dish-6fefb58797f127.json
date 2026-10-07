@@ -1,0 +1,22 @@
+{
+  "id": "dish-6fefb58797f127",
+  "kind": "dish",
+  "name": "Chicken Manchow Soup",
+  "description": "Chicken Manchow Soup, hot vegetable broth finished to order.",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Soups",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Soups"
+    }
+  ],
+  "file": "dish-6fefb58797f127.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84282,
+  "sha256": "c7aa2f0e746d1b6b38dcae770001effeb8eabaa9fa800bba9cf6fb7f5fd45ab8"
+}

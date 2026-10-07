@@ -28,3 +28,11 @@ void bootDurableStorage({ appId: 'pos-admin', restaurantId: localStorage.getItem
     </React.StrictMode>
   );
 });
+
+// An installable app that opens with no signal: the shell is cached by ./sw.js (production builds only, so development
+// never serves a stale copy). The restaurant's own data lives in the app's own database, and the API is never cached.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('./sw.js').catch(() => undefined);
+  });
+}

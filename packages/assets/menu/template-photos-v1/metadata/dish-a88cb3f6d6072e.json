@@ -1,0 +1,30 @@
+{
+  "id": "dish-a88cb3f6d6072e",
+  "kind": "dish",
+  "name": "Lemon Iced Tea",
+  "description": "Lemon Iced Tea, cold refreshments.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-a88cb3f6d6072e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68416,
+  "sha256": "426ebf944d76b395b59b8362f2edef95287122c982ab811fd00db80290b878bd"
+}

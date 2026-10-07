@@ -1,0 +1,26 @@
+{
+  "id": "dish-5e5e8b892f0dce",
+  "kind": "dish",
+  "name": "Salted Lassi",
+  "description": "Salted Lassi, traditional dairy drinks and fresh citrus refreshments.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-5e5e8b892f0dce.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 61710,
+  "sha256": "454bfd5bb6014ecd7ef350d6f350aa46389c875ac30a43fafc142880182a134c"
+}

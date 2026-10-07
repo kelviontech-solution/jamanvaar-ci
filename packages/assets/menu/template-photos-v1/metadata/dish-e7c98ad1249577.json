@@ -1,0 +1,22 @@
+{
+  "id": "dish-e7c98ad1249577",
+  "kind": "dish",
+  "name": "Bhindi Masala",
+  "description": "Bhindi Masala, rustic regional vegetable preparations.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    }
+  ],
+  "file": "dish-e7c98ad1249577.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110874,
+  "sha256": "ad95080aefb9261a54c2b5732ac9ce1a64512a3240bbbfd6a9bcc9e7a2d32a88"
+}

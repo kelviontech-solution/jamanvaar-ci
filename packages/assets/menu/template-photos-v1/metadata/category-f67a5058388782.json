@@ -1,0 +1,37 @@
+{
+  "id": "category-f67a5058388782",
+  "kind": "category",
+  "name": "Sides — Fast Food & Quick Service Restaurant",
+  "categoryName": "Sides",
+  "templateId": "tpl-fast-food",
+  "slug": "sides",
+  "description": "Crisp potato sides and bites",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "components": [
+    {
+      "name": "French Fries",
+      "description": "French Fries, crisp potato sides and bites.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Peri Peri Fries",
+      "description": "Peri Peri Fries, crisp potato sides and bites.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Potato Wedges",
+      "description": "Potato Wedges, crisp potato sides and bites.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f67a5058388782.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115328,
+  "sha256": "d7dd16de67958aadb769c85f89022bbae571594550637d4db5d6870175dcbbb2"
+}

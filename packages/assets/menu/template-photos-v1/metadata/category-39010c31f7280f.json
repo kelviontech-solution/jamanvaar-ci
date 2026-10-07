@@ -1,0 +1,37 @@
+{
+  "id": "category-39010c31f7280f",
+  "kind": "category",
+  "name": "Jain Rice — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Rice",
+  "templateId": "tpl-jain",
+  "slug": "jain-rice",
+  "description": "Rice preparations without root vegetables",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Rice",
+  "components": [
+    {
+      "name": "Jain Jeera Rice",
+      "description": "Jain Jeera Rice, rice preparations without root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Veg Pulao",
+      "description": "Jain Veg Pulao, rice preparations without root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Moong Khichdi",
+      "description": "Jain Moong Khichdi, rice preparations without root vegetables.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-39010c31f7280f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110528,
+  "sha256": "d72d08c36d38ba8fb72060c1b25baa8f90b92cf93a86dede30fdd14e5325001f"
+}

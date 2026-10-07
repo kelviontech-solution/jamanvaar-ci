@@ -1,0 +1,37 @@
+{
+  "id": "category-02061a320447ff",
+  "kind": "category",
+  "name": "Soups — Authentic Chinese & Wok",
+  "categoryName": "Soups",
+  "templateId": "tpl-chinese",
+  "slug": "soups",
+  "description": "Hot vegetable broth finished to order",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Soups",
+  "components": [
+    {
+      "name": "Veg Manchow Soup",
+      "description": "Veg Manchow Soup, hot vegetable broth finished to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Hot and Sour Soup",
+      "description": "Veg Hot and Sour Soup, hot vegetable broth finished to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sweet Corn Soup",
+      "description": "Sweet Corn Soup, hot vegetable broth finished to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-02061a320447ff.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98728,
+  "sha256": "348be4a904ed5752ba855cffdd6cab2550318e01f706d479007e34313b155d46"
+}

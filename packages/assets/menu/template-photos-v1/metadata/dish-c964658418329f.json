@@ -1,0 +1,25 @@
+{
+  "id": "dish-c964658418329f",
+  "kind": "dish",
+  "name": "Mango Kulfi",
+  "description": "Mango Kulfi, traditional chilled dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Kulfi & Falooda"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c964658418329f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 76362,
+  "sha256": "b8f6fbd5f5e09ac03bcde24fa382472c2a855a2d13bcbf713be998c2b9d62f94"
+}

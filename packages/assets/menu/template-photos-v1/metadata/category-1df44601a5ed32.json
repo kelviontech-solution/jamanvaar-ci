@@ -1,0 +1,27 @@
+{
+  "id": "category-1df44601a5ed32",
+  "kind": "category",
+  "name": "Iced Frappes & Coolers — Artisan Café & Coffee Bar",
+  "categoryName": "Iced Frappes & Coolers",
+  "templateId": "tpl-cafe",
+  "slug": "iced-frappes",
+  "description": "Blended cold coffees and fruit coolers",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Iced Frappes & Coolers",
+  "components": [
+    {
+      "name": "Caramel Brownie Frappe",
+      "description": "Chilled blended espresso with chocolate brownie crumbs, caramel drizzle and whipped cream",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1df44601a5ed32.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87576,
+  "sha256": "cb004fb1607e0f6aeeb8b9784ba4dbfec63dcc27b38431e3d51d39ed07e7955c"
+}

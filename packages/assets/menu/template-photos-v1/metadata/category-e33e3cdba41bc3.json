@@ -1,0 +1,32 @@
+{
+  "id": "category-e33e3cdba41bc3",
+  "kind": "category",
+  "name": "Combos — North Indian Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-north-indian",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Paneer Tikka Angara",
+      "description": "Fresh cottage cheese cubes marinated in Kashmiri chilli-yogurt masala, roasted in clay oven with bell peppers",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice (Desi Ghee)",
+      "description": "Steamed basmati rice tempered with roasted cumin seeds and desi ghee",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e33e3cdba41bc3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105616,
+  "sha256": "ad025a7fe113a197247b55580114f3a0f9bb4a27986cbe7ade81fd08c56e6924"
+}

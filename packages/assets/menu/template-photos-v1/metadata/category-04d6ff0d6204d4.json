@@ -1,0 +1,37 @@
+{
+  "id": "category-04d6ff0d6204d4",
+  "kind": "category",
+  "name": "Cakes — Bakery, Patisserie & Cafe",
+  "categoryName": "Cakes",
+  "templateId": "tpl-bakery",
+  "slug": "cakes",
+  "description": "Eggless celebration cakes; size selection available",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "components": [
+    {
+      "name": "Chocolate Truffle Cake",
+      "description": "Chocolate Truffle Cake, eggless celebration cakes; size selection available.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vanilla Cream Cake",
+      "description": "Vanilla Cream Cake, eggless celebration cakes; size selection available.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Black Forest Cake",
+      "description": "Black Forest Cake, eggless celebration cakes; size selection available.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-04d6ff0d6204d4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89084,
+  "sha256": "e7822e50c3f17e0908950443e1cf493bd6c45fd8deaa28762c4f21057a0ecd8c"
+}

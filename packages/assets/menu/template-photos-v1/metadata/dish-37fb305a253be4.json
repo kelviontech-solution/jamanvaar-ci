@@ -1,0 +1,22 @@
+{
+  "id": "dish-37fb305a253be4",
+  "kind": "dish",
+  "name": "Chocolate Truffle Cake",
+  "description": "Chocolate Truffle Cake, eggless celebration cakes; size selection available.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cakes"
+    }
+  ],
+  "file": "dish-37fb305a253be4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84110,
+  "sha256": "06f875d492ffa14bf537e26cbd00f7c4d0b678708268ecfae2f455bd24347c9e"
+}

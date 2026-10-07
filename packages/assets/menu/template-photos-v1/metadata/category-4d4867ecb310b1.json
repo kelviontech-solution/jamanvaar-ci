@@ -1,0 +1,32 @@
+{
+  "id": "category-4d4867ecb310b1",
+  "kind": "category",
+  "name": "Desi Chinese Favorites — Desi Indo-Chinese Food Corner",
+  "categoryName": "Desi Chinese Favorites",
+  "templateId": "tpl-indo-chinese",
+  "slug": "desi-chinese",
+  "description": "Spicy fusion Chinese dishes",
+  "diet": "VEG",
+  "cuisine": "Desi Chinese & Fast Asian",
+  "category": "Desi Chinese Favorites",
+  "components": [
+    {
+      "name": "Triple Schezwan Rice with Gravy",
+      "description": "Combo of wok rice, fried noodles, and hot Schezwan Manchurian gravy bowl",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Crispy Chinese Bhel",
+      "description": "Fried noodles tossed with cabbage, capsicum, sweet chilli and schezwan dips",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4d4867ecb310b1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 132176,
+  "sha256": "f15df7fa9c4020914f31d0320e40d322acbb83ca70145ccd17549ff00df0e7d7"
+}

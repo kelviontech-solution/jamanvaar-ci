@@ -1,0 +1,25 @@
+{
+  "id": "dish-bd4de2b7249cc6",
+  "kind": "dish",
+  "name": "Patra Steamed Rolls",
+  "description": "Colocasia leaf rolls coated with spiced sweet and tangy gram flour paste",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Fresh Farsan (Snacks)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Fresh Farsan (Snacks)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/patra.webp"
+  ],
+  "file": "dish-bd4de2b7249cc6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91184,
+  "sha256": "5aca9dc6ad363f803edb05b5ac7ced8a6df96db32f52f6a3ce0509f5c7cb52f5"
+}

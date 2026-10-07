@@ -1,0 +1,25 @@
+{
+  "id": "dish-624377e27d386f",
+  "kind": "dish",
+  "name": "Sabudana Khichdi",
+  "description": "Sabudana Khichdi, comfort snacks prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Regional Favourites",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Regional Favourites"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-624377e27d386f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85940,
+  "sha256": "d1d5949806db36e94ca93c0358339ca0de5dd198d3a23425e572e93d337ad330"
+}

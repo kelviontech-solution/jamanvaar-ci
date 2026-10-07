@@ -1,0 +1,22 @@
+{
+  "id": "dish-e6a28a7353c3d0",
+  "kind": "dish",
+  "name": "Crispy Medu Vada (2 Pcs)",
+  "description": "Golden crunchy black gram donuts infused with crushed black peppercorns and curry leaves",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada Specialties"
+    }
+  ],
+  "file": "dish-e6a28a7353c3d0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85290,
+  "sha256": "0e97e4167e0ebc33de398cec69b39c147a1c4ef3c5293d7b1d7ef9bcaa240e38"
+}

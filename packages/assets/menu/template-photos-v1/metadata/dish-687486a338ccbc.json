@@ -1,0 +1,22 @@
+{
+  "id": "dish-687486a338ccbc",
+  "kind": "dish",
+  "name": "Sarson Ka Saag",
+  "description": "Sarson Ka Saag, traditional Punjabi dishes.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Punjabi Specials"
+    }
+  ],
+  "file": "dish-687486a338ccbc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97986,
+  "sha256": "13cad875fc70933f521ee6298906924832555c479a5cb9e904b11fb6c535c0de"
+}

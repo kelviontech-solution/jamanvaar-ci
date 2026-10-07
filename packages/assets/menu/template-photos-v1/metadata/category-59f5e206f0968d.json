@@ -1,0 +1,37 @@
+{
+  "id": "category-59f5e206f0968d",
+  "kind": "category",
+  "name": "Desserts — North Indian Restaurant",
+  "categoryName": "Desserts",
+  "templateId": "tpl-north-indian",
+  "slug": "desserts",
+  "description": "Traditional Indian dessert portions",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Gulab Jamun",
+      "description": "Gulab Jamun, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rasmalai",
+      "description": "Rasmalai, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rice Kheer",
+      "description": "Rice Kheer, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-59f5e206f0968d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93598,
+  "sha256": "6618b20865557ee73e9e6f5c9860f9279ff65b844e054464e20b07d2cb86cb4d"
+}

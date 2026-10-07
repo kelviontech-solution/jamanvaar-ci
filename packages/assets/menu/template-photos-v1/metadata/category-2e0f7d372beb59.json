@@ -1,0 +1,37 @@
+{
+  "id": "category-2e0f7d372beb59",
+  "kind": "category",
+  "name": "Breads — Punjabi Dhaba & Restaurant",
+  "categoryName": "Breads",
+  "templateId": "tpl-punjabi",
+  "slug": "breads",
+  "description": "Fresh tandoor or griddle breads",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Breads",
+  "components": [
+    {
+      "name": "Butter Naan",
+      "description": "Butter Naan, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Garlic Naan",
+      "description": "Garlic Naan, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Roti",
+      "description": "Tandoori Roti, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-2e0f7d372beb59.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 129590,
+  "sha256": "b838c80c7ffbbcd8a30d0c104f3c73b5b202ce31ea3eebd6a65f1015c7c16609"
+}

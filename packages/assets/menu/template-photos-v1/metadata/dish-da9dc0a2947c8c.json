@@ -1,0 +1,30 @@
+{
+  "id": "dish-da9dc0a2947c8c",
+  "kind": "dish",
+  "name": "Dal Dhokli",
+  "description": "Dal Dhokli, sweet-sour Gujarati tempering, served hot.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Dal & Kadhi"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Dal & Kadhi"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "file": "dish-da9dc0a2947c8c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93080,
+  "sha256": "5238078ef0dcee185f0873b9704a781550f412f3b2b793d3f2a6146ef85dd600"
+}

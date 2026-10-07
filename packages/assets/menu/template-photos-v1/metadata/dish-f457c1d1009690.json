@@ -1,0 +1,22 @@
+{
+  "id": "dish-f457c1d1009690",
+  "kind": "dish",
+  "name": "Sev Dungri Nu Shaak",
+  "description": "Caramelized onions cooked with crisp sev in a tangy rustic sauce",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Special Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Special Shaak"
+    }
+  ],
+  "file": "dish-f457c1d1009690.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104026,
+  "sha256": "91139934c32ee0d5336c38af721c4b4c644d8dd3d7a2139b08b8f28b5be95ebf"
+}

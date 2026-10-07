@@ -1,0 +1,37 @@
+{
+  "id": "category-a2c78700d62c7f",
+  "kind": "category",
+  "name": "Momos — Authentic Chinese & Wok",
+  "categoryName": "Momos",
+  "templateId": "tpl-chinese",
+  "slug": "momos",
+  "description": "Fresh dumplings with dipping sauce",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Momos",
+  "components": [
+    {
+      "name": "Veg Steamed Momos",
+      "description": "Veg Steamed Momos, fresh dumplings with dipping sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Fried Momos",
+      "description": "Veg Fried Momos, fresh dumplings with dipping sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Momos",
+      "description": "Paneer Momos, fresh dumplings with dipping sauce.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a2c78700d62c7f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97820,
+  "sha256": "cd71db0ce65e9a3a76d5cdb7c412ad75b196648c10d012a5865155829cbd3eb5"
+}

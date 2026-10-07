@@ -1,0 +1,22 @@
+{
+  "id": "dish-519122353e5e62",
+  "kind": "dish",
+  "name": "Badam Milk",
+  "description": "Badam Milk, freshly brewed South Indian refreshments.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-519122353e5e62.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 61582,
+  "sha256": "4ca463381994a80a2af1e527f61e38da4bf4225fc8d4e368dea1df44d236db85"
+}

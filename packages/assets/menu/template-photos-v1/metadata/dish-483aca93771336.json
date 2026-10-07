@@ -1,0 +1,25 @@
+{
+  "id": "dish-483aca93771336",
+  "kind": "dish",
+  "name": "Pista Ice Cream",
+  "description": "Pista Ice Cream, single scoops of chilled ice cream.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Ice Cream Scoops",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-483aca93771336.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 63842,
+  "sha256": "b047e06b251f64c15789e2de66a6447edc4b73b4a225cf393390b92678872c99"
+}

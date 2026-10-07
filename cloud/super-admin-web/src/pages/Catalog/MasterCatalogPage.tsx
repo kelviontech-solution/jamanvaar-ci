@@ -536,7 +536,7 @@ export function MasterCatalogPage() {
                     <h3 className="dish-name">{dish.name}</h3>
                     <div className="dish-price-wrap">
                       <div className="dish-price-amount">₹{(dish.basePrice / 100).toFixed(0)}</div>
-                      <div className="dish-price-gst">+5% GST</div>
+                      <div className="dish-price-gst">+{dish.taxRate / 100}% GST</div>
                     </div>
                   </div>
 
@@ -639,7 +639,7 @@ export function MasterCatalogPage() {
                         <span style={{ fontWeight: 900, color: '#047857', fontSize: 14 }}>
                           ₹{(dish.basePrice / 100).toFixed(0)}
                         </span>
-                        <span style={{ color: 'var(--jv-text-light)', fontSize: 11, marginLeft: 4 }}>+ 5% GST</span>
+                        <span style={{ color: 'var(--jv-text-light)', fontSize: 11, marginLeft: 4 }}>+ {dish.taxRate / 100}% GST</span>
                       </td>
                       <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
                         <Clock className="w-3.5 h-3.5 inline mr-1 text-slate-400" />

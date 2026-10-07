@@ -1,0 +1,30 @@
+{
+  "id": "dish-65ecf5f6722f95",
+  "kind": "dish",
+  "name": "Dal Tadka",
+  "description": "Dal Tadka, lentils simmered and tempered before serving.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Rice & Curries"
+    }
+  ],
+  "file": "dish-65ecf5f6722f95.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92846,
+  "sha256": "2be75ac594ca15255ae62d850592e152b652b98e54435b459fbc389b41cf1627"
+}

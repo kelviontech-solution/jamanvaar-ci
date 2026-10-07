@@ -1,9 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
-import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
-import { db, AuditRepository, OrderRepository, ReceiptRepository } from '@jamanvaar/database';
-import { DayOrdersService, ReportGeneratorService, CentralReportingService } from '@jamanvaar/business';
+import { Order } from '@jamanvaar/types';
+import { formatINR, formatDate, formatTime, getOrderSource, getBillingTender, ORDER_SOURCE_LABELS, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
+import { db, AuditRepository, OrderRepository, ReceiptRepository, isUnpaidOpenOrder, billsWaiting, billLinesOf } from '@jamanvaar/database';
+import { DayOrdersService, CentralReportingService } from '@jamanvaar/business';
 import { printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
+import { exportBillingCsv, formatBillingMoney, isPendingCollection, isSubmittedBillingOrder, summarizeBillingLedger } from './billingLedger';
+import { BillingStatementDocument } from './BillingStatementDocument';
 import {
   DollarSign,
   CreditCard,
@@ -13,7 +17,6 @@ import {
   Search,
   Filter,
   FileSpreadsheet,
-  Download,
   Printer,
   Calendar,
   X,
@@ -69,6 +72,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   // Clickable Summary Filters
   const [paymentFilter, setPaymentFilter] = useState<string>('ALL'); // 'ALL' | 'CASH' | 'UPI_QR' | 'CARD_TERMINAL' | 'SPLIT'
+  const [sourceFilter, setSourceFilter] = useState('ALL');
+  const [collectionFilter, setCollectionFilter] = useState('ALL');
   const [orderTypeFilter, setOrderTypeFilter] = useState<string>('ALL'); // 'ALL' | 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY' | 'TOKEN'
   const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'COMPLETED' | 'CONFIRMED' | 'PREPARING' | 'READY' | 'CANCELLED' | 'REFUNDED'
   const [refundOnlyFilter, setRefundOnlyFilter] = useState<boolean>(false);
@@ -104,22 +109,24 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
     );
     const filtered = CentralReportingService.getReportableOrders(orders, range, {
       includeCancelled: true
-    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }).filter(isSubmittedBillingOrder).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return { dateFilteredOrders: filtered, dateLabel: range.label };
   }, [orders, orders.length, orders[0]?.id, datePreset, customStartDate, customEndDate]);
 
   // 2. Summary Metrics for the Selected Date Range from CentralReportingService
+  const sourceOrders = useMemo(() => dateFilteredOrders.filter(o => sourceFilter === 'ALL' || getOrderSource(o) === sourceFilter), [dateFilteredOrders, sourceFilter]);
+  const ledgerMetrics = useMemo(() => summarizeBillingLedger(sourceOrders), [sourceOrders]);
   const summaryMetrics = useMemo(() => {
-    const summary = CentralReportingService.calculateFinancialSummary(dateFilteredOrders, dateLabel);
+    const summary = CentralReportingService.calculateFinancialSummary(sourceOrders, dateLabel);
 
     let cashCount = 0;
     let upiCount = 0;
     let cardCount = 0;
     let splitCount = 0;
 
-    dateFilteredOrders.forEach((ord) => {
-      if (ord.orderStatus !== 'CANCELLED') {
+    sourceOrders.forEach((ord) => {
+      if (ord.orderStatus !== 'CANCELLED' && !isUnpaidOpenOrder(ord)) {
         const pm = (ord.paymentMethod || '').toUpperCase();
         if (pm === 'CASH' || pm === 'CASH_AT_COUNTER') cashCount++;
         else if (pm === 'UPI' || pm === 'UPI_QR' || pm === 'BHARAT_QR') upiCount++;
@@ -129,7 +136,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
     });
 
     return {
-      totalOrders: dateFilteredOrders.length,
+      totalOrders: sourceOrders.length,
       grossSales: summary.grossSales,
       netSales: summary.netSales,
       discountTotal: summary.discountAmount,
@@ -154,13 +161,15 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       tokenCount: summary.orderTypeBreakdown.token.count,
       avgOrderValue: summary.avgOrderValue
     };
-  }, [dateFilteredOrders, dateLabel]);
+  }, [sourceOrders, dateLabel]);
 
   // 3. Complete Filtering Pipeline (Combines date, card filters, dropdowns & debounced search)
   const filteredOrders = useMemo(() => {
-    return dateFilteredOrders.filter((ord) => {
+    return sourceOrders.filter((ord) => {
+      if (collectionFilter === 'PENDING' && !isPendingCollection(ord)) return false;
+      if (collectionFilter === 'PAID' && (ord.orderStatus === 'CANCELLED' || isUnpaidOpenOrder(ord))) return false;
       // Payment Method Filter
-      if (paymentFilter !== 'ALL' && ord.paymentMethod !== paymentFilter) {
+      if (paymentFilter !== 'ALL' && getBillingTender(ord.paymentMethod) !== getBillingTender(paymentFilter)) {
         return false;
       }
 
@@ -225,7 +234,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       return true;
     });
   }, [
-    dateFilteredOrders,
+    sourceOrders,
+    collectionFilter,
     paymentFilter,
     orderTypeFilter,
     statusFilter,
@@ -282,6 +292,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   // Handler: Reset all filters
   const handleClearAllFilters = () => {
+    setSourceFilter('ALL');
+    setCollectionFilter('ALL');
     setPaymentFilter('ALL');
     setOrderTypeFilter('ALL');
     setStatusFilter('ALL');
@@ -295,8 +307,14 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
   };
 
   // Handler: Export CSV
+  const exportFilters = [sourceFilter === 'ALL' ? 'All sources' : ORDER_SOURCE_LABELS[sourceFilter as keyof typeof ORDER_SOURCE_LABELS],
+    collectionFilter === 'ALL' ? 'All payment states' : collectionFilter === 'PENDING' ? 'Pending collection' : 'Paid / refunded',
+    paymentFilter !== 'ALL' && `Tender: ${paymentFilter}`, orderTypeFilter !== 'ALL' && `Type: ${orderTypeFilter}`,
+    statusFilter !== 'ALL' && `Status: ${statusFilter}`, refundOnlyFilter && 'Refunds only',
+    cashierFilter !== 'ALL' && `Cashier: ${cashierFilter}`, captainFilter !== 'ALL' && `Captain: ${captainFilter}`,
+    posTerminalFilter !== 'ALL' && `Terminal: ${posTerminalFilter}`, searchQuery.trim() && `Search: ${searchQuery.trim()}`].filter(Boolean).join(' · ');
   const handleExportCsv = () => {
-    const csv = ReportGeneratorService.exportTransactionsCsv(filteredOrders);
+    const csv = exportBillingCsv(filteredOrders, db.restaurant, db.outlet, dateLabel, exportFilters);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -305,26 +323,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
     document.body.appendChild(link);
     link.click();
     link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
     showToast(`Exported ${filteredOrders.length} Invoices to CSV!`);
-  };
-
-  // Handler: Export JSON
-  const handleExportJson = () => {
-    const jsonStr = JSON.stringify(filteredOrders, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `jamanvaar_invoices_${Date.now()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    showToast('Exported Invoices to JSON!');
   };
 
   // Handler: Export PDF
   const handleExportPdf = () => {
-    if (!printElement('[data-print-doc="invoice-statement"]', { title: 'Invoice statement', pageSize: 'A4 landscape' })) {
+    if (!printElement('[data-print-doc="billing-statement"]', { title: `${db.restaurant?.name || 'Restaurant'} - Billing statement`, pageSize: 'A4 landscape', margin: '10mm !important' })) {
       showToast('There are no invoices to print.');
       return;
     }
@@ -373,7 +378,34 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto select-none pb-12">
-      
+
+      {/* 0. BILLS WAITING: guests who asked for their bill and have not paid. Settled at the POS counter. */}
+      {billsWaiting().length > 0 && (
+        <section id="bills-waiting" aria-label="Bills waiting" className="bg-amber-50 border border-amber-300 rounded-2xl p-4 space-y-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-sm font-bold text-amber-900">Bills waiting ({billsWaiting().length})</h2>
+            <span className="text-[11px] text-amber-800">Guests asked for these. Settle them at the POS: tap the table's notification, or Live Orders, then Settle.</span>
+          </div>
+          <ul className="divide-y divide-amber-200">
+            {billsWaiting().map((ord) => (
+              <li key={ord.id} className="py-2.5 flex flex-wrap items-start justify-between gap-2 text-sm">
+                <div className="min-w-[12rem] flex-1 space-y-0.5">
+                  <p className="font-bold text-jaman-navy">
+                    Table {ord.tableNumber || '—'} <span className="font-mono text-xs text-slate-500">#{ord.orderNumber}</span>
+                  </p>
+                  <p className="text-xs text-slate-700">{billLinesOf(ord)}</p>
+                  <p className="text-[11px] text-slate-500">
+                    {ord.captainName ? `Captain ${ord.captainName}` : 'Captain'} · asked {new Date(ord.billRequestedAt!).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                    {ord.billSplitNote ? ` · split: ${ord.billSplitNote}` : ''}
+                  </p>
+                </div>
+                <span className="font-mono font-bold text-jaman-navy text-base">{formatINR(ord.totalAmount)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* 1. TOP HEADER & EXPORT ACTIONS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -433,13 +465,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             <span>Export CSV</span>
           </button>
 
-          <button
-            onClick={handleExportJson}
-            className="px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
-          >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
-            <span>Export JSON</span>
-          </button>
+
         </div>
       </div>
 
@@ -518,18 +544,18 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">TOTAL NET SALES</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">TOTAL ORDER VALUE</span>
               <div className="w-8 h-8 rounded-xl bg-brand/[0.07] text-brand flex items-center justify-center border border-brand/30">
                 <DollarSign className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold text-jaman-navy font-mono mt-2">
-              {formatINR(summaryMetrics.netSales)}
+            <div data-testid="billing-order-value" className="text-2xl sm:text-3xl font-bold text-jaman-navy font-mono mt-2">
+              {formatBillingMoney(ledgerMetrics.orderValue)}
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-xs text-slate-500 font-medium">
-            <span>{summaryMetrics.totalOrders} Invoices recorded</span>
+            <span>{ledgerMetrics.acceptedCount} accepted orders</span>
             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
               Tax: {formatINR(summaryMetrics.gstTotal)}
             </span>
@@ -705,6 +731,19 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         )}
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5" aria-label="Collection summary">
+        <div className="bg-white rounded-2xl border border-jaman-border p-4">
+          <div className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Collected revenue</div>
+          <div data-testid="billing-collected" className="text-2xl font-bold text-jaman-navy mt-2">{formatBillingMoney(ledgerMetrics.collected)}</div>
+          <p className="text-xs text-slate-500 mt-2">Payments received, after refunds.</p>
+        </div>
+        <button type="button" onClick={() => { setCollectionFilter(collectionFilter === 'PENDING' ? 'ALL' : 'PENDING'); setCurrentPage(1); }}
+          className={`text-left rounded-2xl border p-4 ${collectionFilter === 'PENDING' ? 'border-amber-500 bg-amber-50' : 'border-amber-200 bg-amber-50/40'}`}>
+          <div className="text-xs font-bold text-amber-800 uppercase tracking-wide">Pending collection</div>
+          <div data-testid="billing-pending" className="text-2xl font-bold text-jaman-navy mt-2">{formatBillingMoney(ledgerMetrics.pending)}</div>
+          <p className="text-xs text-amber-800 mt-2">{ledgerMetrics.pendingCount} orders awaiting payment. Settle kiosk cash orders in POS.</p>
+        </button>
+      </div>
       {/* 5. SEARCH & SECONDARY DROPDOWN FILTERS */}
       <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-3">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-3">
@@ -734,6 +773,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           {/* Secondary Dropdown Selectors */}
           <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto text-xs">
+            <select aria-label="Order source" value={sourceFilter} onChange={e => { setSourceFilter(e.target.value); setCurrentPage(1); }} className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy">
+              <option value="ALL">All order sources</option>
+              {Object.entries(ORDER_SOURCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label} orders</option>)}
+            </select>
+            <select aria-label="Collection status" value={collectionFilter} onChange={e => { setCollectionFilter(e.target.value); setCurrentPage(1); }} className="bg-jaman-cream border border-jaman-border rounded-xl px-3 py-2 font-bold text-jaman-navy">
+              <option value="ALL">All payment states</option><option value="PENDING">Pending collection</option><option value="PAID">Paid / refunded</option>
+            </select>
             {/* Status Dropdown */}
             <select
               value={statusFilter}
@@ -785,7 +831,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         </div>
 
         {/* Active Filter Chips Bar */}
-        {(paymentFilter !== 'ALL' ||
+        {(sourceFilter !== 'ALL' || collectionFilter !== 'ALL' || paymentFilter !== 'ALL' ||
           orderTypeFilter !== 'ALL' ||
           statusFilter !== 'ALL' ||
           refundOnlyFilter ||
@@ -794,6 +840,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           searchQuery.trim() !== '') && (
           <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 text-xs">
             <span className="text-slate-500 font-bold uppercase text-[11px] mr-1">Active Filters:</span>
+            {sourceFilter !== 'ALL' && <span className="bg-slate-100 text-slate-800 font-bold px-2.5 py-0.5 rounded-lg">Source: {ORDER_SOURCE_LABELS[sourceFilter as keyof typeof ORDER_SOURCE_LABELS]}</span>}
+            {collectionFilter !== 'ALL' && <span className="bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-lg">{collectionFilter === 'PENDING' ? 'Pending collection' : 'Paid / refunded'}</span>}
             
             {paymentFilter !== 'ALL' && (
               <span className="bg-slate-100 text-slate-800 font-bold px-2.5 py-0.5 rounded-lg flex items-center gap-1">
@@ -867,7 +915,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         />
       ) : viewMode === 'DAY_GROUPED' ? (
         /* DAY GROUPED LEDGER VIEW */
-        <div data-print-doc="invoice-statement" className="space-y-4">
+        <div data-ledger-view="invoice-statement" className="space-y-4">
           {dayGroupedLedger.map((grp) => (
             <div key={grp.dateKey} className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
               <div className="p-4 bg-jaman-cream border-b border-jaman-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -920,7 +968,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                         </td>
                         <td className="p-3 text-slate-600 font-semibold">{ord.items.length} items</td>
                         <td className="p-3 text-right font-mono font-bold text-emerald-700 text-sm">
-                          {formatINR(ord.totalAmount)}
+                          {formatBillingMoney(ord.totalAmount)}
                         </td>
                         <td className="p-3">
                           <span className="px-2 py-0.5 rounded font-bold text-[11px] uppercase bg-slate-100 text-slate-700">
@@ -958,7 +1006,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         </div>
       ) : (
         /* FLAT COMPLETE INVOICE LEDGER TABLE */
-        <div data-print-doc="invoice-statement" className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
+        <div data-ledger-view="invoice-statement" className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold sticky top-0 z-10">
@@ -1000,6 +1048,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     </td>
                     <td className="p-3.5 font-bold">
                       <div>{ord.orderType}</div>
+                      <span className="text-[11px] text-slate-500">{ORDER_SOURCE_LABELS[getOrderSource(ord)]}</span>
                       {ord.tableNumber && (
                         <span className="text-[11px] font-mono text-brand">Table {ord.tableNumber}</span>
                       )}
@@ -1018,7 +1067,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     <td className="p-3.5 tabular-nums">₹{ord.subtotal}</td>
                     <td className="p-3.5 tabular-nums text-brand">₹{ord.taxAmount}</td>
                     <td className="p-3.5 font-mono font-bold text-emerald-700 text-sm">
-                      {formatINR(ord.totalAmount)}
+                      {formatBillingMoney(ord.totalAmount)}
                     </td>
                     <td className="p-3.5">
                       {ord.paymentMethod === 'SPLIT' ? (
@@ -1048,6 +1097,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                       >
                         {ord.orderStatus}
                       </span>
+                      {isPendingCollection(ord) && <div className="text-amber-700 text-[11px] font-bold mt-2">Pending collection</div>}
                     </td>
                     <td className="p-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1.5">
@@ -1282,11 +1332,11 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                     <span>-₹{selectedOrder.discountAmount || 0}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-600">
-                    <span>CGST (2.5%):</span>
+                    <span>{gstLabels().cgst}:</span>
                     <span>₹{Math.round((selectedOrder.taxAmount || 0) / 2)}</span>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-600">
-                    <span>SGST (2.5%):</span>
+                    <span>{gstLabels().sgst}:</span>
                     <span>₹{Math.round((selectedOrder.taxAmount || 0) / 2)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-jaman-navy text-sm pt-2 border-t border-slate-300">
@@ -1425,102 +1475,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       {/* ========================================================================= */}
       {/* 10. STATUTORY PRINTABLE PDF STATEMENT (VISIBLE ONLY IN PRINT / PDF EXPORT) */}
       {/* ========================================================================= */}
-      <div className="hidden print:block font-sans text-black p-4 space-y-4">
-        {/* Letterhead */}
-        <div className="border-b-2 border-black pb-3 flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-bold uppercase tracking-wide">
-              {db.restaurant?.name || ''}
-            </h1>
-            <p className="text-xs text-gray-700">
-              {db.outlet?.address || db.restaurant?.address || ''}
-            </p>
-            <div className="text-[11px] text-gray-600 font-mono mt-1">
-              {[db.restaurant?.gstin && `GSTIN: ${db.restaurant.gstin}`, db.restaurant?.fssaiNumber && `FSSAI: ${db.restaurant.fssaiNumber}`, db.restaurant?.phone && `Phone: ${db.restaurant.phone}`].filter(Boolean).join(' • ')}
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="text-xs font-bold uppercase border border-black px-2 py-0.5 inline-block">
-              STATUTORY INVOICE LEDGER
-            </span>
-            <div className="text-[11px] text-gray-500 font-mono mt-1">
-              Generated: {formatDate(new Date())} {formatTime(new Date())}
-            </div>
-            <div className="text-[11px] font-bold text-black mt-0.5">
-              Scope: {dateLabel}
-            </div>
-          </div>
-        </div>
-
-        {/* Financial Summary Strip */}
-        <div className="grid grid-cols-4 gap-2 text-xs border border-gray-300 p-2 bg-gray-50">
-          <div>
-            <span className="text-[11px] text-gray-500 font-bold block uppercase">Total Invoices</span>
-            <strong className="text-sm tabular-nums">{filteredOrders.length} Orders</strong>
-          </div>
-          <div>
-            <span className="text-[11px] text-gray-500 font-bold block uppercase">Gross Sales</span>
-            <strong className="text-sm tabular-nums">{formatINR(summaryMetrics.grossSales)}</strong>
-          </div>
-          <div>
-            <span className="text-[11px] text-gray-500 font-bold block uppercase">GST Tax (5%)</span>
-            <strong className="text-sm tabular-nums">{formatINR(summaryMetrics.gstTotal)}</strong>
-          </div>
-          <div>
-            <span className="text-[11px] text-gray-500 font-bold block uppercase">Net Collected</span>
-            <strong className="text-sm tabular-nums">{formatINR(summaryMetrics.netSales)}</strong>
-          </div>
-        </div>
-
-        {/* Tender Allocation Strip */}
-        <div className="grid grid-cols-5 gap-2 text-[11px] border border-gray-200 p-2 text-center">
-          <div>Cash: <strong>{formatINR(summaryMetrics.cashSales)}</strong></div>
-          <div>UPI / QR: <strong>{formatINR(summaryMetrics.upiSales)}</strong></div>
-          <div>Card: <strong>{formatINR(summaryMetrics.cardSales)}</strong></div>
-          <div>Split: <strong>{formatINR(summaryMetrics.splitSales)}</strong></div>
-          <div>Refunds: <strong className="text-red-700">-{formatINR(summaryMetrics.refundAmount)}</strong></div>
-        </div>
-
-        {/* Ledger Table */}
-        <table className="w-full text-left text-[11px] border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100 border-b border-gray-300 uppercase text-[11px] font-bold">
-              <th className="p-1.5 border border-gray-300">Inv #</th>
-              <th className="p-1.5 border border-gray-300">Token</th>
-              <th className="p-1.5 border border-gray-300">Date & Time</th>
-              <th className="p-1.5 border border-gray-300">Type / Table</th>
-              <th className="p-1.5 border border-gray-300">Customer</th>
-              <th className="p-1.5 border border-gray-300">Items</th>
-              <th className="p-1.5 border border-gray-300 text-right">Tax</th>
-              <th className="p-1.5 border border-gray-300 text-right">Total</th>
-              <th className="p-1.5 border border-gray-300">Tender</th>
-              <th className="p-1.5 border border-gray-300">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.map((o) => (
-              <tr key={o.id} className="border-b border-gray-200">
-                <td className="p-1.5 font-mono font-bold border border-gray-200">#{o.orderNumber}</td>
-                <td className="p-1.5 font-mono border border-gray-200">#{o.tokenNumber}</td>
-                <td className="p-1.5 font-mono text-[11px] border border-gray-200">{formatDate(o.createdAt)} {formatTime(o.createdAt)}</td>
-                <td className="p-1.5 border border-gray-200">{o.orderType} {o.tableNumber ? `(T-${o.tableNumber})` : ''}</td>
-                <td className="p-1.5 border border-gray-200">{o.customerName || 'Walk-in'}</td>
-                <td className="p-1.5 border border-gray-200">{o.items.length} items</td>
-                <td className="p-1.5 text-right tabular-nums border border-gray-200">₹{o.taxAmount}</td>
-                <td className="p-1.5 text-right tabular-nums font-bold border border-gray-200">₹{o.totalAmount}</td>
-                <td className="p-1.5 font-mono text-[11px] border border-gray-200">{o.paymentMethod}</td>
-                <td className="p-1.5 font-bold text-[11px] border border-gray-200">{o.orderStatus}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Document Footer Sign-off */}
-        <div className="pt-6 flex justify-between text-xs text-gray-500 border-t border-gray-300">
-          <div>Report generated via JAMANVAAR Restaurant Management System.</div>
-          <div>Authorized Signatory: _________________________</div>
-        </div>
-      </div>
+      <BillingStatementDocument orders={filteredOrders} restaurant={db.restaurant} outlet={db.outlet} scope={dateLabel} filters={exportFilters} />
 
     </div>
   );

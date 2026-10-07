@@ -1,0 +1,22 @@
+{
+  "id": "dish-efe6c67c756228",
+  "kind": "dish",
+  "name": "Paneer Lababdar Special",
+  "description": "Paneer batons cooked in rich tomato and onion gravy with grated paneer garnish",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "North Indian Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "North Indian Curries"
+    }
+  ],
+  "file": "dish-efe6c67c756228.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106934,
+  "sha256": "89740f248d2e07d9a47f1d2473765bfb77d3d029857b7217f88f5d4884e8c07e"
+}

@@ -1,3 +1,4 @@
+import { CachedImg } from './CachedImg';
 import React from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
@@ -56,13 +57,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className={`group relative bg-white rounded-2xl border border-[#EBE6DD] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer active:scale-[0.99] select-none ${className}`}
     >
       <div className="relative w-full h-52 sm:h-60 bg-[#F4EFE6] overflow-hidden">
-        <img
-          src={item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
+        <CachedImg
+          src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
+          dishName={item.name}
           alt={displayName || item.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+            (e.target as HTMLImageElement).src = '/assets/menu/common/menu-placeholder-v2.svg';
           }}
         />
 

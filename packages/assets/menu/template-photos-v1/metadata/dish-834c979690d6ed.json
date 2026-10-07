@@ -1,0 +1,22 @@
+{
+  "id": "dish-834c979690d6ed",
+  "kind": "dish",
+  "name": "Jain Corn Chaat",
+  "description": "Jain Corn Chaat, prepared without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters"
+    }
+  ],
+  "file": "dish-834c979690d6ed.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74018,
+  "sha256": "7e231532839d500fea2d41461d0dd58daab7e5f6ea1692fb7a7c190419fca71c"
+}

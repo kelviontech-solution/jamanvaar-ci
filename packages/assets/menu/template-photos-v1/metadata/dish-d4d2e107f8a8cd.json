@@ -1,0 +1,22 @@
+{
+  "id": "dish-d4d2e107f8a8cd",
+  "kind": "dish",
+  "name": "Paneer Puff",
+  "description": "Paneer Puff, oven-baked savoury snacks.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Savouries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Savouries"
+    }
+  ],
+  "file": "dish-d4d2e107f8a8cd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88934,
+  "sha256": "ba45c1c11e08e160c43b069cdadb213b0c5800d964915947a9027a021571171a"
+}

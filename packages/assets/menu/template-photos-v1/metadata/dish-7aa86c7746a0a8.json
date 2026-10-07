@@ -1,0 +1,22 @@
+{
+  "id": "dish-7aa86c7746a0a8",
+  "kind": "dish",
+  "name": "Jain Phulka",
+  "description": "Jain Phulka, fresh breads without restricted ingredients.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Breads"
+    }
+  ],
+  "file": "dish-7aa86c7746a0a8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87350,
+  "sha256": "a510fd3f47b6e55ead87bef2079c60afd52184b2eb51a99eed90918273d85c34"
+}

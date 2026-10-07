@@ -1,0 +1,22 @@
+{
+  "id": "dish-1d6d672dde1ca9",
+  "kind": "dish",
+  "name": "Jain Gulab Jamun",
+  "description": "Jain Gulab Jamun, traditional dairy sweets and refreshments.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Sweets & Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Sweets & Beverages"
+    }
+  ],
+  "file": "dish-1d6d672dde1ca9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 82828,
+  "sha256": "015d26552c57b59e02c3acccd14377df18ac974b1c82de1e946c00273cf8847e"
+}

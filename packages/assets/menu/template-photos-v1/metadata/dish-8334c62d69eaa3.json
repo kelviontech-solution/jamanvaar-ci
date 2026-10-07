@@ -1,0 +1,22 @@
+{
+  "id": "dish-8334c62d69eaa3",
+  "kind": "dish",
+  "name": "Curd Rice with Pomegranate",
+  "description": "Creamy cooled curd mixed with soft rice, tempered with mustard, ginger and curry leaves",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "South Indian Rice Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "South Indian Rice Meals"
+    }
+  ],
+  "file": "dish-8334c62d69eaa3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74654,
+  "sha256": "ab8345ab69df1dab83ff5296e2c37f17a0d2442dc6d54cece2df2f6cacf40e89"
+}

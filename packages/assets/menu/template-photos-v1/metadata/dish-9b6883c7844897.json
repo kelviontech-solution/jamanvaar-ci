@@ -1,0 +1,26 @@
+{
+  "id": "dish-9b6883c7844897",
+  "kind": "dish",
+  "name": "Peri Peri Paneer Pizza",
+  "description": "Peri Peri Paneer Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-9b6883c7844897.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112148,
+  "sha256": "7e88588998ca024c15e0d7ed61461c6e79568d3b2671bb938309888541811c28"
+}

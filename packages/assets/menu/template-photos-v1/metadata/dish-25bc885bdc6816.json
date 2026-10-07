@@ -1,0 +1,26 @@
+{
+  "id": "dish-25bc885bdc6816",
+  "kind": "dish",
+  "name": "Garlic Chutney",
+  "description": "Garlic Chutney, fresh accompaniments in individual portions.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chutneys",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Chutneys"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-25bc885bdc6816.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89078,
+  "sha256": "66d0e1a23801493b87d195707a96cea7c46462582c33a7ade8ca319080559b91"
+}

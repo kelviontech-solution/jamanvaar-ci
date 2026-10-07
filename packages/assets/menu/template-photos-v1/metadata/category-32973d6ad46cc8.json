@@ -1,0 +1,37 @@
+{
+  "id": "category-32973d6ad46cc8",
+  "kind": "category",
+  "name": "Sandwiches — Artisan Café & Coffee Bar",
+  "categoryName": "Sandwiches",
+  "templateId": "tpl-cafe",
+  "slug": "sandwiches",
+  "description": "Freshly grilled sandwiches",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Sandwiches",
+  "components": [
+    {
+      "name": "Veg Club Sandwich",
+      "description": "Veg Club Sandwich, freshly grilled sandwiches.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Corn Cheese Sandwich",
+      "description": "Corn Cheese Sandwich, freshly grilled sandwiches.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Grilled Sandwich",
+      "description": "Paneer Grilled Sandwich, freshly grilled sandwiches.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-32973d6ad46cc8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109190,
+  "sha256": "faea06d3e1c08599116d2905db845f448496390f5eb28aee2b952b0fbdf5223a"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "combo-desserts",
+  "kind": "combo",
+  "name": "Dessert / Ice Cream Meal Deal",
+  "description": "Royal Kesar Pista Falooda with Rice Kheer. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Royal Kesar Pista Falooda",
+      "description": "Rose syrup, basil seeds, falooda sev, chilled condensed milk topped with saffron ice cream and nuts",
+      "diet": "VEG"
+    },
+    {
+      "name": "Rice Kheer",
+      "description": "Rice Kheer, traditional dessert portions.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-desserts.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72352,
+  "sha256": "192afa3d7dc630afee417b52a53944651ff35593ee3db7f3a7158a3988fab640"
+}

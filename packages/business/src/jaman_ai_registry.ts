@@ -442,7 +442,7 @@ export class JamanAiRegistry {
   /**
    * Get dynamic prioritized questions based on real-time operational state
    */
-  public static getPrioritizedQuestions(app: 'POS' | 'ADMIN', userRole?: string): JamanAiQuestion[] {
+  public static getPrioritizedQuestions(app: 'POS' | 'ADMIN' | 'KDS', userRole?: string): JamanAiQuestion[] {
     const kots = db.kots || [];
     const pendingKots = kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING');
     // The threshold comes from the cloud settings (Super Admin), not a number typed into the code.
@@ -460,13 +460,27 @@ export class JamanAiRegistry {
     const occupancyRate = tables.length > 0 ? (occupiedTables.length / tables.length) * 100 : 0;
 
     const allQuestions = JAMAN_AI_QUESTION_REGISTRY.filter((q) => {
-      if (!q.apps.includes('ALL') && !q.apps.includes(app)) return false;
+      if (app === 'KDS' && q.category !== 'KITCHEN') return false;
+      if (userRole && !q.roles.includes('ALL') && !q.roles.includes(userRole as 'CASHIER' | 'MANAGER' | 'OWNER_ADMIN')) return false;
+      if (!q.apps.includes('ALL') && !(app !== 'KDS' && q.apps.includes(app))) return false;
       // Once the cloud catalogue is known, only the questions it enables are offered.
       return AiConfig.isIntentEnabled(q.intent);
     }).map((q) => (q.intent === 'DELAYED_KOT' ? { ...q, label: delayedKotLabel(delayedMinutes) } : q));
 
+    const cloudQuestions = AiConfig.getQuestions();
+    const configuredQuestions = allQuestions.map(q => {
+      const configured = cloudQuestions.find(c => c.intent === q.intent);
+      return configured ? { ...q, id: configured.id, label: configured.label, icon: configured.icon, priorityScore: configured.priorityScore } : q;
+    });
+    for (const q of cloudQuestions) {
+      if (configuredQuestions.some(known => known.intent === q.intent) || !q.targetDomain || !q.calculationType) continue;
+      if (!JAMAN_AI_CATEGORIES.some(c => c.id === q.category)) continue;
+      if (app === 'KDS' && q.targetDomain !== 'KITCHEN') continue;
+      if (app !== 'ADMIN' && app !== 'KDS') continue; // Custom business formulas are owner tools.
+      configuredQuestions.push({ id: q.id, category: (app === 'KDS' ? 'KITCHEN' : q.category) as JamanAiCategory, label: q.label, icon: q.icon, intent: q.intent, priorityScore: q.priorityScore, roles: ['ALL'], apps: ['ALL'], formula: { targetDomain: q.targetDomain, calculationType: q.calculationType, filterField: q.filterField, filterValue: q.filterValue, displayUnit: q.displayUnit } });
+    }
     // Score and rank dynamically
-    const scoredQuestions = allQuestions.map((q) => {
+    const scoredQuestions = configuredQuestions.map((q) => {
       let dynamicBonus = 0;
       let isCritical = false;
 
@@ -503,7 +517,7 @@ export class JamanAiRegistry {
    */
   public static getQuestionsByCategory(
     category: JamanAiCategory,
-    app: 'POS' | 'ADMIN'
+    app: 'POS' | 'ADMIN' | 'KDS'
   ): JamanAiQuestion[] {
     const list = this.getPrioritizedQuestions(app);
     return list.filter((q) => q.category === category);

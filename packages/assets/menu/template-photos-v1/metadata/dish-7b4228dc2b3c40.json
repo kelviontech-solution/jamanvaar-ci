@@ -1,0 +1,25 @@
+{
+  "id": "dish-7b4228dc2b3c40",
+  "kind": "dish",
+  "name": "Paneer Kathi Roll",
+  "description": "Paneer Kathi Roll, freshly rolled flatbread snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Rolls",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Rolls"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-7b4228dc2b3c40.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87832,
+  "sha256": "fb43258aae6238078e1241226bf97eb8bd77fbcf10f39cc54e90433343fb5510"
+}

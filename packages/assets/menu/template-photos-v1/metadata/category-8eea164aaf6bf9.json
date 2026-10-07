@@ -1,0 +1,37 @@
+{
+  "id": "category-8eea164aaf6bf9",
+  "kind": "category",
+  "name": "Sundaes — Dessert / Ice Cream",
+  "categoryName": "Sundaes",
+  "templateId": "tpl-desserts",
+  "slug": "sundaes",
+  "description": "Ice cream with toppings and sauces",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "components": [
+    {
+      "name": "Chocolate Sundae",
+      "description": "Chocolate Sundae, ice cream with toppings and sauces.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Brownie Sundae",
+      "description": "Brownie Sundae, ice cream with toppings and sauces.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fruit Sundae",
+      "description": "Fruit Sundae, ice cream with toppings and sauces.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8eea164aaf6bf9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105036,
+  "sha256": "199c06a01ad86af20e8d912e97dad21e6e40f0aa653e6d6463a4bc9ed8f388bf"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "dish-e012eae089a995",
+  "kind": "dish",
+  "name": "Paneer Burger",
+  "description": "Paneer Burger, toasted buns with freshly cooked patties.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Burgers"
+    }
+  ],
+  "file": "dish-e012eae089a995.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86846,
+  "sha256": "5a435cd1a9aa895baf7f0456d8071e254bcd0d46fe0faf96027c6241183e0579"
+}

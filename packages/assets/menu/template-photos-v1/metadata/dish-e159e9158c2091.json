@@ -1,0 +1,25 @@
+{
+  "id": "dish-e159e9158c2091",
+  "kind": "dish",
+  "name": "Motichoor Laddoo (250g)",
+  "description": "Tiny gram flour pearls fried in pure desi ghee and soaked in saffron sugar syrup",
+  "diet": "VEG",
+  "cuisine": "Traditional Indian Mithai",
+  "category": "Desi Ghee Mithai",
+  "occurrences": [
+    {
+      "templateId": "tpl-sweets",
+      "category": "Desi Ghee Mithai"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-e159e9158c2091.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75956,
+  "sha256": "d414e012158962fb5d3134587240f91ad92e2f25c777cd8f41b033f4c0f00bac"
+}

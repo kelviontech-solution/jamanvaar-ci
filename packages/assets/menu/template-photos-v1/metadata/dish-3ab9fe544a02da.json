@@ -1,0 +1,25 @@
+{
+  "id": "dish-3ab9fe544a02da",
+  "kind": "dish",
+  "name": "Cheese Dip",
+  "description": "Cheese Dip, freshly fried sides with seasoning served separately.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Sides"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-3ab9fe544a02da.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81694,
+  "sha256": "8bd53070e6dd4aeef277ebfbc198a84fdb3bf4b9c4eb29bc372f465ff8d08d6f"
+}

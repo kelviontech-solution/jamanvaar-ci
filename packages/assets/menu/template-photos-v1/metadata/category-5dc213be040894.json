@@ -1,0 +1,37 @@
+{
+  "id": "category-5dc213be040894",
+  "kind": "category",
+  "name": "Noodles — Authentic Chinese & Wok",
+  "categoryName": "Noodles",
+  "templateId": "tpl-chinese",
+  "slug": "noodles",
+  "description": "Wok-tossed noodles and crunchy vegetables",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Noodles",
+  "components": [
+    {
+      "name": "Veg Schezwan Noodles",
+      "description": "Veg Schezwan Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chilli Garlic Noodles",
+      "description": "Chilli Garlic Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Singapore Noodles",
+      "description": "Singapore Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5dc213be040894.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109586,
+  "sha256": "f249d47cc7fcd6fbe287b8a9992fd3a31721037efdb08597310b111eb3ab9740"
+}

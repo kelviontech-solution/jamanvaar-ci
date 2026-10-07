@@ -1,0 +1,37 @@
+{
+  "id": "category-779a1e4e066852",
+  "kind": "category",
+  "name": "Dal — Punjabi Dhaba & Restaurant",
+  "categoryName": "Dal",
+  "templateId": "tpl-punjabi",
+  "slug": "dal",
+  "description": "Lentils simmered and tempered before serving",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dal",
+  "components": [
+    {
+      "name": "Dal Makhani",
+      "description": "Dal Makhani, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Tadka",
+      "description": "Dal Tadka, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Fry",
+      "description": "Dal Fry, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-779a1e4e066852.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117160,
+  "sha256": "3ab6f01b024b4fd4e0e5d1b98ffd7b894efb1bcbc626df2ec86c6295e5714ba2"
+}

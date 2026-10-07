@@ -1,0 +1,22 @@
+{
+  "id": "dish-0a22978ae29200",
+  "kind": "dish",
+  "name": "Chicken Wrap",
+  "description": "Chicken Wrap, soft flatbread wraps with salad and sauce.",
+  "diet": "NON_VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Wraps"
+    }
+  ],
+  "file": "dish-0a22978ae29200.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87446,
+  "sha256": "f878727efcbf5918d74fc77ab338b87c11851d9d75f83f4aa91b8e8849b7faa9"
+}

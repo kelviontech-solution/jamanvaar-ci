@@ -1,10 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
-import { BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
+import { db, BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
 import { BusinessDayService } from '@jamanvaar/business';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
   X,
   AlertTriangle,
@@ -174,7 +176,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <strong className="text-sm sm:text-base font-black font-mono text-rose-600">- {formatINR(summary.discounts)}</strong>
                 </div>
                 <div className="p-3 bg-white rounded-2xl border border-jaman-border">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">GST (5%)</span>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold block">{gstLabels().total}</span>
                   <strong className="text-sm sm:text-base font-black font-mono text-slate-700">{formatINR(summary.tax_amount)}</strong>
                 </div>
               </div>

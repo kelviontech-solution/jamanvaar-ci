@@ -1,0 +1,25 @@
+{
+  "id": "dish-d06a2778eb7676",
+  "kind": "dish",
+  "name": "Patra",
+  "description": "Patra, steamed or crisp Gujarati snacks with chutney.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Farsan",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Farsan"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/patra.webp"
+  ],
+  "file": "dish-d06a2778eb7676.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122704,
+  "sha256": "d168ebfda7a96d56a9ffa46a9ec5d45564eb0faf25d0aeb051d51b819cd95451"
+}

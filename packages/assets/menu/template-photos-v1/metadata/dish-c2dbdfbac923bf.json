@@ -1,0 +1,26 @@
+{
+  "id": "dish-c2dbdfbac923bf",
+  "kind": "dish",
+  "name": "Potato Wedges",
+  "description": "Potato Wedges, crisp potato sides and bites.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sides"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Sides"
+    }
+  ],
+  "file": "dish-c2dbdfbac923bf.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90046,
+  "sha256": "33dcf0e88650b1743db9afe437999ff0381e483723658ea75f0c341a37aa9b16"
+}

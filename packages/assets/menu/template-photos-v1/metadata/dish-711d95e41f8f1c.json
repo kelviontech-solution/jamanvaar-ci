@@ -1,0 +1,25 @@
+{
+  "id": "dish-711d95e41f8f1c",
+  "kind": "dish",
+  "name": "Paneer Dum Biryani Handi",
+  "description": "Charred paneer cubes marinated in yogurt masala, layered with aged basmati rice and saffron",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Handi Dum Biryanis",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Handi Dum Biryanis"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-711d95e41f8f1c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105298,
+  "sha256": "a6c7bcf8162b559560baa11bc59fe5ba295ea34e4fb88ee51e1e5d758624b1f8"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-9deecb3d05c641",
+  "kind": "dish",
+  "name": "Ringna No Olo",
+  "description": "Ringna No Olo, rustic regional vegetable preparations.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    }
+  ],
+  "file": "dish-9deecb3d05c641.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101916,
+  "sha256": "d2beed34c1a6ebd110c4fdb33a7f8458e76e7dd301c38f3a9555c3a80132e599"
+}

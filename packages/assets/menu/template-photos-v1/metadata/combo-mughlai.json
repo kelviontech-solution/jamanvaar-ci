@@ -1,0 +1,29 @@
+{
+  "id": "combo-mughlai",
+  "kind": "combo",
+  "name": "Mughlai & Awadhi Meal Deal",
+  "description": "Veg Galouti Kebab (4 Pcs) with Paneer Pasanda Tikka. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Veg Galouti Kebab (4 Pcs)",
+      "description": "Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha",
+      "diet": "VEG"
+    },
+    {
+      "name": "Paneer Pasanda Tikka",
+      "description": "Layered cottage cheese stuffed with mint, nuts and khoya, glazed in tandoor",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-mughlai.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108238,
+  "sha256": "13e208f486548fdf56ef885fa9f8bfaffd693468f1cf5af5b3144044ce2fdfc0"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "combo-south-indian",
+  "kind": "combo",
+  "name": "South Indian Meal Deal",
+  "description": "Crispy Butter Masala Dosa with Steamed Ghee Podi Idli (2 Pcs). Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Crispy Butter Masala Dosa",
+      "description": "Crisp golden crepe roasted with pure Amul butter, filled with aromatic spiced potato and onion masala",
+      "diet": "VEG"
+    },
+    {
+      "name": "Steamed Ghee Podi Idli (2 Pcs)",
+      "description": "Pillow-soft steamed idlis drenched in pure desi ghee and spicy gun powder (karam podi)",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-south-indian.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103928,
+  "sha256": "ad6b44d6462dd88e2e11b292c2e9e950baf937eb9145fc9ae7847f57c552a371"
+}

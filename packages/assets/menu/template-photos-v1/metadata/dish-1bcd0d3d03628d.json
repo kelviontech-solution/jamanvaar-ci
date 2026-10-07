@@ -1,0 +1,22 @@
+{
+  "id": "dish-1bcd0d3d03628d",
+  "kind": "dish",
+  "name": "Dinner Rolls 4 Pieces",
+  "description": "Dinner Rolls 4 Pieces, freshly baked breads.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Breads"
+    }
+  ],
+  "file": "dish-1bcd0d3d03628d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79882,
+  "sha256": "49072f94bbcee22de91bbc102c9148d040aaa68a6e4d95cd68a8f58fc4594e2d"
+}

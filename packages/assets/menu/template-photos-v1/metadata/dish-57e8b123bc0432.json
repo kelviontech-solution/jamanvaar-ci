@@ -1,0 +1,25 @@
+{
+  "id": "dish-57e8b123bc0432",
+  "kind": "dish",
+  "name": "Pani Puri Platter (6 Pcs)",
+  "description": "Crispy puris stuffed with spiced chickpea mash, tangy mint-coriander water and sweet date chutney",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Puri & Chaat Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Puri & Chaat Specialties"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-57e8b123bc0432.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 76612,
+  "sha256": "87d51da7eadb4d0ff393149f67fcbc2d1a488b3bd561b25a2dcc6e34cfb2d0ec"
+}

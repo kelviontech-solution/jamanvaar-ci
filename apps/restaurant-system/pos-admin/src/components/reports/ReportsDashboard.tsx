@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR, formatSplitTax } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
   ReportDataEngine,
   ReportPeriodPreset,
@@ -94,7 +96,7 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'GROSS_SALES', category: 'FINANCIAL', title: 'Gross Sales', subtitle: 'Unadjusted food sales before discounts and taxes', icon: DollarSign },
   { id: 'DISCOUNTS_REPORT', category: 'FINANCIAL', title: 'Discounts & Offers', subtitle: 'Discounts given, by whom and why', icon: TrendingDown },
   { id: 'OWNER_SUMMARY', category: 'FINANCIAL', title: 'Owner Summary (WhatsApp)', subtitle: 'The day in a few lines, ready to send to the owner', icon: Sparkles, isPopular: true },
-  { id: 'TAXES_GST', category: 'FINANCIAL', title: 'Taxes / GST Report', subtitle: 'CGST 2.5% and SGST 2.5% filing figures', icon: FileText, isPopular: true },
+  { id: 'TAXES_GST', category: 'FINANCIAL', title: 'Taxes / GST Report', subtitle: 'GST filing figures: CGST and SGST at the rate set in Customisations & Tax', icon: FileText, isPopular: true },
   { id: 'NET_SALES', category: 'FINANCIAL', title: 'Total Billed (incl. GST)', subtitle: 'Everything billed, tax included; matches what was collected', icon: DollarSign },
   { id: 'PAYMENT_COLLECTION', category: 'FINANCIAL', title: 'Payment Collection', subtitle: 'Channel-wise settlement verification', icon: DollarSign, isPopular: true },
   { id: 'CASH_REPORT', category: 'FINANCIAL', title: 'Cash Report', subtitle: 'Cash drawer inflows, payouts, and safe drops', icon: DollarSign },
@@ -552,7 +554,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
           {/* GST */}
           <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase block">GST Tax (5%)</span>
+            <span className="text-[11px] font-bold text-slate-500 uppercase block">{gstLabels().total}</span>
             <div className="text-lg font-mono font-bold text-brand">
               {formatINR(summary.totalTax.current)}
             </div>
@@ -783,7 +785,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                       <th className="p-3">Orders</th>
                       <th className="p-3">Gross</th>
                       <th className="p-3">Discount</th>
-                      <th className="p-3">GST (5%)</th>
+                      <th className="p-3">{gstLabels().total}</th>
                       <th className="p-3">Total Billed (incl. GST)</th>
                       <th className="p-3">Cash</th>
                       <th className="p-3">UPI</th>
@@ -881,7 +883,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
             <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="font-bold text-sm text-jaman-navy">GST Tax Audit Statement (5% Food Rate)</h3>
+                  <h3 className="font-bold text-sm text-jaman-navy">GST Tax Audit Statement ({gstLabels().combined})</h3>
                   <p className="text-xs text-slate-500">GSTIN: {db.restaurant.gstin || 'not registered'}</p>
                 </div>
                 <button
@@ -903,8 +905,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                       <th className="p-3">Tax Slab</th>
                       <th className="p-3">Invoices</th>
                       <th className="p-3 text-right">Taxable Turnover</th>
-                      <th className="p-3 text-right">CGST (2.5%)</th>
-                      <th className="p-3 text-right">SGST (2.5%)</th>
+                      <th className="p-3 text-right">{gstLabels().cgst}</th>
+                      <th className="p-3 text-right">{gstLabels().sgst}</th>
                       <th className="p-3 text-right">Total Tax Liability</th>
                     </tr>
                   </thead>

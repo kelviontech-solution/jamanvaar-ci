@@ -1,0 +1,29 @@
+{
+  "id": "dish-81cf27158f27af",
+  "kind": "dish",
+  "name": "White Sauce Pasta",
+  "description": "White Sauce Pasta, freshly prepared comfort meals.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Quick Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Quick Meals"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pasta"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/pizza/alfredo-pasta.jpg"
+  ],
+  "file": "dish-81cf27158f27af.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89376,
+  "sha256": "a0d4aa49c09740197131ca6de593cf88eb74abf8867fb2e2a0d8b4396e0c74eb"
+}

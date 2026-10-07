@@ -1,0 +1,26 @@
+{
+  "id": "dish-50f989012dfa32",
+  "kind": "dish",
+  "name": "Chicken Sandwich",
+  "description": "Chicken Sandwich, fresh fillings in toasted or grilled bread.",
+  "diet": "NON_VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sandwiches"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Sandwiches"
+    }
+  ],
+  "file": "dish-50f989012dfa32.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94430,
+  "sha256": "99afb3eae582491ed81e8f0cb27c2c47b1a2494d0aed6b318aab09b6a1778952"
+}

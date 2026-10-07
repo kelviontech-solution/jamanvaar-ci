@@ -1,0 +1,25 @@
+{
+  "id": "dish-66c5abbbec7d2f",
+  "kind": "dish",
+  "name": "Surti Undhiyu Special",
+  "description": "Heritage mixed vegetable slow-cooked with fresh surti papdi, purple yam, baby eggplants and methi muthias",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/undhiyu.webp"
+  ],
+  "file": "dish-66c5abbbec7d2f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 134926,
+  "sha256": "22b4eb508b1f66ac98c5c25021cd74ee014a949b82a03c1e96d826e3205005a0"
+}

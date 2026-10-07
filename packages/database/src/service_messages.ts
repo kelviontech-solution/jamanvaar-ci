@@ -20,6 +20,12 @@ export interface ServiceMessage {
   presetText: string;
   customNote?: string;
   tableNumber?: string;
+  /** BILL_REQUEST only: the table's open order, so the counter can load exactly that bill. */
+  orderId?: string;
+  /** BILL_REQUEST only: what the order owes right now, in rupees. */
+  billAmount?: number;
+  /** BILL_REQUEST only: "2× Paneer Tikka, 1× Naan", so the counter knows what it is printing. */
+  billLines?: string;
   createdAt: string;
 }
 
@@ -100,7 +106,34 @@ function parse(raw: unknown): ServiceMessage | null {
     presetText: r.presetText,
     customNote: typeof r.customNote === 'string' && r.customNote ? r.customNote : undefined,
     tableNumber: typeof r.tableNumber === 'string' && r.tableNumber ? r.tableNumber : undefined,
+    orderId: typeof r.orderId === 'string' && r.orderId ? r.orderId : undefined,
+    billAmount: typeof r.billAmount === 'number' && Number.isFinite(r.billAmount) ? r.billAmount : undefined,
+    billLines: typeof r.billLines === 'string' && r.billLines ? r.billLines : undefined,
     createdAt: r.createdAt as string
+  };
+}
+
+/**
+ * The one wording for a bill request, shared by the cloud message and the same-LAN event so a counter
+ * shows the same notification whichever arrives first. Both use the message id as the notification id,
+ * so the second arrival is ignored instead of showing the same bill twice.
+ */
+export function billRequestNotification(input: { requestId: string; tableNumber?: string; senderName: string; billAmount?: number; billLines?: string; orderId?: string; splitNote?: string; createdAt?: string; targetRoles: NotificationRole[] }) {
+  // The title is what the counter acts on: which table, and how much to collect. The body is what was eaten.
+  const table = input.tableNumber ? `Table ${input.tableNumber}` : 'Bill';
+  const amount = input.billAmount !== undefined ? ` · ₹${input.billAmount.toFixed(2)} to pay` : '';
+  const split = input.splitNote ? ` · split: ${input.splitNote}` : '';
+  const who = `${input.senderName} asked for the bill`;
+  return {
+    id: `notif-${input.requestId}`,
+    type: 'BILL_REQUESTED' as const,
+    title: `🧾 ${table}${amount}`,
+    message: input.billLines ? `${input.billLines} — ${who}${split}.` : `${who}${split}.`,
+    priority: 'HIGH' as const,
+    targetRoles: input.targetRoles,
+    tableNumber: input.tableNumber,
+    meta: { orderId: input.orderId, billAmount: input.billAmount },
+    ...(input.createdAt ? { timestamp: input.createdAt } : {})
   };
 }
 
@@ -149,13 +182,15 @@ export class ServiceMessages {
     if (reader === 'CAPTAIN' || reader === 'KIOSK_ADMIN') return msg;
 
     const roles: NotificationRole[] = [reader, 'ALL'];
+    // A bill request is raised from its order, which carries the items and the amount (see refreshBillState). A bare
+    // "asked for the bill" message from an older build would show the counter a table and no bill, so it raises nothing.
+    if (msg.kind === 'BILL_REQUEST') return msg;
     const where = msg.tableNumber ? ` — Table ${msg.tableNumber}` : '';
     NotificationRepository.createNotification({
       id: `notif-${msg.id}`,
-      type: msg.kind === 'BILL_REQUEST' ? 'BILL_REQUESTED' : 'MANAGER_ALERT',
-      title:
-        msg.kind === 'BILL_REQUEST' ? `🧾 Bill requested${where}` : msg.kind === 'CALL_STAFF' ? `🙋 Guest needs help${where}` : `💬 Message from ${msg.senderName}${where}`,
-      message: msg.kind === 'BILL_REQUEST' ? `${msg.senderName} asked for the bill.` : msg.customNote || msg.presetText,
+      type: 'MANAGER_ALERT',
+      title: msg.kind === 'CALL_STAFF' ? `🙋 Guest needs help${where}` : `💬 Message from ${msg.senderName}${where}`,
+      message: msg.customNote || msg.presetText,
       priority: 'HIGH',
       targetRoles: roles,
       tableNumber: msg.tableNumber,

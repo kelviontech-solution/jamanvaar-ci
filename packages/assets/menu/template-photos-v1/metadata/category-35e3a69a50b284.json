@@ -1,0 +1,32 @@
+{
+  "id": "category-35e3a69a50b284",
+  "kind": "category",
+  "name": "Combos — Pizza Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-pizza",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Garlic Bread",
+      "description": "Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Garlic Bread",
+      "description": "Cheese Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-35e3a69a50b284.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123328,
+  "sha256": "a2a7b7b907c5106e05ca6a1fbe06025fdf5dcb23c3e1af0782616fec7508125d"
+}

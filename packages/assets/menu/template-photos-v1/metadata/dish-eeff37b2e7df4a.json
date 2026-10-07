@@ -1,0 +1,22 @@
+{
+  "id": "dish-eeff37b2e7df4a",
+  "kind": "dish",
+  "name": "Yellow Dal Tadka Desi Ghee",
+  "description": "Yellow toor dal tempered with pure desi ghee, cumin seeds, garlic, onions and whole red chillies",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal & Heritage Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal & Heritage Curries"
+    }
+  ],
+  "file": "dish-eeff37b2e7df4a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87330,
+  "sha256": "9a17b94c3c0402ed7bcf09dd6040a4df56da2f2c26cd6b752a98a682935ea764"
+}

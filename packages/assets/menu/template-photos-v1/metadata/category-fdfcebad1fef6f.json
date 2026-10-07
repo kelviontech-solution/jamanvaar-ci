@@ -1,0 +1,37 @@
+{
+  "id": "category-fdfcebad1fef6f",
+  "kind": "category",
+  "name": "Accompaniments — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Accompaniments",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "accompaniments",
+  "description": "Regional meal accompaniments",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Accompaniments",
+  "components": [
+    {
+      "name": "Garlic Chutney",
+      "description": "Garlic Chutney, regional meal accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Gor Ghee",
+      "description": "Gor Ghee, regional meal accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Roasted Papad",
+      "description": "Roasted Papad, regional meal accompaniments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-fdfcebad1fef6f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102728,
+  "sha256": "9b96d8d73a878bf034e67beca79e3c3ff4b1f72969ab0e45fae3121f2def1d30"
+}

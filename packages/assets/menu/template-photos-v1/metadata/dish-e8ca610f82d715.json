@@ -1,0 +1,33 @@
+{
+  "id": "dish-e8ca610f82d715",
+  "kind": "dish",
+  "name": "Veg Hakka Noodles",
+  "description": "Veg Hakka Noodles, wok-tossed noodles and crunchy vegetables.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Noodles"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Wok Tossed Noodles & Rice"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Quick Meals"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/chinese/hakka-noodles.jpg"
+  ],
+  "file": "dish-e8ca610f82d715.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96788,
+  "sha256": "7fbb72e0731212bb0379a1f59293ebc9d61709aa1eef8621373c7f772691425c"
+}

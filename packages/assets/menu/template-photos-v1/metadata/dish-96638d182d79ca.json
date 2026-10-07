@@ -1,0 +1,25 @@
+{
+  "id": "dish-96638d182d79ca",
+  "kind": "dish",
+  "name": "Cheese Croissant",
+  "description": "Cheese Croissant, oven-baked savoury snacks.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Savouries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Savouries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-96638d182d79ca.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108770,
+  "sha256": "67f735c5eaedba845b4a9080c4f4d7885e9cedbc38e0e5ddf3db0be661a67f6f"
+}

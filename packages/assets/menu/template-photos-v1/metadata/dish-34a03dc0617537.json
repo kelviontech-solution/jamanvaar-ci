@@ -1,0 +1,22 @@
+{
+  "id": "dish-34a03dc0617537",
+  "kind": "dish",
+  "name": "Kathiyawadi Bajra Rotla (White Butter)",
+  "description": "Hand-shaped bajra flatbread roasted over slow heat with dollop of fresh churned makhan and jaggery",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Accompaniments"
+    }
+  ],
+  "file": "dish-34a03dc0617537.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100724,
+  "sha256": "206ad72bd03aa0f11d12b98e3c03107ba96f047d48d1c1cd9630f551cc67ae60"
+}

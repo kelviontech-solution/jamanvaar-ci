@@ -1,0 +1,29 @@
+{
+  "id": "combo-snacks",
+  "kind": "combo",
+  "name": "Snacks & Quick Bites Corner Meal Deal",
+  "description": "Special Punjabi Samosa (2 Pcs) with Mumbai Vada Pav with Chutney. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Indian Teatime Snacks",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Special Punjabi Samosa (2 Pcs)",
+      "description": "Crisp pastry triangles stuffed with spiced potato and green peas with saunth chutney",
+      "diet": "VEG"
+    },
+    {
+      "name": "Mumbai Vada Pav with Chutney",
+      "description": "Spiced potato batata vada in a pav with dry garlic coconut chutney and fried green chilli",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-snacks.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83224,
+  "sha256": "de5a3205a728c12301cf54a9bd3fcf52c4ae516883936addffea1b4fc39f4ee6"
+}

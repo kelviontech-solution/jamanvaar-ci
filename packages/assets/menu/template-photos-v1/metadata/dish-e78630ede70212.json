@@ -1,0 +1,22 @@
+{
+  "id": "dish-e78630ede70212",
+  "kind": "dish",
+  "name": "Hot Chocolate",
+  "description": "Hot Chocolate, brewed tea and infusions.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Tea",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Tea"
+    }
+  ],
+  "file": "dish-e78630ede70212.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75112,
+  "sha256": "e79fc2f910ee3f42270f040eebe31753e81746450cc553926aab0dc54d37bbf5"
+}

@@ -103,6 +103,7 @@ export const QrAdminApi = {
   tables: () => qrApi<QrTableRow[]>(`${base}/tables`),
   orders: (branchId?: string) => qrApi<QrOrderRow[]>(`${base}/orders${branchId ? `?branchId=${encodeURIComponent(branchId)}` : ''}`),
   settings: () => qrApi<QrSettings>(`${base}/settings`),
+  paymentReadiness: () => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string }>(`${base}/settings/payment-readiness`),
   saveSettings: (changes: Partial<QrSettings>) => qrApi<QrSettings>(`${base}/settings`, { method: 'PUT', body: JSON.stringify(changes) }),
   branding: () => qrApi<QrBrandingView>(`${base}/branding`),
   updateBranding: (body: Partial<Record<'welcomeTitle' | 'welcomeMessage' | 'footerMessage' | 'orderButtonLabel' | 'accentColor', string>> & { logo?: string | null }) => qrApi<QrBrandingView>(`${base}/branding`, { method: 'PUT', body: JSON.stringify(body) }),

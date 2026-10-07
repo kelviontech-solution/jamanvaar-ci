@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { mergeKitchenPriority } from './kitchen-priority';
 import { randomUUID } from 'node:crypto';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -244,6 +245,7 @@ export class OrderSyncService {
               : undefined;
           // Accepting an order is a claim: the first device to record it owns it, and a later claim cannot take it over.
           if (mergedMeta && typeof priorMeta.acceptedBy === 'string') mergedMeta.acceptedBy = priorMeta.acceptedBy;
+          if (mergedMeta) mergeKitchenPriority(priorMeta, incomingMeta, mergedMeta, device.type);
 
           // The order's state follows rules, not arrival order: no going backwards, no leaving a terminal state, and a device
           // type only sets the states it has authority over. A refused change is recorded; the rest of the push still merges.

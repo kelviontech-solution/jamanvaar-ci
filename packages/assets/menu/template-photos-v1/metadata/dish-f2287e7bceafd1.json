@@ -1,0 +1,25 @@
+{
+  "id": "dish-f2287e7bceafd1",
+  "kind": "dish",
+  "name": "Mumbai Vada Pav with Chutney",
+  "description": "Spiced potato batata vada in a pav with dry garlic coconut chutney and fried green chilli",
+  "diet": "VEG",
+  "cuisine": "Indian Teatime Snacks",
+  "category": "Hot Fried Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-snacks",
+      "category": "Hot Fried Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-f2287e7bceafd1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93602,
+  "sha256": "0235c83301d6e478909e69159e83dcb320d3f84ea6c7facf5305fba8a20facd1"
+}

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ImageCache, type CacheLike, type CacheStorageLike } from '../packages/utils/src/image_cache';
 
 function fakeStorage() {
@@ -16,12 +16,42 @@ function fakeStorage() {
 let online = true;
 const fetcher = async (u: string) => {
   if (!online) throw new TypeError('fetch failed');
-  return u.includes('missing') ? new Response('no', { status: 404 }) : new Response(new Blob([`img:${u}`]), { status: 200 });
+  return u.includes('missing') ? new Response('no', { status: 404 }) : new Response(new Blob([`img:${u}`], { type: 'image/jpeg' }), { status: 200 });
 };
 
 beforeEach(() => { ImageCache.reset(); online = true; });
+afterEach(() => vi.unstubAllGlobals());
 
 describe('offline menu pictures', () => {
+  it('keeps a relative menu image cached when browser Cache.keys returns its absolute URL', async () => {
+    vi.stubGlobal('window', { location: { pathname: '/kiosk/', href: 'https://restaurant.example/kiosk/' } });
+    const { store, storage } = fakeStorage();
+    let downloads = 0;
+    ImageCache.configure({ storage, fetcher: async u => { downloads++; return fetcher(u); } });
+    const src = '/assets/menu/pizza/margherita.jpg';
+    expect(await ImageCache.sync([src])).toMatchObject({ cached: 1, removed: 0 });
+    expect([...store.keys()]).toEqual(['https://restaurant.example/kiosk/assets/menu/pizza/margherita.jpg']);
+    online = false;
+    expect(await ImageCache.sync([src])).toEqual({ cached: 1, removed: 0, failed: 0 });
+    expect(downloads).toBe(1);
+  });
+  it('does not cache an HTTP 200 HTML fallback as a dish photo', async () => {
+    const { store, storage } = fakeStorage();
+    ImageCache.configure({ storage, fetcher: async () => new Response('<html>Menu app</html>', { headers: { 'content-type': 'text/html' } }) });
+    expect(await ImageCache.warm('https://img/fallback.jpg')).toBe(false);
+    expect(store.size).toBe(0);
+  });
+
+  it('repairs a previously cached HTML response instead of keeping it permanently', async () => {
+    const { store, storage } = fakeStorage();
+    store.set('https://img/a.jpg', new Blob(['<html>Not a picture</html>'], { type: 'text/html' }));
+    ImageCache.configure({ storage, fetcher });
+    expect(await ImageCache.warm('https://img/a.jpg')).toBe(true);
+    expect(store.get('https://img/a.jpg')?.type).toBe('image/jpeg');
+    store.set('https://img/b.jpg', new Blob(['<html>Old fallback</html>'], { type: 'text/html' }));
+    expect(await ImageCache.localUrl('https://img/b.jpg')).toBeNull();
+    expect(store.has('https://img/b.jpg')).toBe(false);
+  });
   it('downloads the menu pictures while online and serves them from the device when the internet is down', async () => {
     const { store, storage } = fakeStorage();
     ImageCache.configure({ storage, fetcher });

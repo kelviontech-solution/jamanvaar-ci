@@ -1,0 +1,26 @@
+{
+  "id": "dish-bc4a46a29c61ed",
+  "kind": "dish",
+  "name": "Mushroom Pizza",
+  "description": "Mushroom Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-bc4a46a29c61ed.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 126832,
+  "sha256": "5a1d7a5f942f77e96cc83e6e08647d75cf2c3562e802101110df750303d910ca"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-ef5d53389f299a",
+  "kind": "category",
+  "name": "Idli & Vada — South Indian Restaurant",
+  "categoryName": "Idli & Vada",
+  "templateId": "tpl-south-indian",
+  "slug": "idli-vada",
+  "description": "Steamed rice cakes or crisp lentil fritters with chutney",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "components": [
+    {
+      "name": "Idli 2 Pieces",
+      "description": "Idli 2 Pieces, steamed rice cakes or crisp lentil fritters with chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Medu Vada 2 Pieces",
+      "description": "Medu Vada 2 Pieces, steamed rice cakes or crisp lentil fritters with chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Idli Vada Plate",
+      "description": "Idli Vada Plate, steamed rice cakes or crisp lentil fritters with chutney.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-ef5d53389f299a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93418,
+  "sha256": "9d376d976edde20c0199bc600618f7a69633c44e525ae05821b3e4a9ce882ac7"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "dish-276ff50343f375",
+  "kind": "dish",
+  "name": "Methi Thepla",
+  "description": "Methi Thepla, fresh wheat or millet breads cooked on a griddle.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Breads"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/methi-thepla.webp"
+  ],
+  "file": "dish-276ff50343f375.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109976,
+  "sha256": "909cbfe958592f8a033cc7d6bec7bda4f6e6159fcf4bdd69bac16c2470806368"
+}

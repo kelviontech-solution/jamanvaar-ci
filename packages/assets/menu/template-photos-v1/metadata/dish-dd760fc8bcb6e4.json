@@ -1,0 +1,22 @@
+{
+  "id": "dish-dd760fc8bcb6e4",
+  "kind": "dish",
+  "name": "Chicken Lollipop",
+  "description": "Chicken Lollipop, wok-tossed or crisp starters with house sauces.",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Starters"
+    }
+  ],
+  "file": "dish-dd760fc8bcb6e4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113314,
+  "sha256": "be94240142a12bf694322c1b1a8152f18926c06061e06cd96c505cf8b08e14a2"
+}

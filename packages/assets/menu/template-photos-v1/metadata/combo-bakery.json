@@ -1,0 +1,29 @@
+{
+  "id": "combo-bakery",
+  "kind": "combo",
+  "name": "Bakery, Patisserie & Cafe Meal Deal",
+  "description": "Dutch Chocolate Truffle Slice with White Bread Loaf. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Dutch Chocolate Truffle Slice",
+      "description": "Rich dark chocolate sponge layered with 55% cocoa ganache",
+      "diet": "VEG"
+    },
+    {
+      "name": "White Bread Loaf",
+      "description": "White Bread Loaf, freshly baked breads.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-bakery.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88634,
+  "sha256": "13829036d9ec8fa42f095b04955862ad6a437872b6435da6ddb2c13d6fa14794"
+}

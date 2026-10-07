@@ -1,0 +1,27 @@
+{
+  "id": "category-e5d01eaa01fe7a",
+  "kind": "category",
+  "name": "Vegetarian Starters — Pure Vegetarian Family Restaurant",
+  "categoryName": "Vegetarian Starters",
+  "templateId": "tpl-pure-veg",
+  "slug": "veg-starters",
+  "description": "Crispy snacks and tikkas made with pure vegetarian ingredients",
+  "diet": "VEG",
+  "cuisine": "100% Pure Veg Multi-Cuisine",
+  "category": "Vegetarian Starters",
+  "components": [
+    {
+      "name": "Crispy Corn Salt & Pepper",
+      "description": "Sweet corn kernels wok-tossed with crushed black peppercorns, scallions and bell peppers",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e5d01eaa01fe7a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97864,
+  "sha256": "9d7bd03935c61035547c3640de9fe34cb2a3e1232f72d0a9e6591a37b90bd324"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-24707b1b85f766",
+  "kind": "dish",
+  "name": "Gulab Jamun (2 Pcs)",
+  "description": "Golden fried milk solid dumplings soaked in rose water and cardamom scented sugar syrup",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Heritage Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Heritage Desserts"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-24707b1b85f766.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75554,
+  "sha256": "74e1adda05922ac4a1366bc9678f1370f6104bf8da1fed22d50d0b2de75dc37a"
+}

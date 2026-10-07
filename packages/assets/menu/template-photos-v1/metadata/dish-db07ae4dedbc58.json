@@ -1,0 +1,22 @@
+{
+  "id": "dish-db07ae4dedbc58",
+  "kind": "dish",
+  "name": "Idli Vada Plate",
+  "description": "Idli Vada Plate, steamed rice cakes or crisp lentil fritters with chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada"
+    }
+  ],
+  "file": "dish-db07ae4dedbc58.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 61466,
+  "sha256": "23a8afc1addb8908ef6fa8d5605f5963274b15afa323ed45dd0287e2259229f5"
+}

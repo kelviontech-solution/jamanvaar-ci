@@ -1,0 +1,32 @@
+{
+  "id": "category-820766061aafa2",
+  "kind": "category",
+  "name": "Pastries & Slices — Bakery, Patisserie & Cafe",
+  "categoryName": "Pastries & Slices",
+  "templateId": "tpl-bakery",
+  "slug": "bakery-pastries",
+  "description": "Fresh daily baked layered pastries",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries & Slices",
+  "components": [
+    {
+      "name": "Dutch Chocolate Truffle Slice",
+      "description": "Rich dark chocolate sponge layered with 55% cocoa ganache",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Warm Choco Lava Cake",
+      "description": "Molten chocolate filled warm sponge cake dusted with icing sugar",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-820766061aafa2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103022,
+  "sha256": "9457e690d6ae1d37b0071874b5d849e338931fe442978de83b5ae8f5fbb0c43d"
+}

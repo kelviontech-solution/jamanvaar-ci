@@ -1,0 +1,25 @@
+{
+  "id": "dish-8372a0f9d66f95",
+  "kind": "dish",
+  "name": "Jeera Cookies 200g",
+  "description": "Jeera Cookies 200g, baked cookie packs.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cookies",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cookies"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-8372a0f9d66f95.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105302,
+  "sha256": "720f9d95a02f379b98130ad3e23f7abd4af6f11ce9b0e03b9eb0a06ddd7078b5"
+}

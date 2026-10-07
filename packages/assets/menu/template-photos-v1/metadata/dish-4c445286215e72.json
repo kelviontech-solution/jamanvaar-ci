@@ -1,0 +1,22 @@
+{
+  "id": "dish-4c445286215e72",
+  "kind": "dish",
+  "name": "Authentic Kumbakonam Filter Coffee",
+  "description": "Strong chicory-blended coffee decoction frothed with boiling whole milk, served in traditional dabarah set",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Traditional Filter Coffee & Drinks",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Traditional Filter Coffee & Drinks"
+    }
+  ],
+  "file": "dish-4c445286215e72.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 65122,
+  "sha256": "f7286d1c76008b2b8846917bf6fa35039d072a3514220d71b9a52560283ed94e"
+}

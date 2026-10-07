@@ -1,0 +1,22 @@
+{
+  "id": "dish-1908a5b720079c",
+  "kind": "dish",
+  "name": "Shahi Gatte Ki Sabzi",
+  "description": "Steamed gram flour dumplings simmered in a spiced tangy yogurt and mustard seed gravy",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Rajasthani Royal Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-rajasthani",
+      "category": "Rajasthani Royal Curries"
+    }
+  ],
+  "file": "dish-1908a5b720079c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97194,
+  "sha256": "6b66163e02f0aa3b35af4154145353672786f9ea41e0f88d807d3b823d9dea70"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-a1e7a73325c851",
+  "kind": "category",
+  "name": "Warm Desserts — Dessert / Ice Cream",
+  "categoryName": "Warm Desserts",
+  "templateId": "tpl-desserts",
+  "slug": "warm-desserts",
+  "description": "Desserts served warm",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Warm Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, desserts served warm.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Brownie with Ice Cream",
+      "description": "Brownie with Ice Cream, desserts served warm.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, desserts served warm.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a1e7a73325c851.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 124840,
+  "sha256": "2768af64b8a5ab7e01b6e322d22952889837c397a35c2bb140b44bea3441675d"
+}

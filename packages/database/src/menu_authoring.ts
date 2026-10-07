@@ -122,7 +122,10 @@ export class TaxAuthoring {
     if (issues.length > 0) throw new Error(issues.map((i) => i.message).join(' '));
     const id = input.id || newAuthoringId('tax');
     const existing = db.taxGroups.find((t) => t.id === id);
-    const group: TaxGroup = { id, name: input.name.trim(), cgstPercent: input.cgstPercent, sgstPercent: input.sgstPercent, igstPercent: input.igstPercent, isInclusive: input.isInclusive, isActive: input.isActive };
+    const isDefault = input.isDefault === true && input.isActive;
+    const group: TaxGroup = { id, name: input.name.trim(), cgstPercent: input.cgstPercent, sgstPercent: input.sgstPercent, igstPercent: input.igstPercent, isInclusive: input.isInclusive, isActive: input.isActive, isDefault };
+    // One default only: marking this group clears the flag on the rest, so untaxed dishes always have one clear rate.
+    if (isDefault) for (const other of db.taxGroups) if (other.id !== id) other.isDefault = false;
     if (existing) Object.assign(existing, group);
     else db.taxGroups.push(group);
     db.notify();

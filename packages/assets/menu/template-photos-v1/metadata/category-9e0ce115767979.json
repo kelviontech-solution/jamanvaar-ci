@@ -1,0 +1,37 @@
+{
+  "id": "category-9e0ce115767979",
+  "kind": "category",
+  "name": "Beverages — South Indian Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-south-indian",
+  "slug": "beverages",
+  "description": "Freshly brewed South Indian refreshments",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Filter Coffee",
+      "description": "Filter Coffee, freshly brewed South Indian refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, freshly brewed South Indian refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Badam Milk",
+      "description": "Badam Milk, freshly brewed South Indian refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-9e0ce115767979.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73672,
+  "sha256": "4dd29c297fc6c6a00353ca195fd8c86e9a293058153bee8e0b166080605cc3a9"
+}

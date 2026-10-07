@@ -1,0 +1,37 @@
+{
+  "id": "category-c044f6cb9435a4",
+  "kind": "category",
+  "name": "Thali — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Thali",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "thali",
+  "description": "Complete regional meals",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Thali",
+  "components": [
+    {
+      "name": "Kathiyawadi Thali",
+      "description": "Kathiyawadi Thali, complete regional meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Special Rotla Shaak Meal",
+      "description": "Special Rotla Shaak Meal, complete regional meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mini Kathiyawadi Thali",
+      "description": "Mini Kathiyawadi Thali, complete regional meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c044f6cb9435a4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 134816,
+  "sha256": "31c8191c9ff7fa7d1e1cccb668efc5c5e4053b6d4368d2754994da65ac98bf46"
+}

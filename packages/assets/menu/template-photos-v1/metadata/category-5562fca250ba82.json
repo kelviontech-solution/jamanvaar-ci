@@ -1,0 +1,37 @@
+{
+  "id": "category-5562fca250ba82",
+  "kind": "category",
+  "name": "Beverages — Fast Food & Quick Service Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-fast-food",
+  "slug": "beverages",
+  "description": "Fresh shakes and chilled drinks",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Cold Coffee",
+      "description": "Cold Coffee, fresh shakes and chilled drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Shake",
+      "description": "Chocolate Shake, fresh shakes and chilled drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Strawberry Shake",
+      "description": "Strawberry Shake, fresh shakes and chilled drinks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5562fca250ba82.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83600,
+  "sha256": "40ef71a8f3645a9ebd76e1e63e1781ffdbb4c44d7023debffaac7f74b5f079d4"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-7986e4ffb28592",
+  "kind": "category",
+  "name": "Jain Curries & Dals — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Curries & Dals",
+  "templateId": "tpl-jain",
+  "slug": "jain-curries",
+  "description": "Rich satvik gravies with raw banana, paneer and yellow dals",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries & Dals",
+  "components": [
+    {
+      "name": "Jain Paneer Butter Masala",
+      "description": "Paneer in smooth tomato-cashew gravy made strictly without onion, garlic or ginger paste",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Kela Nu Shaak (Raw Banana Curry)",
+      "description": "Raw bananas cooked in sweet and tangy Gujarati style with crushed peanuts and cumin",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-7986e4ffb28592.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113720,
+  "sha256": "249c544a478536ef351d8b457336bb127747cae462cefc8728b7a53653d43c45"
+}

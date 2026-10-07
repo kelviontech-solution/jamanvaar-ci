@@ -1,0 +1,32 @@
+{
+  "id": "category-8287e6c66c5c00",
+  "kind": "category",
+  "name": "Desserts — South Indian Restaurant",
+  "categoryName": "Desserts",
+  "templateId": "tpl-south-indian",
+  "slug": "desserts",
+  "description": "Traditional sweet portions",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Kesari Bath",
+      "description": "Kesari Bath, traditional sweet portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Payasam",
+      "description": "Payasam, traditional sweet portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8287e6c66c5c00.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 77320,
+  "sha256": "845571043f57855a00532ebf9906758c8daaf3237e7031208c8bfa7a4082c32e"
+}

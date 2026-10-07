@@ -1,0 +1,25 @@
+{
+  "id": "dish-3549c4815befa5",
+  "kind": "dish",
+  "name": "Jeera Rice (Desi Ghee)",
+  "description": "Steamed basmati rice tempered with roasted cumin seeds and desi ghee",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Basmati Rice & Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Basmati Rice & Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-3549c4815befa5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101270,
+  "sha256": "ebc981d54299e43794789b5f9c085730192609a5498247706ea40f2c468a1967"
+}

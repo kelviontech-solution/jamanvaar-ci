@@ -1,0 +1,22 @@
+{
+  "id": "dish-6a63492441db1b",
+  "kind": "dish",
+  "name": "Bisi Bele Bath (Hot Lentil Rice)",
+  "description": "Karnataka specialty rice cooked with lentils, vegetables, tamarind and special aromatic spices",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "South Indian Rice Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "South Indian Rice Meals"
+    }
+  ],
+  "file": "dish-6a63492441db1b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90020,
+  "sha256": "8af4d0ebc93d0ff9b2831464c195650f2eed1cc331b0914c060eaf4ff46aa739"
+}

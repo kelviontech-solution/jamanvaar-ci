@@ -1,0 +1,561 @@
+{
+  "at": "2026-10-07T02:25:40.874Z",
+  "provider": "SIMULATED",
+  "physicalDevices": false,
+  "results": [
+    {
+      "title": "Cold deep link serves /q/assets and loads restaurant/table without activation",
+      "passed": true,
+      "ms": 283.1,
+      "evidence": {
+        "assets": [
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/common/menu-placeholder-v2.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-ByoA--TH.css",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/index-BFt4pPWc.js",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/branding/jamanvaar-logo.png",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/beverages/cold-coffee.jpg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/farmhouse.svg",
+            "status": 200
+          },
+          {
+            "path": "/q/assets/menu/pizza/margherita.jpg",
+            "status": 200
+          }
+        ],
+        "table": "TN2"
+      }
+    },
+    {
+      "title": "Built image assets decode under /q",
+      "passed": true,
+      "ms": 4263.32,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under /pos",
+      "passed": true,
+      "ms": 4468.81,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under /restaurant-admin",
+      "passed": true,
+      "ms": 4200.09,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under /captain",
+      "passed": true,
+      "ms": 4383.83,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under /kds",
+      "passed": true,
+      "ms": 3870.49,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under /kiosk",
+      "passed": true,
+      "ms": 4396.82,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Built image assets decode under Super Admin root",
+      "passed": true,
+      "ms": 4157.89,
+      "evidence": {
+        "decoded": 5
+      }
+    },
+    {
+      "title": "Jamanvaar logo and dish photos decode from the guest app prefix",
+      "passed": true,
+      "ms": 33.98,
+      "evidence": {
+        "dishPhotos": 3,
+        "logo": true
+      }
+    },
+    {
+      "title": "A broken dish photo uses the local placeholder without an error loop",
+      "passed": true,
+      "ms": 218.66
+    },
+    {
+      "title": "Mobile menu has no document overflow at 360px",
+      "passed": true,
+      "ms": 156.32
+    },
+    {
+      "title": "Mobile menu has no document overflow at 375px",
+      "passed": true,
+      "ms": 144.81
+    },
+    {
+      "title": "Mobile menu has no document overflow at 390px",
+      "passed": true,
+      "ms": 102.57
+    },
+    {
+      "title": "Mobile menu has no document overflow at 412px",
+      "passed": true,
+      "ms": 121.47
+    },
+    {
+      "title": "Mobile menu has no document overflow at 430px",
+      "passed": true,
+      "ms": 160.34
+    },
+    {
+      "title": "Mobile menu has no document overflow at 844px",
+      "passed": true,
+      "ms": 221.3
+    },
+    {
+      "title": "Published translations, dietary filters and search work together",
+      "passed": true,
+      "ms": 249.12
+    },
+    {
+      "title": "Required variant, cart quantity, refresh and browser back preserve the basket",
+      "passed": true,
+      "ms": 2258.87
+    },
+    {
+      "title": "Cash QR order reaches actual KDS once; correct variant/price reaches POS API",
+      "passed": true,
+      "ms": 5673.58,
+      "evidence": {
+        "totalPaise": 29900,
+        "kdsTickets": 1,
+        "variant": "Large"
+      }
+    },
+    {
+      "title": "KDS ready updates return to guest status and POS",
+      "passed": true,
+      "ms": 297.82,
+      "evidence": {
+        "guestStatus": "READY"
+      }
+    },
+    {
+      "title": "Actual POS receives QR price and cashier settles the same cash order",
+      "passed": true,
+      "ms": 2063.92,
+      "evidence": {
+        "sameOrderId": true,
+        "totalPaise": 29900,
+        "settled": true
+      }
+    },
+    {
+      "title": "Online mobile checkout stays pending and produces no KOT before payment",
+      "passed": true,
+      "ms": 7793.69,
+      "evidence": {
+        "status": "DRAFT",
+        "kotsBeforePayment": 0,
+        "cashCollectionBlocked": true
+      }
+    },
+    {
+      "title": "Verified online payment survives refresh, admits one KOT and returns paid receipt",
+      "passed": true,
+      "ms": 335.72,
+      "evidence": {
+        "paymentToKdsMs": 335.54,
+        "paidTotal": 120,
+        "kdsTickets": 1
+      }
+    },
+    {
+      "title": "Owner publishes a new price; guest menu refreshes on focus and old receipt keeps its original total",
+      "passed": true,
+      "ms": 284.63,
+      "evidence": {
+        "newMenuPrice": 160,
+        "originalPaidReceipt": 120
+      }
+    },
+    {
+      "title": "Blocked JavaScript displays a retry message instead of a blank screen",
+      "passed": true,
+      "ms": 3641.18
+    },
+    {
+      "title": "Offline menu has an actionable error and reconnect restores it",
+      "passed": true,
+      "ms": 3991.95
+    },
+    {
+      "title": "Revoked QR prevents new orders while an existing paid reference remains readable",
+      "passed": true,
+      "ms": 3976.46
+    }
+  ],
+  "errors": [],
+  "timings": [
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 13.5
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 68.91
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 80.25
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 39.99
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 46.76
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 20.23
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 27.12
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 24.17
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 29.92
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 14.85
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 38.13
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 23.07
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "ms": 45.72
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 23.35
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 37.23
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 51.71
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 56.21
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 31.81
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 39.8
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 51.29
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 28.84
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 39.19
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 18.29
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 31.96
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 39.87
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "ms": 14
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "ms": 157.32
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 29.42
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 38.76
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 43.07
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 24.48
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 28.44
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 44.94
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 38.52
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "ms": 45.67
+    }
+  ]
+}

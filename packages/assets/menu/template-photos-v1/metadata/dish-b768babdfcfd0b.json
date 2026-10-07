@@ -1,0 +1,22 @@
+{
+  "id": "dish-b768babdfcfd0b",
+  "kind": "dish",
+  "name": "Jain Kela Nu Shaak (Raw Banana Curry)",
+  "description": "Raw bananas cooked in sweet and tangy Gujarati style with crushed peanuts and cumin",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries & Dals",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries & Dals"
+    }
+  ],
+  "file": "dish-b768babdfcfd0b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89710,
+  "sha256": "29837a0a93d081adb2df0f4231d81d13ebe1e0d1752bd97966faf236fb8fc6a3"
+}

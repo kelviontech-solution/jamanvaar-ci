@@ -1,0 +1,22 @@
+{
+  "id": "dish-cab69834e15296",
+  "kind": "dish",
+  "name": "Rajma Masala",
+  "description": "Rajma Masala, traditional Punjabi dishes.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Punjabi Specials"
+    }
+  ],
+  "file": "dish-cab69834e15296.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107454,
+  "sha256": "f2b6589f8749625aa9744af79660b44c13c11daced00f65dbfb46adbcb3d9d60"
+}

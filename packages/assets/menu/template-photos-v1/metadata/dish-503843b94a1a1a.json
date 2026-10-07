@@ -1,0 +1,26 @@
+{
+  "id": "dish-503843b94a1a1a",
+  "kind": "dish",
+  "name": "Ven Pongal",
+  "description": "Ven Pongal, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-503843b94a1a1a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74310,
+  "sha256": "99ffad0fd2f3565f8b5469ab5b99a2d37b3ec47f4b374d71eb0e6b0c0962b45f"
+}

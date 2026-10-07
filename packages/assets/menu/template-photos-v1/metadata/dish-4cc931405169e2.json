@@ -1,0 +1,25 @@
+{
+  "id": "dish-4cc931405169e2",
+  "kind": "dish",
+  "name": "Chicken Alfredo Pasta",
+  "description": "Chicken Alfredo Pasta, penne tossed in a freshly prepared sauce.",
+  "diet": "NON_VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Pasta",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pasta"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-4cc931405169e2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85774,
+  "sha256": "cd11803cd5faa57985ff9a61fc33df02e53208eb00eba0f190f7f47b0e4499cc"
+}

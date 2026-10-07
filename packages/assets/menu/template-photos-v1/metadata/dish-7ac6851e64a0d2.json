@@ -1,0 +1,25 @@
+{
+  "id": "dish-7ac6851e64a0d2",
+  "kind": "dish",
+  "name": "Methi Na Gota (Pakoda)",
+  "description": "Crispy fried fenugreek and gram flour fritters served with sweet Kadhi dip",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Fresh Farsan (Snacks)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Fresh Farsan (Snacks)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/methi-gota.webp"
+  ],
+  "file": "dish-7ac6851e64a0d2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102994,
+  "sha256": "f0770d604bda0e464ffe4cd962a86f6af4b4e0df02d783d945eae5ba281e565b"
+}

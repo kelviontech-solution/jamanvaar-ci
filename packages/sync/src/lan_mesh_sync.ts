@@ -516,17 +516,6 @@ export class LanMeshSyncEngine {
       }
 
       // 4. Bill request & Settlement
-      case 'BILL_REQUESTED': {
-        const { tableNumber } = payload;
-        const tbl = dbInst.tables.find((t) => t.tableNumber === tableNumber);
-        if (tbl) {
-          // Flag table as bill requested
-          (tbl as any).billRequested = true;
-          dbInst.notify();
-        }
-        break;
-      }
-
       case 'BILL_SETTLED': {
         const { orderId, tableNumber, paymentMethod, totalAmount, orderNumber } = payload;
         const ord = dbInst.orders.find((o) => o.id === orderId || (orderNumber && o.orderNumber === orderNumber));

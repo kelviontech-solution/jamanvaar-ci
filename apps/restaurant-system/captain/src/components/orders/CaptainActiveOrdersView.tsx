@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
+import { currentTableKots } from '../../captainWorkflow';
+import { captainDb } from '@jamanvaar/database';
 import { DiningTable, Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import {
@@ -28,9 +30,10 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
   // this used to be a single hardcoded "Order Active in Kitchen" string for
   // every table regardless of what was actually happening in the kitchen.
   function getServiceStatus(tableNumber: string): { label: string; tone: 'ready' | 'preparing' | 'served' | 'none' } {
-    const tableKots = kots.filter((k) => k.tableNumber === tableNumber);
+    const table = tables.find(t => t.tableNumber === tableNumber);
+    const tableKots = table ? currentTableKots(table, kots).filter(k => k.status !== 'CANCELLED') : [];
     if (tableKots.length === 0) return { label: 'No Active KOT', tone: 'none' };
-    if (tableKots.some((k) => k.status === 'READY')) return { label: 'Food Ready — Serve Now', tone: 'ready' };
+    if (tableKots.some((k) => k.status === 'READY' || k.items.some(i => i.status === 'READY'))) return { label: 'Food Ready — Serve Now', tone: 'ready' };
     if (tableKots.some((k) => k.status === 'PREPARING' || (k.status as string) === 'PENDING' || (k.status as string) === 'ACCEPTED' || (k.status as string) === 'COOKING')) {
       return { label: 'Preparing in Kitchen', tone: 'preparing' };
     }
@@ -43,8 +46,10 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
     const isOccupied = t.status === 'OCCUPIED' || t.status === 'BILLING' || t.status === 'BILL_REQUESTED' || !!t.currentOrderId;
     if (!isOccupied) return false;
     if (search.trim()) {
-      const q = search.toLowerCase();
-      return t.tableNumber.toLowerCase().includes(q) || ((t as any).section || t.zone || '').toLowerCase().includes(q);
+      const q = search.trim().toLowerCase().replace(/^#/, '');
+      const order = captainDb.orders.find(o => o.id === t.currentOrderId);
+      return t.tableNumber.toLowerCase().includes(q) || ((t as any).section || t.zone || '').toLowerCase().includes(q) ||
+        !!order && [order.tokenNumber, order.orderNumber, order.customerName].some(value => value?.toLowerCase().includes(q));
     }
     return true;
   });
@@ -73,7 +78,8 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search active table..."
+            aria-label="Search active dining orders"
+            placeholder="Search table, token or order..."
             className="w-full pl-9 pr-3 py-1.5 bg-jaman-cream border border-jaman-border rounded-xl text-xs text-jaman-navy outline-none focus:bg-white focus:border-jaman-saffron"
           />
         </div>

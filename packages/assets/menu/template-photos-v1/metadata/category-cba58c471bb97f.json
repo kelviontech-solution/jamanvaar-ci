@@ -1,0 +1,32 @@
+{
+  "id": "category-cba58c471bb97f",
+  "kind": "category",
+  "name": "Combos — Rajasthani Marwari Bhojanalaya",
+  "categoryName": "Combos",
+  "templateId": "tpl-rajasthani",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Marwari Dal Baati Churma Thali",
+      "description": "Panchmel Dal, 4 Baked Baatis drenched in desi ghee, Sweet Wheat Churma, Gatte Ki Sabzi, Garlic Chutney & Chaas",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shahi Gatte Ki Sabzi",
+      "description": "Steamed gram flour dumplings simmered in a spiced tangy yogurt and mustard seed gravy",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-cba58c471bb97f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105416,
+  "sha256": "5283d18bce8319dcefbffb5fe5c8921eb351b9b975dd9fc0eef91064257062c5"
+}

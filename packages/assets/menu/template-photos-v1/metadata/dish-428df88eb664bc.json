@@ -1,0 +1,29 @@
+{
+  "id": "dish-428df88eb664bc",
+  "kind": "dish",
+  "name": "Sev Tameta",
+  "description": "Sev Tameta, rustic regional vegetable preparations.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/sev-tameta.webp"
+  ],
+  "file": "dish-428df88eb664bc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121908,
+  "sha256": "f4ba0754d08b99f7dd38431dc612825c3c99729de7cb522fe1c220740979f0b1"
+}

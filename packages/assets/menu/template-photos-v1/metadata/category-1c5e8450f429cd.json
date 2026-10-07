@@ -1,0 +1,27 @@
+{
+  "id": "category-1c5e8450f429cd",
+  "kind": "category",
+  "name": "South Indian Breakfast & Dosas — South & North Indian Fusion Diner",
+  "categoryName": "South Indian Breakfast & Dosas",
+  "templateId": "tpl-south-north-combo",
+  "slug": "sn-south",
+  "description": "Crisp dosas, idlis and filter coffee",
+  "diet": "VEG",
+  "cuisine": "Dual Heritage Indian",
+  "category": "South Indian Breakfast & Dosas",
+  "components": [
+    {
+      "name": "Butter Masala Dosa Classic",
+      "description": "Crisp crepe with spiced potato filling, coconut chutney and drumstick sambar",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1c5e8450f429cd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95016,
+  "sha256": "bc7abd2c2e5614ee3bdae615633e3aef21bcf3a5ec4d66a986e86b67101657d8"
+}

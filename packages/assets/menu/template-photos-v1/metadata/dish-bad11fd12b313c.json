@@ -1,0 +1,26 @@
+{
+  "id": "dish-bad11fd12b313c",
+  "kind": "dish",
+  "name": "Iced Latte",
+  "description": "Iced Latte, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    }
+  ],
+  "file": "dish-bad11fd12b313c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 40874,
+  "sha256": "dc74c360f7c9452286c4a4e09c472fb7c39cc73b48281e635008c69daae61a31"
+}

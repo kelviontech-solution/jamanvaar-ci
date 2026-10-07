@@ -1,0 +1,32 @@
+{
+  "id": "category-ff9db03fe9f500",
+  "kind": "category",
+  "name": "Combos — Jain Satvik Bhojanalaya",
+  "categoryName": "Combos",
+  "templateId": "tpl-jain",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Jain Paneer Tikka Satvik",
+      "description": "Cottage cheese marinated in pure curd, carom seeds and yellow chilli powder, roasted with capsicum",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Jeera Rice",
+      "description": "Jain Jeera Rice, rice preparations without root vegetables.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-ff9db03fe9f500.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99844,
+  "sha256": "e944c773f192333e02374cd0e2a96c667c8734e4bd7f7f40889ec2ba70b9f341"
+}

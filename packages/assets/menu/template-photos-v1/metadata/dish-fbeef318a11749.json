@@ -1,0 +1,26 @@
+{
+  "id": "dish-fbeef318a11749",
+  "kind": "dish",
+  "name": "French Fries",
+  "description": "French Fries, crisp potato sides and bites.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sides"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Sides"
+    }
+  ],
+  "file": "dish-fbeef318a11749.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73196,
+  "sha256": "755cb1a02f6640f237ab4103ac48e07f57d68c1b7cdd180c096dfb74eab9e7cf"
+}

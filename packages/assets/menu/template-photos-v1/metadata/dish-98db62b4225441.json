@@ -1,0 +1,26 @@
+{
+  "id": "dish-98db62b4225441",
+  "kind": "dish",
+  "name": "Palak Paneer",
+  "description": "Palak Paneer, slow-simmered Indian gravies with fresh spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Main Course",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Main Course"
+    }
+  ],
+  "file": "dish-98db62b4225441.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108392,
+  "sha256": "91eb5ca2e7939a224fa5874808cc2b14271aa26453eb3c359482a4e3fa8ff2e6"
+}

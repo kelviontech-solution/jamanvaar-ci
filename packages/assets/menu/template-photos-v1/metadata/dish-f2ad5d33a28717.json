@@ -1,0 +1,26 @@
+{
+  "id": "dish-f2ad5d33a28717",
+  "kind": "dish",
+  "name": "Pepper Chicken Pizza",
+  "description": "Pepper Chicken Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "NON_VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-f2ad5d33a28717.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 133996,
+  "sha256": "12d080a739b34ccbfbfe496ade5d612afab02f93da6e7a8eae946a59d716e3cb"
+}

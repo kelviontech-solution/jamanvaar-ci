@@ -2,7 +2,7 @@ import { StaffSession } from './staff_session';
 import { KeyValueStore } from '@jamanvaar/database';
 import { SyncEvent, SyncEventType, Order, OrderItem, PaymentSplit } from '@jamanvaar/types';
 import { generateUUID, splitTaxPaise } from '@jamanvaar/utils';
-import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, resolveKitchenState, type NumberLease } from '@jamanvaar/database';
+import { db, KOTRepository, BusinessDayRepository, InventoryRepository, NumberAllocator, resolveKitchenState, refreshBillState, compareKitchenPriority, type NumberLease } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
 import { EndpointResolver } from './endpoint_resolver';
@@ -43,10 +43,15 @@ export interface OrderSyncPushItem {
 }
 
 export interface OrderSyncMeta {
+  kitchenPriority?: 'NORMAL' | 'URGENT';
+  kitchenPriorityRev?: number;
+  kitchenPriorityChangeId?: string;
   orderNumber?: string;
   tokenNumber?: string;
   cashierName?: string;
   captainName?: string;
+  billRequestedAt?: string;
+  billSplitNote?: string;
   customerName?: string;
   customerPhone?: string;
   guestCount?: number;
@@ -227,10 +232,15 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
     paymentStatus: order.paymentStatus,
     paymentMethod: order.paymentMethod,
     meta: {
+      kitchenPriority: order.kitchenPriority,
+      kitchenPriorityRev: order.kitchenPriorityRev,
+      kitchenPriorityChangeId: order.kitchenPriorityChangeId,
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
       cashierName: order.cashierName,
       captainName: order.captainName,
+      billRequestedAt: order.billRequestedAt,
+      billSplitNote: order.billSplitNote,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
       guestCount: order.guestCount,
@@ -301,6 +311,11 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
   if (remote.paymentMethod) local.paymentMethod = remote.paymentMethod as Order['paymentMethod'];
   const m = remote.meta;
   if (m) {
+    if (m.kitchenPriority && compareKitchenPriority(m, local) >= 0) {
+      local.kitchenPriority = m.kitchenPriority;
+      local.kitchenPriorityRev = m.kitchenPriorityRev;
+      local.kitchenPriorityChangeId = m.kitchenPriorityChangeId;
+    }
     if (m.paymentSplits && m.paymentSplits.length > 0) {
       local.paymentSplits = m.paymentSplits.map((l) => ({
         method: l.method as PaymentSplit['method'],
@@ -318,7 +333,17 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
 /** Merges a remote copy into an order this device already has locally. Returns true if items were added. */
 function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolean {
   applyPaymentAndTotals(local, remote);
+  // A Captain table transfer changes an existing order, not its kitchen identity.
+  // Update every already-created ticket instead of leaving the old destination on KDS/reprints.
+  if (remote.tableLabel !== undefined) {
+    local.tableNumber = remote.tableLabel || undefined;
+    const destination = db.tables.find(t => t.tableNumber === local.tableNumber);
+    if (destination) local.tableId = destination.id;
+    db.kots.filter(k => k.orderId === local.id).forEach(k => { k.tableNumber = local.tableNumber; });
+  }
   if (remote.meta?.acceptedBy) local.acceptedByDeviceId = remote.meta.acceptedBy;
+  if (remote.meta?.billRequestedAt) local.billRequestedAt = remote.meta.billRequestedAt;
+  if (remote.meta?.billSplitNote) local.billSplitNote = remote.meta.billSplitNote;
   let addedItems = false;
   remote.items.forEach((ri) => {
     const li = local.items.find((i) => i.id === ri.externalItemId);
@@ -405,6 +430,8 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     updatedAt: nowIso,
     source_type: ((m.sourceType as Order['source_type']) || 'OTHER'),
     acceptedByDeviceId: m.acceptedBy,
+    billRequestedAt: m.billRequestedAt,
+    billSplitNote: m.billSplitNote,
     customerNotes: remote.notes || undefined,
     syncStatus: 'SYNCED',
     isSynced: true
@@ -484,6 +511,7 @@ function ensureKotsForOrder(order: Order): void {
       status: it.kitchenStatus || 'PENDING',
       orderItemId: it.id,
       ...(it.course ? { course: it.course } : {}),
+      ...(it.seat ? { seat: it.seat } : {}),
       ...(it.statusRev ? { rev: it.statusRev } : {})
     })),
     cashierName: order.captainName || order.cashierName || '',
@@ -817,6 +845,9 @@ export class SyncOutboxEngine {
       // Kitchen tickets are per device: bring them in line with the order state just received, so a
       // dish the kitchen finished shows as ready here and a settled order's ticket clears (BUG-098/113).
       KOTRepository.reconcileWithOrders();
+      // Table bill states and bill notifications follow the orders just received, so a bill that arrives before its
+      // table (or the other way round) still shows up on this device.
+      refreshBillState();
       // Prefer the gapless sequence; use the server clock only while no sequenced row has been seen.
       if (deferred) break; // retry this page after the local push; do not acknowledge unapplied updates
       cursor = typeof latestSeq === 'number' ? `seq:${latestSeq}` : serverTime;

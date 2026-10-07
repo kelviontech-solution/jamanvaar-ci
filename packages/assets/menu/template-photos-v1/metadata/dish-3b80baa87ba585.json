@@ -1,0 +1,25 @@
+{
+  "id": "dish-3b80baa87ba585",
+  "kind": "dish",
+  "name": "Kesar Pista Shrikhand (150g)",
+  "description": "Thick hung curd dessert flavoured with saffron strands, green cardamom and sliced pistachios",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets & Mithai",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets & Mithai"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/shrikhand.webp"
+  ],
+  "file": "dish-3b80baa87ba585.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 66876,
+  "sha256": "1c56e92c77caa10dc0af604046605db6f3c35389fe4e03c5777987a8827a849b"
+}

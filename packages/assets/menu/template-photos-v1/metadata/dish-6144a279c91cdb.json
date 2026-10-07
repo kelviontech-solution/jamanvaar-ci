@@ -1,0 +1,26 @@
+{
+  "id": "dish-6144a279c91cdb",
+  "kind": "dish",
+  "name": "Chicken Burger",
+  "description": "Chicken Burger, toasted buns with freshly cooked patties.",
+  "diet": "NON_VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Burgers"
+    }
+  ],
+  "file": "dish-6144a279c91cdb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85182,
+  "sha256": "aa68cf18a0db8c24817d1669b394cb9a8917c0361f852d897fabf69268994259"
+}

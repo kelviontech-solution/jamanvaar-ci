@@ -1,0 +1,25 @@
+{
+  "id": "dish-4b87daad3e8832",
+  "kind": "dish",
+  "name": "Kaju Katli Special (250g)",
+  "description": "Diamond cut cashew nut fudge made with premium cashews and silver vark",
+  "diet": "VEG",
+  "cuisine": "Traditional Indian Mithai",
+  "category": "Desi Ghee Mithai",
+  "occurrences": [
+    {
+      "templateId": "tpl-sweets",
+      "category": "Desi Ghee Mithai"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-4b87daad3e8832.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95572,
+  "sha256": "15cd568f5a33f92704bf3745e947ddddf8efd995462e02f517aa6916e78a7f35"
+}

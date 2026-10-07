@@ -1,0 +1,37 @@
+{
+  "id": "category-dea966fe6c75ec",
+  "kind": "category",
+  "name": "Beverages — Street Food Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-chaat",
+  "slug": "beverages",
+  "description": "Freshly prepared refreshments",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, freshly prepared refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, freshly prepared refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fresh Lime Soda",
+      "description": "Fresh Lime Soda, freshly prepared refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-dea966fe6c75ec.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84388,
+  "sha256": "e245c8b28b7972968271de100b6133d140e58f5473301111700caca8e83e76ec"
+}

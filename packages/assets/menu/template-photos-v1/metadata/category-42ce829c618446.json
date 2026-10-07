@@ -1,0 +1,37 @@
+{
+  "id": "category-42ce829c618446",
+  "kind": "category",
+  "name": "Rotla & Breads — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Rotla & Breads",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "rotla-breads",
+  "description": "Fresh millet and wheat breads",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Breads",
+  "components": [
+    {
+      "name": "Bajra Rotla",
+      "description": "Bajra Rotla, fresh millet and wheat breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jowar Rotla",
+      "description": "Jowar Rotla, fresh millet and wheat breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Phulka",
+      "description": "Phulka, fresh millet and wheat breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-42ce829c618446.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 128082,
+  "sha256": "c216501f1331dcddb2d7a18080e16437e850cc3067f578434863d3aa170aae2b"
+}

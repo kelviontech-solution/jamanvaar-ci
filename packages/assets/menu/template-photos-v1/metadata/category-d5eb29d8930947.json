@@ -1,0 +1,37 @@
+{
+  "id": "category-d5eb29d8930947",
+  "kind": "category",
+  "name": "South Indian Rice Meals — South Indian Restaurant",
+  "categoryName": "South Indian Rice Meals",
+  "templateId": "tpl-south-indian",
+  "slug": "south-rice",
+  "description": "Traditional flavoured rice and complete meals",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "South Indian Rice Meals",
+  "components": [
+    {
+      "name": "South Indian Thali Meal",
+      "description": "Rice, Sambar, Rasam, Kootu, Poriyal, Curd, Appalam, Pickle and Payasam",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Curd Rice with Pomegranate",
+      "description": "Creamy cooled curd mixed with soft rice, tempered with mustard, ginger and curry leaves",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Bisi Bele Bath (Hot Lentil Rice)",
+      "description": "Karnataka specialty rice cooked with lentils, vegetables, tamarind and special aromatic spices",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d5eb29d8930947.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99696,
+  "sha256": "9c80588f0bb08c60aa01fd34011b5db7be3ec5aef46f8d8080d41d6e14c39a7f"
+}

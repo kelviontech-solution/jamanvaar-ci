@@ -1,0 +1,25 @@
+{
+  "id": "dish-8d123352d9d9fe",
+  "kind": "dish",
+  "name": "Raj Kachori",
+  "description": "Raj Kachori, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-8d123352d9d9fe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95584,
+  "sha256": "15c69781f735eb574e82b6c801e371db0dd81bf6a92f1ae4456a80e3be5aebf3"
+}

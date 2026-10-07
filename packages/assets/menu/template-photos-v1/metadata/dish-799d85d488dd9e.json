@@ -1,0 +1,30 @@
+{
+  "id": "dish-799d85d488dd9e",
+  "kind": "dish",
+  "name": "Jalebi",
+  "description": "Jalebi, gujarati sweet portions for a meal finish.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-chaat",
+      "category": "Sweets"
+    }
+  ],
+  "file": "dish-799d85d488dd9e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93898,
+  "sha256": "e80dd744dcd24bf1300ace2eda2db750b969abf7e86d0b0adcb8704eceeee6e9"
+}

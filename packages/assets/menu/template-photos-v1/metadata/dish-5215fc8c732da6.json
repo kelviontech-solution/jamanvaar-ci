@@ -1,0 +1,22 @@
+{
+  "id": "dish-5215fc8c732da6",
+  "kind": "dish",
+  "name": "Pineapple Pastry",
+  "description": "Pineapple Pastry, individual eggless pastry portions.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries"
+    }
+  ],
+  "file": "dish-5215fc8c732da6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 54454,
+  "sha256": "066e9518a3489bf1703326b5b165b68b629e773ab5bdc2b7b0b57a2c062f3775"
+}

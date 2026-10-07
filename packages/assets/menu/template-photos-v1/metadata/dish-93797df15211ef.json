@@ -1,0 +1,29 @@
+{
+  "id": "dish-93797df15211ef",
+  "kind": "dish",
+  "name": "Gujarati Kadhi",
+  "description": "Gujarati Kadhi, regional lentils and yoghurt gravies.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Dal & Kadhi"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/gujarati-kadhi.webp"
+  ],
+  "file": "dish-93797df15211ef.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99114,
+  "sha256": "b8c776c1810b1ee0d5e897da835c42953d4507ab1ac782bd8de5f99a279557fb"
+}

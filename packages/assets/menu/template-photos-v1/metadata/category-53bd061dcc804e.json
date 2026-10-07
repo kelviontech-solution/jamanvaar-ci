@@ -1,0 +1,32 @@
+{
+  "id": "category-53bd061dcc804e",
+  "kind": "category",
+  "name": "Rotla & Accompaniments — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Rotla & Accompaniments",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "rotla-chutney",
+  "description": "Millet flatbreads with fresh white butter, jaggery and garlic chutney",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Accompaniments",
+  "components": [
+    {
+      "name": "Kathiyawadi Bajra Rotla (White Butter)",
+      "description": "Hand-shaped bajra flatbread roasted over slow heat with dollop of fresh churned makhan and jaggery",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Leelvanu Lasan Chutney",
+      "description": "Pounded green garlic and red chilli chutney",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-53bd061dcc804e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110486,
+  "sha256": "3816b846fa8c91906071109a7f905ad7d8433f3f1b2bb0167f8a7e4f0d2a4b88"
+}

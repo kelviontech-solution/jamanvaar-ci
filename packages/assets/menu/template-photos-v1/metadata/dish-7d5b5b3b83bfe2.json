@@ -1,0 +1,22 @@
+{
+  "id": "dish-7d5b5b3b83bfe2",
+  "kind": "dish",
+  "name": "Double Cheese Burger",
+  "description": "Double Cheese Burger, toasted buns with freshly cooked patties.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers"
+    }
+  ],
+  "file": "dish-7d5b5b3b83bfe2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81282,
+  "sha256": "ef0fc0a75cd132a4bbd00cb6f845c69363f78498df8f3b741f389deef164dc64"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-a57318199dc78e",
+  "kind": "category",
+  "name": "Shahi Kormas & Gravies — Mughlai & Awadhi Restaurant",
+  "categoryName": "Shahi Kormas & Gravies",
+  "templateId": "tpl-mughlai",
+  "slug": "mughlai-gravies",
+  "description": "Nut-rich and saffron scented royal gravies",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Shahi Kormas & Gravies",
+  "components": [
+    {
+      "name": "Navratan Korma Royal",
+      "description": "Nine jewels of vegetables, fruits and nuts simmered in a mildly sweet cashew and khoya gravy",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mughlai Paneer Lababdar",
+      "description": "Paneer batons in a velvety tomato and melon seed gravy topped with grated cheese",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a57318199dc78e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114352,
+  "sha256": "6f00faa57b4a4903d404c13424abf9e23fd734807ff641d67e1c7e000017a49e"
+}

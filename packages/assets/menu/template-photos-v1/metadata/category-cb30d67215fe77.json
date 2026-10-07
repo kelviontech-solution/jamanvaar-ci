@@ -1,0 +1,37 @@
+{
+  "id": "category-cb30d67215fe77",
+  "kind": "category",
+  "name": "Shakes — Dessert / Ice Cream",
+  "categoryName": "Shakes",
+  "templateId": "tpl-desserts",
+  "slug": "shakes",
+  "description": "Freshly blended milkshakes",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Shakes",
+  "components": [
+    {
+      "name": "Chocolate Shake",
+      "description": "Chocolate Shake, freshly blended milkshakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Strawberry Shake",
+      "description": "Strawberry Shake, freshly blended milkshakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mango Shake",
+      "description": "Mango Shake, freshly blended milkshakes.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-cb30d67215fe77.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94552,
+  "sha256": "bf01c75609bd09bdc0cf5519de0f83c9e80c6bd0d10f15f399a8e5a4fff7da73"
+}

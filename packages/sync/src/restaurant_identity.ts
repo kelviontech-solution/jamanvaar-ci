@@ -47,14 +47,16 @@ export async function pullRestaurantIdentity(opts: { apiBase: string; deviceToke
  * these fields, so it is the only caller. Sent before the pull above so a rename or address
  * correction saved on this device is not overwritten by the copy the cloud still had.
  */
-export async function pushRestaurantIdentity(opts: { apiBase: string; deviceToken: string; identity: RestaurantIdentityFields }): Promise<void> {
+export async function pushRestaurantIdentity(opts: { apiBase: string; deviceToken: string; identity: RestaurantIdentityFields; requireAcknowledgement?: boolean }): Promise<void> {
   try {
-    await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/restaurant`, {
+    const response = await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/restaurant`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` },
       body: JSON.stringify(opts.identity)
     });
-  } catch {
+    if (!response.ok && opts.requireAcknowledgement) throw new Error('Restaurant settings could not be saved to the server.');
+  } catch (error) {
+    if (opts.requireAcknowledgement) throw error;
     // Best-effort: the next Settings save (or the periodic pull, once another device's edit lands) retries.
   }
 }

@@ -1,0 +1,25 @@
+{
+  "id": "dish-8a184ccae6fa09",
+  "kind": "dish",
+  "name": "Cheese Grilled Sandwich",
+  "description": "Cheese Grilled Sandwich, fresh fillings in toasted or grilled bread.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sandwiches"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/fast-food/sandwich.jpg"
+  ],
+  "file": "dish-8a184ccae6fa09.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84312,
+  "sha256": "3a355863c209f54b3a9587fe419fce38deb7a09f1962394d953a7f47ea008b6c"
+}

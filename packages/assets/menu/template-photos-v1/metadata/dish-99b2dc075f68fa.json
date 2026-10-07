@@ -1,0 +1,25 @@
+{
+  "id": "dish-99b2dc075f68fa",
+  "kind": "dish",
+  "name": "Rasmalai Kesar Pista (2 Pcs)",
+  "description": "Soft spongy cottage cheese patties steeped in thickened saffron infused milk garnished with pistachios",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Heritage Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Heritage Desserts"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-99b2dc075f68fa.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75130,
+  "sha256": "6b7dacaf4c5847d74883731b415aadceceaf2a47e19cdd54f2fa1ec7c0d1f82d"
+}

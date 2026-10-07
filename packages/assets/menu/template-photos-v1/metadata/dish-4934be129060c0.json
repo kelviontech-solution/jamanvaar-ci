@@ -1,0 +1,22 @@
+{
+  "id": "dish-4934be129060c0",
+  "kind": "dish",
+  "name": "Jain Paneer Tikka Satvik",
+  "description": "Cottage cheese marinated in pure curd, carom seeds and yellow chilli powder, roasted with capsicum",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters & Tikkas",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters & Tikkas"
+    }
+  ],
+  "file": "dish-4934be129060c0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95652,
+  "sha256": "e908d70d741f7f0db124c0bfb4e7b3066afedf1a869b6a20858c0caffdfff9fa"
+}

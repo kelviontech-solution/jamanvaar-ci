@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Button } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, MenuCategoryIcon } from '@jamanvaar/ui';
 import { PREBUILT_MENU_TEMPLATES, db, AuditRepository, KeyValueStore } from '@jamanvaar/database';
-import { MenuBuilderService, templateItemKey, existingTemplateItem, exactCategory } from '@jamanvaar/business';
+import { MenuBuilderService, templateItemKey, templateCategoryKey, existingTemplateItem, exactCategory } from '@jamanvaar/business';
 import { publishCatalogNow } from '@jamanvaar/sync';
 interface Props { isOpen: boolean; onClose: () => void; onImported: (count: number) => void }
 // Keep old miniature presets compatible with saved IDs, but offer complete restaurant catalogs for onboarding.
@@ -13,15 +13,16 @@ export const PrebuiltMenuModal: React.FC<Props> = ({ isOpen, onClose, onImported
   const template = PREBUILT_MENU_TEMPLATES.find(t => t.id === templateId)!;
   const entries = template.categories.flatMap(c => c.items.map(item => ({ item, cat: c, key: templateItemKey(template.id, c.slug, item.sku) })));
   useEffect(() => { if (isOpen) { setSelected([]); setCategories([]); setMessage(''); setTenant(KeyValueStore.get('jamanvaar_tenant_id')); } }, [isOpen, templateId]);
-  const chooseAll = () => { setSelected(entries.map(e => e.key)); setCategories(template.categories.map(c => `${template.id}::${c.slug}`)); };
+  const chooseAll = () => { setSelected(entries.map(e => e.key)); setCategories(template.categories.map(c => templateCategoryKey(template.id, c.slug, c.name))); };
   const selectedEntries = entries.filter(e => selected.includes(e.key));
   const duplicateCount = selectedEntries.filter(e => existingTemplateItem(e.key, e.item, exactCategory(e.cat.name))).length;
-  const toggleCategory = (slug: string, checked: boolean) => {
-    const key = `${template.id}::${slug}`;
+  const toggleCategory = (category: typeof template.categories[number], checked: boolean) => {
+    const slug = category.slug;
+    const key = templateCategoryKey(template.id, slug, category.name);
     const dependencies = slug === 'combos' && checked ? new Set(template.combos?.flatMap(c => c.itemSkus || [])) : null;
-    const matching = entries.filter(e => dependencies ? dependencies.has(e.item.sku) : e.cat.slug === slug);
+    const matching = entries.filter(e => dependencies ? dependencies.has(e.item.sku) : e.cat.slug === slug && e.cat.name === category.name);
     const itemKeys = matching.map(e => e.key);
-    setCategories(current => checked ? [...new Set([...current, key, ...matching.map(e => `${template.id}::${e.cat.slug}`)])] : current.filter(k => k !== key));
+    setCategories(current => checked ? [...new Set([...current, key, ...matching.map(e => templateCategoryKey(template.id, e.cat.slug, e.cat.name))])] : current.filter(k => k !== key));
     setSelected(current => checked ? [...new Set([...current, ...itemKeys])] : current.filter(k => !itemKeys.includes(k)));
   };
   return <Modal isOpen={isOpen} onClose={busy ? () => {} : onClose} title="Load Restaurant Menu Template" maxWidth="3xl">
@@ -31,12 +32,12 @@ export const PrebuiltMenuModal: React.FC<Props> = ({ isOpen, onClose, onImported
       <p>{template.description}</p>
       <div data-testid="template-counts" className="rounded-xl bg-orange-50 p-3 text-sm">{template.categories.length} categories · {entries.length} items · {entries.reduce((n, e) => n + (e.item.variants?.length || 0), 0)} variants · {entries.reduce((n, e) => n + (e.item.addons?.length || 0), 0)} add-ons · {template.combos?.length || 0} combos</div>
       <div className="flex gap-3"><Button variant="outline" onClick={chooseAll} disabled={busy}>Select Complete Template</Button><Button variant="outline" onClick={() => { setSelected([]); setCategories([]); }} disabled={busy}>Clear Selection</Button></div>
-      <div className="max-h-[420px] overflow-auto space-y-3">{template.categories.map(cat => <fieldset key={cat.slug} className="rounded-xl border p-3">
-        <legend className="font-bold px-2"><label><input type="checkbox" aria-label={`Select category ${cat.name}`} disabled={busy} checked={categories.includes(`${template.id}::${cat.slug}`)} onChange={e => toggleCategory(cat.slug, e.target.checked)} /> {cat.name} ({cat.items.length || (cat.slug === 'combos' ? template.combos?.length : 0)})</label></legend>
+      <div className="max-h-[420px] overflow-auto space-y-3">{template.categories.map(cat => <fieldset key={templateCategoryKey(template.id, cat.slug, cat.name)} className="rounded-xl border p-3">
+        <legend className="font-bold px-2"><label className="flex items-center gap-2 py-1"><input type="checkbox" aria-label={`Select category ${cat.name}`} disabled={busy} checked={categories.includes(templateCategoryKey(template.id, cat.slug, cat.name))} onChange={e => toggleCategory(cat, e.target.checked)} />{cat.imageUrl && <CachedImg src={cat.imageUrl} alt={`${cat.name} category cover`} className="w-12 h-12 rounded-xl object-cover" />}<MenuCategoryIcon name={cat.name} iconName={cat.iconName} /><span>{cat.name} ({cat.items.length || (cat.slug === 'combos' ? template.combos?.length : 0)})</span></label></legend>
         {cat.slug === 'combos' && <p className="text-xs text-slate-600">Selecting Combos also selects their component dishes for review. They use fixed portions and an authoritative bundle price.</p>}
         {cat.items.map(item => { const key = templateItemKey(template.id, cat.slug, item.sku); const existing = existingTemplateItem(key, item, exactCategory(cat.name)); return <label key={key} className="flex gap-3 items-start py-2 border-b last:border-0">
-          <input aria-label={`Select item ${item.name}`} type="checkbox" disabled={busy} checked={selected.includes(key)} onChange={e => { setSelected(current => e.target.checked ? [...new Set([...current, key])] : current.filter(k => k !== key)); if (e.target.checked) setCategories(current => [...new Set([...current, `${template.id}::${cat.slug}`])]); }} />
-          <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '/assets/menu/common/menu-placeholder-v2.svg'; }} />
+          <input aria-label={`Select item ${item.name}`} type="checkbox" disabled={busy} checked={selected.includes(key)} onChange={e => { setSelected(current => e.target.checked ? [...new Set([...current, key])] : current.filter(k => k !== key)); if (e.target.checked) setCategories(current => [...new Set([...current, templateCategoryKey(template.id, cat.slug, cat.name)])]); }} />
+          <CachedImg src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
           <span className="flex-1 text-sm"><strong>{item.name}</strong> · ₹{item.suggestedPrice} · {item.dietaryType}{item.subcategory && ` · ${item.subcategory}`}<span className="block text-xs text-slate-600">{item.description}</span><span className="block text-xs">{item.variants?.map(v => `${v.name} ₹${v.price}`).join(' / ')}{item.addons?.length ? ` · ${item.addons.length} add-ons` : ''}{item.imageUrl?.includes('placeholder') ? ' · Photo needed' : ''}{existing ? ' · Already exists' : ''}</span></span>
         </label>; })}
       </fieldset>)}</div>

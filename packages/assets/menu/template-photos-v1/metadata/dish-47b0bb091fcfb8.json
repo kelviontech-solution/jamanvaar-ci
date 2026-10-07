@@ -1,0 +1,25 @@
+{
+  "id": "dish-47b0bb091fcfb8",
+  "kind": "dish",
+  "name": "Paneer Makhani Rice Bowl",
+  "description": "Portion of rich paneer butter masala served over steamed jeera basmati rice in single packaging",
+  "diet": "VEG",
+  "cuisine": "Delivery-Optimized Multi-Brand",
+  "category": "Delivery Meal Bowls",
+  "occurrences": [
+    {
+      "templateId": "tpl-cloud-kitchen",
+      "category": "Delivery Meal Bowls"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-47b0bb091fcfb8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85190,
+  "sha256": "52ebf98dde2d1c84656d83332f4ac0427c70b513f309887ddfda9cca4a9f36de"
+}

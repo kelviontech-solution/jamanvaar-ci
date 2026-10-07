@@ -1,0 +1,26 @@
+{
+  "id": "dish-0ee5617d17ec2a",
+  "kind": "dish",
+  "name": "Classic Veg Burger",
+  "description": "Classic Veg Burger, toasted buns with freshly cooked patties.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Burgers"
+    }
+  ],
+  "file": "dish-0ee5617d17ec2a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83296,
+  "sha256": "a2ee0a985b7cb5038e5d024b731776f8e4fed592738ae9f1ff9cb5b247d6d16a"
+}

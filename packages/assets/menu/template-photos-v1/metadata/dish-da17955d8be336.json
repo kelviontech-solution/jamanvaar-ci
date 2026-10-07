@@ -1,0 +1,25 @@
+{
+  "id": "dish-da17955d8be336",
+  "kind": "dish",
+  "name": "Ragda Pattice",
+  "description": "Ragda Pattice, comfort snacks prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Regional Favourites",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Regional Favourites"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-da17955d8be336.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99894,
+  "sha256": "9062033f2b90bfc81032ca0c901aaecdb42226951eacc89164452fe2611c594e"
+}

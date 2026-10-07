@@ -1,0 +1,26 @@
+{
+  "id": "dish-79544015debad7",
+  "kind": "dish",
+  "name": "Farmhouse Pizza",
+  "description": "Farmhouse Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-79544015debad7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119588,
+  "sha256": "fca0077d71bf8ea5b5e858ee3ee3e6b35b628274eb5694850599e7b4b9903bda"
+}

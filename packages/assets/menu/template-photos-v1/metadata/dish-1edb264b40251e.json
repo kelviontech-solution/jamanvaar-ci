@@ -1,0 +1,22 @@
+{
+  "id": "dish-1edb264b40251e",
+  "kind": "dish",
+  "name": "Lucknowi Dum Biryani Handi",
+  "description": "Scented basmati rice cooked on slow dum with royal spices and kewra essence",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Awadhi Breads & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Awadhi Breads & Rice"
+    }
+  ],
+  "file": "dish-1edb264b40251e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95258,
+  "sha256": "5c37d9ff9f122eb383fe494e94bdccdfc3bce6cf6eac2bfb21ed7a569f3d4f81"
+}

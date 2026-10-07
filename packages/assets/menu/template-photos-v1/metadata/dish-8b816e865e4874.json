@@ -1,0 +1,25 @@
+{
+  "id": "dish-8b816e865e4874",
+  "kind": "dish",
+  "name": "Paneer Biryani",
+  "description": "Paneer Biryani, basmati rice dum-cooked with vegetables and spices.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Vegetarian Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Vegetarian Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-8b816e865e4874.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107140,
+  "sha256": "dff6db4d828c68fd52420b3e3fc53f41cbaa766d7aa6ec035cb1b9883b40b1bf"
+}

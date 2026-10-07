@@ -1,0 +1,26 @@
+{
+  "id": "dish-ab97739625249c",
+  "kind": "dish",
+  "name": "Jain Mini Thali",
+  "description": "Jain Mini Thali, complete meals without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Jain Thali"
+    }
+  ],
+  "file": "dish-ab97739625249c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86086,
+  "sha256": "7c14b457f3ab59d336c451f074d12b77f603833e46573cfc6c9bd11da8e34b95"
+}

@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { EodReport } from '@jamanvaar/types';
-import { formatINR, formatDate, formatTime, formatSplitTax } from '@jamanvaar/utils';
+import { formatINR, formatDate, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { db } from '@jamanvaar/database';
 import { EodReportService, DayOrdersService } from '@jamanvaar/business';
 import {
@@ -422,7 +424,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             <div className="border border-slate-300 rounded-xl overflow-hidden print-avoid-break">
               <div className="bg-jaman-navy text-white px-3 py-1.5 font-black text-[11px] uppercase tracking-wider flex items-center justify-between">
                 <span>7. Statutory GST Tax Accounting Summary</span>
-                <span className="text-[9px] font-mono text-amber-300">GST 5% (2.5% CGST + 2.5% SGST)</span>
+                <span className="text-[9px] font-mono text-amber-300">{gstLabels().combined}</span>
               </div>
               <div className="p-2.5 grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs text-center">
                 <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
@@ -433,19 +435,19 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
                 </div>
                 {/* B2-036: derived from the same total as "Total GST" below via formatSplitTax. */}
                 <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
-                  <span className="text-[9px] text-slate-500 font-bold block uppercase">CGST (2.5%)</span>
+                  <span className="text-[9px] text-slate-500 font-bold block uppercase">{gstLabels().cgst}</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
                     {formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).cgst}
                   </span>
                 </div>
                 <div className="p-1.5 bg-jaman-cream rounded-lg border border-slate-200">
-                  <span className="text-[9px] text-slate-500 font-bold block uppercase">SGST (2.5%)</span>
+                  <span className="text-[9px] text-slate-500 font-bold block uppercase">{gstLabels().sgst}</span>
                   <span className="font-mono font-bold text-slate-800 text-xs block mt-0.5">
                     {formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).sgst}
                   </span>
                 </div>
                 <div className="p-1.5 bg-orange-50 rounded-lg border border-orange-200">
-                  <span className="text-[9px] text-brand font-bold block uppercase">Total GST (5%)</span>
+                  <span className="text-[9px] text-brand font-bold block uppercase">Total {gstLabels().total}</span>
                   <span className="font-mono font-black text-brand text-xs block mt-0.5">
                     {formatINR(report.gstSummary.totalTax)}
                   </span>
@@ -868,11 +870,11 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
             </div>
             {/* B2-036: derived from the same total as "Total GST" below via formatSplitTax. */}
             <div className="flex justify-between">
-              <span>CGST (2.5%):</span>
+              <span>{gstLabels().cgst}:</span>
               <span>{formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).cgst}</span>
             </div>
             <div className="flex justify-between">
-              <span>SGST (2.5%):</span>
+              <span>{gstLabels().sgst}:</span>
               <span>{formatSplitTax(report.gstSummary.totalTax, report.gstSummary.cgstAmount, report.gstSummary.sgstAmount).sgst}</span>
             </div>
             <div className="flex justify-between font-bold">

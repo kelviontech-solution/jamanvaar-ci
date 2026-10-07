@@ -1,0 +1,26 @@
+{
+  "id": "dish-5c6bbeed41b88b",
+  "kind": "dish",
+  "name": "Ghee Roast Dosa",
+  "description": "Ghee Roast Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Dosas"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "file": "dish-5c6bbeed41b88b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87182,
+  "sha256": "960a3fd223140626f5a6cc22359a5d9b1ad86255f3b02daabe420027b2105f75"
+}

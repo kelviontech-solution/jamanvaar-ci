@@ -1,0 +1,37 @@
+{
+  "id": "category-425bd34d5824e6",
+  "kind": "category",
+  "name": "Gujarati Thali — Gujarati Restaurant",
+  "categoryName": "Gujarati Thali",
+  "templateId": "tpl-gujarati",
+  "slug": "gujarati-thali",
+  "description": "Rotli, seasonal shaak, dal, rice, farsan and sweet",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali",
+  "components": [
+    {
+      "name": "Gujarati Grand Thali",
+      "description": "Gujarati Grand Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Special Gujarati Thali",
+      "description": "Special Gujarati Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mini Gujarati Thali",
+      "description": "Mini Gujarati Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-425bd34d5824e6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118518,
+  "sha256": "7f94031c4981cbf6d7f1112b7497ed840e73825af4050ae8b14fb087cd60303e"
+}

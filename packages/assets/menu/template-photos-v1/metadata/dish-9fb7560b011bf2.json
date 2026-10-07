@@ -1,0 +1,25 @@
+{
+  "id": "dish-9fb7560b011bf2",
+  "kind": "dish",
+  "name": "Sizzling Chocolate Brownie Sundae",
+  "description": "Warm dark chocolate brownie on a sizzling plate with vanilla scoop and hot fudge sauce",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes & Faloodas",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes & Faloodas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-9fb7560b011bf2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80058,
+  "sha256": "170a84c9803f82139a9ae82873693a0cf6a39f6c960cdd7c0acacb39ffa3495b"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "dish-38c0a2cafb02c0",
+  "kind": "dish",
+  "name": "Rava Dosa",
+  "description": "Rava Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Dosas"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "file": "dish-38c0a2cafb02c0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118092,
+  "sha256": "04bc0b8420980b572627dffa025b3665909f70b655a76a98bb90c3989be79795"
+}

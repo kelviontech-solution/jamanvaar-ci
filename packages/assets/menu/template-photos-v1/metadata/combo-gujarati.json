@@ -1,0 +1,29 @@
+{
+  "id": "combo-gujarati",
+  "kind": "combo",
+  "name": "Gujarati Meal Deal",
+  "description": "Royal Gujarati Grand Thali with Patra Steamed Rolls. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Royal Gujarati Grand Thali",
+      "description": "3 Shaak, Sweet Gujarati Dal, Kadhi, 4 Phulka Rotli, Basmati Rice, Farsan, Sweet, Papad, Pickle & Chilled Chaas",
+      "diet": "VEG"
+    },
+    {
+      "name": "Patra Steamed Rolls",
+      "description": "Colocasia leaf rolls coated with spiced sweet and tangy gram flour paste",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-gujarati.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110074,
+  "sha256": "2f43b181706f574b5949e60846bd1a91ca8dd67092d21fee24b7513594e6b386"
+}

@@ -1,0 +1,94 @@
+{
+  "at": "2026-10-07T05:06:03.098Z",
+  "builds": [
+    "apps/kiosk-system/kiosk-user",
+    "apps/restaurant-system/pos",
+    "apps/restaurant-system/pos-admin",
+    "apps/restaurant-system/captain",
+    "apps/restaurant-system/kds",
+    "apps/qr-guest",
+    "cloud/super-admin-web"
+  ],
+  "typechecks": [
+    "apps/kiosk-system/kiosk-user",
+    "apps/restaurant-system/pos",
+    "apps/restaurant-system/pos-admin",
+    "apps/restaurant-system/captain",
+    "apps/restaurant-system/kds",
+    "apps/qr-guest"
+  ],
+  "regression": {
+    "files": 10,
+    "passed": 76,
+    "log": "logs/menu-photos-regression.log"
+  },
+  "browser": {
+    "passed": 11,
+    "failed": 0,
+    "pageErrors": 0
+  },
+  "packaging": [
+    {
+      "app": "apps/kiosk-system/kiosk-user",
+      "verifiedImages": 22
+    },
+    {
+      "app": "apps/restaurant-system/pos",
+      "verifiedImages": 22
+    },
+    {
+      "app": "apps/restaurant-system/pos-admin",
+      "verifiedImages": 22
+    },
+    {
+      "app": "apps/restaurant-system/captain",
+      "verifiedImages": 22
+    },
+    {
+      "app": "apps/restaurant-system/kds",
+      "verifiedImages": 22
+    },
+    {
+      "app": "apps/qr-guest",
+      "verifiedImages": 22
+    },
+    {
+      "app": "cloud/super-admin-web",
+      "verifiedImages": 22
+    }
+  ],
+  "photoPayloadBytes": 2041632,
+  "production": {
+    "deployed": false,
+    "existingImageChecks": [
+      {
+        "path": "/kiosk/assets/menu/gujarati/khaman.jpg",
+        "status": 200,
+        "contentType": "image/jpeg"
+      },
+      {
+        "path": "/kiosk/assets/menu/thali/gujarati-thali.jpg",
+        "status": 200,
+        "contentType": "image/jpeg"
+      },
+      {
+        "path": "/kiosk/assets/menu/common/menu-placeholder-v2.svg",
+        "status": 200,
+        "contentType": "image/svg+xml"
+      }
+    ],
+    "newAssetChecks": [
+      {
+        "path": "/kiosk/assets/menu/description-matched-v1/khaman.webp",
+        "status": 404,
+        "contentType": "text/html"
+      },
+      {
+        "path": "/restaurant-admin/assets/menu/description-matched-v1/khaman.webp",
+        "status": 404,
+        "contentType": "text/html"
+      }
+    ],
+    "sshReadOnlyProbe": "Blocked: no trusted ED25519 host key for system.kelviontech.in. Strict host verification preserved."
+  }
+}

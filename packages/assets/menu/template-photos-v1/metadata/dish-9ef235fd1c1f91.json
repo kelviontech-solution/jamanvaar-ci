@@ -1,0 +1,22 @@
+{
+  "id": "dish-9ef235fd1c1f91",
+  "kind": "dish",
+  "name": "Caramel Brownie Frappe",
+  "description": "Chilled blended espresso with chocolate brownie crumbs, caramel drizzle and whipped cream",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Iced Frappes & Coolers",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Iced Frappes & Coolers"
+    }
+  ],
+  "file": "dish-9ef235fd1c1f91.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 56890,
+  "sha256": "70c744f4a35fffdd92c5f5572f4830e3b8321afc1a105c8dd2db86c8f3182471"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-2e205ed76ad276",
+  "kind": "dish",
+  "name": "Boneless Chicken Biryani",
+  "description": "Boneless Chicken Biryani, dum-cooked chicken and fragrant basmati rice.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Chicken Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-2e205ed76ad276.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104178,
+  "sha256": "5ac9711170ae21b2fa99bb2b43ef0d69685cc98c7b16794dd53779b724504ab5"
+}

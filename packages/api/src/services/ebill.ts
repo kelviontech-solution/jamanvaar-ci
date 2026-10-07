@@ -1,6 +1,6 @@
 import { Order, ReceiptConfig, ReceiptDeliveryMethod, ReceiptDeliveryStatus, ReceiptRecord } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 
 export type SendReceiptFn = (
   channel: 'WHATSAPP' | 'SMS',
@@ -68,8 +68,8 @@ export class EBillService {
       `━━━━━━━━━━━━━━━━━━━━━\n` +
       `Subtotal: ${formatINR(order.subtotal)}\n` +
       (order.discountAmount > 0 ? `Discount: -${formatINR(order.discountAmount)}\n` : '') +
-      `CGST (2.5%): ${formatINR(order.cgstAmount)}\n` +
-      `SGST (2.5%): ${formatINR(order.sgstAmount)}\n` +
+      `${taxLabels(restaurantGstRate(db.taxGroups)).cgst}: ${formatINR(order.cgstAmount)}\n` +
+      `${taxLabels(restaurantGstRate(db.taxGroups)).sgst}: ${formatINR(order.sgstAmount)}\n` +
       `*TOTAL PAYABLE: ${formatINR(order.totalAmount)}*\n` +
       `Payment: ${order.paymentMethod} (${order.paymentStatus})\n` +
       `━━━━━━━━━━━━━━━━━━━━━\n\n` +

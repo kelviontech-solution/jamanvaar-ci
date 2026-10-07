@@ -1,0 +1,25 @@
+{
+  "id": "dish-0b7a5096d50d80",
+  "kind": "dish",
+  "name": "Soya Chaap Biryani",
+  "description": "Soya Chaap Biryani, basmati rice dum-cooked with vegetables and spices.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Vegetarian Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Vegetarian Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-0b7a5096d50d80.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119152,
+  "sha256": "36a9be0cd3303dbc4d805a035c5cfdcb3afa33c02044b287efa14351d2a84d68"
+}

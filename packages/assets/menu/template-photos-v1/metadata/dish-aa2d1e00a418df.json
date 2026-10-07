@@ -1,0 +1,26 @@
+{
+  "id": "dish-aa2d1e00a418df",
+  "kind": "dish",
+  "name": "Mini Kathiyawadi Thali",
+  "description": "Mini Kathiyawadi Thali, complete regional meals.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Thali"
+    }
+  ],
+  "file": "dish-aa2d1e00a418df.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105734,
+  "sha256": "114ee63ee90a730dc19ed4c91b3d59734d57bbfbcaabf7d74785cd1c62dc51e4"
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePosStore, PosTab } from '../../store/posStore';
 import { db, BusinessDayRepository } from '@jamanvaar/database';
-import { sound } from '@jamanvaar/ui';
+import { useAiAccess, sound } from '@jamanvaar/ui';
 import { useCategoryGroups } from '../menu/useCategoryGroups';
 import {
   UtensilsCrossed,
@@ -30,6 +30,7 @@ interface NavItem {
 }
 
 export const PosSidebar: React.FC = () => {
+  const ai = useAiAccess();
   const {
     activeTab,
     setActiveTab,
@@ -196,7 +197,8 @@ export const PosSidebar: React.FC = () => {
 
           {/* Dedicated AI ASSISTANT Navigation Trigger in Sidebar */}
           <div className="pt-2 border-t border-jaman-border my-1">
-            <button
+            {ai.showButton(db.restaurant?.showJamanAI !== false) && (
+        <button
               onClick={() => setIsChatbotOpen(true)}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative bg-white hover:bg-[#FFF2E8] border border-[#FDBA74]/70 text-jaman-saffron shadow-2xs group cursor-pointer active:scale-98"
               title="JAMAN AI Assistant (Voice & Conversational POS Actions)"
@@ -209,6 +211,7 @@ export const PosSidebar: React.FC = () => {
                 AI
               </span>
             </button>
+        )}
           </div>
         </nav>
       )}

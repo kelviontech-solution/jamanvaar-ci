@@ -27,8 +27,9 @@ export function OfflinePolicyPage() {
   const [policy, setPolicy] = useState<{ offlineGraceDays: number; warnAfterDays: number }>({ offlineGraceDays: 7, warnAfterDays: 4 });
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
-  // null until the check returns; only a definite "not configured" blocks issuing.
+  // null until the check returns. A check that fails is treated as "not ready": an extension must never look issuable when it is not.
   const [signing, setSigning] = useState<{ configured: boolean; reason?: string } | null>(null);
+  const [grantError, setGrantError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -58,7 +59,9 @@ export function OfflinePolicyPage() {
       api.get<{ offlineGraceDays: number; warnAfterDays: number }>('/api/v1/platform/offline-policy/policy').catch(() => null),
       api.get<RestaurantListItem[]>('/api/v1/restaurants'),
       api.get<Branch[]>('/api/v1/branches').catch(() => [] as Branch[]),
-      api.get<{ configured: boolean; reason?: string }>('/api/v1/platform/offline-policy/signing-status').catch(() => null)
+      api
+        .get<{ configured: boolean; reason?: string }>('/api/v1/platform/offline-policy/signing-status')
+        .catch(() => ({ configured: false, reason: 'The signing status could not be checked. Make sure the API is running, then press Refresh.' }))
     ])
       .then(([exts, appDevs, lockedDevs, policyData, rests, allBranches, signingStatus]) => {
         if (policyData) setPolicy(policyData);
@@ -81,6 +84,7 @@ export function OfflinePolicyPage() {
   async function handleGrantExtension() {
     if (!targetRestaurantId || !grantReason.trim() || !requestedBy.trim()) return;
     setGranting(true);
+    setGrantError(null);
     try {
       const granted = await api.post<OfflineExtension>('/api/v1/platform/offline-policy/grant', {
         restaurantId: targetRestaurantId,
@@ -100,7 +104,8 @@ export function OfflinePolicyPage() {
       setTargetBranchId('');
       loadData();
     } catch (err) {
-      showToast(err instanceof ApiError ? (err.issues?.map((i) => i.message).join(' ') || err.message) : 'Failed to grant extension');
+      // Shown inside the dialog, where the person is looking, not as a toast behind it.
+      setGrantError(err instanceof ApiError ? (err.issues?.map((i) => i.message).join(' ') || err.message) : 'The extension could not be granted. Check your connection and try again.');
     } finally {
       setGranting(false);
     }
@@ -122,12 +127,15 @@ export function OfflinePolicyPage() {
         <div>
           <h1 className="page-title">Emergency Offline Policy & Licensing</h1>
           <p className="page-subtitle">
-            Cryptographically signed offline extensions (ECDSA P-256), offline grace period management, and tamper-resistant terminal authorization.
+            A terminal (POS, Captain, Kiosk) locks itself after {policy.offlineGraceDays} days with no contact with JAMANVAAR, so a stolen or
+            cancelled device cannot keep running forever. When a restaurant's internet is genuinely down past that limit, grant one of its terminals
+            a signed certificate here: a few extra offline days, cryptographically signed (ECDSA P-256) so the terminal can verify it without the
+            internet, the same way it verifies its licence.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <RefreshButton loading={loading} onRefresh={loadData} />
-          <Button variant="accent" onClick={() => setModalOpen(true)} disabled={signing?.configured === false}>
+          <Button variant="accent" onClick={() => { setGrantError(null); setModalOpen(true); }} disabled={signing?.configured !== true}>
             <Plus className="w-4 h-4 mr-1" /> Grant Emergency Extension
           </Button>
         </div>
@@ -136,14 +144,22 @@ export function OfflinePolicyPage() {
       {toast && <div className="floating-toast">{toast}</div>}
 
       {signing?.configured === false && (
-        <div className="banner banner-error" role="alert" style={{ marginBottom: 16 }}>
-          <strong>Signing is not ready, so extensions cannot be issued.</strong> {signing.reason}{' '}
-          Set a P-256 private key (base64-encoded PEM) in the API environment and restart it. The matching public key must be the one built into the apps.
+        <div className="signing-status-card signing-status-card-error" role="alert">
+          <AlertTriangle className="w-5 h-5" style={{ flexShrink: 0 }} />
+          <div>
+            <strong>Extensions can't be signed on this server yet.</strong>
+            <p style={{ margin: '4px 0 8px' }}>{signing.reason}</p>
+            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12.5 }}>
+              <li>Generate a P-256 key pair (the API ships <code>scripts/generate-license-key.js</code> for this).</li>
+              <li>Set <code>LICENSE_SIGNING_PRIVATE_KEY_B64</code> and <code>LICENSE_SIGNING_KEY_ID</code> in the API's environment and restart it.</li>
+              <li>Make sure the matching public key is the one built into the apps (<code>packages/config/src/license_keys.ts</code>) — it must already be there before you sign anything with the new key.</li>
+            </ol>
+          </div>
         </div>
       )}
       {signing?.configured === true && (
-        <div className="banner" style={{ marginBottom: 16 }}>
-          <KeyRound className="w-4 h-4" style={{ display: 'inline', marginRight: 6 }} /> Signing key: ready
+        <div className="signing-status-card signing-status-card-ready">
+          <KeyRound className="w-4 h-4" style={{ flexShrink: 0 }} /> Signing key ready — extensions issued here are real, verifiable certificates.
         </div>
       )}
 
@@ -364,6 +380,12 @@ export function OfflinePolicyPage() {
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               />
             </div>
+
+            {grantError && (
+              <div className="banner banner-error" role="alert">
+                {grantError}
+              </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
               <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>

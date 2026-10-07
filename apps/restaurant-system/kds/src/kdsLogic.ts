@@ -82,10 +82,17 @@ export function orderProgress(allKots: KOTRecord[], orderId: string): { ready: n
   return { ready, total, tickets };
 }
 
-/** Cooking tickets oldest first (the one waiting longest is first), then ready ones oldest first, then anything else. */
-export function sortForKitchen(kots: KOTRecord[]): KOTRecord[] {
+/** A leading # searches an exact token; ordinary text searches across ticket details. */
+export function matchesKitchenSearch(kot: KOTRecord, search: string): boolean {
+  const query = search.trim().toLowerCase().replace(/^#/, '');
+  if (query && search.trim().startsWith('#')) return kot.tokenNumber.toLowerCase().replace(/^#/, '') === query;
+  return !query || [kot.tokenNumber, kot.tableNumber, kot.kotNumber, kot.orderNumber, kot.cashierName, kot.station,
+    ...kot.items.map(i => i.name)].some(value => value?.toLowerCase().includes(query));
+}
+
+export function sortForKitchen(kots: KOTRecord[], priorityOf: (orderId: string) => string | undefined = () => undefined): KOTRecord[] {
   const bucket = (k: KOTRecord) => (k.status === 'CANCELLED' ? 0 : k.status === 'READY' ? 2 : k.status === 'SERVED' ? 3 : 1);
-  return [...kots].sort((a, b) => bucket(a) - bucket(b) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  return [...kots].sort((a, b) => bucket(a) - bucket(b) || Number(priorityOf(b.orderId) === 'URGENT') - Number(priorityOf(a.orderId) === 'URGENT') || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
 
 export interface ExpoDish {
@@ -123,7 +130,7 @@ export interface ExpoOrder {
  * each station still owes, and when it can go out. Orders whose every dish is served or cancelled drop off. Orders that can go out
  * now come first, then the ones waiting longest.
  */
-export function buildExpoBoard(kots: KOTRecord[], nowMs: number, prepTimeOf: (menuItemId: string) => number | undefined): ExpoOrder[] {
+export function buildExpoBoard(kots: KOTRecord[], nowMs: number, prepTimeOf: (menuItemId: string) => number | undefined, priorityOf: (orderId: string) => string | undefined = () => undefined): ExpoOrder[] {
   const byOrder = new Map<string, KOTRecord[]>();
   for (const kot of kots) {
     if (kot.status === 'CANCELLED') continue;
@@ -160,7 +167,7 @@ export function buildExpoBoard(kots: KOTRecord[], nowMs: number, prepTimeOf: (me
   }
 
   const rank = (o: ExpoOrder) => (o.allReady ? 0 : o.age.level === 'late' ? 1 : o.age.level === 'warn' ? 2 : 3);
-  return board.sort((a, b) => rank(a) - rank(b) || b.age.mins - a.age.mins || b.age.secs - a.age.secs);
+  return board.sort((a, b) => Number(b.allReady) - Number(a.allReady) || Number(priorityOf(b.orderId) === 'URGENT') - Number(priorityOf(a.orderId) === 'URGENT') || rank(a) - rank(b) || b.age.mins - a.age.mins || b.age.secs - a.age.secs);
 }
 
 export { connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';

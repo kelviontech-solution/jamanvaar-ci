@@ -1,0 +1,37 @@
+{
+  "id": "category-30de0d945207c7",
+  "kind": "category",
+  "name": "Amritsari Kulchas & Rotis — Punjabi Dhaba & Restaurant",
+  "categoryName": "Amritsari Kulchas & Rotis",
+  "templateId": "tpl-punjabi",
+  "slug": "punjabi-breads",
+  "description": "Stuffed crisp tandoori kulchas with butter",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Amritsari Kulchas & Rotis",
+  "components": [
+    {
+      "name": "Amritsari Aloo Pyaaz Kulcha",
+      "description": "Crisp flaky tandoori flatbread stuffed with spiced potatoes and onions, topped with dollop of butter",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Kulcha Stuffed",
+      "description": "Leavened flatbread packed with spiced shredded paneer and fresh coriander",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Makki Di Roti (2 Pcs)",
+      "description": "Cornmeal flatbread roasted on tava with white butter and jaggery",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-30de0d945207c7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 144942,
+  "sha256": "483d4cff16bf9160f16ad858296b8cf649349dc67669b48fefa385729ca89e9f"
+}

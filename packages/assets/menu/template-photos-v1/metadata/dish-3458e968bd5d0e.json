@@ -1,0 +1,25 @@
+{
+  "id": "dish-3458e968bd5d0e",
+  "kind": "dish",
+  "name": "Khandvi with Mustard Tempering",
+  "description": "Silky spiced gram flour rolls garnished with fresh grated coconut and chopped coriander",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Fresh Farsan (Snacks)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Fresh Farsan (Snacks)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/khandvi.webp"
+  ],
+  "file": "dish-3458e968bd5d0e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93720,
+  "sha256": "a833eb341750cbcc934ec37918087995e545d5033c63264461681cdfbceb4b7f"
+}

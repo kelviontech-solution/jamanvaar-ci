@@ -1,4 +1,4 @@
-import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService } from '@jamanvaar/database';
+import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { Order, DiningTable } from '@jamanvaar/types';
 import { formatINR, slipHeader, splitTax } from '@jamanvaar/utils';
 import { DynamicQueryExecutor, DynamicQueryFormula } from './dynamic_query_executor';
@@ -284,7 +284,7 @@ export class PosAssistantService {
     // For intent handlers that need richer order-level detail (TOP_ITEMS, LEAST_ITEMS, etc.)
     // pull the same orders the accounting service used
     const todayOrders = BusinessDayRepository.getOrdersForBusinessDay(activeDay.id);
-    const allOrders   = todayOrders.length > 0 ? todayOrders : db.orders;
+    const allOrders   = todayOrders;
     const completedOrders = allOrders.filter((o) => o.orderStatus === 'COMPLETED');
     const activeOrders    = allOrders.filter((o) => o.orderStatus === 'CONFIRMED' || o.orderStatus === 'PREPARING' || o.orderStatus === 'READY');
     const cancelledOrders = allOrders.filter((o) => o.orderStatus === 'CANCELLED');
@@ -318,14 +318,16 @@ export class PosAssistantService {
           sender: 'ASSISTANT',
           timestamp,
           intent,
-          summaryText: `Today's net revenue is ${formatINR(totalSales)} — ${orderCount} billed orders out of ${totalOrders} total.`,
+          summaryText: `Today's order value is ${formatINR(totalSales)} — ${orderCount} billed orders out of ${totalOrders} total.`,
           card: {
             title: "Today's Gross Sales & Financials",
             badge: `${orderCount} Settled Bills`,
             badgeType: 'success',
             highlightNumber: formatINR(totalSales),
-            highlightLabel: 'Total Net Revenue',
+            highlightLabel: 'Order Value (after discounts)',
             metrics: [
+              { label: 'Net Collected', value: formatINR(summary.net_collected), isBold: true },
+              { label: 'Awaiting Collection', value: formatINR(Math.round(todayOrders.filter(isUnpaidOpenOrder).reduce((sum, order) => sum + Math.round(order.totalAmount * 100), 0)) / 100), color: 'text-amber-700' },
               { label: 'Completed Orders', value: `${orderCount} bills`, isBold: true },
               { label: 'Average Bill (AOV)', value: formatINR(aov) },
               { label: 'Taxable Turnover', value: formatINR(Math.round(taxable)), color: 'text-slate-700' },
@@ -1170,7 +1172,7 @@ export class PosAssistantService {
             badge: reconciled ? 'Reconciled ✓' : 'Check Reconciliation',
             badgeType: reconciled ? 'success' : 'warning',
             highlightNumber: formatINR(totalSales),
-            highlightLabel: 'Total Net Revenue',
+            highlightLabel: 'Order Value (after discounts)',
             metrics: [
               { label: 'Completed Bills', value: `${orderCount} of ${totalOrders} orders`, isBold: true },
               { label: 'Average Bill (AOV)', value: formatINR(aov) },

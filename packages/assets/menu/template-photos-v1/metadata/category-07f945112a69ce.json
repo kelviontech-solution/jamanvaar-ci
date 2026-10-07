@@ -1,0 +1,32 @@
+{
+  "id": "category-07f945112a69ce",
+  "kind": "category",
+  "name": "Combos — Grand Indian Thali Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-thali",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Maharaja Unlimited Royal Thali",
+      "description": "4 Curries, 2 Dals, 4 Bread Varieties, Pulav, 2 Farsan, 2 Desserts, Raita, Papad, Chutney and Chaas",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lemon Rice",
+      "description": "Lemon Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-07f945112a69ce.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 128850,
+  "sha256": "1f4d270634d5d20bc739b944184d6c83c8fcac223bac7d4d7e82999a5dbebc38"
+}

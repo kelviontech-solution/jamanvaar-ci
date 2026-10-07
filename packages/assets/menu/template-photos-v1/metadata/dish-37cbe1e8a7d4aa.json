@@ -1,0 +1,22 @@
+{
+  "id": "dish-37cbe1e8a7d4aa",
+  "kind": "dish",
+  "name": "Jain Paneer Tikka",
+  "description": "Jain Paneer Tikka, prepared without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters"
+    }
+  ],
+  "file": "dish-37cbe1e8a7d4aa.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93308,
+  "sha256": "bec651fde836c047ae9dfa6398bd02d871e87d0870ccf9742fd1ca425bd0267f"
+}

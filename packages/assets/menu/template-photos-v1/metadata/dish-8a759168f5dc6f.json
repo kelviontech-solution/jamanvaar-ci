@@ -1,0 +1,25 @@
+{
+  "id": "dish-8a759168f5dc6f",
+  "kind": "dish",
+  "name": "Surti Nylon Khaman (250g)",
+  "description": "Super soft, airy steamed gram flour cakes tempered with mustard seeds, green chillies and curry leaves",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Fresh Farsan (Snacks)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Fresh Farsan (Snacks)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/khaman.webp"
+  ],
+  "file": "dish-8a759168f5dc6f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93698,
+  "sha256": "7a0e3689c6e50f390b4a06cdb9608931f1ab7ccbc4b7ef65301d230157de3472"
+}

@@ -1,0 +1,3397 @@
+[
+  {
+    "id": "category-f8fe6a47ea6197",
+    "name": "Accompaniments — Biryani & Kebab Darbar",
+    "file": "category-f8fe6a47ea6197.webp"
+  },
+  {
+    "id": "category-fdfcebad1fef6f",
+    "name": "Accompaniments — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-fdfcebad1fef6f.webp"
+  },
+  {
+    "id": "category-5765b34f1132de",
+    "name": "Accompaniments — South Indian Restaurant",
+    "file": "category-5765b34f1132de.webp"
+  },
+  {
+    "id": "dish-b31ea64a0c50a8",
+    "name": "Aloo Tikki Chaat",
+    "file": "dish-b31ea64a0c50a8.webp"
+  },
+  {
+    "id": "dish-054baec40b2734",
+    "name": "Americano",
+    "file": "dish-054baec40b2734.webp"
+  },
+  {
+    "id": "dish-fec22dac90b519",
+    "name": "Amritsari Aloo Pyaaz Kulcha",
+    "file": "dish-fec22dac90b519.webp"
+  },
+  {
+    "id": "dish-2b9ebcdd78351c",
+    "name": "Amritsari Kulcha",
+    "file": "dish-2b9ebcdd78351c.webp"
+  },
+  {
+    "id": "category-30de0d945207c7",
+    "name": "Amritsari Kulchas & Rotis — Punjabi Dhaba & Restaurant",
+    "file": "category-30de0d945207c7.webp"
+  },
+  {
+    "id": "dish-abea6218e4eeb4",
+    "name": "Amritsari Paneer Tikka",
+    "file": "dish-abea6218e4eeb4.webp"
+  },
+  {
+    "id": "combo-cafe",
+    "name": "Artisan Café & Coffee Bar Meal Deal",
+    "file": "combo-cafe.webp"
+  },
+  {
+    "id": "combo-chinese",
+    "name": "Authentic Chinese & Wok Meal Deal",
+    "file": "combo-chinese.webp"
+  },
+  {
+    "id": "dish-d9a8ecaf1b66b2",
+    "name": "Authentic Ker Sangri Special",
+    "file": "dish-d9a8ecaf1b66b2.webp"
+  },
+  {
+    "id": "dish-4c445286215e72",
+    "name": "Authentic Kumbakonam Filter Coffee",
+    "file": "dish-4c445286215e72.webp"
+  },
+  {
+    "id": "category-bc1694c70c2150",
+    "name": "Awadhi Breads & Rice — Mughlai & Awadhi Restaurant",
+    "file": "category-bc1694c70c2150.webp"
+  },
+  {
+    "id": "dish-519122353e5e62",
+    "name": "Badam Milk",
+    "file": "dish-519122353e5e62.webp"
+  },
+  {
+    "id": "dish-aa31f281be46d3",
+    "name": "Bajra Rotla",
+    "file": "dish-aa31f281be46d3.webp"
+  },
+  {
+    "id": "combo-bakery",
+    "name": "Bakery, Patisserie & Cafe Meal Deal",
+    "file": "combo-bakery.webp"
+  },
+  {
+    "id": "category-5d13c038972932",
+    "name": "Bakes & Desserts — Artisan Café & Coffee Bar",
+    "file": "category-5d13c038972932.webp"
+  },
+  {
+    "id": "dish-da5c1eae705442",
+    "name": "Banana Bread Slice",
+    "file": "dish-da5c1eae705442.webp"
+  },
+  {
+    "id": "dish-19dfdc57ff5e21",
+    "name": "Banana Split",
+    "file": "dish-19dfdc57ff5e21.webp"
+  },
+  {
+    "id": "category-5f2960f957097b",
+    "name": "Basmati Rice & Biryani — North Indian Restaurant",
+    "file": "category-5f2960f957097b.webp"
+  },
+  {
+    "id": "dish-5dcbfe8c56f49c",
+    "name": "Basundi",
+    "file": "dish-5dcbfe8c56f49c.webp"
+  },
+  {
+    "id": "category-5584945cdd550a",
+    "name": "Beverages — Authentic Chinese & Wok",
+    "file": "category-5584945cdd550a.webp"
+  },
+  {
+    "id": "category-c6f93b77a112d2",
+    "name": "Beverages — Bakery, Patisserie & Cafe",
+    "file": "category-c6f93b77a112d2.webp"
+  },
+  {
+    "id": "category-5562fca250ba82",
+    "name": "Beverages — Fast Food & Quick Service Restaurant",
+    "file": "category-5562fca250ba82.webp"
+  },
+  {
+    "id": "category-ac5278142fc360",
+    "name": "Beverages — Grand Indian Thali Restaurant",
+    "file": "category-ac5278142fc360.webp"
+  },
+  {
+    "id": "category-23bae29f9225dd",
+    "name": "Beverages — Gujarati Restaurant",
+    "file": "category-23bae29f9225dd.webp"
+  },
+  {
+    "id": "category-b65f9d1bda5609",
+    "name": "Beverages — North Indian Restaurant",
+    "file": "category-b65f9d1bda5609.webp"
+  },
+  {
+    "id": "category-b1169ef76d1436",
+    "name": "Beverages — Pizza Restaurant",
+    "file": "category-b1169ef76d1436.webp"
+  },
+  {
+    "id": "category-12fa065cc36ea1",
+    "name": "Beverages — Punjabi Dhaba & Restaurant",
+    "file": "category-12fa065cc36ea1.webp"
+  },
+  {
+    "id": "category-9e0ce115767979",
+    "name": "Beverages — South Indian Restaurant",
+    "file": "category-9e0ce115767979.webp"
+  },
+  {
+    "id": "category-dea966fe6c75ec",
+    "name": "Beverages — Street Food Restaurant",
+    "file": "category-dea966fe6c75ec.webp"
+  },
+  {
+    "id": "category-3bc4701b10b4c4",
+    "name": "Beverages & Chaas — North Indian Restaurant",
+    "file": "category-3bc4701b10b4c4.webp"
+  },
+  {
+    "id": "dish-4a22aa59ca1d16",
+    "name": "Bhel Puri",
+    "file": "dish-4a22aa59ca1d16.webp"
+  },
+  {
+    "id": "dish-c1c4cccd7018f8",
+    "name": "Bhindanu Shaak (Okra)",
+    "file": "dish-c1c4cccd7018f8.webp"
+  },
+  {
+    "id": "dish-e7c98ad1249577",
+    "name": "Bhindi Masala",
+    "file": "dish-e7c98ad1249577.webp"
+  },
+  {
+    "id": "dish-d86f1d77089864",
+    "name": "Bhindi Sambhariya",
+    "file": "dish-d86f1d77089864.webp"
+  },
+  {
+    "id": "combo-biryani",
+    "name": "Biryani & Kebab Darbar Meal Deal",
+    "file": "combo-biryani.webp"
+  },
+  {
+    "id": "dish-eb74d6172147e4",
+    "name": "Biscuit Bhakri (2 Pcs)",
+    "file": "dish-eb74d6172147e4.webp"
+  },
+  {
+    "id": "dish-6a63492441db1b",
+    "name": "Bisi Bele Bath (Hot Lentil Rice)",
+    "file": "dish-6a63492441db1b.webp"
+  },
+  {
+    "id": "dish-2852539d9dc808",
+    "name": "Black Forest Cake",
+    "file": "dish-2852539d9dc808.webp"
+  },
+  {
+    "id": "dish-4eb431db0421a9",
+    "name": "Black Forest Pastry",
+    "file": "dish-4eb431db0421a9.webp"
+  },
+  {
+    "id": "dish-14e9b36296d408",
+    "name": "Blueberry Muffin",
+    "file": "dish-14e9b36296d408.webp"
+  },
+  {
+    "id": "dish-e39b48eaa1bc7c",
+    "name": "Bombay Special Grilled Sandwich",
+    "file": "dish-e39b48eaa1bc7c.webp"
+  },
+  {
+    "id": "dish-2e205ed76ad276",
+    "name": "Boneless Chicken Biryani",
+    "file": "dish-2e205ed76ad276.webp"
+  },
+  {
+    "id": "dish-7058e5affae0b2",
+    "name": "Boondi Raita",
+    "file": "dish-7058e5affae0b2.webp"
+  },
+  {
+    "id": "dish-86e7a0e18fa526",
+    "name": "Bread Pakora",
+    "file": "dish-86e7a0e18fa526.webp"
+  },
+  {
+    "id": "category-a36708556ed090",
+    "name": "Breads — Bakery, Patisserie & Cafe",
+    "file": "category-a36708556ed090.webp"
+  },
+  {
+    "id": "category-f3d9baa12f6ba5",
+    "name": "Breads — Indian Multi-Cuisine Diner",
+    "file": "category-f3d9baa12f6ba5.webp"
+  },
+  {
+    "id": "category-8df63a320060ea",
+    "name": "Breads — North Indian Restaurant",
+    "file": "category-8df63a320060ea.webp"
+  },
+  {
+    "id": "category-2e0f7d372beb59",
+    "name": "Breads — Punjabi Dhaba & Restaurant",
+    "file": "category-2e0f7d372beb59.webp"
+  },
+  {
+    "id": "category-3a9a13e73c0c99",
+    "name": "Breakfast — Artisan Café & Coffee Bar",
+    "file": "category-3a9a13e73c0c99.webp"
+  },
+  {
+    "id": "dish-d2c103f9f58446",
+    "name": "Brownie Sundae",
+    "file": "dish-d2c103f9f58446.webp"
+  },
+  {
+    "id": "dish-1609b36e239d87",
+    "name": "Brownie with Ice Cream",
+    "file": "dish-1609b36e239d87.webp"
+  },
+  {
+    "id": "combo-burger-sandwich",
+    "name": "Burger & Grilled Sandwich Bar Meal Deal",
+    "file": "combo-burger-sandwich.webp"
+  },
+  {
+    "id": "category-3d57971e41678f",
+    "name": "Burgers — Fast Food & Quick Service Restaurant",
+    "file": "category-3d57971e41678f.webp"
+  },
+  {
+    "id": "category-957d8edee73e46",
+    "name": "Burgers — Pizza Restaurant",
+    "file": "category-957d8edee73e46.webp"
+  },
+  {
+    "id": "category-911c5c21b11b04",
+    "name": "Burgers & Wraps — Fast Food & Quick Service Restaurant",
+    "file": "category-911c5c21b11b04.webp"
+  },
+  {
+    "id": "dish-42c9215489d102",
+    "name": "Burnt Garlic Fried Rice",
+    "file": "dish-42c9215489d102.webp"
+  },
+  {
+    "id": "dish-b92d346bd7608d",
+    "name": "Butter Chicken",
+    "file": "dish-b92d346bd7608d.webp"
+  },
+  {
+    "id": "dish-3d20f5c6834513",
+    "name": "Butter Cookies 200g",
+    "file": "dish-3d20f5c6834513.webp"
+  },
+  {
+    "id": "dish-8bf5032093e8d8",
+    "name": "Butter Croissant",
+    "file": "dish-8bf5032093e8d8.webp"
+  },
+  {
+    "id": "dish-239b2c03194441",
+    "name": "Butter Masala Dosa Classic",
+    "file": "dish-239b2c03194441.webp"
+  },
+  {
+    "id": "dish-571cb35f35d187",
+    "name": "Butter Naan",
+    "file": "dish-571cb35f35d187.webp"
+  },
+  {
+    "id": "dish-c76770a4f49f2b",
+    "name": "Butter Pav Bhaji (2 Pav)",
+    "file": "dish-c76770a4f49f2b.webp"
+  },
+  {
+    "id": "dish-bcd0d1ac293d39",
+    "name": "Butterscotch Ice Cream",
+    "file": "dish-bcd0d1ac293d39.webp"
+  },
+  {
+    "id": "dish-fc614defc41df1",
+    "name": "Cafe Latte",
+    "file": "dish-fc614defc41df1.webp"
+  },
+  {
+    "id": "dish-08e2fce70c1949",
+    "name": "Cafe Mocha",
+    "file": "dish-08e2fce70c1949.webp"
+  },
+  {
+    "id": "category-04d6ff0d6204d4",
+    "name": "Cakes — Bakery, Patisserie & Cafe",
+    "file": "category-04d6ff0d6204d4.webp"
+  },
+  {
+    "id": "dish-d1ca0d19a82caa",
+    "name": "Cappuccino",
+    "file": "dish-d1ca0d19a82caa.webp"
+  },
+  {
+    "id": "dish-9ef235fd1c1f91",
+    "name": "Caramel Brownie Frappe",
+    "file": "dish-9ef235fd1c1f91.webp"
+  },
+  {
+    "id": "dish-20c29cb18d3c48",
+    "name": "Caramel Sundae",
+    "file": "dish-20c29cb18d3c48.webp"
+  },
+  {
+    "id": "category-972d2ac72d26d3",
+    "name": "Chaas & Beverages — Gujarati Restaurant",
+    "file": "category-972d2ac72d26d3.webp"
+  },
+  {
+    "id": "category-3d65c299c5aecf",
+    "name": "Chaat — Street Food Restaurant",
+    "file": "category-3d65c299c5aecf.webp"
+  },
+  {
+    "id": "dish-667302ed8a489c",
+    "name": "Chana Dal",
+    "file": "dish-667302ed8a489c.webp"
+  },
+  {
+    "id": "dish-bec967e51633b3",
+    "name": "Chana Masala",
+    "file": "dish-bec967e51633b3.webp"
+  },
+  {
+    "id": "dish-3200590a5efa4e",
+    "name": "Cheese Balls",
+    "file": "dish-3200590a5efa4e.webp"
+  },
+  {
+    "id": "dish-35192683c415ce",
+    "name": "Cheese Burst Farmhouse",
+    "file": "dish-35192683c415ce.webp"
+  },
+  {
+    "id": "dish-e6fd759a7d08ec",
+    "name": "Cheese Burst Margherita",
+    "file": "dish-e6fd759a7d08ec.webp"
+  },
+  {
+    "id": "dish-b560f12cb29865",
+    "name": "Cheese Burst Rava Dosa",
+    "file": "dish-b560f12cb29865.webp"
+  },
+  {
+    "id": "dish-54a86d884e7d04",
+    "name": "Cheese Corn Breadsticks",
+    "file": "dish-54a86d884e7d04.webp"
+  },
+  {
+    "id": "dish-96638d182d79ca",
+    "name": "Cheese Croissant",
+    "file": "dish-96638d182d79ca.webp"
+  },
+  {
+    "id": "dish-3ab9fe544a02da",
+    "name": "Cheese Dip",
+    "file": "dish-3ab9fe544a02da.webp"
+  },
+  {
+    "id": "dish-5c64a2a8cc8cdb",
+    "name": "Cheese Garlic Bread",
+    "file": "dish-5c64a2a8cc8cdb.webp"
+  },
+  {
+    "id": "dish-8a184ccae6fa09",
+    "name": "Cheese Grilled Sandwich",
+    "file": "dish-8a184ccae6fa09.webp"
+  },
+  {
+    "id": "dish-c393616369767f",
+    "name": "Cheese Pav Bhaji",
+    "file": "dish-c393616369767f.webp"
+  },
+  {
+    "id": "dish-87f7f157429089",
+    "name": "Cheese Toast",
+    "file": "dish-87f7f157429089.webp"
+  },
+  {
+    "id": "dish-e7a3ee6a988c38",
+    "name": "Cheese Veg Burger",
+    "file": "dish-e7a3ee6a988c38.webp"
+  },
+  {
+    "id": "dish-e530ed9a67c779",
+    "name": "Cheesy Jalapeno Poppers (6 Pcs)",
+    "file": "dish-e530ed9a67c779.webp"
+  },
+  {
+    "id": "dish-0616482b3b053b",
+    "name": "Chicken 65",
+    "file": "dish-0616482b3b053b.webp"
+  },
+  {
+    "id": "dish-676ed31215c25d",
+    "name": "Chicken 65 Biryani",
+    "file": "dish-676ed31215c25d.webp"
+  },
+  {
+    "id": "dish-4cc931405169e2",
+    "name": "Chicken Alfredo Pasta",
+    "file": "dish-4cc931405169e2.webp"
+  },
+  {
+    "id": "category-12fa84b01ae266",
+    "name": "Chicken Biryani — Biryani & Kebab Darbar",
+    "file": "category-12fa84b01ae266.webp"
+  },
+  {
+    "id": "dish-6144a279c91cdb",
+    "name": "Chicken Burger",
+    "file": "dish-6144a279c91cdb.webp"
+  },
+  {
+    "id": "dish-598f39f3f4fb36",
+    "name": "Chicken Curry",
+    "file": "dish-598f39f3f4fb36.webp"
+  },
+  {
+    "id": "dish-9ca0a37c997cfe",
+    "name": "Chicken Fried Rice",
+    "file": "dish-9ca0a37c997cfe.webp"
+  },
+  {
+    "id": "dish-93cd32c8412802",
+    "name": "Chicken Hakka Noodles",
+    "file": "dish-93cd32c8412802.webp"
+  },
+  {
+    "id": "dish-1287e8e12320a4",
+    "name": "Chicken Kathi Roll",
+    "file": "dish-1287e8e12320a4.webp"
+  },
+  {
+    "id": "dish-dd760fc8bcb6e4",
+    "name": "Chicken Lollipop",
+    "file": "dish-dd760fc8bcb6e4.webp"
+  },
+  {
+    "id": "dish-6fefb58797f127",
+    "name": "Chicken Manchow Soup",
+    "file": "dish-6fefb58797f127.webp"
+  },
+  {
+    "id": "dish-a62caab80a9c09",
+    "name": "Chicken Momos",
+    "file": "dish-a62caab80a9c09.webp"
+  },
+  {
+    "id": "dish-50f989012dfa32",
+    "name": "Chicken Sandwich",
+    "file": "dish-50f989012dfa32.webp"
+  },
+  {
+    "id": "dish-c6f55bd63a2c6a",
+    "name": "Chicken Tikka",
+    "file": "dish-c6f55bd63a2c6a.webp"
+  },
+  {
+    "id": "dish-799d0beb2e4754",
+    "name": "Chicken Tikka Biryani",
+    "file": "dish-799d0beb2e4754.webp"
+  },
+  {
+    "id": "dish-bb33292f16a733",
+    "name": "Chicken Tikka Pizza",
+    "file": "dish-bb33292f16a733.webp"
+  },
+  {
+    "id": "dish-0a22978ae29200",
+    "name": "Chicken Wrap",
+    "file": "dish-0a22978ae29200.webp"
+  },
+  {
+    "id": "dish-7fa5e0424700d8",
+    "name": "Chilli Chicken",
+    "file": "dish-7fa5e0424700d8.webp"
+  },
+  {
+    "id": "dish-dbcda574fc95b3",
+    "name": "Chilli Garlic Noodles",
+    "file": "dish-dbcda574fc95b3.webp"
+  },
+  {
+    "id": "dish-7b40ac78d6b80f",
+    "name": "Chilli Paneer",
+    "file": "dish-7b40ac78d6b80f.webp"
+  },
+  {
+    "id": "dish-d5e6e1f6d2c61c",
+    "name": "Chilli Paneer Dry",
+    "file": "dish-d5e6e1f6d2c61c.webp"
+  },
+  {
+    "id": "category-b81d0a0634231f",
+    "name": "Chinese Starters & Gravies — Authentic Chinese & Wok",
+    "file": "category-b81d0a0634231f.webp"
+  },
+  {
+    "id": "dish-55faac529b308d",
+    "name": "Chocolate Brownie",
+    "file": "dish-55faac529b308d.webp"
+  },
+  {
+    "id": "dish-a5916ea83fd6f4",
+    "name": "Chocolate Chip Cookies 200g",
+    "file": "dish-a5916ea83fd6f4.webp"
+  },
+  {
+    "id": "dish-ca08ebd5a20dc4",
+    "name": "Chocolate Eclair",
+    "file": "dish-ca08ebd5a20dc4.webp"
+  },
+  {
+    "id": "dish-786bfd869bc877",
+    "name": "Chocolate Ice Cream",
+    "file": "dish-786bfd869bc877.webp"
+  },
+  {
+    "id": "dish-87c5f8566884f5",
+    "name": "Chocolate Lava Cake",
+    "file": "dish-87c5f8566884f5.webp"
+  },
+  {
+    "id": "dish-54a3c83fb3667a",
+    "name": "Chocolate Shake",
+    "file": "dish-54a3c83fb3667a.webp"
+  },
+  {
+    "id": "dish-7d509a12218b96",
+    "name": "Chocolate Sundae",
+    "file": "dish-7d509a12218b96.webp"
+  },
+  {
+    "id": "dish-37fb305a253be4",
+    "name": "Chocolate Truffle Cake",
+    "file": "dish-37fb305a253be4.webp"
+  },
+  {
+    "id": "dish-8c0d2eefce0657",
+    "name": "Chocolate Truffle Pastry",
+    "file": "dish-8c0d2eefce0657.webp"
+  },
+  {
+    "id": "dish-ef0ea735e75711",
+    "name": "Chole Kulche",
+    "file": "dish-ef0ea735e75711.webp"
+  },
+  {
+    "id": "category-6ccb44a2075b4f",
+    "name": "Chutneys — Gujarati Restaurant",
+    "file": "category-6ccb44a2075b4f.webp"
+  },
+  {
+    "id": "dish-f798599fdaec92",
+    "name": "Classic Cappuccino",
+    "file": "dish-f798599fdaec92.webp"
+  },
+  {
+    "id": "dish-0ee5617d17ec2a",
+    "name": "Classic Veg Burger",
+    "file": "dish-0ee5617d17ec2a.webp"
+  },
+  {
+    "id": "combo-cloud-kitchen",
+    "name": "Cloud Kitchen Multi-Brand Menu Meal Deal",
+    "file": "combo-cloud-kitchen.webp"
+  },
+  {
+    "id": "dish-3df1a5302bc994",
+    "name": "Coconut Chutney",
+    "file": "dish-3df1a5302bc994.webp"
+  },
+  {
+    "id": "dish-c7caa7055f95f7",
+    "name": "Cola 250ml",
+    "file": "dish-c7caa7055f95f7.webp"
+  },
+  {
+    "id": "dish-055c169142ca7b",
+    "name": "Cold Coffee",
+    "file": "dish-055c169142ca7b.webp"
+  },
+  {
+    "id": "category-05735a3337affd",
+    "name": "Cold Coffee & Shakes — Artisan Café & Coffee Bar",
+    "file": "category-05735a3337affd.webp"
+  },
+  {
+    "id": "category-c7450044730794",
+    "name": "Cold Coffee & Shakes — Indian Multi-Cuisine Diner",
+    "file": "category-c7450044730794.webp"
+  },
+  {
+    "id": "category-0ad81cad6306fd",
+    "name": "Combos — Artisan Café & Coffee Bar",
+    "file": "category-0ad81cad6306fd.webp"
+  },
+  {
+    "id": "category-f372f5b334c748",
+    "name": "Combos — Authentic Chinese & Wok",
+    "file": "category-f372f5b334c748.webp"
+  },
+  {
+    "id": "category-3003b4a6804460",
+    "name": "Combos — Bakery, Patisserie & Cafe",
+    "file": "category-3003b4a6804460.webp"
+  },
+  {
+    "id": "category-d2a19f5db9eb86",
+    "name": "Combos — Biryani & Kebab Darbar",
+    "file": "category-d2a19f5db9eb86.webp"
+  },
+  {
+    "id": "category-267c2dca29bc3e",
+    "name": "Combos — Burger & Grilled Sandwich Bar",
+    "file": "category-267c2dca29bc3e.webp"
+  },
+  {
+    "id": "category-b96b61e056fe8a",
+    "name": "Combos — Cloud Kitchen Multi-Brand Menu",
+    "file": "category-b96b61e056fe8a.webp"
+  },
+  {
+    "id": "category-c54b1ffeb211ec",
+    "name": "Combos — Desi Indo-Chinese Food Corner",
+    "file": "category-c54b1ffeb211ec.webp"
+  },
+  {
+    "id": "category-a0fd76c15e6eb8",
+    "name": "Combos — Dessert / Ice Cream",
+    "file": "category-a0fd76c15e6eb8.webp"
+  },
+  {
+    "id": "category-e3c48fa9e5ade5",
+    "name": "Combos — Fast Food & Quick Service Restaurant",
+    "file": "category-e3c48fa9e5ade5.webp"
+  },
+  {
+    "id": "category-19aaeb36cf9343",
+    "name": "Combos — Fresh Juice & Mocktail Bar",
+    "file": "category-19aaeb36cf9343.webp"
+  },
+  {
+    "id": "category-07f945112a69ce",
+    "name": "Combos — Grand Indian Thali Restaurant",
+    "file": "category-07f945112a69ce.webp"
+  },
+  {
+    "id": "category-3ef712dec1602a",
+    "name": "Combos — Gujarati Restaurant",
+    "file": "category-3ef712dec1602a.webp"
+  },
+  {
+    "id": "category-5b9315e245e088",
+    "name": "Combos — Indian Multi-Cuisine Diner",
+    "file": "category-5b9315e245e088.webp"
+  },
+  {
+    "id": "category-ff9db03fe9f500",
+    "name": "Combos — Jain Satvik Bhojanalaya",
+    "file": "category-ff9db03fe9f500.webp"
+  },
+  {
+    "id": "category-30e4b6bcd88c60",
+    "name": "Combos — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-30e4b6bcd88c60.webp"
+  },
+  {
+    "id": "category-e0fd22cdc42dde",
+    "name": "Combos — Mughlai & Awadhi Restaurant",
+    "file": "category-e0fd22cdc42dde.webp"
+  },
+  {
+    "id": "category-e33e3cdba41bc3",
+    "name": "Combos — North Indian Restaurant",
+    "file": "category-e33e3cdba41bc3.webp"
+  },
+  {
+    "id": "category-35e3a69a50b284",
+    "name": "Combos — Pizza Restaurant",
+    "file": "category-35e3a69a50b284.webp"
+  },
+  {
+    "id": "category-e3528d2415f979",
+    "name": "Combos — Punjabi Dhaba & Restaurant",
+    "file": "category-e3528d2415f979.webp"
+  },
+  {
+    "id": "category-cba58c471bb97f",
+    "name": "Combos — Rajasthani Marwari Bhojanalaya",
+    "file": "category-cba58c471bb97f.webp"
+  },
+  {
+    "id": "category-a26a0e2b411b79",
+    "name": "Combos — Royal Indian Sweets & Mithai",
+    "file": "category-a26a0e2b411b79.webp"
+  },
+  {
+    "id": "category-f716f277c1c254",
+    "name": "Combos — Snacks & Quick Bites Corner",
+    "file": "category-f716f277c1c254.webp"
+  },
+  {
+    "id": "category-d2b202222ec2cf",
+    "name": "Combos — South & North Indian Fusion Diner",
+    "file": "category-d2b202222ec2cf.webp"
+  },
+  {
+    "id": "category-cd075beea94915",
+    "name": "Combos — South Indian Restaurant",
+    "file": "category-cd075beea94915.webp"
+  },
+  {
+    "id": "category-e1d84813253d7a",
+    "name": "Combos — South Indian Tiffin & Breakfast",
+    "file": "category-e1d84813253d7a.webp"
+  },
+  {
+    "id": "category-2e2c4bf9c5e126",
+    "name": "Combos — Street Food Restaurant",
+    "file": "category-2e2c4bf9c5e126.webp"
+  },
+  {
+    "id": "category-81d67cd454cd22",
+    "name": "Combos — Tandoori Grills & Clay-Oven Specialist",
+    "file": "category-81d67cd454cd22.webp"
+  },
+  {
+    "id": "category-b7f41a702615f8",
+    "name": "Cookies — Bakery, Patisserie & Cafe",
+    "file": "category-b7f41a702615f8.webp"
+  },
+  {
+    "id": "dish-c751b7e97cec20",
+    "name": "Corn Cheese Sandwich",
+    "file": "dish-c751b7e97cec20.webp"
+  },
+  {
+    "id": "dish-44dbe9017b31ad",
+    "name": "Crispy Butter Masala Dosa",
+    "file": "dish-44dbe9017b31ad.webp"
+  },
+  {
+    "id": "dish-65206d0e970dfb",
+    "name": "Crispy Chilli Potato",
+    "file": "dish-65206d0e970dfb.webp"
+  },
+  {
+    "id": "dish-91503233133f19",
+    "name": "Crispy Chinese Bhel",
+    "file": "dish-91503233133f19.webp"
+  },
+  {
+    "id": "dish-8d788004012388",
+    "name": "Crispy Corn Salt & Pepper",
+    "file": "dish-8d788004012388.webp"
+  },
+  {
+    "id": "dish-e6a28a7353c3d0",
+    "name": "Crispy Medu Vada (2 Pcs)",
+    "file": "dish-e6a28a7353c3d0.webp"
+  },
+  {
+    "id": "dish-85b2a89e308b89",
+    "name": "Crispy Veggie Supreme Burger",
+    "file": "dish-85b2a89e308b89.webp"
+  },
+  {
+    "id": "dish-1a0f796747b906",
+    "name": "Curd Rice",
+    "file": "dish-1a0f796747b906.webp"
+  },
+  {
+    "id": "dish-8334c62d69eaa3",
+    "name": "Curd Rice with Pomegranate",
+    "file": "dish-8334c62d69eaa3.webp"
+  },
+  {
+    "id": "dish-ca837ed0aa9139",
+    "name": "Dabeli",
+    "file": "dish-ca837ed0aa9139.webp"
+  },
+  {
+    "id": "dish-ed933b314d99c0",
+    "name": "Dahi Papdi Chaat",
+    "file": "dish-ed933b314d99c0.webp"
+  },
+  {
+    "id": "dish-9acaac2b8915fe",
+    "name": "Dahi Puri",
+    "file": "dish-9acaac2b8915fe.webp"
+  },
+  {
+    "id": "dish-35640c589bd101",
+    "name": "Dahi Sev Batata Puri",
+    "file": "dish-35640c589bd101.webp"
+  },
+  {
+    "id": "dish-542781f36a465c",
+    "name": "Dahi Tikhari",
+    "file": "dish-542781f36a465c.webp"
+  },
+  {
+    "id": "dish-0007951af851f4",
+    "name": "Dahi Tikhari (Kathiyawadi Dip)",
+    "file": "dish-0007951af851f4.webp"
+  },
+  {
+    "id": "category-a68b775fc9db53",
+    "name": "Dal — Indian Multi-Cuisine Diner",
+    "file": "category-a68b775fc9db53.webp"
+  },
+  {
+    "id": "category-9e0e13ffb7d240",
+    "name": "Dal — North Indian Restaurant",
+    "file": "category-9e0e13ffb7d240.webp"
+  },
+  {
+    "id": "category-779a1e4e066852",
+    "name": "Dal — Punjabi Dhaba & Restaurant",
+    "file": "category-779a1e4e066852.webp"
+  },
+  {
+    "id": "category-31f2ce782e297d",
+    "name": "Dal & Heritage Curries — North Indian Restaurant",
+    "file": "category-31f2ce782e297d.webp"
+  },
+  {
+    "id": "category-51afc7e20e2efd",
+    "name": "Dal & Kadhi — Grand Indian Thali Restaurant",
+    "file": "category-51afc7e20e2efd.webp"
+  },
+  {
+    "id": "category-17ac327bca8e8c",
+    "name": "Dal & Kadhi — Gujarati Restaurant",
+    "file": "category-17ac327bca8e8c.webp"
+  },
+  {
+    "id": "category-d9acf7d8d6c2da",
+    "name": "Dal & Kadhi — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-d9acf7d8d6c2da.webp"
+  },
+  {
+    "id": "category-f9da2783ff2770",
+    "name": "Dal Baati Churma Specialties — Rajasthani Marwari Bhojanalaya",
+    "file": "category-f9da2783ff2770.webp"
+  },
+  {
+    "id": "dish-da9dc0a2947c8c",
+    "name": "Dal Dhokli",
+    "file": "dish-da9dc0a2947c8c.webp"
+  },
+  {
+    "id": "dish-7ec8b8e85b7ad5",
+    "name": "Dal Fry",
+    "file": "dish-7ec8b8e85b7ad5.webp"
+  },
+  {
+    "id": "dish-370b29076d2df7",
+    "name": "Dal Makhani",
+    "file": "dish-370b29076d2df7.webp"
+  },
+  {
+    "id": "dish-40640ab44b4e7b",
+    "name": "Dal Makhani Bukhara",
+    "file": "dish-40640ab44b4e7b.webp"
+  },
+  {
+    "id": "dish-3ea323b24e765c",
+    "name": "Dal Makhani with 2 Paratha Combo",
+    "file": "dish-3ea323b24e765c.webp"
+  },
+  {
+    "id": "dish-65ecf5f6722f95",
+    "name": "Dal Tadka",
+    "file": "dish-65ecf5f6722f95.webp"
+  },
+  {
+    "id": "category-3b8675e70f9ddb",
+    "name": "Delivery Meal Bowls — Cloud Kitchen Multi-Brand Menu",
+    "file": "category-3b8675e70f9ddb.webp"
+  },
+  {
+    "id": "dish-671f7b7c0ca7bb",
+    "name": "Deluxe Gujarati Executive Thali",
+    "file": "dish-671f7b7c0ca7bb.webp"
+  },
+  {
+    "id": "category-4d4867ecb310b1",
+    "name": "Desi Chinese Favorites — Desi Indo-Chinese Food Corner",
+    "file": "category-4d4867ecb310b1.webp"
+  },
+  {
+    "id": "category-3d73a3b2edbf9c",
+    "name": "Desi Ghee Mithai — Royal Indian Sweets & Mithai",
+    "file": "category-3d73a3b2edbf9c.webp"
+  },
+  {
+    "id": "combo-indo-chinese",
+    "name": "Desi Indo-Chinese Food Corner Meal Deal",
+    "file": "combo-indo-chinese.webp"
+  },
+  {
+    "id": "combo-desserts",
+    "name": "Dessert / Ice Cream Meal Deal",
+    "file": "combo-desserts.webp"
+  },
+  {
+    "id": "category-8d43fd65196f29",
+    "name": "Desserts — Bakery, Patisserie & Cafe",
+    "file": "category-8d43fd65196f29.webp"
+  },
+  {
+    "id": "category-2cb5fa72b2d60c",
+    "name": "Desserts — Fast Food & Quick Service Restaurant",
+    "file": "category-2cb5fa72b2d60c.webp"
+  },
+  {
+    "id": "category-59f5e206f0968d",
+    "name": "Desserts — North Indian Restaurant",
+    "file": "category-59f5e206f0968d.webp"
+  },
+  {
+    "id": "category-35e0a1d73ba302",
+    "name": "Desserts — Pizza Restaurant",
+    "file": "category-35e0a1d73ba302.webp"
+  },
+  {
+    "id": "category-8d24b4236c3680",
+    "name": "Desserts — Punjabi Dhaba & Restaurant",
+    "file": "category-8d24b4236c3680.webp"
+  },
+  {
+    "id": "category-8287e6c66c5c00",
+    "name": "Desserts — South Indian Restaurant",
+    "file": "category-8287e6c66c5c00.webp"
+  },
+  {
+    "id": "category-4415e5b97338bb",
+    "name": "Desserts & Drinks — Biryani & Kebab Darbar",
+    "file": "category-4415e5b97338bb.webp"
+  },
+  {
+    "id": "dish-35f8d1b2d7aab4",
+    "name": "Dhaba Dahi Kebab (6 Pcs)",
+    "file": "dish-35f8d1b2d7aab4.webp"
+  },
+  {
+    "id": "category-5b6f6349192b86",
+    "name": "Dhaba Special Curries — Punjabi Dhaba & Restaurant",
+    "file": "category-5b6f6349192b86.webp"
+  },
+  {
+    "id": "category-43a0f6d7b0d9d7",
+    "name": "Dhaba Starters & Tikkas — Punjabi Dhaba & Restaurant",
+    "file": "category-43a0f6d7b0d9d7.webp"
+  },
+  {
+    "id": "dish-a19df0bccb680b",
+    "name": "Dhokla",
+    "file": "dish-a19df0bccb680b.webp"
+  },
+  {
+    "id": "dish-1bcd0d3d03628d",
+    "name": "Dinner Rolls 4 Pieces",
+    "file": "dish-1bcd0d3d03628d.webp"
+  },
+  {
+    "id": "category-e550e1813bf577",
+    "name": "Dosas — Indian Multi-Cuisine Diner",
+    "file": "category-e550e1813bf577.webp"
+  },
+  {
+    "id": "category-c50c7a803a1e89",
+    "name": "Dosas — South Indian Restaurant",
+    "file": "category-c50c7a803a1e89.webp"
+  },
+  {
+    "id": "dish-7d5b5b3b83bfe2",
+    "name": "Double Cheese Burger",
+    "file": "dish-7d5b5b3b83bfe2.webp"
+  },
+  {
+    "id": "dish-0a1b5e70f7535f",
+    "name": "Double Ka Meetha",
+    "file": "dish-0a1b5e70f7535f.webp"
+  },
+  {
+    "id": "dish-d368a2ae10fdd0",
+    "name": "Dudhi Chana Dal",
+    "file": "dish-d368a2ae10fdd0.webp"
+  },
+  {
+    "id": "dish-cca6cc55813db0",
+    "name": "Dutch Chocolate Truffle Slice",
+    "file": "dish-cca6cc55813db0.webp"
+  },
+  {
+    "id": "dish-54812827019300",
+    "name": "Earl Grey Tea",
+    "file": "dish-54812827019300.webp"
+  },
+  {
+    "id": "dish-df27264219a061",
+    "name": "Egg Biryani",
+    "file": "dish-df27264219a061.webp"
+  },
+  {
+    "id": "dish-a78a70da51db02",
+    "name": "Egg Fried Rice",
+    "file": "dish-a78a70da51db02.webp"
+  },
+  {
+    "id": "dish-bcb8011ae27d41",
+    "name": "Egg Noodles",
+    "file": "dish-bcb8011ae27d41.webp"
+  },
+  {
+    "id": "dish-29587efe5128e5",
+    "name": "Egg Roll",
+    "file": "dish-29587efe5128e5.webp"
+  },
+  {
+    "id": "dish-79674942205707",
+    "name": "Eggs on Toast",
+    "file": "dish-79674942205707.webp"
+  },
+  {
+    "id": "dish-3c4ef966f728d7",
+    "name": "Espresso",
+    "file": "dish-3c4ef966f728d7.webp"
+  },
+  {
+    "id": "dish-db8f4a5bd56d3c",
+    "name": "Extra Gravy",
+    "file": "dish-db8f4a5bd56d3c.webp"
+  },
+  {
+    "id": "dish-47b94c81ed05a7",
+    "name": "Extra Pav Pair",
+    "file": "dish-47b94c81ed05a7.webp"
+  },
+  {
+    "id": "dish-c17a633a7bce57",
+    "name": "Extra Sambar",
+    "file": "dish-c17a633a7bce57.webp"
+  },
+  {
+    "id": "dish-1a21bd8f71c990",
+    "name": "Fafda",
+    "file": "dish-1a21bd8f71c990.webp"
+  },
+  {
+    "id": "dish-350381a070cf7a",
+    "name": "Falafel Wrap",
+    "file": "dish-350381a070cf7a.webp"
+  },
+  {
+    "id": "category-c41d3f40f980c4",
+    "name": "Family Sharing Platters — Indian Family Restaurant & Banquet",
+    "file": "category-c41d3f40f980c4.webp"
+  },
+  {
+    "id": "dish-79544015debad7",
+    "name": "Farmhouse Pizza",
+    "file": "dish-79544015debad7.webp"
+  },
+  {
+    "id": "category-244c647fb506d6",
+    "name": "Farsan — Gujarati Restaurant",
+    "file": "category-244c647fb506d6.webp"
+  },
+  {
+    "id": "combo-fast-food",
+    "name": "Fast Food & Quick Service Meal Deal",
+    "file": "combo-fast-food.webp"
+  },
+  {
+    "id": "dish-8ebc7c00ae4cce",
+    "name": "Filter Coffee",
+    "file": "dish-8ebc7c00ae4cce.webp"
+  },
+  {
+    "id": "dish-b2cc47237e3cba",
+    "name": "Flat White",
+    "file": "dish-b2cc47237e3cba.webp"
+  },
+  {
+    "id": "dish-fbeef318a11749",
+    "name": "French Fries",
+    "file": "dish-fbeef318a11749.webp"
+  },
+  {
+    "id": "category-4eec6b76926d4b",
+    "name": "Fresh Cold Juices — Fresh Juice & Mocktail Bar",
+    "file": "category-4eec6b76926d4b.webp"
+  },
+  {
+    "id": "category-5f3ece90b8ab1b",
+    "name": "Fresh Farsan (Snacks) — Gujarati Restaurant",
+    "file": "category-5f3ece90b8ab1b.webp"
+  },
+  {
+    "id": "combo-juice-beverages",
+    "name": "Fresh Juice & Mocktail Bar Meal Deal",
+    "file": "combo-juice-beverages.webp"
+  },
+  {
+    "id": "dish-1894cbf684520b",
+    "name": "Fresh Lime Soda",
+    "file": "dish-1894cbf684520b.webp"
+  },
+  {
+    "id": "dish-5e9d38ffab39d7",
+    "name": "Fresh Lime Soda (Sweet & Salt)",
+    "file": "dish-5e9d38ffab39d7.webp"
+  },
+  {
+    "id": "dish-9dea0ecc21c4b0",
+    "name": "Fresh Mosambi (Sweet Lime) Juice",
+    "file": "dish-9dea0ecc21c4b0.webp"
+  },
+  {
+    "id": "category-401302a642ba3b",
+    "name": "Fried Rice — Authentic Chinese & Wok",
+    "file": "category-401302a642ba3b.webp"
+  },
+  {
+    "id": "category-a4415367720aa1",
+    "name": "Fries & Quick Sides — Fast Food & Quick Service Restaurant",
+    "file": "category-a4415367720aa1.webp"
+  },
+  {
+    "id": "dish-64228b453e2f27",
+    "name": "Fruit Sundae",
+    "file": "dish-64228b453e2f27.webp"
+  },
+  {
+    "id": "dish-4b7aa350a7cce5",
+    "name": "Garlic Bread",
+    "file": "dish-4b7aa350a7cce5.webp"
+  },
+  {
+    "id": "category-790e99d4c89a1b",
+    "name": "Garlic Bread — Pizza Restaurant",
+    "file": "category-790e99d4c89a1b.webp"
+  },
+  {
+    "id": "dish-66db5e2cdbb4ba",
+    "name": "Garlic Butter Naan",
+    "file": "dish-66db5e2cdbb4ba.webp"
+  },
+  {
+    "id": "dish-25bc885bdc6816",
+    "name": "Garlic Chutney",
+    "file": "dish-25bc885bdc6816.webp"
+  },
+  {
+    "id": "dish-278921920570f8",
+    "name": "Garlic Naan",
+    "file": "dish-278921920570f8.webp"
+  },
+  {
+    "id": "dish-c69c664c43db1a",
+    "name": "Ghee Mini Podi Idli (14 Pcs)",
+    "file": "dish-c69c664c43db1a.webp"
+  },
+  {
+    "id": "dish-ef3b818a80fd15",
+    "name": "Ghee Podi Idli",
+    "file": "dish-ef3b818a80fd15.webp"
+  },
+  {
+    "id": "dish-5c6bbeed41b88b",
+    "name": "Ghee Roast Dosa",
+    "file": "dish-5c6bbeed41b88b.webp"
+  },
+  {
+    "id": "dish-52922d905446d4",
+    "name": "Ginger Tea",
+    "file": "dish-52922d905446d4.webp"
+  },
+  {
+    "id": "dish-542eb505adf44b",
+    "name": "Gor Ghee",
+    "file": "dish-542eb505adf44b.webp"
+  },
+  {
+    "id": "category-befaf3a1684739",
+    "name": "Gourmet Indian Appetizers — Fine Dining Gourmet Indian",
+    "file": "category-befaf3a1684739.webp"
+  },
+  {
+    "id": "combo-thali",
+    "name": "Grand Indian Thali Meal Deal",
+    "file": "combo-thali.webp"
+  },
+  {
+    "id": "dish-68b0db783a1bf3",
+    "name": "Grand Tandoori Veg Kebab Platter",
+    "file": "dish-68b0db783a1bf3.webp"
+  },
+  {
+    "id": "category-6e27a95b704c9e",
+    "name": "Gravies — Authentic Chinese & Wok",
+    "file": "category-6e27a95b704c9e.webp"
+  },
+  {
+    "id": "dish-27fd336da4c43d",
+    "name": "Green Chutney",
+    "file": "dish-27fd336da4c43d.webp"
+  },
+  {
+    "id": "dish-69afc2ce866da3",
+    "name": "Green Tea",
+    "file": "dish-69afc2ce866da3.webp"
+  },
+  {
+    "id": "category-e444508ddef14c",
+    "name": "Grilled Sandwiches — Burger & Grilled Sandwich Bar",
+    "file": "category-e444508ddef14c.webp"
+  },
+  {
+    "id": "dish-e5f73369638ecc",
+    "name": "Gujarati Dal",
+    "file": "dish-e5f73369638ecc.webp"
+  },
+  {
+    "id": "dish-d474a3a686e38f",
+    "name": "Gujarati Grand Thali",
+    "file": "dish-d474a3a686e38f.webp"
+  },
+  {
+    "id": "dish-93797df15211ef",
+    "name": "Gujarati Kadhi",
+    "file": "dish-93797df15211ef.webp"
+  },
+  {
+    "id": "combo-gujarati",
+    "name": "Gujarati Meal Deal",
+    "file": "combo-gujarati.webp"
+  },
+  {
+    "id": "category-07a15dcbcd3506",
+    "name": "Gujarati Shaak (Curries) — Grand Indian Thali Restaurant",
+    "file": "category-07a15dcbcd3506.webp"
+  },
+  {
+    "id": "category-5c8968a89e744e",
+    "name": "Gujarati Shaak (Curries) — Gujarati Restaurant",
+    "file": "category-5c8968a89e744e.webp"
+  },
+  {
+    "id": "category-6302b466d7300c",
+    "name": "Gujarati Thali — Grand Indian Thali Restaurant",
+    "file": "category-6302b466d7300c.webp"
+  },
+  {
+    "id": "category-425bd34d5824e6",
+    "name": "Gujarati Thali — Gujarati Restaurant",
+    "file": "category-425bd34d5824e6.webp"
+  },
+  {
+    "id": "category-78a363f38f585b",
+    "name": "Gujarati Thali Special — Gujarati Restaurant",
+    "file": "category-78a363f38f585b.webp"
+  },
+  {
+    "id": "dish-9f5e8d7362659d",
+    "name": "Gulab Jamun",
+    "file": "dish-9f5e8d7362659d.webp"
+  },
+  {
+    "id": "dish-24707b1b85f766",
+    "name": "Gulab Jamun (2 Pcs)",
+    "file": "dish-24707b1b85f766.webp"
+  },
+  {
+    "id": "category-29ee97bed97ba0",
+    "name": "Handi Dum Biryanis — Biryani & Kebab Darbar",
+    "file": "category-29ee97bed97ba0.webp"
+  },
+  {
+    "id": "dish-e325886a1a9fbe",
+    "name": "Hara Bhara Kebab",
+    "file": "dish-e325886a1a9fbe.webp"
+  },
+  {
+    "id": "dish-ca8fb5cbb18153",
+    "name": "Hara Bhara Kebab (6 Pcs)",
+    "file": "dish-ca8fb5cbb18153.webp"
+  },
+  {
+    "id": "category-05d894f1425016",
+    "name": "Heritage Desserts — North Indian Restaurant",
+    "file": "category-05d894f1425016.webp"
+  },
+  {
+    "id": "dish-e78630ede70212",
+    "name": "Hot Chocolate",
+    "file": "dish-e78630ede70212.webp"
+  },
+  {
+    "id": "category-bd770a1cb11387",
+    "name": "Hot Coffee — Artisan Café & Coffee Bar",
+    "file": "category-bd770a1cb11387.webp"
+  },
+  {
+    "id": "category-3011a0bfbda7ef",
+    "name": "Hot Espresso & Coffees — Artisan Café & Coffee Bar",
+    "file": "category-3011a0bfbda7ef.webp"
+  },
+  {
+    "id": "category-53ea44e09ad915",
+    "name": "Hot Fried Snacks — Snacks & Quick Bites Corner",
+    "file": "category-53ea44e09ad915.webp"
+  },
+  {
+    "id": "category-65b6093b005cb7",
+    "name": "Hot Snacks — Street Food Restaurant",
+    "file": "category-65b6093b005cb7.webp"
+  },
+  {
+    "id": "dish-011cd6bd84cc0c",
+    "name": "Hot Ven Pongal with Ghee Cashews",
+    "file": "dish-011cd6bd84cc0c.webp"
+  },
+  {
+    "id": "dish-9ece565f879e5e",
+    "name": "Hyderabadi Chicken Biryani",
+    "file": "dish-9ece565f879e5e.webp"
+  },
+  {
+    "id": "dish-8d8646c74c558d",
+    "name": "Hyderabadi Dum Veg Biryani",
+    "file": "dish-8d8646c74c558d.webp"
+  },
+  {
+    "id": "category-533e9028ce67fc",
+    "name": "Ice Cream Scoops — Dessert / Ice Cream",
+    "file": "category-533e9028ce67fc.webp"
+  },
+  {
+    "id": "dish-2e27a3071dccf2",
+    "name": "Iced Americano",
+    "file": "dish-2e27a3071dccf2.webp"
+  },
+  {
+    "id": "category-1df44601a5ed32",
+    "name": "Iced Frappes & Coolers — Artisan Café & Coffee Bar",
+    "file": "category-1df44601a5ed32.webp"
+  },
+  {
+    "id": "dish-bad11fd12b313c",
+    "name": "Iced Latte",
+    "file": "dish-bad11fd12b313c.webp"
+  },
+  {
+    "id": "category-ef5d53389f299a",
+    "name": "Idli & Vada — South Indian Restaurant",
+    "file": "category-ef5d53389f299a.webp"
+  },
+  {
+    "id": "category-da1d6b84c5df51",
+    "name": "Idli & Vada Specialties — South Indian Restaurant",
+    "file": "category-da1d6b84c5df51.webp"
+  },
+  {
+    "id": "dish-50b93cf2429348",
+    "name": "Idli 2 Pieces",
+    "file": "dish-50b93cf2429348.webp"
+  },
+  {
+    "id": "dish-d6431814eba4e2",
+    "name": "Idli Vada Combo (1+1)",
+    "file": "dish-d6431814eba4e2.webp"
+  },
+  {
+    "id": "dish-db07ae4dedbc58",
+    "name": "Idli Vada Plate",
+    "file": "dish-db07ae4dedbc58.webp"
+  },
+  {
+    "id": "combo-multicuisine",
+    "name": "Indian Multi-Cuisine Diner Meal Deal",
+    "file": "combo-multicuisine.webp"
+  },
+  {
+    "id": "category-9dbe9029264728",
+    "name": "Indian Sweets — Dessert / Ice Cream",
+    "file": "category-9dbe9029264728.webp"
+  },
+  {
+    "id": "category-979da14cfa079a",
+    "name": "Jain Breads — Jain Satvik Bhojanalaya",
+    "file": "category-979da14cfa079a.webp"
+  },
+  {
+    "id": "dish-426476ff0e7279",
+    "name": "Jain Butter Naan",
+    "file": "dish-426476ff0e7279.webp"
+  },
+  {
+    "id": "dish-21f96036508471",
+    "name": "Jain Chana Masala",
+    "file": "dish-21f96036508471.webp"
+  },
+  {
+    "id": "dish-834c979690d6ed",
+    "name": "Jain Corn Chaat",
+    "file": "dish-834c979690d6ed.webp"
+  },
+  {
+    "id": "category-562839052f6223",
+    "name": "Jain Curries — Jain Satvik Bhojanalaya",
+    "file": "category-562839052f6223.webp"
+  },
+  {
+    "id": "category-7986e4ffb28592",
+    "name": "Jain Curries & Dals — Jain Satvik Bhojanalaya",
+    "file": "category-7986e4ffb28592.webp"
+  },
+  {
+    "id": "category-b594794d4f7857",
+    "name": "Jain Dal — Jain Satvik Bhojanalaya",
+    "file": "category-b594794d4f7857.webp"
+  },
+  {
+    "id": "dish-039091fefa994f",
+    "name": "Jain Dal Fry",
+    "file": "dish-039091fefa994f.webp"
+  },
+  {
+    "id": "dish-2b9e9c50b6c047",
+    "name": "Jain Dal Makhani",
+    "file": "dish-2b9e9c50b6c047.webp"
+  },
+  {
+    "id": "dish-9090757c0e9863",
+    "name": "Jain Dal Tadka",
+    "file": "dish-9090757c0e9863.webp"
+  },
+  {
+    "id": "dish-1d6d672dde1ca9",
+    "name": "Jain Gulab Jamun",
+    "file": "dish-1d6d672dde1ca9.webp"
+  },
+  {
+    "id": "dish-5c2dfffe828ed2",
+    "name": "Jain Hara Bhara Kebab",
+    "file": "dish-5c2dfffe828ed2.webp"
+  },
+  {
+    "id": "dish-6a0d4fd2f36618",
+    "name": "Jain Jeera Rice",
+    "file": "dish-6a0d4fd2f36618.webp"
+  },
+  {
+    "id": "dish-b768babdfcfd0b",
+    "name": "Jain Kela Nu Shaak (Raw Banana Curry)",
+    "file": "dish-b768babdfcfd0b.webp"
+  },
+  {
+    "id": "dish-d7a97f28363196",
+    "name": "Jain Masala Chaas",
+    "file": "dish-d7a97f28363196.webp"
+  },
+  {
+    "id": "dish-ab97739625249c",
+    "name": "Jain Mini Thali",
+    "file": "dish-ab97739625249c.webp"
+  },
+  {
+    "id": "dish-44cb911bbc957d",
+    "name": "Jain Mixed Vegetable Curry",
+    "file": "dish-44cb911bbc957d.webp"
+  },
+  {
+    "id": "dish-3ad04c8c36712c",
+    "name": "Jain Moong Dal",
+    "file": "dish-3ad04c8c36712c.webp"
+  },
+  {
+    "id": "dish-156e27c93d7a62",
+    "name": "Jain Moong Khichdi",
+    "file": "dish-156e27c93d7a62.webp"
+  },
+  {
+    "id": "dish-e529c75cdff089",
+    "name": "Jain Mushroom Tikka",
+    "file": "dish-e529c75cdff089.webp"
+  },
+  {
+    "id": "dish-638a19234a23fc",
+    "name": "Jain Palak Paneer",
+    "file": "dish-638a19234a23fc.webp"
+  },
+  {
+    "id": "dish-2e4d87ec5cdfcd",
+    "name": "Jain Paneer Butter Masala",
+    "file": "dish-2e4d87ec5cdfcd.webp"
+  },
+  {
+    "id": "dish-37cbe1e8a7d4aa",
+    "name": "Jain Paneer Tikka",
+    "file": "dish-37cbe1e8a7d4aa.webp"
+  },
+  {
+    "id": "dish-4934be129060c0",
+    "name": "Jain Paneer Tikka Satvik",
+    "file": "dish-4934be129060c0.webp"
+  },
+  {
+    "id": "dish-7aa86c7746a0a8",
+    "name": "Jain Phulka",
+    "file": "dish-7aa86c7746a0a8.webp"
+  },
+  {
+    "id": "dish-3a758016bdf37f",
+    "name": "Jain Raw Banana Cutlets (4 Pcs)",
+    "file": "dish-3a758016bdf37f.webp"
+  },
+  {
+    "id": "category-39010c31f7280f",
+    "name": "Jain Rice — Jain Satvik Bhojanalaya",
+    "file": "category-39010c31f7280f.webp"
+  },
+  {
+    "id": "dish-f335a3ce647f14",
+    "name": "Jain Rotli Shaak Meal",
+    "file": "dish-f335a3ce647f14.webp"
+  },
+  {
+    "id": "combo-jain",
+    "name": "Jain Satvik Bhojanalaya Meal Deal",
+    "file": "combo-jain.webp"
+  },
+  {
+    "id": "dish-65bfe4a4176f40",
+    "name": "Jain Shahi Paneer",
+    "file": "dish-65bfe4a4176f40.webp"
+  },
+  {
+    "id": "dish-c09d1473978d58",
+    "name": "Jain Shrikhand",
+    "file": "dish-c09d1473978d58.webp"
+  },
+  {
+    "id": "dish-94a26dd577dc43",
+    "name": "Jain Special Thali",
+    "file": "dish-94a26dd577dc43.webp"
+  },
+  {
+    "id": "category-1476b71182ec86",
+    "name": "Jain Starters — Jain Satvik Bhojanalaya",
+    "file": "category-1476b71182ec86.webp"
+  },
+  {
+    "id": "category-ea7cf1198435e9",
+    "name": "Jain Starters & Tikkas — Jain Satvik Bhojanalaya",
+    "file": "category-ea7cf1198435e9.webp"
+  },
+  {
+    "id": "dish-ba1b75f5700cd2",
+    "name": "Jain Steamed Rice",
+    "file": "dish-ba1b75f5700cd2.webp"
+  },
+  {
+    "id": "dish-0168d0c203b9fc",
+    "name": "Jain Sweet Lassi",
+    "file": "dish-0168d0c203b9fc.webp"
+  },
+  {
+    "id": "dish-ff45d524c35116",
+    "name": "Jain Tandoori Roti",
+    "file": "dish-ff45d524c35116.webp"
+  },
+  {
+    "id": "category-1c9d158cd27d4c",
+    "name": "Jain Thali — Grand Indian Thali Restaurant",
+    "file": "category-1c9d158cd27d4c.webp"
+  },
+  {
+    "id": "category-480b66377c7d85",
+    "name": "Jain Thali — Jain Satvik Bhojanalaya",
+    "file": "category-480b66377c7d85.webp"
+  },
+  {
+    "id": "dish-550987bb81a265",
+    "name": "Jain Veg Pulao",
+    "file": "dish-550987bb81a265.webp"
+  },
+  {
+    "id": "dish-82b99fcefbe285",
+    "name": "Jain Wheat Bhakri",
+    "file": "dish-82b99fcefbe285.webp"
+  },
+  {
+    "id": "dish-62f3efdf1a06e3",
+    "name": "Jalapeno Corn Pizza",
+    "file": "dish-62f3efdf1a06e3.webp"
+  },
+  {
+    "id": "dish-cf2e6bfe318412",
+    "name": "Jalapeno Dip",
+    "file": "dish-cf2e6bfe318412.webp"
+  },
+  {
+    "id": "dish-799d85d488dd9e",
+    "name": "Jalebi",
+    "file": "dish-799d85d488dd9e.webp"
+  },
+  {
+    "id": "dish-8372a0f9d66f95",
+    "name": "Jeera Cookies 200g",
+    "file": "dish-8372a0f9d66f95.webp"
+  },
+  {
+    "id": "dish-2c296d880521d0",
+    "name": "Jeera Rice",
+    "file": "dish-2c296d880521d0.webp"
+  },
+  {
+    "id": "dish-3549c4815befa5",
+    "name": "Jeera Rice (Desi Ghee)",
+    "file": "dish-3549c4815befa5.webp"
+  },
+  {
+    "id": "dish-ca8f3074dcc4ab",
+    "name": "Jowar Rotla",
+    "file": "dish-ca8f3074dcc4ab.webp"
+  },
+  {
+    "id": "dish-1b587763c4556b",
+    "name": "Kachori 2 Pieces",
+    "file": "dish-1b587763c4556b.webp"
+  },
+  {
+    "id": "dish-012f45a0373aac",
+    "name": "Kadai Paneer",
+    "file": "dish-012f45a0373aac.webp"
+  },
+  {
+    "id": "dish-d43be805b977de",
+    "name": "Kadai Paneer Peshawari",
+    "file": "dish-d43be805b977de.webp"
+  },
+  {
+    "id": "dish-4b87daad3e8832",
+    "name": "Kaju Katli Special (250g)",
+    "file": "dish-4b87daad3e8832.webp"
+  },
+  {
+    "id": "dish-afdc565b8a4e45",
+    "name": "Kathal Biryani",
+    "file": "dish-afdc565b8a4e45.webp"
+  },
+  {
+    "id": "dish-c79daced88ae13",
+    "name": "Kathiyawadi Bajra Rotla (Ghee)",
+    "file": "dish-c79daced88ae13.webp"
+  },
+  {
+    "id": "dish-34a03dc0617537",
+    "name": "Kathiyawadi Bajra Rotla (White Butter)",
+    "file": "dish-34a03dc0617537.webp"
+  },
+  {
+    "id": "dish-1d6591078557cd",
+    "name": "Kathiyawadi Dal",
+    "file": "dish-1d6591078557cd.webp"
+  },
+  {
+    "id": "combo-kathiyawadi",
+    "name": "Kathiyawadi Dhaba & Bhojanalaya Meal Deal",
+    "file": "combo-kathiyawadi.webp"
+  },
+  {
+    "id": "dish-cf4cb0ee1409e9",
+    "name": "Kathiyawadi Masala Chaas",
+    "file": "dish-cf4cb0ee1409e9.webp"
+  },
+  {
+    "id": "dish-9e0cbc89791d21",
+    "name": "Kathiyawadi Ringna No Olo",
+    "file": "dish-9e0cbc89791d21.webp"
+  },
+  {
+    "id": "category-15671346ee9def",
+    "name": "Kathiyawadi Shaak — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-15671346ee9def.webp"
+  },
+  {
+    "id": "category-7f084d17b35a1f",
+    "name": "Kathiyawadi Special Shaak — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-7f084d17b35a1f.webp"
+  },
+  {
+    "id": "dish-57d860f05cac41",
+    "name": "Kathiyawadi Thali",
+    "file": "dish-57d860f05cac41.webp"
+  },
+  {
+    "id": "dish-59e0429f086bc6",
+    "name": "Kesar Milk",
+    "file": "dish-59e0429f086bc6.webp"
+  },
+  {
+    "id": "dish-70a265117e8358",
+    "name": "Kesar Pista Kulfi",
+    "file": "dish-70a265117e8358.webp"
+  },
+  {
+    "id": "dish-3b80baa87ba585",
+    "name": "Kesar Pista Shrikhand (150g)",
+    "file": "dish-3b80baa87ba585.webp"
+  },
+  {
+    "id": "dish-5dbfb0c68f3438",
+    "name": "Kesari Bath",
+    "file": "dish-5dbfb0c68f3438.webp"
+  },
+  {
+    "id": "dish-b18359a557a12d",
+    "name": "Khamiri Roti (2 Pcs)",
+    "file": "dish-b18359a557a12d.webp"
+  },
+  {
+    "id": "dish-9219016f12c69e",
+    "name": "Khandvi",
+    "file": "dish-9219016f12c69e.webp"
+  },
+  {
+    "id": "dish-3458e968bd5d0e",
+    "name": "Khandvi with Mustard Tempering",
+    "file": "dish-3458e968bd5d0e.webp"
+  },
+  {
+    "id": "category-310a2125560188",
+    "name": "Khichdi & Rice — Gujarati Restaurant",
+    "file": "category-310a2125560188.webp"
+  },
+  {
+    "id": "category-ab3e3e62d260e9",
+    "name": "Kulfi & Falooda — Dessert / Ice Cream",
+    "file": "category-ab3e3e62d260e9.webp"
+  },
+  {
+    "id": "dish-f62c9d53942e9a",
+    "name": "Laccha Paratha",
+    "file": "dish-f62c9d53942e9a.webp"
+  },
+  {
+    "id": "dish-561e74ef1cddae",
+    "name": "Lachha Paratha",
+    "file": "dish-561e74ef1cddae.webp"
+  },
+  {
+    "id": "dish-bcec0eaa370729",
+    "name": "Lasaniya Bateta",
+    "file": "dish-bcec0eaa370729.webp"
+  },
+  {
+    "id": "dish-3ec7eb98bed243",
+    "name": "Lasaniya Bateta (Garlic Potatoes)",
+    "file": "dish-3ec7eb98bed243.webp"
+  },
+  {
+    "id": "dish-7ae6c8c0128a04",
+    "name": "Leelvanu Lasan Chutney",
+    "file": "dish-7ae6c8c0128a04.webp"
+  },
+  {
+    "id": "dish-a88cb3f6d6072e",
+    "name": "Lemon Iced Tea",
+    "file": "dish-a88cb3f6d6072e.webp"
+  },
+  {
+    "id": "dish-db3790bb5a03c6",
+    "name": "Lemon Rice",
+    "file": "dish-db3790bb5a03c6.webp"
+  },
+  {
+    "id": "dish-406f5de5193780",
+    "name": "Lucknowi Chicken Biryani",
+    "file": "dish-406f5de5193780.webp"
+  },
+  {
+    "id": "dish-1edb264b40251e",
+    "name": "Lucknowi Dum Biryani Handi",
+    "file": "dish-1edb264b40251e.webp"
+  },
+  {
+    "id": "dish-ec254b0f5a123d",
+    "name": "Maharaja Unlimited Royal Thali",
+    "file": "dish-ec254b0f5a123d.webp"
+  },
+  {
+    "id": "category-f8fb6775c7e555",
+    "name": "Main Course — Indian Multi-Cuisine Diner",
+    "file": "category-f8fb6775c7e555.webp"
+  },
+  {
+    "id": "category-7f149564bad810",
+    "name": "Main Course — North Indian Restaurant",
+    "file": "category-7f149564bad810.webp"
+  },
+  {
+    "id": "category-a0cd0991c8ceaa",
+    "name": "Main Course — Punjabi Dhaba & Restaurant",
+    "file": "category-a0cd0991c8ceaa.webp"
+  },
+  {
+    "id": "dish-478569217b809c",
+    "name": "Makki Di Roti (2 Pcs)",
+    "file": "dish-478569217b809c.webp"
+  },
+  {
+    "id": "dish-4260940928ac40",
+    "name": "Makki Roti",
+    "file": "dish-4260940928ac40.webp"
+  },
+  {
+    "id": "dish-3e04ed5fe06369",
+    "name": "Malai Kofta Mughlai",
+    "file": "dish-3e04ed5fe06369.webp"
+  },
+  {
+    "id": "dish-79b058265706ce",
+    "name": "Malai Kulfi",
+    "file": "dish-79b058265706ce.webp"
+  },
+  {
+    "id": "dish-4dbc5b80c726e2",
+    "name": "Malai Paneer Tikka",
+    "file": "dish-4dbc5b80c726e2.webp"
+  },
+  {
+    "id": "dish-b8fc3a1345d107",
+    "name": "Malai Soya Chaap Tandoori",
+    "file": "dish-b8fc3a1345d107.webp"
+  },
+  {
+    "id": "dish-49222f0d5dc116",
+    "name": "Mango Ice Cream",
+    "file": "dish-49222f0d5dc116.webp"
+  },
+  {
+    "id": "dish-c964658418329f",
+    "name": "Mango Kulfi",
+    "file": "dish-c964658418329f.webp"
+  },
+  {
+    "id": "dish-797f089dae69ee",
+    "name": "Mango Shake",
+    "file": "dish-797f089dae69ee.webp"
+  },
+  {
+    "id": "dish-0c2f4f7947bce2",
+    "name": "Margherita Pizza",
+    "file": "dish-0c2f4f7947bce2.webp"
+  },
+  {
+    "id": "dish-b6b3dbf6adc62c",
+    "name": "Marwari Dal Baati Churma Thali",
+    "file": "dish-b6b3dbf6adc62c.webp"
+  },
+  {
+    "id": "dish-1eac8d2cb267a2",
+    "name": "Masala Chaas",
+    "file": "dish-1eac8d2cb267a2.webp"
+  },
+  {
+    "id": "dish-017f29502a7b80",
+    "name": "Masala Chaas (Spiced Buttermilk)",
+    "file": "dish-017f29502a7b80.webp"
+  },
+  {
+    "id": "dish-cdcd5f44e7c6d6",
+    "name": "Masala Dosa",
+    "file": "dish-cdcd5f44e7c6d6.webp"
+  },
+  {
+    "id": "dish-69bf23e445d7e4",
+    "name": "Masala Khichdi",
+    "file": "dish-69bf23e445d7e4.webp"
+  },
+  {
+    "id": "dish-695502b6c5d818",
+    "name": "Masala Omelette",
+    "file": "dish-695502b6c5d818.webp"
+  },
+  {
+    "id": "dish-da160979993c11",
+    "name": "Masala Papad",
+    "file": "dish-da160979993c11.webp"
+  },
+  {
+    "id": "dish-a4a70acc8f1130",
+    "name": "Masala Rice",
+    "file": "dish-a4a70acc8f1130.webp"
+  },
+  {
+    "id": "dish-454938e2a62289",
+    "name": "Masala Tea",
+    "file": "dish-454938e2a62289.webp"
+  },
+  {
+    "id": "dish-d1b35090e293df",
+    "name": "Medu Vada 2 Pieces",
+    "file": "dish-d1b35090e293df.webp"
+  },
+  {
+    "id": "dish-7ac6851e64a0d2",
+    "name": "Methi Na Gota (Pakoda)",
+    "file": "dish-7ac6851e64a0d2.webp"
+  },
+  {
+    "id": "dish-276ff50343f375",
+    "name": "Methi Thepla",
+    "file": "dish-276ff50343f375.webp"
+  },
+  {
+    "id": "dish-743cb5e5d120fb",
+    "name": "Methi Thepla (4 Pcs)",
+    "file": "dish-743cb5e5d120fb.webp"
+  },
+  {
+    "id": "dish-a7b2b58b041edc",
+    "name": "Mexican Green Wave Pizza",
+    "file": "dish-a7b2b58b041edc.webp"
+  },
+  {
+    "id": "dish-02bfa797457c74",
+    "name": "Mineral Water 500ml",
+    "file": "dish-02bfa797457c74.webp"
+  },
+  {
+    "id": "dish-91c955c332ace5",
+    "name": "Mini Gujarati Thali",
+    "file": "dish-91c955c332ace5.webp"
+  },
+  {
+    "id": "dish-43818b812c460b",
+    "name": "Mini Idli Sambar",
+    "file": "dish-43818b812c460b.webp"
+  },
+  {
+    "id": "dish-aa2d1e00a418df",
+    "name": "Mini Kathiyawadi Thali",
+    "file": "dish-aa2d1e00a418df.webp"
+  },
+  {
+    "id": "dish-bd9da26b2a15e2",
+    "name": "Mirchi Bhaji",
+    "file": "dish-bd9da26b2a15e2.webp"
+  },
+  {
+    "id": "dish-3d9a4299409dbe",
+    "name": "Mirchi Ka Salan",
+    "file": "dish-3d9a4299409dbe.webp"
+  },
+  {
+    "id": "dish-c19572e2f84114",
+    "name": "Misal Pav",
+    "file": "dish-c19572e2f84114.webp"
+  },
+  {
+    "id": "dish-1e92c20ba6873c",
+    "name": "Mixed Vegetable Cheese Uttapam",
+    "file": "dish-1e92c20ba6873c.webp"
+  },
+  {
+    "id": "dish-cf4548d95d1158",
+    "name": "Mixed Vegetable Kolhapuri",
+    "file": "dish-cf4548d95d1158.webp"
+  },
+  {
+    "id": "dish-f2714dda296d66",
+    "name": "Mixed Vegetable Uttapam",
+    "file": "dish-f2714dda296d66.webp"
+  },
+  {
+    "id": "dish-cb06cd0151278a",
+    "name": "Mohanthal",
+    "file": "dish-cb06cd0151278a.webp"
+  },
+  {
+    "id": "category-a2c78700d62c7f",
+    "name": "Momos — Authentic Chinese & Wok",
+    "file": "category-a2c78700d62c7f.webp"
+  },
+  {
+    "id": "dish-e159e9158c2091",
+    "name": "Motichoor Laddoo (250g)",
+    "file": "dish-e159e9158c2091.webp"
+  },
+  {
+    "id": "combo-mughlai",
+    "name": "Mughlai & Awadhi Meal Deal",
+    "file": "combo-mughlai.webp"
+  },
+  {
+    "id": "dish-0bf887be568c5d",
+    "name": "Mughlai Paneer Lababdar",
+    "file": "dish-0bf887be568c5d.webp"
+  },
+  {
+    "id": "dish-178d05c8f6510c",
+    "name": "Multigrain Bread",
+    "file": "dish-178d05c8f6510c.webp"
+  },
+  {
+    "id": "dish-f2287e7bceafd1",
+    "name": "Mumbai Vada Pav with Chutney",
+    "file": "dish-f2287e7bceafd1.webp"
+  },
+  {
+    "id": "dish-78682637b629d6",
+    "name": "Mushroom Biryani",
+    "file": "dish-78682637b629d6.webp"
+  },
+  {
+    "id": "dish-1fe951fd5566ac",
+    "name": "Mushroom in Hot Garlic Sauce",
+    "file": "dish-1fe951fd5566ac.webp"
+  },
+  {
+    "id": "dish-bc4a46a29c61ed",
+    "name": "Mushroom Pizza",
+    "file": "dish-bc4a46a29c61ed.webp"
+  },
+  {
+    "id": "category-f71ae6c0eb1026",
+    "name": "Mutton & Egg Biryani — Biryani & Kebab Darbar",
+    "file": "category-f71ae6c0eb1026.webp"
+  },
+  {
+    "id": "dish-23295ca0d78628",
+    "name": "Mutton Dum Biryani",
+    "file": "dish-23295ca0d78628.webp"
+  },
+  {
+    "id": "dish-a41c23de9d438d",
+    "name": "Mutton Keema Biryani",
+    "file": "dish-a41c23de9d438d.webp"
+  },
+  {
+    "id": "dish-80682dee769390",
+    "name": "Mysore Masala Dosa",
+    "file": "dish-80682dee769390.webp"
+  },
+  {
+    "id": "dish-3f435efc0192a7",
+    "name": "Navratan Korma Royal",
+    "file": "dish-3f435efc0192a7.webp"
+  },
+  {
+    "id": "category-1481c7d298b432",
+    "name": "Nawabi Starters — Mughlai & Awadhi Restaurant",
+    "file": "category-1481c7d298b432.webp"
+  },
+  {
+    "id": "category-5dc213be040894",
+    "name": "Noodles — Authentic Chinese & Wok",
+    "file": "category-5dc213be040894.webp"
+  },
+  {
+    "id": "category-cc58de6d6f5918",
+    "name": "Noodles — Indian Multi-Cuisine Diner",
+    "file": "category-cc58de6d6f5918.webp"
+  },
+  {
+    "id": "category-fcd1e93be52f8a",
+    "name": "North Indian Curries — Indian Multi-Cuisine Diner",
+    "file": "category-fcd1e93be52f8a.webp"
+  },
+  {
+    "id": "category-f9ad30d1fbbfcc",
+    "name": "North Indian Curries & Naans — South & North Indian Fusion Diner",
+    "file": "category-f9ad30d1fbbfcc.webp"
+  },
+  {
+    "id": "combo-north-indian",
+    "name": "North Indian Meal Deal",
+    "file": "combo-north-indian.webp"
+  },
+  {
+    "id": "dish-751ea79493ff38",
+    "name": "Oats Cookies 200g",
+    "file": "dish-751ea79493ff38.webp"
+  },
+  {
+    "id": "dish-da76248b13199e",
+    "name": "Onion Pakora",
+    "file": "dish-da76248b13199e.webp"
+  },
+  {
+    "id": "dish-0e97d302f9dd10",
+    "name": "Onion Raita",
+    "file": "dish-0e97d302f9dd10.webp"
+  },
+  {
+    "id": "dish-efec769a7ca3bd",
+    "name": "Onion Rava Dosa",
+    "file": "dish-efec769a7ca3bd.webp"
+  },
+  {
+    "id": "dish-7bd5dc0b3fc387",
+    "name": "Onion Salad",
+    "file": "dish-7bd5dc0b3fc387.webp"
+  },
+  {
+    "id": "dish-a804d58f2147b6",
+    "name": "Onion Tomato Chilli Uttapam",
+    "file": "dish-a804d58f2147b6.webp"
+  },
+  {
+    "id": "dish-154c361346ba3d",
+    "name": "Onion Uttapam",
+    "file": "dish-154c361346ba3d.webp"
+  },
+  {
+    "id": "dish-bd7efc6f13f4bd",
+    "name": "Oreo Shake",
+    "file": "dish-bd7efc6f13f4bd.webp"
+  },
+  {
+    "id": "dish-98db62b4225441",
+    "name": "Palak Paneer",
+    "file": "dish-98db62b4225441.webp"
+  },
+  {
+    "id": "dish-b4ba6cc06d1d00",
+    "name": "Palak Paneer Lahori",
+    "file": "dish-b4ba6cc06d1d00.webp"
+  },
+  {
+    "id": "dish-a83de9a96ee1c0",
+    "name": "Pancakes with Honey",
+    "file": "dish-a83de9a96ee1c0.webp"
+  },
+  {
+    "id": "dish-d82c0d1c75d22c",
+    "name": "Paneer Bhurji Desi Ghee",
+    "file": "dish-d82c0d1c75d22c.webp"
+  },
+  {
+    "id": "dish-8b816e865e4874",
+    "name": "Paneer Biryani",
+    "file": "dish-8b816e865e4874.webp"
+  },
+  {
+    "id": "dish-e012eae089a995",
+    "name": "Paneer Burger",
+    "file": "dish-e012eae089a995.webp"
+  },
+  {
+    "id": "dish-b3b470b6b43dcb",
+    "name": "Paneer Butter Masala",
+    "file": "dish-b3b470b6b43dcb.webp"
+  },
+  {
+    "id": "dish-fdbe51d47f0333",
+    "name": "Paneer Dosa",
+    "file": "dish-fdbe51d47f0333.webp"
+  },
+  {
+    "id": "dish-711d95e41f8f1c",
+    "name": "Paneer Dum Biryani Handi",
+    "file": "dish-711d95e41f8f1c.webp"
+  },
+  {
+    "id": "dish-55b5c0f26a969e",
+    "name": "Paneer Grilled Sandwich",
+    "file": "dish-55b5c0f26a969e.webp"
+  },
+  {
+    "id": "dish-5eeed8d3a95b22",
+    "name": "Paneer in Black Bean Sauce",
+    "file": "dish-5eeed8d3a95b22.webp"
+  },
+  {
+    "id": "dish-7b4228dc2b3c40",
+    "name": "Paneer Kathi Roll",
+    "file": "dish-7b4228dc2b3c40.webp"
+  },
+  {
+    "id": "dish-976b786b47da85",
+    "name": "Paneer Kulcha Stuffed",
+    "file": "dish-976b786b47da85.webp"
+  },
+  {
+    "id": "dish-efe6c67c756228",
+    "name": "Paneer Lababdar Special",
+    "file": "dish-efe6c67c756228.webp"
+  },
+  {
+    "id": "dish-ae9afa60b772c9",
+    "name": "Paneer Makhani Cheese Toastie",
+    "file": "dish-ae9afa60b772c9.webp"
+  },
+  {
+    "id": "dish-47b0bb091fcfb8",
+    "name": "Paneer Makhani Rice Bowl",
+    "file": "dish-47b0bb091fcfb8.webp"
+  },
+  {
+    "id": "dish-21587e45194bc4",
+    "name": "Paneer Momos",
+    "file": "dish-21587e45194bc4.webp"
+  },
+  {
+    "id": "dish-68f288804c8537",
+    "name": "Paneer Pasanda Tikka",
+    "file": "dish-68f288804c8537.webp"
+  },
+  {
+    "id": "dish-d4d2e107f8a8cd",
+    "name": "Paneer Puff",
+    "file": "dish-d4d2e107f8a8cd.webp"
+  },
+  {
+    "id": "dish-7dd26e7342d183",
+    "name": "Paneer Tikka",
+    "file": "dish-7dd26e7342d183.webp"
+  },
+  {
+    "id": "dish-a8885e6fcca642",
+    "name": "Paneer Tikka Angara",
+    "file": "dish-a8885e6fcca642.webp"
+  },
+  {
+    "id": "dish-37a7198da56bcc",
+    "name": "Paneer Tikka Pizza",
+    "file": "dish-37a7198da56bcc.webp"
+  },
+  {
+    "id": "dish-9803b03458035b",
+    "name": "Paneer Wrap",
+    "file": "dish-9803b03458035b.webp"
+  },
+  {
+    "id": "dish-2165e83581abee",
+    "name": "Pani Puri",
+    "file": "dish-2165e83581abee.webp"
+  },
+  {
+    "id": "dish-57e8b123bc0432",
+    "name": "Pani Puri Platter (6 Pcs)",
+    "file": "dish-57e8b123bc0432.webp"
+  },
+  {
+    "id": "dish-7e25fcd6c45485",
+    "name": "Paper Plain Roast Dosa",
+    "file": "dish-7e25fcd6c45485.webp"
+  },
+  {
+    "id": "category-08e36c5ae9b103",
+    "name": "Pasta — Pizza Restaurant",
+    "file": "category-08e36c5ae9b103.webp"
+  },
+  {
+    "id": "category-c678d45dd06b6e",
+    "name": "Pastries — Bakery, Patisserie & Cafe",
+    "file": "category-c678d45dd06b6e.webp"
+  },
+  {
+    "id": "category-820766061aafa2",
+    "name": "Pastries & Slices — Bakery, Patisserie & Cafe",
+    "file": "category-820766061aafa2.webp"
+  },
+  {
+    "id": "dish-d06a2778eb7676",
+    "name": "Patra",
+    "file": "dish-d06a2778eb7676.webp"
+  },
+  {
+    "id": "dish-bd4de2b7249cc6",
+    "name": "Patra Steamed Rolls",
+    "file": "dish-bd4de2b7249cc6.webp"
+  },
+  {
+    "id": "category-46861a04b6110c",
+    "name": "Pav & Buns — Street Food Restaurant",
+    "file": "category-46861a04b6110c.webp"
+  },
+  {
+    "id": "dish-82b0fd8b436d9e",
+    "name": "Pav Bhaji",
+    "file": "dish-82b0fd8b436d9e.webp"
+  },
+  {
+    "id": "dish-b341b41f980de2",
+    "name": "Payasam",
+    "file": "dish-b341b41f980de2.webp"
+  },
+  {
+    "id": "dish-a71fd9173257be",
+    "name": "Peas Pulao",
+    "file": "dish-a71fd9173257be.webp"
+  },
+  {
+    "id": "dish-f2ad5d33a28717",
+    "name": "Pepper Chicken Pizza",
+    "file": "dish-f2ad5d33a28717.webp"
+  },
+  {
+    "id": "dish-571f82e0abf441",
+    "name": "Peri Peri Crinkle Fries",
+    "file": "dish-571f82e0abf441.webp"
+  },
+  {
+    "id": "dish-44ea070d49d489",
+    "name": "Peri Peri Fries",
+    "file": "dish-44ea070d49d489.webp"
+  },
+  {
+    "id": "dish-9b6883c7844897",
+    "name": "Peri Peri Paneer Pizza",
+    "file": "dish-9b6883c7844897.webp"
+  },
+  {
+    "id": "dish-0231e07107f83a",
+    "name": "Pesto Pasta",
+    "file": "dish-0231e07107f83a.webp"
+  },
+  {
+    "id": "dish-1bc143f3b2b3c6",
+    "name": "Phulka",
+    "file": "dish-1bc143f3b2b3c6.webp"
+  },
+  {
+    "id": "dish-cf2c9938464d1a",
+    "name": "Phulka Rotli (Ghee, 4 Pcs)",
+    "file": "dish-cf2c9938464d1a.webp"
+  },
+  {
+    "id": "dish-ea76e017d29752",
+    "name": "Pindi Chhole",
+    "file": "dish-ea76e017d29752.webp"
+  },
+  {
+    "id": "dish-ca94e4a5291524",
+    "name": "Pindi Chhole (Rawalpindi Style)",
+    "file": "dish-ca94e4a5291524.webp"
+  },
+  {
+    "id": "dish-13a182e169c32b",
+    "name": "Pineapple Cake",
+    "file": "dish-13a182e169c32b.webp"
+  },
+  {
+    "id": "dish-5215fc8c732da6",
+    "name": "Pineapple Pastry",
+    "file": "dish-5215fc8c732da6.webp"
+  },
+  {
+    "id": "dish-c563ad1e40ac4f",
+    "name": "Pink Sauce Pasta",
+    "file": "dish-c563ad1e40ac4f.webp"
+  },
+  {
+    "id": "dish-483aca93771336",
+    "name": "Pista Ice Cream",
+    "file": "dish-483aca93771336.webp"
+  },
+  {
+    "id": "dish-efe9e680029e39",
+    "name": "Pithod Ki Sabzi",
+    "file": "dish-efe9e680029e39.webp"
+  },
+  {
+    "id": "combo-pizza",
+    "name": "Pizza Meal Deal",
+    "file": "combo-pizza.webp"
+  },
+  {
+    "id": "category-29a337d20ce022",
+    "name": "Pizzas — Indian Multi-Cuisine Diner",
+    "file": "category-29a337d20ce022.webp"
+  },
+  {
+    "id": "category-8f707a73d2e7b9",
+    "name": "Pizzas — Pizza Restaurant",
+    "file": "category-8f707a73d2e7b9.webp"
+  },
+  {
+    "id": "dish-4f67b2ab47fda7",
+    "name": "Plain Chaas",
+    "file": "dish-4f67b2ab47fda7.webp"
+  },
+  {
+    "id": "dish-7fe77b3702ec96",
+    "name": "Plain Dosa",
+    "file": "dish-7fe77b3702ec96.webp"
+  },
+  {
+    "id": "dish-897af6d2d66ad5",
+    "name": "Plain Khichdi",
+    "file": "dish-897af6d2d66ad5.webp"
+  },
+  {
+    "id": "dish-e7947053aef8f3",
+    "name": "Plain Kulcha",
+    "file": "dish-e7947053aef8f3.webp"
+  },
+  {
+    "id": "dish-86a46ec8640ed3",
+    "name": "Plain Uttapam",
+    "file": "dish-86a46ec8640ed3.webp"
+  },
+  {
+    "id": "dish-17d00b650ddfd0",
+    "name": "Podi with Ghee",
+    "file": "dish-17d00b650ddfd0.webp"
+  },
+  {
+    "id": "dish-a90a3df635e852",
+    "name": "Poha",
+    "file": "dish-a90a3df635e852.webp"
+  },
+  {
+    "id": "dish-c2dbdfbac923bf",
+    "name": "Potato Wedges",
+    "file": "dish-c2dbdfbac923bf.webp"
+  },
+  {
+    "id": "combo-punjabi",
+    "name": "Punjabi Dhaba & Meal Deal",
+    "file": "combo-punjabi.webp"
+  },
+  {
+    "id": "category-1b877b98239e75",
+    "name": "Punjabi Specials — Punjabi Dhaba & Restaurant",
+    "file": "category-1b877b98239e75.webp"
+  },
+  {
+    "id": "dish-920510f603a4d7",
+    "name": "Punjabi Sweet Lassi (Malai Maar Ke)",
+    "file": "dish-920510f603a4d7.webp"
+  },
+  {
+    "id": "category-14388d160d4d67",
+    "name": "Puri & Chaat Specialties — Street Food Restaurant",
+    "file": "category-14388d160d4d67.webp"
+  },
+  {
+    "id": "dish-d3d6f7f23a8748",
+    "name": "Quick Business Lunch Thali",
+    "file": "dish-d3d6f7f23a8748.webp"
+  },
+  {
+    "id": "category-d8d833493f1100",
+    "name": "Quick Meals — Fast Food & Quick Service Restaurant",
+    "file": "category-d8d833493f1100.webp"
+  },
+  {
+    "id": "category-d7c0e19e382868",
+    "name": "Quick Tiffin Plates — South Indian Tiffin & Breakfast",
+    "file": "category-d7c0e19e382868.webp"
+  },
+  {
+    "id": "dish-96d3581ed1ce31",
+    "name": "Rabri",
+    "file": "dish-96d3581ed1ce31.webp"
+  },
+  {
+    "id": "dish-da17955d8be336",
+    "name": "Ragda Pattice",
+    "file": "dish-da17955d8be336.webp"
+  },
+  {
+    "id": "dish-8d123352d9d9fe",
+    "name": "Raj Kachori",
+    "file": "dish-8d123352d9d9fe.webp"
+  },
+  {
+    "id": "combo-rajasthani",
+    "name": "Rajasthani Marwari Bhojanalaya Meal Deal",
+    "file": "combo-rajasthani.webp"
+  },
+  {
+    "id": "category-8c81243c83b377",
+    "name": "Rajasthani Royal Curries — Rajasthani Marwari Bhojanalaya",
+    "file": "category-8c81243c83b377.webp"
+  },
+  {
+    "id": "dish-cab69834e15296",
+    "name": "Rajma Masala",
+    "file": "dish-cab69834e15296.webp"
+  },
+  {
+    "id": "dish-febccb0604b538",
+    "name": "Rasmalai",
+    "file": "dish-febccb0604b538.webp"
+  },
+  {
+    "id": "dish-99b2dc075f68fa",
+    "name": "Rasmalai Kesar Pista (2 Pcs)",
+    "file": "dish-99b2dc075f68fa.webp"
+  },
+  {
+    "id": "dish-38c0a2cafb02c0",
+    "name": "Rava Dosa",
+    "file": "dish-38c0a2cafb02c0.webp"
+  },
+  {
+    "id": "dish-9ebad982675ccc",
+    "name": "Red Sauce Pasta",
+    "file": "dish-9ebad982675ccc.webp"
+  },
+  {
+    "id": "dish-b140a69d611722",
+    "name": "Red Velvet Cake",
+    "file": "dish-b140a69d611722.webp"
+  },
+  {
+    "id": "dish-7820865dcff96a",
+    "name": "Red Velvet Pastry",
+    "file": "dish-7820865dcff96a.webp"
+  },
+  {
+    "id": "category-c03965c735a258",
+    "name": "Regional Favourites — Street Food Restaurant",
+    "file": "category-c03965c735a258.webp"
+  },
+  {
+    "id": "category-66a8b5cba7387b",
+    "name": "Rice — Indian Multi-Cuisine Diner",
+    "file": "category-66a8b5cba7387b.webp"
+  },
+  {
+    "id": "category-7d88896f16e4d1",
+    "name": "Rice — North Indian Restaurant",
+    "file": "category-7d88896f16e4d1.webp"
+  },
+  {
+    "id": "category-c784599c506c7f",
+    "name": "Rice — Punjabi Dhaba & Restaurant",
+    "file": "category-c784599c506c7f.webp"
+  },
+  {
+    "id": "category-042bbddbf19466",
+    "name": "Rice & Curries — Biryani & Kebab Darbar",
+    "file": "category-042bbddbf19466.webp"
+  },
+  {
+    "id": "category-0e38dcf5698e1a",
+    "name": "Rice & Khichdi — Gujarati Restaurant",
+    "file": "category-0e38dcf5698e1a.webp"
+  },
+  {
+    "id": "category-a31633713c1ce1",
+    "name": "Rice & Khichdi — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-a31633713c1ce1.webp"
+  },
+  {
+    "id": "category-2dc4e66f4b4976",
+    "name": "Rice & Meals — Grand Indian Thali Restaurant",
+    "file": "category-2dc4e66f4b4976.webp"
+  },
+  {
+    "id": "category-9aece96b1e8951",
+    "name": "Rice & Meals — South Indian Restaurant",
+    "file": "category-9aece96b1e8951.webp"
+  },
+  {
+    "id": "dish-30c4fde5c23429",
+    "name": "Rice Kheer",
+    "file": "dish-30c4fde5c23429.webp"
+  },
+  {
+    "id": "dish-fd9aae39e6bd05",
+    "name": "Rich Basundi Bowl",
+    "file": "dish-fd9aae39e6bd05.webp"
+  },
+  {
+    "id": "dish-97af36ae9654e6",
+    "name": "Ringna Bateta",
+    "file": "dish-97af36ae9654e6.webp"
+  },
+  {
+    "id": "dish-b319399464989f",
+    "name": "Ringna Bateta Nu Shaak",
+    "file": "dish-b319399464989f.webp"
+  },
+  {
+    "id": "dish-9deecb3d05c641",
+    "name": "Ringna No Olo",
+    "file": "dish-9deecb3d05c641.webp"
+  },
+  {
+    "id": "dish-ec06fa0ae45f00",
+    "name": "Roasted Hazelnut Latte",
+    "file": "dish-ec06fa0ae45f00.webp"
+  },
+  {
+    "id": "dish-d793663533beb4",
+    "name": "Roasted Papad",
+    "file": "dish-d793663533beb4.webp"
+  },
+  {
+    "id": "category-6530e049d376ed",
+    "name": "Rolls — Street Food Restaurant",
+    "file": "category-6530e049d376ed.webp"
+  },
+  {
+    "id": "dish-b38e805912eb59",
+    "name": "Roomali Roti",
+    "file": "dish-b38e805912eb59.webp"
+  },
+  {
+    "id": "dish-5c17e7951c282f",
+    "name": "Rose Falooda",
+    "file": "dish-5c17e7951c282f.webp"
+  },
+  {
+    "id": "dish-296ed8969c9e59",
+    "name": "Rose Milk",
+    "file": "dish-296ed8969c9e59.webp"
+  },
+  {
+    "id": "category-53bd061dcc804e",
+    "name": "Rotla & Accompaniments — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-53bd061dcc804e.webp"
+  },
+  {
+    "id": "category-42ce829c618446",
+    "name": "Rotla & Breads — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-42ce829c618446.webp"
+  },
+  {
+    "id": "category-4da078f422fad1",
+    "name": "Rotli, Bhakri & Thepla — Grand Indian Thali Restaurant",
+    "file": "category-4da078f422fad1.webp"
+  },
+  {
+    "id": "category-3107d24eb1340c",
+    "name": "Rotli, Bhakri & Thepla — Gujarati Restaurant",
+    "file": "category-3107d24eb1340c.webp"
+  },
+  {
+    "id": "dish-477b1a90401569",
+    "name": "Royal Falooda",
+    "file": "dish-477b1a90401569.webp"
+  },
+  {
+    "id": "dish-dcb182bc7ce0ba",
+    "name": "Royal Gujarati Grand Thali",
+    "file": "dish-dcb182bc7ce0ba.webp"
+  },
+  {
+    "id": "combo-sweets",
+    "name": "Royal Indian Sweets & Mithai Meal Deal",
+    "file": "combo-sweets.webp"
+  },
+  {
+    "id": "dish-5a5477a118a972",
+    "name": "Royal Kesar Pista Falooda",
+    "file": "dish-5a5477a118a972.webp"
+  },
+  {
+    "id": "category-37dd4853ef0306",
+    "name": "Royal Paneer Curries — North Indian Restaurant",
+    "file": "category-37dd4853ef0306.webp"
+  },
+  {
+    "id": "dish-624377e27d386f",
+    "name": "Sabudana Khichdi",
+    "file": "dish-624377e27d386f.webp"
+  },
+  {
+    "id": "dish-5e5e8b892f0dce",
+    "name": "Salted Lassi",
+    "file": "dish-5e5e8b892f0dce.webp"
+  },
+  {
+    "id": "dish-2db25926504100",
+    "name": "Sambar Rice",
+    "file": "dish-2db25926504100.webp"
+  },
+  {
+    "id": "dish-6ac667dcfaadf3",
+    "name": "Samosa 2 Pieces",
+    "file": "dish-6ac667dcfaadf3.webp"
+  },
+  {
+    "id": "category-32973d6ad46cc8",
+    "name": "Sandwiches — Artisan Café & Coffee Bar",
+    "file": "category-32973d6ad46cc8.webp"
+  },
+  {
+    "id": "category-76fd7fd26285c9",
+    "name": "Sandwiches — Fast Food & Quick Service Restaurant",
+    "file": "category-76fd7fd26285c9.webp"
+  },
+  {
+    "id": "dish-687486a338ccbc",
+    "name": "Sarson Ka Saag",
+    "file": "dish-687486a338ccbc.webp"
+  },
+  {
+    "id": "dish-919c45c31580ad",
+    "name": "Sarson Ka Saag (Seasonal)",
+    "file": "dish-919c45c31580ad.webp"
+  },
+  {
+    "id": "category-201154f1132dec",
+    "name": "Savouries — Bakery, Patisserie & Cafe",
+    "file": "category-201154f1132dec.webp"
+  },
+  {
+    "id": "dish-27d991eddee8c8",
+    "name": "Schezwan Fried Rice",
+    "file": "dish-27d991eddee8c8.webp"
+  },
+  {
+    "id": "dish-f457c1d1009690",
+    "name": "Sev Dungri Nu Shaak",
+    "file": "dish-f457c1d1009690.webp"
+  },
+  {
+    "id": "dish-d02ec47fb6a42d",
+    "name": "Sev Puri",
+    "file": "dish-d02ec47fb6a42d.webp"
+  },
+  {
+    "id": "dish-428df88eb664bc",
+    "name": "Sev Tameta",
+    "file": "dish-428df88eb664bc.webp"
+  },
+  {
+    "id": "dish-83f3a1187e5ad2",
+    "name": "Sev Tameta Nu Shaak",
+    "file": "dish-83f3a1187e5ad2.webp"
+  },
+  {
+    "id": "dish-1908a5b720079c",
+    "name": "Shahi Gatte Ki Sabzi",
+    "file": "dish-1908a5b720079c.webp"
+  },
+  {
+    "id": "category-a57318199dc78e",
+    "name": "Shahi Kormas & Gravies — Mughlai & Awadhi Restaurant",
+    "file": "category-a57318199dc78e.webp"
+  },
+  {
+    "id": "dish-0376b693bdb4bc",
+    "name": "Shahi Paneer",
+    "file": "dish-0376b693bdb4bc.webp"
+  },
+  {
+    "id": "dish-6332e612c4535c",
+    "name": "Shahi Paneer Nawabi",
+    "file": "dish-6332e612c4535c.webp"
+  },
+  {
+    "id": "dish-85855c5033cf40",
+    "name": "Shahi Subz Dum Biryani",
+    "file": "dish-85855c5033cf40.webp"
+  },
+  {
+    "id": "category-cb30d67215fe77",
+    "name": "Shakes — Dessert / Ice Cream",
+    "file": "category-cb30d67215fe77.webp"
+  },
+  {
+    "id": "dish-3594c73099db25",
+    "name": "Shrikhand",
+    "file": "dish-3594c73099db25.webp"
+  },
+  {
+    "id": "category-f67a5058388782",
+    "name": "Sides — Fast Food & Quick Service Restaurant",
+    "file": "category-f67a5058388782.webp"
+  },
+  {
+    "id": "category-cd3b3661573474",
+    "name": "Sides — Pizza Restaurant",
+    "file": "category-cd3b3661573474.webp"
+  },
+  {
+    "id": "category-849722026f0d50",
+    "name": "Signature Dosas & Crepes — South Indian Restaurant",
+    "file": "category-849722026f0d50.webp"
+  },
+  {
+    "id": "category-6193fb64b695fe",
+    "name": "Signature Thali Offerings — Grand Indian Thali Restaurant",
+    "file": "category-6193fb64b695fe.webp"
+  },
+  {
+    "id": "dish-11c40712c6175c",
+    "name": "Singapore Noodles",
+    "file": "dish-11c40712c6175c.webp"
+  },
+  {
+    "id": "dish-9fb7560b011bf2",
+    "name": "Sizzling Chocolate Brownie Sundae",
+    "file": "dish-9fb7560b011bf2.webp"
+  },
+  {
+    "id": "dish-ce6a3f45084e3f",
+    "name": "Smoked Truffle Paneer Tikka",
+    "file": "dish-ce6a3f45084e3f.webp"
+  },
+  {
+    "id": "combo-snacks",
+    "name": "Snacks & Quick Bites Corner Meal Deal",
+    "file": "combo-snacks.webp"
+  },
+  {
+    "id": "category-02061a320447ff",
+    "name": "Soups — Authentic Chinese & Wok",
+    "file": "category-02061a320447ff.webp"
+  },
+  {
+    "id": "combo-south-north-combo",
+    "name": "South & North Indian Fusion Diner Meal Deal",
+    "file": "combo-south-north-combo.webp"
+  },
+  {
+    "id": "category-1c5e8450f429cd",
+    "name": "South Indian Breakfast & Dosas — South & North Indian Fusion Diner",
+    "file": "category-1c5e8450f429cd.webp"
+  },
+  {
+    "id": "combo-south-indian",
+    "name": "South Indian Meal Deal",
+    "file": "combo-south-indian.webp"
+  },
+  {
+    "id": "dish-818c2ee24ce3b5",
+    "name": "South Indian Meals",
+    "file": "dish-818c2ee24ce3b5.webp"
+  },
+  {
+    "id": "category-d5eb29d8930947",
+    "name": "South Indian Rice Meals — South Indian Restaurant",
+    "file": "category-d5eb29d8930947.webp"
+  },
+  {
+    "id": "dish-ffcea6e4e3e46e",
+    "name": "South Indian Thali Meal",
+    "file": "dish-ffcea6e4e3e46e.webp"
+  },
+  {
+    "id": "combo-south-tiffin",
+    "name": "South Indian Tiffin & Breakfast Meal Deal",
+    "file": "combo-south-tiffin.webp"
+  },
+  {
+    "id": "dish-0b7a5096d50d80",
+    "name": "Soya Chaap Biryani",
+    "file": "dish-0b7a5096d50d80.webp"
+  },
+  {
+    "id": "dish-a6632cb6e05d94",
+    "name": "Special Gujarati Thali",
+    "file": "dish-a6632cb6e05d94.webp"
+  },
+  {
+    "id": "dish-fa64643a13a437",
+    "name": "Special Punjabi Samosa (2 Pcs)",
+    "file": "dish-fa64643a13a437.webp"
+  },
+  {
+    "id": "dish-80cb84e963106a",
+    "name": "Special Rotla Shaak Meal",
+    "file": "dish-80cb84e963106a.webp"
+  },
+  {
+    "id": "dish-ca81d5fa4a971a",
+    "name": "Spicy Paneer Tikka Wrap",
+    "file": "dish-ca81d5fa4a971a.webp"
+  },
+  {
+    "id": "dish-9bdd41091b24da",
+    "name": "Spring Rolls",
+    "file": "dish-9bdd41091b24da.webp"
+  },
+  {
+    "id": "category-0ecd1e7c85de1b",
+    "name": "Starters — Authentic Chinese & Wok",
+    "file": "category-0ecd1e7c85de1b.webp"
+  },
+  {
+    "id": "category-a0cbf21b37d17d",
+    "name": "Starters — Biryani & Kebab Darbar",
+    "file": "category-a0cbf21b37d17d.webp"
+  },
+  {
+    "id": "category-e8ffaa64ca5ee1",
+    "name": "Starters — Indian Multi-Cuisine Diner",
+    "file": "category-e8ffaa64ca5ee1.webp"
+  },
+  {
+    "id": "category-467966b07eb507",
+    "name": "Starters — North Indian Restaurant",
+    "file": "category-467966b07eb507.webp"
+  },
+  {
+    "id": "category-af74fa978a3afa",
+    "name": "Starters — Punjabi Dhaba & Restaurant",
+    "file": "category-af74fa978a3afa.webp"
+  },
+  {
+    "id": "dish-bff7a7e4433ece",
+    "name": "Steamed Ghee Podi Idli (2 Pcs)",
+    "file": "dish-bff7a7e4433ece.webp"
+  },
+  {
+    "id": "dish-70677a5e9dc074",
+    "name": "Steamed Rice",
+    "file": "dish-70677a5e9dc074.webp"
+  },
+  {
+    "id": "dish-8604220ce8e63c",
+    "name": "Steamed Surti Basmati Rice",
+    "file": "dish-8604220ce8e63c.webp"
+  },
+  {
+    "id": "dish-f8de5a0da9a83b",
+    "name": "Strawberry Ice Cream",
+    "file": "dish-f8de5a0da9a83b.webp"
+  },
+  {
+    "id": "dish-6ad631d1a92e25",
+    "name": "Strawberry Shake",
+    "file": "dish-6ad631d1a92e25.webp"
+  },
+  {
+    "id": "combo-chaat",
+    "name": "Street Food Meal Deal",
+    "file": "combo-chaat.webp"
+  },
+  {
+    "id": "dish-c488100310ec55",
+    "name": "Stuffed Garlic Bread",
+    "file": "dish-c488100310ec55.webp"
+  },
+  {
+    "id": "dish-f4169043d17ac0",
+    "name": "Sukhdi",
+    "file": "dish-f4169043d17ac0.webp"
+  },
+  {
+    "id": "category-8eea164aaf6bf9",
+    "name": "Sundaes — Dessert / Ice Cream",
+    "file": "category-8eea164aaf6bf9.webp"
+  },
+  {
+    "id": "category-a0e8d9b90de3ea",
+    "name": "Sundaes & Faloodas — Dessert / Ice Cream",
+    "file": "category-a0e8d9b90de3ea.webp"
+  },
+  {
+    "id": "dish-8a759168f5dc6f",
+    "name": "Surti Nylon Khaman (250g)",
+    "file": "dish-8a759168f5dc6f.webp"
+  },
+  {
+    "id": "dish-66c5abbbec7d2f",
+    "name": "Surti Undhiyu Special",
+    "file": "dish-66c5abbbec7d2f.webp"
+  },
+  {
+    "id": "dish-17e8660f86bf48",
+    "name": "Sweet Corn Soup",
+    "file": "dish-17e8660f86bf48.webp"
+  },
+  {
+    "id": "dish-0f67f32e78fb82",
+    "name": "Sweet Gujarati Toor Dal",
+    "file": "dish-0f67f32e78fb82.webp"
+  },
+  {
+    "id": "dish-5aefc491ae7047",
+    "name": "Sweet Lassi",
+    "file": "dish-5aefc491ae7047.webp"
+  },
+  {
+    "id": "dish-97a29ad854081d",
+    "name": "Sweet Tamarind Chutney",
+    "file": "dish-97a29ad854081d.webp"
+  },
+  {
+    "id": "category-4a02d3d87924da",
+    "name": "Sweets — Grand Indian Thali Restaurant",
+    "file": "category-4a02d3d87924da.webp"
+  },
+  {
+    "id": "category-2c5a19355daca3",
+    "name": "Sweets — Gujarati Restaurant",
+    "file": "category-2c5a19355daca3.webp"
+  },
+  {
+    "id": "category-a01251eabef0ba",
+    "name": "Sweets — Street Food Restaurant",
+    "file": "category-a01251eabef0ba.webp"
+  },
+  {
+    "id": "category-495f82771d6b57",
+    "name": "Sweets & Beverages — Jain Satvik Bhojanalaya",
+    "file": "category-495f82771d6b57.webp"
+  },
+  {
+    "id": "category-a42127454a2ebb",
+    "name": "Sweets & Beverages — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-a42127454a2ebb.webp"
+  },
+  {
+    "id": "category-1895f545621992",
+    "name": "Sweets & Mithai — Gujarati Restaurant",
+    "file": "category-1895f545621992.webp"
+  },
+  {
+    "id": "dish-596445bacfcd46",
+    "name": "Tamarind Rice",
+    "file": "dish-596445bacfcd46.webp"
+  },
+  {
+    "id": "dish-7a1439e2e170df",
+    "name": "Tandoori Afghani Paneer Tikka",
+    "file": "dish-7a1439e2e170df.webp"
+  },
+  {
+    "id": "dish-f8ba9b75567ba4",
+    "name": "Tandoori Chicken Half",
+    "file": "dish-f8ba9b75567ba4.webp"
+  },
+  {
+    "id": "category-638a4ba18a9650",
+    "name": "Tandoori Grills & Chaap — Tandoori Grills & Clay-Oven Specialist",
+    "file": "category-638a4ba18a9650.webp"
+  },
+  {
+    "id": "combo-tandoor",
+    "name": "Tandoori Grills & Clay-Oven Specialist Meal Deal",
+    "file": "combo-tandoor.webp"
+  },
+  {
+    "id": "dish-fa9ba6d1cef1eb",
+    "name": "Tandoori Roti",
+    "file": "dish-fa9ba6d1cef1eb.webp"
+  },
+  {
+    "id": "dish-3057968274433d",
+    "name": "Tandoori Roti (Butter)",
+    "file": "dish-3057968274433d.webp"
+  },
+  {
+    "id": "category-4c9819d635c060",
+    "name": "Tandoori Roti & Naan Breads — North Indian Restaurant",
+    "file": "category-4c9819d635c060.webp"
+  },
+  {
+    "id": "category-d24a31910975e4",
+    "name": "Tandoori Starters & Kebabs — North Indian Restaurant",
+    "file": "category-d24a31910975e4.webp"
+  },
+  {
+    "id": "dish-2c22caa2969c02",
+    "name": "Tandoori Stuffed Mushroom",
+    "file": "dish-2c22caa2969c02.webp"
+  },
+  {
+    "id": "category-9f80ce7a293c3b",
+    "name": "Tea — Artisan Café & Coffee Bar",
+    "file": "category-9f80ce7a293c3b.webp"
+  },
+  {
+    "id": "category-32f1fc4d9eea7f",
+    "name": "Thali — Grand Indian Thali Restaurant",
+    "file": "category-32f1fc4d9eea7f.webp"
+  },
+  {
+    "id": "category-c044f6cb9435a4",
+    "name": "Thali — Kathiyawadi Dhaba & Bhojanalaya",
+    "file": "category-c044f6cb9435a4.webp"
+  },
+  {
+    "id": "dish-ff54046b408ae7",
+    "name": "Thepla",
+    "file": "dish-ff54046b408ae7.webp"
+  },
+  {
+    "id": "dish-ca3a7217a51ff9",
+    "name": "Tindora Nu Shaak",
+    "file": "dish-ca3a7217a51ff9.webp"
+  },
+  {
+    "id": "dish-e0f2d5332c35d7",
+    "name": "Tomato Chutney",
+    "file": "dish-e0f2d5332c35d7.webp"
+  },
+  {
+    "id": "dish-1a5b79de95bc88",
+    "name": "Tomato Uttapam",
+    "file": "dish-1a5b79de95bc88.webp"
+  },
+  {
+    "id": "category-810b2ab58e19dc",
+    "name": "Traditional Filter Coffee & Drinks — South Indian Restaurant",
+    "file": "category-810b2ab58e19dc.webp"
+  },
+  {
+    "id": "dish-6dd1cf9a31c8ca",
+    "name": "Traditional Gujarati Kadhi",
+    "file": "dish-6dd1cf9a31c8ca.webp"
+  },
+  {
+    "id": "dish-8fcbb47826bd46",
+    "name": "Triple Schezwan Rice with Gravy",
+    "file": "dish-8fcbb47826bd46.webp"
+  },
+  {
+    "id": "category-06cf8e0fb9dcd4",
+    "name": "Uttapam — South Indian Restaurant",
+    "file": "category-06cf8e0fb9dcd4.webp"
+  },
+  {
+    "id": "category-82f1490d05738a",
+    "name": "Uttapam & Thick Pancakes — South Indian Restaurant",
+    "file": "category-82f1490d05738a.webp"
+  },
+  {
+    "id": "dish-b4b6fc0b1e9b7a",
+    "name": "Vada Pav",
+    "file": "dish-b4b6fc0b1e9b7a.webp"
+  },
+  {
+    "id": "dish-199ce6b187841f",
+    "name": "Vaghareli Khichdi",
+    "file": "dish-199ce6b187841f.webp"
+  },
+  {
+    "id": "dish-97018a22391588",
+    "name": "Vaghareli Khichdi with Kadhi",
+    "file": "dish-97018a22391588.webp"
+  },
+  {
+    "id": "dish-b2644bf6038f7f",
+    "name": "Vanilla Cream Cake",
+    "file": "dish-b2644bf6038f7f.webp"
+  },
+  {
+    "id": "dish-533b0cd396c41f",
+    "name": "Vanilla Cupcake",
+    "file": "dish-533b0cd396c41f.webp"
+  },
+  {
+    "id": "dish-9025a0d3e38633",
+    "name": "Vanilla Ice Cream",
+    "file": "dish-9025a0d3e38633.webp"
+  },
+  {
+    "id": "dish-8e5dafcb91ed19",
+    "name": "Vanilla Shake",
+    "file": "dish-8e5dafcb91ed19.webp"
+  },
+  {
+    "id": "dish-0cf400ce2ca7ca",
+    "name": "Veg Club Sandwich",
+    "file": "dish-0cf400ce2ca7ca.webp"
+  },
+  {
+    "id": "dish-6ea2f304d41f58",
+    "name": "Veg Dum Biryani",
+    "file": "dish-6ea2f304d41f58.webp"
+  },
+  {
+    "id": "dish-199f7bb2ae3327",
+    "name": "Veg Frankie",
+    "file": "dish-199f7bb2ae3327.webp"
+  },
+  {
+    "id": "dish-5f3f0bd98e6016",
+    "name": "Veg Fried Momos",
+    "file": "dish-5f3f0bd98e6016.webp"
+  },
+  {
+    "id": "dish-fc2d3d3ff5e1bd",
+    "name": "Veg Fried Rice",
+    "file": "dish-fc2d3d3ff5e1bd.webp"
+  },
+  {
+    "id": "dish-1b314792293d4b",
+    "name": "Veg Galouti Kebab (4 Pcs)",
+    "file": "dish-1b314792293d4b.webp"
+  },
+  {
+    "id": "dish-e8ca610f82d715",
+    "name": "Veg Hakka Noodles",
+    "file": "dish-e8ca610f82d715.webp"
+  },
+  {
+    "id": "dish-3ef1093d7dbc15",
+    "name": "Veg Hot and Sour Soup",
+    "file": "dish-3ef1093d7dbc15.webp"
+  },
+  {
+    "id": "dish-fb2c6a922b70f8",
+    "name": "Veg Manchow Soup",
+    "file": "dish-fb2c6a922b70f8.webp"
+  },
+  {
+    "id": "dish-bdd0900d9ebc95",
+    "name": "Veg Manchurian Dry",
+    "file": "dish-bdd0900d9ebc95.webp"
+  },
+  {
+    "id": "dish-71ec09f1817dc4",
+    "name": "Veg Manchurian Gravy",
+    "file": "dish-71ec09f1817dc4.webp"
+  },
+  {
+    "id": "dish-342b74148f8968",
+    "name": "Veg Mexican Wrap",
+    "file": "dish-342b74148f8968.webp"
+  },
+  {
+    "id": "dish-5d93aac791e7f9",
+    "name": "Veg Nuggets",
+    "file": "dish-5d93aac791e7f9.webp"
+  },
+  {
+    "id": "dish-5a2017b447a43c",
+    "name": "Veg Puff",
+    "file": "dish-5a2017b447a43c.webp"
+  },
+  {
+    "id": "dish-8df148d9949107",
+    "name": "Veg Pulao Shahi",
+    "file": "dish-8df148d9949107.webp"
+  },
+  {
+    "id": "dish-b9d799d42d8312",
+    "name": "Veg Quiche",
+    "file": "dish-b9d799d42d8312.webp"
+  },
+  {
+    "id": "dish-66e82239e373e5",
+    "name": "Veg Schezwan Noodles",
+    "file": "dish-66e82239e373e5.webp"
+  },
+  {
+    "id": "dish-379470840e2263",
+    "name": "Veg Seekh Kebab Mughlai",
+    "file": "dish-379470840e2263.webp"
+  },
+  {
+    "id": "dish-16ff65aaecf5d1",
+    "name": "Veg Steamed Momos",
+    "file": "dish-16ff65aaecf5d1.webp"
+  },
+  {
+    "id": "dish-b4c818f3740dbb",
+    "name": "Vegetable Poha",
+    "file": "dish-b4c818f3740dbb.webp"
+  },
+  {
+    "id": "category-d2e3cd9a73fea1",
+    "name": "Vegetarian Biryani — Biryani & Kebab Darbar",
+    "file": "category-d2e3cd9a73fea1.webp"
+  },
+  {
+    "id": "category-e5d01eaa01fe7a",
+    "name": "Vegetarian Starters — Pure Vegetarian Family Restaurant",
+    "file": "category-e5d01eaa01fe7a.webp"
+  },
+  {
+    "id": "dish-cbdc293a4fefa8",
+    "name": "Veggie Supreme Pizza",
+    "file": "dish-cbdc293a4fefa8.webp"
+  },
+  {
+    "id": "dish-503843b94a1a1a",
+    "name": "Ven Pongal",
+    "file": "dish-503843b94a1a1a.webp"
+  },
+  {
+    "id": "dish-c40dbcd6ab5ed8",
+    "name": "Virgin Mint Mojito Cooler",
+    "file": "dish-c40dbcd6ab5ed8.webp"
+  },
+  {
+    "id": "dish-f8fe1060da7895",
+    "name": "Warm Choco Lava Cake",
+    "file": "dish-f8fe1060da7895.webp"
+  },
+  {
+    "id": "category-a1e7a73325c851",
+    "name": "Warm Desserts — Dessert / Ice Cream",
+    "file": "category-a1e7a73325c851.webp"
+  },
+  {
+    "id": "category-af9ae1799eea1e",
+    "name": "Warm Desserts — Indian Multi-Cuisine Diner",
+    "file": "category-af9ae1799eea1e.webp"
+  },
+  {
+    "id": "dish-5a40c81ac98abc",
+    "name": "Wheat Bhakri",
+    "file": "dish-5a40c81ac98abc.webp"
+  },
+  {
+    "id": "dish-17f6af53b91b70",
+    "name": "White Bread Loaf",
+    "file": "dish-17f6af53b91b70.webp"
+  },
+  {
+    "id": "dish-81cf27158f27af",
+    "name": "White Sauce Pasta",
+    "file": "dish-81cf27158f27af.webp"
+  },
+  {
+    "id": "dish-3e69b75dc07cfd",
+    "name": "Whole Wheat Bread",
+    "file": "dish-3e69b75dc07cfd.webp"
+  },
+  {
+    "id": "category-5345e3c3762d15",
+    "name": "Wok Tossed Noodles & Rice — Authentic Chinese & Wok",
+    "file": "category-5345e3c3762d15.webp"
+  },
+  {
+    "id": "category-4a97235073a580",
+    "name": "Wraps — Fast Food & Quick Service Restaurant",
+    "file": "category-4a97235073a580.webp"
+  },
+  {
+    "id": "dish-eeff37b2e7df4a",
+    "name": "Yellow Dal Tadka Desi Ghee",
+    "file": "dish-eeff37b2e7df4a.webp"
+  }
+]

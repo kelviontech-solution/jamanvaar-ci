@@ -1,0 +1,29 @@
+{
+  "id": "combo-multicuisine",
+  "kind": "combo",
+  "name": "Indian Multi-Cuisine Diner Meal Deal",
+  "description": "Paneer Lababdar Special with Steamed Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Paneer Lababdar Special",
+      "description": "Paneer batons cooked in rich tomato and onion gravy with grated paneer garnish",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-multicuisine.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88870,
+  "sha256": "f77cb200e7d9fa0852a56b77dd6a9bc7b30c3f299d0a1f03a070b6e728222a1c"
+}

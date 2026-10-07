@@ -1,3 +1,4 @@
+import { CachedImg } from '@jamanvaar/ui';
 import React, { useRef } from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { usePosStore } from '../../store/posStore';
@@ -80,7 +81,7 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
       <div className="flex gap-3 items-stretch">
         {/* Image with dietary / spice badges overlaid */}
         <div className="w-[44%] aspect-square max-h-28 rounded-2xl overflow-hidden bg-jaman-cream border border-jaman-border shrink-0 relative">
-          <img
+          <CachedImg
             src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"

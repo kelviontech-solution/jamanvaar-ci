@@ -1,0 +1,37 @@
+{
+  "id": "category-32f1fc4d9eea7f",
+  "kind": "category",
+  "name": "Thali — Grand Indian Thali Restaurant",
+  "categoryName": "Thali",
+  "templateId": "tpl-thali",
+  "slug": "thali",
+  "description": "Complete regional meals",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Thali",
+  "components": [
+    {
+      "name": "Kathiyawadi Thali",
+      "description": "Kathiyawadi Thali, complete regional meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Special Rotla Shaak Meal",
+      "description": "Special Rotla Shaak Meal, complete regional meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mini Kathiyawadi Thali",
+      "description": "Mini Kathiyawadi Thali, complete regional meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-32f1fc4d9eea7f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 132182,
+  "sha256": "e1634650a25cc898ce8148eded7b2e4336a524a37c62a72c30426fbf500d95cd"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-495f82771d6b57",
+  "kind": "category",
+  "name": "Sweets & Beverages — Jain Satvik Bhojanalaya",
+  "categoryName": "Sweets & Beverages",
+  "templateId": "tpl-jain",
+  "slug": "sweets-beverages",
+  "description": "Traditional dairy sweets and refreshments",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Sweets & Beverages",
+  "components": [
+    {
+      "name": "Jain Gulab Jamun",
+      "description": "Jain Gulab Jamun, traditional dairy sweets and refreshments.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Shrikhand",
+      "description": "Jain Shrikhand, traditional dairy sweets and refreshments.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Masala Chaas",
+      "description": "Jain Masala Chaas, traditional dairy sweets and refreshments.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-495f82771d6b57.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99182,
+  "sha256": "45b93f1ab4365e3a35998f8c0b94c4f1feab4dc8d349f65bd80ce78af13d7901"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "dish-30c4fde5c23429",
+  "kind": "dish",
+  "name": "Rice Kheer",
+  "description": "Rice Kheer, traditional Indian dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Indian Sweets"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-30c4fde5c23429.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 69674,
+  "sha256": "ddcf0fb79a9b307d4edb25cee7c0f85d18873ca8ca44c1a731b23ed67576f022"
+}

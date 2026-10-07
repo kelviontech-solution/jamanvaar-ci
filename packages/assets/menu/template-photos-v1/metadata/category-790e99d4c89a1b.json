@@ -1,0 +1,37 @@
+{
+  "id": "category-790e99d4c89a1b",
+  "kind": "category",
+  "name": "Garlic Bread — Pizza Restaurant",
+  "categoryName": "Garlic Bread",
+  "templateId": "tpl-pizza",
+  "slug": "garlic-bread",
+  "description": "Oven-baked bread with garlic butter and herbs",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Garlic Bread",
+  "components": [
+    {
+      "name": "Garlic Bread",
+      "description": "Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Garlic Bread",
+      "description": "Cheese Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Stuffed Garlic Bread",
+      "description": "Stuffed Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-790e99d4c89a1b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 136804,
+  "sha256": "6da33320fc1d09591c8c819284ae16daa54896a6d7a2afde27222631d400ab72"
+}

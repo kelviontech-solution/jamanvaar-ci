@@ -20,6 +20,7 @@ import {
   db,
   StaffRepository,
   ServiceMessages,
+  projectTableBillState,
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
@@ -926,7 +927,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       kitchenStation: ci.menuItem.kitchenStation || 'Main Kitchen',
       status: 'PREPARING' as const,
       orderItemId: lineIdOf.get(ci.id)!,
-      course: ci.course ?? 'COURSE_1'
+      course: ci.course ?? 'COURSE_1',
+      ...(ci.seat ? { seat: ci.seat } : {})
     }));
 
     const generatedKots = KOTRepository.generateKOT({
@@ -1021,10 +1023,15 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   markItemServed: (foodReadyId) => {
     const st = get();
     const targetItem = st.foodReadyItems.find((it) => it.id === foodReadyId);
-    if (!targetItem) return;
+    if (!targetItem || targetItem.isServed) return;
+    const liveTicket = captainDb.kots.find(k => k.id === targetItem.kotId);
+    const liveDish = liveTicket?.items.find(i => i.id === targetItem.itemId);
+    // A kitchen Undo can arrive before this screen refreshes its ready list.
+    if (!liveTicket || !liveDish || liveTicket.status === 'CANCELLED' || liveTicket.status === 'SERVED' || liveDish.status === 'CANCELLED' || liveDish.status === 'SERVED') return;
+    if (liveDish.status !== 'READY' && liveTicket.status !== 'READY') return;
 
     // The waiter took the dish to the table: record it on the order so POS and KDS see it too.
-    KOTRepository.markItemServed(targetItem.kotId, targetItem.itemId);
+    if (!KOTRepository.markItemServed(targetItem.kotId, targetItem.itemId)) return;
     get().refreshState();
     set((s2) => ({
       shiftStats: {
@@ -1050,15 +1057,18 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   serveReadyForTable: (tableNumber) => {
     const waiting = get().foodReadyItems.filter((it) => it.tableNumber === tableNumber && !it.isServed);
+    const servedBefore = get().shiftStats.foodServed;
     waiting.forEach((it) => get().markItemServed(it.id));
-    return waiting.reduce((n, it) => n + (it.quantity || 1), 0);
+    return get().shiftStats.foodServed - servedBefore;
   },
 
   markEntireKotServed: (kotId) => {
     const st = get();
-    const matchingItems = st.foodReadyItems.filter((it) => it.kotId === kotId);
+    const ticket = captainDb.kots.find(k => k.id === kotId);
+    if (!ticket || ticket.status !== 'READY') return;
+    const matchingItems = st.foodReadyItems.filter((it) => it.kotId === kotId && !it.isServed);
 
-    KOTRepository.markKotServed(kotId);
+    if (!KOTRepository.markKotServed(kotId)) return;
     get().refreshState();
     set((s2) => ({
       shiftStats: {
@@ -1085,8 +1095,16 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     const tbl = captainDb.tables.find((t) => t.tableNumber === tableNumber);
     // There must be an order to bill. The table state travels to POS with the table sync, where the
     // counter sees it as "Billing" (BUG-099).
-    if (!tbl || !tbl.currentOrderId || !captainDb.orders.some((o) => o.id === tbl.currentOrderId)) return false;
-    tbl.status = 'BILL_REQUESTED';
+    const billOrder = tbl?.currentOrderId ? captainDb.orders.find((o) => o.id === tbl.currentOrderId) : undefined;
+    if (!tbl || !billOrder) return false;
+    // The request belongs to the order. It syncs with the order, and the table and the counter's notification are derived from it,
+    // so there is no separate table flag or bill message to keep in step.
+    const requestedAt = new Date().toISOString();
+    billOrder.billRequestedAt = requestedAt;
+    billOrder.billSplitNote = splitNote || undefined;
+    billOrder.updatedAt = requestedAt;
+    billOrder.syncStatus = 'SAVED_LOCALLY';
+    projectTableBillState(tbl, captainDb.orders);
     captainDb.notify();
 
     set((s) => ({
@@ -1101,18 +1119,6 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       category: 'ORDER',
       details: `Bill requested for Table #${tableNumber} by ${get().currentCaptain?.name}${splitNote ? ` (split: ${splitNote})` : ''}`,
       username: get().currentCaptain?.name || 'Captain'
-    });
-
-    ServiceMessages.enqueue({
-      kind: 'BILL_REQUEST',
-      recipient: 'POS',
-      senderName: get().currentCaptain?.name || 'Staff',
-      presetText: splitNote ? `Bill requested: split by seat (${splitNote})` : 'Bill requested',
-      tableNumber
-    });
-    lanMeshSync.broadcast('BILL_REQUESTED', {
-      tableNumber,
-      captainName: get().currentCaptain?.name || 'Captain'
     });
 
     pushNow();

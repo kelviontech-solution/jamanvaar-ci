@@ -1,0 +1,248 @@
+{
+  "version": 1,
+  "notice": "AI-generated description-matched starter images; restaurant owners can replace these with actual restaurant photos.",
+  "photos": [
+    {
+      "file": "royal-gujarati-thali.webp",
+      "name": "Royal Gujarati Grand Thali",
+      "description": "A stainless steel Gujarati thali with 3 small vegetable shaak bowls, sweet Gujarati dal, white kadhi, four thin phulka rotli, basmati rice, yellow khaman farsan, a small sweet, papad, pickle and a glass of chaas. Entirely vegetarian.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 115180,
+      "sha256": "5aa53880570d648397fd5906d3b7d9cae851dea365d3b443bb50fd4072d1682b"
+    },
+    {
+      "file": "deluxe-gujarati-thali.webp",
+      "name": "Deluxe Gujarati Executive Thali",
+      "description": "A stainless steel Gujarati thali with 2 vegetable shaak bowls, dal, white kadhi, three phulka rotli, rice, khaman farsan and a glass of masala chaas. Entirely vegetarian.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 86108,
+      "sha256": "bec2ea46c90e922148dc9f39992654ea02c82f8fbe458014692a55716021e5e6"
+    },
+    {
+      "file": "khandvi.webp",
+      "name": "Khandvi with Mustard Tempering",
+      "description": "Silky thin yellow gram flour rolls arranged on a ceramic plate, topped with black mustard seeds, fresh grated coconut and chopped coriander.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 97562,
+      "sha256": "d55e7e5e02331bf852cf8e6b11017b898437cf8a266e56f4925c5ffc5c7e7e63"
+    },
+    {
+      "file": "methi-gota.webp",
+      "name": "Methi Na Gota (Pakoda)",
+      "description": "Round golden brown crispy fried fenugreek and gram flour fritters with small visible green fenugreek flecks, served with a small bowl of creamy white sweet kadhi dip.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 94080,
+      "sha256": "0b13ccc57c8485fa1f2ebd0a9881297a0885f09e2593d978abff4eea72f8ffab"
+    },
+    {
+      "file": "patra.webp",
+      "name": "Patra Steamed Rolls",
+      "description": "Sliced spiral colocasia leaf rolls with dark green leaf layers and golden spiced gram flour paste, lightly tempered with mustard and sesame seeds, Gujarati patra.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 111444,
+      "sha256": "d4be730fafc72e5c84daa20659b44027a995b6ac25df2eb5566366e28bbecbbd"
+    },
+    {
+      "file": "undhiyu.webp",
+      "name": "Surti Undhiyu Special",
+      "description": "Rustic Gujarati undhiyu in a bowl: surti papdi beans, purple yam, baby eggplants, potatoes and methi muthia dumplings, green herb masala, dry slow-cooked mixed vegetables.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 113192,
+      "sha256": "00814b765c425d966096b564d3e6c0e3743032cb9d48622b6cf567c0e47d2ca4"
+    },
+    {
+      "file": "sev-tameta.webp",
+      "name": "Sev Tameta Nu Shaak",
+      "description": "Sweet tangy red tomato curry in a bowl, topped generously with thin crispy golden sev noodles and coriander, authentic Gujarati sev tameta.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 96570,
+      "sha256": "8b5fd48426541c98ca61eb3e8028ec2aeecf6e7b4bbee4051669f07dd14c433c"
+    },
+    {
+      "file": "ringna-bateta.webp",
+      "name": "Ringna Bateta Nu Shaak",
+      "description": "Gujarati chunky aubergine and potato curry with purple eggplant skins, yellow potatoes and traditional red-brown spiced gravy.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 118066,
+      "sha256": "024af74d627bc19572612a2bdb575f0ee9e5dae99c908385eab99b8eed1d55e3"
+    },
+    {
+      "file": "bhindi-shaak.webp",
+      "name": "Bhindanu Shaak (Okra)",
+      "description": "Stir-fried sliced green okra with toasted peanuts, sesame seeds and dry Gujarati spices, dry vegetable preparation in a bowl, no paneer or gravy.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 113952,
+      "sha256": "e74d6f1e7d524c507ab0a6d6deeed7d8f71fcd99e7d5261ce934cd4a870bf752"
+    },
+    {
+      "file": "gujarati-dal.webp",
+      "name": "Sweet Gujarati Toor Dal",
+      "description": "Thin golden pigeon pea lentil soup in a bowl, with whole peanuts, mustard seed tempering, curry leaves and small dried chilli.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 77110,
+      "sha256": "a5e2fd2b9b69e873e4e3b8a203baf93ed65443dca8f965724eaae1b48a095ac2"
+    },
+    {
+      "file": "gujarati-kadhi.webp",
+      "name": "Traditional Gujarati Kadhi",
+      "description": "Creamy white pale-yellow yoghurt and besan soup in a bowl, cinnamon and cloves, curry leaves, ginger and mustard seed tempering; no pakora.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 76504,
+      "sha256": "d0d84ab8e13410393be9b9198e3b51a6d1a64d60c484f46f4fc5e17a4a68c089"
+    },
+    {
+      "file": "phulka.webp",
+      "name": "Phulka Rotli (Ghee, 4 Pcs)",
+      "description": "Four paper-thin whole wheat rotli, softly puffed and folded on a plate, lightly brushed with ghee, browned griddle spots.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 91528,
+      "sha256": "e07d761100d80ecbf0ad50068f25c89b7e300ee14ffc465beee17a8630b896a0"
+    },
+    {
+      "file": "bajra-rotla.webp",
+      "name": "Kathiyawadi Bajra Rotla (Ghee)",
+      "description": "Thick hand-flattened round grey-brown pearl millet flatbread with rustic cracked texture and roasted spots, served with white butter and jaggery. Not naan or samosa.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 117130,
+      "sha256": "dfda4dbf7184eae70b68509cc5e15cd8dfb0dced40c7c3d65e80aab3f3a65e44"
+    },
+    {
+      "file": "steamed-rice.webp",
+      "name": "Steamed Surti Basmati Rice",
+      "description": "A bowl of fluffy white long-grain steamed basmati rice, individual elongated grains clearly visible, no gravy or vegetables.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 49000,
+      "sha256": "2f3ff6cf3a9642db49ca08e8fbf0c67d5cd1d079d4d6c9e9b1239b878b5eb697"
+    },
+    {
+      "file": "basundi.webp",
+      "name": "Rich Basundi Bowl",
+      "description": "Creamy off-white reduced whole milk dessert in a bowl, slightly textured from simmering, topped with sliced almonds and light nutmeg. Not idli.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 69434,
+      "sha256": "41e9faaea54c3c65c16f688cdcf8a2eaf6e076227d554ebf05bc5614866fa4ce"
+    },
+    {
+      "file": "methi-thepla.webp",
+      "name": "Methi Thepla (4 Pcs)",
+      "description": "Four thin golden spiced wheat flatbreads with visible green fenugreek flecks stacked on a plate, sweet mango chundo in small ramekin.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 109328,
+      "sha256": "af84bd6fe307e241d0aca5107549124e85cf515dbef4cabfcfcb74917fb2e1f2"
+    },
+    {
+      "file": "shrikhand.webp",
+      "name": "Kesar Pista Shrikhand (150g)",
+      "description": "Thick smooth pale yellow hung-curd dessert in a small bowl, saffron strands, sliced pistachios and cardamom, rich spoonable texture. Not idli.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 61310,
+      "sha256": "7052e2719dcd310206e8c8f12943bb84f2e7cc15ab623c15288a762ef4aa1e9c"
+    },
+    {
+      "file": "khichdi-kadhi.webp",
+      "name": "Vaghareli Khichdi with Kadhi",
+      "description": "Golden soft rice and moong lentil khichdi tempered with garlic, onions, cloves and whole spices, in a bowl paired with a separate bowl of creamy white Gujarati kadhi.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 92752,
+      "sha256": "392006dcc9725d6691d176025868a6f060f969d7309073f3ca34a4fbea092ee0"
+    },
+    {
+      "file": "paneer-rice-meal.webp",
+      "name": "Indian Multi-Cuisine Diner Meal Deal",
+      "description": "A vegetarian meal on a white plate: red-orange paneer lababdar curry in a small bowl with clearly visible paneer cubes and a mound of fluffy white steamed basmati rice beside it.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 74922,
+      "sha256": "6f1b515c27af5f24c74267422294ff11450769dc8f99680d85f0007f2064c0c9"
+    },
+    {
+      "file": "biscuit-bhakri.webp",
+      "name": "Biscuit Bhakri (2 Pcs)",
+      "description": "Two thick crisp golden round Gujarati wheat and semolina bhakri discs, concentric roast patterns, lightly glazed with ghee.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 100108,
+      "sha256": "41bfd1c8d5c43c20a0a6731516d205ab06be8e2d0a0aa811816fa7351cfed751"
+    },
+    {
+      "file": "masala-chaas.webp",
+      "name": "Kathiyawadi Masala Chaas",
+      "description": "A tall glass of chilled white buttermilk with roasted cumin, coriander and a hint of green chilli, simple Gujarati chaas.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 87334,
+      "sha256": "66b74b9b6945830de2f1356dca9fc6e1614d4396b636ca859be3f3a48548ff78"
+    },
+    {
+      "file": "khaman.webp",
+      "name": "Surti Nylon Khaman (250g)",
+      "description": "Soft airy yellow steamed gram flour cakes, mustard seeds, green chillies, curry leaves and fresh coconut.",
+      "source": "AI_GENERATED_STARTER_PHOTO",
+      "generatedAt": "2026-10-07",
+      "width": 840,
+      "height": 630,
+      "bytes": 89018,
+      "sha256": "14bee47a30b22bf84cf849cb16ca11d7054f1463c8aebcda1f2babeb8bf75046"
+    }
+  ]
+}

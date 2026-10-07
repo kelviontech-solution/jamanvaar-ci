@@ -1,0 +1,25 @@
+{
+  "id": "dish-e5f73369638ecc",
+  "kind": "dish",
+  "name": "Gujarati Dal",
+  "description": "Gujarati Dal, sweet-sour Gujarati tempering, served hot.",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-thali",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/gujarati-dal.webp"
+  ],
+  "file": "dish-e5f73369638ecc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79284,
+  "sha256": "7b5fff492ed5d48b22e3f204b1af160514bf6639a7898be44828643f9698c5f8"
+}

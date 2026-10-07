@@ -1,0 +1,25 @@
+{
+  "id": "dish-6ac667dcfaadf3",
+  "kind": "dish",
+  "name": "Samosa 2 Pieces",
+  "description": "Samosa 2 Pieces, freshly fried snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Hot Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/snacks/samosa.jpg"
+  ],
+  "file": "dish-6ac667dcfaadf3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68506,
+  "sha256": "023c43f0b170f1f93a374bff5650796ff82a8bff429c829d9a56d3532253b979"
+}

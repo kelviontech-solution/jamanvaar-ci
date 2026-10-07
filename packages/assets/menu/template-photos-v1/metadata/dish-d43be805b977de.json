@@ -1,0 +1,22 @@
+{
+  "id": "dish-d43be805b977de",
+  "kind": "dish",
+  "name": "Kadai Paneer Peshawari",
+  "description": "Cottage cheese wok-tossed with freshly pounded coriander seeds, bell peppers and whole red chillies",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Royal Paneer Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Royal Paneer Curries"
+    }
+  ],
+  "file": "dish-d43be805b977de.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121984,
+  "sha256": "41bb414b94331ad955019497c0b268197ac13bba5354a9e284b37bd6ee48c119"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-e3c48fa9e5ade5",
+  "kind": "category",
+  "name": "Combos — Fast Food & Quick Service Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-fast-food",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Crispy Veggie Supreme Burger",
+      "description": "Crisp vegetable patty with cheese slice, iceberg lettuce and smoky mayo on a toasted sesame bun",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Classic Veg Burger",
+      "description": "Classic Veg Burger, toasted buns with freshly cooked patties.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e3c48fa9e5ade5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91430,
+  "sha256": "8883000a457ed03492e12f6a29a2448365e3ff1c5f493a849f2a0ba9e7c118a7"
+}

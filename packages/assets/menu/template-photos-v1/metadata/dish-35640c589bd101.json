@@ -1,0 +1,25 @@
+{
+  "id": "dish-35640c589bd101",
+  "kind": "dish",
+  "name": "Dahi Sev Batata Puri",
+  "description": "Crispy puris filled with potato mash, sweet chilled curd, sev, pomegranate and mint chutney",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Puri & Chaat Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Puri & Chaat Specialties"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-35640c589bd101.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91610,
+  "sha256": "505ea9900f5f36958c9405bfa9a0116447ebbd807fcb80f9c33e56840f4219f0"
+}

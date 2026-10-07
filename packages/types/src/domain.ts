@@ -344,6 +344,8 @@ export interface TaxGroup {
   igstPercent: number; // e.g. 5.0
   isInclusive: boolean; // default true for restaurants
   isActive: boolean;
+  /** Charged on dishes with no tax group of their own. Only one active group should carry it. */
+  isDefault?: boolean;
 }
 
 export interface Offer {
@@ -620,6 +622,10 @@ export interface Order {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentTransactionId?: string;
+  /** Operational kitchen urgency; it never changes prices, payment or service status. */
+  kitchenPriority?: 'NORMAL' | 'URGENT';
+  kitchenPriorityRev?: number;
+  kitchenPriorityChangeId?: string;
   orderStatus: OrderStatus;
   estimatedWaitMinutes: number;
   tenderedAmount?: number;
@@ -633,6 +639,10 @@ export interface Order {
   /** The device that accepted this order (QR orders wait for exactly one POS to accept them). First accept wins, everywhere. */
   acceptedByDeviceId?: string;
   customerNotes?: string;
+  /** Set when the guest's table asked for the bill. The order owns this: the table's "Bill requested" state and the counter's notification are derived from it. */
+  billRequestedAt?: string;
+  /** The split-by-seat note the captain gave with the bill request, if any. */
+  billSplitNote?: string;
   kitchenRouting?: {
     stationBreakdown: Record<string, number>;
     summaryText: string;
@@ -1253,6 +1263,8 @@ export interface KOTItem {
   /** The order line this ticket line cooks. Set for every ticket made from now on; older tickets are matched by menuItemId. */
   orderItemId?: string;
   course?: string;
+  /** Dining seat copied from the order line for kitchen delivery and reprints. */
+  seat?: number;
   /** Mirrors OrderItem.statusRev, so a recall on one device reaches the ticket on every other. */
   rev?: number;
   cancelReason?: string;

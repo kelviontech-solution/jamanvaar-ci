@@ -1,0 +1,22 @@
+{
+  "id": "dish-44cb911bbc957d",
+  "kind": "dish",
+  "name": "Jain Mixed Vegetable Curry",
+  "description": "Jain Mixed Vegetable Curry, tomato or cashew gravies without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries"
+    }
+  ],
+  "file": "dish-44cb911bbc957d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90708,
+  "sha256": "46a1ee4aba68b0ce8f1798d57d87eef4e4ac5286b5fe07920638dd12669562c4"
+}

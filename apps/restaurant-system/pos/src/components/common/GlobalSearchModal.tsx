@@ -1,3 +1,4 @@
+import { CachedImg } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
@@ -351,8 +352,8 @@ export const GlobalSearchModal: React.FC = () => {
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 border border-jaman-border shrink-0">
-                              <img
-                                src={it.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=120&q=80'}
+                              <CachedImg
+                                src={it.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                                 alt={it.name}
                                 className="w-full h-full object-cover"
                               />

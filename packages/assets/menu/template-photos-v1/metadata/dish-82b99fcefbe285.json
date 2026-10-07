@@ -1,0 +1,22 @@
+{
+  "id": "dish-82b99fcefbe285",
+  "kind": "dish",
+  "name": "Jain Wheat Bhakri",
+  "description": "Jain Wheat Bhakri, fresh breads without restricted ingredients.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Breads"
+    }
+  ],
+  "file": "dish-82b99fcefbe285.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84468,
+  "sha256": "22346b71ac007e8f2f4d3ed2f1e18bb75ed6088e941705b79c21aa5478883f4b"
+}

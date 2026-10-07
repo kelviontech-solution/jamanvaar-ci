@@ -1,0 +1,37 @@
+{
+  "id": "category-0ecd1e7c85de1b",
+  "kind": "category",
+  "name": "Starters — Authentic Chinese & Wok",
+  "categoryName": "Starters",
+  "templateId": "tpl-chinese",
+  "slug": "starters",
+  "description": "Wok-tossed or crisp starters with house sauces",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "components": [
+    {
+      "name": "Chilli Paneer",
+      "description": "Chilli Paneer, wok-tossed or crisp starters with house sauces.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Manchurian Dry",
+      "description": "Veg Manchurian Dry, wok-tossed or crisp starters with house sauces.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Crispy Chilli Potato",
+      "description": "Crispy Chilli Potato, wok-tossed or crisp starters with house sauces.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-0ecd1e7c85de1b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 124812,
+  "sha256": "b9ced8238bc8e7754b206299f17d953a58a6f45a04af23287a7a3fd036486f80"
+}

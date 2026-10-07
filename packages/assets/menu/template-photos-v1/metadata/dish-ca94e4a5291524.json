@@ -1,0 +1,22 @@
+{
+  "id": "dish-ca94e4a5291524",
+  "kind": "dish",
+  "name": "Pindi Chhole (Rawalpindi Style)",
+  "description": "Dark slow-cooked chickpeas steeped with tea leaves, anardana, dried mango and desi spices",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Special Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dhaba Special Curries"
+    }
+  ],
+  "file": "dish-ca94e4a5291524.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115550,
+  "sha256": "40be42031e64fead0236d833e7ffec89bf69128671244272d523d8928cbc51c1"
+}

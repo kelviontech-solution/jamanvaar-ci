@@ -1,0 +1,37 @@
+{
+  "id": "category-4a02d3d87924da",
+  "kind": "category",
+  "name": "Sweets — Grand Indian Thali Restaurant",
+  "categoryName": "Sweets",
+  "templateId": "tpl-thali",
+  "slug": "sweets",
+  "description": "Gujarati sweet portions for a meal finish",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Sweets",
+  "components": [
+    {
+      "name": "Jalebi",
+      "description": "Jalebi, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Basundi",
+      "description": "Basundi, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shrikhand",
+      "description": "Shrikhand, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4a02d3d87924da.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97256,
+  "sha256": "7874fb2a05c639b5dd56fa20b1ff5fd8c16c9744e4c6cb3f62e8a69fbba3cedf"
+}

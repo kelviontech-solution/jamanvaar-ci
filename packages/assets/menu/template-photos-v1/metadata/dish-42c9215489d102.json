@@ -1,0 +1,22 @@
+{
+  "id": "dish-42c9215489d102",
+  "kind": "dish",
+  "name": "Burnt Garlic Fried Rice",
+  "description": "Burnt Garlic Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Fried Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Fried Rice"
+    }
+  ],
+  "file": "dish-42c9215489d102.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109018,
+  "sha256": "1fcaa72d956642f1ccd3ea9767f42490a04abc8783d0d4b3bb31416458494b88"
+}

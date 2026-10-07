@@ -1,0 +1,22 @@
+{
+  "id": "dish-9e0cbc89791d21",
+  "kind": "dish",
+  "name": "Kathiyawadi Ringna No Olo",
+  "description": "Charcoal roasted smoked eggplants mashed and cooked with garlic, green chillies, spring onions and oil",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Special Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Special Shaak"
+    }
+  ],
+  "file": "dish-9e0cbc89791d21.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102114,
+  "sha256": "c3f85be996b47a406a94e79f412903f3b62e067387300e853b2fa1ee68a4a85a"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-3011a0bfbda7ef",
+  "kind": "category",
+  "name": "Hot Espresso & Coffees — Artisan Café & Coffee Bar",
+  "categoryName": "Hot Espresso & Coffees",
+  "templateId": "tpl-cafe",
+  "slug": "hot-coffee",
+  "description": "Freshly ground Arabica espresso coffees",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Espresso & Coffees",
+  "components": [
+    {
+      "name": "Classic Cappuccino",
+      "description": "Rich double espresso topped with silky steamed whole milk foam and dark cocoa dust",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Roasted Hazelnut Latte",
+      "description": "Velvety espresso with steamed milk and aromatic roasted hazelnut syrup",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3011a0bfbda7ef.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100452,
+  "sha256": "b7f713a4f0b379090c1dba6a20e78f3a5e9b126dea91b7d53604d476c2c53a9c"
+}

@@ -2,7 +2,9 @@ import React, { useState, useEffect} from 'react';
 import { Order } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, printElement } from '@jamanvaar/ui';
-import { formatDate, formatTime, formatINR, formatSplitTax } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
   ReportDesignTheme,
   ReportSummaryMetrics,
@@ -327,11 +329,11 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
               </div>
 
               <div className={st.card}>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">GST Tax (2.5%+2.5%)</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">{gstLabels().total}</span>
                 <div className="font-mono font-black text-brand text-lg">
                   {formatINR(summary.totalTax.current)}
                 </div>
-                <span className="text-[10px] text-slate-400 font-semibold">CGST + SGST (5%)</span>
+                <span className="text-[10px] text-slate-400 font-semibold">CGST + SGST</span>
               </div>
 
               <div className="border border-emerald-300 bg-emerald-50/80 p-3 rounded-2xl">
@@ -467,7 +469,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             {/* GST STATUTORY AUDIT TABLE */}
             <div className="my-6 space-y-2">
               <h4 className="font-extrabold text-xs text-jaman-navy uppercase tracking-wider">
-                Statutory GST Tax Summary (5% Standard Food GST)
+                Statutory GST Tax Summary ({gstLabels().combined})
               </h4>
 
               <div className="rounded-2xl border border-jaman-border overflow-hidden">
@@ -477,8 +479,8 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                       <th className="p-2.5">GST Rate</th>
                       <th className="p-2.5">Invoices Count</th>
                       <th className="p-2.5 text-right">Taxable Turnover</th>
-                      <th className="p-2.5 text-right">CGST (2.5%)</th>
-                      <th className="p-2.5 text-right">SGST (2.5%)</th>
+                      <th className="p-2.5 text-right">{gstLabels().cgst}</th>
+                      <th className="p-2.5 text-right">{gstLabels().sgst}</th>
                       <th className="p-2.5 text-right">Total Tax</th>
                     </tr>
                   </thead>

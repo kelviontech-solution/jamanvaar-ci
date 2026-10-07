@@ -1,0 +1,37 @@
+{
+  "id": "category-a36708556ed090",
+  "kind": "category",
+  "name": "Breads — Bakery, Patisserie & Cafe",
+  "categoryName": "Breads",
+  "templateId": "tpl-bakery",
+  "slug": "breads",
+  "description": "Freshly baked breads",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "components": [
+    {
+      "name": "White Bread Loaf",
+      "description": "White Bread Loaf, freshly baked breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Whole Wheat Bread",
+      "description": "Whole Wheat Bread, freshly baked breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Multigrain Bread",
+      "description": "Multigrain Bread, freshly baked breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a36708556ed090.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 129808,
+  "sha256": "a29176144da6fe38b6ebdae7ef1de8bc51ec59015e63a2c99be0b12fee1c006a"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-8604220ce8e63c",
+  "kind": "dish",
+  "name": "Steamed Surti Basmati Rice",
+  "description": "Fluffy steamed rice, best enjoyed with Gujarati toor dal",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Khichdi & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Khichdi & Rice"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/steamed-rice.webp"
+  ],
+  "file": "dish-8604220ce8e63c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68400,
+  "sha256": "3ce29a231d81f60d785695328a5cee658a872c93ee998e9bff84b0a044aeff4c"
+}

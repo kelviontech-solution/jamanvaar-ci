@@ -1,0 +1,32 @@
+{
+  "id": "category-b81d0a0634231f",
+  "kind": "category",
+  "name": "Chinese Starters & Gravies — Authentic Chinese & Wok",
+  "categoryName": "Chinese Starters & Gravies",
+  "templateId": "tpl-chinese",
+  "slug": "chinese-starters",
+  "description": "Crispy appetizers and savoury gravies",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Chinese Starters & Gravies",
+  "components": [
+    {
+      "name": "Chilli Paneer Dry",
+      "description": "Crisp coated paneer cubes tossed with onion petals, green chillies, garlic and soy glaze",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Manchurian Gravy",
+      "description": "Vegetable dumplings simmered in rich garlic, coriander and soy sauce gravy",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-b81d0a0634231f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119298,
+  "sha256": "54dac452d4a84cb9af75048fd65905b877d9e7300f64f5781402f23e8d372645"
+}

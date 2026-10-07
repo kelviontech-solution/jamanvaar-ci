@@ -1,0 +1,25 @@
+{
+  "id": "dish-c393616369767f",
+  "kind": "dish",
+  "name": "Cheese Pav Bhaji",
+  "description": "Cheese Pav Bhaji, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c393616369767f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98574,
+  "sha256": "283a11a3f46930eee149e152284f8d119b8c34ffa5eef44403cef52aaf73a006"
+}

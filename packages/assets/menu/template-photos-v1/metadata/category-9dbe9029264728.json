@@ -1,0 +1,37 @@
+{
+  "id": "category-9dbe9029264728",
+  "kind": "category",
+  "name": "Indian Sweets — Dessert / Ice Cream",
+  "categoryName": "Indian Sweets",
+  "templateId": "tpl-desserts",
+  "slug": "indian-sweets",
+  "description": "Traditional dessert portions",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Indian Sweets",
+  "components": [
+    {
+      "name": "Rasmalai",
+      "description": "Rasmalai, traditional dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shrikhand",
+      "description": "Shrikhand, traditional dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Basundi",
+      "description": "Basundi, traditional dessert portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-9dbe9029264728.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93948,
+  "sha256": "95b49313b5a365ac4e79a0622639d32baecd47c0e661e6f67644601f7797944b"
+}

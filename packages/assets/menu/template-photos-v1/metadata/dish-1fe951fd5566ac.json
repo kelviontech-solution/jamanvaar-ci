@@ -1,0 +1,22 @@
+{
+  "id": "dish-1fe951fd5566ac",
+  "kind": "dish",
+  "name": "Mushroom in Hot Garlic Sauce",
+  "description": "Mushroom in Hot Garlic Sauce, wok gravies to pair with rice or noodles.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Gravies"
+    }
+  ],
+  "file": "dish-1fe951fd5566ac.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97948,
+  "sha256": "66bf8740b1a257dcd9c186f87f11e82483da44c0f528a191cef5418ef4d742aa"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-6dd1cf9a31c8ca",
+  "kind": "dish",
+  "name": "Traditional Gujarati Kadhi",
+  "description": "Silky smooth yogurt and besan soup tempered with cinnamon, cloves, curry leaves and ginger",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/gujarati-kadhi.webp"
+  ],
+  "file": "dish-6dd1cf9a31c8ca.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88962,
+  "sha256": "2e5479ebd88840b968c6186d9cd33bd9c48d51a99dfe3d2a9d52928bc6747992"
+}

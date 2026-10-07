@@ -1,0 +1,25 @@
+{
+  "id": "dish-c69c664c43db1a",
+  "kind": "dish",
+  "name": "Ghee Mini Podi Idli (14 Pcs)",
+  "description": "Cocktail bite-sized idlis coated in spicy podi powder and hot melted ghee",
+  "diet": "VEG",
+  "cuisine": "Fast South Indian Tiffin",
+  "category": "Quick Tiffin Plates",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-tiffin",
+      "category": "Quick Tiffin Plates"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c69c664c43db1a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98184,
+  "sha256": "7fc3b58ddaf9f700564f254737a3147a6e620c5d62a5db2d7a90fd75ed0c324f"
+}

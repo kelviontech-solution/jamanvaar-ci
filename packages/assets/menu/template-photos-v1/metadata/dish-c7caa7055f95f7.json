@@ -1,0 +1,30 @@
+{
+  "id": "dish-c7caa7055f95f7",
+  "kind": "dish",
+  "name": "Cola 250ml",
+  "description": "Cola 250ml, cold refreshments.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-c7caa7055f95f7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75702,
+  "sha256": "286f069428853db4883ea20a66a859f3ca19c5a13461428ff3a1e116e9baf498"
+}

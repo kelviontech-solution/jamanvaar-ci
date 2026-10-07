@@ -1,0 +1,32 @@
+{
+  "id": "category-05d894f1425016",
+  "kind": "category",
+  "name": "Heritage Desserts — North Indian Restaurant",
+  "categoryName": "Heritage Desserts",
+  "templateId": "tpl-north-indian",
+  "slug": "desserts",
+  "description": "Warm gulab jamuns, rasmalai and seasonal halwas",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Heritage Desserts",
+  "components": [
+    {
+      "name": "Gulab Jamun (2 Pcs)",
+      "description": "Golden fried milk solid dumplings soaked in rose water and cardamom scented sugar syrup",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rasmalai Kesar Pista (2 Pcs)",
+      "description": "Soft spongy cottage cheese patties steeped in thickened saffron infused milk garnished with pistachios",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-05d894f1425016.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96192,
+  "sha256": "096af27efd2c85293b09ca967fc87f1a4d1449bec4faa30249a50c0c4edb92b0"
+}

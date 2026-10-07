@@ -1,0 +1,22 @@
+{
+  "id": "dish-ea76e017d29752",
+  "kind": "dish",
+  "name": "Pindi Chhole",
+  "description": "Pindi Chhole, traditional Punjabi dishes.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Punjabi Specials"
+    }
+  ],
+  "file": "dish-ea76e017d29752.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103240,
+  "sha256": "bc4c3856a27309706f1c615042c587ee044e76f15f1d7718e77454dea4a95005"
+}

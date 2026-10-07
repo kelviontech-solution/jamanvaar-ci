@@ -1,0 +1,37 @@
+{
+  "id": "category-d9acf7d8d6c2da",
+  "kind": "category",
+  "name": "Dal & Kadhi — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Dal & Kadhi",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "dal-kadhi",
+  "description": "Regional lentils and yoghurt gravies",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Dal & Kadhi",
+  "components": [
+    {
+      "name": "Kathiyawadi Dal",
+      "description": "Kathiyawadi Dal, regional lentils and yoghurt gravies.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Gujarati Kadhi",
+      "description": "Gujarati Kadhi, regional lentils and yoghurt gravies.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Dhokli",
+      "description": "Dal Dhokli, regional lentils and yoghurt gravies.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d9acf7d8d6c2da.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 135768,
+  "sha256": "a8b770e30bf95960d4abfb1afa2ce8cda30341e6e395bc85a859c0aa5fcde196"
+}

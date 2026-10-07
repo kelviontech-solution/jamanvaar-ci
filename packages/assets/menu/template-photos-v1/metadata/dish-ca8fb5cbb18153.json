@@ -1,0 +1,25 @@
+{
+  "id": "dish-ca8fb5cbb18153",
+  "kind": "dish",
+  "name": "Hara Bhara Kebab (6 Pcs)",
+  "description": "Crisp spinach, green pea and potato patties stuffed with spiced cashews and herbs",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Starters & Kebabs",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Starters & Kebabs"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/hara-bhara-kebab.jpg"
+  ],
+  "file": "dish-ca8fb5cbb18153.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113860,
+  "sha256": "3c10c5d54a0890c77364e80b59e93f816495f39b5715962d96941bfea7c58630"
+}

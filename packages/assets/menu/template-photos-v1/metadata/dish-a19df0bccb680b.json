@@ -1,0 +1,22 @@
+{
+  "id": "dish-a19df0bccb680b",
+  "kind": "dish",
+  "name": "Dhokla",
+  "description": "Dhokla, steamed or crisp Gujarati snacks with chutney.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Farsan",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Farsan"
+    }
+  ],
+  "file": "dish-a19df0bccb680b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97196,
+  "sha256": "449b45dec0228b2262eb0b5a29347094f3efcfe1fa63683bccbc04c874f03b82"
+}

@@ -108,7 +108,8 @@ export const SEED_TAX_GROUPS: TaxGroup[] = [
     sgstPercent: 2.5,
     igstPercent: 5.0,
     isInclusive: true,
-    isActive: true
+    isActive: true,
+    isDefault: true
   }
 ];
 

@@ -1,0 +1,44 @@
+[
+  {
+    "app": "apps/restaurant-system/pos",
+    "sourceImages": 163,
+    "builtImages": 163,
+    "missing": []
+  },
+  {
+    "app": "apps/restaurant-system/pos-admin",
+    "sourceImages": 163,
+    "builtImages": 163,
+    "missing": []
+  },
+  {
+    "app": "apps/restaurant-system/captain",
+    "sourceImages": 164,
+    "builtImages": 164,
+    "missing": []
+  },
+  {
+    "app": "apps/restaurant-system/kds",
+    "sourceImages": 163,
+    "builtImages": 163,
+    "missing": []
+  },
+  {
+    "app": "apps/kiosk-system/kiosk-user",
+    "sourceImages": 163,
+    "builtImages": 163,
+    "missing": []
+  },
+  {
+    "app": "cloud/super-admin-web",
+    "sourceImages": 164,
+    "builtImages": 164,
+    "missing": []
+  },
+  {
+    "app": "apps/qr-guest",
+    "sourceImages": 163,
+    "builtImages": 163,
+    "missing": []
+  }
+]

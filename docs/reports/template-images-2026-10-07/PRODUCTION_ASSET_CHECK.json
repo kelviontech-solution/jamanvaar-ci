@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-07T07:50:40.586Z",
+  "results": [
+    {
+      "app": "kiosk",
+      "url": "https://system.kelviontech.in/kiosk/assets/menu/template-photos-v1/dish-55faac529b308d.webp",
+      "status": 404,
+      "type": "text/html"
+    },
+    {
+      "app": "restaurant-admin",
+      "url": "https://system.kelviontech.in/restaurant-admin/assets/menu/template-photos-v1/dish-55faac529b308d.webp",
+      "status": 404,
+      "type": "text/html"
+    }
+  ]
+}

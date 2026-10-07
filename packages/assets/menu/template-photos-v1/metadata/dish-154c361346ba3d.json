@@ -1,0 +1,22 @@
+{
+  "id": "dish-154c361346ba3d",
+  "kind": "dish",
+  "name": "Onion Uttapam",
+  "description": "Onion Uttapam, thick rice-lentil pancakes with vegetable toppings.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam"
+    }
+  ],
+  "file": "dish-154c361346ba3d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102644,
+  "sha256": "35dab7d807d3a5edad96d4d892eedbb027a3fe4b282fc13d986a6ca7c658ed1f"
+}

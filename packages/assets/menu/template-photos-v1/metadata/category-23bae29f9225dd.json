@@ -1,0 +1,37 @@
+{
+  "id": "category-23bae29f9225dd",
+  "kind": "category",
+  "name": "Beverages — Gujarati Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-gujarati",
+  "slug": "beverages",
+  "description": "Chilled traditional drinks",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Plain Chaas",
+      "description": "Plain Chaas, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kesar Milk",
+      "description": "Kesar Milk, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-23bae29f9225dd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86534,
+  "sha256": "35a7caf0e9ff492d800e568cb69fde897af580a3ff2ceb085b4b46d2a37939a8"
+}

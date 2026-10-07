@@ -1,0 +1,22 @@
+{
+  "id": "dish-ec06fa0ae45f00",
+  "kind": "dish",
+  "name": "Roasted Hazelnut Latte",
+  "description": "Velvety espresso with steamed milk and aromatic roasted hazelnut syrup",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Espresso & Coffees",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Espresso & Coffees"
+    }
+  ],
+  "file": "dish-ec06fa0ae45f00.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 67374,
+  "sha256": "175cc49ad843fabd31befe0a30efa87defdc57a31866357a26efb1dcb1e7a303"
+}

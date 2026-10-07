@@ -1,0 +1,37 @@
+{
+  "id": "category-a68b775fc9db53",
+  "kind": "category",
+  "name": "Dal — Indian Multi-Cuisine Diner",
+  "categoryName": "Dal",
+  "templateId": "tpl-multicuisine",
+  "slug": "dal",
+  "description": "Lentils simmered and tempered before serving",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Dal",
+  "components": [
+    {
+      "name": "Dal Makhani",
+      "description": "Dal Makhani, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Tadka",
+      "description": "Dal Tadka, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Fry",
+      "description": "Dal Fry, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a68b775fc9db53.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123524,
+  "sha256": "4604d7319896f63e59bd33b0483f6e256ebdcb45772aaaf756a532b28732d1aa"
+}

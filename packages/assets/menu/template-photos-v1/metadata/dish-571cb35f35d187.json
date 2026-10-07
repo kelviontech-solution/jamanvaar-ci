@@ -1,0 +1,33 @@
+{
+  "id": "dish-571cb35f35d187",
+  "kind": "dish",
+  "name": "Butter Naan",
+  "description": "Refined flour leavened flatbread brushed with molten butter from the clay tandoor",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Roti & Naan Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Roti & Naan Breads"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Breads"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/butter-naan.jpg"
+  ],
+  "file": "dish-571cb35f35d187.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109648,
+  "sha256": "00cef5ce434f1eb1dffb22685c78a000d8b3df03d3c0d0cf46a23e698d90526a"
+}

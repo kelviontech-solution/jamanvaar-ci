@@ -1,0 +1,37 @@
+{
+  "id": "category-201154f1132dec",
+  "kind": "category",
+  "name": "Savouries — Bakery, Patisserie & Cafe",
+  "categoryName": "Savouries",
+  "templateId": "tpl-bakery",
+  "slug": "savouries",
+  "description": "Oven-baked savoury snacks",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Savouries",
+  "components": [
+    {
+      "name": "Veg Puff",
+      "description": "Veg Puff, oven-baked savoury snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Puff",
+      "description": "Paneer Puff, oven-baked savoury snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Croissant",
+      "description": "Cheese Croissant, oven-baked savoury snacks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-201154f1132dec.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99278,
+  "sha256": "907bb48ebb0b41186864c0ffbf1090dcffb5f75b50c8e7126b6fbf041090f8f4"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-27fd336da4c43d",
+  "kind": "dish",
+  "name": "Green Chutney",
+  "description": "Green Chutney, fresh accompaniments in individual portions.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chutneys",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Chutneys"
+    }
+  ],
+  "file": "dish-27fd336da4c43d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 77338,
+  "sha256": "72bb3f36c32d4518cb85579b0859c64bcd46484680c766ae8d6130291d3d79c6"
+}

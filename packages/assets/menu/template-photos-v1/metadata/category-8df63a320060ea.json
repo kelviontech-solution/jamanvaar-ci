@@ -1,0 +1,37 @@
+{
+  "id": "category-8df63a320060ea",
+  "kind": "category",
+  "name": "Breads — North Indian Restaurant",
+  "categoryName": "Breads",
+  "templateId": "tpl-north-indian",
+  "slug": "breads",
+  "description": "Fresh tandoor or griddle breads",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Breads",
+  "components": [
+    {
+      "name": "Garlic Naan",
+      "description": "Garlic Naan, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Roti",
+      "description": "Tandoori Roti, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lachha Paratha",
+      "description": "Lachha Paratha, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8df63a320060ea.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122132,
+  "sha256": "6e661c865330076361e70fefaf4d807753b5d5d76f73637b68b1ad31ad9c3e65"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "combo-sweets",
+  "kind": "combo",
+  "name": "Royal Indian Sweets & Mithai Meal Deal",
+  "description": "Kaju Katli Special (250g) with Motichoor Laddoo (250g). Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Traditional Indian Mithai",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Kaju Katli Special (250g)",
+      "description": "Diamond cut cashew nut fudge made with premium cashews and silver vark",
+      "diet": "VEG"
+    },
+    {
+      "name": "Motichoor Laddoo (250g)",
+      "description": "Tiny gram flour pearls fried in pure desi ghee and soaked in saffron sugar syrup",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-sweets.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81956,
+  "sha256": "92f9c743dfc2cc3986e45faed538c68e4f3be4a5d02aac4c5e663e2c72ff31b7"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-e1d84813253d7a",
+  "kind": "category",
+  "name": "Combos — South Indian Tiffin & Breakfast",
+  "categoryName": "Combos",
+  "templateId": "tpl-south-tiffin",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Fast South Indian Tiffin",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Ghee Mini Podi Idli (14 Pcs)",
+      "description": "Cocktail bite-sized idlis coated in spicy podi powder and hot melted ghee",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Hot Ven Pongal with Ghee Cashews",
+      "description": "Moong dal and rice porridge cooked with cumin, pepper, ginger and fried cashews in ghee",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e1d84813253d7a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108318,
+  "sha256": "4365b70d8b532c0b2bb64beb276c6002a1f7978cf017621420897f65e9a96f17"
+}

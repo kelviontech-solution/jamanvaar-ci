@@ -1,0 +1,33 @@
+{
+  "id": "dish-7ec8b8e85b7ad5",
+  "kind": "dish",
+  "name": "Dal Fry",
+  "description": "Dal Fry, lentils simmered and tempered before serving.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dal"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-7ec8b8e85b7ad5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97072,
+  "sha256": "1502e968e8bb75dac826afd56e04708dedc11dfbda64ef46604526e40bc8f78c"
+}

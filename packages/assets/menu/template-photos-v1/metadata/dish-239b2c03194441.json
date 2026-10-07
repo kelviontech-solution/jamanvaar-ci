@@ -1,0 +1,25 @@
+{
+  "id": "dish-239b2c03194441",
+  "kind": "dish",
+  "name": "Butter Masala Dosa Classic",
+  "description": "Crisp crepe with spiced potato filling, coconut chutney and drumstick sambar",
+  "diet": "VEG",
+  "cuisine": "Dual Heritage Indian",
+  "category": "South Indian Breakfast & Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-north-combo",
+      "category": "South Indian Breakfast & Dosas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-239b2c03194441.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84344,
+  "sha256": "93a83134ceb65c5bedd66b8e479fb4274ef5bbda8bced03e3af925e1073dbf4c"
+}

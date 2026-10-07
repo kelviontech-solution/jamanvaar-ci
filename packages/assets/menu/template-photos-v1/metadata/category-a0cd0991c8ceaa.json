@@ -1,0 +1,37 @@
+{
+  "id": "category-a0cd0991c8ceaa",
+  "kind": "category",
+  "name": "Main Course — Punjabi Dhaba & Restaurant",
+  "categoryName": "Main Course",
+  "templateId": "tpl-punjabi",
+  "slug": "main-course",
+  "description": "Slow-simmered Indian gravies with fresh spices",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Main Course",
+  "components": [
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer Butter Masala, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kadai Paneer",
+      "description": "Kadai Paneer, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shahi Paneer",
+      "description": "Shahi Paneer, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a0cd0991c8ceaa.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127688,
+  "sha256": "f3dd460b6204c7a5fd60fb4c0da427b873a376799f181da80d7333e090070293"
+}

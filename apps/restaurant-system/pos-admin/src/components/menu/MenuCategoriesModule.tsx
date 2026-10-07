@@ -1,3 +1,5 @@
+import { CachedImg, MenuCategoryIcon } from '@jamanvaar/ui';
+import { isMenuPlaceholder, menuDishImage, menuCategoryImage } from '@jamanvaar/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
@@ -324,38 +326,40 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         </div>
 
         {/* Category Filter Strip */}
-        <div ref={categoryStripRef} className="relative flex items-center gap-1.5 overflow-x-auto pt-1 pb-1 border-t border-slate-100" style={{ scrollBehavior: 'smooth' }}>
+        <div ref={categoryStripRef} className="relative flex items-stretch gap-2 overflow-x-auto pt-3 pb-2 border-t border-slate-100" style={{ scrollBehavior: 'smooth' }}>
           <button
             data-cat-pill="ALL"
             onClick={() => setSelectedCategoryFilter('ALL')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+            className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer ${
               selectedCategoryFilter === 'ALL'
                 ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                 : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
             }`}
           >
-            All Categories ({menuItems.filter(item => !item.archivedAt).length})
+            <MenuCategoryIcon name="All Categories" size="md" />
+            <span className="text-left">All Categories<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{menuItems.filter(item => !item.archivedAt).length} dishes</span></span>
           </button>
 
-          {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => (
+          {[...categories].sort((a, b) => a.sortOrder - b.sortOrder).map((c: Category) => {
+            const dishes = menuItems.filter(m => m.categoryId === c.id && !m.archivedAt);
+            const categoryCover = menuCategoryImage(c.imageUrl, c.name, c.description, c.templateCategoryKey);
+            const cover = !isMenuPlaceholder(categoryCover) ? categoryCover : dishes.map(m => menuDishImage(m.imageUrl, m.name)).find(image => !isMenuPlaceholder(image));
+            return (
             <div key={c.id} data-cat-pill={c.id} className="relative group shrink-0">
               <button
                 onClick={() => setSelectedCategoryFilter(c.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2.5 cursor-pointer ${
                   selectedCategoryFilter === c.id
                     ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'
                 }`}
               >
-                <span>{c.name}{c.qrVisible === false ? ' (hidden from QR)' : ''}</span>
-                <span className={`text-[11px] px-1.5 py-0.2 rounded-md ${
-                  selectedCategoryFilter === c.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
-                }`}>
-                  {menuItems.filter(m => m.categoryId === c.id).length}
-                </span>
+                {cover && <CachedImg src={cover} alt={`${c.name} category cover`} className="w-10 h-10 rounded-lg object-cover border border-white shrink-0" />}
+                <MenuCategoryIcon name={c.name} iconName={c.iconName} />
+                <span className="text-left">{c.name}<span className="block mt-0.5 text-[10px] font-medium text-slate-500">{dishes.length} dishes{c.qrVisible === false ? ' · Hidden from QR' : ''}</span></span>
               </button>
             </div>
-          ))}
+          ); })}
         </div>
         {selectedCategoryFilter !== 'ALL' && categories.some((c: Category) => c.id === selectedCategoryFilter) && (
           <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
@@ -454,13 +458,10 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
               className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs flex flex-col justify-between group hover:shadow-xs transition-all hover:border-[#D8D1C3]"
             >
               <div className="relative h-36 bg-slate-100 overflow-hidden">
-                <img
+                <CachedImg
                   src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
                   alt={item.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg';
-                  }}
                 />
                 <span className="absolute top-2.5 right-2.5 bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-jaman-navy shadow-2xs">
                   {item.sku}

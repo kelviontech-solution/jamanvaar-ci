@@ -1,0 +1,22 @@
+{
+  "id": "dish-85b2a89e308b89",
+  "kind": "dish",
+  "name": "Crispy Veggie Supreme Burger",
+  "description": "Crisp vegetable patty with cheese slice, iceberg lettuce and smoky mayo on a toasted sesame bun",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers & Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers & Wraps"
+    }
+  ],
+  "file": "dish-85b2a89e308b89.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79464,
+  "sha256": "8701fccfec536341c99eaa6561827f6055ad65b861cb873e825f726834cd0ad2"
+}

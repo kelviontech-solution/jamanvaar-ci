@@ -1,0 +1,22 @@
+{
+  "id": "dish-fec22dac90b519",
+  "kind": "dish",
+  "name": "Amritsari Aloo Pyaaz Kulcha",
+  "description": "Crisp flaky tandoori flatbread stuffed with spiced potatoes and onions, topped with dollop of butter",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Amritsari Kulchas & Rotis",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Amritsari Kulchas & Rotis"
+    }
+  ],
+  "file": "dish-fec22dac90b519.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108466,
+  "sha256": "08e130301027e81c57de97faffc9ac199590d34a0a1597ec265dd1909bf134b6"
+}

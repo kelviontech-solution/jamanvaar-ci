@@ -1,0 +1,37 @@
+{
+  "id": "category-08e36c5ae9b103",
+  "kind": "category",
+  "name": "Pasta — Pizza Restaurant",
+  "categoryName": "Pasta",
+  "templateId": "tpl-pizza",
+  "slug": "pasta",
+  "description": "Penne tossed in a freshly prepared sauce",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Pasta",
+  "components": [
+    {
+      "name": "White Sauce Pasta",
+      "description": "White Sauce Pasta, penne tossed in a freshly prepared sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Red Sauce Pasta",
+      "description": "Red Sauce Pasta, penne tossed in a freshly prepared sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Pink Sauce Pasta",
+      "description": "Pink Sauce Pasta, penne tossed in a freshly prepared sauce.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-08e36c5ae9b103.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108500,
+  "sha256": "4386e2c63eed31dd18216834a49ed2380c77cd2274a2f3af42332f1665e185ca"
+}

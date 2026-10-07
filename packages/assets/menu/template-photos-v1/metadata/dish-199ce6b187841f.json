@@ -1,0 +1,26 @@
+{
+  "id": "dish-199ce6b187841f",
+  "kind": "dish",
+  "name": "Vaghareli Khichdi",
+  "description": "Vaghareli Khichdi, comforting rice and lentil preparations.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rice & Khichdi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rice & Khichdi"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rice & Khichdi"
+    }
+  ],
+  "file": "dish-199ce6b187841f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87042,
+  "sha256": "3010e0281644a44322e069d508216f2f8dcc06c97472f5b3d5022e96e95bb8d7"
+}

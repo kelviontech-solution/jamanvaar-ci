@@ -1,0 +1,25 @@
+{
+  "id": "dish-78682637b629d6",
+  "kind": "dish",
+  "name": "Mushroom Biryani",
+  "description": "Mushroom Biryani, basmati rice dum-cooked with vegetables and spices.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Vegetarian Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Vegetarian Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-78682637b629d6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121566,
+  "sha256": "a47f24246f7816e4258247a871ecd0c723a9fc846cc05ad79b393d5d2e4d35c8"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-ef3b818a80fd15",
+  "kind": "dish",
+  "name": "Ghee Podi Idli",
+  "description": "Ghee Podi Idli, steamed rice cakes or crisp lentil fritters with chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada"
+    }
+  ],
+  "file": "dish-ef3b818a80fd15.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98232,
+  "sha256": "3841381dc9a035ad2f2bcb6d119ba32038178931f5629af23335d8b2c5345817"
+}

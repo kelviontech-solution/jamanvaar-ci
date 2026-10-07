@@ -1,0 +1,37 @@
+{
+  "id": "category-4da078f422fad1",
+  "kind": "category",
+  "name": "Rotli, Bhakri & Thepla — Grand Indian Thali Restaurant",
+  "categoryName": "Rotli, Bhakri & Thepla",
+  "templateId": "tpl-thali",
+  "slug": "rotli-bhakri-thepla",
+  "description": "Fresh wheat or millet breads cooked on a griddle",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Rotli, Bhakri & Thepla",
+  "components": [
+    {
+      "name": "Phulka",
+      "description": "Phulka, fresh wheat or millet breads cooked on a griddle.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Bajra Rotla",
+      "description": "Bajra Rotla, fresh wheat or millet breads cooked on a griddle.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Thepla",
+      "description": "Thepla, fresh wheat or millet breads cooked on a griddle.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4da078f422fad1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122404,
+  "sha256": "906f6cc02ddb70406d7633ad955c64f8e5a4828f0b790b0010743b1232e486db"
+}

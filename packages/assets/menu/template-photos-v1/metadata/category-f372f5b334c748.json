@@ -1,0 +1,32 @@
+{
+  "id": "category-f372f5b334c748",
+  "kind": "category",
+  "name": "Combos — Authentic Chinese & Wok",
+  "categoryName": "Combos",
+  "templateId": "tpl-chinese",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Veg Hakka Noodles",
+      "description": "Thin noodles wok tossed with shredded cabbage, bell peppers, carrots, spring onions and dark soy sauce",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Schezwan Fried Rice",
+      "description": "Basmati rice tossed with fiery Sichuan pepper sauce and diced crunchy vegetables",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f372f5b334c748.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113098,
+  "sha256": "7a6d18f6d620a97c89f975775b3a0a45525f07ecbfc2552df83e99dd61244377"
+}

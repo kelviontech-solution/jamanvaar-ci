@@ -1,0 +1,37 @@
+{
+  "id": "category-3bc4701b10b4c4",
+  "kind": "category",
+  "name": "Beverages & Chaas — North Indian Restaurant",
+  "categoryName": "Beverages & Chaas",
+  "templateId": "tpl-north-indian",
+  "slug": "beverages",
+  "description": "Chilled traditional refreshers and lassi",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Beverages & Chaas",
+  "components": [
+    {
+      "name": "Masala Chaas (Spiced Buttermilk)",
+      "description": "Traditional churned yogurt drink tempered with roasted cumin, rock salt, ginger and fresh mint",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Punjabi Sweet Lassi (Malai Maar Ke)",
+      "description": "Thick creamy sweetened curd topped with clotted cream and crushed cardamom",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fresh Lime Soda (Sweet & Salt)",
+      "description": "Fresh squeezed lime juice in carbonated soda with rock salt and sugar syrup",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3bc4701b10b4c4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73804,
+  "sha256": "71ea3fb8d15d1c7fb3c67a86df5999b03d9404c75ef40541dbdc095ae690a242"
+}

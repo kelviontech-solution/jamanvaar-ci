@@ -1,6 +1,6 @@
 import React from 'react';
 import { Category } from '@jamanvaar/types';
-import * as Icons from 'lucide-react';
+import { MenuCategoryIcon } from './MenuCategoryIcon';
 import { sound } from './SoundManager';
 
 export interface CategoryCardProps {
@@ -21,11 +21,6 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   className = '',
   displayName
 }) => {
-  // Dynamically resolve icon if provided
-  const IconComponent = (category.iconName && (Icons as any)[category.iconName])
-    ? (Icons as any)[category.iconName]
-    : Icons.Utensils;
-
   return (
     <button
       type="button"
@@ -39,7 +34,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           : 'bg-white text-[#0B253A] border border-[#EBE6DD] hover:bg-[#F8F6F0]'
       } ${className}`}
     >
-      <IconComponent className={`w-4 h-4 ${isSelected ? 'text-[#E66817]' : 'text-[#4A5568]'}`} />
+      <MenuCategoryIcon name={category.name} iconName={category.iconName} />
       <span>{displayName || category.name}</span>
     </button>
   );

@@ -1,0 +1,22 @@
+{
+  "id": "dish-1e92c20ba6873c",
+  "kind": "dish",
+  "name": "Mixed Vegetable Cheese Uttapam",
+  "description": "Loaded with finely chopped bell peppers, carrots, sweet corn and grated mozzarella",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam & Thick Pancakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam & Thick Pancakes"
+    }
+  ],
+  "file": "dish-1e92c20ba6873c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105574,
+  "sha256": "8201203fd126c3896bac55e2fe6515d1f6e0a8591fc56964d6abb1f714e841c3"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-43a0f6d7b0d9d7",
+  "kind": "category",
+  "name": "Dhaba Starters & Tikkas — Punjabi Dhaba & Restaurant",
+  "categoryName": "Dhaba Starters & Tikkas",
+  "templateId": "tpl-punjabi",
+  "slug": "punjabi-starters",
+  "description": "Hearty highway dhaba style appetizers",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Starters & Tikkas",
+  "components": [
+    {
+      "name": "Amritsari Paneer Tikka",
+      "description": "Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dhaba Dahi Kebab (6 Pcs)",
+      "description": "Crispy fried hung curd and paneer patties with cardamom and mint",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-43a0f6d7b0d9d7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114684,
+  "sha256": "87c3d25c7a817851cda738ac6c5d6dc0ed29c385e715891874f1af714f4f8f87"
+}

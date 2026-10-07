@@ -1,0 +1,22 @@
+{
+  "id": "dish-c17a633a7bce57",
+  "kind": "dish",
+  "name": "Extra Sambar",
+  "description": "Extra Sambar, fresh accompaniments for tiffin.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-c17a633a7bce57.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 56744,
+  "sha256": "846836b3c7cc22722d0515d7c09c0d8db23f85bbd0e6b7901e0db866db5f62f5"
+}

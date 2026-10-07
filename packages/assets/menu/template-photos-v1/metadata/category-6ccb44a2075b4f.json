@@ -1,0 +1,37 @@
+{
+  "id": "category-6ccb44a2075b4f",
+  "kind": "category",
+  "name": "Chutneys — Gujarati Restaurant",
+  "categoryName": "Chutneys",
+  "templateId": "tpl-gujarati",
+  "slug": "chutneys",
+  "description": "Fresh accompaniments in individual portions",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chutneys",
+  "components": [
+    {
+      "name": "Green Chutney",
+      "description": "Green Chutney, fresh accompaniments in individual portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Garlic Chutney",
+      "description": "Garlic Chutney, fresh accompaniments in individual portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sweet Tamarind Chutney",
+      "description": "Sweet Tamarind Chutney, fresh accompaniments in individual portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-6ccb44a2075b4f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99458,
+  "sha256": "9f66cb643510a394c793a99d3b8f1ecb495bec5106b3686e236ce438e996dad3"
+}

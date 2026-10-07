@@ -1,0 +1,37 @@
+{
+  "id": "category-042bbddbf19466",
+  "kind": "category",
+  "name": "Rice & Curries — Biryani & Kebab Darbar",
+  "categoryName": "Rice & Curries",
+  "templateId": "tpl-biryani",
+  "slug": "rice-curries",
+  "description": "Curries and rice sides",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Rice & Curries",
+  "components": [
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, curries and rice sides.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chicken Curry",
+      "description": "Chicken Curry, curries and rice sides.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer Butter Masala, curries and rice sides.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-042bbddbf19466.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121694,
+  "sha256": "69fbf7e77c3cff25d86130f5ea0e45885403bc26336bb7ed4ff20723264c0c07"
+}

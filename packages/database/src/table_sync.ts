@@ -1,5 +1,6 @@
 import type { DiningTable, TableStatus } from '@jamanvaar/types';
 import { db } from './db';
+import { projectTableBillState } from './bill_requests';
 
 /**
  * Cross-device dining-table sync (BUG-096/097). Every terminal keeps its own local copy of the
@@ -230,6 +231,8 @@ export class TableSync {
     }
 
     const applied = db.tables.find((t) => t.id === id)!;
+    // The table's bill state follows its order on this device, whatever the table record said.
+    projectTableBillState(applied);
     if (state.sigs) state.sigs[id] = signature(applied);
     state.pushed[id] = signature(applied);
     save();

@@ -1,0 +1,22 @@
+{
+  "id": "dish-342b74148f8968",
+  "kind": "dish",
+  "name": "Veg Mexican Wrap",
+  "description": "Veg Mexican Wrap, soft flatbread wraps with salad and sauce.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Wraps"
+    }
+  ],
+  "file": "dish-342b74148f8968.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81574,
+  "sha256": "591601ed362655f9b040024bdfe7eff5651a9d3ec9d8f835165a0527c782f838"
+}

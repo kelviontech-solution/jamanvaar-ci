@@ -1,0 +1,22 @@
+{
+  "id": "dish-3057968274433d",
+  "kind": "dish",
+  "name": "Tandoori Roti (Butter)",
+  "description": "Whole wheat flatbread baked crisp in clay oven topped with butter",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Roti & Naan Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Roti & Naan Breads"
+    }
+  ],
+  "file": "dish-3057968274433d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103386,
+  "sha256": "8cd05c805b88ed3e1accfc0d523f36db15ef24af6e4a05ab4f41842960d09164"
+}

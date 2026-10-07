@@ -15,7 +15,9 @@ export const createRefundSchema = z.object({
   // so the refund isn't otherwise unattributed in Refund.requestedBy/the
   // audit log. Client-asserted, same trust level as every other staff-name
   // field this terminal already sends (e.g. order.cashierName).
-  requestedBy: z.string().trim().min(1, 'requestedBy is required').max(200)
+  requestedBy: z.string().trim().min(1, 'requestedBy is required').max(200),
+  // Refunds are paid by the restaurant itself, in cash or by UPI from the owner's account. Razorpay is never used.
+  method: z.enum(['CASH', 'UPI_TO_CUSTOMER'])
 });
 
 export type CreateRefundDto = z.infer<typeof createRefundSchema>;

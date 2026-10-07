@@ -1,0 +1,22 @@
+{
+  "id": "dish-87f7f157429089",
+  "kind": "dish",
+  "name": "Cheese Toast",
+  "description": "Cheese Toast, made-to-order breakfast plates.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Breakfast"
+    }
+  ],
+  "file": "dish-87f7f157429089.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 82730,
+  "sha256": "3b8e1115932f0a9e823a04035bec6e1c3ff055bf1aacb223bb312211de2877be"
+}

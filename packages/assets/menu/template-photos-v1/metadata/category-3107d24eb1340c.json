@@ -1,0 +1,37 @@
+{
+  "id": "category-3107d24eb1340c",
+  "kind": "category",
+  "name": "Rotli, Bhakri & Thepla — Gujarati Restaurant",
+  "categoryName": "Rotli, Bhakri & Thepla",
+  "templateId": "tpl-gujarati",
+  "slug": "rotli-bhakri",
+  "description": "Freshly made phulkas, biscuit bhakri and bajra rotla",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "components": [
+    {
+      "name": "Phulka Rotli (Ghee, 4 Pcs)",
+      "description": "Paper-thin whole wheat puffed rotlis smeared with pure desi ghee",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kathiyawadi Bajra Rotla (Ghee)",
+      "description": "Thick hand-flattened pearl millet flatbread roasted on clay tava with white butter and jaggery",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Methi Thepla (4 Pcs)",
+      "description": "Spiced fenugreek and whole wheat flatbreads served with sweet mango chundo",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3107d24eb1340c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 129852,
+  "sha256": "930cf4418b273b451f753ab87f5ab034e321afa23f4541925cff57547d618b78"
+}

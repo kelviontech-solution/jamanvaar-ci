@@ -1,0 +1,22 @@
+{
+  "id": "dish-abea6218e4eeb4",
+  "kind": "dish",
+  "name": "Amritsari Paneer Tikka",
+  "description": "Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Starters & Tikkas",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dhaba Starters & Tikkas"
+    }
+  ],
+  "file": "dish-abea6218e4eeb4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107680,
+  "sha256": "9936f1abccc83a15071017ec218956a1e9f1af7dda019424ea46983ba4380165"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-17e8660f86bf48",
+  "kind": "dish",
+  "name": "Sweet Corn Soup",
+  "description": "Sweet Corn Soup, hot vegetable broth finished to order.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Soups",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Soups"
+    }
+  ],
+  "file": "dish-17e8660f86bf48.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 63668,
+  "sha256": "117ad5e447619de9303e2a1bae07ad139e0f3de0fa1d20b3dd83d5513f15b661"
+}

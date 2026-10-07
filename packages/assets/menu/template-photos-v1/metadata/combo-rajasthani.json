@@ -1,0 +1,29 @@
+{
+  "id": "combo-rajasthani",
+  "kind": "combo",
+  "name": "Rajasthani Marwari Bhojanalaya Meal Deal",
+  "description": "Marwari Dal Baati Churma Thali with Shahi Gatte Ki Sabzi. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Marwari Dal Baati Churma Thali",
+      "description": "Panchmel Dal, 4 Baked Baatis drenched in desi ghee, Sweet Wheat Churma, Gatte Ki Sabzi, Garlic Chutney & Chaas",
+      "diet": "VEG"
+    },
+    {
+      "name": "Shahi Gatte Ki Sabzi",
+      "description": "Steamed gram flour dumplings simmered in a spiced tangy yogurt and mustard seed gravy",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-rajasthani.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118542,
+  "sha256": "875d723f1576832f1bfd1291a46bf9fa556b3cfacbd1f9dcaaa75ee0031cff05"
+}

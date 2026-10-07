@@ -54,7 +54,7 @@ const modifierGroup = z
   .passthrough()
   .refine((g) => !g.maxSelections || g.minSelections === undefined || g.minSelections <= g.maxSelections, { message: 'minSelections cannot exceed maxSelections' });
 
-const taxGroup = z.object({ name: nonEmpty(120), cgstPercent: percent.optional(), sgstPercent: percent.optional(), igstPercent: percent.optional(), isInclusive: z.boolean().optional(), isActive: z.boolean().optional() }).passthrough();
+const taxGroup = z.object({ name: nonEmpty(120), cgstPercent: percent.optional(), sgstPercent: percent.optional(), igstPercent: percent.optional(), isInclusive: z.boolean().optional(), isActive: z.boolean().optional(), isDefault: z.boolean().optional() }).passthrough();
 
 const diningTable = z
   .object({

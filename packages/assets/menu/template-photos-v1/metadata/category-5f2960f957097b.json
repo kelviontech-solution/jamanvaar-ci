@@ -1,0 +1,37 @@
+{
+  "id": "category-5f2960f957097b",
+  "kind": "category",
+  "name": "Basmati Rice & Biryani — North Indian Restaurant",
+  "categoryName": "Basmati Rice & Biryani",
+  "templateId": "tpl-north-indian",
+  "slug": "rice-biryani",
+  "description": "Long-grain fragrant basmati rice dishes",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Basmati Rice & Biryani",
+  "components": [
+    {
+      "name": "Hyderabadi Dum Veg Biryani",
+      "description": "Fragrant basmati rice layered with spiced vegetables, saffron, mint and fried onions, served with raita",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice (Desi Ghee)",
+      "description": "Steamed basmati rice tempered with roasted cumin seeds and desi ghee",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Pulao Shahi",
+      "description": "Basmati rice cooked with garden green peas, carrots, beans and mild whole spices",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5f2960f957097b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 136318,
+  "sha256": "f8ebaae2a59467a9d0b26da3f87948ca6f1717f0f56d5cbe1cbfe0301f204bff"
+}

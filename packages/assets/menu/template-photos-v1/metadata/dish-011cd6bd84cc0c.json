@@ -1,0 +1,22 @@
+{
+  "id": "dish-011cd6bd84cc0c",
+  "kind": "dish",
+  "name": "Hot Ven Pongal with Ghee Cashews",
+  "description": "Moong dal and rice porridge cooked with cumin, pepper, ginger and fried cashews in ghee",
+  "diet": "VEG",
+  "cuisine": "Fast South Indian Tiffin",
+  "category": "Quick Tiffin Plates",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-tiffin",
+      "category": "Quick Tiffin Plates"
+    }
+  ],
+  "file": "dish-011cd6bd84cc0c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81972,
+  "sha256": "d879ebff1b0832ba7b53e8173348552ffcdedff2a1844043800a59ffd746a981"
+}

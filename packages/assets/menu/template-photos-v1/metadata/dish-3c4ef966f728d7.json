@@ -1,0 +1,22 @@
+{
+  "id": "dish-3c4ef966f728d7",
+  "kind": "dish",
+  "name": "Espresso",
+  "description": "Espresso, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    }
+  ],
+  "file": "dish-3c4ef966f728d7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 39118,
+  "sha256": "ace3195a27ffcc369027d2a44fbf9d8da4741d6ddc8de90053a65956fe68823d"
+}

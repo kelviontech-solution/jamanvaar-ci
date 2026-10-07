@@ -1,0 +1,37 @@
+{
+  "id": "category-37dd4853ef0306",
+  "kind": "category",
+  "name": "Royal Paneer Curries — North Indian Restaurant",
+  "categoryName": "Royal Paneer Curries",
+  "templateId": "tpl-north-indian",
+  "slug": "paneer-curries",
+  "description": "Velvety tomato, cashew and onion gravies with fresh paneer",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Royal Paneer Curries",
+  "components": [
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Soft paneer cubes simmered in a rich, buttery tomato gravy infused with kasuri methi and cream",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kadai Paneer Peshawari",
+      "description": "Cottage cheese wok-tossed with freshly pounded coriander seeds, bell peppers and whole red chillies",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shahi Paneer Nawabi",
+      "description": "Royal white cashew and almond gravy with fragrant cardamom and tender paneer cubes",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-37dd4853ef0306.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 126820,
+  "sha256": "0f4de9367f3b27523117bddcaa268dc3f48f5e920fb113c4c66c84dd76af246b"
+}

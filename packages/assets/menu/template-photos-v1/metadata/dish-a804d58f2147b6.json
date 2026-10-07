@@ -1,0 +1,22 @@
+{
+  "id": "dish-a804d58f2147b6",
+  "kind": "dish",
+  "name": "Onion Tomato Chilli Uttapam",
+  "description": "Soft pancake topped with diced red onions, juicy tomatoes, cilantro and green chillies",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam & Thick Pancakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam & Thick Pancakes"
+    }
+  ],
+  "file": "dish-a804d58f2147b6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117040,
+  "sha256": "67bec02be49ff7691d70da44516a27b399879898511774afe1a9a80e863872e8"
+}

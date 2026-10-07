@@ -3,7 +3,7 @@ import type { MenuItem } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import { hasRequiredModifierGroup } from '@jamanvaar/business';
 import { Plus } from 'lucide-react';
-import { StatusBadge } from '@jamanvaar/ui';
+import { CachedImg, StatusBadge } from '@jamanvaar/ui';
 
 export interface KioskProductCardProps {
   item: MenuItem;
@@ -29,19 +29,17 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
 
   return (
     <div
+      data-testid="kiosk-menu-card"
       onClick={() => onSelectDetails?.(item)}
       className="group flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden cursor-pointer select-none transition-colors hover:border-jaman-saffron/60 active:scale-[0.99]"
     >
       <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
-        <img
+        <CachedImg
           src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
+          dishName={item.name}
           alt={displayName || item.name}
           className="w-full h-full object-cover"
           loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).onerror = null;
-            (e.target as HTMLImageElement).src = '/assets/menu/common/menu-placeholder-v2.svg';
-          }}
         />
         <div className="absolute bottom-2 left-2">
           <StatusBadge status={item.dietaryType} type="dietary" />

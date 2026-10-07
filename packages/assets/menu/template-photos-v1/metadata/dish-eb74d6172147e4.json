@@ -1,0 +1,25 @@
+{
+  "id": "dish-eb74d6172147e4",
+  "kind": "dish",
+  "name": "Biscuit Bhakri (2 Pcs)",
+  "description": "Crisp golden layered wheat and semolina disc roasted with ghee",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/biscuit-bhakri.webp"
+  ],
+  "file": "dish-eb74d6172147e4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104404,
+  "sha256": "5489d45d9320da2597a976b208dab10ee9e0f76454e9ce89102976d6a4d407e6"
+}

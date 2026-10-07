@@ -1,0 +1,27 @@
+{
+  "id": "category-fcd1e93be52f8a",
+  "kind": "category",
+  "name": "North Indian Curries — Indian Multi-Cuisine Diner",
+  "categoryName": "North Indian Curries",
+  "templateId": "tpl-multicuisine",
+  "slug": "mc-north",
+  "description": "Paneer butter masala, dal tadka, kadai veg and naans",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "North Indian Curries",
+  "components": [
+    {
+      "name": "Paneer Lababdar Special",
+      "description": "Paneer batons cooked in rich tomato and onion gravy with grated paneer garnish",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-fcd1e93be52f8a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 130076,
+  "sha256": "680c06e4e0f27a4222b1c7b2efe327ec25af8c183e1d8ae8d4dea724d681b632"
+}

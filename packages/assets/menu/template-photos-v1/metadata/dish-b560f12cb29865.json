@@ -1,0 +1,22 @@
+{
+  "id": "dish-b560f12cb29865",
+  "kind": "dish",
+  "name": "Cheese Burst Rava Dosa",
+  "description": "Crisp lacy semolina crepe studded with green chillies, ginger, cashews and melted cheese",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Signature Dosas & Crepes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Signature Dosas & Crepes"
+    }
+  ],
+  "file": "dish-b560f12cb29865.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108110,
+  "sha256": "7e120ae9500ea0f76ca835eb3d0707bbd8184b98183e012ef0c797f7b2fd9234"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-695502b6c5d818",
+  "kind": "dish",
+  "name": "Masala Omelette",
+  "description": "Masala Omelette, made-to-order breakfast plates.",
+  "diet": "EGG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Breakfast"
+    }
+  ],
+  "file": "dish-695502b6c5d818.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106604,
+  "sha256": "31542b94bd389e73bd11fc56f90a1ef5547695c9f4e419546b296adf9d410e1e"
+}

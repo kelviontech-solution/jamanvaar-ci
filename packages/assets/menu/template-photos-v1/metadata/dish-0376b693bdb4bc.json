@@ -1,0 +1,26 @@
+{
+  "id": "dish-0376b693bdb4bc",
+  "kind": "dish",
+  "name": "Shahi Paneer",
+  "description": "Shahi Paneer, slow-simmered Indian gravies with fresh spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Main Course",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Main Course"
+    }
+  ],
+  "file": "dish-0376b693bdb4bc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100168,
+  "sha256": "514f6dad381912d337206a2fe7f5fdde0dca53e407a4b82493b9a71da8e5bbd4"
+}

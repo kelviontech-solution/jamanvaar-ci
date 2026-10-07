@@ -1,0 +1,37 @@
+{
+  "id": "category-af9ae1799eea1e",
+  "kind": "category",
+  "name": "Warm Desserts — Indian Multi-Cuisine Diner",
+  "categoryName": "Warm Desserts",
+  "templateId": "tpl-multicuisine",
+  "slug": "warm-desserts",
+  "description": "Desserts served warm",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Warm Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, desserts served warm.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Brownie with Ice Cream",
+      "description": "Brownie with Ice Cream, desserts served warm.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, desserts served warm.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-af9ae1799eea1e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101772,
+  "sha256": "c0146ad089f16af697d6a529382a41312b5a2a8b21050844695e16b725c964cf"
+}

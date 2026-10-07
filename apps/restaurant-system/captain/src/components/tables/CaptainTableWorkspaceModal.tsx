@@ -3,12 +3,13 @@ import React, { useState, useMemo } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { priceOrderLines } from '@jamanvaar/business';
-import { captainDb } from '@jamanvaar/database';
-import { EmptyState } from '@jamanvaar/ui';
+import { captainDb, isBillWaiting } from '@jamanvaar/database';
+import { CachedImg, EmptyState } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import { CaptainCancelDishModal } from '../modals/CaptainCancelDishModal';
+import { matchesCaptainDiet } from '../../captainWorkflow';
 import {
   X,
   Plus,
@@ -40,7 +41,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   table,
   isOpen,
   onClose,
-  onOpenSendMessage
+  onOpenSendMessage,
+  onOpenTransferMerge
 }) => {
   useEscapeToClose(isOpen, onClose);
   const {
@@ -68,6 +70,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const [searchQuery, setSearchQuery] = useState('');
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [kotSuccessAlert, setKotSuccessAlert] = useState('');
+  const [billAlert, setBillAlert] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [repeatOrderError, setRepeatOrderError] = useState('');
   // On a phone the cart is a bar at the bottom of the menu; tap it to see the dishes.
   const [cartOpen, setCartOpen] = useState(false);
@@ -76,11 +79,10 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter((item) => {
       if (selectedCategory !== 'ALL' && item.categoryId !== selectedCategory) return false;
-      if (dietaryFilter === 'VEG' && item.dietaryType !== 'VEG') return false;
-      if (dietaryFilter === 'NON_VEG' && item.dietaryType !== 'NON_VEG') return false;
+      if (!matchesCaptainDiet(item, dietaryFilter)) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        return item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q);
+        return item.name.toLowerCase().includes(q) || item.sku?.toLowerCase().includes(q);
       }
       return true;
     });
@@ -143,6 +145,22 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       setTimeout(() => setKotSuccessAlert(''), 3000);
       setActiveWorkspaceTab('ORDER');
     }
+  };
+
+  // The bill belongs to the order: it is "sent" while the order is waiting for the counter, whatever the table record says.
+  const billWaiting = isBillWaiting(liveOrder);
+  // The GST line names the rate the restaurant set in Customisations & Tax, not a fixed one.
+  const gstLabels = taxLabels(restaurantGstRate(captainDb.taxGroups));
+  const billSentAt = liveOrder?.billRequestedAt ? new Date(liveOrder.billRequestedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+  const sendBill = (split = false) => {
+    const sent = split ? requestSplitBill() : requestBill(table!.tableNumber);
+    if (sent) {
+      setBillAlert({ tone: 'ok', text: split ? 'Split bill sent to the counter POS.' : 'Bill sent to the counter POS. It is waiting there for payment.' });
+    } else {
+      setBillAlert({ tone: 'error', text: 'Nothing to bill yet. Send the order to the kitchen first.' });
+    }
+    setTimeout(() => setBillAlert(null), 4000);
   };
 
   if (!isOpen || !table) return null;
@@ -210,6 +228,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {(currentCaptain?.permissions.CAN_TRANSFER_TABLE || currentCaptain?.permissions.CAN_MERGE_TABLE) && <button type="button" onClick={onOpenTransferMerge} aria-label="Transfer or merge this table" title="Transfer or merge this table" className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5"><UtensilsCrossed className="w-4 h-4" /><span className="hidden lg:inline">Transfer / Merge</span></button>}
             <button
               type="button"
               onClick={() => onOpenSendMessage(table.tableNumber)}
@@ -222,13 +241,13 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             </button>
             <button
               type="button"
-              onClick={() => requestBill(table.tableNumber)}
+              onClick={() => sendBill(false)}
               className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
-              title="Request final bill from POS Cashier"
-              aria-label="Request the bill"
+              title={billWaiting ? 'Bill already with the counter. Send it again after adding dishes.' : 'Send the bill to the counter POS'}
+              aria-label={billWaiting ? 'Re-send the bill' : 'Request the bill'}
             >
               <Receipt className="w-4 h-4" />
-              <span className="hidden sm:inline">Request Bill</span>
+              <span className="hidden sm:inline">{billWaiting ? 'Bill sent · re-send' : 'Request Bill'}</span>
             </button>
             <button type="button" onClick={onClose} aria-label="Close" className="min-w-[40px] min-h-[40px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
               <X className="w-5 h-5" />
@@ -240,7 +259,10 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
         <div className="hidden md:block bg-jaman-cream border-b border-jaman-border px-4 py-2 overflow-x-auto scrollbar-none shrink-0">
           <div className="flex items-center justify-between min-w-[500px] text-[11px] font-bold text-slate-500">
             {['Order Taken', 'KOT Sent', 'Cooking', 'Food Ready', 'Served', 'Bill Requested'].map((label, i) => {
-              const done = i === 0 ? cartItems.length > 0 : i === 1 ? firedCartItems.length > 0 : i === 5 ? table.status === 'BILL_REQUESTED' : false;
+              const live = firedCartItems.filter(item => dishState(item) !== 'CANCELLED');
+              const done = i === 0 ? cartItems.length > 0 : i === 1 ? firedCartItems.length > 0
+                : i === 2 ? live.length > 0 : i === 3 ? live.some(item => ['READY', 'SERVED'].includes(dishState(item)))
+                : i === 4 ? live.length > 0 && live.every(item => dishState(item) === 'SERVED') : billWaiting;
               return (
                 <React.Fragment key={label}>
                   {i > 0 && <span className="text-slate-300">➔</span>}
@@ -284,6 +306,20 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
               {/* Dishes */}
               <div className="flex-1 p-3 sm:p-5 overflow-y-auto space-y-3 min-h-0">
+                {billWaiting && (
+                  <div role="status" className="p-3 rounded-2xl bg-purple-50 border border-purple-300 text-purple-900 text-xs font-bold flex items-start gap-2">
+                    <Receipt className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                    <span>
+                      Bill sent to the counter at {billSentAt}. Total {formatINR(liveOrder!.totalAmount)} waiting for payment at the POS.
+                      {' '}Add dishes and re-send if the guest orders more.
+                    </span>
+                  </div>
+                )}
+                {billAlert && (
+                  <div role="status" className={`p-3 rounded-2xl border text-xs font-bold flex items-center gap-2 ${billAlert.tone === 'ok' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-amber-50 border-amber-300 text-amber-800'}`}>
+                    <span>{billAlert.text}</span>
+                  </div>
+                )}
                 {kotSuccessAlert && (
                   <div role="status" className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -432,12 +468,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               </div>
 
               {/* Bill and actions: a compact strip at the bottom on a phone, a side column on a tablet */}
-              <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-3 md:p-5 flex flex-col gap-2.5 md:gap-4 shrink-0 md:overflow-y-auto">
+              <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-3 md:p-5 flex flex-col gap-2.5 md:gap-4 shrink-0 max-h-[42dvh] md:max-h-none overflow-y-auto">
                 <div className="hidden md:block space-y-3">
                   <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">Table Financial Summary</h3>
                   <div className="space-y-2 text-xs font-semibold text-slate-600 bg-white p-3.5 rounded-2xl border border-jaman-border">
                     <div className="flex justify-between"><span>Subtotal</span><span className="font-mono text-jaman-navy">{formatINR(subtotal)}</span></div>
-                    <div className="flex justify-between"><span>GST (CGST 2.5% + SGST 2.5%)</span><span className="font-mono text-jaman-navy">{formatINR(gst)}</span></div>
+                    <div className="flex justify-between"><span>{gstLabels.combined}</span><span className="font-mono text-jaman-navy">{formatINR(gst)}</span></div>
                     {roundOff !== 0 && (
                       <div className="flex justify-between"><span>Round Off</span><span className="font-mono text-jaman-navy">{roundOff > 0 ? '+' : ''}{formatINR(roundOff)}</span></div>
                     )}
@@ -456,13 +492,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     <Plus className="w-4 h-4" />
                     <span>Add dishes</span>
                   </button>
-                  <button type="button" onClick={() => requestBill(table.tableNumber)} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                  <button type="button" onClick={() => sendBill(false)} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
                     <Receipt className="w-3.5 h-3.5" />
-                    <span className="md:hidden">Request bill</span>
-                    <span className="hidden md:inline">Send Bill Request to Counter POS</span>
+                    <span>{billWaiting ? `Bill sent ${billSentAt} · re-send` : 'Request bill'}</span>
                   </button>
                   {seatTotals.length > 0 && (
-                    <button type="button" onClick={requestSplitBill} className="col-span-2 md:col-span-1 min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                    <button type="button" onClick={() => sendBill(true)} className="col-span-2 md:col-span-1 min-h-[44px] py-2.5 px-3 rounded-2xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
                       <Receipt className="w-3.5 h-3.5" />
                       <span>Request split bill by seat</span>
                     </button>
@@ -501,7 +536,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     />
                   </div>
                   <div className="flex items-center gap-1">
-                    {(['ALL', 'VEG', 'NON_VEG'] as const).map((diet) => (
+                    {(['ALL', 'VEG', 'JAIN', 'NON_VEG'] as const).map((diet) => (
                       <button
                         key={diet}
                         type="button"
@@ -509,7 +544,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                         aria-pressed={dietaryFilter === diet}
                         className={`px-3 min-h-[40px] rounded-xl text-[11px] font-bold transition-all cursor-pointer ${dietaryFilter === diet ? 'bg-jaman-navy text-white' : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'}`}
                       >
-                        {diet === 'ALL' ? 'All' : diet === 'VEG' ? 'Veg' : 'Non-Veg'}
+                        {diet === 'ALL' ? 'All' : diet === 'VEG' ? 'Veg' : diet === 'JAIN' ? 'Jain' : 'Non-Veg'}
                       </button>
                     ))}
                   </div>
@@ -553,7 +588,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                         className={`bg-white border border-jaman-border rounded-2xl p-2.5 sm:p-3 flex flex-col justify-between gap-1.5 shadow-2xs transition-all ${soldOut ? 'opacity-50 cursor-not-allowed' : 'hover:border-jaman-saffron hover:shadow-md active:scale-98 cursor-pointer'}`}
                       >
                         <div className="w-full h-14 sm:h-24 rounded-xl bg-slate-100 overflow-hidden relative">
-                          <img
+                          <CachedImg
                             src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
                             alt={item.name}
                             loading="lazy"

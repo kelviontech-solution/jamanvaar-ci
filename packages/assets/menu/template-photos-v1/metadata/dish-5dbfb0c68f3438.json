@@ -1,0 +1,22 @@
+{
+  "id": "dish-5dbfb0c68f3438",
+  "kind": "dish",
+  "name": "Kesari Bath",
+  "description": "Kesari Bath, traditional sweet portions.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Desserts"
+    }
+  ],
+  "file": "dish-5dbfb0c68f3438.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68480,
+  "sha256": "b2f1b8c70296e50dbb63a7b44cb8f32c69e4df4025828bb969b87af36bef381b"
+}

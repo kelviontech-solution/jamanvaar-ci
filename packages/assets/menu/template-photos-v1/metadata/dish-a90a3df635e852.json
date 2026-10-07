@@ -1,0 +1,25 @@
+{
+  "id": "dish-a90a3df635e852",
+  "kind": "dish",
+  "name": "Poha",
+  "description": "Poha, comfort snacks prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Regional Favourites",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Regional Favourites"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-a90a3df635e852.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88682,
+  "sha256": "67c93f27bca025cf52e9c452c339cea690a23273eaf0f2abf21081f3cbb879b6"
+}

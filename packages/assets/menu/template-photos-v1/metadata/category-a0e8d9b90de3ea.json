@@ -1,0 +1,32 @@
+{
+  "id": "category-a0e8d9b90de3ea",
+  "kind": "category",
+  "name": "Sundaes & Faloodas — Dessert / Ice Cream",
+  "categoryName": "Sundaes & Faloodas",
+  "templateId": "tpl-desserts",
+  "slug": "sundaes-falooda",
+  "description": "Loaded ice cream desserts",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes & Faloodas",
+  "components": [
+    {
+      "name": "Royal Kesar Pista Falooda",
+      "description": "Rose syrup, basil seeds, falooda sev, chilled condensed milk topped with saffron ice cream and nuts",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sizzling Chocolate Brownie Sundae",
+      "description": "Warm dark chocolate brownie on a sizzling plate with vanilla scoop and hot fudge sauce",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a0e8d9b90de3ea.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104376,
+  "sha256": "e7eaa91a0ab848872910f86a0ecf76f258ac54b38efe546186091517c10e4bec"
+}

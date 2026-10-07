@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-07T08:02:28.823Z",
+  "environment": "isolated browser QA API at localhost:4010; compiled production paths",
+  "results": [
+    {
+      "app": "@jamanvaar/kiosk-user",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-0.log"
+    },
+    {
+      "app": "@jamanvaar/pos",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-1.log"
+    },
+    {
+      "app": "@jamanvaar/pos-admin",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-2.log"
+    },
+    {
+      "app": "@jamanvaar/captain",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-3.log"
+    },
+    {
+      "app": "@jamanvaar/kds",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-4.log"
+    },
+    {
+      "app": "@jamanvaar/qr-guest",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-6.log"
+    },
+    {
+      "app": "@jamanvaar/super-admin-web",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-build-5.log"
+    }
+  ]
+}

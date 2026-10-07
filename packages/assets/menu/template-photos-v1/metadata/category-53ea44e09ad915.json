@@ -1,0 +1,32 @@
+{
+  "id": "category-53ea44e09ad915",
+  "kind": "category",
+  "name": "Hot Fried Snacks — Snacks & Quick Bites Corner",
+  "categoryName": "Hot Fried Snacks",
+  "templateId": "tpl-snacks",
+  "slug": "fried-snacks",
+  "description": "Fresh morning and evening snacks",
+  "diet": "VEG",
+  "cuisine": "Indian Teatime Snacks",
+  "category": "Hot Fried Snacks",
+  "components": [
+    {
+      "name": "Special Punjabi Samosa (2 Pcs)",
+      "description": "Crisp pastry triangles stuffed with spiced potato and green peas with saunth chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mumbai Vada Pav with Chutney",
+      "description": "Spiced potato batata vada in a pav with dry garlic coconut chutney and fried green chilli",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-53ea44e09ad915.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91330,
+  "sha256": "1fb48ce68d853b478d986b18ef961bdce4021e413fb820dbf5df7f9878ea2ddd"
+}

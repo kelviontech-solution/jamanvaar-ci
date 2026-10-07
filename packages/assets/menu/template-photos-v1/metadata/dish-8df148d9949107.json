@@ -1,0 +1,25 @@
+{
+  "id": "dish-8df148d9949107",
+  "kind": "dish",
+  "name": "Veg Pulao Shahi",
+  "description": "Basmati rice cooked with garden green peas, carrots, beans and mild whole spices",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Basmati Rice & Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Basmati Rice & Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-8df148d9949107.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88948,
+  "sha256": "85f16f78b82481722cb5a4a6603948eaa64736704ab30da8520111c82ac9a0a1"
+}

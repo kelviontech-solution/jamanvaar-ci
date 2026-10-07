@@ -1,0 +1,22 @@
+{
+  "id": "dish-f2714dda296d66",
+  "kind": "dish",
+  "name": "Mixed Vegetable Uttapam",
+  "description": "Mixed Vegetable Uttapam, thick rice-lentil pancakes with vegetable toppings.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam"
+    }
+  ],
+  "file": "dish-f2714dda296d66.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94714,
+  "sha256": "f71fcd480d3b2faa3de567750237cb8742f59c0c3a231c277efc84579d2938d2"
+}

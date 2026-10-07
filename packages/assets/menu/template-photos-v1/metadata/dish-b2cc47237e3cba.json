@@ -1,0 +1,22 @@
+{
+  "id": "dish-b2cc47237e3cba",
+  "kind": "dish",
+  "name": "Flat White",
+  "description": "Flat White, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    }
+  ],
+  "file": "dish-b2cc47237e3cba.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 47022,
+  "sha256": "8552f3f07bb08f52836c886a403d8628be17576d9eabe2c4a08fab78447292e7"
+}

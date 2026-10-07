@@ -1,0 +1,22 @@
+{
+  "id": "dish-9803b03458035b",
+  "kind": "dish",
+  "name": "Paneer Wrap",
+  "description": "Paneer Wrap, soft flatbread wraps with salad and sauce.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Wraps"
+    }
+  ],
+  "file": "dish-9803b03458035b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80256,
+  "sha256": "fcb518bb71cfea78fb44fe755a0d565206b27d10b781d20836711530c6fa5e5f"
+}

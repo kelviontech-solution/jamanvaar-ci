@@ -1,0 +1,29 @@
+{
+  "id": "dish-aa31f281be46d3",
+  "kind": "dish",
+  "name": "Bajra Rotla",
+  "description": "Bajra Rotla, fresh millet and wheat breads.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Breads"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/bajra-rotla.webp"
+  ],
+  "file": "dish-aa31f281be46d3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 131102,
+  "sha256": "556809cf8fa7fa941e5e10a1292e5ca1de507df4509e7262bbf52d384b2c6705"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-0231e07107f83a",
+  "kind": "dish",
+  "name": "Pesto Pasta",
+  "description": "Pesto Pasta, penne tossed in a freshly prepared sauce.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Pasta",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pasta"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-0231e07107f83a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102394,
+  "sha256": "c4e28064f139458f2f63aece13bc674b79986fa683151a8f15a99453c4fa4982"
+}

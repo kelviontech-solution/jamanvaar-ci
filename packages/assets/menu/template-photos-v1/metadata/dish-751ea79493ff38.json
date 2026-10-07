@@ -1,0 +1,25 @@
+{
+  "id": "dish-751ea79493ff38",
+  "kind": "dish",
+  "name": "Oats Cookies 200g",
+  "description": "Oats Cookies 200g, baked cookie packs.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cookies",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cookies"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-751ea79493ff38.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117558,
+  "sha256": "1b776532e42b772b7fc5ec386552bfe137dfad90d745879365672d13a847b36b"
+}

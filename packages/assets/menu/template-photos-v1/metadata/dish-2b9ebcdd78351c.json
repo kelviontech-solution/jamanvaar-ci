@@ -1,0 +1,22 @@
+{
+  "id": "dish-2b9ebcdd78351c",
+  "kind": "dish",
+  "name": "Amritsari Kulcha",
+  "description": "Amritsari Kulcha, traditional Punjabi dishes.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Punjabi Specials"
+    }
+  ],
+  "file": "dish-2b9ebcdd78351c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118454,
+  "sha256": "d02c2d0b8770cb066bbcf553ad2adce46dc9fd51ffc5a64ec382b528774c718a"
+}

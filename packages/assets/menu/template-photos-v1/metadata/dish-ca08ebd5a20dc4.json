@@ -1,0 +1,25 @@
+{
+  "id": "dish-ca08ebd5a20dc4",
+  "kind": "dish",
+  "name": "Chocolate Eclair",
+  "description": "Chocolate Eclair, individual eggless pastry portions.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-ca08ebd5a20dc4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 64040,
+  "sha256": "fe09f504d4badcfa465ec7441ccc19d0a76514c94f2f9fd4f0accab03ba77d7e"
+}

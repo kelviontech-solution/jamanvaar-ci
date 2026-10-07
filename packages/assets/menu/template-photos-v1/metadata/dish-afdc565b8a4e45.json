@@ -1,0 +1,25 @@
+{
+  "id": "dish-afdc565b8a4e45",
+  "kind": "dish",
+  "name": "Kathal Biryani",
+  "description": "Kathal Biryani, basmati rice dum-cooked with vegetables and spices.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Vegetarian Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Vegetarian Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-afdc565b8a4e45.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 131864,
+  "sha256": "c31e20080090ac8b38755d4bb59dfbadd73b5fd4bc1cae61a9b9c34b669e9cc7"
+}

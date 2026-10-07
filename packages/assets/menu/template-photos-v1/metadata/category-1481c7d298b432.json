@@ -1,0 +1,32 @@
+{
+  "id": "category-1481c7d298b432",
+  "kind": "category",
+  "name": "Nawabi Starters — Mughlai & Awadhi Restaurant",
+  "categoryName": "Nawabi Starters",
+  "templateId": "tpl-mughlai",
+  "slug": "mughlai-starters",
+  "description": "Delicate melt-in-mouth Awadhi kebabs",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Nawabi Starters",
+  "components": [
+    {
+      "name": "Veg Galouti Kebab (4 Pcs)",
+      "description": "Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Pasanda Tikka",
+      "description": "Layered cottage cheese stuffed with mint, nuts and khoya, glazed in tandoor",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1481c7d298b432.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122514,
+  "sha256": "1cef2f637eb0f7a51f95f0cac90c04e0d9663aa5087b86a7d1696af0c167bbf1"
+}

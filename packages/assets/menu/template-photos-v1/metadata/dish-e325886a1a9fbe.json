@@ -1,0 +1,33 @@
+{
+  "id": "dish-e325886a1a9fbe",
+  "kind": "dish",
+  "name": "Hara Bhara Kebab",
+  "description": "Hara Bhara Kebab, marinated starters grilled or shallow-fried to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/hara-bhara-kebab.jpg"
+  ],
+  "file": "dish-e325886a1a9fbe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96610,
+  "sha256": "4fac5ad77d17c804db9c68e71c61f93fd3efd10a7d80b71865e76bbf0d5b2da4"
+}

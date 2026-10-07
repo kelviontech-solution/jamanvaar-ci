@@ -1,0 +1,22 @@
+{
+  "id": "dish-35f8d1b2d7aab4",
+  "kind": "dish",
+  "name": "Dhaba Dahi Kebab (6 Pcs)",
+  "description": "Crispy fried hung curd and paneer patties with cardamom and mint",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Starters & Tikkas",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dhaba Starters & Tikkas"
+    }
+  ],
+  "file": "dish-35f8d1b2d7aab4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112168,
+  "sha256": "8041f63efb563e8f61dff5c9c351ae6444886770902083a0bfa564a23676f95a"
+}

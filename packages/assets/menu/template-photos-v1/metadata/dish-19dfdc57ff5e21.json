@@ -1,0 +1,25 @@
+{
+  "id": "dish-19dfdc57ff5e21",
+  "kind": "dish",
+  "name": "Banana Split",
+  "description": "Banana Split, ice cream with toppings and sauces.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-19dfdc57ff5e21.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72944,
+  "sha256": "7b3246207018c320fdeeb381c6a3c3f829660c3a8730a34a54266621e96d576f"
+}

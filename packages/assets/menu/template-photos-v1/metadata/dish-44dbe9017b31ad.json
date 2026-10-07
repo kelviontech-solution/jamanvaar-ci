@@ -1,0 +1,22 @@
+{
+  "id": "dish-44dbe9017b31ad",
+  "kind": "dish",
+  "name": "Crispy Butter Masala Dosa",
+  "description": "Crisp golden crepe roasted with pure Amul butter, filled with aromatic spiced potato and onion masala",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Signature Dosas & Crepes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Signature Dosas & Crepes"
+    }
+  ],
+  "file": "dish-44dbe9017b31ad.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79748,
+  "sha256": "7da81d21a3ec4c31c75e1cfbd33d316ecaddb449b2cc5e0ae860c88cb5ee51d8"
+}

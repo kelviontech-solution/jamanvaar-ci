@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { CentralReportingService, PeriodReconciliationResult, CentralDatePreset } from '@jamanvaar/business';
-import { formatINR, formatDate, formatTime } from '@jamanvaar/utils';
+import { formatINR, formatDate, formatTime, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
   ShieldCheck,
   AlertTriangle,
@@ -213,7 +215,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
               </div>
 
               <div className="p-3 flex justify-between items-center">
-                <span className="font-bold text-slate-700">GST (CGST 2.5% + SGST 2.5% = 5% Food Service GST)</span>
+                <span className="font-bold text-slate-700">{gstLabels().combined}</span>
                 <strong className="tabular-nums text-sm text-brand">+{formatINR(recon.gstTotal)}</strong>
               </div>
 

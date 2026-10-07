@@ -1,0 +1,22 @@
+{
+  "id": "dish-97a29ad854081d",
+  "kind": "dish",
+  "name": "Sweet Tamarind Chutney",
+  "description": "Sweet Tamarind Chutney, fresh accompaniments in individual portions.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chutneys",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Chutneys"
+    }
+  ],
+  "file": "dish-97a29ad854081d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89282,
+  "sha256": "b87dfd344ecbb96ab30b0283386ec3932271d120607818a01c77772c85ffa79e"
+}

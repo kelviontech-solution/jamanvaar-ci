@@ -1,0 +1,37 @@
+{
+  "id": "category-a0cbf21b37d17d",
+  "kind": "category",
+  "name": "Starters — Biryani & Kebab Darbar",
+  "categoryName": "Starters",
+  "templateId": "tpl-biryani",
+  "slug": "starters",
+  "description": "Freshly cooked accompaniments",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Starters",
+  "components": [
+    {
+      "name": "Paneer Tikka",
+      "description": "Paneer Tikka, freshly cooked accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chicken Tikka",
+      "description": "Chicken Tikka, freshly cooked accompaniments.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Chicken 65",
+      "description": "Chicken 65, freshly cooked accompaniments.",
+      "dietaryType": "NON_VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a0cbf21b37d17d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 129968,
+  "sha256": "35fc008163c175a29ae4beaec5508364d089948f88dc218006736459b05dd9d4"
+}

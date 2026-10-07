@@ -1,0 +1,37 @@
+{
+  "id": "category-15671346ee9def",
+  "kind": "category",
+  "name": "Kathiyawadi Shaak — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Kathiyawadi Shaak",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "kathiyawadi-shaak",
+  "description": "Rustic regional vegetable preparations",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Shaak",
+  "components": [
+    {
+      "name": "Sev Tameta",
+      "description": "Sev Tameta, rustic regional vegetable preparations.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Ringna No Olo",
+      "description": "Ringna No Olo, rustic regional vegetable preparations.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lasaniya Bateta",
+      "description": "Lasaniya Bateta, rustic regional vegetable preparations.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-15671346ee9def.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120788,
+  "sha256": "d8747f65ab26593ed405987d4dd90326b7237cfcf92af450ea284389f93f2f7d"
+}

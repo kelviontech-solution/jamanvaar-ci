@@ -1,0 +1,22 @@
+{
+  "id": "dish-d7a97f28363196",
+  "kind": "dish",
+  "name": "Jain Masala Chaas",
+  "description": "Jain Masala Chaas, traditional dairy sweets and refreshments.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Sweets & Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Sweets & Beverages"
+    }
+  ],
+  "file": "dish-d7a97f28363196.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 67274,
+  "sha256": "1708ec5db2c6233e1cb89b4bd451884604c4681de8f7c131767abbc6d52006c1"
+}

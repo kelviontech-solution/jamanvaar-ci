@@ -1,0 +1,37 @@
+{
+  "id": "category-5b6f6349192b86",
+  "kind": "category",
+  "name": "Dhaba Special Curries — Punjabi Dhaba & Restaurant",
+  "categoryName": "Dhaba Special Curries",
+  "templateId": "tpl-punjabi",
+  "slug": "punjabi-curries",
+  "description": "Desi ghee tempered dhaba curries",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Special Curries",
+  "components": [
+    {
+      "name": "Pindi Chhole (Rawalpindi Style)",
+      "description": "Dark slow-cooked chickpeas steeped with tea leaves, anardana, dried mango and desi spices",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Bhurji Desi Ghee",
+      "description": "Scrambled fresh cottage cheese wok-fried with onions, tomatoes, ginger and green chillies",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sarson Ka Saag (Seasonal)",
+      "description": "Traditional mustard leaves cooked with bathua, spinach and desi makhan",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5b6f6349192b86.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120750,
+  "sha256": "e86de70ac85a66330a3e628591f0cfcf48b8d2f81fbe0ca89bb3a895e1c13dbb"
+}

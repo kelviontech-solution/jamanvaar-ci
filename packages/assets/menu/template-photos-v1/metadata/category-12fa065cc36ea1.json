@@ -1,0 +1,37 @@
+{
+  "id": "category-12fa065cc36ea1",
+  "kind": "category",
+  "name": "Beverages — Punjabi Dhaba & Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-punjabi",
+  "slug": "beverages",
+  "description": "Traditional dairy drinks and fresh citrus refreshments",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sweet Lassi",
+      "description": "Sweet Lassi, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Salted Lassi",
+      "description": "Salted Lassi, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-12fa065cc36ea1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 78552,
+  "sha256": "e831f06a0e9604396fbe1ecb87b3b76e75abdbb028ca198affa5885e5c0d03fb"
+}

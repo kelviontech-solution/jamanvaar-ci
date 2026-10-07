@@ -1,0 +1,22 @@
+{
+  "id": "dish-919c45c31580ad",
+  "kind": "dish",
+  "name": "Sarson Ka Saag (Seasonal)",
+  "description": "Traditional mustard leaves cooked with bathua, spinach and desi makhan",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Special Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dhaba Special Curries"
+    }
+  ],
+  "file": "dish-919c45c31580ad.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107658,
+  "sha256": "faa482e06bfb8b050360146d4fbe0d860d11d9ae57bc1563d2fbc4d789ee0132"
+}

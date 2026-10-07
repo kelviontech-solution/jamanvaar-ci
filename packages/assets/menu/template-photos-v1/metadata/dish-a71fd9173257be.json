@@ -1,0 +1,30 @@
+{
+  "id": "dish-a71fd9173257be",
+  "kind": "dish",
+  "name": "Peas Pulao",
+  "description": "Peas Pulao, steamed or tempered basmati rice.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Rice"
+    }
+  ],
+  "file": "dish-a71fd9173257be.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94318,
+  "sha256": "26bf82d239a886871fcb0f90ad1c6a5a743f74a587efa90f55e9ee2cc2158287"
+}

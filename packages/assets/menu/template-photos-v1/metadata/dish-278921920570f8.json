@@ -1,0 +1,33 @@
+{
+  "id": "dish-278921920570f8",
+  "kind": "dish",
+  "name": "Garlic Naan",
+  "description": "Garlic Naan, fresh tandoor or griddle breads.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Breads"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/garlic-naan.jpg"
+  ],
+  "file": "dish-278921920570f8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118754,
+  "sha256": "c915d67f69b58e08745b9e7b5604320010a27891a7aeb6d2d8cc1aa063038f95"
+}

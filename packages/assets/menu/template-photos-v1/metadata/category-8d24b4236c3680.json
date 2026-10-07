@@ -1,0 +1,37 @@
+{
+  "id": "category-8d24b4236c3680",
+  "kind": "category",
+  "name": "Desserts — Punjabi Dhaba & Restaurant",
+  "categoryName": "Desserts",
+  "templateId": "tpl-punjabi",
+  "slug": "desserts",
+  "description": "Traditional Indian dessert portions",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Gulab Jamun",
+      "description": "Gulab Jamun, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rasmalai",
+      "description": "Rasmalai, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rice Kheer",
+      "description": "Rice Kheer, traditional Indian dessert portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8d24b4236c3680.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101680,
+  "sha256": "8a2bfe1152f6872969e7dafc88166cec01de938a879e31be097215bd9f8fc8e4"
+}

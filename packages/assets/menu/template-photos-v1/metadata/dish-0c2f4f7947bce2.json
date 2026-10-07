@@ -1,0 +1,33 @@
+{
+  "id": "dish-0c2f4f7947bce2",
+  "kind": "dish",
+  "name": "Margherita Pizza",
+  "description": "Margherita Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Quick Meals"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/pizza/margherita.jpg"
+  ],
+  "file": "dish-0c2f4f7947bce2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 130152,
+  "sha256": "14de452cd4cc0bcacc5f54bb9ba830f34aa30969e58e9fad3523222749ec86b0"
+}

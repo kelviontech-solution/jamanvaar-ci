@@ -92,18 +92,24 @@ describe('Refund creation', () => {
 
   it('a KIOSK device cannot initiate a refund (403)', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, kioskToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Test Manager' });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, kioskToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Test Manager', method: 'CASH' });
     expect(res.status).toBe(403);
   });
 
-  it('creates a refund, sets PaymentTransaction to REFUND_PENDING, never claims REFUNDED synchronously', async () => {
+  it('records a manual refund as done at once, marks the payment REFUNDED, and never calls Razorpay', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Test Manager' });
+    const before = createRefundMock.mock.calls.length;
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Test Manager', method: 'UPI_TO_CUSTOMER' });
     expect(res.status).toBe(201);
     expect(res.body.refundId).toBeTruthy();
+    expect(createRefundMock.mock.calls.length).toBe(before);
+
+    const refund = await prisma.runAsPlatform((tx) => tx.refund.findUniqueOrThrow({ where: { id: res.body.refundId } }));
+    expect(refund.status).toBe('SUCCESS');
+    expect(refund.method).toBe('UPI_TO_CUSTOMER');
 
     const payment = await prisma.runAsPlatform((tx) => tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } }));
-    expect(payment.status).toBe('REFUND_PENDING');
+    expect(payment.status).toBe('REFUNDED');
 
     const order = await prisma.runAsPlatform((tx) => tx.order.findUniqueOrThrow({ where: { id: payment.orderId } }));
     expect(order.status).toBe('PAID'); // untouched — only the webhook finalizes this
@@ -111,16 +117,16 @@ describe('Refund creation', () => {
 
   it('rejects a refund exceeding the remaining refundable amount', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10001, reason: 'Too much', requestedBy: 'Test Manager' });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10001, reason: 'Too much', requestedBy: 'Test Manager', method: 'CASH' });
     expect(res.status).toBe(400);
   });
 
   it('counts a PENDING refund against the remaining balance for a second request', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const first = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Partial 1', requestedBy: 'Test Manager' });
+    const first = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Partial 1', requestedBy: 'Test Manager', method: 'CASH' });
     expect(first.status).toBe(201);
 
-    const second = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 5000, reason: 'Partial 2', requestedBy: 'Test Manager' });
+    const second = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 5000, reason: 'Partial 2', requestedBy: 'Test Manager', method: 'CASH' });
     expect(second.status).toBe(400); // 6000 + 5000 > 10000, and the first is still PENDING
   });
 
@@ -131,7 +137,7 @@ describe('Refund creation', () => {
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, orderId: order.id, restaurantId, providerOrderId: `pay_unpaid_${Date.now()}`, amount: 5000, currency: 'INR', status: 'PENDING' } })
     );
-    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 5000, reason: 'Too early', requestedBy: 'Test Manager' });
+    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 5000, reason: 'Too early', requestedBy: 'Test Manager', method: 'CASH' });
     expect(res.status).toBe(400);
   });
 
@@ -149,7 +155,7 @@ describe('Refund creation', () => {
     const otherRedeemRes = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: otherKeyRes.body.code, deviceType: 'POS' });
     const otherPosToken = otherRedeemRes.body.deviceToken;
 
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, otherPosToken).send({ amountPaise: 10000, reason: 'Cross-tenant attempt', requestedBy: 'Test Manager', staffSession: await refundManagerSession(app, prisma, otherPosToken) });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, otherPosToken).send({ amountPaise: 10000, reason: 'Cross-tenant attempt', requestedBy: 'Test Manager', method: 'CASH', staffSession: await refundManagerSession(app, prisma, otherPosToken) });
     expect(res.status).toBe(404); // tenant-scoped lookup finds nothing, not a 403 that would confirm the payment exists
 
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: otherRestaurantId } }));
@@ -157,20 +163,21 @@ describe('Refund creation', () => {
 
   it('rejects a device-only cashier request even if it claims a manager name', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await request(app.getHttpServer()).post(`/api/v1/payments/${paymentId}/refund`).set('Authorization', `Bearer ${posToken}`).send({ amountPaise: 1, reason: 'Bypass probe', requestedBy: 'Manager' });
+    const res = await request(app.getHttpServer()).post(`/api/v1/payments/${paymentId}/refund`).set('Authorization', `Bearer ${posToken}`).send({ amountPaise: 1, reason: 'Bypass probe', requestedBy: 'Manager', method: 'CASH' });
     expect(res.status).toBe(403);
     expect(await prisma.runAsTenant(restaurantId, tx => tx.refund.count({ where: { paymentId } }))).toBe(0);
   });
 
-  it('replays one refund idempotency key without another provider request', async () => {
+  it('replays one refund idempotency key as one recorded refund', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const payload = { amountPaise: 100, reason: 'One intended refund', requestedBy: 'Untrusted Name', idempotencyKey: `qa-refund-${paymentId}` };
+    const payload = { amountPaise: 100, reason: 'One intended refund', requestedBy: 'Untrusted Name', method: 'CASH' as const, idempotencyKey: `qa-refund-${paymentId}` };
     const before = createRefundMock.mock.calls.length;
     const first = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send(payload);
     const repeat = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send(payload);
     expect(first.status).toBe(201); expect(repeat.status).toBe(201);
     expect(repeat.body.refundId).toBe(first.body.refundId);
-    expect(createRefundMock.mock.calls.length - before).toBe(1);
+    expect(createRefundMock.mock.calls.length - before).toBe(0);
+    expect(await prisma.runAsTenant(restaurantId, tx => tx.refund.count({ where: { paymentId } }))).toBe(1);
     const changed = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ ...payload, amountPaise: 101 });
     expect(changed.status).toBe(409);
   });
@@ -178,13 +185,13 @@ describe('Refund creation', () => {
   // security-audit LOW-02 regressions
   it('rejects a refund with no requestedBy — staff attribution is mandatory, not optional', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request' });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request', method: 'CASH' });
     expect(res.status).toBe(400);
   });
 
   it('persists requestedBy on the Refund row and writes an audit log entry naming the device and the staff member', async () => {
     const paymentId = await seedPaidOrder(10000);
-    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Priya Manager' });
+    const res = await authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 10000, reason: 'Customer request', requestedBy: 'Priya Manager', method: 'CASH' });
     expect(res.status).toBe(201);
 
     const refund = await prisma.runAsPlatform((tx) => tx.refund.findUniqueOrThrow({ where: { id: res.body.refundId } }));
@@ -203,8 +210,8 @@ describe('Refund creation', () => {
     const paymentId = await seedPaidOrder(10000);
 
     const [first, second] = await Promise.all([
-      authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Concurrent A', requestedBy: 'Test Manager' }),
-      authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Concurrent B', requestedBy: 'Test Manager' })
+      authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Concurrent A', requestedBy: 'Test Manager', method: 'CASH' }),
+      authed('post', `/api/v1/payments/${paymentId}/refund`, posToken).send({ amountPaise: 6000, reason: 'Concurrent B', requestedBy: 'Test Manager', method: 'CASH' })
     ]);
 
     const statuses = [first.status, second.status].sort();

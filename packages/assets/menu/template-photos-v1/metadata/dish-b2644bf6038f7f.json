@@ -1,0 +1,22 @@
+{
+  "id": "dish-b2644bf6038f7f",
+  "kind": "dish",
+  "name": "Vanilla Cream Cake",
+  "description": "Vanilla Cream Cake, eggless celebration cakes; size selection available.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cakes"
+    }
+  ],
+  "file": "dish-b2644bf6038f7f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 50508,
+  "sha256": "6c4ad8037f0feb031fc9c5b31b5ff0a8be1e440e0ca12a73c8c63c4b63bb3d68"
+}

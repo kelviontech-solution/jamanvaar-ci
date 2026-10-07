@@ -1,0 +1,22 @@
+{
+  "id": "dish-13a182e169c32b",
+  "kind": "dish",
+  "name": "Pineapple Cake",
+  "description": "Pineapple Cake, eggless celebration cakes; size selection available.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cakes"
+    }
+  ],
+  "file": "dish-13a182e169c32b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 44420,
+  "sha256": "a907f0651fc848ff923b902bdadc38c224f1ae89ef0e7a0ea9cbd8c259e6326e"
+}

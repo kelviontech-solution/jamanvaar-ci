@@ -637,6 +637,38 @@
   color: var(--jv-success-text);
 }
 
+/* A server-readiness notice (signing key, backup storage, ...): what is wrong, and the exact steps to fix it,
+   not just a one-line error. */
+.signing-status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--jv-radius-md);
+  border: 1px solid var(--jv-border);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.signing-status-card-error {
+  background: var(--jv-error-soft);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: var(--jv-error-text);
+}
+.signing-status-card-error code,
+.signing-status-card-ready code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11.5px;
+}
+.signing-status-card-ready {
+  align-items: center;
+  background: var(--jv-success-soft);
+  border-color: rgba(22, 163, 74, 0.3);
+  color: var(--jv-success-text);
+}
+
 /* The shared Modal renders a .modal-body; without padding its content touched the dialog edges. */
 .modal-body {
   padding: 20px 24px;

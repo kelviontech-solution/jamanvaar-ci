@@ -1,0 +1,22 @@
+{
+  "id": "dish-054baec40b2734",
+  "kind": "dish",
+  "name": "Americano",
+  "description": "Americano, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    }
+  ],
+  "file": "dish-054baec40b2734.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 37006,
+  "sha256": "715f6e67c1281f5232da36bc1682290cfcf43e55c0a81477c431b19c60014466"
+}

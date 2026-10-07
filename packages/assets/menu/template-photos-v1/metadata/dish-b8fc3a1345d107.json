@@ -1,0 +1,25 @@
+{
+  "id": "dish-b8fc3a1345d107",
+  "kind": "dish",
+  "name": "Malai Soya Chaap Tandoori",
+  "description": "Tender soya chaap marinated in creamy cashew, cheese and green cardamom paste, roasted to perfection",
+  "diet": "VEG",
+  "cuisine": "Authentic Charcoal Tandoor",
+  "category": "Tandoori Grills & Chaap",
+  "occurrences": [
+    {
+      "templateId": "tpl-tandoor",
+      "category": "Tandoori Grills & Chaap"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-b8fc3a1345d107.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93280,
+  "sha256": "eacef9d97282acdb99bb4b7592caa168abba0fe1c99343da29512d2405d412ea"
+}

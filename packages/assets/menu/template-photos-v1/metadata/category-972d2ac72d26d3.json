@@ -1,0 +1,27 @@
+{
+  "id": "category-972d2ac72d26d3",
+  "kind": "category",
+  "name": "Chaas & Beverages — Gujarati Restaurant",
+  "categoryName": "Chaas & Beverages",
+  "templateId": "tpl-gujarati",
+  "slug": "gujarati-drinks",
+  "description": "Digestive chaas and chilled coolers",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chaas & Beverages",
+  "components": [
+    {
+      "name": "Kathiyawadi Masala Chaas",
+      "description": "Smoky spiced buttermilk tempered with roasted cumin, green chilli paste, ginger and black salt",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-972d2ac72d26d3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94148,
+  "sha256": "aa7fcabdf54de85492e7ba2a92baab6faedbb84ea7c00f9ee305ba96f483e10f"
+}

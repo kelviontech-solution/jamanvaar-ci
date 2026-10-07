@@ -1,0 +1,18 @@
+{
+  "pages": 4,
+  "checks": {
+    "lastInvoicePrinted": true,
+    "kioskInvoicePrinted": true,
+    "restaurantIdentity": true,
+    "branded": true,
+    "all32Records": true,
+    "all30PaginationFixturesPrinted": true,
+    "firstPageHasLedgerRows": true,
+    "recordedGstLabel": true,
+    "noAppShell": true
+  },
+  "pageSizePoints": [
+    841.91998,
+    594.95996
+  ]
+}

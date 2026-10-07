@@ -1,0 +1,22 @@
+{
+  "id": "dish-8fcbb47826bd46",
+  "kind": "dish",
+  "name": "Triple Schezwan Rice with Gravy",
+  "description": "Combo of wok rice, fried noodles, and hot Schezwan Manchurian gravy bowl",
+  "diet": "VEG",
+  "cuisine": "Desi Chinese & Fast Asian",
+  "category": "Desi Chinese Favorites",
+  "occurrences": [
+    {
+      "templateId": "tpl-indo-chinese",
+      "category": "Desi Chinese Favorites"
+    }
+  ],
+  "file": "dish-8fcbb47826bd46.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107232,
+  "sha256": "82783b2e9525004c5ad85d285720a5b2df3773f4e695e02bb8233c1aab07c0f0"
+}

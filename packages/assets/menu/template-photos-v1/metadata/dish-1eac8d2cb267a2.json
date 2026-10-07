@@ -1,0 +1,45 @@
+{
+  "id": "dish-1eac8d2cb267a2",
+  "kind": "dish",
+  "name": "Masala Chaas",
+  "description": "Masala Chaas, chilled traditional drinks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Sweets & Beverages"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-chaat",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Desserts & Drinks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/masala-chaas.webp"
+  ],
+  "file": "dish-1eac8d2cb267a2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 62078,
+  "sha256": "944da115a5d61a830f377de82479d95bc143c38c70351a0d71dae87fa077c089"
+}

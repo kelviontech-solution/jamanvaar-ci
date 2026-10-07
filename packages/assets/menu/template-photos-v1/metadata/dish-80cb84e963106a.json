@@ -1,0 +1,26 @@
+{
+  "id": "dish-80cb84e963106a",
+  "kind": "dish",
+  "name": "Special Rotla Shaak Meal",
+  "description": "Special Rotla Shaak Meal, complete regional meals.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Thali"
+    }
+  ],
+  "file": "dish-80cb84e963106a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115284,
+  "sha256": "b0f902c60d8a5d2ee7a527b31e56705c9442e7a6e9d7251abc478665c8f484a6"
+}

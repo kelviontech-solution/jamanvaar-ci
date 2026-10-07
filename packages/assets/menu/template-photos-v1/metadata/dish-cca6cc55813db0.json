@@ -1,0 +1,22 @@
+{
+  "id": "dish-cca6cc55813db0",
+  "kind": "dish",
+  "name": "Dutch Chocolate Truffle Slice",
+  "description": "Rich dark chocolate sponge layered with 55% cocoa ganache",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries & Slices",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries & Slices"
+    }
+  ],
+  "file": "dish-cca6cc55813db0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85024,
+  "sha256": "5f4cf5d79b4ab3f2dd64a2efd84a94159ddb7b15d3ab8ffc6eee1a1f99087b7c"
+}

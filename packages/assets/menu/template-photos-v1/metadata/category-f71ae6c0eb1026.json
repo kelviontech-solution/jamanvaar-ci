@@ -1,0 +1,37 @@
+{
+  "id": "category-f71ae6c0eb1026",
+  "kind": "category",
+  "name": "Mutton & Egg Biryani — Biryani & Kebab Darbar",
+  "categoryName": "Mutton & Egg Biryani",
+  "templateId": "tpl-biryani",
+  "slug": "mutton-egg-biryani",
+  "description": "Traditional dum rice preparations",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Mutton & Egg Biryani",
+  "components": [
+    {
+      "name": "Mutton Dum Biryani",
+      "description": "Mutton Dum Biryani, traditional dum rice preparations.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Mutton Keema Biryani",
+      "description": "Mutton Keema Biryani, traditional dum rice preparations.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Egg Biryani",
+      "description": "Egg Biryani, traditional dum rice preparations.",
+      "dietaryType": "EGG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f71ae6c0eb1026.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 152254,
+  "sha256": "75213379b96cca09d55305ba3874340dba06a0648ebf2dae5ddb9b89832deaef"
+}

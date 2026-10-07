@@ -1,3 +1,4 @@
+import { CachedImg } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { EmptyState } from '@jamanvaar/ui';
@@ -721,13 +722,13 @@ export const PosMenuManagerModal: React.FC<{
                           <div className="flex items-start gap-3">
                             <div className="w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                               {item.imageUrl ? (
-                                <img
+                                <CachedImg
                                   src={item.imageUrl}
                                   alt={item.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).src =
-                                      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
+                                      '/assets/menu/common/menu-placeholder-v2.svg';
                                   }}
                                 />
                               ) : (
@@ -875,7 +876,7 @@ export const PosMenuManagerModal: React.FC<{
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-jaman-cream border border-jaman-border flex items-center justify-center text-jaman-saffron overflow-hidden">
                           {cat.imageUrl ? (
-                            <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
+                            <CachedImg src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                           ) : (
                             <Layers className="w-6 h-6" />
                           )}
@@ -1224,7 +1225,7 @@ export const PosMenuManagerModal: React.FC<{
                                     <div className="flex items-start gap-3">
                                       <div className="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                                         {item.imageUrl ? (
-                                          <img
+                                          <CachedImg
                                             src={item.imageUrl}
                                             alt={item.name}
                                             className="w-full h-full object-cover"
@@ -1810,7 +1811,7 @@ export const PosMenuManagerModal: React.FC<{
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-xl bg-white border border-jaman-border overflow-hidden flex items-center justify-center shrink-0">
                     {editingItem.imageUrl ? (
-                      <img src={editingItem.imageUrl} alt="Dish" className="w-full h-full object-cover" />
+                      <CachedImg src={editingItem.imageUrl} alt="Dish" className="w-full h-full object-cover" />
                     ) : (
                       <ImageIcon className="w-6 h-6 text-slate-400" />
                     )}
@@ -1864,7 +1865,7 @@ export const PosMenuManagerModal: React.FC<{
                           }}
                           className="p-1.5 rounded-lg border border-slate-100 hover:border-jaman-saffron hover:bg-amber-50/40 text-left transition-colors flex items-center gap-2 cursor-pointer"
                         >
-                          <img src={preset.url} alt={preset.name} className="w-7 h-7 rounded-md object-cover shrink-0" />
+                          <CachedImg src={preset.url} alt={preset.name} className="w-7 h-7 rounded-md object-cover shrink-0" />
                           <span className="text-[10px] font-bold text-jaman-navy truncate">{preset.name}</span>
                         </button>
                       ))}
@@ -1950,7 +1951,7 @@ export const PosMenuManagerModal: React.FC<{
                 <div className="flex items-center gap-2.5">
                   <div className="w-12 h-12 rounded-xl bg-white border border-jaman-border overflow-hidden flex items-center justify-center shrink-0">
                     {editingCategory.imageUrl ? (
-                      <img src={editingCategory.imageUrl} alt="Category" className="w-full h-full object-cover" />
+                      <CachedImg src={editingCategory.imageUrl} alt="Category" className="w-full h-full object-cover" />
                     ) : (
                       <ImageIcon className="w-5 h-5 text-slate-400" />
                     )}
@@ -2060,13 +2061,13 @@ export const PosMenuManagerModal: React.FC<{
               <label className="font-bold text-xs text-slate-700 block">Actual Packaged Food Photography:</label>
               <div className="w-full h-56 rounded-2xl bg-slate-900 border border-jaman-border overflow-hidden relative flex items-center justify-center group">
                 {reviewingDish.imageUrl ? (
-                  <img
+                  <CachedImg
                     src={reviewingDish.imageUrl}
                     alt={reviewingDish.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
-                        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+                        '/assets/menu/common/menu-placeholder-v2.svg';
                     }}
                   />
                 ) : (
@@ -2151,7 +2152,7 @@ export const PosMenuManagerModal: React.FC<{
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <img src={preset.url} alt={preset.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
+                    <CachedImg src={preset.url} alt={preset.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
                     <span className="text-[10px] text-jaman-navy truncate">{preset.name}</span>
                   </button>
                 ))}

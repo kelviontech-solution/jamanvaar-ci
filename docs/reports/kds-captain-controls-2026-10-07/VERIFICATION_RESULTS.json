@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-07T04:07:50.009958+00:00",
+  "environment": "Isolated local API and dedicated test database; compiled apps; disposable tenant fixtures",
+  "regressions": {
+    "passed": 136,
+    "filesPassed": 11,
+    "log": "logs/kds-captain-tests.log"
+  },
+  "playwright": {
+    "passed": 18,
+    "failed": 0,
+    "pageErrors": 0,
+    "screenSizes": 7,
+    "results": "BROWSER_RESULTS.json"
+  },
+  "builds": {
+    "API": "passed",
+    "KDS": "passed",
+    "Captain": "passed",
+    "POS": "passed"
+  },
+  "typechecks": {
+    "KDS": "passed",
+    "Captain": "passed",
+    "POS": "passed as part of build"
+  },
+  "databaseMigrationRequired": false,
+  "deployed": false,
+  "physicalPrinterTested": false,
+  "awsLatencyTested": false,
+  "notes": [
+    "Existing Vite bundle-size advisory remains.",
+    "Priority is Normal/Urgent with FIFO within priority groups, not arbitrary drag ordering.",
+    "Browser print is captured to verify document content; physical printing remains unverified."
+  ]
+}

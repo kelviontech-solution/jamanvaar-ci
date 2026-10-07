@@ -32,7 +32,7 @@ export class DynamicQueryExecutor {
     const activeDay = BusinessDayAccountingService.getActiveBusinessDay();
     const summary = BusinessDayAccountingService.getBusinessDaySummary(activeDay.id);
     const todayOrders = BusinessDayRepository.getOrdersForBusinessDay(activeDay.id);
-    const allOrders = todayOrders.length > 0 ? todayOrders : db.orders || [];
+    const allOrders = todayOrders;
 
     switch (formula.targetDomain) {
       case 'ORDERS':

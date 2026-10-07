@@ -1,0 +1,33 @@
+{
+  "id": "dish-bcec0eaa370729",
+  "kind": "dish",
+  "name": "Lasaniya Bateta",
+  "description": "Lasaniya Bateta, gujarati vegetable preparations with fresh regional spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-bcec0eaa370729.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96166,
+  "sha256": "c56305f3c254206f052c15396eadce8fc07075166ee5d095b4e9c0a1275e6d86"
+}

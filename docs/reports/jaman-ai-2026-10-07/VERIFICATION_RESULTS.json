@@ -1,0 +1,56 @@
+{
+  "environment": "isolated local API 4010 and QA proxy 5290; no AWS deployment",
+  "regression": {
+    "passed": 118,
+    "files": 9,
+    "log": "logs/jaman-ai-regression.log"
+  },
+  "browser": {
+    "passed": 28,
+    "total": 28,
+    "pageErrors": [],
+    "file": "BROWSER_RESULTS.json"
+  },
+  "builds": {
+    "pos": {
+      "passed": true,
+      "log": "logs/jaman-ai-pos-build.log"
+    },
+    "admin": {
+      "passed": true,
+      "log": "logs/jaman-ai-admin-build.log"
+    },
+    "captain": {
+      "passed": true,
+      "log": "logs/jaman-ai-captain-build.log"
+    },
+    "kds": {
+      "passed": true,
+      "log": "logs/jaman-ai-kds-build.log"
+    },
+    "kiosk": {
+      "passed": true,
+      "log": "logs/jaman-ai-kiosk-build.log"
+    }
+  },
+  "typechecks": {
+    "captain": {
+      "passed": true,
+      "log": "logs/jaman-ai-captain-typecheck.log"
+    },
+    "kds": {
+      "passed": true,
+      "log": "logs/jaman-ai-kds-typecheck.log"
+    },
+    "kiosk": {
+      "passed": true,
+      "log": "logs/jaman-ai-kiosk-typecheck.log"
+    }
+  },
+  "limitations": [
+    "Not deployed or verified on AWS",
+    "Physical printers and devices not tested",
+    "No general-purpose language model provider",
+    "Offline query telemetry is best effort"
+  ]
+}

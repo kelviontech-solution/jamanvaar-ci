@@ -33,3 +33,6 @@ data/
 **/_tmp_*.cjs
 **/_tmp_*.js
 **/*.scratch.*
+# Rebuilt from the versioned central library before each frontend build.
+**/public/assets/menu/description-matched-v1/
+**/public/assets/menu/template-photos-v1/

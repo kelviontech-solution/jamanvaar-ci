@@ -11,7 +11,7 @@ import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
  * once per tablet.
  */
 
-import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
+import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import { DeviceGate, EndpointResolver, CloudApiError, parseJsonResponse, createDeviceCloudClient, getDevicePublicKeyJwk } from '@jamanvaar/sync';
 import { MenuRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
@@ -55,6 +55,7 @@ export function getConnectedDeviceLabel(): string | null {
  * the device id/token and label, is what actually returns this tablet to the connect/activation screen.
  */
 export function resetTerminal(): void {
+  AiConfig.reset();
   stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);

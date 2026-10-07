@@ -1,0 +1,25 @@
+{
+  "id": "dish-676ed31215c25d",
+  "kind": "dish",
+  "name": "Chicken 65 Biryani",
+  "description": "Chicken 65 Biryani, dum-cooked chicken and fragrant basmati rice.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Chicken Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-676ed31215c25d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106940,
+  "sha256": "de9f771dc3e44706fd873f6dfbd73240207f828d68b7b991c2adffe1be4bb873"
+}

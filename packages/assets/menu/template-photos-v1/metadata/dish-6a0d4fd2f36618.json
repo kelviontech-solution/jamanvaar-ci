@@ -1,0 +1,22 @@
+{
+  "id": "dish-6a0d4fd2f36618",
+  "kind": "dish",
+  "name": "Jain Jeera Rice",
+  "description": "Jain Jeera Rice, rice preparations without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Rice"
+    }
+  ],
+  "file": "dish-6a0d4fd2f36618.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79488,
+  "sha256": "c643b5f33010586c248f4f7159913405c844c1500ee891a02a28548e312fde34"
+}

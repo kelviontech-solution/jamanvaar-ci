@@ -1,0 +1,22 @@
+{
+  "id": "dish-79674942205707",
+  "kind": "dish",
+  "name": "Eggs on Toast",
+  "description": "Eggs on Toast, made-to-order breakfast plates.",
+  "diet": "EGG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Breakfast"
+    }
+  ],
+  "file": "dish-79674942205707.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94464,
+  "sha256": "7e4fde7f5e41b37ac639cbb24389165474515140b2265a8980686837f320199d"
+}

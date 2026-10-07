@@ -1,0 +1,25 @@
+{
+  "id": "dish-ce6a3f45084e3f",
+  "kind": "dish",
+  "name": "Smoked Truffle Paneer Tikka",
+  "description": "Artisanal cottage cheese infused with black truffle oil and charcoal smoke, served with edamame dip",
+  "diet": "VEG",
+  "cuisine": "Gourmet Modern Indian",
+  "category": "Gourmet Indian Appetizers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fine-dining",
+      "category": "Gourmet Indian Appetizers"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-ce6a3f45084e3f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92924,
+  "sha256": "86710d41f08911ea7698af355525375ac80e4d52638e6c5d068113058a4849bb"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-406f5de5193780",
+  "kind": "dish",
+  "name": "Lucknowi Chicken Biryani",
+  "description": "Lucknowi Chicken Biryani, dum-cooked chicken and fragrant basmati rice.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Chicken Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-406f5de5193780.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114428,
+  "sha256": "5e0c440e5c6dce2dbbdf42aeafe5b9664236b144c4c8882b470a30efab583a6e"
+}

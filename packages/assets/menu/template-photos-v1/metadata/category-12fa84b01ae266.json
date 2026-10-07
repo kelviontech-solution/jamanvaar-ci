@@ -1,0 +1,37 @@
+{
+  "id": "category-12fa84b01ae266",
+  "kind": "category",
+  "name": "Chicken Biryani — Biryani & Kebab Darbar",
+  "categoryName": "Chicken Biryani",
+  "templateId": "tpl-biryani",
+  "slug": "chicken-biryani",
+  "description": "Dum-cooked chicken and fragrant basmati rice",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "components": [
+    {
+      "name": "Hyderabadi Chicken Biryani",
+      "description": "Hyderabadi Chicken Biryani, dum-cooked chicken and fragrant basmati rice.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Lucknowi Chicken Biryani",
+      "description": "Lucknowi Chicken Biryani, dum-cooked chicken and fragrant basmati rice.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Chicken Tikka Biryani",
+      "description": "Chicken Tikka Biryani, dum-cooked chicken and fragrant basmati rice.",
+      "dietaryType": "NON_VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-12fa84b01ae266.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 143462,
+  "sha256": "da186283a733d6fb118539881e28ec7eb92b1a1855eeb657c228a1f94c84c3a7"
+}

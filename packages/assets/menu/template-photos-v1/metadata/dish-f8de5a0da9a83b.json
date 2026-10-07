@@ -1,0 +1,25 @@
+{
+  "id": "dish-f8de5a0da9a83b",
+  "kind": "dish",
+  "name": "Strawberry Ice Cream",
+  "description": "Strawberry Ice Cream, single scoops of chilled ice cream.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Ice Cream Scoops",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-f8de5a0da9a83b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75696,
+  "sha256": "acafcee561987060c44d215a899e38c5efeac3dde4dfbfa569329b5e4a16b312"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "dish-14e9b36296d408",
+  "kind": "dish",
+  "name": "Blueberry Muffin",
+  "description": "Blueberry Muffin, bakery snacks and individually portioned desserts.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Bakes & Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Bakes & Desserts"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Desserts"
+    }
+  ],
+  "file": "dish-14e9b36296d408.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75314,
+  "sha256": "2cb0097c1eeb87da6499468fd7e8fdf09e05378c9604e718031d9a5ce193880f"
+}

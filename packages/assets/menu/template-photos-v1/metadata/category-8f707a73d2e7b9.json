@@ -1,0 +1,37 @@
+{
+  "id": "category-8f707a73d2e7b9",
+  "kind": "category",
+  "name": "Pizzas — Pizza Restaurant",
+  "categoryName": "Pizzas",
+  "templateId": "tpl-pizza",
+  "slug": "pizzas",
+  "description": "Hand-tossed dough, tomato sauce and mozzarella, baked to order",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Pizzas",
+  "components": [
+    {
+      "name": "Margherita Pizza",
+      "description": "Margherita Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Farmhouse Pizza",
+      "description": "Farmhouse Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Tikka Pizza",
+      "description": "Paneer Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8f707a73d2e7b9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 134434,
+  "sha256": "d6ca57b5b2b3e8c2aa46b24b3ce4b1e3ea344fa717f6224c6e13d0c0788b4d29"
+}

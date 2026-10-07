@@ -1,0 +1,22 @@
+{
+  "id": "dish-350381a070cf7a",
+  "kind": "dish",
+  "name": "Falafel Wrap",
+  "description": "Falafel Wrap, soft flatbread wraps with salad and sauce.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Wraps"
+    }
+  ],
+  "file": "dish-350381a070cf7a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83002,
+  "sha256": "e9621259ad409ed4b6c5047781856c46bdf20720847e55535bfc4c111e464720"
+}

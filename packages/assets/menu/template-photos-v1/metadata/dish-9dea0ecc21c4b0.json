@@ -1,0 +1,25 @@
+{
+  "id": "dish-9dea0ecc21c4b0",
+  "kind": "dish",
+  "name": "Fresh Mosambi (Sweet Lime) Juice",
+  "description": "Freshly squeezed sweet lime juice with a pinch of black salt",
+  "diet": "VEG",
+  "cuisine": "Cold-Pressed Juices & Shakes",
+  "category": "Fresh Cold Juices",
+  "occurrences": [
+    {
+      "templateId": "tpl-juice-beverages",
+      "category": "Fresh Cold Juices"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-9dea0ecc21c4b0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 59756,
+  "sha256": "7af273d5e9a6dbbb1617d46cec3b6b3d17ad591f3bfb8f046f0257db0b8b9190"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-3d57971e41678f",
+  "kind": "category",
+  "name": "Burgers — Fast Food & Quick Service Restaurant",
+  "categoryName": "Burgers",
+  "templateId": "tpl-fast-food",
+  "slug": "burgers",
+  "description": "Toasted buns with freshly cooked patties",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "components": [
+    {
+      "name": "Classic Veg Burger",
+      "description": "Classic Veg Burger, toasted buns with freshly cooked patties.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Veg Burger",
+      "description": "Cheese Veg Burger, toasted buns with freshly cooked patties.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Burger",
+      "description": "Paneer Burger, toasted buns with freshly cooked patties.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3d57971e41678f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107614,
+  "sha256": "d3db5aa804c7d72f6dce341e673e2f3063a306b97f420f50859228f020f6d322"
+}

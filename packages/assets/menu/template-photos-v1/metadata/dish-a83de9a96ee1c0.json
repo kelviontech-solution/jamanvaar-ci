@@ -1,0 +1,22 @@
+{
+  "id": "dish-a83de9a96ee1c0",
+  "kind": "dish",
+  "name": "Pancakes with Honey",
+  "description": "Pancakes with Honey, made-to-order breakfast plates.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Breakfast"
+    }
+  ],
+  "file": "dish-a83de9a96ee1c0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74632,
+  "sha256": "a390d7c94033d4e13c52a665d81239fe6fcd311891f776ba5d96abd79e638aec"
+}

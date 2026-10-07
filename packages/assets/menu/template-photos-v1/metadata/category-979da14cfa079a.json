@@ -1,0 +1,37 @@
+{
+  "id": "category-979da14cfa079a",
+  "kind": "category",
+  "name": "Jain Breads — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Breads",
+  "templateId": "tpl-jain",
+  "slug": "jain-breads",
+  "description": "Fresh breads without restricted ingredients",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Breads",
+  "components": [
+    {
+      "name": "Jain Phulka",
+      "description": "Jain Phulka, fresh breads without restricted ingredients.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Butter Naan",
+      "description": "Jain Butter Naan, fresh breads without restricted ingredients.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Tandoori Roti",
+      "description": "Jain Tandoori Roti, fresh breads without restricted ingredients.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-979da14cfa079a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113956,
+  "sha256": "23af1e066a73415b50f8d32745d8d34ba38ebfb87e88c84d4551b8d0269be77d"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-638a19234a23fc",
+  "kind": "dish",
+  "name": "Jain Palak Paneer",
+  "description": "Jain Palak Paneer, tomato or cashew gravies without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries"
+    }
+  ],
+  "file": "dish-638a19234a23fc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103196,
+  "sha256": "6763a3700f01388f03f55cc7b8533148edf41755d6227e1f957ca0baa4c6ed15"
+}

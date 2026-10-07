@@ -1,0 +1,26 @@
+{
+  "id": "dish-fdbe51d47f0333",
+  "kind": "dish",
+  "name": "Paneer Dosa",
+  "description": "Paneer Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Dosas"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "file": "dish-fdbe51d47f0333.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106592,
+  "sha256": "eb8e486a97c91cd0e82047a28bcae6c6fc1380244e173325f3286d4d62fd6664"
+}

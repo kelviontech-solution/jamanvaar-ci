@@ -1,0 +1,25 @@
+{
+  "id": "dish-83f3a1187e5ad2",
+  "kind": "dish",
+  "name": "Sev Tameta Nu Shaak",
+  "description": "Sweet and tangy tomato curry topped with crisp ratlami sev",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/sev-tameta.webp"
+  ],
+  "file": "dish-83f3a1187e5ad2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108228,
+  "sha256": "f952309dc5e48caf8059160e734383803ac50bcd8ada893c4b85f107a036b2de"
+}

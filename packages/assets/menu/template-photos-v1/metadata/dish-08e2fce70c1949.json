@@ -1,0 +1,22 @@
+{
+  "id": "dish-08e2fce70c1949",
+  "kind": "dish",
+  "name": "Cafe Mocha",
+  "description": "Cafe Mocha, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    }
+  ],
+  "file": "dish-08e2fce70c1949.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 77280,
+  "sha256": "6b30543dd18c36932aba8f34005e321c82e36989b7da618be96b86b94a4b97f7"
+}

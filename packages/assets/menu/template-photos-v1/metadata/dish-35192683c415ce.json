@@ -1,0 +1,26 @@
+{
+  "id": "dish-35192683c415ce",
+  "kind": "dish",
+  "name": "Cheese Burst Farmhouse",
+  "description": "Cheese Burst Farmhouse, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-35192683c415ce.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118538,
+  "sha256": "267347c5780d0382eb7c427f8b23c3cb1269a31982c152378189986b32d0cb69"
+}

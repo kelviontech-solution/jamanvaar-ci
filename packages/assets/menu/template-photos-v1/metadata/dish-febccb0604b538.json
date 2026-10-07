@@ -1,0 +1,33 @@
+{
+  "id": "dish-febccb0604b538",
+  "kind": "dish",
+  "name": "Rasmalai",
+  "description": "Rasmalai, traditional Indian dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Indian Sweets"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-febccb0604b538.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 70956,
+  "sha256": "33bd5b5ac2e05d9f0e2898b3ab9924ea7aa367f49c01f54a825cd61a16e9e6dd"
+}

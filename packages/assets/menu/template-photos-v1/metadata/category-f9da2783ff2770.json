@@ -1,0 +1,27 @@
+{
+  "id": "category-f9da2783ff2770",
+  "kind": "category",
+  "name": "Dal Baati Churma Specialties — Rajasthani Marwari Bhojanalaya",
+  "categoryName": "Dal Baati Churma Specialties",
+  "templateId": "tpl-rajasthani",
+  "slug": "dal-baati",
+  "description": "Authentic Marwari feast with pure desi ghee",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Dal Baati Churma Specialties",
+  "components": [
+    {
+      "name": "Marwari Dal Baati Churma Thali",
+      "description": "Panchmel Dal, 4 Baked Baatis drenched in desi ghee, Sweet Wheat Churma, Gatte Ki Sabzi, Garlic Chutney & Chaas",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f9da2783ff2770.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109548,
+  "sha256": "60ca4dfef3503877ea271003f4b09164cba16c6331902df9eb9defc886f7b91a"
+}

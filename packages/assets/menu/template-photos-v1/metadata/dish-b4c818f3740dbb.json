@@ -1,0 +1,22 @@
+{
+  "id": "dish-b4c818f3740dbb",
+  "kind": "dish",
+  "name": "Vegetable Poha",
+  "description": "Vegetable Poha, made-to-order breakfast plates.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Breakfast"
+    }
+  ],
+  "file": "dish-b4c818f3740dbb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91884,
+  "sha256": "b7abdb862f5a385fb9247b45b7a964831a10c83912849f82c7411c9b03ebaf3a"
+}

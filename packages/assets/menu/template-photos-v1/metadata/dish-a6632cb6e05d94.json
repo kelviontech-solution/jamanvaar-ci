@@ -1,0 +1,29 @@
+{
+  "id": "dish-a6632cb6e05d94",
+  "kind": "dish",
+  "name": "Special Gujarati Thali",
+  "description": "Special Gujarati Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Thali"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/deluxe-gujarati-thali.webp"
+  ],
+  "file": "dish-a6632cb6e05d94.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102020,
+  "sha256": "aa0c5044ce82ec175304b5e389b513c34d679271207788908f2be93f04c81c15"
+}

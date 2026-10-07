@@ -1,0 +1,37 @@
+{
+  "id": "category-c03965c735a258",
+  "kind": "category",
+  "name": "Regional Favourites — Street Food Restaurant",
+  "categoryName": "Regional Favourites",
+  "templateId": "tpl-chaat",
+  "slug": "regional-favourites",
+  "description": "Comfort snacks prepared to order",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Regional Favourites",
+  "components": [
+    {
+      "name": "Chole Kulche",
+      "description": "Chole Kulche, comfort snacks prepared to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Ragda Pattice",
+      "description": "Ragda Pattice, comfort snacks prepared to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Poha",
+      "description": "Poha, comfort snacks prepared to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c03965c735a258.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 141990,
+  "sha256": "ed7e429a73bdad358628a45e5f2800c1111a00002fb31663a98b6e34eac9045d"
+}

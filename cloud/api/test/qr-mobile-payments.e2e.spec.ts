@@ -42,6 +42,19 @@ beforeAll(async()=>{
 },120000);
 afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])delete process.env[k];});
 it('guest QR resolves without login, with gated online payment',async()=>{const r=await http().get(`/api/v1/public/qr/${qr}`);expect(r.status).toBe(200);expect(r.body.ordering.settings.allowOnlinePayment).toBe(true);});
+it('an active verified gateway offers online checkout by default without a QR settings row',async()=>{
+ await prisma.runAsTenant(restaurantId,tx=>tx.qrSettings.deleteMany({where:{restaurantId}}));
+ expect((await http().get(`/api/v1/public/qr/${qr}`)).body.ordering.onlinePayment.available).toBe(true);
+ const owner=await auth('get','/api/v1/restaurant/qr/settings/payment-readiness');expect(owner.status).toBe(200);expect(owner.body).toMatchObject({available:true,enabled:true,guestAvailable:true,code:'READY'});
+ await auth('put','/api/v1/restaurant/qr/settings').send({autoAccept:false});expect((await auth('get','/api/v1/restaurant/qr/settings')).body.allowOnlinePayment).toBe(true);
+});
+it('preserves the owner opt-out and keeps payment diagnostics scoped to the admin console',async()=>{
+ await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:false});
+ expect((await http().get(`/api/v1/public/qr/${qr}`)).body.ordering.onlinePayment.available).toBe(false);
+ expect((await auth('get','/api/v1/restaurant/qr/settings/payment-readiness')).body).toMatchObject({available:true,enabled:false,guestAvailable:false});
+ expect((await auth('get','/api/v1/restaurant/qr/settings/payment-readiness',device)).status).toBe(403);
+ await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:true});
+});
 it('online checkout freezes server price, has zero kiosk fee, and stays DRAFT until verified',async()=>{const p=await place('online-draft-123');expect(p).toMatchObject({status:'PENDING_PAYMENT',total:249,payment:{status:'PENDING',url:'https://rzp.io/i/qa-only'}});expect(await stored(p.publicOrderId)).toMatchObject({status:'DRAFT',paymentStatus:'PENDING',source:'QR',tableLabel:'TN2',branchId});expect(await payment(p.publicOrderId)).toMatchObject({amount:24900,commissionBps:0,platformAmount:0,restaurantAmount:24900});expect(gateway.createPaymentLink).toHaveBeenCalledWith(expect.objectContaining({amountPaise:24900,callbackUrl:expect.stringContaining('?order=')}));});
 it('parallel duplicate submits produce one order and payment attempt',async()=>{const [a,b]=await Promise.all([place('same-online-key-123'),place('same-online-key-123')]);expect(a.publicOrderId).toBe(b.publicOrderId);const o=await stored(a.publicOrderId);expect(await prisma.runAsTenant(restaurantId,tx=>tx.paymentTransaction.count({where:{order:{externalOrderId:o.externalOrderId}}}))).toBe(1);});
 it('invalid signature and wrong signed amounts cannot admit a kitchen order',async()=>{const p=await place('invalid-payment-123'),pay=await payment(p.publicOrderId);await webhook(pay,{},'bad-signature');expect((await payment(p.publicOrderId)).status).toBe('PENDING');await webhook(pay,{amount:pay.amount+1});expect(await stored(p.publicOrderId)).toMatchObject({status:'DRAFT',paymentStatus:'PENDING'});});

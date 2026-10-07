@@ -1,0 +1,26 @@
+{
+  "id": "dish-818c2ee24ce3b5",
+  "kind": "dish",
+  "name": "South Indian Meals",
+  "description": "South Indian Meals, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-818c2ee24ce3b5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 82104,
+  "sha256": "a637532bdcba9502d4322f17d1bf0448d03f4235057b07dd03a4e2ec68971d78"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-d793663533beb4",
+  "kind": "dish",
+  "name": "Roasted Papad",
+  "description": "Roasted Papad, regional meal accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-d793663533beb4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120448,
+  "sha256": "449c01e09832af0823ed4a51a50f27cc8a09975d17783c030650f85165799a3c"
+}

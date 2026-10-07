@@ -1,0 +1,37 @@
+{
+  "id": "category-5f3ece90b8ab1b",
+  "kind": "category",
+  "name": "Fresh Farsan (Snacks) — Gujarati Restaurant",
+  "categoryName": "Fresh Farsan (Snacks)",
+  "templateId": "tpl-gujarati",
+  "slug": "farsan",
+  "description": "Steamed and fried Gujarati snack specialties",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Fresh Farsan (Snacks)",
+  "components": [
+    {
+      "name": "Surti Nylon Khaman (250g)",
+      "description": "Super soft, airy steamed gram flour cakes tempered with mustard seeds, green chillies and curry leaves",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Khandvi with Mustard Tempering",
+      "description": "Silky spiced gram flour rolls garnished with fresh grated coconut and chopped coriander",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Methi Na Gota (Pakoda)",
+      "description": "Crispy fried fenugreek and gram flour fritters served with sweet Kadhi dip",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5f3ece90b8ab1b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107904,
+  "sha256": "5bda398ffb95f80b8455e11725baef6a485b1002ecf72e93737d9deb8d3530e6"
+}

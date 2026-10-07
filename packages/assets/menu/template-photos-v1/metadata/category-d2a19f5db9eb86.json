@@ -1,0 +1,32 @@
+{
+  "id": "category-d2a19f5db9eb86",
+  "kind": "category",
+  "name": "Combos — Biryani & Kebab Darbar",
+  "categoryName": "Combos",
+  "templateId": "tpl-biryani",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Paneer Tikka",
+      "description": "Paneer Tikka, freshly cooked accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, curries and rice sides.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d2a19f5db9eb86.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127342,
+  "sha256": "f276547555d1442130b4fffd9edb621e84ed6031758e8cd609b43fa8b38a2aab"
+}

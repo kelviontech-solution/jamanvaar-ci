@@ -1,23 +1,24 @@
 import { syncStaffUsers, startLocalChangeSync, verifyPinWithSync } from '@jamanvaar/sync';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore } from '@jamanvaar/database';
+import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore, setKitchenPriority } from '@jamanvaar/database';
 import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
 import { KdsTicketCard } from './KdsTicketCard';
 import { KdsExpoBoard } from './KdsExpoBoard';
-import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge } from './kdsLogic';
+import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge, matchesKitchenSearch } from './kdsLogic';
 import { Platform } from '@jamanvaar/api';
-import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
+import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, reportAiQueryNow, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
   JamanvaarAuthLayout,
   APP_HERO_IMAGES,
   BrandHeader,
+  JamanAiAssistantModal, useAiAccess,
   NotificationToastContainer,
   JAMANVAARStartup,
   EmptyState,
   ActivationWelcomeScreen,
   ActivationNoticeBanner,
-  ActivationHelpNote
+  ActivationHelpNote, printThermalKotTicket
 } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
@@ -38,7 +39,7 @@ import {
   Delete,
   AlertTriangle,
   RefreshCw,
-  ArrowRight
+  ArrowRight, Search, X, Sparkles
 } from 'lucide-react';
 
 /** Who took the order: a table order from the Captain app is the waiter's, anything else was rung up by a cashier (BUG-157). */
@@ -67,6 +68,8 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 };
 
 export const App: React.FC = () => {
+  const ai = useAiAccess();
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
 
   // A new ticket needs an audible cue: cooks are not watching the screen. Tickets normally arrive from the cloud (a Captain
@@ -185,6 +188,7 @@ export const App: React.FC = () => {
     // The menu (read-only here) tells this screen which kitchen stations the restaurant uses.
     void syncMenuCatalog({ push: false });
     void reportHeartbeat();
+    void syncRestaurantIdentity();
 
     // A kitchen needs new tickets within seconds, not every 15 s.
     const orderInterval = setInterval(() => {
@@ -197,6 +201,7 @@ export const App: React.FC = () => {
       void syncStaff();
       void syncMenuCatalog({ push: false });
       void reportHeartbeat();
+    void syncRestaurantIdentity();
     }, 15000);
 
     // Waking the screen (tab visible again, network back, tablet unlocked) catches up at once: no refresh needed.
@@ -235,6 +240,8 @@ export const App: React.FC = () => {
     return () => clearInterval(t);
   }, []);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PREPARING' | 'READY' | 'SERVED' | 'EXPO'>('ALL');
+  const [ticketSearch, setTicketSearch] = useState('');
+  const [sortMode, setSortMode] = useState<'PRIORITY' | 'FIFO'>('PRIORITY');
   const [currentTime, setCurrentTime] = useState<string>(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   );
@@ -459,13 +466,14 @@ export const App: React.FC = () => {
 
   // What is on screen for the chosen tab: cooking tickets oldest first (the one waiting longest is on top), then ready ones.
   const filteredKots = useMemo(() => {
+    const searched = stationKots.filter(k => matchesKitchenSearch(k, ticketSearch));
     if (statusFilter === 'SERVED') {
-      return stationKots
+      return searched
         .filter((k) => k.status === 'SERVED')
         .sort((a, b) => new Date(b.servedAt ?? b.createdAt).getTime() - new Date(a.servedAt ?? a.createdAt).getTime())
         .slice(0, 60);
     }
-    const picked = stationKots.filter((kot) => {
+    const picked = searched.filter((kot) => {
       if (kot.status === 'CANCELLED') return statusFilter !== 'READY' && cancelledAlert(kot);
       if (statusFilter === 'ALL') return kot.status !== 'SERVED';
       if (statusFilter === 'PREPARING') {
@@ -473,9 +481,9 @@ export const App: React.FC = () => {
       }
       return kot.status === statusFilter;
     });
-    return sortForKitchen(picked);
+    return sortForKitchen(picked, id => sortMode === 'PRIORITY' ? db.orders.find(o => o.id === id)?.kitchenPriority : undefined);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stationKots, statusFilter, dismissed]);
+  }, [stationKots, statusFilter, dismissed, ticketSearch, sortMode]);
 
   const toCook = useMemo(() => prepSummary(stationKots), [stationKots]);
   const prepTimeOf = useMemo(() => {
@@ -487,6 +495,16 @@ export const App: React.FC = () => {
   // The person at the screen, for the audit trail (it used to say "Head Chef" for everyone).
   const chefName = () => SessionPersistence.load('kds')?.fullName || 'Kitchen';
   const logKitchen = (action: string, details: string) => AuditRepository.log({ action, category: 'ORDER', details, username: chefName() });
+  const changePriority = (kot: KOTRecord, priority: 'NORMAL' | 'URGENT') => {
+    if (!setKitchenPriority(kot.orderId, priority)) return;
+    logKitchen('KITCHEN_PRIORITY_CHANGED', `Order #${kot.orderNumber}: ${priority} priority`);
+    SyncOutboxEngine.flush();
+  };
+  const reprintKot = (kot: KOTRecord) => {
+    printThermalKotTicket(kot, '80mm', { reprint: true });
+    logKitchen('KOT_REPRINTED', `Reprint KOT #${kot.kotNumber} for token #${kot.tokenNumber}`);
+    offerUndo(`Reprint opened for #${kot.tokenNumber}. Choose your kitchen printer.`);
+  };
   // Every change is pushed at once so the Captain and the counter see it within a second.
   const commit = () => {
     kdsDb.notify();
@@ -567,10 +585,13 @@ export const App: React.FC = () => {
 
   // The pass looks at every station, whichever one this screen is set to.
   const expoBoard = useMemo(
-    () => buildExpoBoard(kots, Date.now(), prepTimeOf),
+    () => {
+      const matching = new Set(kots.filter(k => matchesKitchenSearch(k, ticketSearch)).map(k => k.orderId));
+      return buildExpoBoard(kots.filter(k => matching.has(k.orderId)), Date.now(), prepTimeOf, id => sortMode === 'PRIORITY' ? db.orders.find(o => o.id === id)?.kitchenPriority : undefined);
+    },
     // currentTime ticks every second, which keeps each order's age moving
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [kots, currentTime, prepTimeOf]
+    [kots, currentTime, prepTimeOf, ticketSearch, sortMode]
   );
 
   const serveOrder = (order: { orderId: string; tableNumber?: string; tokenNumber: string; ticketIds: string[] }) => {
@@ -800,6 +821,8 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        <JamanAiAssistantModal isOpen={assistantOpen} onClose={() => setAssistantOpen(false)} app="KDS" userRole="CHEF" posContext="KOT" onPerformAction={() => { setStatusFilter("ALL"); setTicketSearch(""); }} onQueryExecuted={(intent, _query, ms) => void reportAiQueryNow(intent, ms ?? 0)} />
+
         {/* TOP HEADER: brand, live status, counters, station selector */}
         <header className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 sm:py-3 flex flex-wrap items-center gap-x-3 gap-y-2 shadow-xs shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
@@ -810,8 +833,9 @@ export const App: React.FC = () => {
             </div>
           </div>
 
+          {ai.showButton(db.restaurant?.showJamanAI !== false) && <button type="button" aria-label="Open JAMAN AI Kitchen Intelligence" onClick={() => setAssistantOpen(true)} className="flex items-center gap-1 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-bold text-jaman-saffron"><Sparkles className="h-4 w-4" /> JAMAN AI</button>}
           {/* Station pills: their own row on small screens, scrolling sideways */}
-          <nav aria-label="Kitchen station" className="order-last lg:order-none w-full lg:w-auto lg:flex-1 min-w-0 flex lg:justify-center">
+          <nav aria-label="Kitchen station" className="order-last xl:order-none w-full xl:w-auto xl:flex-1 min-w-0 flex xl:justify-center">
             <div className="flex items-center gap-1.5 bg-jaman-cream p-1 rounded-2xl border border-jaman-border overflow-x-auto max-w-full">
               {stationChoices.map((st) => (
                 <button
@@ -894,6 +918,17 @@ export const App: React.FC = () => {
         </div>
 
         {/* WHAT STILL HAS TO BE COOKED, summed across tickets, so a cook can batch */}
+        <div className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 flex flex-wrap items-center gap-2 shrink-0">
+          <div className="relative flex-1 min-w-[140px] max-w-xl">
+            <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+            <input aria-label="Search kitchen tickets" value={ticketSearch} onChange={e => setTicketSearch(e.target.value)} placeholder="Search token, table, KOT or dish…" className="w-full min-h-[40px] pl-9 pr-10 rounded-xl border border-jaman-border text-sm bg-jaman-cream" />
+            {ticketSearch && <button aria-label="Clear ticket search" onClick={() => setTicketSearch('')} className="absolute right-1 top-0 min-h-[40px] w-9 flex justify-center items-center"><X className="w-4 h-4" /></button>}
+          </div>
+          <select aria-label="Kitchen ticket ordering" value={sortMode} onChange={e => setSortMode(e.target.value as 'PRIORITY' | 'FIFO')} className="min-h-[40px] px-3 rounded-xl border border-jaman-border text-xs font-bold bg-jaman-cream text-jaman-navy">
+            <option value="PRIORITY">Priority, then oldest</option><option value="FIFO">Oldest first</option>
+          </select>
+          {ticketSearch && <span className="text-xs text-slate-500" role="status">{statusFilter === 'EXPO' ? expoBoard.length + ' orders' : filteredKots.length + ' tickets'} found</span>}
+        </div>
         {(statusFilter === 'ALL' || statusFilter === 'PREPARING') && toCook.length > 0 && (
           <div className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0 flex items-center gap-2 overflow-x-auto" aria-label="Dishes still to cook" data-testid="kds-to-cook">
             <span className="text-[11px] font-black uppercase tracking-wide text-slate-500 shrink-0">To cook</span>
@@ -907,8 +942,8 @@ export const App: React.FC = () => {
         )}
 
         {/* TICKETS */}
-        <main className="flex-1 p-3 sm:p-5 overflow-y-auto min-h-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 max-w-[1920px] mx-auto items-start">
+        <main data-testid="kds-board" className="kds-board flex-1 p-3 sm:p-5 overflow-y-auto min-h-0 min-w-0">
+          <div className="kds-grid gap-3 sm:gap-4 mx-auto items-start">
             {statusFilter === 'EXPO' && <KdsExpoBoard orders={expoBoard} orderTypeLabel={(t) => ORDER_TYPE_LABEL[t] || t} onServeOrder={serveOrder} />}
 
             {statusFilter !== 'EXPO' && filteredKots.map((kot) => {
@@ -927,6 +962,9 @@ export const App: React.FC = () => {
                   onServe={(k) => updateStatus(k.id, 'SERVED')}
                   onRecall={recallTicket}
                   onDismiss={dismissCancelled}
+                  priority={db.orders.find(o => o.id === kot.orderId)?.kitchenPriority || 'NORMAL'}
+                  onPriority={changePriority}
+                  onReprint={reprintKot}
                 />
               );
             })}
@@ -935,8 +973,8 @@ export const App: React.FC = () => {
               <div className="col-span-full">
                 <EmptyState
                   icon={<ChefHat className="w-8 h-8" />}
-                  title={statusFilter === 'SERVED' ? 'Nothing served yet' : 'All Kitchen Orders Cleared'}
-                  description={statusFilter === 'SERVED' ? 'Tickets you mark served appear here, and can be brought back if you tapped by mistake.' : 'No tickets currently waiting at this station. New orders from POS, Captain or the kiosk appear here by themselves, no refresh needed.'}
+                  title={ticketSearch ? 'No matching kitchen tickets' : statusFilter === 'SERVED' ? 'Nothing served yet' : 'All Kitchen Orders Cleared'}
+                  description={ticketSearch ? 'Clear the search or try a token, table, KOT number or dish name.' : statusFilter === 'SERVED' ? 'Tickets you mark served appear here, and can be brought back if you tapped by mistake.' : 'No tickets currently waiting at this station. New orders from POS, Captain or the kiosk appear here by themselves, no refresh needed.'}
                 />
               </div>
             )}
@@ -945,7 +983,7 @@ export const App: React.FC = () => {
 
         {/* UNDO / NOTICE */}
         {undo && (
-          <div role="status" data-testid="kds-undo" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] bg-jaman-navy text-white rounded-2xl px-4 py-3 shadow-2xl flex items-center gap-3 text-sm font-bold">
+          <div role="status" data-testid="kds-undo" className="shrink-0 bg-jaman-navy text-white px-4 py-2 flex items-center justify-center gap-3 text-sm font-bold">
             <span className="min-w-0 break-words">{undo.text}</span>
             {undo.run && (
               <button type="button" onClick={() => { undo.run?.(); setUndo(null); }} className="shrink-0 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 font-black text-xs uppercase cursor-pointer">

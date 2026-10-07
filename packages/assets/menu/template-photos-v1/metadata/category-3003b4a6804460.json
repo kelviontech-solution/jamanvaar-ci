@@ -1,0 +1,32 @@
+{
+  "id": "category-3003b4a6804460",
+  "kind": "category",
+  "name": "Combos — Bakery, Patisserie & Cafe",
+  "categoryName": "Combos",
+  "templateId": "tpl-bakery",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Dutch Chocolate Truffle Slice",
+      "description": "Rich dark chocolate sponge layered with 55% cocoa ganache",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "White Bread Loaf",
+      "description": "White Bread Loaf, freshly baked breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3003b4a6804460.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99018,
+  "sha256": "41283f92338344150104d4bf5541ad612500de4dcd55483a1fb3e15efa84d12e"
+}

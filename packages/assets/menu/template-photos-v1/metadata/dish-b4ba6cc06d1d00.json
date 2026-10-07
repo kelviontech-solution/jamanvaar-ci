@@ -1,0 +1,22 @@
+{
+  "id": "dish-b4ba6cc06d1d00",
+  "kind": "dish",
+  "name": "Palak Paneer Lahori",
+  "description": "Fresh spinach puree garlic tempered with spices and soft paneer cubes",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Royal Paneer Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Royal Paneer Curries"
+    }
+  ],
+  "file": "dish-b4ba6cc06d1d00.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119194,
+  "sha256": "a7d4379682fdb14ca1bfdd7dc4e4e8bf7f8a2f1a4df6e93c0526625d5c5d5d21"
+}

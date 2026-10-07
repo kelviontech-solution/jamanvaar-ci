@@ -1,0 +1,25 @@
+{
+  "id": "dish-9acaac2b8915fe",
+  "kind": "dish",
+  "name": "Dahi Puri",
+  "description": "Dahi Puri, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-9acaac2b8915fe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91174,
+  "sha256": "a28732ff1eadfdff8a1ce8a525f269de6c27553fbc22edefeada123200c64e63"
+}

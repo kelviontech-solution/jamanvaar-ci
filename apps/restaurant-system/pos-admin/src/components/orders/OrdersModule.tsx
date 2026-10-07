@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Order, OrderStatus } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, getOrderSource, ORDER_SOURCE_LABELS } from '@jamanvaar/utils';
 import {
   DayOrdersService,
   DaySummary,
@@ -74,6 +74,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
   // Drill-down Table Search, Filter & Sort
   const [drillSearchQuery, setDrillSearchQuery] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('ALL');
+  const sourceOrders = useMemo(() => orders.filter(o => sourceFilter === 'ALL' || getOrderSource(o) === sourceFilter), [orders, sourceFilter]);
   const [drillTypeFilter, setDrillTypeFilter] = useState<string>('ALL');
   const [drillStatusFilter, setDrillStatusFilter] = useState<string>('ALL');
   const [drillPaymentFilter, setDrillPaymentFilter] = useState<string>('ALL');
@@ -103,8 +105,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   const daySummaries = useMemo(() => {
     const customStart = customStartDate ? new Date(customStartDate) : undefined;
     const customEnd = customEndDate ? new Date(customEndDate) : undefined;
-    return DayOrdersService.getAllDaysSummaries(orders, filterPreset, customStart, customEnd, 6);
-  }, [orders, orders.length, orders[0]?.id, filterPreset, customStartDate, customEndDate]);
+    return DayOrdersService.getAllDaysSummaries(sourceOrders, filterPreset, customStart, customEnd, 6);
+  }, [sourceOrders, filterPreset, customStartDate, customEndDate]);
 
   // Filter day cards by global search query
   const filteredDaySummaries = useMemo(() => {
@@ -136,8 +138,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   // Compute selected day summary when in drill-down view
   const currentDaySummary = useMemo(() => {
     if (!selectedDayKey) return daySummaries[0] || null;
-    return DayOrdersService.getDaySummary(orders, selectedDayKey, 6);
-  }, [orders, orders.length, orders[0]?.id, selectedDayKey, daySummaries]);
+    return DayOrdersService.getDaySummary(sourceOrders, selectedDayKey, 6);
+  }, [sourceOrders, selectedDayKey, daySummaries]);
 
   // Filtered & Sorted orders for the currently selected day
   const drillFilteredOrders = useMemo(() => {
@@ -278,6 +280,13 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto select-none">
+      <div className="flex items-center gap-3 text-xs font-bold text-jaman-navy">
+        <label htmlFor="history-order-source">Order source</label>
+        <select id="history-order-source" value={sourceFilter} onChange={e => { setSourceFilter(e.target.value); setCurrentPage(1); }} className="bg-white border border-jaman-border rounded-xl px-3 py-2">
+          <option value="ALL">All order sources</option>
+          {Object.entries(ORDER_SOURCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label} orders</option>)}
+        </select>
+      </div>
       
       {/* ========================================================================= */}
       {/* LEVEL 1: MAIN DAY-WISE SUMMARY VIEW */}
@@ -637,6 +646,9 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <span className="text-xl font-bold font-mono text-sky-700">
                 {formatINR(currentDaySummary.openBills)}
               </span>
+              {currentDaySummary.openBills > 0 && (
+                <span className="block mt-1 text-[11px] text-slate-500">Settle these at the POS counter: Live Orders, then Settle Cash.</span>
+              )}
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-2xs">
@@ -878,6 +890,26 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                           >
                             <Printer className="w-3.5 h-3.5" />
                           </button>
+                          {isUnpaidOpenOrder(ord) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!window.confirm(`Void unpaid bill ${ord.orderNumber}? It will be removed from open bills and the kitchen.`)) return;
+                                const reason = window.prompt('Reason for voiding this bill', 'Abandoned by guest')?.trim();
+                                if (!reason) return;
+                                try {
+                                  OrderRepository.voidOrder(ord.id, reason, 'Restaurant Admin');
+                                  showToast(`Voided ${ord.orderNumber}`);
+                                } catch (err) {
+                                  showToast(err instanceof Error ? err.message : 'Could not void this bill');
+                                }
+                              }}
+                              className="px-2.5 py-1.5 border border-rose-200 text-rose-700 hover:bg-rose-50 font-bold rounded-lg text-xs"
+                              title="Void this unpaid bill"
+                            >
+                              Void
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

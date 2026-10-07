@@ -1,0 +1,22 @@
+{
+  "id": "dish-ca81d5fa4a971a",
+  "kind": "dish",
+  "name": "Spicy Paneer Tikka Wrap",
+  "description": "Grilled spiced paneer cubes rolled in a warm tortilla with mint mayo and pickled onions",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers & Wraps",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers & Wraps"
+    }
+  ],
+  "file": "dish-ca81d5fa4a971a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80808,
+  "sha256": "c7a63e82ced0dd66506877791a26a81b91fa0c3c38b93f58b38d97867a1c929c"
+}

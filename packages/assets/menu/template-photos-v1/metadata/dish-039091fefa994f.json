@@ -1,0 +1,22 @@
+{
+  "id": "dish-039091fefa994f",
+  "kind": "dish",
+  "name": "Jain Dal Fry",
+  "description": "Jain Dal Fry, lentils tempered without onion or garlic.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Dal"
+    }
+  ],
+  "file": "dish-039091fefa994f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90968,
+  "sha256": "0d9db795c4f579ec5346a68f536e93fabc45b93301b716e69bcd40b0abb74289"
+}

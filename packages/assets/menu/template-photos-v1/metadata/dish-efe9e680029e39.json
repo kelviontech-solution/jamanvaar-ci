@@ -1,0 +1,22 @@
+{
+  "id": "dish-efe9e680029e39",
+  "kind": "dish",
+  "name": "Pithod Ki Sabzi",
+  "description": "Spiced besan diamond cakes cooked in a creamy Rajasthani kadhi gravy",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Rajasthani Royal Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-rajasthani",
+      "category": "Rajasthani Royal Curries"
+    }
+  ],
+  "file": "dish-efe9e680029e39.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 78822,
+  "sha256": "5aa69b6e7ce919e35b196b27cea6334d6db91d15b359a550e46bcb22a6c7c77e"
+}

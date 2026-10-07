@@ -1,0 +1,32 @@
+{
+  "id": "category-3ef712dec1602a",
+  "kind": "category",
+  "name": "Combos — Gujarati Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-gujarati",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Royal Gujarati Grand Thali",
+      "description": "3 Shaak, Sweet Gujarati Dal, Kadhi, 4 Phulka Rotli, Basmati Rice, Farsan, Sweet, Papad, Pickle & Chilled Chaas",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Patra Steamed Rolls",
+      "description": "Colocasia leaf rolls coated with spiced sweet and tangy gram flour paste",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3ef712dec1602a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99994,
+  "sha256": "26b940d00b90af8285de3539f98c28dda9548ab9a012f6a6ef11f721a5e595ad"
+}

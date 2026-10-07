@@ -1,0 +1,37 @@
+{
+  "id": "category-562839052f6223",
+  "kind": "category",
+  "name": "Jain Curries — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Curries",
+  "templateId": "tpl-jain",
+  "slug": "jain-curries",
+  "description": "Tomato or cashew gravies without root vegetables",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries",
+  "components": [
+    {
+      "name": "Jain Shahi Paneer",
+      "description": "Jain Shahi Paneer, tomato or cashew gravies without root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Mixed Vegetable Curry",
+      "description": "Jain Mixed Vegetable Curry, tomato or cashew gravies without root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Chana Masala",
+      "description": "Jain Chana Masala, tomato or cashew gravies without root vegetables.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-562839052f6223.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 116710,
+  "sha256": "dcd43153140ddc421b649358323ad78747349283024feb64c7cd975b02a8829e"
+}

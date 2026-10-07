@@ -1,0 +1,22 @@
+{
+  "id": "dish-e0f2d5332c35d7",
+  "kind": "dish",
+  "name": "Tomato Chutney",
+  "description": "Tomato Chutney, fresh accompaniments for tiffin.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-e0f2d5332c35d7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95696,
+  "sha256": "63dbeee20027aed8bd320045412e7f9dfe9fa03b4b74c5e1db467b4c39f0d23a"
+}

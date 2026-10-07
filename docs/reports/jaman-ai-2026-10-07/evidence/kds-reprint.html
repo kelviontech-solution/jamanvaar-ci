@@ -1,0 +1,104 @@
+<html><head>
+        <title></title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0 !important;
+          }
+          @media print {
+            @page {
+              size: 80mm auto;
+              margin: 0 !important;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 4px !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            header, footer, nav {
+              display: none !important;
+            }
+          }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: 'Courier New', Courier, monospace, system-ui;
+            font-size: 12px;
+            line-height: 1.3;
+            color: #000;
+            background: #fff;
+            width: 80mm;
+            max-width: 80mm;
+            margin: 0 auto;
+            padding: 8px;
+          }
+          .text-center { text-align: center; }
+          .bold { font-weight: bold; }
+          .divider { border-top: 1px dashed #000; margin: 6px 0; }
+          .double-divider { border-top: 2px dashed #000; margin: 6px 0; }
+          .row { display: flex; justify-content: space-between; margin: 2px 0; }
+          table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+          th { border-bottom: 1px dashed #000; padding: 4px 0; text-align: left; }
+          .kot-title { font-size: 18px; font-weight: 900; }
+          .table-badge { font-size: 16px; font-weight: 900; padding: 2px 6px; border: 2px solid #000; }
+        </style>
+      </head>
+      <body>
+        <div class="text-center">
+          <div class="kot-title">KITCHEN ORDER TICKET</div>
+          <div style="font-weight: bold; border: 2px solid #000; margin: 5px 0; padding: 4px;">REPRINT — EXISTING KOT COPY</div>
+
+          <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">STATION: Main Kitchen</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <span>KOT #: <strong style="font-size: 14px;">MAIN-20261007-002</strong></span>
+          <span class="table-badge">TBL: TN2</span>
+        </div>
+        <div class="row">
+          <span>Order #: <strong>MAIN-20261007-401</strong></span>
+          <span>Token: <strong>#101</strong></span>
+        </div>
+        <div class="row">
+          <span>Time: <strong>10:04</strong></span>
+          <span>Type: <strong>DINE_IN</strong></span>
+        </div>
+
+        <div class="divider"></div>
+
+
+        <table>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th style="text-align: right;">Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+
+    <tr style="border-bottom: 1px dotted #ccc;">
+      <td style="padding: 6px 0; font-size: 14px; font-weight: 900;">
+        Cold Coffee
+
+
+        <br><span style="font-size: 11px;">COURSE_1</span>
+
+      </td>
+      <td style="padding: 6px 0; text-align: right; font-size: 16px; font-weight: 900;">
+        x1
+      </td>
+    </tr>
+
+          </tbody>
+        </table>
+
+        <div class="double-divider"></div>
+
+        <div class="text-center" style="font-size: 10px; margin-top: 4px;">
+          <div>JAMANVAAR Restaurant Ecosystem</div>
+        </div>
+
+
+  </body></html>

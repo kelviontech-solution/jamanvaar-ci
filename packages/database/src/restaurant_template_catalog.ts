@@ -1,5 +1,7 @@
 import type { MenuTemplate, MenuTemplateCategory, MenuTemplateItem } from './menu_templates_data';
 import { normalizeMenuText } from './menu_identity';
+import { starterDishPhoto, starterCategoryPhoto } from '../../utils/src/dish_photos';
+import { categoryVisual } from '../../utils/src/category_visuals';
 
 // Explicit dish mappings, never a random cuisine image. Unknown dishes show a neutral placeholder.
 export const TEMPLATE_DISH_IMAGES: Record<string, string> = {
@@ -20,7 +22,7 @@ export const TEMPLATE_DISH_IMAGES: Record<string, string> = {
   'Chocolate Brownie': 'bakery/choco-lava.jpg', 'Samosa 2 Pieces': 'snacks/samosa.jpg', 'Cheese Grilled Sandwich': 'fast-food/sandwich.jpg', 
 };
 const images = new Map(Object.entries(TEMPLATE_DISH_IMAGES).map(([name, file]) => [normalizeMenuText(name), `/assets/menu/${file}`]));
-export const templateDishImage = (name: string): string => images.get(normalizeMenuText(name)) || '/assets/menu/common/menu-placeholder-v2.svg';
+export const templateDishImage = (name: string): string => starterDishPhoto(name) || images.get(normalizeMenuText(name)) || '/assets/menu/common/menu-placeholder-v2.svg';
 
 // Each tuple describes an actual restaurant category and its preparation, with explicit suggested rupee prices.
 type Section = [string, string, string];
@@ -182,9 +184,10 @@ export function enrichRestaurantTemplates(legacy: MenuTemplate[]): MenuTemplate[
     const usedNames = new Set<string>();
     template.categories = template.categories.map(c => ({ ...c, items: c.items.filter(i => { const key = canonicalStarterName(i.name); if (usedNames.has(key)) return false; usedNames.add(key); return true; }) })).filter(c => c.items.length);
     for (const category of template.categories) for (const item of category.items) {
+      if (item.name === 'Plain Uttapam') item.description = 'Thick, soft rice-lentil pancake without vegetable toppings, served with sambar and coconut chutney.';
       // Preserve original Pizza item identifiers across the catalog upgrade.
       if (template.id === 'tpl-pizza') item.sku = ({ 'Margherita Pizza': 'PIZ-001', 'Farmhouse Pizza': 'PIZ-002', 'Paneer Tikka Pizza': 'PIZ-003', 'Stuffed Garlic Bread': 'PIZ-004', 'White Sauce Pasta': 'PIZ-005' } as Record<string, string>)[item.name] || item.sku;
-      item.imageUrl = templateDishImage(item.name); item.imageSource = item.imageUrl.includes('placeholder') ? 'MISSING_PHOTO' : 'STORED_DISH_ASSET';
+      item.imageUrl = templateDishImage(item.name); item.imageSource = item.imageUrl.includes('placeholder') ? 'MISSING_PHOTO' : /description-matched-v1|template-photos-v1/.test(item.imageUrl) ? 'AI_GENERATED_STARTER_PHOTO' : 'STORED_DISH_ASSET';
       item.tags = [...new Set([...(item.tags || []), template.cuisine, category.name])];
       if (/pizza/i.test(category.name)) {
         item.subcategory = /chicken/i.test(item.name) ? 'Non-Veg Pizza' : /paneer/i.test(item.name) ? 'Paneer Pizza' : /burst/i.test(item.name) ? 'Cheese Burst Pizza' : 'Veg Pizza';
@@ -201,7 +204,12 @@ export function enrichRestaurantTemplates(legacy: MenuTemplate[]): MenuTemplate[
     const first = all.find(i => i.variants === undefined) || all[0];
     const other = all.find(i => i.sku !== first?.sku && !i.variants && /beverage|drink|rice|bread|coffee|tea|chaas|lassi/i.test(i.name)) || all.find(i => i.sku !== first?.sku && !i.variants);
     template.combos = first && other ? [{ id: `${template.id}-meal`, name: `${template.name.replace(' Restaurant', '')} Meal Deal`, description: `${first.name} with ${other.name}. Fixed portions; individual item customisations are not included.`, basePrice: Math.round((first.suggestedPrice + other.suggestedPrice) * .9), itemSkus: [first.sku, other.sku], categorySlug: 'combos', imageUrl: '/assets/menu/common/menu-placeholder-v2.svg' }] : [];
+    for (const combo of template.combos) combo.imageUrl = starterDishPhoto(combo.name!) || combo.imageUrl;
     if (template.combos.length) template.categories.push({ name: 'Combos', slug: 'combos', description: 'Fixed portion meal deals', iconName: 'Package', items: [] });
+    for (const category of template.categories) {
+      category.iconName = categoryVisual(category.name).icon;
+      category.imageUrl = starterCategoryPhoto(template.id, category.slug, category.name) || category.items[0]?.imageUrl || template.combos?.find(combo => combo.categorySlug === category.slug)?.imageUrl;
+    }
     template.approxItemCount = all.length; template.categoryCount = template.categories.length; template.version = '2.0';
     return template;
   });

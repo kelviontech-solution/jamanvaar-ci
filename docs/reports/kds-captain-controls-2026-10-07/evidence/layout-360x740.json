@@ -1,0 +1,29 @@
+{
+  "documentOverflow": false,
+  "board": {
+    "x": 0,
+    "y": 316,
+    "width": 360,
+    "height": 380,
+    "top": 316,
+    "right": 360,
+    "bottom": 696,
+    "left": 0
+  },
+  "cards": [
+    {
+      "width": 336,
+      "height": 312.5625,
+      "overflow": false,
+      "text": 16,
+      "dishViewportHeight": 52
+    },
+    {
+      "width": 336,
+      "height": 356,
+      "overflow": false,
+      "text": 16,
+      "dishViewportHeight": 71
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-e530ed9a67c779",
+  "kind": "dish",
+  "name": "Cheesy Jalapeno Poppers (6 Pcs)",
+  "description": "Crisp golden bites filled with molten cheese and spicy jalapenos",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Fries & Quick Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Fries & Quick Sides"
+    }
+  ],
+  "file": "dish-e530ed9a67c779.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97884,
+  "sha256": "47ba5e4507e5aa825ca4cc40243d981d02ecce9ca54f5c4858c049be6530b1bd"
+}

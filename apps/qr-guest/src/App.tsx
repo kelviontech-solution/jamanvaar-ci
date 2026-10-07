@@ -50,6 +50,18 @@ const paymentUrl = (url: string | null | undefined) => {
   try { const value=new URL(url ?? ''); return value.protocol==='https:' && (value.hostname==='rzp.io' || value.hostname==='razorpay.com' || value.hostname.endsWith('.razorpay.com')) ? value.href : null; } catch { return null; }
 };
 
+function Icon({ name, className = '' }: { name: 'bag' | 'search' | 'arrow' | 'shield' | 'check' | 'plate'; className?: string }) {
+  const paths = { bag: 'M6 7h12l2 14H4L6 7Zm3 0V5a3 3 0 0 1 6 0v2', search: 'm21 21-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z', arrow: 'M5 12h14m-6-6 6 6-6 6', shield: 'm12 2 8 3v6c0 5-8 11-8 11S4 16 4 11V5l8-3Zm-4 9 3 3 5-5', check: 'm5 12 4 4L19 6', plate: 'M3 17h18M5 15a7 7 0 0 1 14 0M12 8V5m-3 0h6M4 20h16' };
+  return <svg className={`icon ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
+}
+
+function DishPhoto({ source, name, className = '' }: { source?: string; name: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [source, name]);
+  const fallback = imageSrc('/assets/menu/common/menu-placeholder-v2.svg');
+  return <img className={className} src={failed ? fallback : imageSrc(source, name) || fallback} alt={name} loading="lazy" decoding="async" onError={() => { if (!failed) setFailed(true); }} />;
+}
+
 export default function App() {
   const token = tokenFromPath();
   if (!token) return <Message title="This QR code is not valid" text="Please scan the code on your table again, or ask a team member." />;
@@ -59,6 +71,8 @@ export default function App() {
 function Message({ title, text, action }: { title: string; text?: string; action?: { label: string; run: () => void } }) {
   return (
     <main className="center">
+      <img className="message-logo" src={imageSrc('/assets/branding/jamanvaar-logo.png')} alt="Jamanvaar by Kelviontech" />
+      <Icon name="plate" className="message-icon" />
       <h1>{title}</h1>
       {text && <p className="muted">{text}</p>}
       {action && <button className="primary" onClick={action.run}>{action.label}</button>}
@@ -139,24 +153,24 @@ function Ordering({ token }: { token: string }) {
 
   if (problem && placed && screen === 'STATUS') return <StatusScreen placed={placed} setPlaced={setPlaced} showStatus onMore={()=>void load().then(()=>navigate('MENU'))} />;
   if (problem) return <Message title={problem.title} text={problem.text} action={problem.retry ? { label: 'Try again', run: () => { setRestoreAttempt(a=>a+1);void load(); } } : undefined} />;
-  if (!info || !menu) return <main className="center"><p className="muted">Loading the menu…</p></main>;
+  if (!info || !menu) return <Message title="Setting your table" text="Your restaurant’s fresh menu is on its way…" />;
 
   const gone = unavailableLines(cart, new Set(menu.items.map((i) => i.id)));
 
   return (
-    <div className="app" style={info.branding?.accentColor ? ({ ['--navy' as string]: info.branding.accentColor } as React.CSSProperties) : undefined}>
+    <div className="app" style={info.branding?.accentColor ? ({ ['--saffron' as string]: info.branding.accentColor } as React.CSSProperties) : undefined}>
       <header className="top">
-        {imageSrc(info.branding?.logoUrl ?? undefined) && <img src={imageSrc(info.branding?.logoUrl ?? undefined)} alt="" className="logo" style={{ height: 36, borderRadius: 8 }} />}
-        <div>
+        <img src={imageSrc(info.branding?.logoUrl || '/assets/branding/jamanvaar-logo.png')} alt={info.branding?.logoUrl ? info.restaurant.name : 'Jamanvaar by Kelviontech'} className="logo" />
+        <div className="restaurant-heading">
           <div className="name">{info.branding?.welcomeTitle || info.restaurant.name}</div>
           <div className="sub">{info.branch.name}{info.table ? ` · Table ${info.table.displayNumber}` : ' · Menu'}</div>
         </div>
-        <div className="mode">{info.mode === 'TABLE_ORDER' ? 'Dine-in ordering' : 'Order'}</div>
+        <div className="mode"><span className="live-dot" />{info.table ? `Table ${info.table.displayNumber}` : 'Guest menu'}</div>
       </header>
-      {info.branding?.welcomeMessage && screen === 'MENU' && <p className="muted pad">{info.branding.welcomeMessage}</p>}
+      {screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => <span key={step} className={step === screen ? 'current' : ''} aria-current={step === screen ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>)}</nav>}
 
       {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} />}
-      {screen === 'CART' && <CartScreen token={token} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => navigate('MENU')} onNext={() => navigate('CHECKOUT')} />}
+      {screen === 'CART' && <CartScreen token={token} menu={menu} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => navigate('MENU')} onNext={() => navigate('CHECKOUT')} />}
       {screen === 'CHECKOUT' && (
         <Checkout token={token} info={info} cart={cart} setCart={setCart} onBack={() => navigate('CART')}
           onPlaced={(p) => { store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart()); navigate('STATUS'); const url=paymentUrl(p.payment?.url);if(url)location.assign(url); }} />
@@ -164,6 +178,7 @@ function Ordering({ token }: { token: string }) {
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
       {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError||"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
       {info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
+      <footer className="brand-footer">Thoughtfully served with <strong>Jamanvaar</strong><span>by Kelviontech</span></footer>
     </div>
   );
 }
@@ -191,22 +206,27 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
 
   return (
     <>
+      <section className="menu-hero">
+        <div className="hero-copy"><span className="eyebrow">FRESH FROM OUR KITCHEN</span><h1>Good food.<br /><em>Great company.</em></h1><p>{info.branding?.welcomeMessage || 'Pick your favourites, make them yours, and let us take care of the rest.'}</p><div className="hero-note"><Icon name="plate" />{info.table ? `Delivered to table ${info.table.displayNumber}` : 'Prepared fresh for you'}</div></div>
+        <div className="hero-photo"><DishPhoto source={(menu.items.find(i => i.imageUrl && /\.(?:jpe?g|png|webp)(?:\?|$)|\/public\/qr\/images\//i.test(i.imageUrl)) || menu.items.find(i => i.imageUrl && !i.imageUrl.includes('placeholder')))?.imageUrl} name="From our menu" /><span>{info.restaurant.name}</span></div>
+      </section>
       {placed && placed.status !== 'COMPLETED' && placed.status !== 'CANCELLED' && (
         <button className="banner" onClick={onStatus}>Your order {placed.orderNumber ?? ''} is {placed.status.toLowerCase()} — view status</button>
       )}
-      <div className="search"><input type="search" placeholder="Search food…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search the menu" /></div>
+      <div className="search"><Icon name="search" /><input type="search" placeholder="Find your next favourite…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search the menu" /></div>
       {languages.length>1 && <nav className="chips" aria-label="Language">{languages.map(l=><button key={l} className={language===l?'chip on':'chip'} onClick={()=>{setLanguage(l);store.set('jv_qr_language',l);}}>{({en:'English',hi:'\u0939\u093f\u0928\u094d\u0926\u0940',gu:'\u0a97\u0ac1\u0a9c\u0ab0\u0abe\u0aa4\u0ac0'} as Record<string,string>)[l]}</button>)}</nav>}
       {diets.length>0 && <nav className="chips" aria-label="Dietary filters"><button className={diet==='ALL'?'chip on':'chip'} onClick={()=>setDiet('ALL')}>All diets</button>{diets.map(d=><button key={d} className={diet===d?'chip on':'chip'} onClick={()=>setDiet(d)}>{d.replaceAll('_',' ')}</button>)}</nav>}
       <nav className="chips" aria-label="Categories">
         <button className={category === 'ALL' ? 'chip on' : 'chip'} onClick={() => setCategory('ALL')}>All</button>
         {menu.categories.map((c) => <button key={c.id} className={category === c.id ? 'chip on' : 'chip'} onClick={() => setCategory(c.id)}>{local(c).name}</button>)}
       </nav>
+      <div className="menu-title"><div><span className="eyebrow">MADE FOR YOUR APPETITE</span><h2>{category === 'ALL' ? 'Explore our menu' : local(menu.categories.find(c => c.id === category) || { name: 'Our menu' }).name}</h2></div><span>{visible.length} dishes</span></div>
       <ul className="items">
         {visible.map((i) => (
           <li key={i.id} className="item">
-            {imageSrc(i.imageUrl) && <img src={imageSrc(i.imageUrl)} alt="" loading="lazy" />}
+            <DishPhoto source={i.imageUrl} name={i.name} />
             <div className="grow">
-              <div className="iname">{i.name}</div>{i.dietaryType&&<small>{i.dietaryType.replaceAll('_',' ')}</small>}
+              <div className="iname">{i.name}</div>{i.dietaryType&&<small className={`diet ${i.dietaryType === 'NON_VEG' ? 'nonveg' : ''}`}><span />{i.dietaryType.replaceAll('_',' ')}</small>}
               {i.description && <div className="idesc">{i.description}</div>}
               <div className="price">{inr(i.price)}</div>
             </div>
@@ -216,7 +236,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
         {visible.length === 0 && <li className="muted pad">{query || category !== 'ALL' || diet !== 'ALL' ? 'Nothing matches your search.' : 'No dishes are available right now. Please ask a team member.'}</li>}
       </ul>
       {itemCount(cart) > 0 && (
-        <button className="cartbar" onClick={onCart}><span>{itemCount(cart)} item{itemCount(cart) === 1 ? '' : 's'}</span><span>{inr(estimatedSubtotal(cart))}</span><span>View Cart</span></button>
+        <button className="cartbar" onClick={onCart}><Icon name="bag" /><span>{itemCount(cart)} item{itemCount(cart) === 1 ? '' : 's'}<small>{inr(estimatedSubtotal(cart))}</small></span><span className="cart-action">View Cart <Icon name="arrow" /></span></button>
       )}
       {picking && <Picker item={picking} groups={picking.modifierGroupIds.map((id) => groups.get(id)).filter((g): g is MenuGroup => !!g)} allowMods={info.ordering.settings.allowModifiers} allowNotes={info.ordering.settings.allowCustomerNotes} onClose={() => setPicking(null)}
         onAdd={(line) => { setCart(addLine(cart, line)); setPicking(null); }} />}
@@ -255,7 +275,8 @@ function Picker({ item, groups, allowMods, allowNotes, onClose, onAdd }: { item:
     <div className="sheet" role="dialog" aria-label={item.name}>
       <div className="panel">
         <button className="close" onClick={onClose} aria-label="Close">×</button>
-        <h2>{item.name}</h2>
+        <DishPhoto source={item.imageUrl} name={item.name} className="picker-photo" />
+        <span className="eyebrow">MAKE IT YOURS</span><h2>{item.name}</h2>
         {shown.map((g) => (
           <fieldset key={g.id}>
             <legend>{g.name} <span className="muted">{rule(g)}{(chosen[g.id]?.length ?? 0) > 0 && g.maxSelections > 1 ? ` · ${chosen[g.id]!.length} chosen` : ''}</span></legend>
@@ -296,16 +317,17 @@ function useQuote(token: string, cart: Cart) {
   return { quote, error };
 }
 
-function CartScreen({ token, cart, setCart, gone, onBack, onNext }: { token: string; cart: Cart; setCart: (c: Cart) => void; gone: string[]; onBack: () => void; onNext: () => void }) {
+function CartScreen({ token, menu, cart, setCart, gone, onBack, onNext }: { token: string; menu: Menu; cart: Cart; setCart: (c: Cart) => void; gone: string[]; onBack: () => void; onNext: () => void }) {
   const { quote, error } = useQuote(token, cart);
   return (
     <section className="page">
       <button className="link" onClick={onBack}>← Menu</button>
-      <h2>Your cart</h2>
+      <span className="eyebrow">YOUR PICKS, PREPARED FRESH</span><h2>Your cart</h2>
       {cart.lines.length === 0 && <p className="muted">Your cart is empty.</p>}
       <ul className="lines">
         {cart.lines.map((l) => (
           <li key={l.key} className={gone.includes(l.key) ? 'gone' : ''}>
+            <DishPhoto source={menu.items.find(i => i.id === l.itemId)?.imageUrl} name={l.name} className="cart-photo" />
             <div className="grow">
               <div className="iname">{l.name}</div>
               {l.optionNames.length > 0 && <div className="idesc">{l.optionNames.join(', ')}</div>}
@@ -338,6 +360,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
   const s = info.ordering.settings;
   const { quote, error: quoteError } = useQuote(token, cart);
   const [paymentMethod,setPaymentMethod]=useState<'CASH_AT_COUNTER'|'ONLINE'>(()=>s.allowCash?'CASH_AT_COUNTER':'ONLINE');
+  useEffect(() => { if (paymentMethod === 'ONLINE' && !s.allowOnlinePayment && s.allowCash) setPaymentMethod('CASH_AT_COUNTER'); else if (paymentMethod === 'CASH_AT_COUNTER' && !s.allowCash && s.allowOnlinePayment) setPaymentMethod('ONLINE'); }, [s.allowOnlinePayment, s.allowCash, paymentMethod]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
@@ -388,7 +411,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
   return (
     <section className="page">
       <button className="link" onClick={onBack}>← Cart</button>
-      <h2>Checkout</h2>
+      <span className="eyebrow">ONE LAST THING</span><h2>Checkout</h2>
       <p className="muted">{info.restaurant.name}{info.table ? ` · Table ${info.table.displayNumber}` : ''}</p>
       <ul className="lines compact">{cart.lines.map((l) => <li key={l.key}><span>{l.name} × {l.quantity}</span></li>)}</ul>
       {menuOnly && (
@@ -398,19 +421,20 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
           {orderType === 'DINE_IN' && <input placeholder="Your table number" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} maxLength={20} />}
         </fieldset>
       )}
-      <input placeholder={s.requireCustomerName ? 'Your name' : 'Your name (optional)'} value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoComplete="name" />
-      <input placeholder={s.requireCustomerPhone ? 'Mobile number' : 'Mobile number (optional)'} value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} autoComplete="tel" />
-      {s.allowCustomerNotes && <textarea placeholder="Note for the kitchen (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} />}
+      <div className="guest-details"><label>Your name {s.requireCustomerName ? '*' : <small>(optional)</small>}<input placeholder="How should we call you?" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoComplete="name" /></label>
+      <label>Mobile number {s.requireCustomerPhone ? '*' : <small>(optional)</small>}<input placeholder="Your mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} autoComplete="tel" /></label>
+      {s.allowCustomerNotes && <label>Note for the kitchen <small>(optional)</small><textarea placeholder="Any special requests?" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} /></label>}</div>
       {quote && <Totals quote={quote} />}
-      <fieldset><legend>Payment method</legend>
-        {s.allowCash && <label className="opt"><input type="radio" name="payment" checked={paymentMethod==='CASH_AT_COUNTER'} onChange={()=>setPaymentMethod('CASH_AT_COUNTER')} /><span>Pay at counter</span></label>}
-        {s.allowOnlinePayment && <label className="opt"><input type="radio" name="payment" checked={paymentMethod==='ONLINE'} onChange={()=>setPaymentMethod('ONLINE')} /><span>Pay online / UPI</span></label>}
+      <fieldset className="payment-options"><legend>How would you like to pay?</legend>
+        <label className={`opt payment-card ${paymentMethod === 'CASH_AT_COUNTER' ? 'selected' : ''} ${!s.allowCash ? 'unavailable' : ''}`}><input type="radio" name="payment" disabled={!s.allowCash} checked={paymentMethod==='CASH_AT_COUNTER'} onChange={()=>setPaymentMethod('CASH_AT_COUNTER')} /><span>Pay at counter<small>{s.allowCash ? 'Settle your bill with our team.' : 'Counter payment is unavailable.'}</small></span><Icon name="plate" /></label>
+        <label className={`opt payment-card ${paymentMethod === 'ONLINE' ? 'selected' : ''} ${!s.allowOnlinePayment ? 'unavailable' : ''}`}><input type="radio" name="payment" disabled={!s.allowOnlinePayment} checked={paymentMethod==='ONLINE'} onChange={()=>setPaymentMethod('ONLINE')} /><span>Pay online / UPI<small>{s.allowOnlinePayment ? 'UPI, cards & more • Secured by Razorpay' : info.ordering.onlinePayment?.message || 'Currently unavailable. Please pay at the counter.'}</small></span><Icon name="shield" /></label>
       </fieldset>
       <p className="muted">{paymentMethod==='ONLINE'?'You will continue to secure Razorpay checkout. Your order reaches the kitchen after payment is verified.':'You pay at the counter when you are done.'}</p>
       {!s.allowCash&&!s.allowOnlinePayment&&<p className="warn">No payment method is currently available. Please ask a team member.</p>}
       {quoteError&&<p className="warn" role="alert">{quoteError}</p>}
       {error && <p className="warn" role="alert">{error}</p>}
       <button className="primary" disabled={busy || !quote || !ready || !(s.allowCash||s.allowOnlinePayment)} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `${paymentMethod==='ONLINE'?'Pay online':info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
+      <div className="secure-note"><Icon name="shield" />Confirmed prices. Secure checkout.</div>
     </section>
   );
 }
@@ -437,6 +461,7 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
   const at = STEPS.findIndex(([s]) => s === placed.status);
   return (
     <section className="page center-text">
+      <div className={`status-seal ${placed.status === 'PENDING_PAYMENT' ? 'pending' : ''}`}><Icon name={placed.status === 'PENDING_PAYMENT' ? 'shield' : placed.status === 'CANCELLED' ? 'plate' : 'check'} /></div>
       <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Payment pending':'Order confirmed'}</h2>
       <p className="big">{placed.orderNumber ?? placed.publicOrderId}</p>
       <p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>

@@ -51,10 +51,16 @@ export const syncedOrderItemSchema = z.object({
 
 export const orderSyncMetaSchema = z
   .object({
+    kitchenPriority: z.enum(['NORMAL', 'URGENT']).optional(),
+    kitchenPriorityRev: z.number().int().min(1).max(1_000_000).optional(),
+    kitchenPriorityChangeId: z.string().uuid().optional(),
     orderNumber: z.string().max(64).optional(),
     tokenNumber: z.string().max(32).optional(),
     cashierName: z.string().max(120).optional(),
     captainName: z.string().max(120).optional(),
+    /** When the table asked for the bill, and the captain's split-by-seat note. Stored on the order, merged key by key. */
+    billRequestedAt: z.string().max(40).optional(),
+    billSplitNote: z.string().max(200).optional(),
     customerName: z.string().max(120).optional(),
     customerPhone: z.string().max(32).optional(),
     guestCount: z.number().int().min(0).max(1000).optional(),

@@ -1,0 +1,22 @@
+{
+  "id": "dish-54812827019300",
+  "kind": "dish",
+  "name": "Earl Grey Tea",
+  "description": "Earl Grey Tea, brewed tea and infusions.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Tea",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Tea"
+    }
+  ],
+  "file": "dish-54812827019300.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72610,
+  "sha256": "7fd5a5d6cb4df94184cbbd702d318efea922037c7a908198bdc8dbae208dc106"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-54a86d884e7d04",
+  "kind": "dish",
+  "name": "Cheese Corn Breadsticks",
+  "description": "Cheese Corn Breadsticks, oven-baked bread with garlic butter and herbs.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Garlic Bread",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Garlic Bread"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-54a86d884e7d04.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109108,
+  "sha256": "cbf3848c39a0802f54e61d27f66411fcc36339a641dabbf91ea911fa7ddbb335"
+}

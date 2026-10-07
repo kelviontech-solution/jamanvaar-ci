@@ -1,0 +1,26 @@
+{
+  "id": "dish-6ad631d1a92e25",
+  "kind": "dish",
+  "name": "Strawberry Shake",
+  "description": "Strawberry Shake, fresh shakes and chilled drinks.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Shakes"
+    }
+  ],
+  "file": "dish-6ad631d1a92e25.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 53392,
+  "sha256": "b6e62d201263181268ece41f272f68690001a8f98baaa17e1fced8f7db4eac4c"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-bd770a1cb11387",
+  "kind": "category",
+  "name": "Hot Coffee — Artisan Café & Coffee Bar",
+  "categoryName": "Hot Coffee",
+  "templateId": "tpl-cafe",
+  "slug": "hot-coffee",
+  "description": "Freshly brewed coffee prepared to order",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "components": [
+    {
+      "name": "Espresso",
+      "description": "Espresso, freshly brewed coffee prepared to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Americano",
+      "description": "Americano, freshly brewed coffee prepared to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cappuccino",
+      "description": "Cappuccino, freshly brewed coffee prepared to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-bd770a1cb11387.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 76132,
+  "sha256": "105893ee3e0eb6f9b2c68e05a774983b604b8fd44e74d28ee1664897db7f9a76"
+}

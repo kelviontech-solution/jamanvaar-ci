@@ -1,0 +1,22 @@
+{
+  "id": "dish-3d20f5c6834513",
+  "kind": "dish",
+  "name": "Butter Cookies 200g",
+  "description": "Butter Cookies 200g, baked cookie packs.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cookies",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cookies"
+    }
+  ],
+  "file": "dish-3d20f5c6834513.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 66768,
+  "sha256": "062a2758cb981d287c5abaa0428f0ec6f1aa77c64041a9bdeed9903ec3a4616e"
+}

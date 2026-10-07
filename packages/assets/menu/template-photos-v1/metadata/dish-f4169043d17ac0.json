@@ -1,0 +1,22 @@
+{
+  "id": "dish-f4169043d17ac0",
+  "kind": "dish",
+  "name": "Sukhdi",
+  "description": "Sukhdi, traditional sweet portions and buttermilk.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Sweets & Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Sweets & Beverages"
+    }
+  ],
+  "file": "dish-f4169043d17ac0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84656,
+  "sha256": "d5d9d209ea680003403cc48422b54666bfa644099d0ed82579ba8f7a7d289d47"
+}

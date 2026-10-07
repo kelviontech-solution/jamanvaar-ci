@@ -1,0 +1,32 @@
+{
+  "id": "category-d2b202222ec2cf",
+  "kind": "category",
+  "name": "Combos — South & North Indian Fusion Diner",
+  "categoryName": "Combos",
+  "templateId": "tpl-south-north-combo",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Dual Heritage Indian",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Butter Masala Dosa Classic",
+      "description": "Crisp crepe with spiced potato filling, coconut chutney and drumstick sambar",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer cubes in creamy buttery tomato gravy",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d2b202222ec2cf.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93218,
+  "sha256": "f91fa048fc4fecad461f69a390b1a41dd67f11c3b2a58976a01c3f93cfdede03"
+}

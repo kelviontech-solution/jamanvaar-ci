@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-07T08:05:01.438Z",
+  "environment": "isolated local API/database; compiled apps; production subpaths",
+  "results": [
+    {
+      "title": "All Menu shows twenty dishes plus one combo in one continuous grid with loaded photos",
+      "passed": true,
+      "ms": 1457.44,
+      "evidence": {
+        "cards": 21,
+        "photos": 21,
+        "comboAndDishesShareRow": true
+      }
+    },
+    {
+      "title": "Search filters combos and dishes together and no-match has a useful empty state",
+      "passed": true,
+      "ms": 126.02,
+      "evidence": {
+        "search": true,
+        "noMatch": true
+      }
+    },
+    {
+      "title": "Combos-only view contains one card without a duplicate backing dish",
+      "passed": false,
+      "error": "expect(locator).toHaveCount(expected) failed\n\nLocator:  getByTestId('kiosk-menu-grid').getByTestId('kiosk-menu-card')\nExpected: 1\nReceived: 0\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.count\" with timeout 5000ms\n  - waiting for getByTestId('kiosk-menu-grid').getByTestId('kiosk-menu-card')\n    14 × locator resolved to 0 elements\n       - unexpected value \"0\"\n"
+    }
+  ],
+  "errors": [],
+  "timings": []
+}

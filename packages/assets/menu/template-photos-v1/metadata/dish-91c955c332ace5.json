@@ -1,0 +1,26 @@
+{
+  "id": "dish-91c955c332ace5",
+  "kind": "dish",
+  "name": "Mini Gujarati Thali",
+  "description": "Mini Gujarati Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Thali"
+    }
+  ],
+  "file": "dish-91c955c332ace5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88978,
+  "sha256": "1c0955fdd49f67775b9898d318ac9320c169bbd6113b6acabe77c1fcf15c40a8"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-a4a70acc8f1130",
+  "kind": "dish",
+  "name": "Masala Rice",
+  "description": "Masala Rice, comforting rice and lentil preparations.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rice & Khichdi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rice & Khichdi"
+    }
+  ],
+  "file": "dish-a4a70acc8f1130.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94570,
+  "sha256": "88364fe106ee4622b337efab02b25a13669901d928e98f4533374ebb73e8b605"
+}

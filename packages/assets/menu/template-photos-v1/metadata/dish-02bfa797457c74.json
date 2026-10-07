@@ -1,0 +1,25 @@
+{
+  "id": "dish-02bfa797457c74",
+  "kind": "dish",
+  "name": "Mineral Water 500ml",
+  "description": "Mineral Water 500ml, made-to-order drinks or sealed beverages.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-02bfa797457c74.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 78960,
+  "sha256": "2b027cb3fe1c8c403f88e913596c121c06a2202267457c83a46380697fee9486"
+}

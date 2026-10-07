@@ -1,0 +1,37 @@
+{
+  "id": "category-cc58de6d6f5918",
+  "kind": "category",
+  "name": "Noodles — Indian Multi-Cuisine Diner",
+  "categoryName": "Noodles",
+  "templateId": "tpl-multicuisine",
+  "slug": "noodles",
+  "description": "Wok-tossed noodles and crunchy vegetables",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "components": [
+    {
+      "name": "Veg Hakka Noodles",
+      "description": "Veg Hakka Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Schezwan Noodles",
+      "description": "Veg Schezwan Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chilli Garlic Noodles",
+      "description": "Chilli Garlic Noodles, wok-tossed noodles and crunchy vegetables.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-cc58de6d6f5918.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 129726,
+  "sha256": "aabd08b45342f806ae90df017a162f81271e2630200360248d261cfdebadcf86"
+}

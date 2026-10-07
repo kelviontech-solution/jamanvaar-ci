@@ -1,3 +1,4 @@
+import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
@@ -82,6 +83,7 @@ export function getKioskDeviceId(): string | null {
  * device credential and forgets the lock state, so the app falls back to asking for a fresh activation key.
  */
 export function resetTerminal(): void {
+  AiConfig.reset();
   stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
@@ -257,6 +259,7 @@ export async function pullEntitySync(entityType: string, since?: string): Promis
 export async function reportHeartbeat(): Promise<void> {
   const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
   if (!deviceToken) return;
+  void refreshAiConfigIfStale({ apiBase: API_BASE, deviceToken });
   // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
   // notice, update offer and any signed offline extension.
   await sendHeartbeat({
@@ -445,4 +448,9 @@ export async function verifyManagerPin(pin: string): Promise<{ staffName: string
   if (res.status === 429) throw new CloudApiError(data?.message ?? 'Too many wrong PINs. Try again in a few minutes.', 429);
   if (!res.ok) throw new CloudApiError(data?.message ?? `Manager check failed (${res.status})`, res.status);
   return { staffName: String(data.staffName ?? 'Manager') };
+}
+
+export async function reportCustomerAiQuery(latencyMs: number): Promise<void> {
+  const deviceToken = getKioskDeviceToken();
+  if (deviceToken) await reportAiQuery({ apiBase: API_BASE, deviceToken, intent: "CUSTOMER_MENU", latencyMs });
 }

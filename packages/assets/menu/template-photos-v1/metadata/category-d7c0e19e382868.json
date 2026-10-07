@@ -1,0 +1,32 @@
+{
+  "id": "category-d7c0e19e382868",
+  "kind": "category",
+  "name": "Quick Tiffin Plates — South Indian Tiffin & Breakfast",
+  "categoryName": "Quick Tiffin Plates",
+  "templateId": "tpl-south-tiffin",
+  "slug": "tiffin-plates",
+  "description": "Steamed tiffin breakfast options",
+  "diet": "VEG",
+  "cuisine": "Fast South Indian Tiffin",
+  "category": "Quick Tiffin Plates",
+  "components": [
+    {
+      "name": "Ghee Mini Podi Idli (14 Pcs)",
+      "description": "Cocktail bite-sized idlis coated in spicy podi powder and hot melted ghee",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Hot Ven Pongal with Ghee Cashews",
+      "description": "Moong dal and rice porridge cooked with cumin, pepper, ginger and fried cashews in ghee",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d7c0e19e382868.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117718,
+  "sha256": "f3ddd6c4e81d39dbaaa506ea1997b1585e7c244cd0c1c1fd5eb53c818602ceb5"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "dish-59e0429f086bc6",
+  "kind": "dish",
+  "name": "Kesar Milk",
+  "description": "Kesar Milk, chilled traditional drinks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-59e0429f086bc6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 62504,
+  "sha256": "8c0aa9e4419bc576d740d0b0f3601445a4db4eaafe1e99c1a15468267095d80d"
+}

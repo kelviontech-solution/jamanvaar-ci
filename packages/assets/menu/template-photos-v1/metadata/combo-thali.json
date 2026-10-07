@@ -1,0 +1,29 @@
+{
+  "id": "combo-thali",
+  "kind": "combo",
+  "name": "Grand Indian Thali Meal Deal",
+  "description": "Maharaja Unlimited Royal Thali with Lemon Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Maharaja Unlimited Royal Thali",
+      "description": "4 Curries, 2 Dals, 4 Bread Varieties, Pulav, 2 Farsan, 2 Desserts, Raita, Papad, Chutney and Chaas",
+      "diet": "VEG"
+    },
+    {
+      "name": "Lemon Rice",
+      "description": "Lemon Rice, south Indian rice preparations and complete meals.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-thali.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110964,
+  "sha256": "97136d5215ba56bf05995fbcd4d01d086008d126c90b4e3fc4a10ba104847f96"
+}

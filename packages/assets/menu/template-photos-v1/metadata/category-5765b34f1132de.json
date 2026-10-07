@@ -1,0 +1,37 @@
+{
+  "id": "category-5765b34f1132de",
+  "kind": "category",
+  "name": "Accompaniments — South Indian Restaurant",
+  "categoryName": "Accompaniments",
+  "templateId": "tpl-south-indian",
+  "slug": "accompaniments",
+  "description": "Fresh accompaniments for tiffin",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Accompaniments",
+  "components": [
+    {
+      "name": "Extra Sambar",
+      "description": "Extra Sambar, fresh accompaniments for tiffin.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Coconut Chutney",
+      "description": "Coconut Chutney, fresh accompaniments for tiffin.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tomato Chutney",
+      "description": "Tomato Chutney, fresh accompaniments for tiffin.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5765b34f1132de.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85780,
+  "sha256": "458024fe17d42978657d879c76061e6d73a16bad155e31964f1be9fa1c3f0439"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-bd9da26b2a15e2",
+  "kind": "dish",
+  "name": "Mirchi Bhaji",
+  "description": "Mirchi Bhaji, freshly fried snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Hot Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-bd9da26b2a15e2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91480,
+  "sha256": "9c0330624a4a156c461a527de89e8f3a50cc7e56a9b1b1ee3c0be7fcb60e4161"
+}

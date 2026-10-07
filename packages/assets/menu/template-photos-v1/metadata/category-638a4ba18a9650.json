@@ -1,0 +1,32 @@
+{
+  "id": "category-638a4ba18a9650",
+  "kind": "category",
+  "name": "Tandoori Grills & Chaap — Tandoori Grills & Clay-Oven Specialist",
+  "categoryName": "Tandoori Grills & Chaap",
+  "templateId": "tpl-tandoor",
+  "slug": "tandoor-grills",
+  "description": "Marinated appetizers charred on high heat",
+  "diet": "VEG",
+  "cuisine": "Authentic Charcoal Tandoor",
+  "category": "Tandoori Grills & Chaap",
+  "components": [
+    {
+      "name": "Malai Soya Chaap Tandoori",
+      "description": "Tender soya chaap marinated in creamy cashew, cheese and green cardamom paste, roasted to perfection",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Afghani Paneer Tikka",
+      "description": "Cottage cheese cubes bathed in mild white pepper cream marinade, charred with bell peppers",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-638a4ba18a9650.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123188,
+  "sha256": "641130b33617a562dba63061a42cda645c1fb61f4904218fbeb62adfd515901a"
+}

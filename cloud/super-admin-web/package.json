@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node ../../tooling/dev/sync_description_photos.mjs",
+    "prebuild": "node ../../tooling/dev/sync_description_photos.mjs",
     "dev": "vite --port 5180",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",

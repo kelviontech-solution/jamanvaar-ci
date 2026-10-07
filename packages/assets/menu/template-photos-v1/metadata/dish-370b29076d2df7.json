@@ -1,0 +1,29 @@
+{
+  "id": "dish-370b29076d2df7",
+  "kind": "dish",
+  "name": "Dal Makhani",
+  "description": "Dal Makhani, lentils simmered and tempered before serving.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dal"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/dal-makhani.jpg"
+  ],
+  "file": "dish-370b29076d2df7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97986,
+  "sha256": "eacec5e8f5cc4224730045fca422e95fa2fc0936b3a694fdb042dac2ee476fac"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-8bf5032093e8d8",
+  "kind": "dish",
+  "name": "Butter Croissant",
+  "description": "Butter Croissant, bakery snacks and individually portioned desserts.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Bakes & Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Bakes & Desserts"
+    }
+  ],
+  "file": "dish-8bf5032093e8d8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72442,
+  "sha256": "ecbd3210e54be8727288b2aaad8d2d7596183f9c4a0cbfbcf31f52c03a16e414"
+}

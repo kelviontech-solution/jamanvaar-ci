@@ -1,0 +1,37 @@
+{
+  "id": "category-8c81243c83b377",
+  "kind": "category",
+  "name": "Rajasthani Royal Curries — Rajasthani Marwari Bhojanalaya",
+  "categoryName": "Rajasthani Royal Curries",
+  "templateId": "tpl-rajasthani",
+  "slug": "rajasthani-curries",
+  "description": "Authentic yogurt and dried berry curries",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Rajasthani Royal Curries",
+  "components": [
+    {
+      "name": "Shahi Gatte Ki Sabzi",
+      "description": "Steamed gram flour dumplings simmered in a spiced tangy yogurt and mustard seed gravy",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Authentic Ker Sangri Special",
+      "description": "Desert beans and wild capers cooked with red chillies, raw mango powder and mustard oil",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Pithod Ki Sabzi",
+      "description": "Spiced besan diamond cakes cooked in a creamy Rajasthani kadhi gravy",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8c81243c83b377.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 144562,
+  "sha256": "30c71a8623461b19c165ec5f1a2a097f86fe9d490bdd544f9534ba6bf683cb13"
+}

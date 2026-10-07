@@ -1,0 +1,26 @@
+{
+  "id": "dish-897af6d2d66ad5",
+  "kind": "dish",
+  "name": "Plain Khichdi",
+  "description": "Plain Khichdi, comforting rice and lentil preparations.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rice & Khichdi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rice & Khichdi"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rice & Khichdi"
+    }
+  ],
+  "file": "dish-897af6d2d66ad5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81726,
+  "sha256": "ca7e4ecbf6b05a3e054500c6a708fcfe4031835ce43744f59a8baebdceea2300"
+}

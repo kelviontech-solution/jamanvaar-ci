@@ -1,0 +1,37 @@
+{
+  "id": "category-b1169ef76d1436",
+  "kind": "category",
+  "name": "Beverages — Pizza Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-pizza",
+  "slug": "beverages",
+  "description": "Made-to-order drinks or sealed beverages",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Cold Coffee",
+      "description": "Cold Coffee, made-to-order drinks or sealed beverages.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lemon Iced Tea",
+      "description": "Lemon Iced Tea, made-to-order drinks or sealed beverages.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fresh Lime Soda",
+      "description": "Fresh Lime Soda, made-to-order drinks or sealed beverages.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-b1169ef76d1436.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94708,
+  "sha256": "b0fa508c767423d2beef925556b5e40918ab01bb152c46347efad188ec16fd4c"
+}

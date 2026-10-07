@@ -1,0 +1,22 @@
+{
+  "id": "dish-68b0db783a1bf3",
+  "kind": "dish",
+  "name": "Grand Tandoori Veg Kebab Platter",
+  "description": "Assortment of Paneer Tikka, Hara Bhara Kebab, Stuffed Mushrooms and Veg Seekh (16 Pcs)",
+  "diet": "VEG",
+  "cuisine": "North Indian & Family Meals",
+  "category": "Family Sharing Platters",
+  "occurrences": [
+    {
+      "templateId": "tpl-family-diner",
+      "category": "Family Sharing Platters"
+    }
+  ],
+  "file": "dish-68b0db783a1bf3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119332,
+  "sha256": "422846c6da76bb85c0dc85188381af9c224dbc621a67d3b0e50d3679258a63ea"
+}

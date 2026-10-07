@@ -1,0 +1,22 @@
+{
+  "id": "dish-d9a8ecaf1b66b2",
+  "kind": "dish",
+  "name": "Authentic Ker Sangri Special",
+  "description": "Desert beans and wild capers cooked with red chillies, raw mango powder and mustard oil",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Rajasthani Royal Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-rajasthani",
+      "category": "Rajasthani Royal Curries"
+    }
+  ],
+  "file": "dish-d9a8ecaf1b66b2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108866,
+  "sha256": "9f1f70bcf59af3a143246b67eec6f2f251daf9db642ff845524e1e58b0c312fe"
+}

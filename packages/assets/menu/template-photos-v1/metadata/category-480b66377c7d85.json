@@ -1,0 +1,37 @@
+{
+  "id": "category-480b66377c7d85",
+  "kind": "category",
+  "name": "Jain Thali — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Thali",
+  "templateId": "tpl-jain",
+  "slug": "jain-thali",
+  "description": "Complete meals without onion, garlic or root vegetables",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Thali",
+  "components": [
+    {
+      "name": "Jain Special Thali",
+      "description": "Jain Special Thali, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Mini Thali",
+      "description": "Jain Mini Thali, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Rotli Shaak Meal",
+      "description": "Jain Rotli Shaak Meal, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-480b66377c7d85.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94892,
+  "sha256": "549bfa592169b37b88554a98c57b48f5baca5be43bd5271727f21324f0685025"
+}

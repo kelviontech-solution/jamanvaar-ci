@@ -1,0 +1,29 @@
+{
+  "id": "dish-96d3581ed1ce31",
+  "kind": "dish",
+  "name": "Rabri",
+  "description": "Rabri, small sweet portions.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Sweets",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Indian Sweets"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-96d3581ed1ce31.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 67142,
+  "sha256": "1296738736a39a1036087d5cb5964a1d5cebfca921d568b315171d6d13635c5a"
+}

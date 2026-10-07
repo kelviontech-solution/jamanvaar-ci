@@ -1,0 +1,22 @@
+{
+  "id": "dish-4260940928ac40",
+  "kind": "dish",
+  "name": "Makki Roti",
+  "description": "Makki Roti, traditional Punjabi dishes.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Punjabi Specials"
+    }
+  ],
+  "file": "dish-4260940928ac40.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95078,
+  "sha256": "e3d6b0805e5478c8686fa4c286817558781ef7879008c71b0e6abf1781a390be"
+}

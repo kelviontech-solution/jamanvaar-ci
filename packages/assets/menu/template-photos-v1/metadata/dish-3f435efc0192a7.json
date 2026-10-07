@@ -1,0 +1,22 @@
+{
+  "id": "dish-3f435efc0192a7",
+  "kind": "dish",
+  "name": "Navratan Korma Royal",
+  "description": "Nine jewels of vegetables, fruits and nuts simmered in a mildly sweet cashew and khoya gravy",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Shahi Kormas & Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Shahi Kormas & Gravies"
+    }
+  ],
+  "file": "dish-3f435efc0192a7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90740,
+  "sha256": "2ca1a98da6fbfbc3efd5c6c1720fa0818e56254392b2bd8bd806240a3ef2d5a1"
+}

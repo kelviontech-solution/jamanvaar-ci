@@ -1,0 +1,45 @@
+{
+  "id": "dish-055c169142ca7b",
+  "kind": "dish",
+  "name": "Cold Coffee",
+  "description": "Cold Coffee, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Shakes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/beverages/cold-coffee.jpg"
+  ],
+  "file": "dish-055c169142ca7b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 64076,
+  "sha256": "8df2d9f0ccb13561d36517b46b6d74c3389124a64195d5269d0ac14761227a22"
+}

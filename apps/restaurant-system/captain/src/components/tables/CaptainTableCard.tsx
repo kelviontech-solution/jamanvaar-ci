@@ -57,6 +57,8 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
 
   return (
     <div
+      role="group"
+      aria-label={`Dining table ${table.tableNumber}`}
       className={`rounded-3xl border-2 p-4 sm:p-5 bg-white transition-all shadow-xs flex flex-col justify-between space-y-3.5 hover:shadow-md ${
         isFoodReady
           ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/15'

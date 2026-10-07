@@ -1,0 +1,25 @@
+{
+  "id": "dish-671f7b7c0ca7bb",
+  "kind": "dish",
+  "name": "Deluxe Gujarati Executive Thali",
+  "description": "2 Shaak, Gujarati Dal, Kadhi, 3 Phulkas, Rice, Farsan & Masala Chaas",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali Special",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Thali Special"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/deluxe-gujarati-thali.webp"
+  ],
+  "file": "dish-671f7b7c0ca7bb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107192,
+  "sha256": "5ec093135e3b4264808f861aa88299082e49b3e0f9368d6255c9e08455628358"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-ae9afa60b772c9",
+  "kind": "dish",
+  "name": "Paneer Makhani Cheese Toastie",
+  "description": "Spiced cottage cheese tossed in makhani sauce loaded with mozzarella in golden toasted bread",
+  "diet": "VEG",
+  "cuisine": "Gourmet Burgers & Sandwiches",
+  "category": "Grilled Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-burger-sandwich",
+      "category": "Grilled Sandwiches"
+    }
+  ],
+  "file": "dish-ae9afa60b772c9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99108,
+  "sha256": "d75f40ce4d6980cbd48fbda3bd6e4a595b333d383cb8880dd569886da67acb71"
+}

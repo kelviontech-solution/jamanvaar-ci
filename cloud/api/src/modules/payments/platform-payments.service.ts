@@ -149,14 +149,14 @@ export class PlatformPaymentsService {
   }
 
   /** A Super Admin refund: same server-side rules as any refund (remaining balance, one Razorpay call), plus the admin's password. */
-  async adminRefund(paymentId: string, dto: { amountPaise: number; reason: string }, actor: PlatformUser, password?: string) {
+  async adminRefund(paymentId: string, dto: { amountPaise: number; reason: string; method: 'CASH' | 'UPI_TO_CUSTOMER' }, actor: PlatformUser, password?: string) {
     await requireStepUpPassword(actor, password);
     const payment = await this.prisma.runAsPlatform((tx) => tx.paymentTransaction.findUnique({ where: { id: paymentId }, select: { restaurantId: true } }));
     if (!payment) throw new NotFoundException('Payment not found');
     return this.payments.createRefund(
       payment.restaurantId,
       paymentId,
-      { amountPaise: dto.amountPaise, reason: dto.reason, requestedBy: actor.email },
+      { amountPaise: dto.amountPaise, reason: dto.reason, method: dto.method, requestedBy: actor.email },
       { id: actor.id, type: 'PLATFORM' },
       'PLATFORM'
     );

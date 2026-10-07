@@ -4,7 +4,8 @@ import {
   OrderRepository,
   BusinessDayRepository,
   TableRepository,
-  KOTRepository
+  KOTRepository,
+  projectTableBillState
 } from '@jamanvaar/database';
 import {
   Order,
@@ -208,17 +209,18 @@ export class RestaurantCommandPipeline {
         }
 
         case 'REQUEST_BILL': {
-          const { tableNumber, requestedBy } = command.payload as any;
+          const { tableNumber } = command.payload as any;
           const table = db.tables.find((t) => t.tableNumber === tableNumber);
           if (!table) throw new Error(`Table ${tableNumber} not found`);
-
-          table.status = 'BILL_REQUESTED';
+          // The request belongs to the table's open order, the same as a captain's request on the device.
+          const order = table.currentOrderId ? db.orders.find((o) => o.id === table.currentOrderId) : undefined;
+          if (!order) throw new Error(`Table ${tableNumber} has no open order to bill`);
+          order.billRequestedAt = new Date().toISOString();
+          order.updatedAt = order.billRequestedAt;
+          order.syncStatus = 'SAVED_LOCALLY';
+          projectTableBillState(table);
 
           emittedEvents.push('BILL_REQUESTED', 'TABLE_UPDATED');
-          lanMeshSync.broadcast('BILL_REQUESTED', {
-            tableNumber,
-            requestedBy: requestedBy || 'Captain Floor'
-          });
           lanMeshSync.broadcast('TABLE_UPDATED', table);
 
           resultData = table;

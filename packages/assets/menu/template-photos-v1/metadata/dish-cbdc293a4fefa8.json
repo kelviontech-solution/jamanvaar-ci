@@ -1,0 +1,26 @@
+{
+  "id": "dish-cbdc293a4fefa8",
+  "kind": "dish",
+  "name": "Veggie Supreme Pizza",
+  "description": "Veggie Supreme Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-cbdc293a4fefa8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110318,
+  "sha256": "5d63a9c81667cd6fbc0b594a48b33d4739dcdd38cf6da096333c1fb1a67ba783"
+}

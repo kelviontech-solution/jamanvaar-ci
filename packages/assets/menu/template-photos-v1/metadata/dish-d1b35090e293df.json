@@ -1,0 +1,22 @@
+{
+  "id": "dish-d1b35090e293df",
+  "kind": "dish",
+  "name": "Medu Vada 2 Pieces",
+  "description": "Medu Vada 2 Pieces, steamed rice cakes or crisp lentil fritters with chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada"
+    }
+  ],
+  "file": "dish-d1b35090e293df.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83674,
+  "sha256": "d9bd18c39dafe97f5fb523b56a6f541bdd01484d12d97d97c173a410a35d6704"
+}

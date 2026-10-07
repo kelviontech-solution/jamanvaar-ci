@@ -211,6 +211,28 @@ describe('Captain service workflow', () => {
   });
 
   describe('food ready and serving (BUG-098)', () => {
+    it('refuses a cooking ticket and ignores repeated serve taps', async () => {
+      await signIn(); store().openTable('1', 2); addDish(0, 1);
+      const [kot] = store().sendKOT()!;
+      const before = store().shiftStats.foodServed;
+      store().markEntireKotServed(kot.id);
+      expect(db.kots.find(k => k.id === kot.id)!.status).toBe('PREPARING');
+      expect(store().shiftStats.foodServed).toBe(before);
+      const order = OrderRepository.getOrderById(table('1').currentOrderId!)!;
+      order.items.forEach(i => { i.kitchenStatus = 'READY'; }); KOTRepository.reconcileWithOrders(); store().refreshState();
+      const ready = store().foodReadyItems[0]; store().markItemServed(ready.id);
+      const after = store().shiftStats.foodServed; store().markItemServed(ready.id); store().markEntireKotServed(kot.id);
+      expect(after).toBeGreaterThan(before); expect(store().shiftStats.foodServed).toBe(after);
+    });
+    it('does not serve a stale ready-list dish after the kitchen undoes Ready', async () => {
+      await signIn(); store().openTable('1', 2); addDish(0, 1); store().sendKOT();
+      const order = OrderRepository.getOrderById(table('1').currentOrderId!)!;
+      order.items.forEach(i => { i.kitchenStatus = 'READY'; }); KOTRepository.reconcileWithOrders(); store().refreshState();
+      const ready = store().foodReadyItems[0], before = store().shiftStats.foodServed;
+      const kot = db.kots.find(k => k.id === ready.kotId)!; kot.status = 'PREPARING'; kot.items.forEach(i => { i.status = 'PREPARING'; });
+      store().markItemServed(ready.id);
+      expect(kot.status).toBe('PREPARING'); expect(store().shiftStats.foodServed).toBe(before);
+    });
     it('dishes the kitchen finished appear as food ready, and serving them clears the list', async () => {
       await signIn();
       store().openTable('1', 2);
@@ -294,16 +316,17 @@ describe('Captain service workflow', () => {
       expect(record.payload).toMatchObject({ kind: 'MESSAGE', recipient: 'KITCHEN', senderName: 'Ravi Waiter', presetText: 'Food taking too long', customNote: 'Table is upset', tableNumber: '4' });
     });
 
-    it('a bill request is queued for the counter', async () => {
+    it('a bill request belongs to the order: the order carries it, the table follows, and no separate message is queued', async () => {
       await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
       store().sendKOT();
       expect(store().requestBill('1')).toBe(true);
 
-      const records = ServiceMessages.collectSyncRecords();
-      expect(records).toHaveLength(1);
-      expect(records[0].payload).toMatchObject({ kind: 'BILL_REQUEST', recipient: 'POS', tableNumber: '1', senderName: 'Ravi Waiter' });
+      const order = db.orders.find((o) => o.id === table('1').currentOrderId);
+      expect(order?.billRequestedAt).toBeTruthy();
+      expect(table('1').status).toBe('BILL_REQUESTED');
+      expect(ServiceMessages.collectSyncRecords()).toHaveLength(0);
     });
 
     it('a refused bill request queues nothing', async () => {

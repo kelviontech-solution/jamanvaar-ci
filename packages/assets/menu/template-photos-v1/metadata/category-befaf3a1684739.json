@@ -1,0 +1,27 @@
+{
+  "id": "category-befaf3a1684739",
+  "kind": "category",
+  "name": "Gourmet Indian Appetizers — Fine Dining Gourmet Indian",
+  "categoryName": "Gourmet Indian Appetizers",
+  "templateId": "tpl-fine-dining",
+  "slug": "fine-starters",
+  "description": "Artfully plated progressive Indian starters",
+  "diet": "VEG",
+  "cuisine": "Gourmet Modern Indian",
+  "category": "Gourmet Indian Appetizers",
+  "components": [
+    {
+      "name": "Smoked Truffle Paneer Tikka",
+      "description": "Artisanal cottage cheese infused with black truffle oil and charcoal smoke, served with edamame dip",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-befaf3a1684739.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100110,
+  "sha256": "ce6aea25bbf72e0dc920d2fc78c9f430ffe61cf0578021bb343c202742a316b0"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "dish-9025a0d3e38633",
+  "kind": "dish",
+  "name": "Vanilla Ice Cream",
+  "description": "Vanilla Ice Cream, sweet snack portions.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-9025a0d3e38633.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 37682,
+  "sha256": "3771addb2bf8e0f3480329a1524024df68e9f603d885fe812771357fe761c7c7"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-fc2d3d3ff5e1bd",
+  "kind": "dish",
+  "name": "Veg Fried Rice",
+  "description": "Veg Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Fried Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Fried Rice"
+    }
+  ],
+  "file": "dish-fc2d3d3ff5e1bd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91188,
+  "sha256": "2f6f91e5d96f0461c2072a522965aeeb3dd02d94cb9ae55176f759f6c861fe8a"
+}

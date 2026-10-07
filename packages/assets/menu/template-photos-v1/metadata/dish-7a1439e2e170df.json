@@ -1,0 +1,25 @@
+{
+  "id": "dish-7a1439e2e170df",
+  "kind": "dish",
+  "name": "Tandoori Afghani Paneer Tikka",
+  "description": "Cottage cheese cubes bathed in mild white pepper cream marinade, charred with bell peppers",
+  "diet": "VEG",
+  "cuisine": "Authentic Charcoal Tandoor",
+  "category": "Tandoori Grills & Chaap",
+  "occurrences": [
+    {
+      "templateId": "tpl-tandoor",
+      "category": "Tandoori Grills & Chaap"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-7a1439e2e170df.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92518,
+  "sha256": "9e8539183f6223cafbac4a7b43688ea16de89a5ddd948b356c2a062e612926cd"
+}

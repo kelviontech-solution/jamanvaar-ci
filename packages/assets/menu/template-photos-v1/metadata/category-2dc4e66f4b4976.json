@@ -1,0 +1,37 @@
+{
+  "id": "category-2dc4e66f4b4976",
+  "kind": "category",
+  "name": "Rice & Meals — Grand Indian Thali Restaurant",
+  "categoryName": "Rice & Meals",
+  "templateId": "tpl-thali",
+  "slug": "rice-meals",
+  "description": "South Indian rice preparations and complete meals",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Rice & Meals",
+  "components": [
+    {
+      "name": "Lemon Rice",
+      "description": "Lemon Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Curd Rice",
+      "description": "Curd Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tamarind Rice",
+      "description": "Tamarind Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-2dc4e66f4b4976.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105132,
+  "sha256": "c5c173ae3638a6b265d20b6bb62363c360aa7d54bd44c1ee22ab6016e7a24d59"
+}

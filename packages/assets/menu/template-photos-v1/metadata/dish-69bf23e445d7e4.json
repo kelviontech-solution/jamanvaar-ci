@@ -1,0 +1,22 @@
+{
+  "id": "dish-69bf23e445d7e4",
+  "kind": "dish",
+  "name": "Masala Khichdi",
+  "description": "Masala Khichdi, rice and lentil comfort meals.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rice & Khichdi",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rice & Khichdi"
+    }
+  ],
+  "file": "dish-69bf23e445d7e4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87770,
+  "sha256": "c162050cbba256504815177924da343115c8d422c2a21ed2601981066ba48251"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-68f288804c8537",
+  "kind": "dish",
+  "name": "Paneer Pasanda Tikka",
+  "description": "Layered cottage cheese stuffed with mint, nuts and khoya, glazed in tandoor",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Nawabi Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Nawabi Starters"
+    }
+  ],
+  "file": "dish-68f288804c8537.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102558,
+  "sha256": "cb68ea5ec8a8c71e90d0fc5eb7c2d8243c9aa3252af39f9f563e5ae8e5335a1c"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-a01251eabef0ba",
+  "kind": "category",
+  "name": "Sweets — Street Food Restaurant",
+  "categoryName": "Sweets",
+  "templateId": "tpl-chaat",
+  "slug": "sweets",
+  "description": "Small sweet portions",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Sweets",
+  "components": [
+    {
+      "name": "Jalebi",
+      "description": "Jalebi, small sweet portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Gulab Jamun",
+      "description": "Gulab Jamun, small sweet portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rabri",
+      "description": "Rabri, small sweet portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a01251eabef0ba.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99430,
+  "sha256": "3fc8f30ef0d80f4044adf6f41be651521689fed63f091de61658996bbc55040f"
+}

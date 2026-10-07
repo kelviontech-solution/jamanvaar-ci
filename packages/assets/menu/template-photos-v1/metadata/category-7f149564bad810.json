@@ -1,0 +1,32 @@
+{
+  "id": "category-7f149564bad810",
+  "kind": "category",
+  "name": "Main Course — North Indian Restaurant",
+  "categoryName": "Main Course",
+  "templateId": "tpl-north-indian",
+  "slug": "main-course",
+  "description": "Slow-simmered Indian gravies with fresh spices",
+  "diet": "NON_VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Main Course",
+  "components": [
+    {
+      "name": "Butter Chicken",
+      "description": "Butter Chicken, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Chicken Curry",
+      "description": "Chicken Curry, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "NON_VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-7f149564bad810.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115966,
+  "sha256": "dd266a24003e8d0a55a909a5a68f5c49e9af2925f8ae4c07937dc5cd197fffd5"
+}

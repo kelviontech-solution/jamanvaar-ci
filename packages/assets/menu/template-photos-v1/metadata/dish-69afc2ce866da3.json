@@ -1,0 +1,22 @@
+{
+  "id": "dish-69afc2ce866da3",
+  "kind": "dish",
+  "name": "Green Tea",
+  "description": "Green Tea, brewed tea and infusions.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Tea",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Tea"
+    }
+  ],
+  "file": "dish-69afc2ce866da3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 71532,
+  "sha256": "903df2ddecaf681b7dfbdcd2ee80a14bc87279e8f30c2eea8cba5694eb0fe0e8"
+}

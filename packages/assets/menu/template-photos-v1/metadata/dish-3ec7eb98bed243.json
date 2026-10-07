@@ -1,0 +1,22 @@
+{
+  "id": "dish-3ec7eb98bed243",
+  "kind": "dish",
+  "name": "Lasaniya Bateta (Garlic Potatoes)",
+  "description": "Baby potatoes simmered in a bold fiery garlic and Kashmiri chilli paste gravy",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Special Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Special Shaak"
+    }
+  ],
+  "file": "dish-3ec7eb98bed243.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106736,
+  "sha256": "5590265d556f6bb86d8976e1065438f536250cd458555138aa9a632a98c1ea45"
+}

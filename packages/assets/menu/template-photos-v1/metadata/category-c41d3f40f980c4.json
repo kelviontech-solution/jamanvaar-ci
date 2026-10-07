@@ -1,0 +1,27 @@
+{
+  "id": "category-c41d3f40f980c4",
+  "kind": "category",
+  "name": "Family Sharing Platters — Indian Family Restaurant & Banquet",
+  "categoryName": "Family Sharing Platters",
+  "templateId": "tpl-family-diner",
+  "slug": "family-platters",
+  "description": "Generous sharing portions for family tables",
+  "diet": "VEG",
+  "cuisine": "North Indian & Family Meals",
+  "category": "Family Sharing Platters",
+  "components": [
+    {
+      "name": "Grand Tandoori Veg Kebab Platter",
+      "description": "Assortment of Paneer Tikka, Hara Bhara Kebab, Stuffed Mushrooms and Veg Seekh (16 Pcs)",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c41d3f40f980c4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 136510,
+  "sha256": "de4605ca41d21f84a364b79b9e41a0f1fb2f113087b773edcf42001a33c81b7f"
+}

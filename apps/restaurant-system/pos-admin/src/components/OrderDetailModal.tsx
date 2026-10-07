@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { createRefund, CloudApiError } from '../cloud/cloudClient';
 import { Order, OrderStatus } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime, formatSplitTax } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
-import { OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle, Check } from 'lucide-react';
 
 interface OrderDetailModalProps {
@@ -84,7 +86,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
     if (order.paymentMethod === 'UPI' && order.paymentTransactionId) {
       try {
-        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason, actorName);
+        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason, actorName, 'UPI_TO_CUSTOMER');
       } catch (err) {
         setRefundError(err instanceof CloudApiError ? err.message : 'Refund request failed');
         return; // never flip local status on a failed cloud refund
@@ -206,11 +208,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             )}
             {/* B2-036: formatSplitTax guarantees the two halves sum to the displayed Total Payable. */}
             <div className="flex justify-between text-slate-600">
-              <span>CGST (2.5%)</span>
+              <span>{gstLabels().cgst}</span>
               <span className="tabular-nums">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).cgst}</span>
             </div>
             <div className="flex justify-between text-slate-600">
-              <span>SGST (2.5%)</span>
+              <span>{gstLabels().sgst}</span>
               <span className="tabular-nums">{formatSplitTax(order.taxAmount ?? 0, order.cgstAmount, order.sgstAmount).sgst}</span>
             </div>
             <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-jaman-navy">

@@ -1,3 +1,4 @@
+import { CachedImg } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
@@ -101,8 +102,8 @@ export const PosCustomizationModal: React.FC = () => {
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-white/10 overflow-hidden border border-white/20 shrink-0">
-              <img
-                src={customizingItem.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'}
+              <CachedImg
+                src={customizingItem.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                 alt={customizingItem.name}
                 className="w-full h-full object-cover"
               />

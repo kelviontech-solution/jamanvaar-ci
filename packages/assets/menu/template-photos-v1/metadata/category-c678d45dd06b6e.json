@@ -1,0 +1,37 @@
+{
+  "id": "category-c678d45dd06b6e",
+  "kind": "category",
+  "name": "Pastries — Bakery, Patisserie & Cafe",
+  "categoryName": "Pastries",
+  "templateId": "tpl-bakery",
+  "slug": "pastries",
+  "description": "Individual eggless pastry portions",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "components": [
+    {
+      "name": "Chocolate Truffle Pastry",
+      "description": "Chocolate Truffle Pastry, individual eggless pastry portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Black Forest Pastry",
+      "description": "Black Forest Pastry, individual eggless pastry portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Red Velvet Pastry",
+      "description": "Red Velvet Pastry, individual eggless pastry portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c678d45dd06b6e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112064,
+  "sha256": "58c34f51502a033f6aaad5f3a1925fd445c5bc46dbc078fdfeb234f84be51d9b"
+}

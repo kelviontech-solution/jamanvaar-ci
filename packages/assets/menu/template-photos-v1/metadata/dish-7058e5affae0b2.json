@@ -1,0 +1,25 @@
+{
+  "id": "dish-7058e5affae0b2",
+  "kind": "dish",
+  "name": "Boondi Raita",
+  "description": "Boondi Raita, traditional biryani accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Accompaniments"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-7058e5affae0b2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72534,
+  "sha256": "dc7db13cd1d61ac2b6492647d14c2f5f1afd4b3ae278531313cda36b03c4b7b5"
+}

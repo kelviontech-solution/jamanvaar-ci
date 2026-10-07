@@ -1,0 +1,32 @@
+{
+  "id": "category-4eec6b76926d4b",
+  "kind": "category",
+  "name": "Fresh Cold Juices — Fresh Juice & Mocktail Bar",
+  "categoryName": "Fresh Cold Juices",
+  "templateId": "tpl-juice-beverages",
+  "slug": "fruit-juices",
+  "description": "100% natural fruit juices with no added preservatives",
+  "diet": "VEG",
+  "cuisine": "Cold-Pressed Juices & Shakes",
+  "category": "Fresh Cold Juices",
+  "components": [
+    {
+      "name": "Fresh Mosambi (Sweet Lime) Juice",
+      "description": "Freshly squeezed sweet lime juice with a pinch of black salt",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Virgin Mint Mojito Cooler",
+      "description": "Crushed fresh mint, lime wedges, simple syrup topped with sparkling soda and ice",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4eec6b76926d4b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91004,
+  "sha256": "c05fdf7989f6e9724cd6abea57139a5a096b64cc061339b855c455bf0b8dd5c5"
+}

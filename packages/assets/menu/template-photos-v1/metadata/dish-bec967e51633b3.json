@@ -1,0 +1,33 @@
+{
+  "id": "dish-bec967e51633b3",
+  "kind": "dish",
+  "name": "Chana Masala",
+  "description": "Chana Masala, lentils simmered and tempered before serving.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dal"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dal"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-bec967e51633b3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102126,
+  "sha256": "1a9824e6178b3bc465c65136e1eb0027f2fedb3bdb3564d11d0783776f20e4f2"
+}

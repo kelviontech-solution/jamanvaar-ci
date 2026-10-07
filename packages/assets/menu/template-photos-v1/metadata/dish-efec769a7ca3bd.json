@@ -1,0 +1,26 @@
+{
+  "id": "dish-efec769a7ca3bd",
+  "kind": "dish",
+  "name": "Onion Rava Dosa",
+  "description": "Onion Rava Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Dosas"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "file": "dish-efec769a7ca3bd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107168,
+  "sha256": "13e169a7a3c7305ae0e30b6fa5c5706d9e2b98842624df61ec38d913a650f22d"
+}

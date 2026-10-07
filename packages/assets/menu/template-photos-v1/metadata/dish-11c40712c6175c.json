@@ -1,0 +1,26 @@
+{
+  "id": "dish-11c40712c6175c",
+  "kind": "dish",
+  "name": "Singapore Noodles",
+  "description": "Singapore Noodles, wok-tossed noodles and crunchy vegetables.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Noodles"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Noodles"
+    }
+  ],
+  "file": "dish-11c40712c6175c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86632,
+  "sha256": "15a6a5049de80c7f4ff811d938e5d316f52f09a582c381e63c02310856570afb"
+}

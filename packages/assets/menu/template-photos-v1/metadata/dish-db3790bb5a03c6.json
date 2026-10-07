@@ -1,0 +1,26 @@
+{
+  "id": "dish-db3790bb5a03c6",
+  "kind": "dish",
+  "name": "Lemon Rice",
+  "description": "Lemon Rice, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-db3790bb5a03c6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81654,
+  "sha256": "ad01802fda9acc37593d2240a066765c7f6a271166de8cb8980b562ad619baa5"
+}

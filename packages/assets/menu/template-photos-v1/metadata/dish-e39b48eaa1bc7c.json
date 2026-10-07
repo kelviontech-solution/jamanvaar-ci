@@ -1,0 +1,22 @@
+{
+  "id": "dish-e39b48eaa1bc7c",
+  "kind": "dish",
+  "name": "Bombay Special Grilled Sandwich",
+  "description": "Spiced potato mash, beetroot, cucumber, tomato and processed cheese with spicy coriander chutney",
+  "diet": "VEG",
+  "cuisine": "Gourmet Burgers & Sandwiches",
+  "category": "Grilled Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-burger-sandwich",
+      "category": "Grilled Sandwiches"
+    }
+  ],
+  "file": "dish-e39b48eaa1bc7c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95902,
+  "sha256": "9941bb876a73342366321d1a989b7bc4608e21a0d2cef87dd949f965ed56c11a"
+}

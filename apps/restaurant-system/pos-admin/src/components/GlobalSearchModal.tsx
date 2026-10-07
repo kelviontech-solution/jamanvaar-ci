@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, ShoppingBag, UtensilsCrossed, Users, User, Grid, ArrowRight } from 'lucide-react';
-import { Modal } from '@jamanvaar/ui';
+import { CachedImg, Modal } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import { formatINR, formatTime } from '@jamanvaar/utils';
 import { Order, MenuItem, CustomerAccount, DiningTable, User as UserType } from '@jamanvaar/types';
@@ -174,7 +174,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     className="p-3 bg-white border border-jaman-border hover:border-brand rounded-xl cursor-pointer transition-all hover:shadow-xs group flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2.5">
-                      <img src={i.imageUrl} alt={i.name} className="w-9 h-9 rounded-lg object-cover bg-slate-100" />
+                      <CachedImg src={i.imageUrl} alt={i.name} className="w-9 h-9 rounded-lg object-cover bg-slate-100" />
                       <div>
                         <span className="font-bold text-xs text-jaman-navy block">{i.name}</span>
                         <span className="text-[11px] text-slate-500 font-mono">{i.sku} • {i.kitchenStation}</span>

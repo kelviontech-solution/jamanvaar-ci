@@ -1,0 +1,26 @@
+{
+  "id": "dish-9ebad982675ccc",
+  "kind": "dish",
+  "name": "Red Sauce Pasta",
+  "description": "Red Sauce Pasta, freshly prepared comfort meals.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Quick Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Quick Meals"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pasta"
+    }
+  ],
+  "file": "dish-9ebad982675ccc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101584,
+  "sha256": "d7bc0898d67a723f7f537430d3d643cabac3847ea6e02a2cf9c7c6d2c0c45996"
+}

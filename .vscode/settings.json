@@ -1,0 +1,15 @@
+{
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/logs/**": true,
+    "**/public/assets/menu/**": true,
+    "**/packages/assets/menu/template-photos-v1/**": true
+  },
+  "search.exclude": {
+    "**/dist/**": true,
+    "**/logs/**": true,
+    "**/public/assets/menu/**": true,
+    "**/packages/assets/menu/template-photos-v1/**": true
+  }
+}

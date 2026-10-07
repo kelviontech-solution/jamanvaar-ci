@@ -1,0 +1,22 @@
+{
+  "id": "dish-d6431814eba4e2",
+  "kind": "dish",
+  "name": "Idli Vada Combo (1+1)",
+  "description": "One soft idli and one crispy medu vada served with hot sambar and fresh chutneys",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada Specialties"
+    }
+  ],
+  "file": "dish-d6431814eba4e2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 70166,
+  "sha256": "c9e69abb4eb6083abfcac934bfab59f8021db489ab95922b71fd5b32d4ef1ffd"
+}

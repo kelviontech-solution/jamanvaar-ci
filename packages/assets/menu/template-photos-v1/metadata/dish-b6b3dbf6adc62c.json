@@ -1,0 +1,22 @@
+{
+  "id": "dish-b6b3dbf6adc62c",
+  "kind": "dish",
+  "name": "Marwari Dal Baati Churma Thali",
+  "description": "Panchmel Dal, 4 Baked Baatis drenched in desi ghee, Sweet Wheat Churma, Gatte Ki Sabzi, Garlic Chutney & Chaas",
+  "diet": "VEG",
+  "cuisine": "Royal Rajasthani & Marwari",
+  "category": "Dal Baati Churma Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-rajasthani",
+      "category": "Dal Baati Churma Specialties"
+    }
+  ],
+  "file": "dish-b6b3dbf6adc62c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105138,
+  "sha256": "37eb485b57f17031fd108d7c2980a0282662ffe98920ddeff278454aed458c53"
+}

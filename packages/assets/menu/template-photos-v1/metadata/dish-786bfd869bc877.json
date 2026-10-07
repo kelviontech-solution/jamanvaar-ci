@@ -1,0 +1,25 @@
+{
+  "id": "dish-786bfd869bc877",
+  "kind": "dish",
+  "name": "Chocolate Ice Cream",
+  "description": "Chocolate Ice Cream, single scoops of chilled ice cream.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Ice Cream Scoops",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-786bfd869bc877.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96940,
+  "sha256": "b04e3b0caf2582035c35663b2844d35f68b82f12ed5b57dfef54871ca7f73a8a"
+}

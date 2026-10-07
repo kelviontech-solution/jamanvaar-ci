@@ -1,0 +1,22 @@
+{
+  "id": "dish-3df1a5302bc994",
+  "kind": "dish",
+  "name": "Coconut Chutney",
+  "description": "Coconut Chutney, fresh accompaniments for tiffin.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-3df1a5302bc994.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 71304,
+  "sha256": "cf2f0668df6679920b9b4e3367516fadfe67c3e762f0a4ac402483c0cd576835"
+}

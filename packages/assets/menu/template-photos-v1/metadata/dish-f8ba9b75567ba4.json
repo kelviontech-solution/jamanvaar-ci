@@ -1,0 +1,33 @@
+{
+  "id": "dish-f8ba9b75567ba4",
+  "kind": "dish",
+  "name": "Tandoori Chicken Half",
+  "description": "Tandoori Chicken Half, marinated starters grilled or shallow-fried to order.",
+  "diet": "NON_VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-f8ba9b75567ba4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106254,
+  "sha256": "62d5996a12bdda36c111e0f80b6d09ac897796380496ad772392dc189890666f"
+}

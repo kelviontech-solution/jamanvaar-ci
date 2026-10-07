@@ -288,7 +288,7 @@ export class RestaurantPayoutsService {
     const blockedBatch: Prisma.RestaurantPayoutWhereInput = { OR: [
       { status: { in: ['ON_HOLD', 'FAILED'] } }, { payments: { some: blockedPayment } }
     ] };
-    const [collected, unbatched, heldUnbatched, pending, heldBatches, paid, refunds, unallocated] = await Promise.all([
+    const [collected, unbatched, heldUnbatched, pending, heldBatches, paid, refunds, unallocated, refundRows] = await Promise.all([
       tx.paymentTransaction.aggregate({ where: captured, _sum: { amount: true, platformAmount: true, restaurantAmount: true } }),
       tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, NOT: blockedPayment }, _sum: { restaurantAmount: true } }),
       tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, ...blockedPayment }, _sum: { restaurantAmount: true } }),
@@ -296,9 +296,23 @@ export class RestaurantPayoutsService {
       tx.restaurantPayout.aggregate({ where: { ...tenant, status: { not: 'PAID' }, ...blockedBatch }, _sum: { netAmount: true } }),
       tx.restaurantPayout.aggregate({ where: { ...tenant, status: 'PAID' }, _sum: { netAmount: true } }),
       tx.refund.aggregate({ where: { ...tenant, status: 'SUCCESS' }, _sum: { amount: true } }),
-      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, restaurantAmount: null }, _sum: { amount: true } })
+      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, restaurantAmount: null }, _sum: { amount: true } }),
+      tx.refund.findMany({ where: { ...tenant, status: 'SUCCESS' }, select: { amount: true, method: true, payment: { select: { amount: true, platformAmount: true, restaurantAmount: true } } } })
     ]);
-    const pendingPayout = (unbatched._sum.restaurantAmount ?? 0) + (pending._sum.netAmount ?? 0);
+    const refundedCash = refundRows.filter((r) => r.method === 'CASH').reduce((sum, r) => sum + r.amount, 0);
+    const refundedUpi = refundRows.filter((r) => r.method === 'UPI_TO_CUSTOMER').reduce((sum, r) => sum + r.amount, 0);
+    // Jamanvaar's fee is kept on a refund. The restaurant gives back its own share of the refunded amount, in proportion.
+    let refundedRestaurantShare = 0;
+    let platformFeeRetained = 0;
+    for (const row of refundRows) {
+      const p = row.payment;
+      if (!p || !p.amount) continue;
+      const ratio = row.amount / p.amount;
+      refundedRestaurantShare += Math.round((p.restaurantAmount ?? 0) * ratio);
+      platformFeeRetained += Math.round((p.platformAmount ?? 0) * ratio);
+    }
+    const pendingPayoutBeforeRefunds = (unbatched._sum.restaurantAmount ?? 0) + (pending._sum.netAmount ?? 0);
+    const pendingPayout = Math.max(0, pendingPayoutBeforeRefunds - refundedRestaurantShare);
     const paidPayout = paid._sum.netAmount ?? 0;
     return {
       grossCollection: collected._sum.amount ?? 0,
@@ -308,6 +322,10 @@ export class RestaurantPayoutsService {
       pendingPayout, paidPayout,
       heldPayable: (heldUnbatched._sum.restaurantAmount ?? 0) + (heldBatches._sum.netAmount ?? 0),
       refundedAmount: refunds._sum.amount ?? 0,
+      refundedRestaurantShare,
+      platformFeeRetained,
+      refundedCash,
+      refundedUpi,
       unallocatedCollection: unallocated._sum.amount ?? 0,
       payoutMode: 'MANUAL', routeStatus: 'PENDING'
     };

@@ -1,0 +1,26 @@
+{
+  "id": "dish-e7a3ee6a988c38",
+  "kind": "dish",
+  "name": "Cheese Veg Burger",
+  "description": "Cheese Veg Burger, toasted buns with freshly cooked patties.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Burgers"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Burgers"
+    }
+  ],
+  "file": "dish-e7a3ee6a988c38.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86994,
+  "sha256": "4638bd0181172d19093e7a1eb8f7636f89d4e22b0d3e2d3702843e60b2aab9f0"
+}

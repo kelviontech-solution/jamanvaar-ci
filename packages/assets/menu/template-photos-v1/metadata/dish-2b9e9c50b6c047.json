@@ -1,0 +1,22 @@
+{
+  "id": "dish-2b9e9c50b6c047",
+  "kind": "dish",
+  "name": "Jain Dal Makhani",
+  "description": "Jain Dal Makhani, lentils tempered without onion or garlic.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Dal"
+    }
+  ],
+  "file": "dish-2b9e9c50b6c047.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104248,
+  "sha256": "059bf2ae6a44da1d09aabd326115256b549edb6f99df309fd9ca1f1db5b7df84"
+}

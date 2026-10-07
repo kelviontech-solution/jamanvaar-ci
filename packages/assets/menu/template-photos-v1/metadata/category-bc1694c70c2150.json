@@ -1,0 +1,37 @@
+{
+  "id": "category-bc1694c70c2150",
+  "kind": "category",
+  "name": "Awadhi Breads & Rice — Mughlai & Awadhi Restaurant",
+  "categoryName": "Awadhi Breads & Rice",
+  "templateId": "tpl-mughlai",
+  "slug": "mughlai-breads",
+  "description": "Sheermal, roomali roti and dum biryanis",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Awadhi Breads & Rice",
+  "components": [
+    {
+      "name": "Khamiri Roti (2 Pcs)",
+      "description": "Traditional Mughal leavened bread with a slight sourdough tang",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Roomali Roti",
+      "description": "Handkerchief-thin soft bread tossed on inverted wok",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lucknowi Dum Biryani Handi",
+      "description": "Scented basmati rice cooked on slow dum with royal spices and kewra essence",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-bc1694c70c2150.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 125142,
+  "sha256": "a7b7ee7ced2f0c184dce5b27a8704c06ed7979443320d1e6d74e799f60e1b228"
+}

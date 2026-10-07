@@ -1,0 +1,22 @@
+{
+  "id": "dish-cf4548d95d1158",
+  "kind": "dish",
+  "name": "Mixed Vegetable Kolhapuri",
+  "description": "Seasonal vegetables cooked in a spicy, roasted coconut and red chilli Kolhapuri gravy",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal & Heritage Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal & Heritage Curries"
+    }
+  ],
+  "file": "dish-cf4548d95d1158.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 116452,
+  "sha256": "512e1aa9ab98e8c7027d7e0fd9e7c4989a346c85e8b0b136742cf4d72ca34782"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-c563ad1e40ac4f",
+  "kind": "dish",
+  "name": "Pink Sauce Pasta",
+  "description": "Pink Sauce Pasta, penne tossed in a freshly prepared sauce.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Pasta",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pasta"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c563ad1e40ac4f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102520,
+  "sha256": "2d0b753f4dd02453ab0c05b02a60f5b84047a706b5165536ca69bedab8f47cb8"
+}

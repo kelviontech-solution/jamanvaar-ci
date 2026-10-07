@@ -1,0 +1,29 @@
+{
+  "id": "dish-80682dee769390",
+  "kind": "dish",
+  "name": "Mysore Masala Dosa",
+  "description": "Spread with spicy red garlic-chilli chutney inside and filled with seasoned potato mash",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Signature Dosas & Crepes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Signature Dosas & Crepes"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/south-indian/mysore-dosa.jpg"
+  ],
+  "file": "dish-80682dee769390.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93134,
+  "sha256": "1c1b40d87b1b40a3ac4eff9630969a61b218e37660edd9af5ff06819d0035876"
+}

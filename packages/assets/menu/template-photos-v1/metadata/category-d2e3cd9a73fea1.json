@@ -1,0 +1,37 @@
+{
+  "id": "category-d2e3cd9a73fea1",
+  "kind": "category",
+  "name": "Vegetarian Biryani — Biryani & Kebab Darbar",
+  "categoryName": "Vegetarian Biryani",
+  "templateId": "tpl-biryani",
+  "slug": "vegetarian-biryani",
+  "description": "Basmati rice dum-cooked with vegetables and spices",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Vegetarian Biryani",
+  "components": [
+    {
+      "name": "Veg Dum Biryani",
+      "description": "Veg Dum Biryani, basmati rice dum-cooked with vegetables and spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Biryani",
+      "description": "Paneer Biryani, basmati rice dum-cooked with vegetables and spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mushroom Biryani",
+      "description": "Mushroom Biryani, basmati rice dum-cooked with vegetables and spices.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d2e3cd9a73fea1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 135152,
+  "sha256": "2123a960f47158ebf07275a853f7941dc41c65353b7ae9ab8602e396522464b0"
+}

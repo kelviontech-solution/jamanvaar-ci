@@ -1,0 +1,37 @@
+{
+  "id": "dish-70677a5e9dc074",
+  "kind": "dish",
+  "name": "Steamed Rice",
+  "description": "Steamed Rice, steamed or tempered basmati rice.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rice & Khichdi"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Rice"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/steamed-rice.webp"
+  ],
+  "file": "dish-70677a5e9dc074.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98478,
+  "sha256": "5ecbce3d39d7b0013ddde3a5479af8a5061824d9c074b244626071d992c74b5f"
+}

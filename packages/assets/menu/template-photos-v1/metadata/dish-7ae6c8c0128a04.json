@@ -1,0 +1,22 @@
+{
+  "id": "dish-7ae6c8c0128a04",
+  "kind": "dish",
+  "name": "Leelvanu Lasan Chutney",
+  "description": "Pounded green garlic and red chilli chutney",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Accompaniments"
+    }
+  ],
+  "file": "dish-7ae6c8c0128a04.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106166,
+  "sha256": "478ada631c54e760d88d10c6c3683916d8b905046d1b8442132cb41c6a5c985c"
+}

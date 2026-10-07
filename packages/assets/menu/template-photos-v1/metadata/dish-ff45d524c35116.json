@@ -1,0 +1,22 @@
+{
+  "id": "dish-ff45d524c35116",
+  "kind": "dish",
+  "name": "Jain Tandoori Roti",
+  "description": "Jain Tandoori Roti, fresh breads without restricted ingredients.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Breads"
+    }
+  ],
+  "file": "dish-ff45d524c35116.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105370,
+  "sha256": "476f3f88377b020bacd9b8442c111d0f45dcce4a741ab35c0addf9033157be02"
+}

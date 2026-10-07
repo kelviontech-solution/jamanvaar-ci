@@ -1,0 +1,26 @@
+{
+  "id": "dish-1a0f796747b906",
+  "kind": "dish",
+  "name": "Curd Rice",
+  "description": "Curd Rice, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-1a0f796747b906.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 60628,
+  "sha256": "bbb52c7dc5da8269b9cd66da3b0e273de65822e6c0d2ce83a5fbf0d5cc77938a"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-76fd7fd26285c9",
+  "kind": "category",
+  "name": "Sandwiches — Fast Food & Quick Service Restaurant",
+  "categoryName": "Sandwiches",
+  "templateId": "tpl-fast-food",
+  "slug": "sandwiches",
+  "description": "Fresh fillings in toasted or grilled bread",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "components": [
+    {
+      "name": "Veg Club Sandwich",
+      "description": "Veg Club Sandwich, fresh fillings in toasted or grilled bread.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Grilled Sandwich",
+      "description": "Cheese Grilled Sandwich, fresh fillings in toasted or grilled bread.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Grilled Sandwich",
+      "description": "Paneer Grilled Sandwich, fresh fillings in toasted or grilled bread.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-76fd7fd26285c9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114594,
+  "sha256": "268213251f7805be313df884051f8946199169a8cb1923f4cd09a6dc089a2e65"
+}

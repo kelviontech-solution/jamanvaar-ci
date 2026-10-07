@@ -5,6 +5,7 @@ import { syncStaffUsers } from '@jamanvaar/sync';
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
+import { cancelAbandonedKioskDraft, confirmKioskCashOrder } from './kioskOrderLifecycle';
 import {
   activateKioskDevice,
   resolveRestaurantByCode,
@@ -25,7 +26,7 @@ import {
   emailReceipt,
   pushOrderSync,
   pullOrderSync,
-  reportHeartbeat,
+  reportHeartbeat, reportCustomerAiQuery,
   pushEntitySync,
   pullEntitySync,
   CloudApiError,
@@ -78,7 +79,7 @@ import {
   calculateCart,
   calculateItemTotal,
   calculateItemUnitPrice,
-  CustomerChatbotEngine,
+  CustomerChatbotEngine, AiConfig, refreshConfiguredAi,
   RecommendationEngine,
   validateModifiers
 } from '@jamanvaar/business';
@@ -97,11 +98,12 @@ import {
   ActivationNoticeBanner,
   ActivationHelpNote,
   CachedImg,
-  LocalCorePairing
+  MenuCategoryIcon,
+  LocalCorePairing, useAiAccess, JamanAiAccessNotice
 } from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
 import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
-import { EBillService, KdsMeshService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
+import { EBillService, NetworkStatusService, PrinterService, VoiceService, Platform } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 import {
@@ -160,7 +162,6 @@ import {
 // an actual icon component for the left nav (see CategoryCard.tsx, which
 // does the same lookup) — everything else in this file uses the named
 // imports above for normal tree-shaken references.
-import * as LucideIcons from 'lucide-react';
 
 type KioskStep =
   | 'LANGUAGE_SELECT'
@@ -169,8 +170,7 @@ type KioskStep =
   | 'TABLE_SELECT'
   | 'MENU'
   | 'CHECKOUT_PAYMENT'
-  | 'CONFIRMATION'
-  | 'TRACKING';
+  | 'CONFIRMATION';
 
 /** Display labels for every language the kiosk *could* offer — which of
  *  these actually show up is decided by KioskDisplaySettings.enabledLanguages,
@@ -562,7 +562,10 @@ export default function KioskUserApp() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Customer Chatbot Assistant ("Need Help?") State
+  const ai = useAiAccess();
+  const showCustomerAi = ai.showButton(db.restaurant?.showJamanAI !== false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  useEffect(() => { if (isChatbotOpen) void refreshConfiguredAi(); }, [isChatbotOpen]);
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -611,11 +614,7 @@ export default function KioskUserApp() {
   const menuImageKey = useRef('');
   useEffect(() => {
     if (networkState !== 'ONLINE') return;
-    const urls = new Set<string>();
-    for (const i of db.menuItems) if (i.imageUrl) urls.add(i.imageUrl);
-    for (const c of db.categories as Array<{ imageUrl?: string }>) if (c.imageUrl) urls.add(c.imageUrl);
-    for (const c of db.combos ?? []) if (c.imageUrl) urls.add(c.imageUrl);
-    const list = [...urls].sort();
+    const list = collectMenuImageUrls(db.menuItems, db.categories, db.combos ?? []);
     const key = list.join('|');
     if (key === menuImageKey.current) return;
     menuImageKey.current = key;
@@ -630,27 +629,12 @@ export default function KioskUserApp() {
     return unsubscribe;
   }, []);
 
-  // Listen to KDS updates for placed order with Live Voice & Chime notification
+  // Confirmation uses the same persisted order as sync; it never keeps a LAN-only snapshot.
   useEffect(() => {
     if (!placedOrder) return;
-    const unsub = KdsMeshService.subscribeToOrders((updatedOrder) => {
-      if (updatedOrder.id === placedOrder.id) {
-        const wasReady = placedOrder.orderStatus === 'READY';
-        setPlacedOrder({ ...updatedOrder });
-        if (updatedOrder.orderStatus === 'READY' && !wasReady) {
-          SoundService.playSuccess();
-          const readyMsg = VoiceService.getReadyMessage(
-            updatedOrder.tokenNumber,
-            updatedOrder.pickupCounter || '1',
-            toVoiceLanguage(lang)
-          );
-          VoiceService.speak(readyMsg, toVoiceLanguage(lang));
-          showToast(`🔔 TOKEN #${updatedOrder.tokenNumber} IS READY AT COUNTER 1!`);
-        }
-      }
-    });
-    return unsub;
-  }, [placedOrder, lang]);
+    const current = OrderRepository.getOrderById(placedOrder.id);
+    if (current && current !== placedOrder) setPlacedOrder(current);
+  }, [dbTick, placedOrder]);
 
   // Idle Timer Reset on Touch/Interaction
   const resetIdleTimer = () => {
@@ -875,21 +859,7 @@ export default function KioskUserApp() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // B2-021: handleProceedToPayment creates a real order (CONFIRMED/PENDING) the moment the guest
-  // taps "Proceed to Payment", before any payment method is chosen — needed so that id exists to
-  // link the cash-at-counter token and the UPI payment-order together. If the guest then walks
-  // away (idle-timeout reset) or taps Back to the menu without ever completing payment, neither
-  // path used to touch that order at all: it sat forever as a real, unpaid CONFIRMED order,
-  // visible in Restaurant Admin's Orders list with nothing to cancel it. Called from both places
-  // the guest can leave the payment screen without finishing. A no-op once payment has actually
-  // settled (paymentStatus is no longer PENDING by then), so it never cancels a real, paid order.
-  const cancelAbandonedPendingOrder = () => {
-    if (!localOrderIdForPayment) return;
-    const order = OrderRepository.getOrderById(localOrderIdForPayment);
-    if (order && order.paymentStatus === 'PENDING' && order.orderStatus !== 'CANCELLED') {
-      OrderRepository.updateOrderStatus(order.id, 'CANCELLED', 'Guest left the kiosk before completing payment');
-    }
-  };
+  const cancelAbandonedPendingOrder = () => cancelAbandonedKioskDraft(localOrderIdForPayment);
 
   // Full Session Memory Scrub (Sections 224-226: No customer data leaks)
   const handleFullSessionReset = () => {
@@ -970,7 +940,9 @@ export default function KioskUserApp() {
     MenuRepository.getAllMenuItems(),
     KeyValueStore.get('jamanvaar_bound_branch_id') || undefined
   );
-  const combos = ComboRepository.getAllCombos().filter(combo => combo.isAvailable !== false);
+  // A combo must have a published backing dish visible to this kiosk/branch.
+  const allCombos = ComboRepository.getAllCombos();
+  const combos = allCombos.filter(combo => combo.isAvailable !== false && menuItems.some(item => item.id === `combo-${combo.id}`)).map(combo => ({ ...combo, imageUrl: menuDishImage(combo.imageUrl, combo.name) }));
   const isNonVegCombo = (combo: ComboDeal) => MenuRepository.getMenuItemById(`combo-${combo.id}`)?.dietaryType === 'NON_VEG' || [...combo.mainItemIds, ...combo.sideItemIds, ...combo.drinkItemIds, ...combo.dessertItemIds].some(id => MenuRepository.getMenuItemById(id)?.dietaryType === 'NON_VEG');
   const tables = TableRepository.getAllTables();
   const kioskConfig = KioskRepository.getKioskById(kioskId);
@@ -979,6 +951,7 @@ export default function KioskUserApp() {
   // Filtered Menu Items — excludes items marked unavailable/sold-out in
   // Kiosk Admin so a guest can never see or order a dish that's 86'd.
   const filteredItems = menuItems.filter((item) => {
+    if (allCombos.some(combo => item.id === `combo-${combo.id}`)) return false;
     if (!item.isAvailable) return false;
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -991,6 +964,13 @@ export default function KioskUserApp() {
     const matchesDietary =
       dietaryFilter === 'ALL' || item.dietaryType === dietaryFilter;
     return matchesSearch && matchesCategory && matchesDietary;
+  });
+  const filteredCombos = combos.filter(combo => {
+    const backing = menuItems.find(item => item.id === `combo-${combo.id}`)!;
+    const query = searchQuery.trim().toLowerCase();
+    return (selectedCategoryId === 'ALL' || selectedCategoryId === 'cat-combos' || selectedCategoryId === backing.categoryId) &&
+      (dietaryFilter === 'ALL' || backing.dietaryType === dietaryFilter) &&
+      [combo.name, combo.description, localizedName(combo, lang), backing.sku, ...(backing.tags || [])].some(value => value?.toLowerCase().includes(query));
   });
 
   // Label for the CENTER column's heading in the kiosk menu's 10/70/20
@@ -1257,7 +1237,7 @@ export default function KioskUserApp() {
     setPaymentStatus('CREATED');
     if (orderId) {
       try {
-        OrderRepository.updateOrderStatus(orderId, 'CANCELLED', 'Kiosk Guest');
+        cancelAbandonedKioskDraft(orderId);
       } catch (err) {
         console.error('Could not cancel the pending order:', err);
       }
@@ -1488,18 +1468,14 @@ export default function KioskUserApp() {
     // Audio chime on successful order
     SoundService.playSuccess();
 
-    // Broadcast to KDS Kitchen Mesh if online
-    if (isCurrentlyOnline) {
-      KdsMeshService.broadcastOrderCreated(order);
-    }
-
     // Generate station-routed Kitchen Order Tickets so this order appears
     // on the KDS board grouped by kitchen station, exactly like a POS
     // order — previously the kiosk only printed a customer receipt and
     // never created KOT records, so kitchen staff never saw kiosk orders.
     // Built from the saved order, not the on-screen cart, so it also works after a restart when the cart is gone.
-    const kotItems = order.items.map((it, idx) => ({
-      id: `koti-${Date.now()}-${idx}`,
+    const kotItems = order.items.map((it) => ({
+      id: `koti-${it.id}`,
+      orderItemId: it.id,
       menuItemId: it.menuItemId,
       name: it.name,
       quantity: it.quantity,
@@ -1508,19 +1484,30 @@ export default function KioskUserApp() {
       kitchenStation: db.menuItems.find((m) => m.id === it.menuItemId)?.kitchenStation || 'Main Kitchen',
       status: 'PREPARING' as const
     }));
-    const kots = KOTRepository.generateKOT({
+    // One set of kitchen tickets per order, however many times this runs (double tap, a re-render, or a restart on the
+    // confirmation screen). A second run used to create a second set of tickets and print them again.
+    const existingKots = KOTRepository.getKOTsForOrder(order.id);
+    const orderLabel = String(order.orderNumber || order.tokenNumber || order.id).replace(/[^A-Za-z0-9-]/g, '');
+    const kots = existingKots.length > 0 ? [] : KOTRepository.generateKOT({
       orderId: order.id,
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
       tableNumber: order.tableNumber ?? selectedTable?.tableNumber,
       orderType: order.orderType ?? orderType,
       items: kotItems,
-      cashierName: 'Kiosk Self-Order'
+      cashierName: 'Kiosk Self-Order',
+      // Deterministic ids: the same order always yields the same tickets, so a repeat can never add a second copy.
+      idBase: `kot-${order.id}-r1`,
+      numberBase: `KOT-${orderLabel}`
     });
+    // Both cash and verified online orders must leave the outbox immediately.
+    // Receipt printing and speech must not hold up the kitchen delivery.
+    const confirmationSync = SyncOutboxEngine.processOutbox();
     // A prepaid order's tickets print only once, across every terminal. Online, the server decides who may print.
     // If the server cannot be reached, the tickets print anyway: a missed kitchen ticket is worse than a rare repeat.
-    let printTickets = true;
-    if (paymentId && isCurrentlyOnline) {
+    // Tickets print only when they were made just now: an order whose tickets already exist was printed before.
+    let printTickets = kots.length > 0;
+    if (printTickets && paymentId && isCurrentlyOnline) {
       try {
         printTickets = (await claimKitchenTicket(paymentId)).claimed;
       } catch (err) {
@@ -1530,7 +1517,7 @@ export default function KioskUserApp() {
     if (printTickets) kots.forEach((kot) => PrinterService.printKOT(kot));
 
     // The ticket now exists: tell the server, which stops flagging this paid order as needing attention.
-    if (paymentId) void SyncOutboxEngine.processOutbox().then(() => acknowledgeFulfilled(paymentId));
+    if (paymentId) void confirmationSync.then(() => acknowledgeFulfilled(paymentId));
 
     // If logged in, award points (10% back in points) & record order
     if (loggedInAccount) {
@@ -1603,12 +1590,11 @@ export default function KioskUserApp() {
       return;
     }
     // The order was created before the guest chose how to pay (default UPI): record the real choice (BUG-134).
-    const order = OrderRepository.choosePaymentMethod(localOrderIdForPayment, 'CASH_AT_COUNTER') ?? OrderRepository.getOrderById(localOrderIdForPayment);
+    const order = confirmKioskCashOrder(localOrderIdForPayment);
     if (!order) {
       setIsProcessingPayment(false);
       return;
     }
-    OrderRepository.updateOrder(order.id, { orderStatus: 'CONFIRMED' });
     await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
@@ -1659,7 +1645,12 @@ export default function KioskUserApp() {
 
   // Customer Chatbot Assistant Handler
   const handleSendCustomerQuery = (queryText: string) => {
-    if (!queryText.trim()) return;
+    if (!queryText.trim() || !AiConfig.isEnabled()) return;
+    if (!AiConfig.canQuery()) {
+      showToast("Today's JAMAN AI question limit has been reached.");
+      return;
+    }
+    const queryStarted = performance.now();
 
     const userMsg: ChatMessage = {
       id: `cust-user-${Date.now()}`,
@@ -1668,7 +1659,8 @@ export default function KioskUserApp() {
       timestamp: new Date().toISOString()
     };
 
-    const responseMsg = CustomerChatbotEngine.processQuery(queryText);
+    const responseMsg = CustomerChatbotEngine.processQuery(queryText, { paymentMethods: onlinePaymentUnavailable ? ["Cash at counter"] : ["UPI / online QR", "Cash at counter"] });
+    void reportCustomerAiQuery(performance.now() - queryStarted);
 
     setChatMessages((prev) => [...prev, userMsg, responseMsg]);
     setChatInput('');
@@ -2123,6 +2115,7 @@ export default function KioskUserApp() {
             </div>
           )}
 
+          {showCustomerAi && (<>
           {/* Customer Chatbot Assistant Trigger ("Need Help?") */}
           <button
             onClick={() => {
@@ -2135,6 +2128,7 @@ export default function KioskUserApp() {
             <span className="hidden sm:inline">{kioskCopy("screen_need_help__5c799f", "Need Help?")}</span>
           </button>
 
+          </>)}
           {/* Call Staff Button — kept directly visible and one tap, not
               behind an overflow menu, since it's the one control a guest
               may urgently need. */}
@@ -2626,10 +2620,9 @@ export default function KioskUserApp() {
             </button>
 
             {categories.filter((cat) => menuItems.some((m) => m.categoryId === cat.id && m.isAvailable)).map((cat) => {
-              const CategoryIcon =
-                (cat.iconName && (LucideIcons as any)[cat.iconName]) || UtensilsCrossed;
-              const photo =
+              const cover =
                 (cat as any).imageUrl || menuItems.find((m) => m.categoryId === cat.id && m.imageUrl)?.imageUrl;
+              const photo = isMenuPlaceholder(cover) ? undefined : cover;
               const active = selectedCategoryId === cat.id;
               return (
                 <button
@@ -2644,12 +2637,13 @@ export default function KioskUserApp() {
                       : 'bg-white border-jaman-border text-[#4A5568] hover:bg-jaman-ivory'
                   }`}
                 >
-                  <div className="w-full h-16 rounded-xl overflow-hidden bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
+                  <div className="relative w-full h-16 rounded-xl overflow-hidden bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
                     {photo ? (
                       <CachedImg src={photo} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <CategoryIcon className="w-6 h-6" />
+                      <MenuCategoryIcon name={cat.name} iconName={cat.iconName} size="md" />
                     )}
+                    {photo && <MenuCategoryIcon name={cat.name} iconName={cat.iconName} className="absolute bottom-1 right-1 shadow-sm" />}
                   </div>
                   <span className="text-xs font-semibold leading-tight line-clamp-2">{localizedName(cat, lang)}</span>
                 </button>
@@ -2815,20 +2809,21 @@ export default function KioskUserApp() {
                   )}
                 </div>
 
-                {/* Show Combos Section when on ALL or Combos tab — no extra
-                    "Chef's Special Combo Meals" sub-heading here; the
-                    category title above already says what's being browsed. */}
-                {(selectedCategoryId === 'ALL' || selectedCategoryId === 'cat-combos') && combos.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
-                      {combos.map((combo) => (
+                {/* One continuous grid: dishes fill the space beside combos. */}
+                {filteredCombos.length === 0 && (selectedCategoryId === 'cat-combos' || filteredItems.length === 0) ? (
+                  <EmptyState title="No dishes found" description="Try another search term or filter category." actionText="View All Dishes" onAction={() => { setSelectedCategoryId('ALL'); setDietaryFilter('ALL'); setSearchQuery(''); }} />
+                ) : (
+                  <div data-testid="kiosk-menu-grid" className="grid gap-4 sm:gap-5 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 230px), 1fr))' }}>
+                      {filteredCombos.map((combo) => (
                         <div
                           key={combo.id}
+                          data-testid="kiosk-menu-card"
                           className="flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm hover:border-jaman-saffron/60 transition-colors"
                         >
                           <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
                             <CachedImg
                               src={combo.imageUrl}
+                              dishName={combo.name}
                               alt={localizedName(combo, lang)}
                               className="w-full h-full object-cover"
                             />
@@ -2862,33 +2857,7 @@ export default function KioskUserApp() {
                           </div>
                         </div>
                       ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Individual Dishes Grid — auto-fill so the column count
-                    adapts to the CENTER column's actual rendered width
-                    (which itself changes with the cart open/closed), not
-                    just the overall viewport breakpoint. */}
-                {selectedCategoryId !== 'cat-combos' && (
-                  <div className="space-y-4">
-                    {filteredItems.length === 0 ? (
-                      <EmptyState
-                        title="No dishes found"
-                        description="Try another search term or filter category."
-                        actionText="View All Dishes"
-                        onAction={() => {
-                          setSelectedCategoryId('ALL');
-                          setDietaryFilter('ALL');
-                          setSearchQuery('');
-                        }}
-                      />
-                    ) : (
-                      <div
-                        className="grid gap-6"
-                        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}
-                      >
-                        {filteredItems.map((item) => (
+                        {selectedCategoryId !== 'cat-combos' && filteredItems.map((item) => (
                           <KioskProductCard
                             key={item.id}
                             item={item}
@@ -2900,8 +2869,6 @@ export default function KioskUserApp() {
 
                           />
                         ))}
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -3303,299 +3270,227 @@ export default function KioskUserApp() {
       )}
 
       {/* STEP 6: ORDER CONFIRMATION & TRUTHFUL STATUS & LIVE THERMAL RECEIPT SLIP */}
-      {step === 'CONFIRMATION' && placedOrder && (
-        <div className="flex-1 flex flex-col p-4 sm:p-6 max-w-6xl mx-auto w-full space-y-6">
-          <div className="text-center space-y-1">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-600 flex items-center justify-center mx-auto animate-bounce">
-              <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy font-serif">
-              {t('orderConfirmed')}
-            </h2>
-            <p className="text-xs text-[#4A5568]">
-              {placedOrder.orderNumber} • {placedOrder.orderType} {placedOrder.tableNumber ? `(Table ${placedOrder.tableNumber})` : ''}
-            </p>
-            {/* Live Order Confirmed Badge — reflects the order's actual
-                syncStatus (kept current by db.subscribe's re-render, see
-                dbTick) instead of asserting delivery unconditionally. */}
-            <div className="pt-0.5">
-              {(() => {
-                const liveOrder = OrderRepository.getOrderById(placedOrder.id) ?? placedOrder;
-                const status =
-                  liveOrder.syncStatus === 'SYNCED' || !liveOrder.syncStatus
-                    ? 'delivered'
-                    : liveOrder.syncStatus === 'FAILED'
-                    ? 'failed'
-                    : 'pending';
-                const style =
-                  status === 'delivered'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : status === 'failed'
-                    ? 'bg-rose-50 text-rose-700 border-rose-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200';
-                const dot = status === 'delivered' ? 'bg-emerald-500' : status === 'failed' ? 'bg-rose-500' : 'bg-amber-500';
-                const label =
-                  status === 'delivered'
-                    ? 'Order Sent to Kitchen (KDS) ✓'
-                    : status === 'failed'
-                    ? 'Kitchen alert delayed — please tell a staff member'
-                    : 'Sending to Kitchen…';
-                return (
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold shadow-xs border ${style}`}>
-                    <span className={`w-2 h-2 rounded-full animate-pulse ${dot}`}></span>
-                    {label}
-                  </span>
-                );
-              })()}
-            </div>
-          </div>
+      {step === 'CONFIRMATION' && placedOrder && (() => {
+        const liveOrder = OrderRepository.getOrderById(placedOrder.id) ?? placedOrder;
+        const syncState =
+          liveOrder.syncStatus === 'SYNCED' || !liveOrder.syncStatus ? 'delivered' : liveOrder.syncStatus === 'FAILED' ? 'failed' : 'pending';
+        const kitchenTickets = db.kots.filter((k) => k.orderId === placedOrder.id);
+        const ticketJobs = db.printJobs.filter((j) => j.type === 'KOT_TICKET' && j.orderId === placedOrder.id);
+        // The latest print job for a ticket decides what the guest is told about it.
+        const ticketStatus = (kotId: string): 'printed' | 'failed' | 'pending' => {
+          const job = ticketJobs.filter((j) => j.kotId === kotId).slice(-1)[0];
+          if (!job) return 'pending';
+          if (job.status === 'PRINTED' || job.status === 'SUCCESS') return 'printed';
+          if (job.status === 'FAILED') return 'failed';
+          return 'pending';
+        };
+        const reprintTicket = (kotId: string) => {
+          const kot = db.kots.find((k) => k.id === kotId);
+          if (!kot) return;
+          PrinterService.printKOT(kot);
+          showToast('Kitchen ticket sent to the printer again.');
+        };
+        const stationNames = [...new Set(kitchenTickets.map((k) => k.station || 'Main Kitchen'))];
+        const pill = (state: 'delivered' | 'failed' | 'pending' | 'printed' | 'printing') =>
+          state === 'delivered' || state === 'printed'
+            ? 'bg-emerald-400/15 text-emerald-100 border-emerald-300/40'
+            : state === 'failed'
+            ? 'bg-rose-400/15 text-rose-100 border-rose-300/40'
+            : 'bg-amber-400/15 text-amber-100 border-amber-300/40';
+        const pillLabel = (state: 'delivered' | 'failed' | 'pending' | 'printed' | 'printing') =>
+          state === 'delivered' ? 'Sent to the kitchen' : state === 'printed' ? 'Printed' : state === 'failed' ? 'Not printed' : 'Sending…';
 
-          {/* Two columns on wide kiosk displays: main confirmation info on
-              the left, receipt + kitchen ticket beside it on the right —
-              previously everything (including the receipt/KOT) stacked in
-              one long centered column, forcing a scroll past a lot of
-              unused horizontal space on a large kiosk screen just to see
-              the receipt. Collapses to a single stacked column on
-              narrower screens. */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start max-w-5xl mx-auto w-full">
-            <div className="w-full max-w-xl mx-auto lg:mx-0 space-y-5">
-              {/* GIANT TOKEN DISPLAY */}
-              <div className="bg-white rounded-3xl p-6 sm:p-7 border-2 border-jaman-border shadow-xl text-center space-y-2">
-                <span className="text-xs font-black uppercase tracking-widest text-[#8C9BAE]">
-                  {t('token')}
+        return (
+          <div className="flex-1 flex flex-col w-full max-w-[1080px] mx-auto gap-4 sm:gap-6 p-4 sm:p-6 xl:p-8 pb-32">
+            {/* HERO: confirmed, with the order and where the kitchen stands */}
+            <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-jaman-navy via-[#163E5E] to-[#0B253A] text-white shadow-2xl p-6 sm:p-8">
+              <div className="pointer-events-none absolute -right-20 -top-20 w-72 h-72 rounded-full bg-jaman-saffron/25 blur-3xl" aria-hidden="true" />
+              <div className="relative flex flex-col items-center text-center gap-3">
+                <div className="w-20 h-20 rounded-full bg-emerald-400/20 border-2 border-emerald-300 flex items-center justify-center">
+                  <CheckCircle2 className="w-11 h-11 text-emerald-300 stroke-[2.5]" />
+                </div>
+                <h2 className="text-3xl sm:text-5xl font-black font-serif tracking-tight">{t('orderConfirmed')}</h2>
+                <p className="text-sm sm:text-base text-white/75 font-semibold">
+                  {liveOrder.orderNumber} · {liveOrder.orderType}{liveOrder.tableNumber ? ` · Table ${liveOrder.tableNumber}` : ''}
+                </p>
+                <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold border ${pill(syncState)}`}>
+                  <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${syncState === 'delivered' ? 'bg-emerald-300' : syncState === 'failed' ? 'bg-rose-300' : 'bg-amber-300'}`} />
+                  {syncState === 'failed' ? 'Kitchen alert delayed. Please tell a staff member.' : pillLabel(syncState)}
                 </span>
-                <div className="text-5xl sm:text-6xl font-black text-jaman-saffron font-mono tracking-tight">
-                  #{placedOrder.tokenNumber}
-                </div>
-                <div className="pt-1 text-xs font-bold text-[#4A5568]">
-                  {t('estimatedWait')}: <span className="text-jaman-navy font-black">{placedOrder.estimatedWaitMinutes} {t('minutes')}</span>
-                </div>
-                <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 py-1 px-3 rounded-full inline-block mt-1">{kioskCopy("screen_pickup_at__e0c9b2", "Pickup at:")}<strong>{placedOrder.pickupCounter || 'Counter 1'}</strong>
-                </div>
               </div>
+            </section>
 
-              {/* POST-PAYMENT DIGITAL RECEIPT DELIVERY OPTIONS */}
-              <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm text-center space-y-3">
-                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider">{kioskCopy("screen_digital_delivery_e_bill_options_91fcfc", "Digital Delivery & E-Bill Options")}</h4>
-
-                <div className="grid grid-cols-3 gap-2.5">
-                  {/* Printing is always an explicit, on-demand action here —
-                      the app has no way to confirm paper actually came out
-                      of a physical printer, so it never claims a receipt
-                      was already dispensed; tapping this just queues a real
-                      print job to the configured printer. */}
-                  <button
-                    onClick={async () => {
-                      const activePrn = PrinterService.getActivePrinter();
-                      const res = await PrinterService.printReceipt(placedOrder);
-                      if (res.success) {
-                        setAutoPrintStatus({
-                          printed: true,
-                          message: res.message,
-                          printerName: activePrn?.name ?? 'No printer configured'
-                        });
-                        showToast(`Print job sent to ${activePrn?.name ?? 'the print queue'}`);
-                      } else {
-                        showToast(res.message);
-                      }
-                    }}
-                    className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-[#FFF4ED] hover:border-jaman-saffron flex flex-col items-center gap-1.5 transition-all active:scale-95"
-                  >
-                    <Printer className="w-5 h-5 text-jaman-saffron" />
-                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_print_receipt_98bad4", "Print Receipt")}</span>
-                  </button>
-
-                  {/* Option 1: Email E-Bill (PDF invoice) */}
-                  {receiptConfig.enableEmail && <button
-                    onClick={() => setIsEBillModalOpen(true)}
-                    className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-emerald-50 hover:border-emerald-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
-                  >
-                    <Mail className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_email_bill_64ee94", "Email Bill")}</span>
-                  </button>}
-
-                  {/* Option 2: Scannable QR Code */}
-                  {receiptConfig.enableQrReceipt && <button
-                    onClick={() => {
-                      setIsHandoffModalOpen(true);
-                    }}
-                    className="p-3 rounded-2xl bg-jaman-ivory border border-jaman-border hover:bg-purple-50 hover:border-purple-500 flex flex-col items-center gap-1.5 transition-all active:scale-95"
-                  >
-                    <QrCode className="w-5 h-5 text-purple-600" />
-                    <span className="text-[11px] font-bold text-jaman-navy">{kioskCopy("screen_qr_invoice_39afac", "QR Invoice")}</span>
-                  </button>}
+            {/* TOKEN + WAIT: the number the guest keeps until the order is called */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <section className="rounded-[28px] bg-white border-2 border-jaman-border shadow-xl p-6 sm:p-8 text-center flex flex-col items-center justify-center gap-2">
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#8C9BAE]">{t('token')}</span>
+                <div className="text-7xl sm:text-8xl font-black text-jaman-saffron font-mono tracking-tight leading-none">#{placedOrder.tokenNumber}</div>
+              </section>
+              <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-6 sm:p-8 flex flex-col justify-center gap-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-bold text-[#4A5568]">{t('estimatedWait')}</span>
+                  <span className="text-2xl font-black text-jaman-navy">{placedOrder.estimatedWaitMinutes} {t('minutes')}</span>
                 </div>
+                <div className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+                  <span className="text-sm font-bold text-emerald-800">Pickup at</span>
+                  <span className="text-lg font-black text-emerald-800">{placedOrder.pickupCounter || 'Counter 1'}</span>
+                </div>
+              </section>
+            </div>
 
-                {eBillSuccessMessage && (
-                  <p className="text-xs text-emerald-600 font-bold bg-emerald-50 py-1.5 rounded-xl border border-emerald-200">
-                    ✓ {eBillSuccessMessage}
-                  </p>
+            {/* BILL + KITCHEN: side by side on wide landscape screens, one stacked column on a portrait kiosk */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-start">
+              <section className="rounded-[28px] bg-white border border-jaman-border shadow-md overflow-hidden">
+                <header className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 bg-jaman-ivory border-b border-jaman-border">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy">{kioskCopy('screen_receipt_dad5a9', 'Your bill')}</h3>
+                  <span className="text-lg font-black font-mono text-jaman-navy">{formatINR(liveOrder.totalAmount)}</span>
+                </header>
+                <div className="p-4 sm:p-5 overflow-x-auto">
+                  <ThermalReceiptView order={placedOrder} config={ReceiptRepository.getConfig()} />
+                </div>
+              </section>
+
+              <section className="rounded-[28px] bg-white border border-jaman-border shadow-md overflow-hidden">
+                <header className="flex flex-wrap items-center justify-between gap-2 px-5 sm:px-6 py-4 bg-jaman-ivory border-b border-jaman-border">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy">Kitchen tickets</h3>
+                  <span className="text-xs font-bold text-slate-500">
+                    {kitchenTickets.length} ticket{kitchenTickets.length === 1 ? '' : 's'} · {stationNames.length} station{stationNames.length === 1 ? '' : 's'}
+                  </span>
+                </header>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {kitchenTickets.length === 0 && (
+                    <p className="text-sm text-slate-500 text-center py-6">The kitchen ticket is being prepared.</p>
+                  )}
+                  {kitchenTickets.map((kot) => {
+                    const status = ticketStatus(kot.id);
+                    return (
+                      <article key={kot.id} className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-4 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-wider text-jaman-saffron">{kot.station || 'Main Kitchen'}</p>
+                            <p className="text-sm font-bold font-mono text-jaman-navy">KOT {kot.kotNumber}</p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${pill(status === 'printed' ? 'printed' : status === 'failed' ? 'failed' : 'printing')}`}>
+                            {status === 'pending' ? 'Printing…' : pillLabel(status)}
+                          </span>
+                        </div>
+                        <ul className="divide-y divide-slate-100">
+                          {kot.items.map((it) => (
+                            <li key={it.id} className="py-2 flex items-start justify-between gap-3 text-sm">
+                              <span className="font-semibold text-jaman-navy">
+                                {it.name}
+                                {it.modifiers && it.modifiers.length > 0 && (
+                                  <span className="block text-xs font-medium text-slate-500">{it.modifiers.map((m: any) => m.optionName ?? m).join(', ')}</span>
+                                )}
+                              </span>
+                              <span className="font-mono font-black text-jaman-navy">× {it.quantity}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        {status === 'failed' && (
+                          <button type="button" onClick={() => reprintTicket(kot.id)} className="w-full min-h-[52px] rounded-xl bg-jaman-navy text-white font-bold text-sm">
+                            Print this ticket again
+                          </button>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
+
+            {/* GET THE BILL */}
+            <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-5 sm:p-6 space-y-4">
+              <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy text-center">{kioskCopy('screen_digital_delivery_e_bill_options_91fcfc', 'Get your bill')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const activePrn = PrinterService.getActivePrinter();
+                    const res = await PrinterService.printReceipt(placedOrder);
+                    if (res.success) {
+                      setAutoPrintStatus({ printed: true, message: res.message, printerName: activePrn?.name ?? 'No printer configured' });
+                      showToast(`Print job sent to ${activePrn?.name ?? 'the print queue'}`);
+                    } else {
+                      showToast(res.message);
+                    }
+                  }}
+                  className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-jaman-saffron flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"
+                >
+                  <Printer className="w-7 h-7 text-jaman-saffron" />
+                  <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_print_receipt_98bad4', 'Print Receipt')}</span>
+                </button>
+                {receiptConfig.enableEmail && (
+                  <button type="button" onClick={() => setIsEBillModalOpen(true)} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                    <Mail className="w-7 h-7 text-emerald-600" />
+                    <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_email_bill_64ee94', 'Email Bill')}</span>
+                  </button>
+                )}
+                {receiptConfig.enableQrReceipt && (
+                  <button type="button" onClick={() => setIsHandoffModalOpen(true)} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-purple-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                    <QrCode className="w-7 h-7 text-purple-600" />
+                    <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_qr_invoice_39afac', 'QR Invoice')}</span>
+                  </button>
                 )}
               </div>
-
-              {/* Customer Feedback Prompt */}
-              {!feedbackSubmitted ? (
-                <div className="bg-white rounded-2xl p-4 border border-jaman-border shadow-sm text-center space-y-2.5">
-                  <h4 className="font-bold text-[11px] text-jaman-navy uppercase tracking-wider">{kioskCopy("screen_how_was_your_ordering_experience__ae5150", "How was your ordering experience?")}</h4>
-                  <div className="flex justify-center gap-2 text-amber-400">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => {
-                          SoundService.playTap();
-                          setFeedbackRating(s);
-                        }}
-                      >
-                        <Star
-                          className={`w-6 h-6 ${s <= feedbackRating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  <Button variant="secondary" size="sm" onClick={handleSubmitFeedback} disabled={feedbackRating === 0}>{kioskCopy("screen_submit_rating_79a8aa", "Submit Rating")}</Button>
-                </div>
-              ) : (
-                <p className="text-xs text-emerald-600 font-bold text-center bg-emerald-50 py-2 rounded-xl border border-emerald-200">{kioskCopy("screen__feedback_recorded_thank_you__632564", "✓ Feedback recorded. Thank you!")}</p>
+              {eBillSuccessMessage && (
+                <p className="text-sm text-emerald-700 font-bold text-center bg-emerald-50 py-2 rounded-xl border border-emerald-200">✓ {eBillSuccessMessage}</p>
               )}
+              {autoPrintStatus.printerName && (
+                <p className={`text-xs font-semibold text-center ${autoPrintStatus.printed ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  Receipt: {autoPrintStatus.printed ? `printed on ${autoPrintStatus.printerName}` : autoPrintStatus.message}
+                </p>
+              )}
+            </section>
 
-              {/* Action Buttons */}
-              <div className="space-y-2">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    SoundService.playTap();
-                    setStep('TRACKING');
-                  }}
-                >
-                  {t('trackOrder')}
+            {/* FEEDBACK */}
+            {!feedbackSubmitted ? (
+              <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-5 sm:p-6 text-center space-y-3">
+                <h3 className="text-sm font-black uppercase tracking-wider text-jaman-navy">{kioskCopy('screen_how_was_your_ordering_experience__ae5150', 'How was your ordering experience?')}</h3>
+                <div className="flex justify-center gap-2 sm:gap-3">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      aria-label={`${s} star${s === 1 ? '' : 's'}`}
+                      onClick={() => {
+                        SoundService.playTap();
+                        setFeedbackRating(s);
+                      }}
+                      className="min-w-[56px] min-h-[56px] flex items-center justify-center"
+                    >
+                      <Star className={`w-10 h-10 ${s <= feedbackRating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
+                    </button>
+                  ))}
+                </div>
+                <Button variant="secondary" size="sm" onClick={handleSubmitFeedback} disabled={feedbackRating === 0}>
+                  {kioskCopy('screen_submit_rating_79a8aa', 'Submit Rating')}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
+              </section>
+            ) : (
+              <p className="text-sm text-emerald-700 font-bold text-center bg-emerald-50 py-3 rounded-2xl border border-emerald-200">
+                {kioskCopy('screen__feedback_recorded_thank_you__632564', '✓ Feedback recorded. Thank you!')}
+              </p>
+            )}
+
+            {/* ONE CLEAR NEXT STEP, always in reach */}
+            <div className="fixed inset-x-0 bottom-0 z-30 bg-jaman-ivory/95 backdrop-blur border-t border-jaman-border px-4 sm:px-6 py-4">
+              <div className="max-w-[1080px] mx-auto flex items-center gap-4">
+                <p className="flex-1 text-sm sm:text-base text-[#4A5568] leading-snug">
+                  Keep your token and wait near {placedOrder.pickupCounter || 'the pickup counter'}. The kiosk resets for the next guest.
+                </p>
+                <button
+                  type="button"
                   onClick={handleFullSessionReset}
+                  className="min-h-[64px] px-6 sm:px-8 rounded-2xl bg-jaman-navy text-white font-black text-base sm:text-lg shadow-lg active:scale-95 transition-transform whitespace-nowrap"
                 >
                   ← {t('newOrder')}
-                </Button>
-              </div>
-            </div>
-
-            {/* RIGHT / "SIDE" COLUMN — receipt + kitchen ticket, beside the
-                main confirmation info on wide kiosk screens instead of
-                stacked further down the page. Shown directly rather than
-                hidden behind a tap, since there's no physical printer to
-                hand a guest/tester an actual slip. */}
-            <div className="w-full max-w-xl mx-auto lg:mx-0 space-y-5">
-              <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
-                <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">{kioskCopy("screen_receipt_dad5a9", "Receipt")}</h4>
-                <ThermalReceiptView order={placedOrder} config={ReceiptRepository.getConfig()} />
-              </div>
-
-              {/* KITCHEN ORDER TICKET(S) (KOT) — the real, station-routed
-                  tickets KOTRepository.generateKOT created for this order
-                  (see handleFinalizePayment), not a mockup. Each ticket is
-                  sized to its own content (not stretched across a grid
-                  column) so a single KOT doesn't look like an oversized,
-                  half-empty box. */}
-              {db.kots.filter((k) => k.orderId === placedOrder.id).length > 0 && (
-                <div className="bg-white rounded-3xl p-5 border border-jaman-border shadow-sm space-y-3">
-                  <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wider text-center">{kioskCopy("screen_kitchen_order_ticket_a68e9c", "Kitchen Order Ticket")}{db.kots.filter((k) => k.orderId === placedOrder.id).length > 1 ? 's' : ''}{kioskCopy("screen__kot__58647b", "(KOT)")}</h4>
-                  <div className="flex flex-col items-center gap-3">
-                    {db.kots
-                      .filter((k) => k.orderId === placedOrder.id)
-                      .map((kot) => (
-                        <pre
-                          key={kot.id}
-                          className="bg-white text-black border border-dashed border-black text-[10px] leading-relaxed font-mono p-4 rounded-xl overflow-x-auto whitespace-pre w-full max-w-[300px] mx-auto"
-                        >
-                          {PrinterService.generateKOTText(kot)}
-                        </pre>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 7: LIVE KITCHEN TRACKING */}
-      {step === 'TRACKING' && placedOrder && (
-        <div className="flex-1 flex flex-col p-8 max-w-4xl mx-auto w-full space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black text-jaman-navy">{t('orderStatus')}</h2>
-            <p className="text-sm text-[#4A5568]">{kioskCopy("screen_live_updates_from_jamanvaar_kitchen_for_token_e65167", "Live updates from JAMANVAAR Kitchen for Token")}<strong className="text-jaman-saffron">#{placedOrder.tokenNumber}</strong>
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-8 border border-jaman-border shadow-lg space-y-8">
-            <div className="grid grid-cols-4 gap-2 text-center">
-              <div className="space-y-2">
-                <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto font-bold shadow-md">
-                  ✓
-                </div>
-                <span className="text-xs font-bold text-jaman-navy block">{t('statusConfirmed')}</span>
-              </div>
-
-              <div className="space-y-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto font-bold shadow-md ${
-                  placedOrder.orderStatus === 'PREPARING' || placedOrder.orderStatus === 'READY' || placedOrder.orderStatus === 'COLLECTED'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-slate-100 text-slate-400 border border-slate-300'
-                }`}>
-                  2
-                </div>
-                <span className="text-xs font-bold text-jaman-navy block">{t('statusPreparing')}</span>
-              </div>
-
-              <div className="space-y-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto font-bold shadow-md ${
-                  placedOrder.orderStatus === 'READY' || placedOrder.orderStatus === 'COLLECTED'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-slate-100 text-slate-400 border border-slate-300'
-                }`}>
-                  3
-                </div>
-                <span className="text-xs font-bold text-jaman-navy block">{t('statusReady')}</span>
-              </div>
-
-              <div className="space-y-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto font-bold shadow-md ${
-                  placedOrder.orderStatus === 'COLLECTED'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-slate-100 text-slate-400 border border-slate-300'
-                }`}>
-                  4
-                </div>
-                <span className="text-xs font-bold text-jaman-navy block">{t('statusCollected')}</span>
-              </div>
-            </div>
-
-            <div className="border-t border-[#F3EFE6] pt-6">
-              <h4 className="font-bold text-sm text-jaman-navy mb-3">{kioskCopy("screen_order_items__cc32cc", "Order Items:")}</h4>
-              <div className="divide-y divide-slate-100">
-                {placedOrder.items.map((it) => (
-                  <div key={it.id} className="py-2 flex justify-between text-sm">
-                    <span className="font-semibold text-jaman-navy">
-                      {it.quantity}{kioskCopy("screen_x_2d7116", "x")}{it.name}
-                    </span>
-                    <span className="font-bold text-jaman-saffron">{formatINR(it.totalPrice)}</span>
-                  </div>
-                ))}
+                </button>
               </div>
             </div>
           </div>
-
-          <div className="text-center">
-            <Button variant="accent" size="lg" onClick={handleFullSessionReset}>
-              {t('newOrder')}
-            </Button>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* MODAL: DIGITAL E-BILL & EMAIL DELIVERY */}
       <Modal
@@ -3806,8 +3701,9 @@ export default function KioskUserApp() {
 
 
       {/* DRAWER: CUSTOMER ASSISTANT CHATBOT ("Need Help?" / Complete Conversational Ordering) */}
-      {isChatbotOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
+      {isChatbotOpen && !AiConfig.isEnabled() && <JamanAiAccessNotice isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />}
+      {isChatbotOpen && showCustomerAi && AiConfig.isEnabled() && (
+        <div role="dialog" aria-modal="true" aria-label="JAMAN AI Food Assistant" className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="fixed inset-0" onClick={() => setIsChatbotOpen(false)} />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between z-10 animate-slideLeft">
             {/* Header with Live Status & Close */}
@@ -3817,13 +3713,14 @@ export default function KioskUserApp() {
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base flex items-center gap-2">{kioskCopy("screen_jaman_ai_8a6f7b", "JAMAN AI")}<span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">{kioskCopy("screen_live_ai_a0e6e8", "Live AI")}</span>
+                  <h3 className="font-bold text-base flex items-center gap-2">{kioskCopy("screen_jaman_ai_8a6f7b", "JAMAN AI")}<span className="text-[10px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">{kioskCopy("screen_live_ai_a0e6e8", "Menu guide")}</span>
                   </h3>
-                  <p className="text-xs text-white/70">{kioskCopy("screen_complete_conversational_food_ordering_dietary_guide_22ba6d", "Complete conversational food ordering & dietary guide")}</p>
+                  <p className="text-xs text-white/70">{kioskCopy("screen_complete_conversational_food_ordering_dietary_guide_22ba6d", "Suggestions from this restaurant?s current menu")}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsChatbotOpen(false)}
+                aria-label="Close JAMAN AI"
                 className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -4241,7 +4138,7 @@ export default function KioskUserApp() {
           bottom-right corner; without this the AI button physically sat on
           top of the cart's "Proceed to Payment" button, blocking checkout.
           Also hidden on WELCOME, which has its own clean layout. */}
-      {!isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && step !== 'WELCOME' && (
+      {showCustomerAi && !isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && step !== 'WELCOME' && (
         <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3 animate-fadeIn">
           {/* Floating Action Button */}
           <button
@@ -4250,7 +4147,7 @@ export default function KioskUserApp() {
               setIsChatbotOpen(true);
             }}
             className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-tr from-jaman-navy to-[#163e5e] hover:from-jaman-saffron hover:to-[#f07d33] text-white flex items-center justify-center shadow-2xl border-2 border-white/30 hover:scale-105 active:scale-95 transition-all relative group"
-            title="JAMANVAAR Food Assistant"
+            title="JAMANVAAR Food Assistant" aria-label="Open JAMAN AI Food Assistant"
           >
             <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-ping" />

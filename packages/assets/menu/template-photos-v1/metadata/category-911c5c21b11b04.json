@@ -1,0 +1,32 @@
+{
+  "id": "category-911c5c21b11b04",
+  "kind": "category",
+  "name": "Burgers & Wraps — Fast Food & Quick Service Restaurant",
+  "categoryName": "Burgers & Wraps",
+  "templateId": "tpl-fast-food",
+  "slug": "burgers-wraps",
+  "description": "Brioche bun burgers and toasted tortilla wraps",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Burgers & Wraps",
+  "components": [
+    {
+      "name": "Crispy Veggie Supreme Burger",
+      "description": "Crisp vegetable patty with cheese slice, iceberg lettuce and smoky mayo on a toasted sesame bun",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Spicy Paneer Tikka Wrap",
+      "description": "Grilled spiced paneer cubes rolled in a warm tortilla with mint mayo and pickled onions",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-911c5c21b11b04.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100120,
+  "sha256": "509463565a9c26583aae3fa65ace0ea7dea0b2ecff1358548a81c60cf44a89c5"
+}

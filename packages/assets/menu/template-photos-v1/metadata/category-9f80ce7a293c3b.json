@@ -1,0 +1,37 @@
+{
+  "id": "category-9f80ce7a293c3b",
+  "kind": "category",
+  "name": "Tea — Artisan Café & Coffee Bar",
+  "categoryName": "Tea",
+  "templateId": "tpl-cafe",
+  "slug": "tea",
+  "description": "Brewed tea and infusions",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Tea",
+  "components": [
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, brewed tea and infusions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Ginger Tea",
+      "description": "Ginger Tea, brewed tea and infusions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Green Tea",
+      "description": "Green Tea, brewed tea and infusions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-9f80ce7a293c3b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92476,
+  "sha256": "f459e01f474d32b2d19d2433fcad6394ea610b629471f1adf417d4e72b950550"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-5d93aac791e7f9",
+  "kind": "dish",
+  "name": "Veg Nuggets",
+  "description": "Veg Nuggets, crisp potato sides and bites.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sides"
+    }
+  ],
+  "file": "dish-5d93aac791e7f9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101546,
+  "sha256": "a4c11aecbfc4fd7b32b83eff3db893456d043ababf9bb41ea5bc93924f0b52f1"
+}

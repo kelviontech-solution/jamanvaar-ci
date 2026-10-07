@@ -1,0 +1,25 @@
+{
+  "id": "dish-9ece565f879e5e",
+  "kind": "dish",
+  "name": "Hyderabadi Chicken Biryani",
+  "description": "Hyderabadi Chicken Biryani, dum-cooked chicken and fragrant basmati rice.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Chicken Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Chicken Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-9ece565f879e5e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92730,
+  "sha256": "ed078b387fb67ecfe6aaa31a49a73e1caa21f0d2bb4f149107cac8114a00bf80"
+}

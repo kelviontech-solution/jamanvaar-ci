@@ -1,0 +1,22 @@
+{
+  "id": "dish-27d991eddee8c8",
+  "kind": "dish",
+  "name": "Schezwan Fried Rice",
+  "description": "Basmati rice tossed with fiery Sichuan pepper sauce and diced crunchy vegetables",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Wok Tossed Noodles & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Wok Tossed Noodles & Rice"
+    }
+  ],
+  "file": "dish-27d991eddee8c8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104638,
+  "sha256": "c757562ae8c86451bb159661653e2117ec5a7444c91e38d0994535093ae3243f"
+}

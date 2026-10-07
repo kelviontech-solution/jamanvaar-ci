@@ -9,6 +9,7 @@ import { AuditService } from '../audit/audit.service';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { QrResolutionCache } from './qr-resolution-cache';
 import { QrSettingsService, QrSettingsUpdate, QrBrandingUpdate } from './qr-settings.service';
+import { PaymentsService } from '../payments/payments.service';
 import { newPublicToken, QR_APP_CODE, QR_AUDIT, QR_EVENT, QR_MODE, QR_STATUS, startOfDayIn } from './qr.support';
 
 export const generateQrSchema = z
@@ -59,7 +60,8 @@ export class QrAdminService {
     private readonly entitlements: ApplicationEntitlementsService,
     private readonly settings: QrSettingsService,
     private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>,
-    private readonly realtime: RealtimeBus
+    private readonly realtime: RealtimeBus,
+    private readonly payments: PaymentsService
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -373,6 +375,12 @@ export class QrAdminService {
 
   getSettings(restaurantId: string, branchId?: string) {
     return this.settings.get(restaurantId, branchId ?? null);
+  }
+
+  async paymentReadiness(restaurantId: string, branchId?: string) {
+    const settings = await this.settings.get(restaurantId, branchId ?? null);
+    const readiness = await this.payments.qrOnlineReadiness(restaurantId);
+    return { ...readiness, enabled: settings.allowOnlinePayment, guestAvailable: settings.allowOnlinePayment && readiness.available };
   }
 }
 

@@ -1,0 +1,25 @@
+{
+  "id": "dish-797f089dae69ee",
+  "kind": "dish",
+  "name": "Mango Shake",
+  "description": "Mango Shake, freshly blended milkshakes.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Shakes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-797f089dae69ee.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 41852,
+  "sha256": "b335b46bb4c1e7c2e4d902732b3037d1187cf7ca0700c854c01ca3addc235be5"
+}

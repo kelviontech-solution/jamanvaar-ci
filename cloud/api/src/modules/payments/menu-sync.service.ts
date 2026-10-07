@@ -48,10 +48,15 @@ export class MenuSyncService {
       const branchId = deviceId ? (await tx.device.findFirst({ where: { id: deviceId, restaurantId }, select: { branchId: true } }))?.branchId : null;
       const byId = new Map(groups.map((g) => [`${g.entityType}:${g.externalId}`, g.payload as Record<string, any>]));
       const result = new Map<string, (typeof legacy)[number] & { taxInclusive?: boolean; taxGroupId?: string }>(legacy.map((item) => [item.externalItemId, item]));
+      // Dishes with no usable tax group take the default group (flagged isDefault, or the only active one), as the POS does.
+      const activeTaxGroups = groups.filter((g) => g.entityType === 'TAX_GROUP').map((g) => g.payload as Record<string, any>).filter((t) => t.deleted !== true && t.isActive !== false);
+      const defaultTax = activeTaxGroups.find((t) => t.isDefault === true) ?? (activeTaxGroups.length === 1 ? activeTaxGroups[0] : undefined);
       for (const row of rows) {
         const item = row.payload as Record<string, any>;
         if (item.deleted === true) { result.delete(row.externalId); continue; }
-        const tax = byId.get(`TAX_GROUP:${item.taxGroupId}`);
+        const declaredTax = byId.get(`TAX_GROUP:${item.taxGroupId}`);
+        const usableDeclared = declaredTax && declaredTax.deleted !== true && declaredTax.isActive !== false ? declaredTax : undefined;
+        const tax = usableDeclared ?? defaultTax;
         const category = byId.get(`MENU_CATEGORY:${item.categoryId}`);
         const override = branchId ? byId.get(`BRANCH_MENU_OVERRIDE:${branchId}:${row.externalId}`) : undefined;
         const modifierGroups = (item.modifierGroups ?? (item.modifierGroupIds ?? []).map((id: string) => byId.get(`MODIFIER_GROUP:${id}`))).filter(Boolean)

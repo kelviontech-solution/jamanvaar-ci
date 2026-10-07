@@ -1,0 +1,25 @@
+{
+  "id": "dish-2165e83581abee",
+  "kind": "dish",
+  "name": "Pani Puri",
+  "description": "Pani Puri, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-2165e83581abee.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97828,
+  "sha256": "86b7ba6732b259b98b5f36c94d169fb3b4e9bbdc8cda264a4ca409ad8b17bec2"
+}

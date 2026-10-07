@@ -1,0 +1,22 @@
+{
+  "id": "dish-1d6591078557cd",
+  "kind": "dish",
+  "name": "Kathiyawadi Dal",
+  "description": "Kathiyawadi Dal, regional lentils and yoghurt gravies.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "file": "dish-1d6591078557cd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86302,
+  "sha256": "38daf918cac0ffac555a3bc0e9704d34d6818fa8aa5a030b8b16575aee05718b"
+}

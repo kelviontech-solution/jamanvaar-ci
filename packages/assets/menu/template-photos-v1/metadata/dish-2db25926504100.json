@@ -1,0 +1,26 @@
+{
+  "id": "dish-2db25926504100",
+  "kind": "dish",
+  "name": "Sambar Rice",
+  "description": "Sambar Rice, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-2db25926504100.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 87546,
+  "sha256": "7658ddbb65039f525e4e95816e8d8654d7abd12f82fe7621ff83a017a87ca115"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-5c2dfffe828ed2",
+  "kind": "dish",
+  "name": "Jain Hara Bhara Kebab",
+  "description": "Jain Hara Bhara Kebab, prepared without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters"
+    }
+  ],
+  "file": "dish-5c2dfffe828ed2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104998,
+  "sha256": "a02ef7ab29d2a4cb5f44883dca036b7aed076c63e9602829dd4cf9557843c527"
+}

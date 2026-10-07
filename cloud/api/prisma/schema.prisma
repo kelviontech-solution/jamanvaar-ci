@@ -1160,6 +1160,12 @@ enum RefundStatus {
   FAILED
 }
 
+/// How the restaurant handed the money back to the customer. Recorded by hand; Razorpay is never called for a refund.
+enum RefundMethod {
+  CASH
+  UPI_TO_CUSTOMER
+}
+
 enum WebhookProcessingStatus {
   RECEIVED
   VERIFIED
@@ -1385,6 +1391,7 @@ model Refund {
   amount           Int // paise
   reason           String?
   status           RefundStatus       @default(PENDING)
+  method           RefundMethod?
   requestedBy      String?
   processedAt      DateTime?
   createdAt        DateTime           @default(now())
@@ -1556,7 +1563,7 @@ model QrSettings {
   allowCustomerNotes   Boolean    @default(true)
   allowModifiers       Boolean    @default(true)
   allowCash            Boolean    @default(true)
-  allowOnlinePayment   Boolean    @default(false)
+  allowOnlinePayment   Boolean    @default(true)
   showOrderStatus      Boolean    @default(true)
   autoAccept           Boolean    @default(false)
   requireCustomerName  Boolean    @default(false)

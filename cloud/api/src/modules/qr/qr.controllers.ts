@@ -218,6 +218,12 @@ export class QrRestaurantController {
     return this.qr.getSettings(device.restaurantId, branchId);
   }
 
+  @Get('settings/payment-readiness')
+  paymentReadiness(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
+    this.qr.assertConsole(device);
+    return this.qr.paymentReadiness(device.restaurantId, branchId);
+  }
+
   @Put('settings')
   @UsePipes(new ZodValidationPipe(qrSettingsSchema))
   putSettings(@CurrentDevice() device: Device, @Body() body: QrSettingsUpdate, @Query('branchId') branchId?: string) {

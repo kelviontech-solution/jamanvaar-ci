@@ -1,0 +1,37 @@
+{
+  "id": "category-cd3b3661573474",
+  "kind": "category",
+  "name": "Sides — Pizza Restaurant",
+  "categoryName": "Sides",
+  "templateId": "tpl-pizza",
+  "slug": "sides",
+  "description": "Freshly fried sides with seasoning served separately",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Sides",
+  "components": [
+    {
+      "name": "French Fries",
+      "description": "French Fries, freshly fried sides with seasoning served separately.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Peri Peri Fries",
+      "description": "Peri Peri Fries, freshly fried sides with seasoning served separately.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Potato Wedges",
+      "description": "Potato Wedges, freshly fried sides with seasoning served separately.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-cd3b3661573474.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117508,
+  "sha256": "bcf013227dd4a6f117222efdd9caa97d8dcec42b5bcd517ae10d3a2c32905871"
+}

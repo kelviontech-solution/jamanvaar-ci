@@ -1,0 +1,25 @@
+{
+  "id": "dish-d2c103f9f58446",
+  "kind": "dish",
+  "name": "Brownie Sundae",
+  "description": "Brownie Sundae, ice cream with toppings and sauces.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-d2c103f9f58446.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79292,
+  "sha256": "db0e8624f980ee200323c0cda702ae15a75515689d17e95516c2e3a432aca2a1"
+}

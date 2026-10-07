@@ -1,0 +1,37 @@
+{
+  "id": "category-ab3e3e62d260e9",
+  "kind": "category",
+  "name": "Kulfi & Falooda — Dessert / Ice Cream",
+  "categoryName": "Kulfi & Falooda",
+  "templateId": "tpl-desserts",
+  "slug": "kulfi-falooda",
+  "description": "Traditional chilled dessert portions",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "components": [
+    {
+      "name": "Malai Kulfi",
+      "description": "Malai Kulfi, traditional chilled dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kesar Pista Kulfi",
+      "description": "Kesar Pista Kulfi, traditional chilled dessert portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mango Kulfi",
+      "description": "Mango Kulfi, traditional chilled dessert portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-ab3e3e62d260e9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90052,
+  "sha256": "458be378a168e91e137e0c9b98188a95d97d9a664ce048bbb3ef497522ff8a98"
+}

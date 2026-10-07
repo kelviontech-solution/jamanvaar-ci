@@ -1,0 +1,25 @@
+{
+  "id": "dish-fa64643a13a437",
+  "kind": "dish",
+  "name": "Special Punjabi Samosa (2 Pcs)",
+  "description": "Crisp pastry triangles stuffed with spiced potato and green peas with saunth chutney",
+  "diet": "VEG",
+  "cuisine": "Indian Teatime Snacks",
+  "category": "Hot Fried Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-snacks",
+      "category": "Hot Fried Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-fa64643a13a437.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75850,
+  "sha256": "42a9f86220c33e5f906d3a80add45ff3c0369d0d0d4e88362c1c5a7e592fb720"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-4415e5b97338bb",
+  "kind": "category",
+  "name": "Desserts & Drinks — Biryani & Kebab Darbar",
+  "categoryName": "Desserts & Drinks",
+  "templateId": "tpl-biryani",
+  "slug": "desserts-drinks",
+  "description": "Sweet finishes and chilled refreshments",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Desserts & Drinks",
+  "components": [
+    {
+      "name": "Double Ka Meetha",
+      "description": "Double Ka Meetha, sweet finishes and chilled refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Gulab Jamun",
+      "description": "Gulab Jamun, sweet finishes and chilled refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, sweet finishes and chilled refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4415e5b97338bb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111796,
+  "sha256": "6a9e08b9f5d43a298ff11c145cd7b1988f0d5b3d162b2f6fd488b582bd3e5eef"
+}

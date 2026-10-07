@@ -1,0 +1,37 @@
+{
+  "id": "category-7d88896f16e4d1",
+  "kind": "category",
+  "name": "Rice — North Indian Restaurant",
+  "categoryName": "Rice",
+  "templateId": "tpl-north-indian",
+  "slug": "rice",
+  "description": "Steamed or tempered basmati rice",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Rice",
+  "components": [
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Peas Pulao",
+      "description": "Peas Pulao, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-7d88896f16e4d1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112390,
+  "sha256": "e3c2d1411b1921209740a0c6d7eeef954b504528b67e18d9e63d2c021d733f03"
+}

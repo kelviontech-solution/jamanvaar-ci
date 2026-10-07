@@ -1,0 +1,25 @@
+{
+  "id": "dish-a5916ea83fd6f4",
+  "kind": "dish",
+  "name": "Chocolate Chip Cookies 200g",
+  "description": "Chocolate Chip Cookies 200g, baked cookie packs.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cookies",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cookies"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-a5916ea83fd6f4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93242,
+  "sha256": "252a41d9554a4eb93aac9d7da153aaa0a960b515d046efaf80b39a0a06b545e6"
+}

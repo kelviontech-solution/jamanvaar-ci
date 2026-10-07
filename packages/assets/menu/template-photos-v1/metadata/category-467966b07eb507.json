@@ -1,0 +1,37 @@
+{
+  "id": "category-467966b07eb507",
+  "kind": "category",
+  "name": "Starters — North Indian Restaurant",
+  "categoryName": "Starters",
+  "templateId": "tpl-north-indian",
+  "slug": "starters",
+  "description": "Marinated starters grilled or shallow-fried to order",
+  "diet": "NON_VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Starters",
+  "components": [
+    {
+      "name": "Malai Paneer Tikka",
+      "description": "Malai Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chicken Tikka",
+      "description": "Chicken Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "NON_VEG"
+    },
+    {
+      "name": "Tandoori Chicken Half",
+      "description": "Tandoori Chicken Half, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "NON_VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-467966b07eb507.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 116350,
+  "sha256": "a4208f1242076a835d6722ca39157fbfd745e0a39674efb38cd628c0ef667500"
+}

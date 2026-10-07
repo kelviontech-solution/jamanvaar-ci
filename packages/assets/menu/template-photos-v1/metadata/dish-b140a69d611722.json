@@ -1,0 +1,22 @@
+{
+  "id": "dish-b140a69d611722",
+  "kind": "dish",
+  "name": "Red Velvet Cake",
+  "description": "Red Velvet Cake, eggless celebration cakes; size selection available.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cakes"
+    }
+  ],
+  "file": "dish-b140a69d611722.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84836,
+  "sha256": "a2c6a247ce7deaef32b554d09035a9f721854fb87cf1fd3dcdd4c8fc570f880b"
+}

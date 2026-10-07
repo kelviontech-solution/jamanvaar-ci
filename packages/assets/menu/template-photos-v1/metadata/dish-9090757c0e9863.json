@@ -1,0 +1,22 @@
+{
+  "id": "dish-9090757c0e9863",
+  "kind": "dish",
+  "name": "Jain Dal Tadka",
+  "description": "Jain Dal Tadka, lentils tempered without onion or garlic.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Dal"
+    }
+  ],
+  "file": "dish-9090757c0e9863.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81788,
+  "sha256": "87fb9485e27cc82e1bc523f1a0afe4ca86f730674b58d273b27c865928d50fbe"
+}

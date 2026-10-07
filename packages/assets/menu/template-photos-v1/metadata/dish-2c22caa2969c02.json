@@ -1,0 +1,22 @@
+{
+  "id": "dish-2c22caa2969c02",
+  "kind": "dish",
+  "name": "Tandoori Stuffed Mushroom",
+  "description": "Button mushrooms filled with spiced processed cheese and herbs, charred in tandoor",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Starters & Kebabs",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Starters & Kebabs"
+    }
+  ],
+  "file": "dish-2c22caa2969c02.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108882,
+  "sha256": "9f7a7f7f812090bb41aae6fd5a17f33a2d58060615f7c48990ddfaf156338ed2"
+}

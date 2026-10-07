@@ -10,7 +10,8 @@ import {
   Building2,
   Menu
 } from 'lucide-react';
-import { JAMANVAAR_LOGOS } from '@jamanvaar/ui';
+import { db } from '@jamanvaar/database';
+import { useAiAccess, JAMANVAAR_LOGOS } from '@jamanvaar/ui';
 import { formatINR } from '@jamanvaar/utils';
 import { ADMIN_PRODUCTS, type AdminProduct } from '../../adminProducts';
 
@@ -58,6 +59,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
   onAdminLogout,
   onOpenNav
 }) => {
+  const ai = useAiAccess();
   return (
     <header className="h-16 sm:h-20 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE3D6] px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 shadow-2xs sticky top-0 z-30 shrink-0 select-none">
       {/* ── 1. Left: Premium Brand Identity Lockup ── */}
@@ -232,6 +234,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         {/* 3C. Utilities Group (Assistant, Notifications, Local-First, Logout) */}
         <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-2 sm:border-l border-jaman-border">
           {/* JAMAN AI Assistant */}
+          {ai.showButton(db.restaurant?.showJamanAI !== false) && (
           <button
             type="button"
             onClick={onOpenAssistant}
@@ -241,6 +244,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
             <Bot className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="hidden lg:inline">Assistant</span>
           </button>
+          )}
 
           {/* Notification Bell */}
           <button

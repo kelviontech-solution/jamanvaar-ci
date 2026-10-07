@@ -1,0 +1,34 @@
+{
+  "id": "dish-454938e2a62289",
+  "kind": "dish",
+  "name": "Masala Tea",
+  "description": "Masala Tea, freshly brewed South Indian refreshments.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Tea"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-chaat",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-454938e2a62289.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 57852,
+  "sha256": "1038dedce356a2593d63d10162a92dd56660fd8d3be51f05ea1d3324756d9f9f"
+}

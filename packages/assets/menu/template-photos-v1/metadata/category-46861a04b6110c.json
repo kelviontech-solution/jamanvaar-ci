@@ -1,0 +1,37 @@
+{
+  "id": "category-46861a04b6110c",
+  "kind": "category",
+  "name": "Pav & Buns — Street Food Restaurant",
+  "categoryName": "Pav & Buns",
+  "templateId": "tpl-chaat",
+  "slug": "pav-buns",
+  "description": "Griddle-cooked snacks in soft pav",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "components": [
+    {
+      "name": "Pav Bhaji",
+      "description": "Pav Bhaji, griddle-cooked snacks in soft pav.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheese Pav Bhaji",
+      "description": "Cheese Pav Bhaji, griddle-cooked snacks in soft pav.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vada Pav",
+      "description": "Vada Pav, griddle-cooked snacks in soft pav.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-46861a04b6110c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115764,
+  "sha256": "7a28f1979deabff85d7bc218876a49facb45edab2c8332e2e86d0192d4ca85ba"
+}

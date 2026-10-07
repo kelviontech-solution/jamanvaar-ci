@@ -315,8 +315,16 @@ export class PaymentsService {
   }
 
   async qrOnlineAvailable(restaurantId: string): Promise<boolean> {
-    if (!this.config.get<string>('RAZORPAY_KEY_ID') || !this.config.get<string>('RAZORPAY_KEY_SECRET') || !this.config.get<string>('RAZORPAY_WEBHOOK_SECRET')) return false;
-    return !!await this.prisma.runAsTenant(restaurantId, tx => tx.restaurantPaymentConnection.findFirst({ where: { restaurantId, status: 'ACTIVE' }, select: { id: true } }));
+    return (await this.qrOnlineReadiness(restaurantId)).available;
+  }
+
+  /** Owner diagnostics contain configuration names and status, never credentials or bank details. */
+  async qrOnlineReadiness(restaurantId: string) {
+    const missing = ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET', 'RAZORPAY_WEBHOOK_SECRET'].filter(key => !this.config.get<string>(key)?.trim());
+    if (missing.length) return { available: false, code: 'GATEWAY_NOT_CONFIGURED', message: `Ask your platform administrator to configure ${missing.join(', ')} on the payment server.` };
+    const connection = await this.prisma.runAsTenant(restaurantId, tx => tx.restaurantPaymentConnection.findFirst({ where: { restaurantId }, select: { status: true } }));
+    if (connection?.status !== 'ACTIVE') return { available: false, code: 'COLLECTION_NOT_ACTIVE', message: 'Ask Super Admin to activate payment collection for this restaurant. Razorpay Route is not required for Jamanvaar collection with manual payouts.' };
+    return { available: true, code: 'READY', message: 'Verified Razorpay checkout is ready. Guests can pay online when the Online payment switch is on.' };
   }
 
   /** Hosted mobile checkout through the same gateway and payment tables as Kiosk. */
@@ -695,31 +703,14 @@ export class PaymentsService {
 
     if (replay) return { refundId: refund.id, providerRefundId: refund.providerRefundId ?? '', status: refund.status === 'SUCCESS' ? 'processed' : refund.status.toLowerCase(), amount: refund.amount };
 
-    if (provider === 'RAZORPAY') {
-      if (!providerPaymentId) {
-        await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
-        throw new ConflictException('This payment has no Razorpay payment id to refund against');
-      }
-      let rzp;
-      try {
-        rzp = await this.razorpay.createRefund({ razorpayPaymentId: providerPaymentId, amountPaise: dto.amountPaise, receipt: refund.id, notes: { refund_id: refund.id } });
-      } catch (err) {
-        const response = err instanceof ServiceUnavailableException ? err.getResponse() : null;
-        if (!response || typeof response !== 'object' || (response as { code?: string }).code !== 'UPSTREAM_RESULT_UNKNOWN') await this.prisma.runAsTenant(restaurantId, (tx) => tx.refund.update({ where: { id: refund.id }, data: { status: 'FAILED' } }));
-        throw err;
-      }
-      const rzpStatus = rzp.status === 'processed' ? 'SUCCESS' : 'PENDING';
-      await this.prisma.runAsTenant(restaurantId, async (tx) => {
-        await tx.refund.update({ where: { id: refund.id }, data: { providerRefundId: rzp.refundId, status: rzpStatus } });
-        const done = await tx.refund.aggregate({ where: { paymentId, status: 'SUCCESS' }, _sum: { amount: true } });
-        const refundedSoFar = done._sum.amount ?? 0;
-        const payment = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } });
-        const nextStatus = rzpStatus === 'PENDING' ? 'REFUND_PENDING' : refundedSoFar >= payment.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
-        await tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: nextStatus } });
-      });
-      return { refundId: refund.id, providerRefundId: rzp.refundId, status: rzp.status, amount: dto.amountPaise };
-    }
-
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.refund.update({ where: { id: refund.id }, data: { status: 'SUCCESS', method: dto.method, processedAt: new Date() } });
+      const done = await tx.refund.aggregate({ where: { paymentId, status: 'SUCCESS' }, _sum: { amount: true } });
+      const refundedSoFar = done._sum.amount ?? 0;
+      const payment = await tx.paymentTransaction.findUniqueOrThrow({ where: { id: paymentId } });
+      await tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: refundedSoFar >= payment.amount ? 'REFUNDED' : 'PARTIALLY_REFUNDED' } });
+    });
+    return { refundId: refund.id, providerRefundId: '', status: 'processed', amount: dto.amountPaise };
   }
 
   async processRazorpayWebhook(rawBody: Buffer, signature: string | undefined, eventId?: string): Promise<void> {

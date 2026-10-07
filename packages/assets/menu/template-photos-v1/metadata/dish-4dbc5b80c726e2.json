@@ -1,0 +1,33 @@
+{
+  "id": "dish-4dbc5b80c726e2",
+  "kind": "dish",
+  "name": "Malai Paneer Tikka",
+  "description": "Malai Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-4dbc5b80c726e2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106048,
+  "sha256": "912b6dd7486aba49a84e8227d668281c6416eaca4b98baa05db56917708e4b10"
+}

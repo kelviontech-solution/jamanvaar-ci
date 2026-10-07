@@ -1,0 +1,37 @@
+{
+  "id": "category-401302a642ba3b",
+  "kind": "category",
+  "name": "Fried Rice — Authentic Chinese & Wok",
+  "categoryName": "Fried Rice",
+  "templateId": "tpl-chinese",
+  "slug": "fried-rice",
+  "description": "Rice tossed on high heat with vegetables and seasoning",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Fried Rice",
+  "components": [
+    {
+      "name": "Veg Fried Rice",
+      "description": "Veg Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Burnt Garlic Fried Rice",
+      "description": "Burnt Garlic Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chicken Fried Rice",
+      "description": "Chicken Fried Rice, rice tossed on high heat with vegetables and seasoning.",
+      "dietaryType": "NON_VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-401302a642ba3b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 132448,
+  "sha256": "4bc0edd9db65fd0bae635d6df45a1eacc6a84da0612e03f8ba69c1c58fc6f9e6"
+}

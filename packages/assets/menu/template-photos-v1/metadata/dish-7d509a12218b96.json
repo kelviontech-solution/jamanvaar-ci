@@ -1,0 +1,25 @@
+{
+  "id": "dish-7d509a12218b96",
+  "kind": "dish",
+  "name": "Chocolate Sundae",
+  "description": "Chocolate Sundae, ice cream with toppings and sauces.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-7d509a12218b96.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73388,
+  "sha256": "2a35961a508c1d6e757243a67d9d0f20bfa93b44f54482683ab4c6f9cdb00cc2"
+}

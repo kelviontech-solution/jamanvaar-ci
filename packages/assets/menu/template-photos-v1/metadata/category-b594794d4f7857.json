@@ -1,0 +1,37 @@
+{
+  "id": "category-b594794d4f7857",
+  "kind": "category",
+  "name": "Jain Dal — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Dal",
+  "templateId": "tpl-jain",
+  "slug": "jain-dal",
+  "description": "Lentils tempered without onion or garlic",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Dal",
+  "components": [
+    {
+      "name": "Jain Dal Tadka",
+      "description": "Jain Dal Tadka, lentils tempered without onion or garlic.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Dal Fry",
+      "description": "Jain Dal Fry, lentils tempered without onion or garlic.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Moong Dal",
+      "description": "Jain Moong Dal, lentils tempered without onion or garlic.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-b594794d4f7857.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108930,
+  "sha256": "740402276504bbe7583c403a41caa912b5a123a66fdbc63c3853836832d06126"
+}

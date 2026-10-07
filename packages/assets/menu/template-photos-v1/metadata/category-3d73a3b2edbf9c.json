@@ -1,0 +1,32 @@
+{
+  "id": "category-3d73a3b2edbf9c",
+  "kind": "category",
+  "name": "Desi Ghee Mithai — Royal Indian Sweets & Mithai",
+  "categoryName": "Desi Ghee Mithai",
+  "templateId": "tpl-sweets",
+  "slug": "ghee-sweets",
+  "description": "Fresh daily sweets made in pure desi ghee",
+  "diet": "VEG",
+  "cuisine": "Traditional Indian Mithai",
+  "category": "Desi Ghee Mithai",
+  "components": [
+    {
+      "name": "Kaju Katli Special (250g)",
+      "description": "Diamond cut cashew nut fudge made with premium cashews and silver vark",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Motichoor Laddoo (250g)",
+      "description": "Tiny gram flour pearls fried in pure desi ghee and soaked in saffron sugar syrup",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3d73a3b2edbf9c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115216,
+  "sha256": "289c64b8d60999ccf44679abf1d7a32c219d3e683593b22a837ad5990d59afce"
+}

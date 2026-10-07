@@ -1,0 +1,32 @@
+{
+  "id": "category-310a2125560188",
+  "kind": "category",
+  "name": "Khichdi & Rice — Gujarati Restaurant",
+  "categoryName": "Khichdi & Rice",
+  "templateId": "tpl-gujarati",
+  "slug": "khichdi-rice",
+  "description": "Comforting khichdi varieties and steamed basmati rice",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Khichdi & Rice",
+  "components": [
+    {
+      "name": "Vaghareli Khichdi with Kadhi",
+      "description": "Rice and moong dal tempered with garlic, onions, cloves and whole spices, paired with Gujarati Kadhi",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Steamed Surti Basmati Rice",
+      "description": "Fluffy steamed rice, best enjoyed with Gujarati toor dal",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-310a2125560188.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103780,
+  "sha256": "0d6e42031f60e083cb7adad6a86580ca415be31a01d4e71beb4febac422b738a"
+}

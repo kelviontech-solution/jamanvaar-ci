@@ -1,0 +1,22 @@
+{
+  "id": "dish-b38e805912eb59",
+  "kind": "dish",
+  "name": "Roomali Roti",
+  "description": "Handkerchief-thin soft bread tossed on inverted wok",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Awadhi Breads & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Awadhi Breads & Rice"
+    }
+  ],
+  "file": "dish-b38e805912eb59.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97778,
+  "sha256": "9dbba0b559f00389873506e335e84d3e8af2e68b26d7662eee90dacf427b5143"
+}

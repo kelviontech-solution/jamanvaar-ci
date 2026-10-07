@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
@@ -21,6 +21,9 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
   const [mode, setMode] = useState<'TRANSFER' | 'MERGE'>('TRANSFER');
   const [targetTableNumber, setTargetTableNumber] = useState<string>('');
   const [error, setError] = useState('');
+  useEffect(() => {
+    if (isOpen) { setMode('TRANSFER'); setTargetTableNumber(''); setError(''); }
+  }, [isOpen, currentTable?.id]);
 
   if (!isOpen || !currentTable) return null;
 
@@ -54,6 +57,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
           </div>
           <button
             type="button"
+            aria-label="Close transfer or merge"
             onClick={onClose}
             className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
           >

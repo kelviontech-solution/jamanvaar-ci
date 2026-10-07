@@ -1,0 +1,22 @@
+{
+  "id": "dish-3a758016bdf37f",
+  "kind": "dish",
+  "name": "Jain Raw Banana Cutlets (4 Pcs)",
+  "description": "Steamed green plantain and green pea cutlets spiced with ginger and green chillies",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters & Tikkas",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters & Tikkas"
+    }
+  ],
+  "file": "dish-3a758016bdf37f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92920,
+  "sha256": "3986d57a93824f90ad20e7b6a90ddf90b1f16906012dfb5db58cf316e1fd9a9d"
+}

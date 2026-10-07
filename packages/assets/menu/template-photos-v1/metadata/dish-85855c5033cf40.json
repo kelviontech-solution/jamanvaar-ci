@@ -1,0 +1,25 @@
+{
+  "id": "dish-85855c5033cf40",
+  "kind": "dish",
+  "name": "Shahi Subz Dum Biryani",
+  "description": "Medley of vegetables, mint and browned onions slow-cooked on dum, served with mirchi salan and raita",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Handi Dum Biryanis",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Handi Dum Biryanis"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-85855c5033cf40.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 137634,
+  "sha256": "cd86ad1193ba4a03cadb1aad3fd2c166a3cc29fd54332a4029909c5fd383d4af"
+}

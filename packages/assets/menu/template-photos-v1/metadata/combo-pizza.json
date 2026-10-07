@@ -1,0 +1,29 @@
+{
+  "id": "combo-pizza",
+  "kind": "combo",
+  "name": "Pizza Meal Deal",
+  "description": "Garlic Bread with Cheese Garlic Bread. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Garlic Bread",
+      "description": "Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "diet": "VEG"
+    },
+    {
+      "name": "Cheese Garlic Bread",
+      "description": "Cheese Garlic Bread, oven-baked bread with garlic butter and herbs.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-pizza.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107634,
+  "sha256": "6f32938ec0a37502c22035bcf22f2d8a0d4af44b7b813b6b77867f9dd988e8f6"
+}

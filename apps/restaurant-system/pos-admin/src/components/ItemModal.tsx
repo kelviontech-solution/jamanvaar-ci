@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
-import { Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
 import { Upload, Sparkles, Image as ImageIcon, Sliders } from 'lucide-react';
 
@@ -515,7 +515,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <img
+            <CachedImg
               src={imageUrl || '/assets/menu/common/fallback-dish.svg'}
               alt="Preview"
               className="w-14 h-14 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100"
@@ -548,7 +548,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           {isLibraryOpen && (
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-2 border-t border-slate-200 max-h-40 overflow-y-auto">
               {FOOD_IMAGE_LIBRARY.map((libImg) => (
-                <img
+                <CachedImg
                   key={libImg.id}
                   src={libImg.url}
                   alt={libImg.title}

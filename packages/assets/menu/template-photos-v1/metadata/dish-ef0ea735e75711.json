@@ -1,0 +1,25 @@
+{
+  "id": "dish-ef0ea735e75711",
+  "kind": "dish",
+  "name": "Chole Kulche",
+  "description": "Chole Kulche, comfort snacks prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Regional Favourites",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Regional Favourites"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-ef0ea735e75711.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102086,
+  "sha256": "831a992106b245f5b9a0bcaad643daa5286e9aa55f8a926b6e07684e2bac9d2c"
+}

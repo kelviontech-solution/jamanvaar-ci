@@ -1,0 +1,22 @@
+{
+  "id": "dish-e529c75cdff089",
+  "kind": "dish",
+  "name": "Jain Mushroom Tikka",
+  "description": "Jain Mushroom Tikka, prepared without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Starters"
+    }
+  ],
+  "file": "dish-e529c75cdff089.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104848,
+  "sha256": "18698d95525ac129d3a9f31de853ebe87bd02021a9958be2d6b081cd11ef0ed6"
+}

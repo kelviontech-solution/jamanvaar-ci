@@ -1,0 +1,25 @@
+{
+  "id": "dish-cf2c9938464d1a",
+  "kind": "dish",
+  "name": "Phulka Rotli (Ghee, 4 Pcs)",
+  "description": "Paper-thin whole wheat puffed rotlis smeared with pure desi ghee",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/phulka.webp"
+  ],
+  "file": "dish-cf2c9938464d1a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97870,
+  "sha256": "92c73eea1864849cccfb1430286351fa763664ca0687fe52ce159248b7c1746b"
+}

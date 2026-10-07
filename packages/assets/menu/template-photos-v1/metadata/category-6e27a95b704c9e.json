@@ -1,0 +1,32 @@
+{
+  "id": "category-6e27a95b704c9e",
+  "kind": "category",
+  "name": "Gravies — Authentic Chinese & Wok",
+  "categoryName": "Gravies",
+  "templateId": "tpl-chinese",
+  "slug": "gravies",
+  "description": "Wok gravies to pair with rice or noodles",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Gravies",
+  "components": [
+    {
+      "name": "Paneer in Black Bean Sauce",
+      "description": "Paneer in Black Bean Sauce, wok gravies to pair with rice or noodles.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mushroom in Hot Garlic Sauce",
+      "description": "Mushroom in Hot Garlic Sauce, wok gravies to pair with rice or noodles.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-6e27a95b704c9e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117778,
+  "sha256": "dbca7a4d3b5c6aa7252200c5bd3390de5abc4108d6cd6cf2783c7e42fbe13134"
+}

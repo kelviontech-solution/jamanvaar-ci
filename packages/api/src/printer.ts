@@ -1,6 +1,6 @@
 import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
 import { Platform, ESC_POS_DRAWER_KICK } from './platform';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 
 // B2-023: a kiosk order's `kioskId` is the real activation UUID (needed internally for device
@@ -328,8 +328,10 @@ export class PrinterService {
       // both), which can print CGST+SGST that no longer sum to TOTAL AMOUNT below. formatSplitTax
       // derives both from the already-rounded whole-rupee tax total instead.
       const { cgst, sgst } = formatSplitTax(order.taxAmount, order.cgstAmount, order.sgstAmount);
-      out += `${row('CGST @ 2.5%:', cgst)}\n`;
-      out += `${row('SGST @ 2.5%:', sgst)}\n`;
+      // The rate printed is the restaurant's configured GST, not a fixed one.
+      const labels = taxLabels(restaurantGstRate(db.taxGroups));
+      out += `${row(`${labels.cgst}:`, cgst)}\n`;
+      out += `${row(`${labels.sgst}:`, sgst)}\n`;
     }
     if (order.roundOffAmount !== 0) {
       out += `${row('Round Off:', formatINR(order.roundOffAmount))}\n`;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
-import { AiConfig } from '@jamanvaar/business';
+import { AiConfig, refreshConfiguredAi } from '@jamanvaar/business';
+import { JamanAiAccessNotice } from '@jamanvaar/ui';
 import { reportAiQueryNow } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
 import {
@@ -26,31 +27,16 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
   onNavigateToTab
 }) => {
   // What the platform allows this restaurant (BUG-057): OFF hides it, LOCKED shows why it does not answer.
-  const aiState = useSyncExternalStore((cb) => AiConfig.subscribe(cb), () => AiConfig.getState(), () => AiConfig.getState());
-  // Escape closes this dialog like any other in the app.
+  useSyncExternalStore((cb) => AiConfig.subscribe(cb), () => AiConfig.getRevision(), () => AiConfig.getRevision());
+  const aiState = AiConfig.getState();
   useEffect(() => {
     if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
-  if (!isOpen || aiState === 'OFF') return null;
-  if (aiState === 'LOCKED') {
-    return (
-      <div role="dialog" aria-modal="true" aria-label="JAMAN AI is not enabled" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-        <div className="w-full max-w-sm space-y-3 rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-          <Sparkles className="mx-auto h-8 w-8 text-jaman-saffron" />
-          <h2 className="text-base font-black text-jaman-navy">JAMAN AI isn&apos;t enabled for your restaurant</h2>
-          <p className="text-xs text-slate-600">Ask your JAMANVAAR account manager to switch it on. It answers floor questions from your own live tables and kitchen tickets.</p>
-          <button type="button" onClick={onClose} className="rounded-xl bg-jaman-navy px-4 py-2 text-xs font-bold text-white">Close</button>
-        </div>
-      </div>
-    );
-  }
-
   const {
+
     tables,
     foodReadyItems,
     kots,
@@ -62,6 +48,10 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
   const [response, setResponse] = useState<string | null>(null);
+  useEffect(() => { if (isOpen) { void refreshConfiguredAi(); setResponse(null); setActiveQuery(null); } }, [isOpen]);
+
+  if (!isOpen) return null;
+  if (aiState !== 'ON') return <JamanAiAccessNotice isOpen={isOpen} onClose={onClose} />;
 
   const activeFoodReady = foodReadyItems.filter((fr) => !fr.isServed);
   // Threshold from the cloud settings (Super Admin), not a number typed into the code.
@@ -150,7 +140,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-4">
+    <div role="dialog" aria-modal="true" aria-label="JAMAN AI Floor Intelligence" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-4">
       <div className="w-full sm:max-w-md h-[85vh] sm:h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-jaman-border flex flex-col justify-between overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
         {/* Header */}
         <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
@@ -166,6 +156,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close JAMAN AI"
             className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />

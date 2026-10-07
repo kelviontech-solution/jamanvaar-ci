@@ -1,0 +1,25 @@
+{
+  "id": "dish-df27264219a061",
+  "kind": "dish",
+  "name": "Egg Biryani",
+  "description": "Egg Biryani, traditional dum rice preparations.",
+  "diet": "EGG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Mutton & Egg Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Mutton & Egg Biryani"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-df27264219a061.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111374,
+  "sha256": "4ff4062c23a0bd5524229d4b5d64bbb2e8e4427acc5a55f96a4d3342995e452e"
+}

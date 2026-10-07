@@ -1,0 +1,22 @@
+{
+  "id": "dish-571f82e0abf441",
+  "kind": "dish",
+  "name": "Peri Peri Crinkle Fries",
+  "description": "Golden potato fries shaken with fiery African peri peri spice mix",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Fries & Quick Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Fries & Quick Sides"
+    }
+  ],
+  "file": "dish-571f82e0abf441.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97052,
+  "sha256": "3084ae42043f7978a62c4175eabfca826dd6967328fef156b7566ae20025c01e"
+}

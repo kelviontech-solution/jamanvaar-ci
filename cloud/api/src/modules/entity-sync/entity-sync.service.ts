@@ -19,7 +19,7 @@ export function sensitiveChange(entityType: string, before: Record<string, unkno
     return !gone && Object.keys(d).length > 0 && was ? { name: after.name, changes: d } : gone && was ? { name: was.name, removed: true } : null;
   }
   if (entityType === 'TAX_GROUP') {
-    const d = diff(['cgstPercent', 'sgstPercent', 'igstPercent', 'isInclusive', 'isActive']);
+    const d = diff(['cgstPercent', 'sgstPercent', 'igstPercent', 'isInclusive', 'isActive', 'isDefault']);
     return gone ? { name: was?.name ?? null, removed: true } : !was ? { name: after.name, created: true } : Object.keys(d).length > 0 ? { name: after.name, changes: d } : null;
   }
   if (entityType === 'COUPON') {

@@ -1,0 +1,20 @@
+{
+  "browserChecks": 13,
+  "browserPassed": true,
+  "unitChecks": 40,
+  "unitFiles": 8,
+  "builds": [
+    "Kiosk",
+    "KDS"
+  ],
+  "deploymentPerformed": false,
+  "measurementsMs": {
+    "cashToKds": [
+      222.53,
+      187.88
+    ],
+    "readyToBackendPos": 179.67,
+    "servedToBackendPosKiosk": 232.94
+  },
+  "productionMetricsAvailable": false
+}

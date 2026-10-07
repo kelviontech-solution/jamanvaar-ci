@@ -1,0 +1,22 @@
+{
+  "id": "dish-b18359a557a12d",
+  "kind": "dish",
+  "name": "Khamiri Roti (2 Pcs)",
+  "description": "Traditional Mughal leavened bread with a slight sourdough tang",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Awadhi Breads & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Awadhi Breads & Rice"
+    }
+  ],
+  "file": "dish-b18359a557a12d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109548,
+  "sha256": "5644a7494e4ca2457e3a6c2a9ca94ae1e5456032fae6ce3a922a55c3a32a55c7"
+}

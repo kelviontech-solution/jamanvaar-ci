@@ -7,6 +7,7 @@ export * from './Button';
 export * from './StatusBadge';
 export * from './ProductCard';
 export * from './CategoryCard';
+export * from './MenuCategoryIcon';
 export * from './KpiCard';
 export * from './Modal';
 export * from './StateFeedback';
@@ -33,3 +34,5 @@ export * from './CachedImg';
 export * from './ConnectionPanel';
 
 export * from './LocalCorePairing';
+
+export * from './JamanAiAccessNotice';

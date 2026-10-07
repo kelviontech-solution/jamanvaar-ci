@@ -1,0 +1,37 @@
+{
+  "id": "dish-3594c73099db25",
+  "kind": "dish",
+  "name": "Shrikhand",
+  "description": "Shrikhand, gujarati sweet portions for a meal finish.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Sweets & Beverages"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Indian Sweets"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/shrikhand.webp"
+  ],
+  "file": "dish-3594c73099db25.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 64256,
+  "sha256": "8b50fe455c04c1f79b44a148acf8a9b345235e9ce9acf34310799d646eee0002"
+}

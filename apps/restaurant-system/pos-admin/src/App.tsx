@@ -14,6 +14,8 @@ import {
   ReservationRepository,
   StaffRepository
 } from '@jamanvaar/database';
+import { NetworkStatusService } from '@jamanvaar/api';
+import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
@@ -529,6 +531,24 @@ export default function PosAdminApp() {
       unsubDb();
       clearInterval(pollInterval);
     };
+  }, []);
+
+  // Keep menu/category pictures on this device, so a dish still shows its real photo once the internet is
+  // down, instead of silently falling back to the placeholder icon. This only ever ran in the kiosk app; an
+  // owner editing the menu through an outage never had the pictures saved locally to fall back to.
+  useEffect(() => {
+    let lastKey = '';
+    const warmImages = () => {
+      if (!NetworkStatusService.isOnline()) return;
+      const list = collectMenuImageUrls(db.menuItems, db.categories);
+      const key = list.join('|');
+      if (key === lastKey) return;
+      lastKey = key;
+      void ImageCache.sync(list);
+    };
+    const unsubNet = NetworkStatusService.subscribe(warmImages);
+    const unsubDb2 = db.subscribe(warmImages);
+    return () => { unsubNet(); unsubDb2(); };
   }, []);
 
   // Database-layer gap: the menu previously lived only in whichever device's
@@ -1862,6 +1882,11 @@ export default function PosAdminApp() {
           isOpen={isNotifDrawerOpen}
           onClose={() => setIsNotifDrawerOpen(false)}
           role="POS_ADMIN"
+          onSelectNotification={(notif) => {
+            // A bill notification lands on Billing, where the bill is listed with its amount under "Bills waiting".
+            if (notif.meta?.orderId) setActiveTab('BILLING_SALES');
+            setIsNotifDrawerOpen(false);
+          }}
         />
 
         <NotificationToastContainer role="POS_ADMIN" />

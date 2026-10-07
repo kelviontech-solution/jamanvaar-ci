@@ -1,0 +1,26 @@
+{
+  "id": "dish-f335a3ce647f14",
+  "kind": "dish",
+  "name": "Jain Rotli Shaak Meal",
+  "description": "Jain Rotli Shaak Meal, complete meals without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Jain Thali"
+    }
+  ],
+  "file": "dish-f335a3ce647f14.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94288,
+  "sha256": "779a7f25bd9ea438f744bf044f8402e2fe9a79b9fdea188bafa9ed47a79b9524"
+}

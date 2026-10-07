@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import sharp from 'sharp';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const [id, source] = process.argv.slice(2);
+if (!/^((dish-[a-f0-9]{14})|(category-[a-f0-9]{14})|(combo-[a-z0-9-]+))$/.test(id || '') || !source) throw new Error('Expected photo ID and generated source file.');
+const publishedPlan = path.join(root, 'packages/assets/menu/template-photos-v1/generation-plan.json');
+const jobs = JSON.parse(fs.readFileSync(fs.existsSync(publishedPlan) ? publishedPlan : path.join(root, 'logs/template-photo-jobs.json'), 'utf8'));
+const job = jobs.find(candidate => candidate.id === id);
+if (!job) throw new Error('Photo is not part of the reviewed catalogue.');
+const directory = path.join(root, 'packages/assets/menu/template-photos-v1');
+fs.mkdirSync(path.join(directory, 'metadata'), { recursive: true });
+const file = `${id}.webp`;
+const target = path.join(directory, file);
+await sharp(source).resize({ width: 840, withoutEnlargement: true }).webp({ quality: 80 }).toFile(target);
+const bytes = fs.readFileSync(target);
+const { width, height } = await sharp(bytes).metadata();
+const record = { ...job, file, source: 'AI_GENERATED_STARTER_PHOTO', generatedAt: '2026-10-07', width, height, bytes: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') };
+fs.writeFileSync(path.join(directory, 'metadata', `${id}.json`), JSON.stringify(record, null, 2) + '\n');
+console.log(JSON.stringify({ id, bytes: bytes.length }));

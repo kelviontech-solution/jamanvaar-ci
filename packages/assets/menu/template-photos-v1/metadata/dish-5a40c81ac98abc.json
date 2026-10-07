@@ -1,0 +1,33 @@
+{
+  "id": "dish-5a40c81ac98abc",
+  "kind": "dish",
+  "name": "Wheat Bhakri",
+  "description": "Wheat Bhakri, fresh wheat or millet breads cooked on a griddle.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Breads"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/biscuit-bhakri.webp"
+  ],
+  "file": "dish-5a40c81ac98abc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106140,
+  "sha256": "738b6430673cd2523af66337cbe05dcd6158414f4336562d26de53442d4fc4f7"
+}

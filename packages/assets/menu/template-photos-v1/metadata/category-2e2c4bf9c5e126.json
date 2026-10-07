@@ -1,0 +1,32 @@
+{
+  "id": "category-2e2c4bf9c5e126",
+  "kind": "category",
+  "name": "Combos — Street Food Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-chaat",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Pani Puri Platter (6 Pcs)",
+      "description": "Crispy puris stuffed with spiced chickpea mash, tangy mint-coriander water and sweet date chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Bread Pakora",
+      "description": "Bread Pakora, freshly fried snacks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-2e2c4bf9c5e126.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99828,
+  "sha256": "db73254233ff0d8e98ed8fbf773e57c7ad9141964c5149bdd0d7536a77d4ff4c"
+}

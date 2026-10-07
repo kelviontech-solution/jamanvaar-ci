@@ -1,0 +1,37 @@
+{
+  "id": "category-0e38dcf5698e1a",
+  "kind": "category",
+  "name": "Rice & Khichdi — Gujarati Restaurant",
+  "categoryName": "Rice & Khichdi",
+  "templateId": "tpl-gujarati",
+  "slug": "rice-khichdi",
+  "description": "Comforting rice and lentil preparations",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rice & Khichdi",
+  "components": [
+    {
+      "name": "Plain Khichdi",
+      "description": "Plain Khichdi, comforting rice and lentil preparations.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vaghareli Khichdi",
+      "description": "Vaghareli Khichdi, comforting rice and lentil preparations.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, comforting rice and lentil preparations.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-0e38dcf5698e1a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 115300,
+  "sha256": "1feed0690f5a114de294dbe4350cf9bc01317a78595e45697385c5e7cdd2dcd1"
+}

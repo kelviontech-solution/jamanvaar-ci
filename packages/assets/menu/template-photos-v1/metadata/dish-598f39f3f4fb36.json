@@ -1,0 +1,37 @@
+{
+  "id": "dish-598f39f3f4fb36",
+  "kind": "dish",
+  "name": "Chicken Curry",
+  "description": "Chicken Curry, slow-simmered Indian gravies with fresh spices.",
+  "diet": "NON_VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Main Course",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Rice & Curries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-598f39f3f4fb36.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99934,
+  "sha256": "211476c3195dfb12acc459e712c4195b523a649bde7ce79666471d3a4ddc1e07"
+}

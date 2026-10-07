@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, BusinessDayRepository, summarizeStations, RiderRepository } from '@jamanvaar/database';
+import { SyncOutboxEngine } from '@jamanvaar/sync';
 import { Order, OrderStatus } from '@jamanvaar/types';
-import { formatINR } from '@jamanvaar/utils';
+import { formatINR, getOrderSource, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { getPaymentStatus } from '../../cloud/cloudClient';
 import { QrOrdersInbox } from './QrOrdersInbox';
 import {
@@ -63,13 +64,7 @@ export const PosOrdersView: React.FC = () => {
     return scopedOrders.filter((o) => {
       if (statusFilter !== 'ALL' && o.orderStatus !== statusFilter) return false;
       if (sourceFilter !== 'ALL') {
-        const orderSrc =
-          o.source_type ||
-          (o.orderType === 'QR_TABLE'
-            ? 'QR_TABLE'
-            : o.kioskId?.startsWith('KIOSK')
-            ? 'KIOSK'
-            : 'POS');
+        const orderSrc = getOrderSource(o);
         if (orderSrc !== sourceFilter) return false;
       }
 
@@ -97,6 +92,10 @@ export const PosOrdersView: React.FC = () => {
   }, [scopedOrders]);
 
   const handleSettleCounterCash = async (order: Order) => {
+    if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED') {
+      alert('This order is cancelled or refunded and cannot be settled.');
+      return;
+    }
     if (order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT') {
       alert('This QR order is awaiting online payment verification. Ask the guest to continue payment on their phone.');
       return;
@@ -112,6 +111,7 @@ export const PosOrdersView: React.FC = () => {
         const result = await getPaymentStatus(order.paymentTransactionId);
         if (result.status === 'SUCCESS') {
           OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Razorpay UPI (reconciled at counter)');
+          void SyncOutboxEngine.flush();
           const updated = OrderRepository.getOrderById(order.id);
           if (updated) {
             setLastCompletedOrder(updated);
@@ -130,6 +130,7 @@ export const PosOrdersView: React.FC = () => {
     }
 
     OrderRepository.settleOrder(order.id, 'CASH', order.totalAmount, undefined, 'Cashier Counter');
+    void SyncOutboxEngine.flush();
     const updated = OrderRepository.getOrderById(order.id);
     if (updated) {
       setLastCompletedOrder(updated);
@@ -310,7 +311,7 @@ export const PosOrdersView: React.FC = () => {
               // carries paymentMethod: 'UPI' with paymentStatus: 'PENDING',
               // and staff need to be able to collect cash for it too.
               const isPendingOnlineQr = order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT';
-              const isCounterCashPending = order.paymentStatus === 'PENDING' && !isPendingOnlineQr;
+              const isCounterCashPending = order.paymentStatus === 'PENDING' && !isPendingOnlineQr && order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'REFUNDED';
               // This specific order attempted a real UPI payment first —
               // Razorpay's webhook (or this kiosk's own background
               // reconciliation) may still confirm it after the visible
@@ -623,7 +624,7 @@ export const PosOrdersView: React.FC = () => {
                   </div>
                 )}
                 <div className="flex justify-between text-slate-500">
-                  <span>GST Tax (5%):</span>
+                  <span>{taxLabels(restaurantGstRate(db.taxGroups)).total}:</span>
                   <span className="font-mono">{formatINR(selectedOrder.taxAmount)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-black text-jaman-navy pt-1 border-t border-dashed border-slate-200">

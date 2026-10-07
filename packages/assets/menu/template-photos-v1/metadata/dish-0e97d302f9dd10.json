@@ -1,0 +1,25 @@
+{
+  "id": "dish-0e97d302f9dd10",
+  "kind": "dish",
+  "name": "Onion Raita",
+  "description": "Onion Raita, traditional biryani accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Accompaniments"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-0e97d302f9dd10.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 54056,
+  "sha256": "dca1a3e65c1b0de6649ac2df7aa19e006d717611d96b0d5434eae0ea0964e3ba"
+}

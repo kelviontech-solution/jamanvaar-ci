@@ -1,0 +1,25 @@
+{
+  "id": "dish-82b0fd8b436d9e",
+  "kind": "dish",
+  "name": "Pav Bhaji",
+  "description": "Pav Bhaji, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-82b0fd8b436d9e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99902,
+  "sha256": "a2f83e7d59dd8d0d05d4a3ae69a78daeccec7f5c7c2b7eb65482a49cfde870b3"
+}

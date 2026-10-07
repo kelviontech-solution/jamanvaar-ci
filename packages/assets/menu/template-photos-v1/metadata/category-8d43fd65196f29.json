@@ -1,0 +1,37 @@
+{
+  "id": "category-8d43fd65196f29",
+  "kind": "category",
+  "name": "Desserts — Bakery, Patisserie & Cafe",
+  "categoryName": "Desserts",
+  "templateId": "tpl-bakery",
+  "slug": "desserts",
+  "description": "Small sweet bakes",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, small sweet bakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, small sweet bakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Blueberry Muffin",
+      "description": "Blueberry Muffin, small sweet bakes.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-8d43fd65196f29.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104928,
+  "sha256": "e94e3d1ae317e34254c66fa05f0793ff06ded774168a0358f812befa67d16ee2"
+}

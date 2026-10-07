@@ -53,13 +53,9 @@ describe('Staff messages and bill requests across devices (BUG-099/100)', () => 
     expect(NotificationRepository.getNotifications('POS').map((n) => n.message)).toContain('Fire drill');
   });
 
-  it('a bill request reaches the counter as a "bill requested" notification for that table', () => {
+  it('a bare bill message raises no notification: the bill itself (items and amount) comes from its order', () => {
     ServiceMessages.applyRemote(remote({ id: 'bill-1', kind: 'BILL_REQUEST', recipient: 'POS', presetText: 'Bill requested', tableNumber: '7' }), 'POS');
-
-    const [n] = NotificationRepository.getNotifications('POS');
-    expect(n.type).toBe('BILL_REQUESTED');
-    expect(n.title).toContain('Table 7');
-    expect(n.tableNumber).toBe('7');
+    expect(NotificationRepository.getNotifications('POS')).toHaveLength(0);
   });
 
   it('the owner\'s Restaurant Admin also sees bill requests and manager messages', () => {

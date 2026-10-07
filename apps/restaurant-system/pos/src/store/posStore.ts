@@ -1372,7 +1372,12 @@ export const usePosStore = create<PosState>((set, get) => {
       }
 
       const order = OrderRepository.getOrderById(table.currentOrderId);
-      if (!order) return;
+      if (!order) {
+        // The table's order has not reached this counter yet (table status can arrive before the order). Fetch it; the
+        // table can then be opened from the floor plan again.
+        void SyncOutboxEngine.catchUpFromCloud();
+        return;
+      }
 
       const cartItems: CartItem[] = order.items.map((oi) => {
         const itemObj = db.menuItems.find((m) => m.id === oi.menuItemId) || {

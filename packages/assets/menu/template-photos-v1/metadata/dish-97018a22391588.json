@@ -1,0 +1,25 @@
+{
+  "id": "dish-97018a22391588",
+  "kind": "dish",
+  "name": "Vaghareli Khichdi with Kadhi",
+  "description": "Rice and moong dal tempered with garlic, onions, cloves and whole spices, paired with Gujarati Kadhi",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Khichdi & Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Khichdi & Rice"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/khichdi-kadhi.webp"
+  ],
+  "file": "dish-97018a22391588.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85928,
+  "sha256": "0a7a2218f219a8b4959b7ab6e306a71939973ebbd1f525acef701c531ff77dba"
+}

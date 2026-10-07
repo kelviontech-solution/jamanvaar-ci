@@ -668,6 +668,13 @@ export const PosHeader: React.FC = () => {
         isOpen={isNotifDrawerOpen}
         onClose={() => setIsNotifDrawerOpen(false)}
         role="POS"
+        onSelectNotification={(notif) => {
+          // A bill notification opens that table's bill: the items and the amount to collect are in the cart, ready for payment.
+          const orderId = notif.meta?.orderId as string | undefined;
+          const table = orderId ? db.tables.find((t) => t.currentOrderId === orderId) : undefined;
+          if (table) usePosStore.getState().loadOrderFromTable(table);
+          setIsNotifDrawerOpen(false);
+        }}
       />
 
       {/* Close Business Day Modal */}

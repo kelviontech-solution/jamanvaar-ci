@@ -1,0 +1,37 @@
+{
+  "id": "category-1476b71182ec86",
+  "kind": "category",
+  "name": "Jain Starters — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Starters",
+  "templateId": "tpl-jain",
+  "slug": "jain-starters",
+  "description": "Prepared without onion, garlic or root vegetables",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters",
+  "components": [
+    {
+      "name": "Jain Paneer Tikka",
+      "description": "Jain Paneer Tikka, prepared without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Hara Bhara Kebab",
+      "description": "Jain Hara Bhara Kebab, prepared without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Corn Chaat",
+      "description": "Jain Corn Chaat, prepared without onion, garlic or root vegetables.",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1476b71182ec86.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105006,
+  "sha256": "8aa315e83bc2e352c2efaedbd2cb50bd854d1286d6ddfc7e9c93f3e15f9809ff"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-743cb5e5d120fb",
+  "kind": "dish",
+  "name": "Methi Thepla (4 Pcs)",
+  "description": "Spiced fenugreek and whole wheat flatbreads served with sweet mango chundo",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/methi-thepla.webp"
+  ],
+  "file": "dish-743cb5e5d120fb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93914,
+  "sha256": "6bde55a3400e44ac3ddc7c6e0a31066893fe6758890d5a18099ce49ca299ef61"
+}

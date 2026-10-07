@@ -54,7 +54,7 @@ export interface QrSettingsView {
 
 const FIELDS: Array<keyof QrSettingsView> = ['orderingEnabled', 'tableOrderingEnabled', 'menuOnlyEnabled', 'allowCustomerNotes', 'allowModifiers', 'allowCash', 'allowOnlinePayment', 'showOrderStatus', 'autoAccept', 'requireCustomerName', 'requireCustomerPhone'];
 
-/** What a restaurant gets before it has changed anything. These are the column defaults, not business rules elsewhere. */
+/** New restaurants offer online checkout when gateway readiness permits it; explicit opt-outs remain authoritative. */
 export const DEFAULT_QR_SETTINGS: QrSettingsView = {
   orderingEnabled: true,
   tableOrderingEnabled: true,
@@ -62,7 +62,7 @@ export const DEFAULT_QR_SETTINGS: QrSettingsView = {
   allowCustomerNotes: true,
   allowModifiers: true,
   allowCash: true,
-  allowOnlinePayment: false,
+  allowOnlinePayment: true,
   showOrderStatus: true,
   autoAccept: false,
   requireCustomerName: false,
@@ -106,7 +106,7 @@ export class QrSettingsService {
       }
       const existing = await tx.qrSettings.findFirst({ where: { restaurantId, branchId } });
       if (existing) await tx.qrSettings.update({ where: { id: existing.id }, data: changes });
-      else await tx.qrSettings.create({ data: { restaurantId, branchId, ...changes } });
+      else await tx.qrSettings.create({ data: { restaurantId, branchId, ...before, ...changes } });
       await this.audit.log(
         { actorType: 'TENANT', actorId: actor.id, restaurantId, action: QR_AUDIT.SETTINGS_CHANGED, category: 'QR_ORDERING', details: { branchId, changes, actorKind: actor.type } },
         tx

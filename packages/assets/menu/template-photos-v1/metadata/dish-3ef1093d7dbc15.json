@@ -1,0 +1,22 @@
+{
+  "id": "dish-3ef1093d7dbc15",
+  "kind": "dish",
+  "name": "Veg Hot and Sour Soup",
+  "description": "Veg Hot and Sour Soup, hot vegetable broth finished to order.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Soups",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Soups"
+    }
+  ],
+  "file": "dish-3ef1093d7dbc15.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 70882,
+  "sha256": "fa219c9cf6c5cf2d0ce3f0c090315afaca016a6cca5fd78f609391e2c1b68151"
+}

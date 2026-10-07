@@ -1,0 +1,22 @@
+{
+  "id": "dish-0168d0c203b9fc",
+  "kind": "dish",
+  "name": "Jain Sweet Lassi",
+  "description": "Jain Sweet Lassi, traditional dairy sweets and refreshments.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Sweets & Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Sweets & Beverages"
+    }
+  ],
+  "file": "dish-0168d0c203b9fc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 42320,
+  "sha256": "adaa4a7c4bc53f991b741eeae5d47801a9501fa38ec60a024c094a455e858392"
+}

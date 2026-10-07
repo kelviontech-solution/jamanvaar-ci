@@ -276,11 +276,11 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
 
   it('a Kiosk Admin device can refund an online payment (POS and POS Admin already could)', async () => {
     const p = await seedPayment(restaurantId, { amount: 10000, fulfilled: true });
-    const res = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 2500, reason: 'wrong dish', requestedBy: 'Owner', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
+    const res = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 2500, reason: 'wrong dish', requestedBy: 'Owner', method: 'CASH', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
     expect(res.status).toBe(201);
-    expect(gateway.createRefund).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: 2500, razorpayPaymentId: p.providerPaymentId }));
+    expect(gateway.createRefund).not.toHaveBeenCalled(); // refunds are recorded by hand, never sent through Razorpay
     // a plain kiosk (customer-facing) still can not
-    const denied = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x' });
+    const denied = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x', method: 'CASH' });
     expect(denied.status).toBe(403);
   });
 
@@ -299,14 +299,14 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   it('Super Admin refund requires the admin password, respects the refundable balance, and is audited', async () => {
     const p = await seedPayment(restaurantId, { amount: 10000, fulfilled: true });
     const url = `/api/v1/payments/${p.id}/admin-refund`;
-    expect((await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill' })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill', password: 'wrong' })).status).toBe(403);
-    expect((await authed('post', url, platformToken).send({ amountPaise: 99999, reason: 'too much', password: adminPassword })).status).toBe(400);
+    expect((await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill', method: 'CASH' })).status).toBe(403);
+    expect((await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill', method: 'CASH', password: 'wrong' })).status).toBe(403);
+    expect((await authed('post', url, platformToken).send({ amountPaise: 99999, reason: 'too much', method: 'CASH', password: adminPassword })).status).toBe(400);
 
     gateway.createRefund.mockClear();
-    const ok = await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill', password: adminPassword });
+    const ok = await authed('post', url, platformToken).send({ amountPaise: 1000, reason: 'goodwill', method: 'CASH', password: adminPassword });
     expect(ok.status).toBe(201);
-    expect(gateway.createRefund).toHaveBeenCalledWith(expect.objectContaining({ amountPaise: 1000 }));
+    expect(gateway.createRefund).not.toHaveBeenCalled();
     const audit = await prisma.runAsPlatform((tx) => tx.auditLog.findFirst({ where: { action: 'REFUND_REQUESTED', restaurantId }, orderBy: { createdAt: 'desc' } }));
     expect(audit).not.toBeNull();
     expect(audit!.actorType).toBe('PLATFORM');
@@ -318,7 +318,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     const token = (await platformLogin(app, email, adminPassword)).body.accessToken;
     const p = await seedPayment(restaurantId, { amount: 2000, fulfilled: true });
     expect((await authed('get', '/api/v1/payments/attention', token)).status).toBe(200);
-    expect((await authed('post', `/api/v1/payments/${p.id}/admin-refund`, token).send({ amountPaise: 100, reason: 'x', password: adminPassword })).status).toBe(403);
+    expect((await authed('post', `/api/v1/payments/${p.id}/admin-refund`, token).send({ amountPaise: 100, reason: 'x', method: 'CASH', password: adminPassword })).status).toBe(403);
     await prisma.platformUser.deleteMany({ where: { email } });
   });
 
@@ -387,7 +387,7 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     const payout = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.create({ data: { restaurantId, businessDate: '20261006', grossAmount: 10000, feeAmount: 300, netAmount: 9700, paymentCount: 1 } }));
     await prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.update({ where: { id: p.id }, data: { payoutId: payout.id } }));
     gateway.createRefund.mockResolvedValueOnce({ refundId: `rfnd_batch_${p.id}`, status: 'processed', amountPaise: 1000 });
-    const result = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 1000, reason: 'wrong dish after batch', requestedBy: 'Owner', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
+    const result = await authed('post', `/api/v1/payments/${p.id}/refund`, kioskAdminToken).send({ amountPaise: 1000, reason: 'wrong dish after batch', requestedBy: 'Owner', method: 'CASH', staffSession: await refundManagerSession(app, prisma, kioskAdminToken) });
     expect(result.status).toBe(201);
     const held = await prisma.runAsTenant(restaurantId, tx => tx.restaurantPayout.findUniqueOrThrow({ where: { id: payout.id } }));
     expect(held.status).toBe('ON_HOLD');

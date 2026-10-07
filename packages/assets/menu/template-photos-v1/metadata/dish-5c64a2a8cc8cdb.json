@@ -1,0 +1,25 @@
+{
+  "id": "dish-5c64a2a8cc8cdb",
+  "kind": "dish",
+  "name": "Cheese Garlic Bread",
+  "description": "Cheese Garlic Bread, oven-baked bread with garlic butter and herbs.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Garlic Bread",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Garlic Bread"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-5c64a2a8cc8cdb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127308,
+  "sha256": "2907f26c44e73be78252adf62e2e0b4a5c7f754002a12093d6d2872262d2c1b1"
+}

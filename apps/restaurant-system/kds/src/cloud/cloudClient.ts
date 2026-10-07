@@ -1,3 +1,4 @@
+import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
@@ -21,7 +22,8 @@ EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_
 const client = createDeviceCloudClient({
   keyPrefix: 'jamanvaar_kds',
   apiBase: API_BASE,
-  appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'
+  appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+  onBeforeHeartbeat: ({ apiBase, deviceToken }) => void refreshAiConfigIfStale({ apiBase, deviceToken })
 });
 const { restaurantId: RESTAURANT_ID_KEY, deviceId: DEVICE_ID_KEY, deviceToken: DEVICE_TOKEN_KEY } = client.keys;
 
@@ -35,6 +37,7 @@ export const isKdsDeviceConnected = client.isDeviceConnected;
  * device credential and forgets the lock state, so the app falls back to asking for a fresh activation key.
  */
 export function resetTerminal(): void {
+  AiConfig.reset();
   stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
@@ -90,3 +93,8 @@ export const {
   syncRestaurantIdentity,
   leaseNumberBlock
 } = client;
+
+export async function reportAiQueryNow(intent: string, latencyMs: number): Promise<void> {
+  const deviceToken = client.getDeviceToken();
+  if (deviceToken) await reportAiQuery({ apiBase: API_BASE, deviceToken, intent, latencyMs });
+}

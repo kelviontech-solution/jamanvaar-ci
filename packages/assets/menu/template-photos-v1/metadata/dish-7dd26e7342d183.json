@@ -1,0 +1,33 @@
+{
+  "id": "dish-7dd26e7342d183",
+  "kind": "dish",
+  "name": "Paneer Tikka",
+  "description": "Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/paneer-tikka.jpg"
+  ],
+  "file": "dish-7dd26e7342d183.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88478,
+  "sha256": "eaef26d5a0d4dec5edcecb27ceb8222993e67135c53c1a7886e89a375f04d9bb"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-c19572e2f84114",
+  "kind": "dish",
+  "name": "Misal Pav",
+  "description": "Misal Pav, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c19572e2f84114.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96904,
+  "sha256": "c94c3e8261057865f7ff65d4c3c6764fc9fbbf84c29cc91a2ed29837cc63de08"
+}

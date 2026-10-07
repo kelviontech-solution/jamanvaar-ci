@@ -1,0 +1,15 @@
+﻿JAMANVAAR | Billing statement
+Restaurant,QA Billing 1791344070265
+Branch,QA Billing 1791344070265
+Address,
+GSTIN,
+Contact,
+Date scope,Today (07 Oct 2026)
+Filters,Kiosk · Pending collection
+Order value,250
+Collected (after refunds),0
+Pending collection,250
+Refunds,0
+
+Invoice / Order,Token,Created at,Source,Type,Table,Customer,Phone,Items,Subtotal,Discount,GST,Total,Tender,Payment status,Order status,Pending collection,Refund amount
+MAIN-20261007-301,K-101,2026-10-07T03:35:00.477Z,Kiosk,TAKEAWAY,,Walk-in,,1 x Cold Coffee,250,0,0,250,CASH_AT_COUNTER,PENDING,CONFIRMED,250,0

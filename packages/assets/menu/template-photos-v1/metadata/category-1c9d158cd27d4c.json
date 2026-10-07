@@ -1,0 +1,37 @@
+{
+  "id": "category-1c9d158cd27d4c",
+  "kind": "category",
+  "name": "Jain Thali — Grand Indian Thali Restaurant",
+  "categoryName": "Jain Thali",
+  "templateId": "tpl-thali",
+  "slug": "jain-thali",
+  "description": "Complete meals without onion, garlic or root vegetables",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Jain Thali",
+  "components": [
+    {
+      "name": "Jain Special Thali",
+      "description": "Jain Special Thali, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jain Mini Thali",
+      "description": "Jain Mini Thali, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Jain Rotli Shaak Meal",
+      "description": "Jain Rotli Shaak Meal, complete meals without onion, garlic or root vegetables.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1c9d158cd27d4c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101788,
+  "sha256": "2185dddae35701b3f9cf7ea36b48dbf6d715117f641eb3b8cc65c627d3aed6b3"
+}

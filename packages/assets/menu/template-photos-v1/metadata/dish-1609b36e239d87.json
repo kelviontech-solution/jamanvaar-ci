@@ -1,0 +1,30 @@
+{
+  "id": "dish-1609b36e239d87",
+  "kind": "dish",
+  "name": "Brownie with Ice Cream",
+  "description": "Brownie with Ice Cream, desserts served warm.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Warm Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Warm Desserts"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Warm Desserts"
+    }
+  ],
+  "file": "dish-1609b36e239d87.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90362,
+  "sha256": "cbced25e60f17333100dab41114a68014d8407526cbf3e19022196b848d10a56"
+}

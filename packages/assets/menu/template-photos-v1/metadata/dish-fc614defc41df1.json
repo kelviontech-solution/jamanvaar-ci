@@ -1,0 +1,22 @@
+{
+  "id": "dish-fc614defc41df1",
+  "kind": "dish",
+  "name": "Cafe Latte",
+  "description": "Cafe Latte, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    }
+  ],
+  "file": "dish-fc614defc41df1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 57700,
+  "sha256": "023ab8395a9371cc1bd2ad9b9dd45959b98de46b1b11226c461b2f5e6b08982f"
+}

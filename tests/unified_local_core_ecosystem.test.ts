@@ -146,6 +146,8 @@ describe('JAMANVAAR — Unified Multi-App Restaurant Ecosystem Suite', () => {
       payload: {
         tableNumber: '12',
         orderType: 'DINE_IN',
+        // A dine-in bill is settled at the counter: unpaid until the bill request is paid.
+        paymentMethod: 'CASH_AT_COUNTER',
         items: [{ dishId: 'DM-05', name: 'Dal Makhani', quantity: 2, unitPrice: 240 }]
       }
     };

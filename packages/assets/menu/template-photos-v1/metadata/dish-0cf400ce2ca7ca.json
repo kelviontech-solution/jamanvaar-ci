@@ -1,0 +1,26 @@
+{
+  "id": "dish-0cf400ce2ca7ca",
+  "kind": "dish",
+  "name": "Veg Club Sandwich",
+  "description": "Veg Club Sandwich, fresh fillings in toasted or grilled bread.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sandwiches"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Sandwiches"
+    }
+  ],
+  "file": "dish-0cf400ce2ca7ca.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 89554,
+  "sha256": "b6bf17ead6a6939d16cafd2df4504185e12bbccb5a48b1fc4d167745b1a0cbea"
+}

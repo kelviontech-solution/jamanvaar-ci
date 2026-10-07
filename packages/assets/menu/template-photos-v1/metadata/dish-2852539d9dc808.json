@@ -1,0 +1,22 @@
+{
+  "id": "dish-2852539d9dc808",
+  "kind": "dish",
+  "name": "Black Forest Cake",
+  "description": "Black Forest Cake, eggless celebration cakes; size selection available.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Cakes"
+    }
+  ],
+  "file": "dish-2852539d9dc808.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110150,
+  "sha256": "8ff10764522e98d0d0078c4bec6ab6bc05eda6bc7f02ebea72a88ed3ce0403ef"
+}

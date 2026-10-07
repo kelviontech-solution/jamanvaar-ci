@@ -1,0 +1,26 @@
+{
+  "id": "dish-ca3a7217a51ff9",
+  "kind": "dish",
+  "name": "Tindora Nu Shaak",
+  "description": "Tindora Nu Shaak, gujarati vegetable preparations with fresh regional spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "file": "dish-ca3a7217a51ff9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113526,
+  "sha256": "b7d0ab0c40312f0468f99f0b745cda6b7e740d9f5d1e0809dfae2ea5e68d1ef5"
+}

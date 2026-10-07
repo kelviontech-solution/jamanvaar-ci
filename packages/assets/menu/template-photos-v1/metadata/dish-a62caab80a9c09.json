@@ -1,0 +1,22 @@
+{
+  "id": "dish-a62caab80a9c09",
+  "kind": "dish",
+  "name": "Chicken Momos",
+  "description": "Chicken Momos, fresh dumplings with dipping sauce.",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Momos",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Momos"
+    }
+  ],
+  "file": "dish-a62caab80a9c09.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74536,
+  "sha256": "878d9dd054df38a7a812b61be3dfa51970263797e81acecd2d32c587db720d2c"
+}

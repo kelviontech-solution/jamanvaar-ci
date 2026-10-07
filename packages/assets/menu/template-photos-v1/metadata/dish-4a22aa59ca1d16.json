@@ -1,0 +1,25 @@
+{
+  "id": "dish-4a22aa59ca1d16",
+  "kind": "dish",
+  "name": "Bhel Puri",
+  "description": "Bhel Puri, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-4a22aa59ca1d16.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88694,
+  "sha256": "50045a6760cc58261441150722993867189fe94fb2c001c743e6c7938dacdbe5"
+}

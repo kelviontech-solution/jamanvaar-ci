@@ -1,0 +1,25 @@
+{
+  "id": "dish-40640ab44b4e7b",
+  "kind": "dish",
+  "name": "Dal Makhani Bukhara",
+  "description": "Whole black lentils slow-cooked overnight with white butter, cream and sun-dried fenugreek",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal & Heritage Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Dal & Heritage Curries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/dal-makhani.jpg"
+  ],
+  "file": "dish-40640ab44b4e7b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106620,
+  "sha256": "c5a0345ed46b77d462a16faa8f9d9b6006d7499b81a47a2165cc6d548e758d67"
+}

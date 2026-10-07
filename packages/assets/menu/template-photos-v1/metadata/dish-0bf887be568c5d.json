@@ -1,0 +1,22 @@
+{
+  "id": "dish-0bf887be568c5d",
+  "kind": "dish",
+  "name": "Mughlai Paneer Lababdar",
+  "description": "Paneer batons in a velvety tomato and melon seed gravy topped with grated cheese",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Shahi Kormas & Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Shahi Kormas & Gravies"
+    }
+  ],
+  "file": "dish-0bf887be568c5d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93828,
+  "sha256": "dabf79807492f1ef9e69f1ab94c2abf3bd57bb9bc752c6761ffa52121406a763"
+}

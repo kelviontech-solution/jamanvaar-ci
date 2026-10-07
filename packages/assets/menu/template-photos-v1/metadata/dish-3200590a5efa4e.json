@@ -1,0 +1,22 @@
+{
+  "id": "dish-3200590a5efa4e",
+  "kind": "dish",
+  "name": "Cheese Balls",
+  "description": "Cheese Balls, crisp potato sides and bites.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sides"
+    }
+  ],
+  "file": "dish-3200590a5efa4e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103212,
+  "sha256": "ae960d6b73ece92db2127f098cf05b64c9bc5a5b6fe4592dedd019fb0222ca90"
+}

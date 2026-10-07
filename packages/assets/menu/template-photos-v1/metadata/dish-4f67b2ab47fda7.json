@@ -1,0 +1,30 @@
+{
+  "id": "dish-4f67b2ab47fda7",
+  "kind": "dish",
+  "name": "Plain Chaas",
+  "description": "Plain Chaas, chilled traditional drinks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Sweets & Beverages"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Beverages"
+    }
+  ],
+  "file": "dish-4f67b2ab47fda7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 64924,
+  "sha256": "e3858a874db34c6a33cdbe6235e0174efba5b8657c7f5ed52dbbe73ec6f4d478"
+}

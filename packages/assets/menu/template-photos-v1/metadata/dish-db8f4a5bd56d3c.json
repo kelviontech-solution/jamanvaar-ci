@@ -1,0 +1,25 @@
+{
+  "id": "dish-db8f4a5bd56d3c",
+  "kind": "dish",
+  "name": "Extra Gravy",
+  "description": "Extra Gravy, traditional biryani accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Accompaniments"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-db8f4a5bd56d3c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74854,
+  "sha256": "ea3b6b56f709748ae641f960cc49034b8270393073edae2f71d340f3e4fb98ad"
+}

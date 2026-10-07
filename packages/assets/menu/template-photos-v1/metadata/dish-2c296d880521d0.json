@@ -1,0 +1,38 @@
+{
+  "id": "dish-2c296d880521d0",
+  "kind": "dish",
+  "name": "Jeera Rice",
+  "description": "Jeera Rice, steamed or tempered basmati rice.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rice & Khichdi"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Rice"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Rice & Curries"
+    }
+  ],
+  "file": "dish-2c296d880521d0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80382,
+  "sha256": "7dbc5bd6d43679d7579a5d0c7bf5ec5e65b7136f192d45fab09ea18dbb93b6ab"
+}

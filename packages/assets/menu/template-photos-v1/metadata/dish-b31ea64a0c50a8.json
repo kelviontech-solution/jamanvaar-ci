@@ -1,0 +1,25 @@
+{
+  "id": "dish-b31ea64a0c50a8",
+  "kind": "dish",
+  "name": "Aloo Tikki Chaat",
+  "description": "Aloo Tikki Chaat, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-b31ea64a0c50a8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94118,
+  "sha256": "7fdf3f7fa5c3ba92d143babc084d9503b4fbec547ef4cc27ab2018ac6a008ac0"
+}

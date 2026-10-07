@@ -1,0 +1,22 @@
+{
+  "id": "dish-17f6af53b91b70",
+  "kind": "dish",
+  "name": "White Bread Loaf",
+  "description": "White Bread Loaf, freshly baked breads.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Breads"
+    }
+  ],
+  "file": "dish-17f6af53b91b70.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73490,
+  "sha256": "bcb7d5964b7fb552b60d318a2fc80c8ce376dee648ac9b4f9498a14b2ca6c5fb"
+}

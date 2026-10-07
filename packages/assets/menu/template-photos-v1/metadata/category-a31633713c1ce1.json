@@ -1,0 +1,37 @@
+{
+  "id": "category-a31633713c1ce1",
+  "kind": "category",
+  "name": "Rice & Khichdi — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Rice & Khichdi",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "rice-khichdi",
+  "description": "Rice and lentil comfort meals",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rice & Khichdi",
+  "components": [
+    {
+      "name": "Plain Khichdi",
+      "description": "Plain Khichdi, rice and lentil comfort meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vaghareli Khichdi",
+      "description": "Vaghareli Khichdi, rice and lentil comfort meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Khichdi",
+      "description": "Masala Khichdi, rice and lentil comfort meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a31633713c1ce1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108734,
+  "sha256": "3194cc4adb2f88c046f5dba65f02386ec02f63e9a11baf53d6746f194ee3d0cc"
+}

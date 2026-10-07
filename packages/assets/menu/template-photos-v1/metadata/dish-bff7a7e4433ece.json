@@ -1,0 +1,22 @@
+{
+  "id": "dish-bff7a7e4433ece",
+  "kind": "dish",
+  "name": "Steamed Ghee Podi Idli (2 Pcs)",
+  "description": "Pillow-soft steamed idlis drenched in pure desi ghee and spicy gun powder (karam podi)",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada Specialties"
+    }
+  ],
+  "file": "dish-bff7a7e4433ece.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103186,
+  "sha256": "68dee09189e244df515dd831eed17a6b426d6c9732646be41da28e37e6dd74d1"
+}

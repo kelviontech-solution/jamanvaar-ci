@@ -1,0 +1,26 @@
+{
+  "id": "dish-66e82239e373e5",
+  "kind": "dish",
+  "name": "Veg Schezwan Noodles",
+  "description": "Veg Schezwan Noodles, wok-tossed noodles and crunchy vegetables.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Noodles"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Noodles"
+    }
+  ],
+  "file": "dish-66e82239e373e5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101874,
+  "sha256": "f549f786fbc7bd0ac377b5a28b9cc6d42e8fa5ae3f97675a5d41e44d16e58f3c"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-fd9aae39e6bd05",
+  "kind": "dish",
+  "name": "Rich Basundi Bowl",
+  "description": "Slow-simmered condensed whole milk infused with nutmeg and almonds",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets & Mithai",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets & Mithai"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/basundi.webp"
+  ],
+  "file": "dish-fd9aae39e6bd05.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81706,
+  "sha256": "1bc3a8bfbf75300d5b081d5ba0bab00e49246142dbe7473baad6b81447e16dc6"
+}

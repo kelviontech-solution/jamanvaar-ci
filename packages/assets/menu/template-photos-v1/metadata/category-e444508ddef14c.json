@@ -1,0 +1,32 @@
+{
+  "id": "category-e444508ddef14c",
+  "kind": "category",
+  "name": "Grilled Sandwiches — Burger & Grilled Sandwich Bar",
+  "categoryName": "Grilled Sandwiches",
+  "templateId": "tpl-burger-sandwich",
+  "slug": "grilled-sandwiches",
+  "description": "Jumbo 3-tier grilled sandwiches with melted cheese",
+  "diet": "VEG",
+  "cuisine": "Gourmet Burgers & Sandwiches",
+  "category": "Grilled Sandwiches",
+  "components": [
+    {
+      "name": "Bombay Special Grilled Sandwich",
+      "description": "Spiced potato mash, beetroot, cucumber, tomato and processed cheese with spicy coriander chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Makhani Cheese Toastie",
+      "description": "Spiced cottage cheese tossed in makhani sauce loaded with mozzarella in golden toasted bread",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e444508ddef14c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 124872,
+  "sha256": "2a655cc5333c5ad8898710ee1b66efcfb12a89747a0c5643e8a3dd85939ebecf"
+}

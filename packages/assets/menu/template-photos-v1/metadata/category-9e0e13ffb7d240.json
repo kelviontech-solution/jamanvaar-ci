@@ -1,0 +1,32 @@
+{
+  "id": "category-9e0e13ffb7d240",
+  "kind": "category",
+  "name": "Dal — North Indian Restaurant",
+  "categoryName": "Dal",
+  "templateId": "tpl-north-indian",
+  "slug": "dal",
+  "description": "Lentils simmered and tempered before serving",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal",
+  "components": [
+    {
+      "name": "Dal Fry",
+      "description": "Dal Fry, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chana Masala",
+      "description": "Chana Masala, lentils simmered and tempered before serving.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-9e0e13ffb7d240.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98448,
+  "sha256": "304d531d2fc0148cfc5b8e59ad2dc555046c61170d1cc65bcee2fa8ff8897521"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-7b40ac78d6b80f",
+  "kind": "dish",
+  "name": "Chilli Paneer",
+  "description": "Chilli Paneer, wok-tossed or crisp starters with house sauces.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/chinese/chilli-paneer.jpg"
+  ],
+  "file": "dish-7b40ac78d6b80f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111106,
+  "sha256": "963feb5d30d5ae2ca6dce0fcaa163a88b9ac41f13e2ae7e58d98e7f236768729"
+}

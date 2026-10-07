@@ -1,5 +1,5 @@
 import { Cart, CartItem, Coupon, MenuItem, SelectedModifier, TaxGroup } from '@jamanvaar/types';
-import { calculateRoundOff, roundToTwoDecimals } from '@jamanvaar/utils';
+import { calculateRoundOff, roundToTwoDecimals, resolveDefaultTaxGroup } from '@jamanvaar/utils';
 import { APP_CONSTANTS } from '@jamanvaar/config';
 
 /**
@@ -59,10 +59,12 @@ export interface CalculateCartOptions {
   sgstPercent?: number;
   serviceChargePercent?: number;
   tipAmount?: number;
-  /** When supplied, only the item's active configured tax group is charged; unassigned items are untaxed. */
+  /** When supplied, each item is taxed at its active tax group, or the default group when it has none (see resolveDefaultTaxGroup). */
   taxGroups?: TaxGroup[];
   roundToRupee?: boolean;
 }
+
+export { resolveDefaultTaxGroup };
 
 /**
  * Calculates authoritative cart financial breakdown:
@@ -155,10 +157,11 @@ export function calculateCart(options: CalculateCartOptions): Cart {
   let includedTax = 0;
   if (options.taxGroups !== undefined) {
     const groups = new Map(options.taxGroups.filter(g => g.isActive).map(g => [g.id, g]));
+    const defaultGroup = resolveDefaultTaxGroup(options.taxGroups);
     let cgstPaise = 0, sgstPaise = 0, includedPaise = 0, allocatedDiscount = 0;
     const discountPaise = Math.round(totalDiscountAmount * 100);
     for (const [index, line] of processedItems.entries()) {
-      const group = groups.get(line.item.taxGroupId ?? '');
+      const group = groups.get(line.item.taxGroupId ?? '') ?? defaultGroup;
       const grossPaise = Math.round(line.itemTotal * 100);
       const lineDiscount = discountScope === 'ITEMS' ? Math.round((line.itemDiscountAmount ?? 0) * 100)
         : index === processedItems.length - 1 ? discountPaise - allocatedDiscount

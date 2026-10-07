@@ -1,0 +1,22 @@
+{
+  "id": "dish-52922d905446d4",
+  "kind": "dish",
+  "name": "Ginger Tea",
+  "description": "Ginger Tea, brewed tea and infusions.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Tea",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Tea"
+    }
+  ],
+  "file": "dish-52922d905446d4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 58766,
+  "sha256": "8a2bceaf681e9bc932698936f30ffab49f8a6e187c360717271a9fa55ab4574f"
+}

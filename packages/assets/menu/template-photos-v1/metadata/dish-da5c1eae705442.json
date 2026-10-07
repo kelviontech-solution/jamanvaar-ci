@@ -1,0 +1,22 @@
+{
+  "id": "dish-da5c1eae705442",
+  "kind": "dish",
+  "name": "Banana Bread Slice",
+  "description": "Banana Bread Slice, bakery snacks and individually portioned desserts.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Bakes & Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Bakes & Desserts"
+    }
+  ],
+  "file": "dish-da5c1eae705442.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86982,
+  "sha256": "ea73ae2cc20c36b4d954e03de676ad3a4cddfe55a0f695cbf69493eac198d057"
+}

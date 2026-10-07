@@ -1,0 +1,22 @@
+{
+  "id": "dish-7bd5dc0b3fc387",
+  "kind": "dish",
+  "name": "Onion Salad",
+  "description": "Onion Salad, regional meal accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-7bd5dc0b3fc387.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93392,
+  "sha256": "7d526fc960340a4fab4b53f06eb8e85eb80007c0076c3c06fe00ef20888b2b67"
+}

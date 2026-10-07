@@ -1,0 +1,130 @@
+{
+  "at": "2026-10-07T05:04:02.418Z",
+  "environment": "isolated local API/database; compiled apps; production subpaths",
+  "results": [
+    {
+      "title": "All Menu shows twenty dishes plus one combo in one continuous grid with loaded photos",
+      "passed": true,
+      "ms": 935.65,
+      "evidence": {
+        "cards": 21,
+        "photos": 21,
+        "comboAndDishesShareRow": true
+      }
+    },
+    {
+      "title": "Search filters combos and dishes together and no-match has a useful empty state",
+      "passed": true,
+      "ms": 106.39,
+      "evidence": {
+        "search": true,
+        "noMatch": true
+      }
+    },
+    {
+      "title": "Combos-only view contains one card without a duplicate backing dish",
+      "passed": true,
+      "ms": 96.98,
+      "evidence": {
+        "comboCount": 1
+      }
+    },
+    {
+      "title": "Kiosk menu cards fit tablet, laptop, TV and portrait widths",
+      "passed": true,
+      "ms": 926.14,
+      "evidence": [
+        {
+          "viewport": 768,
+          "width": 620,
+          "scrollWidth": 620,
+          "columns": 2
+        },
+        {
+          "viewport": 1024,
+          "width": 847,
+          "scrollWidth": 847,
+          "columns": 3
+        },
+        {
+          "viewport": 1366,
+          "width": 1152,
+          "scrollWidth": 1152,
+          "columns": 4
+        },
+        {
+          "viewport": 1920,
+          "width": 1645,
+          "scrollWidth": 1645,
+          "columns": 6
+        },
+        {
+          "viewport": 2560,
+          "width": 2214,
+          "scrollWidth": 2214,
+          "columns": 8
+        }
+      ]
+    },
+    {
+      "title": "Adding a dish opens the cart while the menu remains usable",
+      "passed": true,
+      "ms": 96.37,
+      "evidence": {
+        "correctDish": true,
+        "cartFits": true
+      }
+    },
+    {
+      "title": "Restaurant Admin displays the same repaired Khaman and Basundi photos",
+      "passed": true,
+      "ms": 603.24,
+      "evidence": {
+        "sameLibrary": true
+      }
+    },
+    {
+      "title": "POS menu shows description-matched food photos",
+      "passed": true,
+      "ms": 413.33,
+      "evidence": {
+        "posImageLoaded": true
+      }
+    },
+    {
+      "title": "Captain table menu uses the same photos",
+      "passed": true,
+      "ms": 157.01,
+      "evidence": {
+        "captainImageLoaded": true
+      }
+    },
+    {
+      "title": "Mobile QR ordering renders the published dishes with real images and no overflow",
+      "passed": true,
+      "ms": 220.01,
+      "evidence": {
+        "guestImageLoaded": true,
+        "mobileFits": true
+      }
+    },
+    {
+      "title": "Changing a restaurant photo overrides the starter image across Kiosk and Admin",
+      "passed": true,
+      "ms": 4015.78,
+      "evidence": {
+        "ownerUploadWins": true
+      }
+    },
+    {
+      "title": "Downloaded Kiosk dish photos remain visible after going offline",
+      "passed": true,
+      "ms": 81.51,
+      "evidence": {
+        "offlineImageFromCache": true
+      }
+    }
+  ],
+  "errors": [],
+  "timings": []
+}

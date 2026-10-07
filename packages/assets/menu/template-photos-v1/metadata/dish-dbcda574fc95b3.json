@@ -1,0 +1,26 @@
+{
+  "id": "dish-dbcda574fc95b3",
+  "kind": "dish",
+  "name": "Chilli Garlic Noodles",
+  "description": "Chilli Garlic Noodles, wok-tossed noodles and crunchy vegetables.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Noodles"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Noodles"
+    }
+  ],
+  "file": "dish-dbcda574fc95b3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 104870,
+  "sha256": "4ad1a318754b523432087d1ccb3404e54d5f590e002c045d25c77ec2078183bf"
+}

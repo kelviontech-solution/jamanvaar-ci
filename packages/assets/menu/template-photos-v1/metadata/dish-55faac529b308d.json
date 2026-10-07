@@ -1,0 +1,45 @@
+{
+  "id": "dish-55faac529b308d",
+  "kind": "dish",
+  "name": "Chocolate Brownie",
+  "description": "Chocolate Brownie, desserts served warm.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Warm Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Warm Desserts"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Bakes & Desserts"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Warm Desserts"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/bakery/choco-lava.jpg"
+  ],
+  "file": "dish-55faac529b308d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106678,
+  "sha256": "bf04d67d5ae71e57f8dcb8661374fe120c759efc3130a1d08f75c2b394e458c0"
+}

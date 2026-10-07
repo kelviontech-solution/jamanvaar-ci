@@ -1,0 +1,22 @@
+{
+  "id": "dish-0007951af851f4",
+  "kind": "dish",
+  "name": "Dahi Tikhari (Kathiyawadi Dip)",
+  "description": "Yogurt tempered with sizzling garlic, red chilli powder and cumin in groundnut oil",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Special Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Special Shaak"
+    }
+  ],
+  "file": "dish-0007951af851f4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 101460,
+  "sha256": "bf7a5c174ff937bde19075b402d4c7f176eb9ef03ce1ac16476bb2f419ae7aa5"
+}

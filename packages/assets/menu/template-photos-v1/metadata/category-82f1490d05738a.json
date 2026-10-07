@@ -1,0 +1,32 @@
+{
+  "id": "category-82f1490d05738a",
+  "kind": "category",
+  "name": "Uttapam & Thick Pancakes — South Indian Restaurant",
+  "categoryName": "Uttapam & Thick Pancakes",
+  "templateId": "tpl-south-indian",
+  "slug": "uttapam",
+  "description": "Thick fermented rice pancakes with delicious toppings",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam & Thick Pancakes",
+  "components": [
+    {
+      "name": "Onion Tomato Chilli Uttapam",
+      "description": "Soft pancake topped with diced red onions, juicy tomatoes, cilantro and green chillies",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mixed Vegetable Cheese Uttapam",
+      "description": "Loaded with finely chopped bell peppers, carrots, sweet corn and grated mozzarella",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-82f1490d05738a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123852,
+  "sha256": "552c81295b04785cc18b029c05b15732509d3b20efafc129aa398d1e85897e36"
+}

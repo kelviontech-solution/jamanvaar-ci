@@ -1,0 +1,22 @@
+{
+  "id": "dish-21f96036508471",
+  "kind": "dish",
+  "name": "Jain Chana Masala",
+  "description": "Jain Chana Masala, tomato or cashew gravies without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries"
+    }
+  ],
+  "file": "dish-21f96036508471.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100052,
+  "sha256": "0302e4a83ee784c87b958920b31a19c396ee32f6677b5b8277626cf2d9b8fa48"
+}

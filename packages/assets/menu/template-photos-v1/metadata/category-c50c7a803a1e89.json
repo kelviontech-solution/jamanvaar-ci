@@ -1,0 +1,37 @@
+{
+  "id": "category-c50c7a803a1e89",
+  "kind": "category",
+  "name": "Dosas — South Indian Restaurant",
+  "categoryName": "Dosas",
+  "templateId": "tpl-south-indian",
+  "slug": "dosas",
+  "description": "Fermented rice-lentil crepes with sambar and coconut chutney",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "components": [
+    {
+      "name": "Plain Dosa",
+      "description": "Plain Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Rava Dosa",
+      "description": "Rava Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Onion Rava Dosa",
+      "description": "Onion Rava Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c50c7a803a1e89.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107670,
+  "sha256": "cf958d5161d28488184c7586a41975e7064996479349d251f337b2720175b023"
+}

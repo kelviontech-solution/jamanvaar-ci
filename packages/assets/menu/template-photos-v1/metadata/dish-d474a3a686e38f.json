@@ -1,0 +1,29 @@
+{
+  "id": "dish-d474a3a686e38f",
+  "kind": "dish",
+  "name": "Gujarati Grand Thali",
+  "description": "Gujarati Grand Thali, rotli, seasonal shaak, dal, rice, farsan and sweet.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Thali"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/royal-gujarati-thali.webp"
+  ],
+  "file": "dish-d474a3a686e38f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102598,
+  "sha256": "40981ac8e5bae853d14b5c0570b9221fc0a46f1caf1f6c2dedc7130aed5a727b"
+}

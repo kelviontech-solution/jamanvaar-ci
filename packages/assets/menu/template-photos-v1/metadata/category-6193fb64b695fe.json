@@ -1,0 +1,32 @@
+{
+  "id": "category-6193fb64b695fe",
+  "kind": "category",
+  "name": "Signature Thali Offerings — Grand Indian Thali Restaurant",
+  "categoryName": "Signature Thali Offerings",
+  "templateId": "tpl-thali",
+  "slug": "thali-options",
+  "description": "Complete multi-bowl thali meals",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Signature Thali Offerings",
+  "components": [
+    {
+      "name": "Maharaja Unlimited Royal Thali",
+      "description": "4 Curries, 2 Dals, 4 Bread Varieties, Pulav, 2 Farsan, 2 Desserts, Raita, Papad, Chutney and Chaas",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Quick Business Lunch Thali",
+      "description": "2 Curries, Yellow Dal, 3 Phulkas, Steamed Rice, Sweet and Chaas",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-6193fb64b695fe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122118,
+  "sha256": "9c4a6cd2d422eaa5aaaac54cb451efa635cfe70a54ce62d77b96de6599dc7aa6"
+}

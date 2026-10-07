@@ -1,0 +1,25 @@
+{
+  "id": "dish-1b587763c4556b",
+  "kind": "dish",
+  "name": "Kachori 2 Pieces",
+  "description": "Kachori 2 Pieces, freshly fried snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Hot Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-1b587763c4556b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75900,
+  "sha256": "3b8fea39b0f344eba853086486bb9d2928ad91685080b2da09d5619fbb5c7bf7"
+}

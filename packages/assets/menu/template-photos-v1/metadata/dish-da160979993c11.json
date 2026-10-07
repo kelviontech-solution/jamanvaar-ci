@@ -1,0 +1,22 @@
+{
+  "id": "dish-da160979993c11",
+  "kind": "dish",
+  "name": "Masala Papad",
+  "description": "Masala Papad, regional meal accompaniments.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-da160979993c11.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99414,
+  "sha256": "6fd357b9357193641c309c06f61558a0fd813a97c08ff306c95c8b75d5260023"
+}

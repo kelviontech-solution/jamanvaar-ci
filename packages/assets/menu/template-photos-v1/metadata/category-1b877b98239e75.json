@@ -1,0 +1,37 @@
+{
+  "id": "category-1b877b98239e75",
+  "kind": "category",
+  "name": "Punjabi Specials — Punjabi Dhaba & Restaurant",
+  "categoryName": "Punjabi Specials",
+  "templateId": "tpl-punjabi",
+  "slug": "punjabi-specials",
+  "description": "Traditional Punjabi dishes",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Punjabi Specials",
+  "components": [
+    {
+      "name": "Amritsari Kulcha",
+      "description": "Amritsari Kulcha, traditional Punjabi dishes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Pindi Chhole",
+      "description": "Pindi Chhole, traditional Punjabi dishes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sarson Ka Saag",
+      "description": "Sarson Ka Saag, traditional Punjabi dishes.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-1b877b98239e75.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122776,
+  "sha256": "a97c659a07ed3bf50b71bd9bb30b5247cccb5b6071576cad1ddee3ede8a21692"
+}

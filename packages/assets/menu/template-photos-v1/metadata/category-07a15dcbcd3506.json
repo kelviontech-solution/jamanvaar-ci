@@ -1,0 +1,37 @@
+{
+  "id": "category-07a15dcbcd3506",
+  "kind": "category",
+  "name": "Gujarati Shaak (Curries) — Grand Indian Thali Restaurant",
+  "categoryName": "Gujarati Shaak (Curries)",
+  "templateId": "tpl-thali",
+  "slug": "gujarati-shaak-curries",
+  "description": "Gujarati vegetable preparations with fresh regional spices",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Gujarati Shaak (Curries)",
+  "components": [
+    {
+      "name": "Sev Tameta",
+      "description": "Sev Tameta, gujarati vegetable preparations with fresh regional spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Ringna Bateta",
+      "description": "Ringna Bateta, gujarati vegetable preparations with fresh regional spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Lasaniya Bateta",
+      "description": "Lasaniya Bateta, gujarati vegetable preparations with fresh regional spices.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-07a15dcbcd3506.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 126216,
+  "sha256": "f29e320c4a8030a6d27736cbdd8dae9d380b738d0e8748bb2e55ac4a2f64d459"
+}

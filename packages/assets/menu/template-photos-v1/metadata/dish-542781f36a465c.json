@@ -1,0 +1,22 @@
+{
+  "id": "dish-542781f36a465c",
+  "kind": "dish",
+  "name": "Dahi Tikhari",
+  "description": "Dahi Tikhari, rustic regional vegetable preparations.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Kathiyawadi Shaak",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Kathiyawadi Shaak"
+    }
+  ],
+  "file": "dish-542781f36a465c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96890,
+  "sha256": "8e97667d44f6f11be644ca5baee22c814ec8ed5c1e5d3ac15ae26a1339d8d43a"
+}

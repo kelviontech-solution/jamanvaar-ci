@@ -1,0 +1,37 @@
+{
+  "id": "category-5584945cdd550a",
+  "kind": "category",
+  "name": "Beverages — Authentic Chinese & Wok",
+  "categoryName": "Beverages",
+  "templateId": "tpl-chinese",
+  "slug": "beverages",
+  "description": "Cold refreshments",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Lemon Iced Tea",
+      "description": "Lemon Iced Tea, cold refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fresh Lime Soda",
+      "description": "Fresh Lime Soda, cold refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cola 250ml",
+      "description": "Cola 250ml, cold refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5584945cdd550a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90772,
+  "sha256": "7402823c4b71d9754d7c642fc44acef2cc6a2981ef9a34b8b2504093ec482570"
+}

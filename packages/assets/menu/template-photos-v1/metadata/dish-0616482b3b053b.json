@@ -1,0 +1,25 @@
+{
+  "id": "dish-0616482b3b053b",
+  "kind": "dish",
+  "name": "Chicken 65",
+  "description": "Chicken 65, freshly cooked accompaniments.",
+  "diet": "NON_VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-0616482b3b053b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99494,
+  "sha256": "07caf736a70c60ddf6bed41544c58f61b05857434d91a97f42c74161cb975ca8"
+}

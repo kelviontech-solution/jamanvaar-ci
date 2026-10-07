@@ -1,0 +1,37 @@
+{
+  "id": "category-05735a3337affd",
+  "kind": "category",
+  "name": "Cold Coffee & Shakes — Artisan Café & Coffee Bar",
+  "categoryName": "Cold Coffee & Shakes",
+  "templateId": "tpl-cafe",
+  "slug": "cold-coffee-shakes",
+  "description": "Blended drinks served chilled",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Cold Coffee & Shakes",
+  "components": [
+    {
+      "name": "Cold Coffee",
+      "description": "Cold Coffee, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Iced Americano",
+      "description": "Iced Americano, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Iced Latte",
+      "description": "Iced Latte, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-05735a3337affd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99830,
+  "sha256": "effdda1599e042554ef7e90ca65179ea6658c3b11f7c93a5f1f5c9999cff5610"
+}

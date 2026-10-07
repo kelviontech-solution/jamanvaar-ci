@@ -1,0 +1,37 @@
+{
+  "id": "category-b7f41a702615f8",
+  "kind": "category",
+  "name": "Cookies — Bakery, Patisserie & Cafe",
+  "categoryName": "Cookies",
+  "templateId": "tpl-bakery",
+  "slug": "cookies",
+  "description": "Baked cookie packs",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Cookies",
+  "components": [
+    {
+      "name": "Butter Cookies 200g",
+      "description": "Butter Cookies 200g, baked cookie packs.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Chip Cookies 200g",
+      "description": "Chocolate Chip Cookies 200g, baked cookie packs.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Oats Cookies 200g",
+      "description": "Oats Cookies 200g, baked cookie packs.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-b7f41a702615f8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102048,
+  "sha256": "e0972a0cb27068a87d8d6b9f2d4050739d3941f45324b3dbeccc355c573a3e28"
+}

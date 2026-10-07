@@ -1,0 +1,29 @@
+{
+  "id": "combo-south-north-combo",
+  "kind": "combo",
+  "name": "South & North Indian Fusion Diner Meal Deal",
+  "description": "Butter Masala Dosa Classic with Paneer Butter Masala. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Dual Heritage Indian",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Butter Masala Dosa Classic",
+      "description": "Crisp crepe with spiced potato filling, coconut chutney and drumstick sambar",
+      "diet": "VEG"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer cubes in creamy buttery tomato gravy",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-south-north-combo.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97216,
+  "sha256": "c5e9d8ef4e7273a0abf1be2beda942baceacda4787fe71579c4c5841b765c90e"
+}

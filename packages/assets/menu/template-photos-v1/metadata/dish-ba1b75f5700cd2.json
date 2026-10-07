@@ -1,0 +1,25 @@
+{
+  "id": "dish-ba1b75f5700cd2",
+  "kind": "dish",
+  "name": "Jain Steamed Rice",
+  "description": "Jain Steamed Rice, rice preparations without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Rice"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/steamed-rice.webp"
+  ],
+  "file": "dish-ba1b75f5700cd2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75100,
+  "sha256": "304050077ce61d3fd607b09e6eb30ebfaa189427627c6deb4022db76005ed250"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-91503233133f19",
+  "kind": "dish",
+  "name": "Crispy Chinese Bhel",
+  "description": "Fried noodles tossed with cabbage, capsicum, sweet chilli and schezwan dips",
+  "diet": "VEG",
+  "cuisine": "Desi Chinese & Fast Asian",
+  "category": "Desi Chinese Favorites",
+  "occurrences": [
+    {
+      "templateId": "tpl-indo-chinese",
+      "category": "Desi Chinese Favorites"
+    }
+  ],
+  "file": "dish-91503233133f19.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106048,
+  "sha256": "01c15a3d5633778cc28b7c3a372b98a1f198d1ea5e0066100aee3e680d6c0c8b"
+}

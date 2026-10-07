@@ -1,0 +1,33 @@
+{
+  "id": "dish-1bc143f3b2b3c6",
+  "kind": "dish",
+  "name": "Phulka",
+  "description": "Phulka, fresh wheat or millet breads cooked on a griddle.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    },
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Breads"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/phulka.webp"
+  ],
+  "file": "dish-1bc143f3b2b3c6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91234,
+  "sha256": "46c4735bdd0bc9b35ac603b6d9ffd3aa1bed8a25cf02c567dec21f0d3f25b128"
+}

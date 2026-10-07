@@ -1,0 +1,30 @@
+{
+  "id": "dish-bd7efc6f13f4bd",
+  "kind": "dish",
+  "name": "Oreo Shake",
+  "description": "Oreo Shake, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Shakes"
+    }
+  ],
+  "file": "dish-bd7efc6f13f4bd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 56402,
+  "sha256": "1804debdda501b71be3e40da065b40f76664744e9a18a031cf3347bd207b6e67"
+}

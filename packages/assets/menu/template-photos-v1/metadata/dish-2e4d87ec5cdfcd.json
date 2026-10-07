@@ -1,0 +1,22 @@
+{
+  "id": "dish-2e4d87ec5cdfcd",
+  "kind": "dish",
+  "name": "Jain Paneer Butter Masala",
+  "description": "Paneer in smooth tomato-cashew gravy made strictly without onion, garlic or ginger paste",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries & Dals",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries & Dals"
+    }
+  ],
+  "file": "dish-2e4d87ec5cdfcd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 77328,
+  "sha256": "e8a2345453523e32d9bcb241a5857412ec1b418d1539687bda4f40a10453eb8c"
+}

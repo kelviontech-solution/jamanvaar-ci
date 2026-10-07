@@ -1,0 +1,22 @@
+{
+  "id": "dish-550987bb81a265",
+  "kind": "dish",
+  "name": "Jain Veg Pulao",
+  "description": "Jain Veg Pulao, rice preparations without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Rice"
+    }
+  ],
+  "file": "dish-550987bb81a265.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 90146,
+  "sha256": "e6b54ff0857816f0282dc3d9cf1b1b40fc90699a456799bcb2ada32989254d8f"
+}

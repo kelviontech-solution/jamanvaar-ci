@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAiAccess } from '@jamanvaar/ui';
+import { refreshConfiguredAi } from '@jamanvaar/business';
 import { db } from '@jamanvaar/database';
 import { isValidGstinFormat, isValidFssaiFormat, isValidIndianPincode, isValidIndianPhone } from '@jamanvaar/utils';
 import { saveRestaurantIdentity } from '../../cloud/cloudClient';
@@ -26,6 +28,8 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   showToast,
   onUpdated
 }) => {
+  const ai = useAiAccess();
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [name, setName] = useState(db.restaurant.name || '');
   const [legalName, setLegalName] = useState(
     db.restaurant.legalName || ''
@@ -124,7 +128,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     // stay on this one device forever — POS, Captain, KDS and both kiosk apps never learned of an
     // edit made here, and it was lost entirely on a fresh device or a reinstall. Best-effort: a
     // failed push is simply retried by every terminal's own periodic pull once this one succeeds.
-    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI });
+    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI }).catch(() => showToast('Saved locally. Could not sync restaurant settings; check the connection and save again.'));
     onUpdated();
     showToast('Restaurant Branding & Accounting Profile Saved!');
   };
@@ -159,20 +163,28 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
         <div>
           <span className="text-sm font-bold text-jaman-navy block">Show JAMAN AI Assistant</span>
           <span className="text-xs text-slate-500">
-            Displays the floating JAMAN AI button on POS, Captain and this Admin console. Turning this off hides it for every staff member at this restaurant.
+            Controls JAMAN AI visibility in Restaurant Admin, POS, Captain, KDS and Kiosk. Platform access is granted separately by your plan or Super Admin.
           </span>
+          <p className="mt-2 text-xs font-bold text-jaman-navy">Platform access: {ai.known ? ai.state === 'ON' ? 'Enabled' : ai.state === 'LOCKED' ? 'Locked: ask Super Admin to grant access' : 'Disabled by Super Admin' : 'Waiting for server settings'}</p>
+          <button type="button" className="mt-1 text-xs font-bold text-jaman-saffron underline" onClick={() => void refreshConfiguredAi()}>Refresh assistant access</button>
         </div>
         <label className="relative inline-flex items-center cursor-pointer shrink-0">
           <input
             type="checkbox"
+            aria-label="Show JAMAN AI Assistant"
             checked={showJamanAI}
+            disabled={visibilitySaving}
             onChange={(e) => {
               // Takes effect at once (no Save needed) and is sent to the cloud so POS and Captain follow it too.
               const on = e.target.checked;
+              setVisibilitySaving(true);
               setShowJamanAI(on);
               db.restaurant.showJamanAI = on;
               db.notify();
-              void saveRestaurantIdentity({ showJamanAI: on });
+              void saveRestaurantIdentity({ showJamanAI: on }).catch(() => {
+                setShowJamanAI(!on); db.restaurant.showJamanAI = !on; db.notify();
+                showToast('Could not save JAMAN AI visibility. Check the connection and try again.');
+              }).finally(() => setVisibilitySaving(false));
             }}
             className="sr-only peer"
           />

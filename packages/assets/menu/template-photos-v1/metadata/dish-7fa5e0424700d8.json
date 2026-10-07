@@ -1,0 +1,22 @@
+{
+  "id": "dish-7fa5e0424700d8",
+  "kind": "dish",
+  "name": "Chilli Chicken",
+  "description": "Chilli Chicken, wok-tossed or crisp starters with house sauces.",
+  "diet": "NON_VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Starters"
+    }
+  ],
+  "file": "dish-7fa5e0424700d8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105836,
+  "sha256": "94568ac7784ef8d96a281967ca7dae046f3aa908bf023210668eda28eb79b03e"
+}

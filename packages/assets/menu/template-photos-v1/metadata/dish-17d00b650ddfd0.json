@@ -1,0 +1,22 @@
+{
+  "id": "dish-17d00b650ddfd0",
+  "kind": "dish",
+  "name": "Podi with Ghee",
+  "description": "Podi with Ghee, fresh accompaniments for tiffin.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Accompaniments",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Accompaniments"
+    }
+  ],
+  "file": "dish-17d00b650ddfd0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85468,
+  "sha256": "437f3e878c19122896ee01c7d18fea04fe4ed2b4ae5f121f5f72f83338fbc5d8"
+}

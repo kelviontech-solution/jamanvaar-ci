@@ -1,0 +1,22 @@
+{
+  "id": "dish-f8fe1060da7895",
+  "kind": "dish",
+  "name": "Warm Choco Lava Cake",
+  "description": "Molten chocolate filled warm sponge cake dusted with icing sugar",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries & Slices",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries & Slices"
+    }
+  ],
+  "file": "dish-f8fe1060da7895.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96012,
+  "sha256": "611a48a3e6d0ac851756e404722ac5c35e287ea0d046ba8cdff40ffcaed7be9b"
+}

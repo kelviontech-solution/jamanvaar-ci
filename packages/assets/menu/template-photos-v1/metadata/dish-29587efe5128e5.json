@@ -1,0 +1,25 @@
+{
+  "id": "dish-29587efe5128e5",
+  "kind": "dish",
+  "name": "Egg Roll",
+  "description": "Egg Roll, freshly rolled flatbread snacks.",
+  "diet": "EGG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Rolls",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Rolls"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-29587efe5128e5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85184,
+  "sha256": "3c8197967e6e1cc9753fa1525fc31785d8ddf171f2f3ef5dec217c8b90311226"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-478569217b809c",
+  "kind": "dish",
+  "name": "Makki Di Roti (2 Pcs)",
+  "description": "Cornmeal flatbread roasted on tava with white butter and jaggery",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Amritsari Kulchas & Rotis",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Amritsari Kulchas & Rotis"
+    }
+  ],
+  "file": "dish-478569217b809c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100928,
+  "sha256": "58de9ead07b65a0b81886979b53ade5d146e6ac4e104ae4f94262de1ed2e1c36"
+}

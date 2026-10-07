@@ -1,0 +1,29 @@
+{
+  "id": "combo-indo-chinese",
+  "kind": "combo",
+  "name": "Desi Indo-Chinese Food Corner Meal Deal",
+  "description": "Triple Schezwan Rice with Gravy with Crispy Chinese Bhel. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Desi Chinese & Fast Asian",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Triple Schezwan Rice with Gravy",
+      "description": "Combo of wok rice, fried noodles, and hot Schezwan Manchurian gravy bowl",
+      "diet": "VEG"
+    },
+    {
+      "name": "Crispy Chinese Bhel",
+      "description": "Fried noodles tossed with cabbage, capsicum, sweet chilli and schezwan dips",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-indo-chinese.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123750,
+  "sha256": "7cac44e92ee8b9741c1d309d43d583b33a81c61e266cc65e75e48ef70ccaa562"
+}

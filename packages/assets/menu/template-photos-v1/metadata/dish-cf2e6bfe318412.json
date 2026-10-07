@@ -1,0 +1,25 @@
+{
+  "id": "dish-cf2e6bfe318412",
+  "kind": "dish",
+  "name": "Jalapeno Dip",
+  "description": "Jalapeno Dip, freshly fried sides with seasoning served separately.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Sides"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-cf2e6bfe318412.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98616,
+  "sha256": "ae4f28c034a0f9884ced44d801f6e7453218c68e50487f7fe5113d69011d6d9e"
+}

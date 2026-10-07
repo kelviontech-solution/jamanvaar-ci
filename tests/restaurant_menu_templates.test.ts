@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { db, KeyValueStore, PREBUILT_MENU_TEMPLATES, MenuRepository, scanMenuDuplicates, archiveConfirmedDuplicates, captureMenuCleanupBackup, restoreMenuCleanupBackup, menuCleanupReportIsCurrent, menuTransaction, menuItemBranchIntersection, TenantIsolation } from '@jamanvaar/database';
-import { MenuBuilderService, previewMenuCsv, applyMenuCsv, templateItemKey, calculateItemUnitPrice } from '@jamanvaar/business';
+import { MenuBuilderService, previewMenuCsv, applyMenuCsv, templateItemKey, templateCategoryKey, calculateItemUnitPrice } from '@jamanvaar/business';
 import { buildStandardMenu } from '../apps/kiosk-system/kiosk-user/src/standardMenu';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -42,10 +42,35 @@ describe('restaurant niche templates and one real menu', () => {
     load('tpl-pizza', [item.templateItemKey!], { duplicateStrategy: 'IMPORT_AS_NEW', selectedOnly: true }); const copy = db.menuItems.find(i => i.name === 'Margherita Pizza (New)')!; expect(copy.id).not.toBe(item.id); expect(copy.sku).not.toBe(item.sku);
   });
   it('keeps Gujarati categories distinct and does not group Dal/Kadhi into Main Course', () => { load('tpl-gujarati'); expect(db.categories.map(c => c.name)).toContain('Dal & Kadhi'); expect(db.categories.map(c => c.name)).toContain('Gujarati Shaak (Curries)'); });
+  it('saves category covers, preserves owner uploads on repeat import and honours opting out of images', () => {
+    const template = PREBUILT_MENU_TEMPLATES.find(t => t.id === 'tpl-pizza')!;
+    load();
+    for (const category of template.categories) expect(db.categories.find(c => c.name === category.name)?.imageUrl).toBe(category.imageUrl);
+    const category = db.categories.find(c => c.name === 'Pizzas')!;
+    category.imageUrl = 'https://restaurant.example/own-pizzas.webp';
+    load(); expect(category.imageUrl).toBe('https://restaurant.example/own-pizzas.webp');
+    db.categories = []; db.menuItems = []; db.combos = []; db.modifierGroups = [];
+    load('tpl-pizza', [], { importImages: false });
+    expect(db.categories.every(c => c.imageUrl === undefined)).toBe(true);
+  });
+  it('keeps differently named categories with identical legacy slugs separate, including selective imports', () => {
+    const template = PREBUILT_MENU_TEMPLATES.find(t => t.categories.some(c => t.categories.filter(peer => peer.slug === c.slug).length > 1))!;
+    const category = template.categories.find(c => template.categories.filter(peer => peer.slug === c.slug).length > 1 && c.items.length)!;
+    const peer = template.categories.find(c => c.slug === category.slug && c.name !== category.name)!;
+    expect(templateCategoryKey(template.id, category.slug, category.name)).not.toBe(templateCategoryKey(template.id, peer.slug, peer.name));
+    load(template.id, category.items.map(i => templateItemKey(template.id, category.slug, i.sku)), { selectedOnly: true, selectedCategoryKeys: [templateCategoryKey(template.id, category.slug, category.name)] });
+    expect(db.categories.map(c => c.name)).toEqual([category.name]);
+    load(template.id);
+    const first = db.categories.find(c => c.name === category.name)!;
+    const second = db.categories.find(c => c.name === peer.name)!;
+    expect(first.id).not.toBe(second.id); expect(first.imageUrl).toBe(category.imageUrl); expect(second.imageUrl).toBe(peer.imageUrl);
+    for (const source of [category, peer]) for (const item of source.items) expect(db.menuItems.find(i => i.templateItemKey === templateItemKey(template.id, source.slug, item.sku))?.categoryId).toBe(db.categories.find(c => c.name === source.name)?.id);
+    const ids = db.categories.map(c => c.id); load(template.id); expect(db.categories.map(c => c.id)).toEqual(ids);
+  });
   it('uses only explicit matching assets or a neutral fallback, all packaged in Admin and Kiosk', () => {
     const pizza = PREBUILT_MENU_TEMPLATES.find(t => t.id === 'tpl-pizza')!;
-    expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Margherita Pizza')?.imageUrl).toBe('/assets/menu/pizza/margherita.jpg');
-    expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Garlic Bread')?.imageUrl).toContain('placeholder');
+    expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Margherita Pizza')?.imageUrl).toMatch(/^\/assets\/menu\/template-photos-v1\/dish-[a-f0-9]+\.webp$/);
+    expect(pizza.categories.flatMap(c => c.items).find(i => i.name === 'Garlic Bread')?.imageUrl).toMatch(/^\/assets\/menu\/template-photos-v1\/dish-[a-f0-9]+\.webp$/);
     for (const item of PREBUILT_MENU_TEMPLATES.flatMap(t => t.categories.flatMap(c => c.items))) for (const app of ['apps/restaurant-system/pos-admin','apps/kiosk-system/kiosk-user']) expect(existsSync(resolve(app, 'public' + item.imageUrl)), item.name).toBe(true);
   });
   it('keeps the owner category order, food types and branch/channel restrictions on Kiosk', () => {

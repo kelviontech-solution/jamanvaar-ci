@@ -1,0 +1,25 @@
+{
+  "id": "dish-49222f0d5dc116",
+  "kind": "dish",
+  "name": "Mango Ice Cream",
+  "description": "Mango Ice Cream, single scoops of chilled ice cream.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Ice Cream Scoops",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-49222f0d5dc116.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 53062,
+  "sha256": "5b2d07b12ed308d0a1a7187ff96c57f792c08082a4a2ad5972442ffb0d23474b"
+}

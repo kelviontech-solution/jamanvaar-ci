@@ -533,18 +533,31 @@ export function BackupsPage() {
             </>
           }
         >
-          <form id="trigger-snapshot-form" onSubmit={handleTriggerSnapshot} className="modal-form" style={{ padding: 0 }}>
-            {/* BUG-070/071: say so up front instead of letting the operator hit an error. */}
-            {data?.stats.storageConfigured === false && (
-              <div className="banner-error" role="alert">
-                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <form id="trigger-snapshot-form" onSubmit={handleTriggerSnapshot} className="modal-form">
+            {/* BUG-070/071: say so up front instead of letting the operator hit an error. A server that has not been
+                redeployed with storage support can still report this; everything else degrades gracefully around it. */}
+            {data?.stats.storageConfigured === false ? (
+              <div className="signing-status-card signing-status-card-error" role="alert">
+                <AlertTriangle className="w-4 h-4" style={{ flexShrink: 0 }} />
                 <span>
-                  Backup storage is not configured on the server, so snapshots cannot be created yet. Set the
-                  BACKUP_S3_* environment variables (bucket, region, access key, secret) and restart the API.
+                  Backup storage is not configured on this server, so snapshots cannot be created yet. Set{' '}
+                  <code>BACKUP_LOCAL_DIR</code> (works out of the box) or the <code>BACKUP_S3_*</code> variables for an
+                  off-site bucket, then restart the API.
+                </span>
+              </div>
+            ) : (
+              <div className="signing-status-card signing-status-card-ready">
+                <Database className="w-4 h-4" style={{ flexShrink: 0 }} />
+                <span>
+                  {data?.stats.storageNote ?? (data?.stats.storageMode === 's3' ? 'Stored off-site in the configured bucket.' : "Stored on this server's own disk.")}
                 </span>
               </div>
             )}
-            {triggerError && <div className="banner-error" role="alert">{triggerError}</div>}
+            {triggerError && (
+              <div className="banner banner-error" role="alert">
+                {triggerError}
+              </div>
+            )}
             <div className="form-field">
               <label htmlFor="restaurant-select">Target Restaurant</label>
               <select

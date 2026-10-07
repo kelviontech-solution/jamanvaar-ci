@@ -71,7 +71,7 @@ import {
   FoodReadyItem
 } from '@jamanvaar/types';
 import { getOrderTenders, splitsMatchTotal } from './tender';
-import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate } from '@jamanvaar/utils';
+import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate, menuDishImage } from '@jamanvaar/utils';
 import { db } from './db';
 import { resetEntitySyncCursors } from './sync_cursors';
 import { kitchenRank, resolveKitchenState, deriveTicketStatus } from './kitchen_status';
@@ -340,6 +340,7 @@ export class MenuRepository {
   public static getAllMenuItems(): MenuItem[] {
     return db.menuItems.filter(item => !item.archivedAt).map((item) => ({
       ...item,
+      imageUrl: menuDishImage(item.imageUrl, item.name),
       modifierGroups: (item.modifierGroupIds || [])
         .map((gId) => db.modifierGroups.find((g) => g.id === gId))
         .filter(Boolean) as ModifierGroup[]
@@ -351,6 +352,7 @@ export class MenuRepository {
     if (!item) return undefined;
     return {
       ...item,
+      imageUrl: menuDishImage(item.imageUrl, item.name),
       modifierGroups: (item.modifierGroupIds || [])
         .map((gId) => db.modifierGroups.find((g) => g.id === gId))
         .filter(Boolean) as ModifierGroup[]
@@ -4551,6 +4553,9 @@ export class BusinessDayRepository {
 
 export class NotificationRepository {
   public static createNotification(notif: Partial<AppNotification>): AppNotification {
+    // The same event can arrive twice (LAN and cloud); one id means one notification.
+    const already = notif.id ? db.notifications.find((n) => n.id === notif.id) : undefined;
+    if (already) return already;
     const newNotif: AppNotification = {
       id: notif.id || `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       type: notif.type || 'MANAGER_ALERT',

@@ -38,6 +38,7 @@
     "build:kds": "npm run build --workspace=@jamanvaar/kds",
     "build": "npm run prepare:images && npm run validate:menu-assets && npm run build --workspace=@jamanvaar/kiosk-user && npm run build --workspace=@jamanvaar/pos && npm run build --workspace=@jamanvaar/pos-admin && npm run build --workspace=@jamanvaar/captain && npm run build --workspace=@jamanvaar/kds",
     "typecheck": "tsc -b",
+    "pretest": "node tooling/dev/sync_description_photos.mjs",
     "test": "vitest run"
   },
   "devDependencies": {

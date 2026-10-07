@@ -1,0 +1,26 @@
+{
+  "id": "dish-e6fd759a7d08ec",
+  "kind": "dish",
+  "name": "Cheese Burst Margherita",
+  "description": "Cheese Burst Margherita, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-e6fd759a7d08ec.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105372,
+  "sha256": "697acdb52bb4d0755cc1990aa89b527e193872f2cb471111ea91c587b98dfd43"
+}

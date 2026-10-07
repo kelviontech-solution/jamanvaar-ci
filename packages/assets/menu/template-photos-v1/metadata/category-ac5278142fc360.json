@@ -1,0 +1,37 @@
+{
+  "id": "category-ac5278142fc360",
+  "kind": "category",
+  "name": "Beverages — Grand Indian Thali Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-thali",
+  "slug": "beverages",
+  "description": "Chilled traditional drinks",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Plain Chaas",
+      "description": "Plain Chaas, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kesar Milk",
+      "description": "Kesar Milk, chilled traditional drinks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-ac5278142fc360.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94108,
+  "sha256": "6a2ac0ac5eef4589e5d6c5ae2e61a00bee59ea9b720c3aca8b16975a620b42e6"
+}

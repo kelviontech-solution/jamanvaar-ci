@@ -1,0 +1,25 @@
+{
+  "id": "dish-70a265117e8358",
+  "kind": "dish",
+  "name": "Kesar Pista Kulfi",
+  "description": "Kesar Pista Kulfi, traditional chilled dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Kulfi & Falooda"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-70a265117e8358.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 73206,
+  "sha256": "f038fedce2713444603a657b15e2941da666b7e43b76386f5e60c219c2d5cbd2"
+}

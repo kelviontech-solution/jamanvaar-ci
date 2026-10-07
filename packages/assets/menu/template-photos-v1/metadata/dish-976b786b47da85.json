@@ -1,0 +1,22 @@
+{
+  "id": "dish-976b786b47da85",
+  "kind": "dish",
+  "name": "Paneer Kulcha Stuffed",
+  "description": "Leavened flatbread packed with spiced shredded paneer and fresh coriander",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Amritsari Kulchas & Rotis",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Amritsari Kulchas & Rotis"
+    }
+  ],
+  "file": "dish-976b786b47da85.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123806,
+  "sha256": "98ccf2394aac8405b31283699632ef2ac17bb886ef2ebee3c16a12a4e27f3446"
+}

@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-07T08:21:23.408Z",
+  "environment": "normal workspace build configuration; production subpaths; no temporary QA API override",
+  "results": [
+    {
+      "app": "@jamanvaar/kiosk-user",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-0.log"
+    },
+    {
+      "app": "@jamanvaar/pos",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-1.log"
+    },
+    {
+      "app": "@jamanvaar/pos-admin",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-2.log"
+    },
+    {
+      "app": "@jamanvaar/captain",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-3.log"
+    },
+    {
+      "app": "@jamanvaar/kds",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-4.log"
+    },
+    {
+      "app": "@jamanvaar/qr-guest",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-6.log"
+    },
+    {
+      "app": "@jamanvaar/super-admin-web",
+      "passed": true,
+      "exitCode": 0,
+      "log": "logs/template-normal-build-5.log"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-3b8675e70f9ddb",
+  "kind": "category",
+  "name": "Delivery Meal Bowls — Cloud Kitchen Multi-Brand Menu",
+  "categoryName": "Delivery Meal Bowls",
+  "templateId": "tpl-cloud-kitchen",
+  "slug": "meal-bowls",
+  "description": "All-in-one convenient packaging meal bowls",
+  "diet": "VEG",
+  "cuisine": "Delivery-Optimized Multi-Brand",
+  "category": "Delivery Meal Bowls",
+  "components": [
+    {
+      "name": "Paneer Makhani Rice Bowl",
+      "description": "Portion of rich paneer butter masala served over steamed jeera basmati rice in single packaging",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Makhani with 2 Paratha Combo",
+      "description": "Creamy slow-cooked dal makhani with 2 warm parathas and pickled onion salad",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3b8675e70f9ddb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111502,
+  "sha256": "ac07e4562206c7b176c0591523584eba770f4d86583f360e59833d0f44bac2af"
+}

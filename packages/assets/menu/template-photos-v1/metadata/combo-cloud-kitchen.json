@@ -1,0 +1,29 @@
+{
+  "id": "combo-cloud-kitchen",
+  "kind": "combo",
+  "name": "Cloud Kitchen Multi-Brand Menu Meal Deal",
+  "description": "Paneer Makhani Rice Bowl with Dal Makhani with 2 Paratha Combo. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Delivery-Optimized Multi-Brand",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Paneer Makhani Rice Bowl",
+      "description": "Portion of rich paneer butter masala served over steamed jeera basmati rice in single packaging",
+      "diet": "VEG"
+    },
+    {
+      "name": "Dal Makhani with 2 Paratha Combo",
+      "description": "Creamy slow-cooked dal makhani with 2 warm parathas and pickled onion salad",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-cloud-kitchen.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111014,
+  "sha256": "3eb6c4dd75b24679b7cfa72df07f43b300065dd07e18c060244186214d4a9e12"
+}

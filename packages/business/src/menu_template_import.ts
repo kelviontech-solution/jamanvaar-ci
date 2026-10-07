@@ -3,7 +3,14 @@ import { db, PREBUILT_MENU_TEMPLATES, normalizeMenuText, menuItemBranchIntersect
 import type { TemplateImportOptions, ImportExecutionResult } from './menu_builder';
 const hash = (text: string) => { let h = 2166136261; for (const c of text) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0).toString(36); };
 import { KeyValueStore } from '@jamanvaar/database';
+import { isMenuPlaceholder } from '../../utils/src/dish_photos';
 export const templateItemKey = (templateId: string, slug: string, sku: string) => `${templateId}::${slug}::${sku}`;
+/** Some older templates contain distinct category names with the same slug. */
+export function templateCategoryKey(templateId: string, slug: string, name: string): string {
+  const peers = PREBUILT_MENU_TEMPLATES.find(template => template.id === templateId)?.categories.filter(category => category.slug === slug) || [];
+  const base = `${templateId}::${slug}`;
+  return peers.length > 1 ? `${base}::${hash(normalizeMenuText(name))}` : base;
+}
 export function existingTemplateItem(key: string, item: MenuTemplateItem, category?: Category): MenuItem | undefined {
   return db.menuItems.find(i => i.templateItemKey === key || (!!item.sku && normalizeMenuText(i.sku) === normalizeMenuText(item.sku)) || (!i.archivedAt && !!category && i.categoryId === category.id && normalizeMenuText(i.name) === normalizeMenuText(item.name)));
 }
@@ -19,21 +26,25 @@ export function executeTemplateImport(templateIds: string[], selectedItemKeys: s
   return menuTransaction(() => {
     for (const template of templates) {
       const itemMap = new Map<string, MenuItem>();
-      const allowedCategory = (slug: string) => !options.selectedCategoryKeys || options.selectedCategoryKeys.includes(`${template.id}::${slug}`);
-      const categoryFor = (slug: string, name: string, description?: string, iconName?: string): Category => {
-        const key = `${template.id}::${slug}`; const mapping = mappings[key];
-        let cat = mapping?.action === 'USE_EXISTING' ? db.categories.find(c => c.id === mapping.existingCategoryId) : mapping?.action === 'CREATE_NEW' ? undefined : db.categories.find(c => c.templateCategoryKey === key) || exactCategory(name);
+      const allowedCategory = (slug: string, name: string) => !options.selectedCategoryKeys || options.selectedCategoryKeys.includes(templateCategoryKey(template.id, slug, name)) || options.selectedCategoryKeys.includes(`${template.id}::${slug}`);
+      const categoryFor = (slug: string, name: string, description?: string, iconName?: string, imageUrl?: string): Category => {
+        const base = `${template.id}::${slug}`, key = templateCategoryKey(template.id, slug, name); const mapping = mappings[key] || mappings[base];
+        const firstPeer = template.categories.find(category => category.slug === slug);
+        let cat = mapping?.action === 'USE_EXISTING' ? db.categories.find(c => c.id === mapping.existingCategoryId) : mapping?.action === 'CREATE_NEW' ? undefined : db.categories.find(c => c.templateCategoryKey === key) || (key !== base && firstPeer?.name === name ? db.categories.find(c => c.templateCategoryKey === base) : undefined) || exactCategory(name);
         if (mapping?.action === 'USE_EXISTING' && !cat) throw Error(`The selected existing category for ${name} no longer exists.`);
-        if (cat) { result.matchedCategoriesCount++; return cat; }
+        if (cat) {
+          if (options.importImages !== false && imageUrl && isMenuPlaceholder(cat.imageUrl)) { cat.imageUrl = imageUrl; cat.updatedAt = now; }
+          result.matchedCategoriesCount++; return cat;
+        }
         if (options.importCategories === false) throw Error(`Create or map category ${name} first.`);
-        cat = { id: mapping?.action === 'CREATE_NEW' ? newAuthoringId('cat') : stable('tplcat', key), name, slug, description, iconName, isActive: true, sortOrder: Math.max(0, ...db.categories.map(c => c.sortOrder)) + 1, templateCategoryKey: key, updatedAt: now };
+        cat = { id: mapping?.action === 'CREATE_NEW' ? newAuthoringId('cat') : stable('tplcat', key), name, slug, description, iconName, imageUrl: options.importImages === false ? undefined : imageUrl, isActive: true, sortOrder: Math.max(0, ...db.categories.map(c => c.sortOrder)) + 1, templateCategoryKey: key, updatedAt: now };
         db.categories.push(cat); result.importedCategoriesCount++; return cat;
       };
       for (const category of template.categories) {
-        if (!allowedCategory(category.slug)) continue;
+        if (!allowedCategory(category.slug, category.name)) continue;
         const rows = category.items.filter(item => options.importItems !== false && (!options.selectedOnly && !chosen.size || chosen.has(templateItemKey(template.id, category.slug, item.sku))));
         if (!rows.length) continue;
-        const target = categoryFor(category.slug, category.name, category.description, category.iconName);
+        const target = categoryFor(category.slug, category.name, category.description, category.iconName, category.imageUrl);
         for (const item of rows) {
           const key = templateItemKey(template.id, category.slug, item.sku); const existing = existingTemplateItem(key, item, target);
           const action = resolutions[key] || options.duplicateStrategy || 'SKIP_DUPLICATE';
@@ -76,12 +87,12 @@ export function executeTemplateImport(templateIds: string[], selectedItemKeys: s
           result.stationsAssignedCount++; itemMap.set(item.sku, record);
         }
       }
-      if (options.importCombos !== false && allowedCategory('combos')) for (const combo of template.combos || []) {
+      if (options.importCombos !== false && allowedCategory('combos', 'Combos')) for (const combo of template.combos || []) {
         const parts = (combo.itemSkus || []).map(sku => itemMap.get(sku));
         if (parts.length < 2 || parts.some(p => !p)) continue; // A selective import never pulls unselected hidden components.
         const id = stable('tpldeal', `${template.id}::${combo.id}`);
         const exists = db.combos.find(c => c.id === id); if (exists && options.duplicateStrategy !== 'REPLACE_DUPLICATE' && options.duplicateStrategy !== 'UPDATE_EXISTING') continue;
-        const target = categoryFor('combos', 'Combos', 'Fixed portion meal deals', 'Package');
+        const target = categoryFor('combos', 'Combos', 'Fixed portion meal deals', 'Package', template.categories.find(category => category.slug === 'combos')?.imageUrl);
         const realParts = parts as MenuItem[]; const originalPrice = realParts.reduce((sum, p) => sum + p.price, 0);
         const branchIds = menuItemBranchIntersection(realParts);
         if (branchIds && !branchIds.length) throw Error(`The components of ${combo.name} are restricted to different branches. Import the dishes without this combo or review their branch restrictions.`);

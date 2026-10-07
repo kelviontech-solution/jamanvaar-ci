@@ -137,6 +137,7 @@ export class QrPublicService {
     const ctx = await this.resolve(rawToken);
     const menu = await this.menus.build(ctx.restaurant.id, ctx.branch.id);
     const branding = await this.settingsService.branding(ctx.restaurant.id);
+    const onlineAvailable = ctx.settings.allowOnlinePayment && await this.payments.qrOnlineAvailable(ctx.restaurant.id);
     await this.touchScan(ctx, sessionId);
     return {
       currency: ctx.restaurant.currency,
@@ -149,7 +150,8 @@ export class QrPublicService {
         enabled: true,
         menuReady: menu.ready,
         menuVersion: menu.menuVersion,
-        settings: { ...this.publicSettings(ctx.settings), allowOnlinePayment: ctx.settings.allowOnlinePayment && await this.payments.qrOnlineAvailable(ctx.restaurant.id) }
+        settings: { ...this.publicSettings(ctx.settings), allowOnlinePayment: onlineAvailable },
+        onlinePayment: { available: onlineAvailable, message: onlineAvailable ? 'Secure Razorpay checkout with UPI and supported payment methods.' : 'Online payment is currently unavailable. Please pay at the counter or ask a team member.' }
       }
     };
   }

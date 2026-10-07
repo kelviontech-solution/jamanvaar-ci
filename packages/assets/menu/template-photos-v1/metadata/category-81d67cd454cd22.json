@@ -1,0 +1,32 @@
+{
+  "id": "category-81d67cd454cd22",
+  "kind": "category",
+  "name": "Combos — Tandoori Grills & Clay-Oven Specialist",
+  "categoryName": "Combos",
+  "templateId": "tpl-tandoor",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Authentic Charcoal Tandoor",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Malai Soya Chaap Tandoori",
+      "description": "Tender soya chaap marinated in creamy cashew, cheese and green cardamom paste, roasted to perfection",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Afghani Paneer Tikka",
+      "description": "Cottage cheese cubes bathed in mild white pepper cream marinade, charred with bell peppers",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-81d67cd454cd22.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120476,
+  "sha256": "94535b285ae589058d238660c078338c7e62279544e9bf1a996502d16b73854d"
+}

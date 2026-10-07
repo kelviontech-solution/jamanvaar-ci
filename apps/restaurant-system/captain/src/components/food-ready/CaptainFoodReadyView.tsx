@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
 import { FoodReadyItem } from '@jamanvaar/types';
 import {
@@ -9,7 +9,7 @@ import {
   ChefHat,
   ArrowRight,
   Sparkles,
-  Users
+  Users, Search
 } from 'lucide-react';
 
 interface CaptainFoodReadyViewProps {
@@ -21,14 +21,18 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
 }) => {
   const {
     foodReadyItems,
+    kots,
     tables,
     markItemServed,
     markEntireKotServed
   } = useCaptainStore();
+  const [search, setSearch] = useState('');
 
   const activeFoodReady = useMemo(() => {
-    return foodReadyItems.filter((fr) => !fr.isServed);
-  }, [foodReadyItems]);
+    const q = search.trim().toLowerCase().replace(/^#/, '');
+    return foodReadyItems.filter((fr) => !fr.isServed && (!q || [fr.tableNumber, fr.dishName, fr.kotNumber, fr.station,
+      kots.find(k => k.id === fr.kotId)?.tokenNumber].some(value => value?.toLowerCase().includes(q))));
+  }, [foodReadyItems, kots, search]);
 
   // Group items by Table Number
   const groupedByTable = useMemo(() => {
@@ -67,6 +71,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
         )}
       </div>
 
+      <div className="relative max-w-xl"><Search className="absolute top-3 left-3 w-4 h-4 text-slate-500" /><input aria-label="Search ready food" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search table, token, dish or station…" className="w-full min-h-[44px] pl-10 pr-3 rounded-xl border border-jaman-border bg-white text-sm" /></div>
       {/* Grouped Table Cards List */}
       {tableNumbers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-16 md:pb-6">
@@ -154,7 +159,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                     className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>DELIVER ALL READY ITEMS ({items.length})</span>
+                    <span>{search.trim() ? 'DELIVER SHOWN READY ITEMS' : 'DELIVER ALL READY ITEMS'} ({items.length})</span>
                   </button>
 
                   <button
@@ -175,7 +180,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
           <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-black text-jaman-navy">All Food Delivered & Served!</h3>
+          <h3 className="text-lg font-black text-jaman-navy">{search.trim() ? 'No ready food matches your search' : 'All Food Delivered & Served!'}</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             The kitchen stations have no pending ready dishes. New food ready notifications will pop up automatically.
           </p>

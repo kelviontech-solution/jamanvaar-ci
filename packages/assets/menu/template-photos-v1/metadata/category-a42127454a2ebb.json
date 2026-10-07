@@ -1,0 +1,37 @@
+{
+  "id": "category-a42127454a2ebb",
+  "kind": "category",
+  "name": "Sweets & Beverages — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Sweets & Beverages",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "sweets-beverages",
+  "description": "Traditional sweet portions and buttermilk",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Sweets & Beverages",
+  "components": [
+    {
+      "name": "Sukhdi",
+      "description": "Sukhdi, traditional sweet portions and buttermilk.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shrikhand",
+      "description": "Shrikhand, traditional sweet portions and buttermilk.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Chaas",
+      "description": "Masala Chaas, traditional sweet portions and buttermilk.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a42127454a2ebb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93294,
+  "sha256": "11a3b8871a8f782cba0732ef416ab65d23d2e9562450649cb1e164371c3c96a9"
+}

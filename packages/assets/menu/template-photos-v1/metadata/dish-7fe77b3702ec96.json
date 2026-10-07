@@ -1,0 +1,26 @@
+{
+  "id": "dish-7fe77b3702ec96",
+  "kind": "dish",
+  "name": "Plain Dosa",
+  "description": "Plain Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Dosas"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "file": "dish-7fe77b3702ec96.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72380,
+  "sha256": "35cd27c744abb14c691d0f89efcb2683c2542317fa8837c020c6dda39dfecb66"
+}

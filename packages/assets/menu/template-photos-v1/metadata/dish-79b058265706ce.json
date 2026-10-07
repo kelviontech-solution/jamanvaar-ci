@@ -1,0 +1,25 @@
+{
+  "id": "dish-79b058265706ce",
+  "kind": "dish",
+  "name": "Malai Kulfi",
+  "description": "Malai Kulfi, traditional chilled dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Kulfi & Falooda"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-79b058265706ce.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85284,
+  "sha256": "10304381bff212d7461cb68175436afa265750119ac4f6b63f17e74b496c898e"
+}

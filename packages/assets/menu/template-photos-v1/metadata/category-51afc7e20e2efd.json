@@ -1,0 +1,37 @@
+{
+  "id": "category-51afc7e20e2efd",
+  "kind": "category",
+  "name": "Dal & Kadhi — Grand Indian Thali Restaurant",
+  "categoryName": "Dal & Kadhi",
+  "templateId": "tpl-thali",
+  "slug": "dal-kadhi",
+  "description": "Sweet-sour Gujarati tempering, served hot",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Dal & Kadhi",
+  "components": [
+    {
+      "name": "Gujarati Dal",
+      "description": "Gujarati Dal, sweet-sour Gujarati tempering, served hot.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Gujarati Kadhi",
+      "description": "Gujarati Kadhi, sweet-sour Gujarati tempering, served hot.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dal Dhokli",
+      "description": "Dal Dhokli, sweet-sour Gujarati tempering, served hot.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-51afc7e20e2efd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105698,
+  "sha256": "a8e6dd1edb2e7ec5940ecad12798b846211e6bc04ff94e8e0a1cf4a3a6ed9473"
+}

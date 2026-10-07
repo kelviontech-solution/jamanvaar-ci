@@ -515,21 +515,28 @@ export function printThermalReceipt(
  * Isolated browser printer function that prints ONLY the 80mm/58mm kitchen KOT ticket
  * inside a sandboxed iframe without printing the main page background, dashboards or modals.
  */
-export function printThermalKotTicket(
+function escapeKotHtml(value: unknown): string {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+}
+
+export function buildThermalKotTicketHtml(
   kot: KOTRecord,
-  paperWidth: '80mm' | '58mm' = '80mm'
-): void {
-  if (typeof window === 'undefined') return;
+  paperWidth: '80mm' | '58mm' = '80mm',
+  options: { reprint?: boolean } = {}
+): string {
 
   const is80mm = paperWidth === '80mm';
   const itemsHtml = (kot.items || []).map((it) => `
     <tr style="border-bottom: 1px dotted #ccc;">
       <td style="padding: 6px 0; font-size: ${is80mm ? '14px' : '12px'}; font-weight: 900;">
-        ${it.name}
-        ${it.specialInstructions ? `<br/><span style="font-size: 10px; font-weight: bold; color: #000;">NOTE: ${it.specialInstructions}</span>` : ''}
+        ${escapeKotHtml(it.name)}
+        ${it.status === 'CANCELLED' ? '<br/><strong>CANCELLED — DO NOT COOK</strong>' : ''}
+        ${it.modifiers?.length ? `<br/><span style="font-size: 11px;">${escapeKotHtml(it.modifiers.map(m => m.optionName).join(', '))}</span>` : ''}
+        ${it.course || it.seat ? `<br/><span style="font-size: 11px;">${escapeKotHtml([it.course, it.seat && `Seat ${it.seat}`].filter(Boolean).join(' · '))}</span>` : ''}
+        ${it.specialInstructions ? `<br/><span style="font-size: 10px; font-weight: bold; color: #000;">NOTE: ${escapeKotHtml(it.specialInstructions)}</span>` : ''}
       </td>
       <td style="padding: 6px 0; text-align: right; font-size: ${is80mm ? '16px' : '14px'}; font-weight: 900;">
-        x${it.quantity}
+        x${escapeKotHtml(it.quantity)}
       </td>
     </tr>
   `).join('');
@@ -585,26 +592,29 @@ export function printThermalKotTicket(
       <body>
         <div class="text-center">
           <div class="kot-title">KITCHEN ORDER TICKET</div>
-          <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">STATION: ${kot.station || 'MAIN_KITCHEN'}</div>
+          ${options.reprint ? '<div style="font-weight: bold; border: 2px solid #000; margin: 5px 0; padding: 4px;">REPRINT — EXISTING KOT COPY</div>' : ''}
+          ${kot.status === 'CANCELLED' ? '<div style="font-weight: bold;">CANCELLED — DO NOT COOK</div>' : ''}
+          <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">STATION: ${escapeKotHtml(kot.station || 'MAIN_KITCHEN')}</div>
         </div>
 
         <div class="divider"></div>
 
         <div class="row">
-          <span>KOT #: <strong style="font-size: 14px;">${kot.kotNumber || kot.id.slice(-6)}</strong></span>
-          <span class="table-badge">TBL: ${kot.tableNumber || 'N/A'}</span>
+          <span>KOT #: <strong style="font-size: 14px;">${escapeKotHtml(kot.kotNumber || kot.id.slice(-6))}</strong></span>
+          <span class="table-badge">TBL: ${escapeKotHtml(kot.tableNumber || 'N/A')}</span>
         </div>
         <div class="row">
-          <span>Order #: <strong>${kot.orderNumber || ''}</strong></span>
-          <span>Token: <strong>#${kot.tokenNumber || ''}</strong></span>
+          <span>Order #: <strong>${escapeKotHtml(kot.orderNumber || '')}</strong></span>
+          <span>Token: <strong>#${escapeKotHtml(kot.tokenNumber || '')}</strong></span>
         </div>
         <div class="row">
           <span>Time: <strong>${new Date(kot.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong></span>
-          <span>Type: <strong>${kot.orderType || 'DINE_IN'}</strong></span>
+          <span>Type: <strong>${escapeKotHtml(kot.orderType || 'DINE_IN')}</strong></span>
         </div>
 
         <div class="divider"></div>
 
+        ${kot.orderNotes ? `<div style="font-weight: bold; padding: 6px 0;">ORDER NOTE: ${escapeKotHtml(kot.orderNotes)}</div>` : ''}
         <table>
           <thead>
             <tr>
@@ -626,6 +636,12 @@ export function printThermalKotTicket(
     </html>
   `;
 
+  return html;
+}
+
+export function printThermalKotTicket(kot: KOTRecord, paperWidth: '80mm' | '58mm' = '80mm', options: { reprint?: boolean } = {}): void {
+  if (typeof window === 'undefined') return;
+  const html = buildThermalKotTicketHtml(kot, paperWidth, options);
   const iframe = document.createElement('iframe');
   iframe.style.position = 'fixed';
   iframe.style.right = '0';

@@ -1,0 +1,22 @@
+{
+  "id": "dish-667302ed8a489c",
+  "kind": "dish",
+  "name": "Chana Dal",
+  "description": "Chana Dal, regional lentils and yoghurt gravies.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "file": "dish-667302ed8a489c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 94072,
+  "sha256": "95a313fca2e64c4893a50e5eb749540bd286ad5e6c680402294acd4358cf61e7"
+}

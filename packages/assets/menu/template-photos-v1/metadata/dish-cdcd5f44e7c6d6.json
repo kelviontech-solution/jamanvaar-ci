@@ -1,0 +1,25 @@
+{
+  "id": "dish-cdcd5f44e7c6d6",
+  "kind": "dish",
+  "name": "Masala Dosa",
+  "description": "Masala Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Dosas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Dosas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/south-indian/masala-dosa.jpg"
+  ],
+  "file": "dish-cdcd5f44e7c6d6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83978,
+  "sha256": "142080355e93fd3358bed35fd38505b0fbe6dd0695ce2c308aecffba05c979c6"
+}

@@ -1,10 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
-import { BusinessDayRepository, PrintQueueRepository } from '@jamanvaar/database';
+import { db, BusinessDayRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
 import { PosPrinterService } from '../../services/printerService';
 import { PosDayOrdersModal } from './PosDayOrdersModal';
-import { formatINR, splitTax } from '@jamanvaar/utils';
+import { formatINR, splitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+// The restaurant's configured GST (Customisations & Tax), read when shown.
+const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
   X,
   Calendar,
@@ -329,7 +331,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
 
             <div className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
               <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
-                Total Tax (GST 5%)
+                Total {gstLabels().total}
               </span>
               <div className="text-2xl font-black font-mono text-purple-700 mt-0.5">
                 {formatINR(businessDay.tax)}

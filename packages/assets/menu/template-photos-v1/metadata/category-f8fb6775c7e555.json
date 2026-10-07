@@ -1,0 +1,37 @@
+{
+  "id": "category-f8fb6775c7e555",
+  "kind": "category",
+  "name": "Main Course — Indian Multi-Cuisine Diner",
+  "categoryName": "Main Course",
+  "templateId": "tpl-multicuisine",
+  "slug": "main-course",
+  "description": "Slow-simmered Indian gravies with fresh spices",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Main Course",
+  "components": [
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer Butter Masala, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kadai Paneer",
+      "description": "Kadai Paneer, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shahi Paneer",
+      "description": "Shahi Paneer, slow-simmered Indian gravies with fresh spices.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f8fb6775c7e555.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 122924,
+  "sha256": "a6a2f1bc800994d0b3d9e2985b072bd19109cdee6fb085f1728e9c6fe78ccf46"
+}

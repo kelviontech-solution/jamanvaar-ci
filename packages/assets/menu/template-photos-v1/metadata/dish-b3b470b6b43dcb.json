@@ -1,0 +1,41 @@
+{
+  "id": "dish-b3b470b6b43dcb",
+  "kind": "dish",
+  "name": "Paneer Butter Masala",
+  "description": "Soft paneer cubes simmered in a rich, buttery tomato gravy infused with kasuri methi and cream",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Royal Paneer Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Royal Paneer Curries"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Rice & Curries"
+    },
+    {
+      "templateId": "tpl-south-north-combo",
+      "category": "North Indian Curries & Naans"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/paneer-butter-masala.jpg"
+  ],
+  "file": "dish-b3b470b6b43dcb.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127964,
+  "sha256": "da48c021420bb53439b402f1ba0224405270b0afb6d558e39a5bffcc307476a0"
+}

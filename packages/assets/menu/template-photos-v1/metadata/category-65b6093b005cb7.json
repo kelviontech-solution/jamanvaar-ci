@@ -1,0 +1,37 @@
+{
+  "id": "category-65b6093b005cb7",
+  "kind": "category",
+  "name": "Hot Snacks — Street Food Restaurant",
+  "categoryName": "Hot Snacks",
+  "templateId": "tpl-chaat",
+  "slug": "hot-snacks",
+  "description": "Freshly fried snacks",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "components": [
+    {
+      "name": "Samosa 2 Pieces",
+      "description": "Samosa 2 Pieces, freshly fried snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Kachori 2 Pieces",
+      "description": "Kachori 2 Pieces, freshly fried snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Onion Pakora",
+      "description": "Onion Pakora, freshly fried snacks.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-65b6093b005cb7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106152,
+  "sha256": "9cd45f5cac2da3ebcd46daedb042a4bc136a5bf0335e5d21f9f95c00f3e9fc61"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-d8d833493f1100",
+  "kind": "category",
+  "name": "Quick Meals — Fast Food & Quick Service Restaurant",
+  "categoryName": "Quick Meals",
+  "templateId": "tpl-fast-food",
+  "slug": "quick-meals",
+  "description": "Freshly prepared comfort meals",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Quick Meals",
+  "components": [
+    {
+      "name": "Veg Hakka Noodles",
+      "description": "Veg Hakka Noodles, freshly prepared comfort meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Red Sauce Pasta",
+      "description": "Red Sauce Pasta, freshly prepared comfort meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "White Sauce Pasta",
+      "description": "White Sauce Pasta, freshly prepared comfort meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d8d833493f1100.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120198,
+  "sha256": "26ca7fc0b31612044eeb83f71b2912212fc9924e877f28619ed5b5373765a4ce"
+}

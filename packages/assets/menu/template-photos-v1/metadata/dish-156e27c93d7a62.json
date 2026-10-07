@@ -1,0 +1,22 @@
+{
+  "id": "dish-156e27c93d7a62",
+  "kind": "dish",
+  "name": "Jain Moong Khichdi",
+  "description": "Jain Moong Khichdi, rice preparations without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Rice",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Rice"
+    }
+  ],
+  "file": "dish-156e27c93d7a62.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 74566,
+  "sha256": "bb81680d05a8776e99fd58e8f7457f162686d199b19451a2d4c49082aa9bf256"
+}

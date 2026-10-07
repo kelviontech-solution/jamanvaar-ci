@@ -1,0 +1,22 @@
+{
+  "id": "dish-1b314792293d4b",
+  "kind": "dish",
+  "name": "Veg Galouti Kebab (4 Pcs)",
+  "description": "Melt-in-mouth smoked yam and lentil patties flavored with potli masala, served over mini ulta tawa paratha",
+  "diet": "VEG",
+  "cuisine": "Royal Mughlai & Awadhi",
+  "category": "Nawabi Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-mughlai",
+      "category": "Nawabi Starters"
+    }
+  ],
+  "file": "dish-1b314792293d4b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81802,
+  "sha256": "2997bbe09d5ec0951a763d755422dfdf3a2a1d1617482b058fcc7ad1748e9e16"
+}

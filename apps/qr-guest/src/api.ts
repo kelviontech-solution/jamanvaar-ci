@@ -1,3 +1,6 @@
+import { resolveMenuImage } from '../../../packages/utils/src/menu_image';
+import { menuDishImage } from '../../../packages/utils/src/dish_photos';
+
 /**
  * The public QR API, and nothing else. No credentials, no cookies: the token in the address is the whole identity,
  * and the server derives restaurant, branch and table from it.
@@ -15,6 +18,7 @@ export interface Describe {
     enabled: boolean;
     menuReady: boolean;
     menuVersion: number;
+    onlinePayment?: { available: boolean; message: string };
     settings: { allowCustomerNotes: boolean; allowModifiers: boolean; allowCash: boolean; allowOnlinePayment: boolean; showOrderStatus: boolean; requireCustomerName: boolean; requireCustomerPhone: boolean };
   };
 }
@@ -43,11 +47,8 @@ export function apiBase(): string | null {
 }
 
 /** Pictures the restaurant uploaded are served by the API (cached for a year); web addresses are used as they are. */
-export function imageSrc(url: string | undefined): string | undefined {
-  if (!url) return undefined;
-  if (!url.startsWith('/api/')) return url;
-  const base = apiBase();
-  return base ? `${base}${url}` : undefined;
+export function imageSrc(url: string | undefined, dishName?: string): string | undefined {
+  return resolveMenuImage(menuDishImage(url, dishName), { apiBase: apiBase() ?? undefined });
 }
 
 async function call<T>(path: string, init: RequestInit & { session?: string } = {}): Promise<{ data: T | null; status: number; etag: string | null }> {
@@ -75,7 +76,7 @@ export const QrApi = {
   describe: async (token: string, session: string) => (await call<Describe>(`/${encodeURIComponent(token)}`, { session })).data as Describe,
   menu: async (token: string, session: string, etag?: string | null): Promise<{ menu: Menu | null; etag: string | null }> => {
     const r = await call<Menu>(`/${encodeURIComponent(token)}/menu`, { session, headers: etag ? { 'If-None-Match': etag } : {} });
-    return { menu: r.data, etag: r.etag };
+    return { menu: r.data ? { ...r.data, items: r.data.items.map(item => ({ ...item, imageUrl: menuDishImage(item.imageUrl, item.name) })) } : null, etag: r.etag };
   },
   quote: async (token: string, items: Array<{ itemId: string; quantity: number; optionIds: string[]; note?: string }>) =>
     (await call<Quote>(`/${encodeURIComponent(token)}/quote`, { method: 'POST', body: JSON.stringify({ items }) })).data as Quote,

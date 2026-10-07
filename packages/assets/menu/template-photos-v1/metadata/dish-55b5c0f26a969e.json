@@ -1,0 +1,26 @@
+{
+  "id": "dish-55b5c0f26a969e",
+  "kind": "dish",
+  "name": "Paneer Grilled Sandwich",
+  "description": "Paneer Grilled Sandwich, fresh fillings in toasted or grilled bread.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sandwiches",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sandwiches"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Sandwiches"
+    }
+  ],
+  "file": "dish-55b5c0f26a969e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 99588,
+  "sha256": "ebef3c9bc1b27103eb32b256815a8b31c1a670311d19cd814ca86f3466582d3e"
+}

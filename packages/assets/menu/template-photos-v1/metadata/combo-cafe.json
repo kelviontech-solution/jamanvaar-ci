@@ -1,0 +1,29 @@
+{
+  "id": "combo-cafe",
+  "kind": "combo",
+  "name": "Artisan Café & Coffee Bar Meal Deal",
+  "description": "Classic Cappuccino with Masala Tea. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Classic Cappuccino",
+      "description": "Rich double espresso topped with silky steamed whole milk foam and dark cocoa dust",
+      "diet": "VEG"
+    },
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, brewed tea and infusions.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-cafe.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86578,
+  "sha256": "276680f90e7cd9064198889db3e114ee367895ee53253aa74d9ce4446db90ca0"
+}

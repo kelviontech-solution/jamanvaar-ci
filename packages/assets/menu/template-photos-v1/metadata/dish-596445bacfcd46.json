@@ -1,0 +1,26 @@
+{
+  "id": "dish-596445bacfcd46",
+  "kind": "dish",
+  "name": "Tamarind Rice",
+  "description": "Tamarind Rice, south Indian rice preparations and complete meals.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Rice & Meals"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Rice & Meals"
+    }
+  ],
+  "file": "dish-596445bacfcd46.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103746,
+  "sha256": "1827def40a71ddcdaad6175e94a6bb3d08e363f7970b156b7e10ba090351a92a"
+}

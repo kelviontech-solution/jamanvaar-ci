@@ -1,0 +1,25 @@
+{
+  "id": "dish-5a2017b447a43c",
+  "kind": "dish",
+  "name": "Veg Puff",
+  "description": "Veg Puff, oven-baked savoury snacks.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Savouries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Savouries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-5a2017b447a43c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85166,
+  "sha256": "e5ec0c043ea0d38570336f48a302442a0bd959f66356181ce8a5e14193d1936c"
+}

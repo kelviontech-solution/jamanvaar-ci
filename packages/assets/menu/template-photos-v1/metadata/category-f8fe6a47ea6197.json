@@ -1,0 +1,37 @@
+{
+  "id": "category-f8fe6a47ea6197",
+  "kind": "category",
+  "name": "Accompaniments — Biryani & Kebab Darbar",
+  "categoryName": "Accompaniments",
+  "templateId": "tpl-biryani",
+  "slug": "accompaniments",
+  "description": "Traditional biryani accompaniments",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Accompaniments",
+  "components": [
+    {
+      "name": "Boondi Raita",
+      "description": "Boondi Raita, traditional biryani accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Onion Raita",
+      "description": "Onion Raita, traditional biryani accompaniments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mirchi Ka Salan",
+      "description": "Mirchi Ka Salan, traditional biryani accompaniments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f8fe6a47ea6197.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117616,
+  "sha256": "45c44fcdbe36b4c6b85b92237290e9a7bd7c7eef801005322453b80d1bfab05e"
+}

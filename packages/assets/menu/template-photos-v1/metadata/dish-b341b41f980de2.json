@@ -1,0 +1,22 @@
+{
+  "id": "dish-b341b41f980de2",
+  "kind": "dish",
+  "name": "Payasam",
+  "description": "Payasam, traditional sweet portions.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Desserts"
+    }
+  ],
+  "file": "dish-b341b41f980de2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 59648,
+  "sha256": "4303434bbc5ee8de75860d1507b89146dc114e21f6c66372b7fd376f7180da0f"
+}

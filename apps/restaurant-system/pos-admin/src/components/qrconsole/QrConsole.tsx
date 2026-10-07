@@ -343,11 +343,13 @@ const SETTING_ROWS: Array<[keyof QrSettings, string, string, boolean?]> = [
 
 function Settings({ showToast }: { showToast: (m: string) => void }) {
   const { data, error, reload } = useLoad<QrSettings>(QrAdminApi.settings);
+  const payment = useLoad(QrAdminApi.paymentReadiness);
   const save = async (key: keyof QrSettings, value: boolean) => {
     try {
       await QrAdminApi.saveSettings({ [key]: value });
       showToast('Saved');
       reload();
+      payment.reload();
     } catch (e) {
       showToast(errText(e));
     }
@@ -356,6 +358,11 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
   if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
   return (
     <div className="rounded-2xl border border-jaman-border bg-white divide-y max-w-2xl">
+      <div className="p-4 bg-jaman-ivory rounded-t-2xl" role="status">
+        <strong className="block text-sm text-jaman-navy">Mobile online payment: {payment.data?.guestAvailable ? 'Available' : 'Setup needed'}</strong>
+        <p className="text-xs text-slate-600 mt-1">{payment.error || payment.data?.message || 'Checking payment collection…'}</p>
+        {payment.data?.available && !data.allowOnlinePayment && <p className="text-xs text-jaman-saffron mt-1">Turn on Online payment below to show it on the guest checkout.</p>}
+      </div>
       {SETTING_ROWS.map(([key, label, help, unavailable]) => (
         <label key={key} className={`flex items-center justify-between gap-4 p-4 ${unavailable ? 'opacity-50' : ''}`}>
           <span><span className="block font-bold text-sm text-jaman-navy">{label}</span><span className="block text-xs text-slate-500">{help}</span></span>

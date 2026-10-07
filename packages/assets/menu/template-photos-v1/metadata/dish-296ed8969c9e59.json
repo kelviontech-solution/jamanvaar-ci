@@ -1,0 +1,25 @@
+{
+  "id": "dish-296ed8969c9e59",
+  "kind": "dish",
+  "name": "Rose Milk",
+  "description": "Rose Milk, freshly prepared refreshments.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-296ed8969c9e59.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 62240,
+  "sha256": "1804c6ce6b554099c8c20db31fbab3518feab7d648716d792cd47fd9dc9f9600"
+}

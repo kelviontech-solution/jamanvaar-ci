@@ -1,0 +1,22 @@
+{
+  "id": "dish-3ad04c8c36712c",
+  "kind": "dish",
+  "name": "Jain Moong Dal",
+  "description": "Jain Moong Dal, lentils tempered without onion or garlic.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Dal",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Dal"
+    }
+  ],
+  "file": "dish-3ad04c8c36712c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 83742,
+  "sha256": "ac3976d263e0719ea12eb9514b004df38cc581a2bbfe8b6b734b0b3f684a423e"
+}

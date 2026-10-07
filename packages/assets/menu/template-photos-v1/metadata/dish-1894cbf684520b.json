@@ -1,0 +1,41 @@
+{
+  "id": "dish-1894cbf684520b",
+  "kind": "dish",
+  "name": "Fresh Lime Soda",
+  "description": "Fresh Lime Soda, traditional dairy drinks and fresh citrus refreshments.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-chaat",
+      "category": "Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-1894cbf684520b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75504,
+  "sha256": "5bb877f9713c4167eb8b145985e174692fdecad5e6378787a368e8ade3141983"
+}

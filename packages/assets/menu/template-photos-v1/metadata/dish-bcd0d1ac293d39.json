@@ -1,0 +1,25 @@
+{
+  "id": "dish-bcd0d1ac293d39",
+  "kind": "dish",
+  "name": "Butterscotch Ice Cream",
+  "description": "Butterscotch Ice Cream, single scoops of chilled ice cream.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Ice Cream Scoops",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Ice Cream Scoops"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-bcd0d1ac293d39.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 63914,
+  "sha256": "4b6f56e1243911bb3ae140c4a23f69e0e46ed3ddc0f3f453b8c5c94468fee75a"
+}

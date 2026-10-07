@@ -1,0 +1,26 @@
+{
+  "id": "dish-93cd32c8412802",
+  "kind": "dish",
+  "name": "Chicken Hakka Noodles",
+  "description": "Chicken Hakka Noodles, wok-tossed noodles and crunchy vegetables.",
+  "diet": "NON_VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Noodles",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Noodles"
+    },
+    {
+      "templateId": "tpl-chinese",
+      "category": "Noodles"
+    }
+  ],
+  "file": "dish-93cd32c8412802.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103426,
+  "sha256": "293acdcda2e20f2fde6d32d4a32cdd941f2b1a090c86d21c9327b64549db84aa"
+}

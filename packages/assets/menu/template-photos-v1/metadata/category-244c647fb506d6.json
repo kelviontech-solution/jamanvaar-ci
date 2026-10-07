@@ -1,0 +1,37 @@
+{
+  "id": "category-244c647fb506d6",
+  "kind": "category",
+  "name": "Farsan — Gujarati Restaurant",
+  "categoryName": "Farsan",
+  "templateId": "tpl-gujarati",
+  "slug": "farsan",
+  "description": "Steamed or crisp Gujarati snacks with chutney",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Farsan",
+  "components": [
+    {
+      "name": "Dhokla",
+      "description": "Dhokla, steamed or crisp Gujarati snacks with chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Khandvi",
+      "description": "Khandvi, steamed or crisp Gujarati snacks with chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fafda",
+      "description": "Fafda, steamed or crisp Gujarati snacks with chutney.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-244c647fb506d6.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96642,
+  "sha256": "e0917060c444388837a930d20499cbfaacc5a0e6e8d58af211230f8a503fae82"
+}

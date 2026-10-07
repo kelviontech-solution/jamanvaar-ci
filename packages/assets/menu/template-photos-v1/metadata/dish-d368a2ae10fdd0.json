@@ -1,0 +1,26 @@
+{
+  "id": "dish-d368a2ae10fdd0",
+  "kind": "dish",
+  "name": "Dudhi Chana Dal",
+  "description": "Dudhi Chana Dal, gujarati vegetable preparations with fresh regional spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "file": "dish-d368a2ae10fdd0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88626,
+  "sha256": "6a16c6ff4421aac1c645e9b3ba1279798b5a8aed93d75801f1081d7dcf4b86fa"
+}

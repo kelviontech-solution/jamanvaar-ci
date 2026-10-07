@@ -1,0 +1,22 @@
+{
+  "id": "dish-f62c9d53942e9a",
+  "kind": "dish",
+  "name": "Laccha Paratha",
+  "description": "Multi-layered crispy whole wheat paratha baked in tandoor",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Roti & Naan Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Roti & Naan Breads"
+    }
+  ],
+  "file": "dish-f62c9d53942e9a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106974,
+  "sha256": "beb266c896c5c0210bc6f08287ac0bab2e2702715a558464458ba1e57d1d9914"
+}

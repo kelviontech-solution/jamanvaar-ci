@@ -1,0 +1,22 @@
+{
+  "id": "dish-9bdd41091b24da",
+  "kind": "dish",
+  "name": "Spring Rolls",
+  "description": "Spring Rolls, wok-tossed or crisp starters with house sauces.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Starters"
+    }
+  ],
+  "file": "dish-9bdd41091b24da.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 75510,
+  "sha256": "8744a3b189cfe1117728fc56dfd4bbf4b45c604f89bf4005ab80c2ff28283027"
+}

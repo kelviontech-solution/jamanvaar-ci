@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5174",
+    "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+    "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

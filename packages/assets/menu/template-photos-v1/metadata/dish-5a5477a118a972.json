@@ -1,0 +1,25 @@
+{
+  "id": "dish-5a5477a118a972",
+  "kind": "dish",
+  "name": "Royal Kesar Pista Falooda",
+  "description": "Rose syrup, basil seeds, falooda sev, chilled condensed milk topped with saffron ice cream and nuts",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes & Faloodas",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes & Faloodas"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-5a5477a118a972.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80490,
+  "sha256": "9148557d9617bb9bb415029d5473fb1f9ede91680c47e6252a06f168b9314148"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "category-30e4b6bcd88c60",
+  "kind": "category",
+  "name": "Combos — Kathiyawadi Dhaba & Bhojanalaya",
+  "categoryName": "Combos",
+  "templateId": "tpl-kathiyawadi",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Kathiyawadi Ringna No Olo",
+      "description": "Charcoal roasted smoked eggplants mashed and cooked with garlic, green chillies, spring onions and oil",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, rice and lentil comfort meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-30e4b6bcd88c60.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109034,
+  "sha256": "bd0f3e740b6157e1e54bd29e2b452e7ef6aa01685c0891d45d1010edcd612665"
+}

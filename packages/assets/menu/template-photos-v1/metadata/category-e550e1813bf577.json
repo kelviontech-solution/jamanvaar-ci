@@ -1,0 +1,37 @@
+{
+  "id": "category-e550e1813bf577",
+  "kind": "category",
+  "name": "Dosas — Indian Multi-Cuisine Diner",
+  "categoryName": "Dosas",
+  "templateId": "tpl-multicuisine",
+  "slug": "dosas",
+  "description": "Fermented rice-lentil crepes with sambar and coconut chutney",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Dosas",
+  "components": [
+    {
+      "name": "Plain Dosa",
+      "description": "Plain Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Dosa",
+      "description": "Masala Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Mysore Masala Dosa",
+      "description": "Mysore Masala Dosa, fermented rice-lentil crepes with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e550e1813bf577.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112520,
+  "sha256": "2da8fbb35ccff9329b7af03572bd0039dbf4c82dfcca050bbd31b1c65b3a5111"
+}

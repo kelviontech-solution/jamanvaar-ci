@@ -1,0 +1,37 @@
+{
+  "id": "category-3d65c299c5aecf",
+  "kind": "category",
+  "name": "Chaat — Street Food Restaurant",
+  "categoryName": "Chaat",
+  "templateId": "tpl-chaat",
+  "slug": "chaat",
+  "description": "Freshly assembled chaat with sweet and spicy chutneys",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "components": [
+    {
+      "name": "Pani Puri",
+      "description": "Pani Puri, freshly assembled chaat with sweet and spicy chutneys.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sev Puri",
+      "description": "Sev Puri, freshly assembled chaat with sweet and spicy chutneys.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dahi Puri",
+      "description": "Dahi Puri, freshly assembled chaat with sweet and spicy chutneys.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3d65c299c5aecf.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100324,
+  "sha256": "931ec64146cdde62f88f4e55e0c019346f1a877dd5c6e8132350fdc425665229"
+}

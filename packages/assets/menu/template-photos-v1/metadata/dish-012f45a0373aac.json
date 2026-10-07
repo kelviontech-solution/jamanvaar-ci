@@ -1,0 +1,26 @@
+{
+  "id": "dish-012f45a0373aac",
+  "kind": "dish",
+  "name": "Kadai Paneer",
+  "description": "Kadai Paneer, slow-simmered Indian gravies with fresh spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Main Course",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Main Course"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Main Course"
+    }
+  ],
+  "file": "dish-012f45a0373aac.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108142,
+  "sha256": "eba13c2f69cd4ea8013c5ec0993d1f3106a9401c8dc4deb6a634ccaabe448c66"
+}

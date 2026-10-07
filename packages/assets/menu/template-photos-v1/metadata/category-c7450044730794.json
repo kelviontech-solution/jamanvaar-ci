@@ -1,0 +1,37 @@
+{
+  "id": "category-c7450044730794",
+  "kind": "category",
+  "name": "Cold Coffee & Shakes — Indian Multi-Cuisine Diner",
+  "categoryName": "Cold Coffee & Shakes",
+  "templateId": "tpl-multicuisine",
+  "slug": "cold-coffee-shakes",
+  "description": "Blended drinks served chilled",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "components": [
+    {
+      "name": "Cold Coffee",
+      "description": "Cold Coffee, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Iced Americano",
+      "description": "Iced Americano, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Iced Latte",
+      "description": "Iced Latte, blended drinks served chilled.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c7450044730794.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97114,
+  "sha256": "82d0135e0722f90e0cb9daa6cfad90ae0424747fd4d112bf8a3bab1afec4f26c"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-f798599fdaec92",
+  "kind": "dish",
+  "name": "Classic Cappuccino",
+  "description": "Rich double espresso topped with silky steamed whole milk foam and dark cocoa dust",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Espresso & Coffees",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Espresso & Coffees"
+    }
+  ],
+  "file": "dish-f798599fdaec92.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 69940,
+  "sha256": "a2c37d7bee94565b23fc9f3a8d035d955ec0c027de6428a28a9e0bf1b3efde18"
+}

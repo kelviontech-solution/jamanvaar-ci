@@ -3,12 +3,45 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
 }
+
+/* Size text by ticket width, so a wide TV with many columns does not enlarge narrow cards. */
+.kds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  max-width: 2400px;
+}
+.kds-board { container-type: size; }
+.kds-ticket {
+  container-type: inline-size;
+  max-height: max(330px, calc(100dvh - 270px));
+  max-height: max(330px, 100cqh);
+  overflow-wrap: anywhere;
+}
+.kds-ticket-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.kds-ticket-body > :not(.kds-dishes), .kds-ticket-footer { flex-shrink: 0; }
+.kds-token { font-size: 1.75rem; font-size: clamp(1.5rem, 8cqi, 2.25rem); }
+.kds-dish-name { font-size: 1rem; font-size: clamp(1rem, 4.8cqi, 1.25rem); overflow-wrap: anywhere; }
+.kds-dishes {
+  min-height: 0;
+  flex: 0 1 auto;
+  max-height: clamp(160px, 44dvh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 3px;
+}
+.kds-dishes:focus-visible { outline: 2px solid #E66817; outline-offset: 3px; }
 
 /* Custom scrollbars for kitchen touch panels */
 ::-webkit-scrollbar {

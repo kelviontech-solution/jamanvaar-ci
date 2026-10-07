@@ -1,5 +1,5 @@
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR, toCsvRow } from '@jamanvaar/utils';
+import { formatDate, formatTime, formatINR, toCsvRow, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { db } from '@jamanvaar/database';
 import {
   ReportSummaryMetrics,
@@ -128,7 +128,8 @@ export class ReportExportService {
    * Export GST Tax Report to CSV
    */
   public static exportGstCsv(gstRows: GstTaxBreakdownRow[]): void {
-    const headers = ['Tax Rate %', 'Invoices Count', 'Taxable Amount (₹)', 'CGST (2.5%) (₹)', 'SGST (2.5%) (₹)', 'Total GST (5%) (₹)'];
+    const labels = taxLabels(restaurantGstRate(db.taxGroups));
+    const headers = ['Tax Rate %', 'Invoices Count', 'Taxable Amount (₹)', `${labels.cgst} (₹)`, `${labels.sgst} (₹)`, `${labels.total} (₹)`];
     const rows = gstRows.map((g) => [`${g.taxRatePercent}%`, g.invoicesCount, g.taxableAmount, g.cgstAmount, g.sgstAmount, g.totalTax]);
 
     const csv = [

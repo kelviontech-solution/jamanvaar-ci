@@ -1,0 +1,29 @@
+{
+  "id": "combo-north-indian",
+  "kind": "combo",
+  "name": "North Indian Meal Deal",
+  "description": "Paneer Tikka Angara with Jeera Rice (Desi Ghee). Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Paneer Tikka Angara",
+      "description": "Fresh cottage cheese cubes marinated in Kashmiri chilli-yogurt masala, roasted in clay oven with bell peppers",
+      "diet": "VEG"
+    },
+    {
+      "name": "Jeera Rice (Desi Ghee)",
+      "description": "Steamed basmati rice tempered with roasted cumin seeds and desi ghee",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-north-indian.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 131406,
+  "sha256": "85f889101171991586965b11c97c35102a3bc880a0d338a0df1ac5dc792ca7bc"
+}

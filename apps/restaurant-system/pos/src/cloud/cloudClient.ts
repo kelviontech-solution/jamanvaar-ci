@@ -8,7 +8,7 @@ import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
  * response's own deviceToken is used directly, no second login step.
  */
 
-import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
+import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import { DeviceGate, EndpointResolver, CloudApiError, parseJsonResponse, createDeviceCloudClient, getDevicePublicKeyJwk, signDeviceRequest } from '@jamanvaar/sync';
 import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdentityRepository, TenantIsolation } from '@jamanvaar/database';
 
@@ -49,6 +49,7 @@ export const {
  * device credential and forgets the lock state, so the app falls back to asking for a fresh activation key.
  */
 export function resetTerminal(): void {
+  AiConfig.reset();
   stopRealtime();
   try {
     localStorage.removeItem(RESTAURANT_ID_KEY);
@@ -127,12 +128,13 @@ export async function getPaymentStatus(paymentId: string): Promise<{ status: str
   return data;
 }
 
-export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, idempotencyKey?: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+/** Records a refund the restaurant paid back by hand (cash, or UPI from the owner's account). Razorpay is not called. */
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, idempotencyKey?: string, method: 'CASH' | 'UPI_TO_CUSTOMER' = 'UPI_TO_CUSTOMER'): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const scope = StaffSession.approvalScope();
   const key = idempotencyKey ?? (scope?.paymentId === paymentId && scope.amountPaise === amountPaise ? scope.idempotencyKey : crypto.randomUUID());
   const res = await signedDeviceFetch(`/api/v1/payments/${paymentId}/refund`, {
     method: 'POST',
-    body: JSON.stringify({ amountPaise, reason, requestedBy, staffSession: StaffSession.sessionToken(), approvalSession: StaffSession.approvalToken(), idempotencyKey: key })
+    body: JSON.stringify({ amountPaise, reason, requestedBy, method, staffSession: StaffSession.sessionToken(), approvalSession: StaffSession.approvalToken(), idempotencyKey: key })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

@@ -1,0 +1,37 @@
+{
+  "id": "category-2cb5fa72b2d60c",
+  "kind": "category",
+  "name": "Desserts — Fast Food & Quick Service Restaurant",
+  "categoryName": "Desserts",
+  "templateId": "tpl-fast-food",
+  "slug": "desserts",
+  "description": "Sweet snack portions",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, sweet snack portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vanilla Ice Cream",
+      "description": "Vanilla Ice Cream, sweet snack portions.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, sweet snack portions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-2cb5fa72b2d60c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100110,
+  "sha256": "0033c1e2e6de53f1ee91f5775bf578ba293b0fa896bebb9b1459c5afe0bde88e"
+}

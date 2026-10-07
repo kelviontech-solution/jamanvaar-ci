@@ -1,0 +1,26 @@
+{
+  "id": "dish-57d860f05cac41",
+  "kind": "dish",
+  "name": "Kathiyawadi Thali",
+  "description": "Kathiyawadi Thali, complete regional meals.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Thali"
+    }
+  ],
+  "file": "dish-57d860f05cac41.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120976,
+  "sha256": "82f528e22e8ff2671de876620635bd675182adde554318d4b4018db8c2a88f23"
+}

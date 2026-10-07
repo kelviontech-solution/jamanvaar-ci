@@ -1,0 +1,32 @@
+{
+  "id": "category-78a363f38f585b",
+  "kind": "category",
+  "name": "Gujarati Thali Special — Gujarati Restaurant",
+  "categoryName": "Gujarati Thali Special",
+  "templateId": "tpl-gujarati",
+  "slug": "gujarati-thali",
+  "description": "Complete authentic balanced Gujarati dining feast",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Thali Special",
+  "components": [
+    {
+      "name": "Royal Gujarati Grand Thali",
+      "description": "3 Shaak, Sweet Gujarati Dal, Kadhi, 4 Phulka Rotli, Basmati Rice, Farsan, Sweet, Papad, Pickle & Chilled Chaas",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Deluxe Gujarati Executive Thali",
+      "description": "2 Shaak, Gujarati Dal, Kadhi, 3 Phulkas, Rice, Farsan & Masala Chaas",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-78a363f38f585b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121046,
+  "sha256": "66a0343ee3b6fc767b7df7801c69241445cd9d30bd456069a6b0dd39c56b2611"
+}

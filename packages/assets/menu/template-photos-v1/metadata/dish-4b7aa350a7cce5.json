@@ -1,0 +1,26 @@
+{
+  "id": "dish-4b7aa350a7cce5",
+  "kind": "dish",
+  "name": "Garlic Bread",
+  "description": "Garlic Bread, freshly baked breads.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Breads"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Garlic Bread"
+    }
+  ],
+  "file": "dish-4b7aa350a7cce5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 111442,
+  "sha256": "64bf88eb1c528bfc06967c9fcba6e7adea800bd7e1b939f460e4f2e762b76381"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-29a337d20ce022",
+  "kind": "category",
+  "name": "Pizzas — Indian Multi-Cuisine Diner",
+  "categoryName": "Pizzas",
+  "templateId": "tpl-multicuisine",
+  "slug": "pizzas",
+  "description": "Hand-tossed dough, tomato sauce and mozzarella, baked to order",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "components": [
+    {
+      "name": "Margherita Pizza",
+      "description": "Margherita Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Farmhouse Pizza",
+      "description": "Farmhouse Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Paneer Tikka Pizza",
+      "description": "Paneer Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-29a337d20ce022.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127884,
+  "sha256": "1e611250c9b7ebca23a76a38021caac7fa9a7f6e530d9c7b5c65619e9f5060c6"
+}

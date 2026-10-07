@@ -1,0 +1,25 @@
+{
+  "id": "dish-c79daced88ae13",
+  "kind": "dish",
+  "name": "Kathiyawadi Bajra Rotla (Ghee)",
+  "description": "Thick hand-flattened pearl millet flatbread roasted on clay tava with white butter and jaggery",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Rotli, Bhakri & Thepla",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Rotli, Bhakri & Thepla"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/bajra-rotla.webp"
+  ],
+  "file": "dish-c79daced88ae13.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119578,
+  "sha256": "5b886a3c6de3ba85446dbe795d2157296f360c594a534f70de1e6cf5f6feb75b"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-16ff65aaecf5d1",
+  "kind": "dish",
+  "name": "Veg Steamed Momos",
+  "description": "Veg Steamed Momos, fresh dumplings with dipping sauce.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Momos",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Momos"
+    }
+  ],
+  "file": "dish-16ff65aaecf5d1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 59490,
+  "sha256": "c8e48d5e50bfb733a1f2e74689c06539f88df7e51d8d3269f7395107145a3aaa"
+}

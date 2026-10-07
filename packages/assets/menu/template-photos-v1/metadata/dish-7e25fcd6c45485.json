@@ -1,0 +1,22 @@
+{
+  "id": "dish-7e25fcd6c45485",
+  "kind": "dish",
+  "name": "Paper Plain Roast Dosa",
+  "description": "Extra-large ultra-thin crispy crepe roasted in ghee",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Signature Dosas & Crepes",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Signature Dosas & Crepes"
+    }
+  ],
+  "file": "dish-7e25fcd6c45485.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 77366,
+  "sha256": "d646f0b24ce4d22fb17fd1f6a188339db6005dc2bb55fe27cf70944cbdaea711"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-da1d6b84c5df51",
+  "kind": "category",
+  "name": "Idli & Vada Specialties — South Indian Restaurant",
+  "categoryName": "Idli & Vada Specialties",
+  "templateId": "tpl-south-indian",
+  "slug": "idli-vada",
+  "description": "Soft steamed cakes and crisp lentil fritters",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada Specialties",
+  "components": [
+    {
+      "name": "Steamed Ghee Podi Idli (2 Pcs)",
+      "description": "Pillow-soft steamed idlis drenched in pure desi ghee and spicy gun powder (karam podi)",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Crispy Medu Vada (2 Pcs)",
+      "description": "Golden crunchy black gram donuts infused with crushed black peppercorns and curry leaves",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Idli Vada Combo (1+1)",
+      "description": "One soft idli and one crispy medu vada served with hot sambar and fresh chutneys",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-da1d6b84c5df51.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100370,
+  "sha256": "4ab1b2b98d81829549a661880a13b03bd2b297045e4c54ce86f13afb98688aab"
+}

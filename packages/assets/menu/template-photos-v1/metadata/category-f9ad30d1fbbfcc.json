@@ -1,0 +1,27 @@
+{
+  "id": "category-f9ad30d1fbbfcc",
+  "kind": "category",
+  "name": "North Indian Curries & Naans — South & North Indian Fusion Diner",
+  "categoryName": "North Indian Curries & Naans",
+  "templateId": "tpl-south-north-combo",
+  "slug": "sn-north",
+  "description": "Paneer butter masala, dal makhani and tandoori naans",
+  "diet": "VEG",
+  "cuisine": "Dual Heritage Indian",
+  "category": "North Indian Curries & Naans",
+  "components": [
+    {
+      "name": "Paneer Butter Masala",
+      "description": "Paneer cubes in creamy buttery tomato gravy",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f9ad30d1fbbfcc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 138152,
+  "sha256": "5794803e17bf84cb394b5a304409ff6f73510acc20a2801eb74a50c8db274f6a"
+}

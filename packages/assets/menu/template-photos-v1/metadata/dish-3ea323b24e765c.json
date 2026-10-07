@@ -1,0 +1,25 @@
+{
+  "id": "dish-3ea323b24e765c",
+  "kind": "dish",
+  "name": "Dal Makhani with 2 Paratha Combo",
+  "description": "Creamy slow-cooked dal makhani with 2 warm parathas and pickled onion salad",
+  "diet": "VEG",
+  "cuisine": "Delivery-Optimized Multi-Brand",
+  "category": "Delivery Meal Bowls",
+  "occurrences": [
+    {
+      "templateId": "tpl-cloud-kitchen",
+      "category": "Delivery Meal Bowls"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-3ea323b24e765c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 121250,
+  "sha256": "1d0fcb313f036f08e1b3317e855e6078bd30df2b47db36534a415b33aade5bb0"
+}

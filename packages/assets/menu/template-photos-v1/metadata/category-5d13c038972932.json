@@ -1,0 +1,37 @@
+{
+  "id": "category-5d13c038972932",
+  "kind": "category",
+  "name": "Bakes & Desserts — Artisan Café & Coffee Bar",
+  "categoryName": "Bakes & Desserts",
+  "templateId": "tpl-cafe",
+  "slug": "bakes-desserts",
+  "description": "Bakery snacks and individually portioned desserts",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Bakes & Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, bakery snacks and individually portioned desserts.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, bakery snacks and individually portioned desserts.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Banana Bread Slice",
+      "description": "Banana Bread Slice, bakery snacks and individually portioned desserts.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5d13c038972932.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 114596,
+  "sha256": "718857aa8df9f9b8205fb1fc108e393cdc519c9353fb8ef730fea90980cebb96"
+}

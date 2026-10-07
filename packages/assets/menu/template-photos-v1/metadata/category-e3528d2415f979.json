@@ -1,0 +1,32 @@
+{
+  "id": "category-e3528d2415f979",
+  "kind": "category",
+  "name": "Combos — Punjabi Dhaba & Restaurant",
+  "categoryName": "Combos",
+  "templateId": "tpl-punjabi",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Amritsari Paneer Tikka",
+      "description": "Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, steamed or tempered basmati rice.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-e3528d2415f979.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 106766,
+  "sha256": "8bc66d3f9aa02b456a2bc72e4b58a44a9efa4eaad683534e07d905a60f41435c"
+}

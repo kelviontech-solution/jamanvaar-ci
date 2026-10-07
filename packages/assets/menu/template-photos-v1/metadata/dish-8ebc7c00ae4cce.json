@@ -1,0 +1,25 @@
+{
+  "id": "dish-8ebc7c00ae4cce",
+  "kind": "dish",
+  "name": "Filter Coffee",
+  "description": "Filter Coffee, freshly brewed South Indian refreshments.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/south-indian/filter-coffee.jpg"
+  ],
+  "file": "dish-8ebc7c00ae4cce.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 69186,
+  "sha256": "fcfff6dd2b503b81bded38295956a46f24efac5097bc25ca695509055abf2766"
+}

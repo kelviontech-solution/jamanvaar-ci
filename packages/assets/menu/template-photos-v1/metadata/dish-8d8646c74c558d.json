@@ -1,0 +1,22 @@
+{
+  "id": "dish-8d8646c74c558d",
+  "kind": "dish",
+  "name": "Hyderabadi Dum Veg Biryani",
+  "description": "Fragrant basmati rice layered with spiced vegetables, saffron, mint and fried onions, served with raita",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Basmati Rice & Biryani",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Basmati Rice & Biryani"
+    }
+  ],
+  "file": "dish-8d8646c74c558d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110018,
+  "sha256": "8d5ad50b409862fd3be286e7c616c3c678d1b765674de3cf866d58ff7cca919f"
+}

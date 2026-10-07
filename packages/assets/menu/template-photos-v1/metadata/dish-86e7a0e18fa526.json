@@ -1,0 +1,25 @@
+{
+  "id": "dish-86e7a0e18fa526",
+  "kind": "dish",
+  "name": "Bread Pakora",
+  "description": "Bread Pakora, freshly fried snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Hot Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-86e7a0e18fa526.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93102,
+  "sha256": "22122e5819de4d2e0ea91d5a52ab2715713b90ec69a01b55f7fbc3119afe5aad"
+}

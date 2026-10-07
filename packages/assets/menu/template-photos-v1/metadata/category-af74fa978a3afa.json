@@ -1,0 +1,37 @@
+{
+  "id": "category-af74fa978a3afa",
+  "kind": "category",
+  "name": "Starters — Punjabi Dhaba & Restaurant",
+  "categoryName": "Starters",
+  "templateId": "tpl-punjabi",
+  "slug": "starters",
+  "description": "Marinated starters grilled or shallow-fried to order",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Starters",
+  "components": [
+    {
+      "name": "Paneer Tikka",
+      "description": "Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Malai Paneer Tikka",
+      "description": "Malai Paneer Tikka, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Hara Bhara Kebab",
+      "description": "Hara Bhara Kebab, marinated starters grilled or shallow-fried to order.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-af74fa978a3afa.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 123414,
+  "sha256": "3490efb4808d0cf2a9082e127d6f5bc6762b516453d834d8938c8be54b359ecc"
+}

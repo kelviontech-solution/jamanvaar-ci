@@ -1,0 +1,32 @@
+{
+  "id": "category-ea7cf1198435e9",
+  "kind": "category",
+  "name": "Jain Starters & Tikkas — Jain Satvik Bhojanalaya",
+  "categoryName": "Jain Starters & Tikkas",
+  "templateId": "tpl-jain",
+  "slug": "jain-starters",
+  "description": "Prepared without any root vegetables, onions or garlic",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Starters & Tikkas",
+  "components": [
+    {
+      "name": "Jain Paneer Tikka Satvik",
+      "description": "Cottage cheese marinated in pure curd, carom seeds and yellow chilli powder, roasted with capsicum",
+      "dietaryType": "JAIN"
+    },
+    {
+      "name": "Jain Raw Banana Cutlets (4 Pcs)",
+      "description": "Steamed green plantain and green pea cutlets spiced with ginger and green chillies",
+      "dietaryType": "JAIN"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-ea7cf1198435e9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102004,
+  "sha256": "b48c95d417531c6787f98b581f50061d2c86065eca642264534fe4d1fd16d92e"
+}

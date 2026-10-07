@@ -1,0 +1,25 @@
+{
+  "id": "dish-c76770a4f49f2b",
+  "kind": "dish",
+  "name": "Butter Pav Bhaji (2 Pav)",
+  "description": "Mashed spicy mixed vegetable gravy simmered with Amul butter, served with toasted butter pav",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Puri & Chaat Specialties",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Puri & Chaat Specialties"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c76770a4f49f2b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 102684,
+  "sha256": "d35eca25415d734ea8772871a1279ab570aef2827bd0e89fd0260f8b8f89b529"
+}

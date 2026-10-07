@@ -1,0 +1,26 @@
+{
+  "id": "dish-94a26dd577dc43",
+  "kind": "dish",
+  "name": "Jain Special Thali",
+  "description": "Jain Special Thali, complete meals without onion, garlic or root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Thali",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Thali"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Jain Thali"
+    }
+  ],
+  "file": "dish-94a26dd577dc43.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97220,
+  "sha256": "6790e7023981e68e367a6473fb09b80cea2269cb46ebee506d6d0fb7cd8dbfaf"
+}

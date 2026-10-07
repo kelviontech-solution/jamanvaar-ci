@@ -1,0 +1,25 @@
+{
+  "id": "dish-cf4cb0ee1409e9",
+  "kind": "dish",
+  "name": "Kathiyawadi Masala Chaas",
+  "description": "Smoky spiced buttermilk tempered with roasted cumin, green chilli paste, ginger and black salt",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Chaas & Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Chaas & Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/masala-chaas.webp"
+  ],
+  "file": "dish-cf4cb0ee1409e9.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 78172,
+  "sha256": "b15beed598e978af1c7c30d6e15a39a159c364415f6d8e0e53fa63148ed07664"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-178d05c8f6510c",
+  "kind": "dish",
+  "name": "Multigrain Bread",
+  "description": "Multigrain Bread, freshly baked breads.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Breads"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-178d05c8f6510c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 142038,
+  "sha256": "1a88dcbd0f257ff3edb2d39a5cc79016a7853459f77c98ebe06e23fb8bb88740"
+}

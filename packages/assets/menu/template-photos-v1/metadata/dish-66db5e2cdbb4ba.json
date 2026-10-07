@@ -1,0 +1,25 @@
+{
+  "id": "dish-66db5e2cdbb4ba",
+  "kind": "dish",
+  "name": "Garlic Butter Naan",
+  "description": "Tandoori naan topped with roasted chopped garlic and fresh coriander leaves",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Roti & Naan Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Roti & Naan Breads"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/north-indian/garlic-naan.jpg"
+  ],
+  "file": "dish-66db5e2cdbb4ba.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 125596,
+  "sha256": "9445978161e08e049e97793028b4562a46404da446b80000f6cae5955c7294ff"
+}

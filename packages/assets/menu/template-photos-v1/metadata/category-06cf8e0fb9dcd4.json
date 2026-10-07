@@ -1,0 +1,37 @@
+{
+  "id": "category-06cf8e0fb9dcd4",
+  "kind": "category",
+  "name": "Uttapam — South Indian Restaurant",
+  "categoryName": "Uttapam",
+  "templateId": "tpl-south-indian",
+  "slug": "uttapam",
+  "description": "Thick rice-lentil pancakes with vegetable toppings",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam",
+  "components": [
+    {
+      "name": "Plain Uttapam",
+      "description": "Thick, soft rice-lentil pancake without vegetable toppings, served with sambar and coconut chutney.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Onion Uttapam",
+      "description": "Onion Uttapam, thick rice-lentil pancakes with vegetable toppings.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tomato Uttapam",
+      "description": "Tomato Uttapam, thick rice-lentil pancakes with vegetable toppings.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-06cf8e0fb9dcd4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 127698,
+  "sha256": "6662c4ef2502a962d14ca3f4241409282f88be43100eef4222c7efc287f2ebe1"
+}

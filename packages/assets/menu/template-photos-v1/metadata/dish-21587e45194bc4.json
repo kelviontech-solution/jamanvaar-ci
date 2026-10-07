@@ -1,0 +1,22 @@
+{
+  "id": "dish-21587e45194bc4",
+  "kind": "dish",
+  "name": "Paneer Momos",
+  "description": "Paneer Momos, fresh dumplings with dipping sauce.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Momos",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Momos"
+    }
+  ],
+  "file": "dish-21587e45194bc4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 76446,
+  "sha256": "b2645b3b004027ce96bedeb43d66f43762eb4a72a4951eb8126992dc2a3370a8"
+}

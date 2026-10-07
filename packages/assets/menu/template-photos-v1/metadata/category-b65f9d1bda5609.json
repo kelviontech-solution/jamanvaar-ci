@@ -1,0 +1,37 @@
+{
+  "id": "category-b65f9d1bda5609",
+  "kind": "category",
+  "name": "Beverages — North Indian Restaurant",
+  "categoryName": "Beverages",
+  "templateId": "tpl-north-indian",
+  "slug": "beverages",
+  "description": "Traditional dairy drinks and fresh citrus refreshments",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Sweet Lassi",
+      "description": "Sweet Lassi, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Salted Lassi",
+      "description": "Salted Lassi, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Fresh Lime Soda",
+      "description": "Fresh Lime Soda, traditional dairy drinks and fresh citrus refreshments.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-b65f9d1bda5609.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 84740,
+  "sha256": "4dd3e8b83cadfda4029f88a7b728813ce660b8cec7d5eef0b1e8c7b43d2831fc"
+}

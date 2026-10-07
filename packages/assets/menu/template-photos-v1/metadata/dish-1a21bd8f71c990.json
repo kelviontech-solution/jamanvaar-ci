@@ -1,0 +1,22 @@
+{
+  "id": "dish-1a21bd8f71c990",
+  "kind": "dish",
+  "name": "Fafda",
+  "description": "Fafda, steamed or crisp Gujarati snacks with chutney.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Farsan",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Farsan"
+    }
+  ],
+  "file": "dish-1a21bd8f71c990.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79968,
+  "sha256": "cfa51d15f538251a0d625c8fc4c070eefcbeef38b1bc8f9085a2dcb397f94710"
+}

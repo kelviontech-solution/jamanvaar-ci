@@ -1,0 +1,25 @@
+{
+  "id": "dish-8c0d2eefce0657",
+  "kind": "dish",
+  "name": "Chocolate Truffle Pastry",
+  "description": "Chocolate Truffle Pastry, individual eggless pastry portions.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-8c0d2eefce0657.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95446,
+  "sha256": "be38bccc5c95b0fb355ba097a1a636144571bbf30ab2f8bb8bef9f5cbcb26a2c"
+}

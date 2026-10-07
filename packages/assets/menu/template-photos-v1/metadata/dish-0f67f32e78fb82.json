@@ -1,0 +1,25 @@
+{
+  "id": "dish-0f67f32e78fb82",
+  "kind": "dish",
+  "name": "Sweet Gujarati Toor Dal",
+  "description": "Thin pigeon pea lentil soup balanced with kokum, peanuts, jaggery and mustard tempering",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Dal & Kadhi",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Dal & Kadhi"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/description-matched-v1/gujarati-dal.webp"
+  ],
+  "file": "dish-0f67f32e78fb82.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108580,
+  "sha256": "a28b3d50043b2d66182890fc3c50e058a6c6dabb4bd7de357feebdaf256c9e3c"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "dish-c488100310ec55",
+  "kind": "dish",
+  "name": "Stuffed Garlic Bread",
+  "description": "Stuffed Garlic Bread, oven-baked bread with garlic butter and herbs.",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Garlic Bread",
+  "occurrences": [
+    {
+      "templateId": "tpl-pizza",
+      "category": "Garlic Bread"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c488100310ec55.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112724,
+  "sha256": "6edc6a3c5099ff526d6aa7f4a9c68a00d53d55cd673709853d2f7dfca5568d9b"
+}

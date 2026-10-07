@@ -48,12 +48,18 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
   const warnings: string[] = [];
 
   const taxGroups: SnapshotContent['taxGroups'] = {};
+  // Dishes with no usable tax group are charged the default group (flagged isDefault, or the only active one), as the POS does.
+  let defaultTaxGroupId: string | undefined;
+  const activeTaxGroupIds: string[] = [];
   for (const t of live(rows, 'TAX_GROUP')) {
     const id = str(t.id);
     if (!id || t.isActive === false) continue;
     const percent = num(t.igstPercent) > 0 ? num(t.igstPercent) : num(t.cgstPercent) + num(t.sgstPercent);
     taxGroups[id] = { rateBp: Math.round(percent * 100), inclusive: t.isInclusive === true };
+    activeTaxGroupIds.push(id);
+    if (t.isDefault === true && defaultTaxGroupId === undefined) defaultTaxGroupId = id;
   }
+  if (defaultTaxGroupId === undefined && activeTaxGroupIds.length === 1) defaultTaxGroupId = activeTaxGroupIds[0];
 
   const categories: SnapCategory[] = live(rows, 'MENU_CATEGORY')
     .filter((c) => str(c.id) && c.isActive !== false)
@@ -91,7 +97,8 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
     }
     const categoryId = String(p.categoryId ?? '');
     if (!categoryIds.has(categoryId)) warnings.push(`Dish "${name}" is in a category that is inactive or missing; it is hidden.`);
-    const taxGroupId = str(p.taxGroupId);
+    const declaredTaxGroupId = str(p.taxGroupId);
+    const taxGroupId = declaredTaxGroupId && taxGroups[declaredTaxGroupId] ? declaredTaxGroupId : defaultTaxGroupId ?? declaredTaxGroupId;
     if (taxGroupId && !taxGroups[taxGroupId]) warnings.push(`Dish "${name}" names a tax group that is not published; guests cannot order it.`);
     const minQ = Math.max(1, Math.floor(num(p.minQuantity, 1)));
     const maxQ = Math.min(50, Math.max(minQ, Math.floor(num(p.maxQuantity, 50))));

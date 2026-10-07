@@ -1,0 +1,25 @@
+{
+  "id": "dish-ca837ed0aa9139",
+  "kind": "dish",
+  "name": "Dabeli",
+  "description": "Dabeli, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-ca837ed0aa9139.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 91994,
+  "sha256": "0e171dccf835e022b96f6b391f4248b0db6e00259aae85108e1e3c9ca1ed5130"
+}

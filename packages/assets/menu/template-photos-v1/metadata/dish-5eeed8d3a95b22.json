@@ -1,0 +1,22 @@
+{
+  "id": "dish-5eeed8d3a95b22",
+  "kind": "dish",
+  "name": "Paneer in Black Bean Sauce",
+  "description": "Paneer in Black Bean Sauce, wok gravies to pair with rice or noodles.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Gravies"
+    }
+  ],
+  "file": "dish-5eeed8d3a95b22.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103984,
+  "sha256": "7576a3ddcece93ee6993bf4d2e6ca24ac6b20ffface4e745fec52c5736230a59"
+}

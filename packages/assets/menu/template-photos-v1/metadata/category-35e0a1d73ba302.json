@@ -1,0 +1,37 @@
+{
+  "id": "category-35e0a1d73ba302",
+  "kind": "category",
+  "name": "Desserts — Pizza Restaurant",
+  "categoryName": "Desserts",
+  "templateId": "tpl-pizza",
+  "slug": "desserts",
+  "description": "Individually portioned sweet finishes",
+  "diet": "VEG",
+  "cuisine": "Italian & Pizza",
+  "category": "Desserts",
+  "components": [
+    {
+      "name": "Chocolate Brownie",
+      "description": "Chocolate Brownie, individually portioned sweet finishes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Chocolate Lava Cake",
+      "description": "Chocolate Lava Cake, individually portioned sweet finishes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Vanilla Ice Cream",
+      "description": "Vanilla Ice Cream, individually portioned sweet finishes.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-35e0a1d73ba302.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 110824,
+  "sha256": "2311260d173c2d1ed1ea6cbe12447be92136c3a6b7437a6f8e9ad6f6e3d46d01"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-43818b812c460b",
+  "kind": "dish",
+  "name": "Mini Idli Sambar",
+  "description": "Mini Idli Sambar, steamed rice cakes or crisp lentil fritters with chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Idli & Vada",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Idli & Vada"
+    }
+  ],
+  "file": "dish-43818b812c460b.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 81716,
+  "sha256": "5c343b5d00264d99c67206e9f92635e1fe939c9c6a03098022655063432c03fa"
+}

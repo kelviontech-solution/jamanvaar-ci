@@ -1,0 +1,25 @@
+{
+  "id": "dish-ed933b314d99c0",
+  "kind": "dish",
+  "name": "Dahi Papdi Chaat",
+  "description": "Dahi Papdi Chaat, freshly assembled chaat with sweet and spicy chutneys.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Chaat",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Chaat"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-ed933b314d99c0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 108076,
+  "sha256": "36a6806521f08b93e593ebf0904d9ec316bd361e78178017fa718793944ecd65"
+}

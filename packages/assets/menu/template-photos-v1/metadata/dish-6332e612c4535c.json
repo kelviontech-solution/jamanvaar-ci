@@ -1,0 +1,22 @@
+{
+  "id": "dish-6332e612c4535c",
+  "kind": "dish",
+  "name": "Shahi Paneer Nawabi",
+  "description": "Royal white cashew and almond gravy with fragrant cardamom and tender paneer cubes",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Royal Paneer Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Royal Paneer Curries"
+    }
+  ],
+  "file": "dish-6332e612c4535c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85540,
+  "sha256": "9589dbf4f4fa43798ffc4554970c37c28b0a31864c18ca8904b0bf1de874141b"
+}

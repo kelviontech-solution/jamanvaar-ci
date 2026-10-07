@@ -1,0 +1,29 @@
+{
+  "id": "dish-d86f1d77089864",
+  "kind": "dish",
+  "name": "Bhindi Sambhariya",
+  "description": "Bhindi Sambhariya, gujarati vegetable preparations with fresh regional spices.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Gujarati Shaak (Curries)"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Gujarati Shaak (Curries)"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-d86f1d77089864.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 116294,
+  "sha256": "97c25be1fc083941b1a6f2e95e721adadc14a340f25d42b2d4b461d015551356"
+}

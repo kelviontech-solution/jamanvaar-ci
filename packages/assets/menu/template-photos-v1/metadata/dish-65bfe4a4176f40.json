@@ -1,0 +1,22 @@
+{
+  "id": "dish-65bfe4a4176f40",
+  "kind": "dish",
+  "name": "Jain Shahi Paneer",
+  "description": "Jain Shahi Paneer, tomato or cashew gravies without root vegetables.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Curries"
+    }
+  ],
+  "file": "dish-65bfe4a4176f40.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105332,
+  "sha256": "c3ab17edfc609a8d2040aad6ea97a297fc74dc144d961d3de8d3bd2e48854e72"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "dish-d82c0d1c75d22c",
+  "kind": "dish",
+  "name": "Paneer Bhurji Desi Ghee",
+  "description": "Scrambled fresh cottage cheese wok-fried with onions, tomatoes, ginger and green chillies",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Dhaba Special Curries",
+  "occurrences": [
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Dhaba Special Curries"
+    }
+  ],
+  "file": "dish-d82c0d1c75d22c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109106,
+  "sha256": "d0dc8f3b22512f55276dd0539ddc7e470ff9884f472fe04f59b658ef1ce0b162"
+}

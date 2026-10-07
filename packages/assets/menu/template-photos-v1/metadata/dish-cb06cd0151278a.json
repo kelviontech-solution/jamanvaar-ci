@@ -1,0 +1,26 @@
+{
+  "id": "dish-cb06cd0151278a",
+  "kind": "dish",
+  "name": "Mohanthal",
+  "description": "Mohanthal, gujarati sweet portions for a meal finish.",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets",
+  "occurrences": [
+    {
+      "templateId": "tpl-gujarati",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-thali",
+      "category": "Sweets"
+    }
+  ],
+  "file": "dish-cb06cd0151278a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85432,
+  "sha256": "b8848ab799437c43bfd6ae816603da2da8422e217bdf7fa8f1dbf073f1bdfb05"
+}

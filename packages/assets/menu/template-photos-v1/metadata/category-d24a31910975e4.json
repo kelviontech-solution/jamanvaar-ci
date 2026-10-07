@@ -1,0 +1,37 @@
+{
+  "id": "category-d24a31910975e4",
+  "kind": "category",
+  "name": "Tandoori Starters & Kebabs — North Indian Restaurant",
+  "categoryName": "Tandoori Starters & Kebabs",
+  "templateId": "tpl-north-indian",
+  "slug": "tandoor-starters",
+  "description": "Charcoal clay-oven roasted kebabs and tikkas",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Starters & Kebabs",
+  "components": [
+    {
+      "name": "Paneer Tikka Angara",
+      "description": "Fresh cottage cheese cubes marinated in Kashmiri chilli-yogurt masala, roasted in clay oven with bell peppers",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Hara Bhara Kebab (6 Pcs)",
+      "description": "Crisp spinach, green pea and potato patties stuffed with spiced cashews and herbs",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Stuffed Mushroom",
+      "description": "Button mushrooms filled with spiced processed cheese and herbs, charred in tandoor",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-d24a31910975e4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 133604,
+  "sha256": "af03427d4c50a4f092d4faebdee223f9c143b5fcb7df97bfcdbbfbd345b24c3d"
+}

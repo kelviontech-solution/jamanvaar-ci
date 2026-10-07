@@ -1,0 +1,37 @@
+{
+  "id": "category-c6f93b77a112d2",
+  "kind": "category",
+  "name": "Beverages — Bakery, Patisserie & Cafe",
+  "categoryName": "Beverages",
+  "templateId": "tpl-bakery",
+  "slug": "beverages",
+  "description": "Fresh drinks to accompany bakes",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Beverages",
+  "components": [
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, fresh drinks to accompany bakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cappuccino",
+      "description": "Cappuccino, fresh drinks to accompany bakes.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cold Coffee",
+      "description": "Cold Coffee, fresh drinks to accompany bakes.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-c6f93b77a112d2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85600,
+  "sha256": "3bf48561b37ecdf4c862993641546d56585a66b0d90b022b147b1481c221cad6"
+}

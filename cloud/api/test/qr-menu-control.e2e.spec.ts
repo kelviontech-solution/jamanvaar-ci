@@ -200,7 +200,7 @@ describe('QR ordering: restaurant-controlled menu', () => {
       expect(await price(F.token1)).toBe(b1Before);
       const placed = await http().post(`/api/v1/public/qr/${F.token2}/orders`).send(order([{ itemId: 'side', quantity: 1 }]));
       expect(placed.status, JSON.stringify(placed.body)).toBe(201);
-      expect(placed.body.total).toBe(75); // no tax group on this dish
+      expect(placed.body.total).toBe(78.75); // no tax group on this dish: the restaurant's default 5% GST is added on top of ₹75
       // Unavailable in one branch only.
       await put({ branchId: F.b2, itemId: 'side', isAvailable: false });
       await publish(F.console, 'hide');

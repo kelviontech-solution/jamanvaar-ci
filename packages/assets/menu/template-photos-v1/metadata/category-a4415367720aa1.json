@@ -1,0 +1,32 @@
+{
+  "id": "category-a4415367720aa1",
+  "kind": "category",
+  "name": "Fries & Quick Sides — Fast Food & Quick Service Restaurant",
+  "categoryName": "Fries & Quick Sides",
+  "templateId": "tpl-fast-food",
+  "slug": "fries-sides",
+  "description": "Crisp salted and seasoned sides",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Fries & Quick Sides",
+  "components": [
+    {
+      "name": "Peri Peri Crinkle Fries",
+      "description": "Golden potato fries shaken with fiery African peri peri spice mix",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Cheesy Jalapeno Poppers (6 Pcs)",
+      "description": "Crisp golden bites filled with molten cheese and spicy jalapenos",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-a4415367720aa1.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 113998,
+  "sha256": "b954542e726aeb5230485c15f594e1fa5bf965b4bb2b1962d3a2f54dc1c4b1ce"
+}

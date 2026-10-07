@@ -2,7 +2,9 @@ import { syncStaffUsers, startLocalChangeSync, syncInventoryMasters, InventoryLe
 import React, { useEffect, useState } from 'react';
 import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
-import { db, CustomerRepository, NotificationRepository, StaffRepository } from '@jamanvaar/database';
+import { db, CustomerRepository, NotificationRepository, StaffRepository, BILL_REQUESTED_EVENT } from '@jamanvaar/database';
+import { NetworkStatusService } from '@jamanvaar/api';
+import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import type { MenuItem, Category } from '@jamanvaar/types';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, onAppResume } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
@@ -92,6 +94,24 @@ export const App: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  // Keep menu/category pictures on this device, so a dish still shows its real photo once the internet is
+  // down, instead of silently falling back to the placeholder icon. This only ever ran in the kiosk app; a
+  // cashier working through an outage never had the menu's pictures saved locally to fall back to.
+  useEffect(() => {
+    let lastKey = '';
+    const warm = () => {
+      if (!NetworkStatusService.isOnline()) return;
+      const list = collectMenuImageUrls(db.menuItems, db.categories);
+      const key = list.join('|');
+      if (key === lastKey) return;
+      lastKey = key;
+      void ImageCache.sync(list);
+    };
+    const unsubNet = NetworkStatusService.subscribe(warm);
+    const unsubDb = db.subscribe(warm);
+    return () => { unsubNet(); unsubDb(); };
+  }, []);
+
   // Real-time LAN mesh — without this, POS only ever broadcasts (sendKOT
   // etc.) and never attaches to receive anything back, so events other
   // devices fire (Captain's bill request, food-ready, table transfers) never
@@ -102,23 +122,10 @@ export const App: React.FC = () => {
     lanMeshSync.registerDevice('POS', 'POS-01', 'POS Terminal');
     lanMeshSync.setAttachedDatabase(db);
 
-    const unsubBillRequested = lanMeshSync.on('BILL_REQUESTED', (event) => {
-      const { tableNumber, captainName } = event.payload || {};
-      if (!tableNumber) return;
-      sound.play('kot');
-      NotificationRepository.createNotification({
-        type: 'MANAGER_ALERT' as any,
-        title: `Bill Requested — Table ${tableNumber}`,
-        message: `${captainName || 'Captain'} requested the bill for Table ${tableNumber}.`,
-        priority: 'HIGH',
-        targetRoles: ['POS', 'POS_ADMIN', 'ALL'],
-        tableNumber
-      });
-    });
-
-    return () => {
-      unsubBillRequested();
-    };
+    // A bill request is raised from its order (see refreshBillState), so the chime follows the order too.
+    const onBillRequested = () => sound.play('kot');
+    window.addEventListener(BILL_REQUESTED_EVENT, onBillRequested);
+    return () => window.removeEventListener(BILL_REQUESTED_EVENT, onBillRequested);
   }, []);
 
   // Wire the real cloud sync bridge once this terminal is activated — without

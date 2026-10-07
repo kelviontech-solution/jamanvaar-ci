@@ -1,0 +1,37 @@
+{
+  "id": "category-3a9a13e73c0c99",
+  "kind": "category",
+  "name": "Breakfast — Artisan Café & Coffee Bar",
+  "categoryName": "Breakfast",
+  "templateId": "tpl-cafe",
+  "slug": "breakfast",
+  "description": "Made-to-order breakfast plates",
+  "diet": "EGG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Breakfast",
+  "components": [
+    {
+      "name": "Cheese Toast",
+      "description": "Cheese Toast, made-to-order breakfast plates.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Pancakes with Honey",
+      "description": "Pancakes with Honey, made-to-order breakfast plates.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Eggs on Toast",
+      "description": "Eggs on Toast, made-to-order breakfast plates.",
+      "dietaryType": "EGG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-3a9a13e73c0c99.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117332,
+  "sha256": "4336c1bfad32df7c74951ba1608ccd77b9b193bc63e2a3ccee46afc67294d306"
+}

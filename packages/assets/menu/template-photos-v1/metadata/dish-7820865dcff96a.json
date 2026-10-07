@@ -1,0 +1,22 @@
+{
+  "id": "dish-7820865dcff96a",
+  "kind": "dish",
+  "name": "Red Velvet Pastry",
+  "description": "Red Velvet Pastry, individual eggless pastry portions.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Pastries",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Pastries"
+    }
+  ],
+  "file": "dish-7820865dcff96a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85830,
+  "sha256": "bbcf923cf8dac5114d032c27aa9286a90392056786c354002f38890784b3fd20"
+}

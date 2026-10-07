@@ -1,0 +1,25 @@
+{
+  "id": "dish-86a46ec8640ed3",
+  "kind": "dish",
+  "name": "Plain Uttapam",
+  "description": "Thick, soft rice-lentil pancake without vegetable toppings, served with sambar and coconut chutney.",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Uttapam",
+  "occurrences": [
+    {
+      "templateId": "tpl-south-indian",
+      "category": "Uttapam"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-86a46ec8640ed3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79990,
+  "sha256": "d4546bc9d66f6a67695f4773062b2488bbd8dc43f86fb3f52b0d1e72bdf1710d"
+}

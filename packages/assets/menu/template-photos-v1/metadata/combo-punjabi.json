@@ -1,0 +1,29 @@
+{
+  "id": "combo-punjabi",
+  "kind": "combo",
+  "name": "Punjabi Dhaba & Meal Deal",
+  "description": "Amritsari Paneer Tikka with Steamed Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Authentic Punjabi & Dhaba",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Amritsari Paneer Tikka",
+      "description": "Thick spiced cottage cheese slabs infused with ajwain and mustard oil, charred in clay oven",
+      "diet": "VEG"
+    },
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, steamed or tempered basmati rice.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-punjabi.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 100904,
+  "sha256": "0aba682007a42c33ecf2ad6be9c9b4c83cce5a051cd28204a0bd9338ea3ec963"
+}

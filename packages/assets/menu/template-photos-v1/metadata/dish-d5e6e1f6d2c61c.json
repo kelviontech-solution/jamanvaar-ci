@@ -1,0 +1,22 @@
+{
+  "id": "dish-d5e6e1f6d2c61c",
+  "kind": "dish",
+  "name": "Chilli Paneer Dry",
+  "description": "Crisp coated paneer cubes tossed with onion petals, green chillies, garlic and soy glaze",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Chinese Starters & Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Chinese Starters & Gravies"
+    }
+  ],
+  "file": "dish-d5e6e1f6d2c61c.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 96036,
+  "sha256": "96189e4472aa9ce9b8d479e1bb1193dbd9ffe4ff0a9419921d40fa15d93b30a1"
+}

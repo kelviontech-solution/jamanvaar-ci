@@ -93,7 +93,8 @@ describe('PrinterService & Automatic Built-in Kiosk Thermal Spooler', () => {
     expect(text80).toContain('TOKEN #108');
     expect(text80).toContain('Paneer Tikka');
     expect(text80).toContain('Extra Mint Chutney');
-    expect(text80).toContain('CGST @ 2.5%:');
+    // The split is the restaurant's configured GST (the seeded 5% group), not a fixed label.
+    expect(text80).toMatch(/CGST \(2\.5%\):/);
     expect(text80).toContain('TOTAL AMOUNT:');
     expect(text80).toContain('COUNTER 1');
   });

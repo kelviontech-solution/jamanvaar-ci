@@ -1,0 +1,37 @@
+{
+  "id": "category-f3d9baa12f6ba5",
+  "kind": "category",
+  "name": "Breads — Indian Multi-Cuisine Diner",
+  "categoryName": "Breads",
+  "templateId": "tpl-multicuisine",
+  "slug": "breads",
+  "description": "Fresh tandoor or griddle breads",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Breads",
+  "components": [
+    {
+      "name": "Butter Naan",
+      "description": "Butter Naan, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Garlic Naan",
+      "description": "Garlic Naan, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tandoori Roti",
+      "description": "Tandoori Roti, fresh tandoor or griddle breads.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-f3d9baa12f6ba5.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118160,
+  "sha256": "111afb842db1551e2f511fddcede39a9ae423a626d5a4a1f8b8b7c0e7138e3ee"
+}

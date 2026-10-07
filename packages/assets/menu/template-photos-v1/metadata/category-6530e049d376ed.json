@@ -1,0 +1,37 @@
+{
+  "id": "category-6530e049d376ed",
+  "kind": "category",
+  "name": "Rolls — Street Food Restaurant",
+  "categoryName": "Rolls",
+  "templateId": "tpl-chaat",
+  "slug": "rolls",
+  "description": "Freshly rolled flatbread snacks",
+  "diet": "EGG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Rolls",
+  "components": [
+    {
+      "name": "Paneer Kathi Roll",
+      "description": "Paneer Kathi Roll, freshly rolled flatbread snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Frankie",
+      "description": "Veg Frankie, freshly rolled flatbread snacks.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Egg Roll",
+      "description": "Egg Roll, freshly rolled flatbread snacks.",
+      "dietaryType": "EGG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-6530e049d376ed.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 97546,
+  "sha256": "afd4ef981cfbc0615ae1365670e7eac5ba97dbf5846dd01d8c86742839d70127"
+}

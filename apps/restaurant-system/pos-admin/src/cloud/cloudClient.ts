@@ -2,7 +2,7 @@ import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
-import { refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
+import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import type { PlanEntitlements, PlanTier } from '@jamanvaar/types';
 
 /**
@@ -135,6 +135,7 @@ export function saveDeviceRegistration(deviceId: string, deviceToken: string, re
  * cloud sign-in, backups, Help & Support) fall back to asking to reconnect.
  */
 export function resetTerminal(): void {
+  AiConfig.reset();
   sessionEpoch++;
   accessToken = null;
   stopRealtime();
@@ -954,7 +955,7 @@ export async function pullEntitySync(
 export async function reportDeviceHeartbeat(): Promise<void> {
   const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
   if (!deviceToken) return;
-  // The platform's decision about JAMAN AI for this restaurant rides on the heartbeat (cached 5 minutes).
+  // The platform's decision about JAMAN AI for this restaurant rides on the heartbeat (cached one minute).
   void refreshAiConfigIfStale({ apiBase: API_BASE, deviceToken });
   // Real version (from package.json at build time), OS and sync backlog; also applies the answer: lock,
   // notice, update offer and any signed offline extension.
@@ -978,8 +979,8 @@ export async function syncRestaurantIdentity(): Promise<void> {
 /** B2-054: Settings Save sends the owner's edit to the cloud, so every other terminal picks it up too. */
 export async function saveRestaurantIdentity(identity: RestaurantIdentityFields): Promise<void> {
   const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
-  if (!deviceToken) return;
-  await pushRestaurantIdentity({ apiBase: API_BASE, deviceToken, identity });
+  if (!deviceToken) throw new CloudApiError('Activate this terminal before saving restaurant settings.', 401);
+  await pushRestaurantIdentity({ apiBase: API_BASE, deviceToken, identity, requireAcknowledgement: true });
 }
 
 /**
@@ -988,7 +989,10 @@ export async function saveRestaurantIdentity(identity: RestaurantIdentityFields)
  * request<T>() and sends the device token this app already has from its own
  * existing activation flow instead.
  */
-export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export type RefundMethod = 'CASH' | 'UPI_TO_CUSTOMER';
+
+/** Records a refund the restaurant has already paid the customer by hand (cash, or UPI from the owner's account). Razorpay is not involved. */
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, method: RefundMethod): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
   // The device credential alone cannot authorize money movement. This also refreshes expired owner access once.
@@ -996,7 +1000,7 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
   if (!accessToken) throw new CloudApiError('Sign in again before issuing a refund', 401);
 
   const path = `/api/v1/payments/${paymentId}/refund`;
-  const body = JSON.stringify({ amountPaise, reason, requestedBy, idempotencyKey: crypto.randomUUID() });
+  const body = JSON.stringify({ amountPaise, reason, requestedBy, method, idempotencyKey: crypto.randomUUID() });
   const signed = await signDeviceRequest('POS_ADMIN', 'POST', path, body).catch((err) => {
     console.error('Could not sign device request; sending unsigned:', err);
     return null;
@@ -1453,6 +1457,11 @@ export interface PayoutSummary {
   heldPayable: number;
   netBeforeAdjustments: number;
   refundedAmount: number;
+  /** The restaurant's own share given back on refunds. Jamanvaar's fee is kept. */
+  refundedRestaurantShare?: number;
+  platformFeeRetained?: number;
+  refundedCash?: number;
+  refundedUpi?: number;
 }
 
 export interface RestaurantPayout {

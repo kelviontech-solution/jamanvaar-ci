@@ -1,0 +1,32 @@
+{
+  "id": "category-5345e3c3762d15",
+  "kind": "category",
+  "name": "Wok Tossed Noodles & Rice — Authentic Chinese & Wok",
+  "categoryName": "Wok Tossed Noodles & Rice",
+  "templateId": "tpl-chinese",
+  "slug": "chinese-mains",
+  "description": "High flame wok tossed noodles and basmati rice",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Wok Tossed Noodles & Rice",
+  "components": [
+    {
+      "name": "Veg Hakka Noodles",
+      "description": "Thin noodles wok tossed with shredded cabbage, bell peppers, carrots, spring onions and dark soy sauce",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Schezwan Fried Rice",
+      "description": "Basmati rice tossed with fiery Sichuan pepper sauce and diced crunchy vegetables",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5345e3c3762d15.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 107032,
+  "sha256": "47c5b5a5b7caacf05c82762a28c5fb2f1c566c3fa45569e517c7f5c8bf783e0a"
+}

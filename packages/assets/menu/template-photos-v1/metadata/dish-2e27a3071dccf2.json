@@ -1,0 +1,26 @@
+{
+  "id": "dish-2e27a3071dccf2",
+  "kind": "dish",
+  "name": "Iced Americano",
+  "description": "Iced Americano, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    }
+  ],
+  "file": "dish-2e27a3071dccf2.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 57156,
+  "sha256": "f416e177882eb081c0373962e6d37ad79bd79e32e3e8be8f2ca8e99a5d11c450"
+}

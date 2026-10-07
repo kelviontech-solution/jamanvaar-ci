@@ -1,0 +1,22 @@
+{
+  "id": "dish-5f3f0bd98e6016",
+  "kind": "dish",
+  "name": "Veg Fried Momos",
+  "description": "Veg Fried Momos, fresh dumplings with dipping sauce.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Momos",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Momos"
+    }
+  ],
+  "file": "dish-5f3f0bd98e6016.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85808,
+  "sha256": "5fda2f451006a0cf3c411b8799572c29afcf91494a5181ea1345b6a352b95807"
+}

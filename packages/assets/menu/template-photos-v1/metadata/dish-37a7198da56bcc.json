@@ -1,0 +1,26 @@
+{
+  "id": "dish-37a7198da56bcc",
+  "kind": "dish",
+  "name": "Paneer Tikka Pizza",
+  "description": "Paneer Tikka Pizza, hand-tossed dough, tomato sauce and mozzarella, baked to order.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Pizzas",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Pizzas"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Pizzas"
+    }
+  ],
+  "file": "dish-37a7198da56bcc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103594,
+  "sha256": "d62ca177d7a8de2b1b649216d9309297de1411aad6dec5899f8f8d83fd641407"
+}

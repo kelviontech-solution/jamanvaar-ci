@@ -1,0 +1,25 @@
+{
+  "id": "dish-0a1b5e70f7535f",
+  "kind": "dish",
+  "name": "Double Ka Meetha",
+  "description": "Double Ka Meetha, sweet finishes and chilled refreshments.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Desserts & Drinks",
+  "occurrences": [
+    {
+      "templateId": "tpl-biryani",
+      "category": "Desserts & Drinks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-0a1b5e70f7535f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105206,
+  "sha256": "f286b2dfea2c95e8c167423a924b7576fd1a7ed8eede1a3383a1b939bdde4808"
+}

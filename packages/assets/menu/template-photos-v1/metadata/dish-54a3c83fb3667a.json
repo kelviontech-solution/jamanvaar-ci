@@ -1,0 +1,34 @@
+{
+  "id": "dish-54a3c83fb3667a",
+  "kind": "dish",
+  "name": "Chocolate Shake",
+  "description": "Chocolate Shake, blended drinks served chilled.",
+  "diet": "VEG",
+  "cuisine": "North Indian, South Indian & Chinese",
+  "category": "Cold Coffee & Shakes",
+  "occurrences": [
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-cafe",
+      "category": "Cold Coffee & Shakes"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Shakes"
+    }
+  ],
+  "file": "dish-54a3c83fb3667a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 52824,
+  "sha256": "31aa68b0c269c1f1eafa743d1b78fe9524c0fed22a43c6014e6f4ba01b5f9ea0"
+}

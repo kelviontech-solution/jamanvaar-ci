@@ -177,11 +177,12 @@ const TaxEditor: React.FC<{ tax: TaxGroup | null; onSaved: () => void; onCancel:
   const [total, setTotal] = useState(String(tax ? tax.igstPercent || tax.cgstPercent + tax.sgstPercent : 5));
   const [inclusive, setInclusive] = useState(tax?.isInclusive ?? false);
   const [active, setActive] = useState(tax?.isActive ?? true);
+  const [isDefault, setIsDefault] = useState(tax?.isDefault ?? false);
   const [error, setError] = useState('');
   const save = () => {
     const pct = Number(total);
     try {
-      TaxAuthoring.save({ id: tax?.id, name, cgstPercent: pct / 2, sgstPercent: pct / 2, igstPercent: pct, isInclusive: inclusive, isActive: active });
+      TaxAuthoring.save({ id: tax?.id, name, cgstPercent: pct / 2, sgstPercent: pct / 2, igstPercent: pct, isInclusive: inclusive, isActive: active, isDefault });
       onSaved();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save');
@@ -195,8 +196,9 @@ const TaxEditor: React.FC<{ tax: TaxGroup | null; onSaved: () => void; onCancel:
         <label className="text-xs font-bold text-slate-600">Total GST %<input type="number" min={0} max={100} step="0.5" className={input} value={total} onChange={(e) => setTotal(e.target.value)} /></label>
         <label className="text-xs font-bold text-slate-600 flex items-center gap-2"><input type="checkbox" checked={inclusive} onChange={(e) => setInclusive(e.target.checked)} /> Dish prices already include this tax</label>
         <label className="text-xs font-bold text-slate-600 flex items-center gap-2"><input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /> In use</label>
+        <label className="text-xs font-bold text-slate-600 flex items-center gap-2"><input type="checkbox" checked={isDefault} disabled={!active} onChange={(e) => setIsDefault(e.target.checked)} /> Default: charge this on dishes with no tax group</label>
       </div>
-      <p className="text-[11px] text-slate-500">Split evenly into CGST and SGST on the bill.</p>
+      <p className="text-[11px] text-slate-500">Split evenly into CGST and SGST on the bill. Only one group can be the default; choosing this one moves the default off the others.</p>
       {error && <p role="alert" className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2">{error}</p>}
       <div className="flex gap-2">
         <button type="button" onClick={save} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold">Save tax group</button>
@@ -342,7 +344,7 @@ export const MenuOptionsModule: React.FC<Props> = ({ showToast, onRequestConfirm
         {taxes.map((t) => (
           <div key={t.id} className={`${card} flex flex-wrap items-center justify-between gap-3`}>
             <div>
-              <p className="font-bold text-jaman-navy text-sm">{t.name} {!t.isActive && <span className="text-[11px] text-slate-500">(not in use)</span>}</p>
+              <p className="font-bold text-jaman-navy text-sm">{t.name} {t.isDefault && t.isActive && <span className="text-[11px] text-emerald-700">(default: dishes with no tax group)</span>} {!t.isActive && <span className="text-[11px] text-slate-500">(not in use)</span>}</p>
               <p className="text-xs text-slate-500">{t.igstPercent || t.cgstPercent + t.sgstPercent}% · {t.isInclusive ? 'included in dish price' : 'added on top of dish price'} · {TaxAuthoring.usedBy(t.id).length} dish(es)</p>
             </div>
             <div className="flex gap-2">

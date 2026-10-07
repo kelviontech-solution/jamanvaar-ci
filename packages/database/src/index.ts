@@ -24,6 +24,7 @@ export * from './collection_sync';
 export * from './inventory_sync';
 export * from './menu_authoring';
 export * from './service_messages';
+export * from './bill_requests';
 export * from './pin';
 export * from './number_allocator';
 export * from './durable/sql_kv_engine';
@@ -38,6 +39,7 @@ export * from './sync_cursors';
 export * from './kitchen_status';
 export * from './table_bulk';
 export * from './kitchen_routing';
+export * from './kitchen_priority';
 
 export * from './kiosk_configuration';
 export * from './kiosk_combo_authoring';

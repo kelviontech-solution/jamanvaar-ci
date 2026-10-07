@@ -1,0 +1,22 @@
+{
+  "id": "dish-ca8f3074dcc4ab",
+  "kind": "dish",
+  "name": "Jowar Rotla",
+  "description": "Jowar Rotla, fresh millet and wheat breads.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Rotla & Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-kathiyawadi",
+      "category": "Rotla & Breads"
+    }
+  ],
+  "file": "dish-ca8f3074dcc4ab.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 125604,
+  "sha256": "fbd63e5128ce0b063df18ade40da610660211c047c497b023f84b7a5f05eab4b"
+}

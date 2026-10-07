@@ -1,0 +1,25 @@
+{
+  "id": "dish-477b1a90401569",
+  "kind": "dish",
+  "name": "Royal Falooda",
+  "description": "Royal Falooda, traditional chilled dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Kulfi & Falooda",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Kulfi & Falooda"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-477b1a90401569.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 79296,
+  "sha256": "e5cdb84a75771625affab704e452db31fae06910ce6a2e6da30d0997a7b89560"
+}

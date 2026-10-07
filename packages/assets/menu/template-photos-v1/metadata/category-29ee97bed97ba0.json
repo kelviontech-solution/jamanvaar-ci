@@ -1,0 +1,32 @@
+{
+  "id": "category-29ee97bed97ba0",
+  "kind": "category",
+  "name": "Handi Dum Biryanis — Biryani & Kebab Darbar",
+  "categoryName": "Handi Dum Biryanis",
+  "templateId": "tpl-biryani",
+  "slug": "dum-biryanis",
+  "description": "Cooked in sealed pots with royal spices and saffron",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Handi Dum Biryanis",
+  "components": [
+    {
+      "name": "Paneer Dum Biryani Handi",
+      "description": "Charred paneer cubes marinated in yogurt masala, layered with aged basmati rice and saffron",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shahi Subz Dum Biryani",
+      "description": "Medley of vegetables, mint and browned onions slow-cooked on dum, served with mirchi salan and raita",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-29ee97bed97ba0.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 120638,
+  "sha256": "5e96e22bbb4b8e28f990040aec844d629c05395a5c6e5e0ae5f9c9fd8c25bd70"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "category-9aece96b1e8951",
+  "kind": "category",
+  "name": "Rice & Meals — South Indian Restaurant",
+  "categoryName": "Rice & Meals",
+  "templateId": "tpl-south-indian",
+  "slug": "rice-meals",
+  "description": "South Indian rice preparations and complete meals",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Rice & Meals",
+  "components": [
+    {
+      "name": "Lemon Rice",
+      "description": "Lemon Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Curd Rice",
+      "description": "Curd Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Tamarind Rice",
+      "description": "Tamarind Rice, south Indian rice preparations and complete meals.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-9aece96b1e8951.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 118980,
+  "sha256": "24d7e0fbbe3751f688cad59e45a0d66db28a4f7f662e6a3f63e48ee58d27e80b"
+}

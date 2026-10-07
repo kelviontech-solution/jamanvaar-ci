@@ -1,0 +1,22 @@
+{
+  "id": "dish-8d788004012388",
+  "kind": "dish",
+  "name": "Crispy Corn Salt & Pepper",
+  "description": "Sweet corn kernels wok-tossed with crushed black peppercorns, scallions and bell peppers",
+  "diet": "VEG",
+  "cuisine": "100% Pure Veg Multi-Cuisine",
+  "category": "Vegetarian Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-pure-veg",
+      "category": "Vegetarian Starters"
+    }
+  ],
+  "file": "dish-8d788004012388.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98506,
+  "sha256": "23d25c1a43b7512e4bb63b829d5b074b71c82d7cc440a431543dae9d3dac5be9"
+}

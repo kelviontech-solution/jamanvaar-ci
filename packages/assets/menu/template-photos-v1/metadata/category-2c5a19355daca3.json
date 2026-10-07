@@ -1,0 +1,37 @@
+{
+  "id": "category-2c5a19355daca3",
+  "kind": "category",
+  "name": "Sweets — Gujarati Restaurant",
+  "categoryName": "Sweets",
+  "templateId": "tpl-gujarati",
+  "slug": "sweets",
+  "description": "Gujarati sweet portions for a meal finish",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Sweets",
+  "components": [
+    {
+      "name": "Jalebi",
+      "description": "Jalebi, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Basundi",
+      "description": "Basundi, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Shrikhand",
+      "description": "Shrikhand, gujarati sweet portions for a meal finish.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-2c5a19355daca3.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 88920,
+  "sha256": "de2b70d77debbcf1f53e163aa9049291768db49cc6ee9aee5e0f4a6d91b1417a"
+}

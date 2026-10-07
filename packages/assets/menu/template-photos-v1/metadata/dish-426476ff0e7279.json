@@ -1,0 +1,22 @@
+{
+  "id": "dish-426476ff0e7279",
+  "kind": "dish",
+  "name": "Jain Butter Naan",
+  "description": "Jain Butter Naan, fresh breads without restricted ingredients.",
+  "diet": "JAIN",
+  "cuisine": "Authentic Jain & No Root-Veg",
+  "category": "Jain Breads",
+  "occurrences": [
+    {
+      "templateId": "tpl-jain",
+      "category": "Jain Breads"
+    }
+  ],
+  "file": "dish-426476ff0e7279.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 109326,
+  "sha256": "bdb6b4bd8c285d96f963053f19cb20e0710b74978f55fc408293a53b70d8603f"
+}

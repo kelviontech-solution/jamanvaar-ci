@@ -1,0 +1,32 @@
+{
+  "id": "category-0ad81cad6306fd",
+  "kind": "category",
+  "name": "Combos — Artisan Café & Coffee Bar",
+  "categoryName": "Combos",
+  "templateId": "tpl-cafe",
+  "slug": "combos",
+  "description": "Fixed portion meal deals",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Combos",
+  "components": [
+    {
+      "name": "Classic Cappuccino",
+      "description": "Rich double espresso topped with silky steamed whole milk foam and dark cocoa dust",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Masala Tea",
+      "description": "Masala Tea, brewed tea and infusions.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-0ad81cad6306fd.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 85702,
+  "sha256": "c89cd85a137b2f00f9934fc5e3f9ce68f72a58442605c7b273b3f9c251754e45"
+}

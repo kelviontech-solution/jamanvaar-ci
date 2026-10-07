@@ -1,0 +1,25 @@
+{
+  "id": "dish-533b0cd396c41f",
+  "kind": "dish",
+  "name": "Vanilla Cupcake",
+  "description": "Vanilla Cupcake, small sweet bakes.",
+  "diet": "VEG",
+  "cuisine": "Baking & Confectionery",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-bakery",
+      "category": "Desserts"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-533b0cd396c41f.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 63804,
+  "sha256": "0937579677ddb7c314d61efcbbd871c31db3fde54064e2338037f95a575e0af0"
+}

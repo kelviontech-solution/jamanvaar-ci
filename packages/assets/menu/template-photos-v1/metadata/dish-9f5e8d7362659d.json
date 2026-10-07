@@ -1,0 +1,45 @@
+{
+  "id": "dish-9f5e8d7362659d",
+  "kind": "dish",
+  "name": "Gulab Jamun",
+  "description": "Gulab Jamun, traditional Indian dessert portions.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Desserts",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Desserts"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Warm Desserts"
+    },
+    {
+      "templateId": "tpl-chaat",
+      "category": "Sweets"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Desserts & Drinks"
+    },
+    {
+      "templateId": "tpl-desserts",
+      "category": "Warm Desserts"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/desserts/gulab-jamun.jpg"
+  ],
+  "file": "dish-9f5e8d7362659d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 86060,
+  "sha256": "c13857132b98f53f1b1ba5fbbbd9188c6fb2fd7b1a2574d2ec26f0b8666a0d29"
+}

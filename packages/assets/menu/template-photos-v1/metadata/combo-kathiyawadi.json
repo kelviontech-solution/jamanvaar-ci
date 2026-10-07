@@ -1,0 +1,29 @@
+{
+  "id": "combo-kathiyawadi",
+  "kind": "combo",
+  "name": "Kathiyawadi Dhaba & Bhojanalaya Meal Deal",
+  "description": "Kathiyawadi Ringna No Olo with Steamed Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Rustic Saurashtra & Kathiyawadi",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Kathiyawadi Ringna No Olo",
+      "description": "Charcoal roasted smoked eggplants mashed and cooked with garlic, green chillies, spring onions and oil",
+      "diet": "VEG"
+    },
+    {
+      "name": "Steamed Rice",
+      "description": "Steamed Rice, rice and lentil comfort meals.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-kathiyawadi.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 117344,
+  "sha256": "c9184b56386f911125de7f9a7ca72ec9b6dbaa6045c264f182adc68082b19f7e"
+}

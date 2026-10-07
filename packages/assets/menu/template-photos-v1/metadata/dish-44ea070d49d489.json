@@ -1,0 +1,26 @@
+{
+  "id": "dish-44ea070d49d489",
+  "kind": "dish",
+  "name": "Peri Peri Fries",
+  "description": "Peri Peri Fries, crisp potato sides and bites.",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Sides",
+  "occurrences": [
+    {
+      "templateId": "tpl-fast-food",
+      "category": "Sides"
+    },
+    {
+      "templateId": "tpl-pizza",
+      "category": "Sides"
+    }
+  ],
+  "file": "dish-44ea070d49d489.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 93410,
+  "sha256": "146bd5dc06fc2234e24f102b3432e355f701c211f151213c5a0224007aa9cfad"
+}

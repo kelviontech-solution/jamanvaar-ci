@@ -1,0 +1,25 @@
+{
+  "id": "dish-20c29cb18d3c48",
+  "kind": "dish",
+  "name": "Caramel Sundae",
+  "description": "Caramel Sundae, ice cream with toppings and sauces.",
+  "diet": "VEG",
+  "cuisine": "Gourmet Ice Creams & Sundaes",
+  "category": "Sundaes",
+  "occurrences": [
+    {
+      "templateId": "tpl-desserts",
+      "category": "Sundaes"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-20c29cb18d3c48.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 67186,
+  "sha256": "561ae084fd3b747eacd521970133e92a63adabd7fabc3da7014bfd1dfb68bf9f"
+}

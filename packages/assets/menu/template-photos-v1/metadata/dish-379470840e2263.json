@@ -1,0 +1,22 @@
+{
+  "id": "dish-379470840e2263",
+  "kind": "dish",
+  "name": "Veg Seekh Kebab Mughlai",
+  "description": "Minced mixed vegetables and cottage cheese skewered and roasted with aromatic garam masala",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Tandoori Starters & Kebabs",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Tandoori Starters & Kebabs"
+    }
+  ],
+  "file": "dish-379470840e2263.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119406,
+  "sha256": "61cf54bc6e78421c9c7cc44590d3b451973edab9d0f00de4c712a0d57df12a15"
+}

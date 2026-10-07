@@ -1,0 +1,25 @@
+{
+  "id": "dish-da76248b13199e",
+  "kind": "dish",
+  "name": "Onion Pakora",
+  "description": "Onion Pakora, freshly fried snacks.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Hot Snacks",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Hot Snacks"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-da76248b13199e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 105448,
+  "sha256": "1dca09d82b229a1997c6aafd44a8d212be72529eee5875a01b3106bcaf674fea"
+}

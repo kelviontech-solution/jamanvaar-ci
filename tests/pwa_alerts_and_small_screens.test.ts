@@ -45,6 +45,47 @@ describe('the Captain and KDS install like apps and open without signal', () => 
   }
 });
 
+describe('POS and Restaurant Admin open with no signal too, not just Captain and KDS', () => {
+  // Orders and the menu live in each app's own database, so once the page itself is in the browser the data
+  // already works offline (see the ImageCache and SyncOutboxEngine coverage elsewhere). What was missing was
+  // the page itself: with no app-shell service worker, closing or reloading the tab with no internet left
+  // POS and Restaurant Admin unable to open at all, while Captain and KDS already could.
+  for (const app of ['pos', 'pos-admin']) {
+    describe(app, () => {
+      it('registers the service worker in production builds only', () => {
+        const main = read(`${app}/src/main.tsx`);
+        expect(main).toMatch(/import\.meta\.env\.PROD[\s\S]{0,120}serviceWorker/);
+        expect(main).toContain("register('./sw.js')");
+      });
+
+      it('the service worker caches only this app\'s own files: never the API, never a write', () => {
+        const sw = read(`${app}/public/sw.js`);
+        expect(sw).toMatch(/req\.method !== 'GET'\) return/);
+        expect(sw).toContain('url.origin !== self.location.origin');
+        expect(sw).toContain("url.pathname.startsWith('/api/')");
+      });
+
+      it('every file the service worker installs at startup actually exists, so the install can never silently fail', () => {
+        // Vite's own layout: index.html lives at the app root; every other static file lives under public/.
+        // Both end up flat in dist/, which is what the service worker's relative paths actually resolve against.
+        const sw = read(`${app}/public/sw.js`);
+        const files = [...sw.matchAll(/'\.\/([^']+)'/g)].map((m) => m[1]).filter((f) => f && f !== '');
+        expect(files.length).toBeGreaterThan(0);
+        for (const f of files) {
+          const onDisk = f === 'index.html' ? join(SYSTEM, app, f) : join(SYSTEM, app, 'public', f);
+          expect(existsSync(onDisk), f).toBe(true);
+        }
+      });
+
+      it('builds the shell from the Vite plugin that fills in the real asset list, not a hand-maintained one', () => {
+        const config = read(`${app}/vite.config.ts`);
+        expect(config).toContain("import { appShellCache } from '../../../tooling/vite/app_shell_cache'");
+        expect(config).toMatch(/plugins:\s*\[react\(\),\s*appShellCache\(\)\]/);
+      });
+    });
+  }
+});
+
 describe('a waiter is told when food is ready, even with the phone in a pocket', () => {
   const memory = new Map<string, string>();
   const g = globalThis as unknown as { localStorage: unknown; navigator: { vibrate?: (p: number[]) => boolean } };

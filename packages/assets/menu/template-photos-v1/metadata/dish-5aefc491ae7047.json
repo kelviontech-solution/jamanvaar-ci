@@ -1,0 +1,30 @@
+{
+  "id": "dish-5aefc491ae7047",
+  "kind": "dish",
+  "name": "Sweet Lassi",
+  "description": "Sweet Lassi, traditional dairy drinks and fresh citrus refreshments.",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Beverages",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Beverages"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Desserts & Drinks"
+    }
+  ],
+  "file": "dish-5aefc491ae7047.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 36810,
+  "sha256": "7a355157b96cbb9fc31b9b139503b6617d1b02972d53b1d1057908d7e3cce768"
+}

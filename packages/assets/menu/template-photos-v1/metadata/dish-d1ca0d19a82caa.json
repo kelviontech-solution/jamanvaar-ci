@@ -1,0 +1,29 @@
+{
+  "id": "dish-d1ca0d19a82caa",
+  "kind": "dish",
+  "name": "Cappuccino",
+  "description": "Cappuccino, freshly brewed coffee prepared to order.",
+  "diet": "VEG",
+  "cuisine": "Specialty Coffee & Continental",
+  "category": "Hot Coffee",
+  "occurrences": [
+    {
+      "templateId": "tpl-cafe",
+      "category": "Hot Coffee"
+    },
+    {
+      "templateId": "tpl-bakery",
+      "category": "Beverages"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/cafe/cappuccino.jpg"
+  ],
+  "file": "dish-d1ca0d19a82caa.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 68674,
+  "sha256": "f99e1b82ef1c3c0b2e8865629c5082d46036562c7aac4863821594778ef6ab0d"
+}

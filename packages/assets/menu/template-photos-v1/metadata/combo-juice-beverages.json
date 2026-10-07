@@ -1,0 +1,29 @@
+{
+  "id": "combo-juice-beverages",
+  "kind": "combo",
+  "name": "Fresh Juice & Mocktail Bar Meal Deal",
+  "description": "Fresh Mosambi (Sweet Lime) Juice with Virgin Mint Mojito Cooler. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Cold-Pressed Juices & Shakes",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Fresh Mosambi (Sweet Lime) Juice",
+      "description": "Freshly squeezed sweet lime juice with a pinch of black salt",
+      "diet": "VEG"
+    },
+    {
+      "name": "Virgin Mint Mojito Cooler",
+      "description": "Crushed fresh mint, lime wedges, simple syrup topped with sparkling soda and ice",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-juice-beverages.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 78386,
+  "sha256": "2a6ee4d3f1cd24c1f08f144e87fb77ae9eb46f2b1c60064e4f90ecae12398c84"
+}

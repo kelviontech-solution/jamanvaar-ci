@@ -1,0 +1,22 @@
+{
+  "id": "dish-fb2c6a922b70f8",
+  "kind": "dish",
+  "name": "Veg Manchow Soup",
+  "description": "Veg Manchow Soup, hot vegetable broth finished to order.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Soups",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Soups"
+    }
+  ],
+  "file": "dish-fb2c6a922b70f8.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 80002,
+  "sha256": "af535393afec8631fcfa1df7c955a1ed657c9d43cbfa9fae30a6321d96547fa0"
+}

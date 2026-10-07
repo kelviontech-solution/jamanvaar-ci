@@ -1,0 +1,29 @@
+{
+  "id": "combo-chinese",
+  "kind": "combo",
+  "name": "Authentic Chinese & Wok Meal Deal",
+  "description": "Veg Hakka Noodles with Schezwan Fried Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Veg Hakka Noodles",
+      "description": "Thin noodles wok tossed with shredded cabbage, bell peppers, carrots, spring onions and dark soy sauce",
+      "diet": "VEG"
+    },
+    {
+      "name": "Schezwan Fried Rice",
+      "description": "Basmati rice tossed with fiery Sichuan pepper sauce and diced crunchy vegetables",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-chinese.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 98944,
+  "sha256": "be1d79fc00cd6766b4c7668258e370998050dcd178b440806e433ba1d89c720c"
+}

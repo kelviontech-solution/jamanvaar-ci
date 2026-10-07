@@ -1,0 +1,37 @@
+{
+  "id": "category-5c8968a89e744e",
+  "kind": "category",
+  "name": "Gujarati Shaak (Curries) — Gujarati Restaurant",
+  "categoryName": "Gujarati Shaak (Curries)",
+  "templateId": "tpl-gujarati",
+  "slug": "gujarati-shaak",
+  "description": "Authentic seasonal vegetable curries",
+  "diet": "VEG",
+  "cuisine": "Authentic Gujarati Heritage",
+  "category": "Gujarati Shaak (Curries)",
+  "components": [
+    {
+      "name": "Surti Undhiyu Special",
+      "description": "Heritage mixed vegetable slow-cooked with fresh surti papdi, purple yam, baby eggplants and methi muthias",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Sev Tameta Nu Shaak",
+      "description": "Sweet and tangy tomato curry topped with crisp ratlami sev",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Ringna Bateta Nu Shaak",
+      "description": "Tender eggplants and potatoes cooked in traditional Gujarati spices with a hint of jaggery",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-5c8968a89e744e.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 152860,
+  "sha256": "8fbfa9b1d900e439afeb0562f9a9c585d0292032b0020f3a38ab93526fd759ad"
+}

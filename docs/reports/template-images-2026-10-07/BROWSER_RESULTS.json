@@ -1,0 +1,243 @@
+{
+  "at": "2026-10-07T08:14:51.300Z",
+  "environment": "isolated local API/database; compiled apps; production subpaths",
+  "results": [
+    {
+      "title": "All Menu shows twenty dishes plus one combo in one continuous grid with loaded photos",
+      "passed": true,
+      "ms": 4141.4,
+      "evidence": {
+        "cards": 21,
+        "photos": 21,
+        "comboAndDishesShareRow": true
+      }
+    },
+    {
+      "title": "Search filters combos and dishes together and no-match has a useful empty state",
+      "passed": true,
+      "ms": 1502.01,
+      "evidence": {
+        "search": true,
+        "noMatch": true
+      }
+    },
+    {
+      "title": "Combos-only view contains one card without a duplicate backing dish",
+      "passed": true,
+      "ms": 529.54,
+      "evidence": {
+        "comboCount": 1
+      }
+    },
+    {
+      "title": "Kiosk menu cards fit tablet, laptop, TV and portrait widths",
+      "passed": true,
+      "ms": 7669.48,
+      "evidence": [
+        {
+          "viewport": 768,
+          "width": 620,
+          "scrollWidth": 620,
+          "columns": 2
+        },
+        {
+          "viewport": 1024,
+          "width": 847,
+          "scrollWidth": 847,
+          "columns": 3
+        },
+        {
+          "viewport": 1366,
+          "width": 1152,
+          "scrollWidth": 1152,
+          "columns": 4
+        },
+        {
+          "viewport": 1920,
+          "width": 1645,
+          "scrollWidth": 1645,
+          "columns": 6
+        },
+        {
+          "viewport": 2560,
+          "width": 2214,
+          "scrollWidth": 2214,
+          "columns": 8
+        }
+      ]
+    },
+    {
+      "title": "Adding a dish opens the cart while the menu remains usable",
+      "passed": true,
+      "ms": 261.21,
+      "evidence": {
+        "correctDish": true,
+        "cartFits": true
+      }
+    },
+    {
+      "title": "Restaurant Admin displays the same repaired Khaman and Basundi photos",
+      "passed": true,
+      "ms": 1478.1,
+      "evidence": {
+        "sameLibrary": true
+      }
+    },
+    {
+      "title": "POS menu shows description-matched food photos",
+      "passed": true,
+      "ms": 585.3,
+      "evidence": {
+        "posImageLoaded": true
+      }
+    },
+    {
+      "title": "Captain table menu uses the same photos",
+      "passed": true,
+      "ms": 219.45,
+      "evidence": {
+        "captainImageLoaded": true
+      }
+    },
+    {
+      "title": "Mobile QR ordering renders the published dishes with real images and no overflow",
+      "passed": true,
+      "ms": 366.26,
+      "evidence": {
+        "guestImageLoaded": true,
+        "mobileFits": true
+      }
+    },
+    {
+      "title": "Changing a restaurant photo overrides the starter image across Kiosk and Admin",
+      "passed": true,
+      "ms": 11886.82,
+      "evidence": {
+        "ownerUploadWins": true
+      }
+    },
+    {
+      "title": "Downloaded Kiosk dish photos remain visible after going offline",
+      "passed": true,
+      "ms": 140.26,
+      "evidence": {
+        "offlineImageFromCache": true
+      }
+    },
+    {
+      "title": "Admin categories show cover photos and editable food icons",
+      "passed": true,
+      "ms": 4005.87,
+      "evidence": {
+        "categoryPhoto": true,
+        "editableIcons": 25,
+        "iconSaveSurvivesReload": true
+      }
+    },
+    {
+      "title": "Every offered onboarding template has loaded dish and category photographs",
+      "passed": true,
+      "ms": 70988,
+      "evidence": [
+        {
+          "id": "tpl-north-indian",
+          "name": "North Indian Restaurant",
+          "photos": 60
+        },
+        {
+          "id": "tpl-gujarati",
+          "name": "Gujarati Restaurant",
+          "photos": 67
+        },
+        {
+          "id": "tpl-south-indian",
+          "name": "South Indian Restaurant",
+          "photos": 55
+        },
+        {
+          "id": "tpl-punjabi",
+          "name": "Punjabi Dhaba & Restaurant",
+          "photos": 56
+        },
+        {
+          "id": "tpl-kathiyawadi",
+          "name": "Kathiyawadi Dhaba & Bhojanalaya",
+          "photos": 47
+        },
+        {
+          "id": "tpl-jain",
+          "name": "Jain Satvik Bhojanalaya",
+          "photos": 41
+        },
+        {
+          "id": "tpl-multicuisine",
+          "name": "Indian Multi-Cuisine Diner",
+          "photos": 72
+        },
+        {
+          "id": "tpl-thali",
+          "name": "Grand Indian Thali Restaurant",
+          "photos": 49
+        },
+        {
+          "id": "tpl-chinese",
+          "name": "Authentic Chinese & Wok",
+          "photos": 42
+        },
+        {
+          "id": "tpl-fast-food",
+          "name": "Fast Food & Quick Service Restaurant",
+          "photos": 45
+        },
+        {
+          "id": "tpl-cafe",
+          "name": "Artisan Café & Coffee Bar",
+          "photos": 43
+        },
+        {
+          "id": "tpl-bakery",
+          "name": "Bakery, Patisserie & Cafe",
+          "photos": 41
+        },
+        {
+          "id": "tpl-pizza",
+          "name": "Pizza Restaurant",
+          "photos": 47
+        },
+        {
+          "id": "tpl-chaat",
+          "name": "Street Food Restaurant",
+          "photos": 45
+        },
+        {
+          "id": "tpl-biryani",
+          "name": "Biryani & Kebab Darbar",
+          "photos": 40
+        },
+        {
+          "id": "tpl-desserts",
+          "name": "Dessert / Ice Cream",
+          "photos": 40
+        }
+      ]
+    },
+    {
+      "title": "Importing a Pizza category publishes its new photos to the open Kiosk without refresh",
+      "passed": true,
+      "ms": 3403.21,
+      "evidence": {
+        "before": 21,
+        "after": 33,
+        "liveSync": true,
+        "resumedAfterIdle": true
+      }
+    }
+  ],
+  "errors": [],
+  "timings": [
+    {
+      "phase": "isolated fixture combo hydration",
+      "ms": 233.83
+    }
+  ]
+}

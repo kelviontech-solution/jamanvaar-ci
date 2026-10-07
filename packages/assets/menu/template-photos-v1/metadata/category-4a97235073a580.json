@@ -1,0 +1,37 @@
+{
+  "id": "category-4a97235073a580",
+  "kind": "category",
+  "name": "Wraps — Fast Food & Quick Service Restaurant",
+  "categoryName": "Wraps",
+  "templateId": "tpl-fast-food",
+  "slug": "wraps",
+  "description": "Soft flatbread wraps with salad and sauce",
+  "diet": "VEG",
+  "cuisine": "Fast Food & American",
+  "category": "Wraps",
+  "components": [
+    {
+      "name": "Paneer Wrap",
+      "description": "Paneer Wrap, soft flatbread wraps with salad and sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Falafel Wrap",
+      "description": "Falafel Wrap, soft flatbread wraps with salad and sauce.",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Veg Mexican Wrap",
+      "description": "Veg Mexican Wrap, soft flatbread wraps with salad and sauce.",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-4a97235073a580.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103400,
+  "sha256": "8df078214cdfa87919a9183a235242f02363248ab6cb9f513db9aa6ae220ca46"
+}

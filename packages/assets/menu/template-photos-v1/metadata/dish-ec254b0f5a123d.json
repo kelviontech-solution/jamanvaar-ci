@@ -1,0 +1,22 @@
+{
+  "id": "dish-ec254b0f5a123d",
+  "kind": "dish",
+  "name": "Maharaja Unlimited Royal Thali",
+  "description": "4 Curries, 2 Dals, 4 Bread Varieties, Pulav, 2 Farsan, 2 Desserts, Raita, Papad, Chutney and Chaas",
+  "diet": "VEG",
+  "cuisine": "Unlimited & Executive Thalis",
+  "category": "Signature Thali Offerings",
+  "occurrences": [
+    {
+      "templateId": "tpl-thali",
+      "category": "Signature Thali Offerings"
+    }
+  ],
+  "file": "dish-ec254b0f5a123d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 119212,
+  "sha256": "b51189512b2f92118af4c76cd39334078d0bf57f01a3ba3abeca7406c8300194"
+}

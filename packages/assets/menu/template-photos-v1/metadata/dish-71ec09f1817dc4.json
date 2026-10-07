@@ -1,0 +1,22 @@
+{
+  "id": "dish-71ec09f1817dc4",
+  "kind": "dish",
+  "name": "Veg Manchurian Gravy",
+  "description": "Vegetable dumplings simmered in rich garlic, coriander and soy sauce gravy",
+  "diet": "VEG",
+  "cuisine": "Pan-Asian & Chinese Wok",
+  "category": "Chinese Starters & Gravies",
+  "occurrences": [
+    {
+      "templateId": "tpl-chinese",
+      "category": "Chinese Starters & Gravies"
+    }
+  ],
+  "file": "dish-71ec09f1817dc4.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 92824,
+  "sha256": "c756d0fceaced18151628038766c557a737ceecf860122618d19ce6bb7ab9e41"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "category-810b2ab58e19dc",
+  "kind": "category",
+  "name": "Traditional Filter Coffee & Drinks — South Indian Restaurant",
+  "categoryName": "Traditional Filter Coffee & Drinks",
+  "templateId": "tpl-south-indian",
+  "slug": "south-beverages",
+  "description": "Authentic decoction brewed filter kaapi",
+  "diet": "VEG",
+  "cuisine": "Traditional South Indian",
+  "category": "Traditional Filter Coffee & Drinks",
+  "components": [
+    {
+      "name": "Authentic Kumbakonam Filter Coffee",
+      "description": "Strong chicory-blended coffee decoction frothed with boiling whole milk, served in traditional dabarah set",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-810b2ab58e19dc.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 72426,
+  "sha256": "bbd024c3ca41e71adbafbf1c8c48e493e8dbd551026bb63e43ad0107313b3e57"
+}

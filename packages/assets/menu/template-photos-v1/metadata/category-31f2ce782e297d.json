@@ -1,0 +1,37 @@
+{
+  "id": "category-31f2ce782e297d",
+  "kind": "category",
+  "name": "Dal & Heritage Curries — North Indian Restaurant",
+  "categoryName": "Dal & Heritage Curries",
+  "templateId": "tpl-north-indian",
+  "slug": "dal-curries",
+  "description": "Overnight slow-cooked dals and rich vegetable curries",
+  "diet": "VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Dal & Heritage Curries",
+  "components": [
+    {
+      "name": "Dal Makhani Bukhara",
+      "description": "Whole black lentils slow-cooked overnight with white butter, cream and sun-dried fenugreek",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Yellow Dal Tadka Desi Ghee",
+      "description": "Yellow toor dal tempered with pure desi ghee, cumin seeds, garlic, onions and whole red chillies",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Malai Kofta Mughlai",
+      "description": "Paneer and potato dumplings stuffed with dry fruits in a velvety cashew and saffron sauce",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-31f2ce782e297d.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 116948,
+  "sha256": "a0b7a39fcde95dcf44102f151b9dbff312c8e831f590a40d29bbcce212aecbd3"
+}

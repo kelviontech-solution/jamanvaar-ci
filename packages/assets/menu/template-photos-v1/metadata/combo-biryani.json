@@ -1,0 +1,29 @@
+{
+  "id": "combo-biryani",
+  "kind": "combo",
+  "name": "Biryani & Kebab Darbar Meal Deal",
+  "description": "Paneer Tikka with Jeera Rice. Fixed portions; individual item customisations are not included.",
+  "diet": "VEG",
+  "cuisine": "Royal Dum Biryanis & Kebabs",
+  "category": "Combo",
+  "components": [
+    {
+      "name": "Paneer Tikka",
+      "description": "Paneer Tikka, freshly cooked accompaniments.",
+      "diet": "VEG"
+    },
+    {
+      "name": "Jeera Rice",
+      "description": "Jeera Rice, curries and rice sides.",
+      "diet": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "combo-biryani.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 103748,
+  "sha256": "fe54fa4e42b4a0803efd85207b0acf5fd2906bcb88cba186b1551935dc8017b3"
+}

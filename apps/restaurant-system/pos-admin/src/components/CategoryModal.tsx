@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, MenuCategoryIcon } from '@jamanvaar/ui';
+import { CATEGORY_ICON_OPTIONS, isMenuPlaceholder, menuCategoryImage } from '@jamanvaar/utils';
 import { MenuRepository, AuditRepository } from '@jamanvaar/database';
 
 interface CategoryModalProps {
@@ -20,7 +21,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [sortOrder, setSortOrder] = useState(1);
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
-  const [iconName, setIconName] = useState('UtensilsCrossed');
+  const [iconName, setIconName] = useState('auto');
   const [isActive, setIsActive] = useState(true);
   const [qrVisible, setQrVisible] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
@@ -36,7 +37,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       setName(categoryToEdit.name); setSortOrder(categoryToEdit.sortOrder);
       setSlug(categoryToEdit.slug);
       setDescription(categoryToEdit.description || '');
-      setIconName(categoryToEdit.iconName || 'UtensilsCrossed');
+      setIconName(categoryToEdit.iconName === 'Cake' ? 'CakeSlice' : CATEGORY_ICON_OPTIONS.some(([icon]) => icon === categoryToEdit.iconName) ? categoryToEdit.iconName! : 'auto');
       setIsActive(categoryToEdit.isActive ?? true);
       setQrVisible(categoryToEdit.qrVisible !== false);
       setImageUrl(categoryToEdit.imageUrl || '');
@@ -44,7 +45,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       setName(''); setSortOrder(1);
       setSlug('');
       setDescription('');
-      setIconName('UtensilsCrossed');
+      setIconName('auto');
       setIsActive(true);
       setQrVisible(true);
       setImageUrl('');
@@ -123,6 +124,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     onClose();
   };
 
+  const categoryPreview = menuCategoryImage(imageUrl, name, description, categoryToEdit?.templateCategoryKey);
   return (
     <Modal
       isOpen={isOpen}
@@ -155,17 +157,14 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1">Icon Style</label>
+            <label htmlFor="category-icon-style" className="block text-xs font-bold text-slate-600 mb-1">Icon Style</label>
             <select
+              id="category-icon-style"
               value={iconName}
               onChange={(e) => setIconName(e.target.value)}
               className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
             >
-              <option value="UtensilsCrossed">Utensils</option>
-              <option value="Flame">Tandoor / Grill</option>
-              <option value="Coffee">Coffee / Drink</option>
-              <option value="Cake">Dessert / Sweet</option>
-              <option value="Pizza">Pizza / Fast Food</option>
+              {CATEGORY_ICON_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </div>
         </div>
@@ -183,12 +182,14 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          {imageUrl && <img src={imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-jaman-border" />}
+          <MenuCategoryIcon name={name || 'Meals'} iconName={iconName} size="lg" />
+          {!isMenuPlaceholder(categoryPreview) && <CachedImg src={categoryPreview} alt="Category picture preview" className="w-14 h-14 rounded-xl object-cover border border-jaman-border" />}
           <label className="text-xs font-bold text-slate-600">Picture (optional)
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => { const f = e.target.files?.[0]; if (f) pickImage(f); }} className="block mt-1 text-xs" />
           </label>
           {imageUrl && <button type="button" onClick={() => setImageUrl('')} className="text-xs font-bold text-rose-600">Remove</button>}
         </div>
+        <p className="text-xs text-slate-500">Automatic icons match the category name. Without a custom picture, the menu uses a matching template cover or a dish from this category.</p>
 
         <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
           <input type="checkbox" checked={qrVisible} onChange={(e) => setQrVisible(e.target.checked)} className="rounded" />

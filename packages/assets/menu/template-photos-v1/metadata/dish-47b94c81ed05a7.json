@@ -1,0 +1,25 @@
+{
+  "id": "dish-47b94c81ed05a7",
+  "kind": "dish",
+  "name": "Extra Pav Pair",
+  "description": "Extra Pav Pair, griddle-cooked snacks in soft pav.",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Pav & Buns",
+  "occurrences": [
+    {
+      "templateId": "tpl-chaat",
+      "category": "Pav & Buns"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-47b94c81ed05a7.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 67312,
+  "sha256": "f8b95ced4514e379a02aab6a90fe4a01fd9e8b5f5b592a02fefaa2d57439f41b"
+}

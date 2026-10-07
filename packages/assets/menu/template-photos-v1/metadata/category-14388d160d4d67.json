@@ -1,0 +1,37 @@
+{
+  "id": "category-14388d160d4d67",
+  "kind": "category",
+  "name": "Puri & Chaat Specialties — Street Food Restaurant",
+  "categoryName": "Puri & Chaat Specialties",
+  "templateId": "tpl-chaat",
+  "slug": "chaats",
+  "description": "Tangy and sweet street food delights",
+  "diet": "VEG",
+  "cuisine": "Authentic Indian Chaat",
+  "category": "Puri & Chaat Specialties",
+  "components": [
+    {
+      "name": "Pani Puri Platter (6 Pcs)",
+      "description": "Crispy puris stuffed with spiced chickpea mash, tangy mint-coriander water and sweet date chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Dahi Sev Batata Puri",
+      "description": "Crispy puris filled with potato mash, sweet chilled curd, sev, pomegranate and mint chutney",
+      "dietaryType": "VEG"
+    },
+    {
+      "name": "Butter Pav Bhaji (2 Pav)",
+      "description": "Mashed spicy mixed vegetable gravy simmered with Amul butter, served with toasted butter pav",
+      "dietaryType": "VEG"
+    }
+  ],
+  "priorImages": [],
+  "file": "category-14388d160d4d67.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 112414,
+  "sha256": "3f79e5d424077bb56fcd5cf3fa6b2ea301cc56e25ac8bc1af957754966235eba"
+}

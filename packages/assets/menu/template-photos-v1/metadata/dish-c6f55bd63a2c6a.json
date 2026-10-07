@@ -1,0 +1,37 @@
+{
+  "id": "dish-c6f55bd63a2c6a",
+  "kind": "dish",
+  "name": "Chicken Tikka",
+  "description": "Chicken Tikka, marinated starters grilled or shallow-fried to order.",
+  "diet": "NON_VEG",
+  "cuisine": "Mughlai & Heritage Indian",
+  "category": "Starters",
+  "occurrences": [
+    {
+      "templateId": "tpl-north-indian",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-punjabi",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-multicuisine",
+      "category": "Starters"
+    },
+    {
+      "templateId": "tpl-biryani",
+      "category": "Starters"
+    }
+  ],
+  "priorImages": [
+    "/assets/menu/common/menu-placeholder-v2.svg"
+  ],
+  "file": "dish-c6f55bd63a2c6a.webp",
+  "source": "AI_GENERATED_STARTER_PHOTO",
+  "generatedAt": "2026-10-07",
+  "width": 840,
+  "height": 630,
+  "bytes": 95394,
+  "sha256": "76ff2f78f7a431888b061e5f22c9be8a9952b71b4c7e7b3a59187d3bb9d34913"
+}
