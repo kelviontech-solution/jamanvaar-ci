@@ -9,7 +9,7 @@ use std::thread;
 use std::time::Duration;
 
 /// Result of LAN discovery for a JAMANVAAR Local Core
-#[derive(serde::Serialize, serde::Clone)]
+#[derive(serde::Serialize, Clone)]
 struct DiscoveredCore {
     ip: String,
     port: u16,
