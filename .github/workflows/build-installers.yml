@@ -115,6 +115,7 @@ jobs:
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> "$GITHUB_ENV"
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -129,14 +130,10 @@ jobs:
 
       - name: Init Android project (${{ matrix.app.name }})
         working-directory: ${{ matrix.app.path }}
-        env:
-          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
         run: npx --yes "@tauri-apps/cli@2.11.4" android init
 
       - name: Build Android APK (${{ matrix.app.name }}, debug-signed)
         working-directory: ${{ matrix.app.path }}
-        env:
-          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
         run: npx --yes "@tauri-apps/cli@2.11.4" android build --debug
 
       - uses: actions/upload-artifact@v4
