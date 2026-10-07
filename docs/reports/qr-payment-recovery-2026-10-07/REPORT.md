@@ -21,6 +21,8 @@ Counter conversion reserves the order while provider checks run outside a databa
 - **98 focused frontend/shared tests** passed; a further **54 Captain/service-message/kitchen checks** passed for the concurrent guest-help changes included in this push (some coverage overlaps).
 - Production builds passed for API, QR Guest, POS, Restaurant Admin and Captain. Existing large-bundle warnings remain.
 
+GitHub received the WhatsApp receipt update `94b0a337` during this work. It was merged without conflicts. The combined revision passed a further **51 payment/receipt API checks** and **17 e-bill/print-queue checks**, with backend, POS and Kiosk production builds checked again. These additional checks overlap the earlier suites. See [MERGED_API_RESULTS.json](MERGED_API_RESULTS.json).
+
 See [API_RESULTS.json](API_RESULTS.json), [BROWSER_RESULTS.json](BROWSER_RESULTS.json), [completed guest screen](evidence/kds-served-guest-completed.png) and [counter conversion](evidence/online-switched-counter.png).
 
 The guest screen retains its existing five-second status refresh plus focus/visibility refresh. Expected kitchen-status visibility is therefore up to one refresh interval plus network latency; these local checks do not measure AWS latency. The failed initial browser attempt used the normal production API configuration with a disposable QA QR token; the passing run used the documented isolated API build setting. The normal QR build was restored afterward.
