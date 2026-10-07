@@ -1,0 +1,84 @@
+name: Build Desktop Installers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-desktop:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - name: POS
+            path: apps/restaurant-system/pos
+            binary: jamanvaar-pos.exe
+            title: "JAMANVAAR POS — High-Speed Counter Billing Terminal"
+          - name: RestaurantAdmin
+            path: apps/restaurant-system/pos-admin
+            binary: jamanvaar-pos-admin.exe
+            title: "JAMANVAAR POS Admin — Restaurant Operations & Intelligence"
+          - name: Kiosk
+            path: apps/kiosk-system/kiosk-user
+            binary: jamanvaar-kiosk-user.exe
+            title: "JAMANVAAR Kiosk — Customer Self-Order Terminal"
+          - name: Captain
+            path: apps/restaurant-system/captain
+            binary: jamanvaar-captain.exe
+            title: "JAMANVAAR Captain — Table-Side Ordering & Service"
+          - name: KDS
+            path: apps/restaurant-system/kds
+            binary: jamanvaar-kds.exe
+            title: "JAMANVAAR Kitchen Display — Prep Queue & Order Timing"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Build frontend (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: npm run build
+
+      - name: Build Tauri installer (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: npx --yes "@tauri-apps/cli@2.11.4" build
+
+      - name: Smoke test (${{ matrix.app.name }})
+        shell: pwsh
+        run: |
+          $binaryPath = Join-Path "${{ matrix.app.path }}" "src-tauri/target/release/${{ matrix.app.binary }}"
+          $proc = Start-Process -FilePath $binaryPath -PassThru
+          Start-Sleep -Seconds 8
+          $proc.Refresh()
+          if ($proc.HasExited) {
+            throw "${{ matrix.app.name }} exited within 8 seconds instead of showing a window (exit code $($proc.ExitCode))."
+          }
+          $title = $proc.MainWindowTitle
+          if ([string]::IsNullOrWhiteSpace($title)) {
+            Write-Warning "${{ matrix.app.name }}: MainWindowTitle came back empty on this runner — falling back to the alive-process check."
+            Start-Sleep -Seconds 2
+            $proc.Refresh()
+            if ($proc.HasExited) {
+              throw "${{ matrix.app.name }} exited before the fallback check completed (exit code $($proc.ExitCode))."
+            }
+          } elseif ($title -notlike "*${{ matrix.app.title }}*") {
+            throw "${{ matrix.app.name }}: expected window title containing '${{ matrix.app.title }}' but got '$title'."
+          } else {
+            Write-Host "${{ matrix.app.name }}: window title confirmed: $title"
+          }
+          Stop-Process -Id $proc.Id -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app.name }}-installer
+          path: ${{ matrix.app.path }}/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
