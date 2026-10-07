@@ -6,6 +6,7 @@ import {
   CreditCard,
   Database,
   DollarSign,
+  Download,
   Flame,
   Grid,
   Heart,
@@ -86,7 +87,8 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
       { id: 'LICENSE', label: 'Subscription Plans', icon: Award },
       { id: 'AUDIT', label: 'Audit Trail Logs', icon: ShieldCheck },
       { id: 'BACKUP', label: 'Backup & Restore', icon: Database },
-      { id: 'SUPPORT', label: 'Help & Support', icon: LifeBuoy }
+      { id: 'SUPPORT', label: 'Help & Support', icon: LifeBuoy },
+      { id: 'DOWNLOADS', label: 'App Downloads', icon: Download }
     ]
   }
 ];
@@ -101,7 +103,7 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
     ['KIOSK OPERATIONS', ['DASHBOARD', 'KIOSKS', 'ORDERS', 'LIVE_KDS', 'TABLES']],
     ['CUSTOMER EXPERIENCE', ['MENU', 'TEMPLATES', 'MENU_OPTIONS', 'KIOSK_WELCOME', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'COUPONS']],
     ['PAYMENTS & SERVICE', ['KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'FEEDBACK', 'STAFF', 'REPORTS']],
-    ['SYSTEM', ['SETTINGS', 'SYNC', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT']]
+    ['SYSTEM', ['SETTINGS', 'SYNC', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'DOWNLOADS']]
   ] as const;
   const additions: Record<string, NavSectionItem> = {
     KIOSK_WELCOME: { id: 'KIOSK_WELCOME', label: 'Kiosk Welcome Screen', icon: Tablet },

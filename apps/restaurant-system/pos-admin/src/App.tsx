@@ -133,6 +133,7 @@ import { AuditTrailModule } from './components/audit/AuditTrailModule';
 import { BackupRestoreModule } from './components/backup/BackupRestoreModule';
 import { SupportTicketsModule } from './components/support/SupportTicketsModule';
 import { InventoryControlModule } from './components/inventory/InventoryControlModule';
+import { AppDownloadsModule } from './components/downloads/AppDownloadsModule';
 import { TerminalDisplaySettings } from './components/settings/TerminalDisplaySettings';
 import { KioskDisplaySettingsPanel } from './components/settings/KioskDisplaySettingsPanel';
 import { WhatsAppChannelPanel } from './components/settings/WhatsAppChannelPanel';
@@ -191,7 +192,8 @@ export type PosAdminTab =
   | 'RECEIPTS'
   | 'TEMPLATES'
   | 'KIOSK_PAYMENTS'
-  | 'FEEDBACK';
+  | 'FEEDBACK'
+  | 'DOWNLOADS';
 
 /** The real production tab list, as a runtime array -- restoreActiveTab validates against this
  *  (not a hardcoded fixture), so a test can prove every actual tab round-trips, and the array
@@ -200,7 +202,7 @@ export const ALL_POS_ADMIN_TABS: readonly PosAdminTab[] = [
   'DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS',
   'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS',
   'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT',
-  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_WELCOME', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK'
+  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_WELCOME', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK', 'DOWNLOADS'
 ];
 
 
@@ -1613,6 +1615,8 @@ export default function PosAdminApp() {
                 onRequestConfirm={setConfirmDialog}
               />
             )}
+
+            {activeTab === 'DOWNLOADS' && <AppDownloadsModule />}
           </main>}
         </div>
 

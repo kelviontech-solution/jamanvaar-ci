@@ -16,14 +16,16 @@ export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, str
     MENU: 'menu', MENU_OPTIONS: 'options', INVENTORY: 'inventory', INVENTORY_CONTROL: 'purchasing',
     CUSTOMERS: 'customers', STAFF: 'staff', PAYMENTS: 'payments', COUPONS: 'coupons', SHIFTS: 'shifts',
     REPORTS: 'reports', HARDWARE: 'printers', RECEIPTS: 'receipts', SYNC: 'sync', SETTINGS: 'settings',
-    LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support', TEMPLATES: 'templates'
+    LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support', TEMPLATES: 'templates',
+    DOWNLOADS: 'downloads'
   },
   KIOSK_ADMIN: {
     DASHBOARD: 'dashboard', KIOSKS: 'terminals', MENU: 'menu', TEMPLATES: 'templates', MENU_OPTIONS: 'options',
     KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
     LIVE_KDS: 'kitchen', TABLES: 'tables', STAFF: 'staff', KIOSK_PAYMENTS: 'payments',
     FEEDBACK: 'feedback', REPORTS: 'reports', HARDWARE: 'printers', RECEIPTS: 'receipts', SYNC: 'sync',
-    SETTINGS: 'settings', LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support'
+    SETTINGS: 'settings', LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support',
+    DOWNLOADS: 'downloads'
   }
 };
 

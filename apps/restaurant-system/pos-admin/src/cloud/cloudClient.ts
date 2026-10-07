@@ -656,6 +656,27 @@ export async function fetchCloudBranches(): Promise<CloudBranch[]> {
   return request<CloudBranch[]>('/api/v1/tenant/branches');
 }
 
+export interface CloudAppCatalogEntry {
+  code: string;
+  name: string;
+  category: string;
+  description: string;
+  currentVersion: string | null;
+  supportedPlatforms: string[];
+  downloadUrl: string | null;
+  releaseNotes: string | null;
+  releasedAt: string | null;
+}
+
+/**
+ * The app catalog and each app's current downloadable version, as Super Admin's
+ * "Publish Version" flow has set it — backs the Downloads page. `downloadUrl` is
+ * null until a real release has been published for that app.
+ */
+export async function fetchCloudApplications(): Promise<CloudAppCatalogEntry[]> {
+  return request<CloudAppCatalogEntry[]>('/api/v1/tenant/applications');
+}
+
 export interface TenantDashboard {
   scope:{branchId:string|null;label:string;from:string;to:string;timezone:string};
   summary:{sales:number;grossSales:number;refunds:number;orders:number;averageOrder:number;pendingAmount:number;pendingPayments:number};

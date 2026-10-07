@@ -159,6 +159,37 @@ export class ApplicationsService {
     });
   }
 
+  /**
+   * A restaurant's own read of the app catalog and its current downloadable version — same
+   * release lookup as list(), but stripped of platform-wide fleet/device/entitlement counts,
+   * which belong to Super Admin only and are meaningless (or a cross-tenant data leak) to a
+   * single restaurant's admin console.
+   */
+  async listForTenant() {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const allReleases = await tx.appRelease.findMany({
+        orderBy: { releasedAt: 'desc' }
+      });
+
+      return APP_CATALOG.map((meta) => {
+        const releases = allReleases.filter((r) => r.appCode === meta.code);
+        const latestRelease = releases.filter((r) => r.channel === 'STABLE').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
+
+        return {
+          code: meta.code,
+          name: meta.name,
+          category: meta.category,
+          description: meta.description,
+          currentVersion: latestRelease?.version ?? null,
+          supportedPlatforms: (latestRelease?.supportedPlatforms as string[]) || ['web'],
+          downloadUrl: latestRelease?.downloadUrl || null,
+          releaseNotes: latestRelease?.releaseNotes || null,
+          releasedAt: latestRelease?.releasedAt || null
+        };
+      });
+    });
+  }
+
   async getReleases(appCode: string) {
     return this.prisma.runAsPlatform(async (tx) => {
       return tx.appRelease.findMany({
