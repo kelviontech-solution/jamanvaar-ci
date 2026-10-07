@@ -1,4 +1,5 @@
 import { KeyValueStore, KioskConfigurationRepository } from '@jamanvaar/database';
+import { activeAdminBranch } from '../adminBranchScope';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder, PushedMovement, RemoteMovement } from '@jamanvaar/sync';
@@ -21,7 +22,14 @@ import { MenuRepository, PrinterRepository, InventoryRepository, RestaurantIdent
 
 const API_BASE = import.meta.env.VITE_CLOUD_API_BASE_URL ?? 'http://localhost:4000';
 // Operational traffic goes to the restaurant's Branch Core when one is configured and reachable; the cloud otherwise.
-EndpointResolver.setTransport((url, init) => DeviceGate.gatedFetch(url, init));
+EndpointResolver.setTransport(async (url, init) => {
+  const path=new URL(url,API_BASE).pathname;
+  const scope=await adminScopeHeaders(path);
+  // A selected remote branch is served by the cloud, never the paired local
+  // core's database. The registered terminal and core pairing stay intact.
+  const target=Object.keys(scope).length?`${API_BASE}${path}${new URL(url,API_BASE).search}`:url;
+  return DeviceGate.gatedFetch(target,{...init,headers:{...Object.fromEntries(new Headers(init?.headers)),...scope}});
+});
 EndpointResolver.configure({ cloudBase: API_BASE, coreUrl: import.meta.env.VITE_BRANCH_CORE_URL });
 
 const RESTAURANT_ID_KEY = 'jamanvaar_cloud_restaurant_id';
@@ -645,8 +653,21 @@ export interface CloudBranch {
  * other outlets, not a way to view their live operational data.
  */
 export async function fetchCloudBranches(): Promise<CloudBranch[]> {
-  if (!isCloudLoggedIn()) return [];
   return request<CloudBranch[]>('/api/v1/tenant/branches');
+}
+
+export interface TenantDashboard {
+  scope:{branchId:string|null;label:string;from:string;to:string;timezone:string};
+  summary:{sales:number;grossSales:number;refunds:number;orders:number;averageOrder:number;pendingAmount:number;pendingPayments:number};
+  trend:{bucket:string;sales:number}[];bySource:{source:string;sales:number;orders:number}[];
+  byBranch:{id:string;name:string;code:string;status:string;sales:number;orders:number;averageOrder:number;devices:number;online:number;deployedProducts:string[]}[];
+  unassigned:{sales:number;orders:number}|null;topItems:{id:string;name:string;units:number;revenue:number}[];
+  deviceCounts:{type:string;total:number;online:number}[];alerts:{title:string;detail:string}[];
+  recentOrders:{externalOrderId:string;tokenNumber?:string;orderNumber?:string;branchName:string;source:string;status:string;paymentStatus?:string;total:number}[];
+  generatedAt:string;
+}
+export function fetchTenantDashboard(query:{branchId?:string;period?:string;source?:string;from?:string;to?:string}={}) {
+  return request<TenantDashboard>(`/api/v1/tenant/dashboard?${new URLSearchParams(query)}`);
 }
 
 /**
@@ -873,12 +894,21 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
 }
 
 /** Same device-authed bypass pattern as createRefund() below — order-sync and entity-sync are DeviceAuthGuard endpoints, not user-session ones. */
-function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+async function adminScopeHeaders(path:string):Promise<Record<string,string>> {
+  const branch=activeAdminBranch;
+  const restaurantPayout=/^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(path);
+  if(!restaurantPayout&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
+  let expired=true;
+  try { expired=!accessToken||JSON.parse(atob(accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000<Date.now()+30000; } catch { /* refresh malformed/absent token */ }
+  if(expired&&(await refreshAccessToken())!=='ok')throw new CloudApiError('Sign in to manage this branch',401);
+  return {...(branch&&branch!=='all'?{'x-admin-branch':branch}:{}),'x-owner-authorization':accessToken!};
+}
+async function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getStoredDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
   return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init.headers ?? {}) }
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...await adminScopeHeaders(path), ...(init.headers ?? {}) }
   });
 }
 
@@ -897,6 +927,7 @@ async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
+      ...await adminScopeHeaders(path),
       ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
       ...(init.headers ?? {})
     }

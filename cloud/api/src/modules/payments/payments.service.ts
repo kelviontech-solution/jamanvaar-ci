@@ -82,6 +82,8 @@ export class PaymentsService {
   ) {}
 
   async createOrGetPaymentOrder(restaurantId: string, kioskId: string, dto: CreatePaymentOrderDto) {
+    const kiosk = await this.prisma.runAsTenant(restaurantId, tx => tx.device.findFirst({ where: { id: kioskId, restaurantId }, select: { id: true, branchId: true } }));
+    if (!kiosk) throw new NotFoundException('Kiosk not found');
     const connection = await this.prisma.runAsTenant(restaurantId, (tx) => tx.restaurantPaymentConnection.findUnique({ where: { restaurantId } }));
 
     const existingOrder = await this.prisma.runAsTenant(restaurantId, (tx) =>
@@ -93,6 +95,7 @@ export class PaymentsService {
 
     if (existingOrder) {
       if (existingOrder.source !== 'KIOSK') throw new ConflictException('This order belongs to another payment channel');
+      if (existingOrder.kioskId !== kioskId) throw new ForbiddenException('This payment belongs to another kiosk');
       const latest = existingOrder.paymentTransactions[0];
       if (existingOrder.status === 'PAID' || (latest && NON_TERMINAL_STATUSES.includes(latest.status))) {
         return this.toOrderResponse(existingOrder, latest);
@@ -132,11 +135,18 @@ export class PaymentsService {
       throw err;
     }
 
-    const order = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({
+    const order = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'kiosk-payment-order:' + restaurantId + ':' + dto.externalOrderId}))`;
+      const prior = await tx.order.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: dto.externalOrderId } } });
+      if (prior) {
+        if (prior.kioskId !== kioskId || prior.source !== 'KIOSK') throw new ForbiddenException('This payment reference belongs to another device or channel');
+        return prior;
+      }
+      return tx.order.create({
         data: {
           restaurantId,
           kioskId,
+          branchId: kiosk.branchId,
           externalOrderId: dto.externalOrderId,
           items: priced.lines as unknown as Prisma.InputJsonValue,
           subtotal: priced.subtotal,
@@ -145,8 +155,8 @@ export class PaymentsService {
           totalAmount: priced.totalAmount,
           status: 'PENDING_PAYMENT'
         }
-      })
-    );
+      });
+    });
 
     const payment = await this.createRazorpayAttempt(order.id, restaurantId, order.totalAmount, order.currency, connection);
     this.prewarmUpiQr(restaurantId, payment.id);
@@ -252,11 +262,14 @@ export class PaymentsService {
   private async createRazorpayAttempt(orderId: string, restaurantId: string, amount: number, currency: string, connection: { commissionOverrideBps: number | null } | null) {
     const { commissionBps, platformAmount, restaurantAmount } = await this.commissionSplitFor(amount, connection, 'KIOSK');
 
-    const payment = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.paymentTransaction.create({
+    const payment = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'kiosk-payment-attempt:' + orderId}))`;
+      const prior = await tx.paymentTransaction.findFirst({ where: { orderId, restaurantId }, orderBy: { createdAt: 'desc' } });
+      if (prior && [...PAID_STATUSES, ...NON_TERMINAL_STATUSES].includes(prior.status)) return prior;
+      return tx.paymentTransaction.create({
         data: { orderId, restaurantId, provider: 'RAZORPAY', providerOrderId: randomUUID(), amount, currency, status: 'PENDING', commissionBps, platformAmount, restaurantAmount }
-      })
-    );
+      });
+    });
     // No separate Razorpay "order" API call happens for the kiosk/QR path — the UPI QR created in createUpiQr
     // below is itself the provider-side artifact, so that event doubles as razorpay_order_created for this path.
     this.logger.log(`event=payment_attempt_created paymentId=${payment.id} orderId=${orderId} restaurantId=${restaurantId} amount=${amount}`);
@@ -325,6 +338,13 @@ export class PaymentsService {
     const connection = await this.prisma.runAsTenant(restaurantId, tx => tx.restaurantPaymentConnection.findFirst({ where: { restaurantId }, select: { status: true } }));
     if (connection?.status !== 'ACTIVE') return { available: false, code: 'COLLECTION_NOT_ACTIVE', message: 'Ask Super Admin to activate payment collection for this restaurant. Razorpay Route is not required for Jamanvaar collection with manual payouts.' };
     return { available: true, code: 'READY', message: 'Verified Razorpay checkout is ready. Guests can pay online when the Online payment switch is on.' };
+  }
+
+  async assertDevicePaymentScope(device: { id: string; type: string; restaurantId: string; branchId: string | null }, paymentId: string) {
+    const payment = await this.prisma.runAsTenant(device.restaurantId, tx => tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId: device.restaurantId }, select: { order: { select: { branchId: true, kioskId: true, kiosk: { select: { branchId: true } } } } } }));
+    if (!payment) throw new NotFoundException('Payment not found');
+    const branch = payment.order.branchId ?? payment.order.kiosk?.branchId;
+    if ((device.branchId && branch !== device.branchId) || (device.type === 'KIOSK' && payment.order.kioskId !== device.id)) throw new NotFoundException('Payment not found');
   }
 
   /** Hosted mobile checkout through the same gateway and payment tables as Kiosk. */
@@ -458,13 +478,13 @@ export class PaymentsService {
     }
   }
 
-  async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {
+  async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date; branchId?: string | null }) {
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const where = { restaurantId, ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {}) };
+      const where: Prisma.PaymentTransactionWhereInput = { restaurantId, ...(filters.branchId ? { order: { OR: [{branchId:filters.branchId},{branchId:null,kiosk:{branchId:filters.branchId}}] } } : {}), ...(filters.from || filters.to ? { createdAt: { ...(filters.from ? { gte: filters.from } : {}), ...(filters.to ? { lte: filters.to } : {}) } } : {}) };
       const [successAgg, failedCount, refunded] = await Promise.all([
         tx.paymentTransaction.aggregate({ where: { ...where, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'] } }, _sum: { amount: true }, _count: true }),
         tx.paymentTransaction.count({ where: { ...where, status: 'FAILED' } }),
-        tx.refund.aggregate({ where: { status: 'SUCCESS', payment: { restaurantId } }, _sum: { amount: true } })
+        tx.refund.aggregate({ where: { status: 'SUCCESS', payment: where }, _sum: { amount: true } })
       ]);
       return {
         grossVolume: successAgg._sum.amount ?? 0,
@@ -594,10 +614,10 @@ export class PaymentsService {
   }
 
   /** The latest online payments for a restaurant, with the two things staff act on: paid-but-unserved and refundable balance. */
-  async tenantRecent(restaurantId: string, limit = 30) {
+  async tenantRecent(restaurantId: string, limit = 30, branchId?: string | null) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findMany({
-        where: { restaurantId },
+        where: { restaurantId, ...(branchId ? { order: { OR: [{branchId},{branchId:null,kiosk:{branchId}}] } } : {}) },
         orderBy: { createdAt: 'desc' },
         take: Math.min(100, Math.max(1, limit)),
         include: { order: { select: { externalOrderId: true } }, refunds: { select: { amount: true, status: true } } }
@@ -626,8 +646,8 @@ export class PaymentsService {
     };
   }
 
-  async tenantStatement(restaurantId: string, date: string | undefined) {
-    return this.prisma.runAsTenant(restaurantId, (tx) => buildDayStatement(tx, restaurantId, date));
+  async tenantStatement(restaurantId: string, date: string | undefined, branchId?: string | null) {
+    return this.prisma.runAsTenant(restaurantId, (tx) => buildDayStatement(tx, restaurantId, date, branchId));
   }
 
   private readonly statusRequests = new Map<string, Promise<{ paymentId: string; orderId: string; status: string; amount: number; currency: string; orderStatus: string }>>();

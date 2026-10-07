@@ -110,7 +110,10 @@ export function DevicesListPage() {
     if (device.isLocked) {
       try {
         await api.post(`/api/v1/devices/${device.id}/unlock`);
-        showToast('Unlock requested. The terminal releases once it checks in.');
+        // Takes effect immediately, server-side — the same guard every device request passes through
+        // stops blocking it at once. It does not need to check in first; that line used to say
+        // otherwise and contradicted the LOCKED badge disappearing from this very table a moment later.
+        showToast(`${device.name ?? device.type} is unlocked. It can reach the cloud again immediately.`);
         reload();
       } catch (err) {
         showToast(err instanceof ApiError ? err.message : 'Unlock failed');
@@ -126,7 +129,7 @@ export function DevicesListPage() {
     setLockPending(true);
     try {
       await api.post(`/api/v1/devices/${lockTarget.id}/lock`, { reason: lockReason });
-      showToast('Terminal locked');
+      showToast(`${lockTarget.name ?? lockTarget.type} is locked. Every cloud request it makes is refused immediately, even if it's offline right now.`);
       setLockTarget(null);
       reload();
     } catch (err) {
@@ -315,7 +318,7 @@ export function DevicesListPage() {
                   <th style={{ padding: '12px 14px' }}>Type</th>
                   <th style={{ padding: '12px 14px' }}>Restaurant &amp; branch</th>
                   <th style={{ padding: '12px 14px' }}>Health</th>
-                  <th style={{ padding: '12px 14px' }}>Lock</th>
+                  <th style={{ padding: '12px 14px' }} title="MDM lock blocks every cloud call this terminal makes (sync, orders, heartbeat) the instant it's set — even if the terminal is offline right now, it takes effect the moment it next connects.">Lock</th>
                   <th style={{ padding: '12px 14px' }}>Last seen</th>
                   <th style={{ padding: '12px 14px' }}>Version</th>
                   <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
@@ -380,7 +383,13 @@ export function DevicesListPage() {
                         <Link to={`/devices/${d.id}`}>
                           <Button variant="ghost" size="sm"><Eye className="w-3.5 h-3.5 mr-1" /> MDM</Button>
                         </Link>
-                        <Button variant="ghost" size="sm" aria-label={d.isLocked ? 'Unlock terminal' : 'Lock terminal'} onClick={() => handleToggleLock(d)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={d.isLocked ? 'Unlock terminal' : 'Lock terminal'}
+                          title={d.isLocked ? 'Unlock: this terminal can reach the cloud again on its next request.' : 'Lock: immediately blocks this terminal from syncing, taking orders or checking in, until unlocked here.'}
+                          onClick={() => handleToggleLock(d)}
+                        >
                           {d.isLocked ? <Unlock className="w-3.5 h-3.5 text-green-600" /> : <Lock className="w-3.5 h-3.5 text-amber-600" />}
                         </Button>
                       </div>

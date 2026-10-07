@@ -9,6 +9,7 @@ import { PUBLISHED_DEMO_QR_TOKENS } from './published-demo-qr-tokens';
 import { menuEntityProblem } from './menu-entity-schemas';
 import { staffVisibleTo } from './entity-authority';
 import { WelcomeDesignsService } from '../platform-settings/welcome-designs.service';
+import { BRANCH_ENTITY_TYPES, BRANCH_FILTER_TYPES } from './branch-entity-scope';
 
 /** What is worth an audit line when a synced record changes: money, tax, staff access and coupon value. Never the PIN hash itself. */
 export function sensitiveChange(entityType: string, before: Record<string, unknown> | null, after: Record<string, unknown>): Record<string, unknown> | null {
@@ -101,11 +102,11 @@ export class EntitySyncService {
       for (let evt of events) {
         await tx.$executeRaw`SAVEPOINT entity_event`;
         try {
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && typeof evt.payload.branchId === 'string' && evt.payload.branchId !== deviceBranchId) {
+          if ((BRANCH_ENTITY_TYPES.has(entityType) || entityType === 'STAFF_USER') && deviceBranchId && typeof evt.payload.branchId === 'string' && evt.payload.branchId !== deviceBranchId) {
             throw new Error('BRANCH_FORBIDDEN: This table belongs to another branch');
           }
           // A branch-owned record pushed by a branch-bound terminal is stamped with that branch, so other branches never receive it.
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
+          if (BRANCH_ENTITY_TYPES.has(entityType) && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deviceBranchId } };
           }
           if (entityType === 'MENU_ITEM' && deviceBranchId && evt.payload.deleted !== true && typeof evt.payload.price === 'number') {
@@ -151,13 +152,21 @@ export class EntitySyncService {
             }
           });
           const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
+          if (entityType === 'STAFF_USER' && typeof evt.payload.branchId !== 'string' && (existingBranch || (!existing && deviceBranchId))) {
+            evt = { ...evt, payload: { ...evt.payload, branchId: existingBranch ?? deviceBranchId } };
+          }
+          const targetBranch = typeof evt.payload.branchId === 'string' ? evt.payload.branchId : existingBranch;
+          if ((BRANCH_ENTITY_TYPES.has(entityType) || entityType === 'STAFF_USER') && targetBranch) {
+            const branch = await tx.branch.findFirst({ where: { id: targetBranch, restaurantId }, select: { id: true } });
+            if (!branch) throw new Error('BRANCH_FORBIDDEN: Branch does not belong to this restaurant');
+          }
           if (welcomeCatalog && evt.payload.deleted !== true) this.welcomeDesigns.validateSelection(evt.payload.welcome, (existing?.payload as any)?.welcome, welcomeCatalog.designs);
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && deviceBranchId && existing && existingBranch !== deviceBranchId) {
+          if ((BRANCH_ENTITY_TYPES.has(entityType) || entityType === 'STAFF_USER') && deviceBranchId && existingBranch && existingBranch !== deviceBranchId) {
             throw new Error('BRANCH_FORBIDDEN: This table is outside this device branch');
           }
           // Minimal deletion payloads must retain ownership, including when an unbound owner removes a branch record.
           const deletionBranch = existingBranch ?? deviceBranchId;
-          if (['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) && evt.payload.deleted === true && deletionBranch && typeof evt.payload.branchId !== 'string') {
+          if ((BRANCH_ENTITY_TYPES.has(entityType) || entityType === 'STAFF_USER') && evt.payload.deleted === true && deletionBranch && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deletionBranch } };
           }
           if (existing && JSON.stringify(existing.payload) === JSON.stringify(evt.payload)) {
@@ -219,7 +228,7 @@ export class EntitySyncService {
     });
 
     if (changed) {
-      this.realtime.publish({ restaurantId, branchId: ['DINING_TABLE', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType) ? deviceBranchId ?? null : null,
+      this.realtime.publish({ restaurantId, branchId: BRANCH_ENTITY_TYPES.has(entityType) ? deviceBranchId ?? null : null,
         kind: `entity:${entityType}`, originDeviceId: deviceId });
     }
     return { results, serverTime: new Date().toISOString() };
@@ -258,7 +267,7 @@ export class EntitySyncService {
   }
 
   async catchUp(device: Device, entityType: SyncableEntityType, since?: string, afterSeq?: number) {
-    return this.catchUpForRestaurant(device.restaurantId, entityType, since, (['DINING_TABLE', 'MENU_ITEM', 'INVENTORY_ITEM', 'RECIPE', 'KIOSK_CONFIGURATION'].includes(entityType)) ? device.branchId : null, device.type, afterSeq);
+    return this.catchUpForRestaurant(device.restaurantId, entityType, since, BRANCH_FILTER_TYPES.has(entityType) ? device.branchId : null, device.type, afterSeq);
   }
 
   /**
@@ -287,7 +296,10 @@ export class EntitySyncService {
     const metadata = { latestSeq, hasMore, serverTime: readStartedAt };
 
     if (entityType === 'STAFF_USER' && deviceType) {
-      const staff = page.filter((e) => staffVisibleTo(deviceType as never, e.payload as Record<string, unknown> | null));
+      const staff = page.filter((e) => {
+        const payload = e.payload as Record<string, unknown> | null;
+        return (!branchId || !payload?.branchId || payload.branchId === branchId) && staffVisibleTo(deviceType as never, payload);
+      });
       return { entities: staff, ...metadata };
     }
     if (entityType === 'MENU_ITEM' && branchId) {
@@ -302,15 +314,17 @@ export class EntitySyncService {
       const applied = page.map((e) => {
         const o = mine.get(e.externalId);
         const p = e.payload as Record<string, unknown> | null;
-        if (!o || !p || p.deleted === true) return e;
-        return { ...e, payload: { ...p, ...(typeof o.price === 'number' ? { price: o.price } : {}), ...(o.isAvailable === false ? { isAvailable: false } : {}) } };
+        if (!p || p.deleted === true) return e;
+        const hidden = Array.isArray(p.branchIds) && p.branchIds.length > 0 && !p.branchIds.includes(branchId);
+        return { ...e, payload: { ...p, ...(hidden ? { deleted: true } : {}), ...(typeof o?.price === 'number' ? { price: o.price } : {}), ...(typeof o?.isAvailable === 'boolean' ? { isAvailable: o.isAvailable } : {}) } };
       });
       return { entities: applied, ...metadata };
     }
+    const allowLegacy = !branchId || !BRANCH_ENTITY_TYPES.has(entityType) || (await this.prisma.runAsTenant(restaurantId, tx => tx.branch.count({ where: { restaurantId } }))) === 1;
     const visible = branchId
       ? page.filter((e) => {
           const b = (e.payload as { branchId?: unknown } | null)?.branchId;
-          return typeof b !== 'string' || b === branchId;
+          return b === branchId || (typeof b !== 'string' && allowLegacy);
         })
       : page;
     return { entities: visible, ...metadata };

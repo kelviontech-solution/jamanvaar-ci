@@ -17,10 +17,11 @@ export class BranchesService {
    * paged in the database, with per-status counts for the whole (unfiltered by status) scope, so the
    * browser never has to load every branch of every restaurant (BUG-047).
    */
-  list(query: { restaurantId?: string; q?: string; status?: string; page?: unknown; pageSize?: unknown } = {}) {
+  list(query: { restaurantId?: string; branchId?:string; q?: string; status?: string; page?: unknown; pageSize?: unknown } = {}) {
     const paging = parsePaging(query);
     const scope = {
       ...(query.restaurantId ? { restaurantId: query.restaurantId } : {}),
+      ...(query.branchId ? { id:query.branchId } : {}),
       ...(query.q?.trim()
         ? {
             OR: [
@@ -69,19 +70,21 @@ export class BranchesService {
     return this.prisma.runAsPlatform(async (tx) => {
       const restaurant = await tx.restaurant.findFirst({ where: { id: dto.restaurantId, deletedAt: null } });
       if (!restaurant) throw new NotFoundException('Restaurant not found');
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'branch-quota:' + dto.restaurantId}))`;
 
-      const [branchCount, activeSub] = await Promise.all([
+      const [branchCount, activeSubscriptions] = await Promise.all([
         tx.branch.count({ where: { restaurantId: dto.restaurantId } }),
-        tx.subscription.findFirst({
-          where: { restaurantId: dto.restaurantId, status: { in: ['TRIAL', 'ACTIVE'] } },
-          include: { plan: true },
-          orderBy: { createdAt: 'desc' }
+        tx.subscription.findMany({
+          where: { restaurantId: dto.restaurantId, status: { in: ['TRIAL', 'ACTIVE'] }, expiresAt: { gt: new Date() } },
+          include: { plan: true }
         })
       ]);
-
-      if (activeSub && branchCount >= activeSub.plan.maxBranches) {
+      // Restaurant and Kiosk subscriptions coexist. A newer, smaller Kiosk
+      // plan must not remove the branch capacity of the Restaurant plan.
+      const capacity = activeSubscriptions.reduce((max, sub) => Math.max(max, sub.plan.maxBranches), 0);
+      if (activeSubscriptions.length && branchCount >= capacity) {
         throw new ConflictException(
-          `Branch limit reached: ${activeSub.plan.name} allows up to ${activeSub.plan.maxBranches} branch(es)`
+          `Branch limit reached: the active plans allow up to ${capacity} branch(es)`
         );
       }
 

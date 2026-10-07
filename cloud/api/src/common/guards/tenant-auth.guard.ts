@@ -66,6 +66,7 @@ export class TenantAuthGuard implements CanActivate {
       if (!resourceApps.some(app => apps.includes(app))) throw new ForbiddenException({ statusCode: 403, code: 'PRODUCT_ACCESS_DENIED', message: 'Your subscription does not enable this application resource.' });
     }
     (request as Request & { tenantUser: typeof user }).tenantUser = user;
+    (request as Request & { tenantDeviceId?: string }).tenantDeviceId = payload.did;
     return true;
   }
 

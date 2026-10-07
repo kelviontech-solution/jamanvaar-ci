@@ -1,0 +1,42 @@
+{
+  "environment": "dedicated local QA database",
+  "compiledProductionService": true,
+  "additionalOrders": 10000,
+  "additionalDevices": 1001,
+  "serviceRequestMs": [
+    198,
+    2337,
+    4098
+  ],
+  "productionAwsMeasured": false,
+  "results": [
+    {
+      "name": "10,000 sales reconcile exactly across all branches and charts",
+      "status": "PASS"
+    },
+    {
+      "name": "partial refunds and null unpaid states retain exact cents",
+      "status": "PASS"
+    },
+    {
+      "name": "fleet totals and fault alerts include devices beyond the detail cap",
+      "status": "PASS"
+    },
+    {
+      "name": "each branch returns its own sales and devices",
+      "status": "PASS"
+    },
+    {
+      "name": "all four order-source filters agree with consolidated totals",
+      "status": "PASS"
+    },
+    {
+      "name": "manager scope cannot request consolidated or foreign branch data",
+      "status": "PASS"
+    },
+    {
+      "name": "three measured aggregate reads each remain below five seconds",
+      "status": "PASS"
+    }
+  ]
+}

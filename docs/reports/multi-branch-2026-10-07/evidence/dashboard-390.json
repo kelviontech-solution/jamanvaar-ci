@@ -1,0 +1,449 @@
+{
+  "title": "JAMANVAAR | Restaurant Admin",
+  "text": "QA Five Branch Restaurant\nRESTAURANT ADMIN\nAhmedabad Flagship Store\nSwitch application\nRestaurant Admin\nKiosk Admin\nWorkspace\nChoose branch\nAll restaurant · overview\nQA Five Branch Restaurant — Main Branch · MAIN\nOutlet 2 · OUT2\nOutlet 3 · OUT3\nOutlet 4 · OUT4\nOutlet 5 · OUT5\nOrders, tables, inventory and devices belong to this branch.\nOPERATIONS\nDashboard\nBilling / Invoices\nOrders\nLive Orders / KDS\nFloor / Tables\nReservations\nKitchen / KOT\nDIGITAL ORDERING\nQR Table Ordering\nON\nMENU & INVENTORY\nMenu & Categories\nCustomisations & Tax\nInventory & Recipes\nPurchasing & Stock Control\nPEOPLE & CASH\nCustomers CRM\nStaff & Roles (RBAC)\nPayments & Split\nOffers & Coupons\nShift & Cash Drawer\nANALYTICS & SYSTEM\nReports & Analytics\nPrinters & Devices\nReceipt & E-Bill\nSync & Devices\nRestaurant Settings\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nEOD Report\nReconciliation\nAssistant\nLog out\nBusiness overview\n\nLoading workspace · Confirmed sales, open payments and device health\n\nToday\nYesterday\nLast 7 days\nLast 30 days\nThis month\nThis year\nCustom dates\nAll sources\nPOS\nCAPTAIN\nKIOSK\nQR\nWHATSAPP\nONLINE\nUpdating…\n\nLoading consolidated data…\n\nGet Your Restaurant Ready\n\n1 of 4 steps complete\n\nNEXT STEP\n\nAdd and publish your menu\n\nAdd categories and dishes so all devices share the same menu.\n\nAdd and publish your menu\nSet up this branch’s tables\nAdd your team\nConnect receipt and kitchen printers\nJAMAN AI",
+  "headings": [
+    "Business overview",
+    "Get Your Restaurant Ready"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Ahmedabad Flagship Store",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Kitchen / KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "DIGITAL ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "MENU & INVENTORY",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "PEOPLE & CASH",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Shift & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "ANALYTICS & SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Updating…",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Dismiss checklist",
+      "disabled": false
+    },
+    {
+      "text": "Add and publish your menu",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Set up this branch’s tables",
+      "aria": null,
+      "title": "",
+      "disabled": true
+    },
+    {
+      "text": "Add your team",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "Connect receipt and kitchen printers",
+      "aria": null,
+      "title": "",
+      "disabled": false
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false
+    }
+  ],
+  "inputs": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "POS_ADMIN",
+          "text": "Restaurant Admin"
+        },
+        {
+          "value": "KIOSK_ADMIN",
+          "text": "Kiosk Admin"
+        }
+      ]
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "placeholder": "Search orders, invoices, dishes, tables...",
+      "name": "",
+      "id": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "admin-branch-workspace",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose branch"
+        },
+        {
+          "value": "all",
+          "text": "All restaurant · overview"
+        },
+        {
+          "value": "0977e62a-60e4-4825-a237-9728b8658281",
+          "text": "QA Five Branch Restaurant — Main Branch · MAIN"
+        },
+        {
+          "value": "132ff406-169d-444d-a992-ca697e766684",
+          "text": "Outlet 2 · OUT2"
+        },
+        {
+          "value": "81b60169-1bf9-4bf5-a9ca-d5621150e26d",
+          "text": "Outlet 3 · OUT3"
+        },
+        {
+          "value": "f41f9f05-27fb-442b-a44c-59b385c39dcf",
+          "text": "Outlet 4 · OUT4"
+        },
+        {
+          "value": "f142fba0-7136-47a6-9fc1-42e03629f9dc",
+          "text": "Outlet 5 · OUT5"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "TODAY",
+          "text": "Today"
+        },
+        {
+          "value": "YESTERDAY",
+          "text": "Yesterday"
+        },
+        {
+          "value": "7_DAYS",
+          "text": "Last 7 days"
+        },
+        {
+          "value": "30_DAYS",
+          "text": "Last 30 days"
+        },
+        {
+          "value": "THIS_MONTH",
+          "text": "This month"
+        },
+        {
+          "value": "THIS_YEAR",
+          "text": "This year"
+        },
+        {
+          "value": "CUSTOM",
+          "text": "Custom dates"
+        }
+      ]
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "placeholder": null,
+      "name": "",
+      "id": "",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All sources"
+        },
+        {
+          "value": "POS",
+          "text": "POS"
+        },
+        {
+          "value": "CAPTAIN",
+          "text": "CAPTAIN"
+        },
+        {
+          "value": "KIOSK",
+          "text": "KIOSK"
+        },
+        {
+          "value": "QR",
+          "text": "QR"
+        },
+        {
+          "value": "WHATSAPP",
+          "text": "WHATSAPP"
+        },
+        {
+          "value": "ONLINE",
+          "text": "ONLINE"
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "overflow": false
+}

@@ -14,6 +14,8 @@ interface Props {
   onStart: (kot: KOTRecord) => void;
   onAllReady: (kot: KOTRecord) => void;
   onServe: (kot: KOTRecord) => void;
+  /** False when this restaurant has no Captain app: then the kitchen is the only one who can ever mark a table order served. */
+  captainHandlesService: boolean;
   onRecall: (kot: KOTRecord) => void;
   onDismiss: (kot: KOTRecord) => void;
   priority: 'NORMAL' | 'URGENT';
@@ -23,13 +25,17 @@ interface Props {
 
 const BTN = 'w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer';
 
-export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, onRecall, onDismiss, priority, onPriority, onReprint }) => {
+export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, captainHandlesService, onRecall, onDismiss, priority, onPriority, onReprint }) => {
   const cancelled = kot.status === 'CANCELLED';
   const isReady = kot.status === 'READY';
   const isServed = kot.status === 'SERVED';
   const isPending = kot.status === 'PENDING' || kot.status === 'ACCEPTED';
   const isPreparing = !cancelled && !isReady && !isServed && !isPending;
   const hasCancelledDish = !cancelled && kot.items.some((i) => i.status === 'CANCELLED');
+  // A table order is handed to a guest by whoever walks it there — the kitchen confirming "served" for a
+  // dine-in ticket it never carried out is exactly the gap Captain's own Food Ready queue exists to close.
+  // A counter/takeaway order (no table) has nobody else to do it, so the kitchen keeps the button for those.
+  const kitchenMayServe = !kot.tableNumber || !captainHandlesService;
   const ticketAllergy = allergyText(kot.orderNotes) || kot.items.some((i) => i.status !== 'CANCELLED' && dishAllergy(i));
   const showCourses = new Set(kot.items.map((i) => i.course).filter(Boolean)).size > 1;
 
@@ -223,9 +229,18 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
             <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Marked ready by mistake? Put it back to cooking">
               <Undo2 className="w-4 h-4" /> Undo
             </button>
-            <button type="button" onClick={() => onServe(kot)} className={`${BTN} bg-gradient-to-r from-jaman-navy to-jaman-darkBorder text-white shadow-md shadow-slate-900/20`}>
-              <CheckCheck className="w-4 h-4 text-emerald-400" /> Served
-            </button>
+            {kitchenMayServe ? (
+              <button type="button" onClick={() => onServe(kot)} className={`${BTN} bg-gradient-to-r from-jaman-navy to-jaman-darkBorder text-white shadow-md shadow-slate-900/20`}>
+                <CheckCheck className="w-4 h-4 text-emerald-400" /> Served
+              </button>
+            ) : (
+              <div
+                className="w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 bg-amber-50 border border-amber-300 text-amber-800"
+                title="Only the captain who delivers this dish to the table marks it served"
+              >
+                <Bell className="w-4 h-4" /> Waiting for captain
+              </div>
+            )}
           </div>
         )}
 

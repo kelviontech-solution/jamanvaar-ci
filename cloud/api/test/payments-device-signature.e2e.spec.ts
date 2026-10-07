@@ -249,18 +249,19 @@ describe('Device-bound kiosk signatures on payment routes', () => {
 
   it('a key-registered POS must also sign payment requests (the guard is not Kiosk-only)', async () => {
     const posToken = await issuePosToken(true);
+    const branchId = (await prisma.runAsTenant(restaurantId, tx => tx.branch.findFirstOrThrow({ where: { restaurantId } }))).id;
     const order = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({ data: { restaurantId, externalOrderId: `sig-pos-${stamp}`, items: [], subtotal: 10000, taxAmount: 0, totalAmount: 10000, status: 'PAID' } })
+      tx.order.create({ data: { restaurantId, branchId, externalOrderId: `sig-pos-${stamp}`, items: [], subtotal: 10000, taxAmount: 0, totalAmount: 10000, status: 'PAID' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_sig_pos_${stamp}`, orderId: order.id, restaurantId, providerOrderId: `pay_sig_pos_${stamp}`, amount: 10000, currency: 'INR', status: 'SUCCESS' } })
     );
     const path = `/api/v1/payments/${payment.id}/refund`;
-    const unsigned = await authed('post', path, posToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x' });
+    const unsigned = await authed('post', path, posToken).send({ amountPaise: 100, method: 'CASH', reason: 'x', requestedBy: 'x' });
     expect(unsigned.status).toBe(401);
     expect(unsigned.body.code).toBe('DEVICE_SIGNATURE_REQUIRED');
 
-    const body = JSON.stringify({ amountPaise: 100, reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
+    const body = JSON.stringify({ amountPaise: 100, method: 'CASH', reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
     const { signature, timestamp } = signPos('POST', path, body);
     const signed = await authed('post', path, posToken).set('x-device-signature', signature).set('x-device-timestamp', timestamp).set('Content-Type', 'application/json').send(body);
     expect(signed.status).toBe(201);
@@ -268,13 +269,14 @@ describe('Device-bound kiosk signatures on payment routes', () => {
 
   it('a POS with no registered key still works unsigned', async () => {
     const posToken = await issuePosToken(false);
+    const branchId = (await prisma.runAsTenant(restaurantId, tx => tx.branch.findFirstOrThrow({ where: { restaurantId } }))).id;
     const order = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({ data: { restaurantId, externalOrderId: `sig-pos-legacy-${stamp}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PAID' } })
+      tx.order.create({ data: { restaurantId, branchId, externalOrderId: `sig-pos-legacy-${stamp}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PAID' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_sig_pos_legacy_${stamp}`, orderId: order.id, restaurantId, providerOrderId: `pay_sig_pos_legacy_${stamp}`, amount: 5000, currency: 'INR', status: 'SUCCESS' } })
     );
-    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 100, reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
+    const res = await authed('post', `/api/v1/payments/${payment.id}/refund`, posToken).send({ amountPaise: 100, method: 'CASH', reason: 'x', requestedBy: 'x', staffSession: await refundManagerSession(app, prisma, posToken) });
     expect(res.status).toBe(201);
   });
 

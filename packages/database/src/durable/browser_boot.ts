@@ -15,7 +15,7 @@ const DB_NAME = 'jamanvaar';
  * once, and wait for it, before the UI renders. If this browser can't do it, the app carries on exactly as
  * before on localStorage and the reason is returned.
  */
-export async function bootDurableStorage(opts: { appId?: string; restaurantId?: string | null } = {}): Promise<DurableBootResult> {
+export async function bootDurableStorage(opts: { appId?: string; restaurantId?: string | null; migrateLegacy?: boolean } = {}): Promise<DurableBootResult> {
   const app = opts.appId?.toLowerCase().replace(/[^a-z0-9_-]/g, '');
   const name = app ? `${DB_NAME}-${app}` : DB_NAME;
   let cluster: ClusterBackend | null = null;
@@ -28,12 +28,23 @@ export async function bootDurableStorage(opts: { appId?: string; restaurantId?: 
     removeItem: (key) => localStorage.removeItem(prefix + key),
     keys: () => Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)!).filter((k) => k?.startsWith(prefix)).map((k) => k.slice(prefix.length))
   };
+  const initializeEmptyScope = (target: DbStorage) => {
+    if (opts.migrateLegacy !== false) return;
+    // An empty branch is a real empty floor plan, never a request for demo
+    // tables. Persist both markers before loadFromStorage can seed them.
+    for (const prefix of JamanvaarDatabase.knownPrefixes()) {
+      if (!target.getItem(`${prefix}tables`)) {
+        target.setItem(`${prefix}tables`, '[]');
+        target.setItem(`${prefix}floor_plan_started_empty`, 'true');
+      }
+    }
+  };
   const attachFallback = () => {
     if (!app) return;
     if (!fallback.getItem('__app_scope_migrated')) {
       let owner: string | null = null;
       try { owner = localStorage.getItem('jamanvaar_tenant_id') ?? JSON.parse(localStorage.getItem('jamanvaar_db_restaurant') || 'null')?.id; } catch { /* legacy store unreadable */ }
-      if (opts.restaurantId && owner === opts.restaurantId) {
+      if (opts.migrateLegacy !== false && opts.restaurantId && owner === opts.restaurantId) {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i)!;
           if (key?.startsWith('jamanvaar_') && !key.startsWith('jamanvaar_app_') && !key.includes('_device_token')) fallback.setItem(key, localStorage.getItem(key)!);
@@ -41,6 +52,7 @@ export async function bootDurableStorage(opts: { appId?: string; restaurantId?: 
       }
       fallback.setItem('__app_scope_migrated', '1');
     }
+    initializeEmptyScope(fallback);
     db.discardUnscopedCache();
     JamanvaarDatabase.attachDurableStorageToAll(fallback);
     KeyValueStore.attach(fallback, { migrateLegacy: false });
@@ -64,9 +76,10 @@ export async function bootDurableStorage(opts: { appId?: string; restaurantId?: 
         new WorkerBackend(new Worker(new URL('./sqlite_worker.ts', import.meta.url), { type: 'module' }) as never, name)
     });
     const storage = await DurableStorage.open(cluster);
+    initializeEmptyScope(storage);
 
     let migrated = 0;
-    if (app && !storage.getItem('__app_scope_migrated')) {
+    if (app && opts.migrateLegacy !== false && !storage.getItem('__app_scope_migrated')) {
       // Copy legacy data only when its ownership matches this app's existing activation.
       // Keep the original database untouched so unsent records remain recoverable.
       const legacyCluster = new ClusterBackend({

@@ -44,7 +44,8 @@ export class StaffApprovalService {
     const rows = await this.prisma.runAsTenant(rid, (tx) => tx.syncedEntity.findMany({ where: { restaurantId: rid, entityType: 'STAFF_USER' }, select: { externalId: true, payload: true } }));
     let matched: FoundStaff | null = null;
     for (const row of rows) {
-      const p = row.payload as { deleted?: unknown; isActive?: unknown; roleId?: unknown; pinHash?: unknown; fullName?: unknown; id?: unknown; pinScope?: unknown } | null;
+      const p = row.payload as { branchId?: unknown; deleted?: unknown; isActive?: unknown; roleId?: unknown; pinHash?: unknown; fullName?: unknown; id?: unknown; pinScope?: unknown } | null;
+      if (device.branchId && p?.branchId && p.branchId !== device.branchId) continue;
       if (!p || p.deleted === true || p.isActive === false || typeof p.roleId !== 'string' || !accept(p.roleId) || typeof p.pinHash !== 'string') continue;
       // The PIN was hashed under the restaurant id the console had at the time: normally the real one, but staff made before the console was
       // bound to its restaurant carry `pinScope` (or the built-in placeholder id).

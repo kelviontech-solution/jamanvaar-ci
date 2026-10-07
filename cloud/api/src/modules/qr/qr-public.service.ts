@@ -132,6 +132,29 @@ export class QrPublicService {
     return { code, restaurant, branch: { id: branch.id, name: branch.name }, settings, entitlement, table };
   }
 
+  /**
+   * A menu-only QR code has no fixed table — the guest types their own table number, which is just a
+   * free-text label until it is matched to the restaurant's actual floor plan (synced from POS/Restaurant
+   * Admin/Captain as DINING_TABLE entities). Only a match inside the same branch, on a table that is not
+   * deleted/inactive/blocked, counts — anything else (a typo, a table this branch has not digitized, a
+   * duplicate number in another branch) leaves the order's tableId unresolved rather than guessing: the
+   * order still succeeds either way, it simply will not show as occupying a table on the floor plan.
+   */
+  private async resolveTableIdByNumber(restaurantId: string, branchId: string, typed: string): Promise<string | null> {
+    const wanted = typed.trim().toLowerCase();
+    if (!wanted) return null;
+    const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE' } })
+    );
+    for (const row of rows) {
+      const payload = row.payload as Record<string, unknown>;
+      if (payload.deleted === true || payload.isActive === false || payload.status === 'BLOCKED') continue;
+      if (typeof payload.branchId === 'string' && payload.branchId !== branchId) continue;
+      if (typeof payload.tableNumber === 'string' && payload.tableNumber.trim().toLowerCase() === wanted) return row.externalId;
+    }
+    return null;
+  }
+
   /** `GET /public/qr/:token`: only what a customer may know. No ids, no internal configuration. */
   async describe(rawToken: string, sessionId?: string) {
     const ctx = await this.resolve(rawToken);
@@ -244,6 +267,12 @@ export class QrPublicService {
       if (orderType === 'DINE_IN') {
         if (!dto.tableNumber) throw new BadRequestException('Please enter your table number.');
         tableLabel = dto.tableNumber;
+        // A menu-only code lets the guest TYPE their table instead of it being fixed by the code
+        // (as TABLE_ORDER mode's tableId above is). Without resolving that typed number against the
+        // restaurant's real floor plan, the order carried only a free-text label and never actually
+        // occupied the table on POS, Restaurant Admin or Captain — the next guest, or a captain
+        // seating a walk-in, could be sent to a table someone was already sitting at.
+        tableId = await this.resolveTableIdByNumber(ctx.restaurant.id, ctx.branch.id, dto.tableNumber);
       }
     }
 

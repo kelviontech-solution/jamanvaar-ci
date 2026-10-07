@@ -685,6 +685,31 @@ describe('QR ordering (SaaS)', () => {
         expect((await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }], { orderType: 'TAKEAWAY' }))).status).toBe(400);
       });
 
+      it('a menu-only order with a table number matching the real floor plan occupies that table, not just a free-text label', async () => {
+        // Another tenant's table sharing the same number must never match (tenant isolation) — created
+        // first, so the assertion below actually proves it was skipped, not merely never looked at.
+        const other = await restaurant('QrOtherTenant', F.qr);
+        const otherBranch = await branch(other.id, 'Other Main', 'OOM');
+        const otherConsole = await activate(other.id, 'POS_ADMIN');
+        await table(otherConsole, 'tbl-ot7', '7', { branchId: otherBranch });
+
+        await as('put', '/api/v1/restaurant/qr/settings', F.A.console).send({ menuOnlyEnabled: true });
+        await table(F.A.console, 'tbl-a7', '7', { branchId: F.A.b1 });
+        const made = await as('post', '/api/v1/restaurant/qr/menu-codes', F.A.console).send({ branchId: F.A.b1, label: 'Menu card 2' });
+        const t = tokenOf(made.body.url);
+
+        const placed = await http().post(`/api/v1/public/qr/${t}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }], { orderType: 'DINE_IN', tableNumber: '7' }));
+        expect(placed.status, JSON.stringify(placed.body)).toBe(201);
+        const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId: placed.body.publicOrderId } }));
+        expect(row).toMatchObject({ tableId: 'tbl-a7', tableLabel: '7' });
+
+        // A typo, or a table this restaurant never digitized, still succeeds — it just never occupies anything.
+        const untracked = await http().post(`/api/v1/public/qr/${t}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }], { orderType: 'DINE_IN', tableNumber: 'no-such-table' }));
+        expect(untracked.status, JSON.stringify(untracked.body)).toBe(201);
+        const untrackedRow = await prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId: untracked.body.publicOrderId } }));
+        expect(untrackedRow).toMatchObject({ tableId: null, tableLabel: 'no-such-table' });
+      });
+
       it('the daily QR order limit stops the next order even under concurrency', async () => {
         const r = await restaurant('QrDaily', F.qr);
         const b = await branch(r.id, 'D Main', 'DDD');

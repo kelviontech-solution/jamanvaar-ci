@@ -133,6 +133,7 @@ export interface KioskSession {
 export interface User {
   id: string;
   restaurantId: string;
+  branchId?: string;
   username: string;
   fullName: string;
   email: string;
@@ -625,6 +626,8 @@ export interface Order {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentTransactionId?: string;
+  /** Rupees actually returned to the guest; retained for partial-refund reporting. */
+  refundAmount?: number;
   /** Operational kitchen urgency; it never changes prices, payment or service status. */
   kitchenPriority?: 'NORMAL' | 'URGENT';
   kitchenPriorityRev?: number;

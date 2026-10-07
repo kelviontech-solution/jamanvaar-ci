@@ -6,6 +6,8 @@ import { DeviceGateOverlay, PlatformNoticeBanner } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
 import './index.css';
 import { resetTerminal, startPlatformNoticePolling } from './cloud/cloudClient';
+import { adminBranchStorageApp,storedAdminBranch } from './adminBranchScope';
+import { KioskConfigurationRepository } from '@jamanvaar/database';
 
 // BUG-145 follow-up: a device credential the cloud no longer recognises is fixed by reconnecting this console
 // again, not by blocking the screen — see DeviceGate's own comment. This is what actually does that unbinding
@@ -18,7 +20,8 @@ DeviceGate.onIdentityInvalid(() => {
 startPlatformNoticePolling();
 
 // The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
-void bootDurableStorage({ appId: 'pos-admin', restaurantId: localStorage.getItem('jamanvaar_cloud_restaurant_id') }).then(() => {
+void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !storedAdminBranch(), restaurantId: localStorage.getItem('jamanvaar_cloud_restaurant_id') }).then(() => {
+  const branch=storedAdminBranch();if(branch&&branch!=='all')KioskConfigurationRepository.bindBranch(branch);
   DeviceGate.reload();
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

@@ -294,7 +294,7 @@ export class DevicesService {
   async setKitchenStation(console: Device, targetId: string, station: string | null) {
     if (console.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can assign a kitchen station');
     return this.prisma.runAsTenant(console.restaurantId, async (tx) => {
-      const target = await tx.device.findFirst({ where: { id: targetId, restaurantId: console.restaurantId } });
+      const target = await tx.device.findFirst({ where: { id: targetId, restaurantId: console.restaurantId, ...(console.branchId ? { branchId: console.branchId } : {}) } });
       if (!target) throw new NotFoundException('Device not found');
       if (target.type !== 'KDS') throw new BadRequestException('Only a KDS screen has a kitchen station');
       const updated = await tx.device.update({ where: { id: target.id }, data: { kitchenStation: station } });
@@ -303,10 +303,10 @@ export class DevicesService {
     });
   }
 
-  async listKiosksForRestaurant(restaurantId: string) {
+  async listKiosksForRestaurant(restaurantId: string, branchId?: string | null) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.device.findMany({
-        where: { restaurantId, type: 'KIOSK', status: { not: 'REVOKED' } },
+        where: { restaurantId, ...(branchId ? { branchId } : {}), type: 'KIOSK', status: { not: 'REVOKED' } },
         select: { id: true, name: true, status: true, lastSeenAt: true, appVersion: true, isLocked: true, lockReason: true, branch: { select: { name: true } } },
         orderBy: { createdAt: 'asc' }
       })

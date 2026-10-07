@@ -218,6 +218,7 @@ export function PlatformSettingsPage() {
           </Card>
 
           <InvoiceSellerCard
+            className="settings-card-wide"
             value={sellerValue}
             onSaved={(message) => {
               setSuccessToast(message);

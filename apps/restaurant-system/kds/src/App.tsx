@@ -20,7 +20,7 @@ import {
   ActivationNoticeBanner,
   ActivationHelpNote, printThermalKotTicket
 } from '@jamanvaar/ui';
-import { SessionPersistence } from '@jamanvaar/business';
+import { SessionPersistence, EntitlementService } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
 import {
   ChefHat,
@@ -222,6 +222,7 @@ export const App: React.FC = () => {
   const _kdsSession = SessionPersistence.load('kds');
   const [isKdsLoggedIn, setIsKdsLoggedIn] = useState<boolean>(_kdsSession !== null);
   const [kdsPin, setKdsPin] = useState('');
+  const [kdsPinBusy, setKdsPinBusy] = useState(false);
   const [kdsStationSelection, setKdsStationSelection] = useState(
     getAssignedStation() || _kdsSession?.stationName || 'ALL'
   );
@@ -366,10 +367,13 @@ export const App: React.FC = () => {
   // nothing — not even a hardcoded PIN, unlike Captain/POS Admin's
   // (already-fixed or already-removed) demo bypasses.
   const handleKdsPinPress = async (digit: string) => {
+    if (kdsPinBusy) return;
     if (kdsPin.length < 4) {
       const next = kdsPin + digit;
       setKdsPin(next);
       if (next.length === 4) {
+        setKdsPinBusy(true);
+        try {
         const candidate = (await verifyPinWithSync(next))?.user;
         // A PIN for a role that does not work the kitchen screen is refused (BUG-118).
         const matchedUser = candidate && StaffRepository.canUseTerminal(candidate.roleId, 'KDS') ? candidate : undefined;
@@ -392,7 +396,12 @@ export const App: React.FC = () => {
         } else {
           setKdsPinError(true);
         }
-        setKdsPin('');
+        } catch (error) {
+          setKdsPinDenied(error instanceof Error ? error.message : 'Could not verify your PIN. Please try again.');
+          setKdsPinError(true);
+        } finally {
+          setKdsPin('');setKdsPinBusy(false);
+        }
       }
     }
   };
@@ -484,6 +493,13 @@ export const App: React.FC = () => {
     return sortForKitchen(picked, id => sortMode === 'PRIORITY' ? db.orders.find(o => o.id === id)?.kitchenPriority : undefined);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stationKots, statusFilter, dismissed, ticketSearch, sortMode]);
+
+  // A table order is only truly "served" once a captain has physically delivered it — the kitchen marking
+  // it served itself (while the plate may still be sitting at the pass going cold) is exactly the gap that
+  // put Captain's own "Food Ready for Delivery" queue there in the first place. This only applies when the
+  // restaurant actually has the Captain app (a paid add-on): without it, nobody else can ever mark a dine-in
+  // ticket served, so the kitchen keeps that ability rather than stranding every table order at "Ready" forever.
+  const captainHandlesService = EntitlementService.checkCaptainAppAccess().allowed;
 
   const toCook = useMemo(() => prepSummary(stationKots), [stationKots]);
   const prepTimeOf = useMemo(() => {
@@ -756,6 +772,7 @@ export const App: React.FC = () => {
                 placeholder="• • • •"
                 className="w-full text-center text-2xl tracking-[0.5em] font-mono py-3.5 px-4 rounded-2xl bg-white border border-jaman-border focus:border-jaman-saffron outline-none text-jaman-navy"
               />
+              {kdsPinBusy && <p role="status" className="text-xs font-bold text-slate-600 text-center">Verifying staff PIN…</p>}
               {kdsPinError && (
                 <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
                   <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
@@ -944,7 +961,7 @@ export const App: React.FC = () => {
         {/* TICKETS */}
         <main data-testid="kds-board" className="kds-board flex-1 p-3 sm:p-5 overflow-y-auto min-h-0 min-w-0">
           <div className="kds-grid gap-3 sm:gap-4 mx-auto items-start">
-            {statusFilter === 'EXPO' && <KdsExpoBoard orders={expoBoard} orderTypeLabel={(t) => ORDER_TYPE_LABEL[t] || t} onServeOrder={serveOrder} />}
+            {statusFilter === 'EXPO' && <KdsExpoBoard orders={expoBoard} orderTypeLabel={(t) => ORDER_TYPE_LABEL[t] || t} onServeOrder={serveOrder} captainHandlesService={captainHandlesService} />}
 
             {statusFilter !== 'EXPO' && filteredKots.map((kot) => {
               const cashier = kot.cashierName ? `${kotTakenByLabel(kot)}: ${kot.cashierName}` : null;
@@ -960,6 +977,7 @@ export const App: React.FC = () => {
                   onStart={(k) => updateStatus(k.id, 'PREPARING')}
                   onAllReady={markAllReady}
                   onServe={(k) => updateStatus(k.id, 'SERVED')}
+                  captainHandlesService={captainHandlesService}
                   onRecall={recallTicket}
                   onDismiss={dismissCancelled}
                   priority={db.orders.find(o => o.id === kot.orderId)?.kitchenPriority || 'NORMAL'}

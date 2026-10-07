@@ -40,7 +40,7 @@ export class DeviceHeartbeatController {
 
   @Get('kiosks')
   kiosks(@CurrentDevice() device: Device) {
-    return this.devices.listKiosksForRestaurant(device.restaurantId);
+    return this.devices.listKiosksForRestaurant(device.restaurantId, device.branchId);
   }
 
   /** The device roster a Branch Core caches so it can authorize devices while offline. Console devices only. */

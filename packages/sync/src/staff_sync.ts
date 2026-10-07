@@ -18,7 +18,7 @@ export function syncStaffUsers(opts: { push: boolean }): Promise<void> {
   pushNext ||= opts.push;
   if (inFlight) { again = true; return inFlight; }
   inFlight = (async () => {
-    do {
+    {
       again = false;
       const push = pushNext; pushNext = false;
       let acknowledged: Record<string, string> = {};
@@ -40,8 +40,17 @@ export function syncStaffUsers(opts: { push: boolean }): Promise<void> {
         }
       }
       KeyValueStore.set(ACK_KEY, JSON.stringify(acknowledged));
-    } while (again);
-  })().finally(() => { inFlight = null; });
+    }
+  })().finally(() => {
+    inFlight = null;
+    // Finish this pass for its callers (including PIN verification). New
+    // invalidations are a separate pass, so frequent background requests
+    // cannot keep a sign-in waiting for an unbounded drain loop.
+    if (again) {
+      again = false;
+      void syncStaffUsers({ push: pushNext }).catch(() => undefined);
+    }
+  });
   return inFlight;
 }
 

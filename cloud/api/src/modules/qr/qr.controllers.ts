@@ -115,19 +115,19 @@ export class QrRestaurantController {
   @Get('overview')
   overview(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
-    return this.qr.overview(device.restaurantId);
+    return this.qr.overview(device.restaurantId, device.branchId);
   }
 
   @Get('branches')
   branches(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
-    return this.qr.listBranches(device.restaurantId);
+    return this.qr.listBranches(device.restaurantId, device.branchId);
   }
 
   @Get('tables')
   tables(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
-    return this.qr.listTables(device.restaurantId);
+    return this.qr.listTables(device.restaurantId, device.branchId);
   }
 
   @Post('tables')
@@ -190,19 +190,19 @@ export class QrRestaurantController {
   @Get('codes/:id/print-data')
   printData(@CurrentDevice() device: Device, @Param('id') id: string) {
     this.qr.assertConsole(device);
-    return this.qr.printData(device.restaurantId, id);
+    return this.qr.printData(device.restaurantId, id, device.branchId);
   }
 
   @Get('orders')
   orders(@CurrentDevice() device: Device, @Query('branchId') branchId?: string, @Query('limit') limit?: string) {
     this.qr.assertConsole(device);
-    return this.qr.listOrders(device.restaurantId, { branchId, limit: limit ? Number(limit) : undefined });
+    return this.qr.listOrders(device.restaurantId, { branchId: this.qr.scopedBranch(device, branchId), limit: limit ? Number(limit) : undefined });
   }
 
   @Get('tables/:tableId/orders')
   tableOrders(@CurrentDevice() device: Device, @Param('tableId') tableId: string) {
     this.qr.assertConsole(device);
-    return this.qr.tableOrders(device.restaurantId, tableId);
+    return this.qr.tableOrders(device.restaurantId, tableId, device.branchId);
   }
 
   @Get('branding')
@@ -221,13 +221,13 @@ export class QrRestaurantController {
   @Get('settings')
   getSettings(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
     this.qr.assertConsole(device);
-    return this.qr.getSettings(device.restaurantId, branchId);
+    return this.qr.getSettings(device.restaurantId, this.qr.scopedBranch(device, branchId));
   }
 
   @Get('settings/payment-readiness')
   paymentReadiness(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
     this.qr.assertConsole(device);
-    return this.qr.paymentReadiness(device.restaurantId, branchId);
+    return this.qr.paymentReadiness(device.restaurantId, this.qr.scopedBranch(device, branchId));
   }
 
   @Put('settings')

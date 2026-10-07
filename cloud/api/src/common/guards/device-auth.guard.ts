@@ -5,6 +5,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { hashOpaqueToken } from '../security/token.util';
 import { RealtimeBus } from '../realtime/realtime-bus';
 import { requiredConsoleApps } from '../security/admin-product-access';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { TENANT_JWT_AUDIENCE, TENANT_JWT_ISSUER, TenantAccessTokenPayload } from '../../modules/tenant-auth/tenant-auth.service';
 
 /**
  * Every device request used to run four queries (device + restaurant + branch, subscriptions, application entitlement) before
@@ -55,7 +58,7 @@ const ALLOWED_WHILE_LOCKED = /^\/api\/v1\/devices\/me(\/|\?|$)/;
  */
 @Injectable()
 export class DeviceAuthGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService, private readonly bus: RealtimeBus) {}
+  constructor(private readonly prisma: PrismaService, private readonly bus: RealtimeBus, private readonly config: ConfigService = new ConfigService()) {}
 
   private deny(kind: 'unauthorized' | 'forbidden', code: DeviceDenialCode, message: string, reason?: string): never {
     const body = { statusCode: kind === 'unauthorized' ? 401 : 403, message, code, ...(reason ? { reason } : {}) };
@@ -165,7 +168,32 @@ export class DeviceAuthGuard implements CanActivate {
       this.deny('forbidden', 'DEVICE_LOCKED', 'This terminal has been locked by your platform administrator.', device.lockReason ?? undefined);
     }
 
-    (request as Request & { device: Device }).device = device as Device;
+    let scopedDevice = device;
+    const requestedBranch = request.headers['x-admin-branch'];
+    const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(request.originalUrl ?? request.url ?? '');
+    const requiresRestaurantOwner = payoutPath && await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } })) > 1;
+    if (requestedBranch !== undefined || requiresRestaurantOwner) {
+      if (requestedBranch !== undefined && (device.type !== 'POS_ADMIN' || typeof requestedBranch !== 'string' || !/^[0-9a-f-]{36}$/i.test(requestedBranch))) throw new ForbiddenException('Invalid admin branch scope');
+      const proof = request.headers['x-owner-authorization'];
+      let claims: TenantAccessTokenPayload;
+      try {
+        if (typeof proof !== 'string') throw new Error('Owner proof required');
+        claims = await new JwtService().verifyAsync<TenantAccessTokenPayload>(proof, { secret: this.config.getOrThrow<string>('JWT_ACCESS_SECRET'), issuer: TENANT_JWT_ISSUER, audience: TENANT_JWT_AUDIENCE });
+      } catch { throw new ForbiddenException({code:'ADMIN_SESSION_REQUIRED',message:'Current owner or branch-manager sign-in is required'}); }
+      if (claims.impersonatedBy || claims.restaurantId !== device.restaurantId || claims.did !== device.id) throw new ForbiddenException('Admin scope does not belong to this device');
+      const authorized = await this.prisma.runAsTenant(device.restaurantId, async tx => {
+        const user = await tx.user.findFirst({ where: { id: claims.sub, restaurantId: device.restaurantId, status: 'ACTIVE' } });
+        if (!user || !['OWNER', 'MANAGER'].includes(user.role)) return false;
+        if (requiresRestaurantOwner && user.role !== 'OWNER') return false;
+        if (requestedBranch === undefined) return true;
+        if (user.role !== 'OWNER' && (user.branchId ?? device.branchId) !== requestedBranch) return false;
+        return Boolean(await tx.branch.findFirst({ where: { id: requestedBranch, restaurantId: device.restaurantId, status: 'ACTIVE' } }));
+      });
+      if (!authorized) throw new ForbiddenException('You cannot manage this branch');
+      // Request scope only: never move the registered terminal or rewrite its historical orders.
+      if (typeof requestedBranch === 'string') scopedDevice = { ...device, branchId: requestedBranch };
+    }
+    (request as Request & { device: Device }).device = scopedDevice as Device;
     return true;
   }
 

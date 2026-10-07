@@ -1,8 +1,9 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { BranchesService } from './branches.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
+import { TenantDashboardService } from '../dashboard/tenant-dashboard.service';
 
 /**
  * A restaurant's own authenticated session listing its own sibling branches
@@ -14,10 +15,11 @@ import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.d
 @Controller('api/v1/tenant/branches')
 @UseGuards(TenantAuthGuard)
 export class TenantBranchesController {
-  constructor(private readonly branches: BranchesService) {}
+  constructor(private readonly branches: BranchesService,private readonly scope:TenantDashboardService) {}
 
   @Get()
-  list(@CurrentTenantUser() user: User) {
-    return this.branches.list({ restaurantId: user.restaurantId });
+  async list(@CurrentTenantUser() user: User,@Req() request:{tenantDeviceId?:string}) {
+    const branchId=await this.scope.branchScope(user,undefined,request.tenantDeviceId);
+    return this.branches.list({ restaurantId: user.restaurantId,...(branchId?{branchId}:{}) });
   }
 }

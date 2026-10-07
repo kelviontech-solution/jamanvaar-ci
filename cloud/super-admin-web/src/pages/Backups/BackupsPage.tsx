@@ -20,6 +20,8 @@ import {
   Download,
   AlertTriangle,
   CheckCircle2,
+  ShieldCheck,
+  Eye,
   Plus
 } from 'lucide-react';
 import './backups.css';
@@ -358,19 +360,18 @@ export function BackupsPage() {
                 <tr>
                   <th>Snapshot ID</th>
                   <th>Restaurant</th>
-                  <th>Device / Origin</th>
-                  <th>Method</th>
-                  <th>Payload Size</th>
+                  <th>Source</th>
+                  <th>Size</th>
                   <th>Created At</th>
                   <th>Status</th>
-                  <th>Integrity Verification</th>
+                  <th>Integrity</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={9}>
+                    <td colSpan={8}>
                       <EmptyState
                         icon={<Database className="w-8 h-8 text-secondary" />}
                         title="No Backups Found"
@@ -398,10 +399,10 @@ export function BackupsPage() {
                         </div>
                       </td>
                       <td>
-                        <Badge tone="neutral">{b.deviceType}</Badge>
-                      </td>
-                      <td>
-                        <span className="text-sm font-medium">{b.method}</span>
+                        <div className="source-cell">
+                          <Badge tone="neutral">{b.deviceType}</Badge>
+                          <span className="text-secondary text-xs">{b.method}</span>
+                        </div>
                       </td>
                       <td className="font-mono text-sm">{formatBytes(b.sizeBytes)}</td>
                       <td className="text-secondary text-sm">
@@ -422,26 +423,34 @@ export function BackupsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="btn-icon-only"
                             disabled={verifyingId === b.id}
                             onClick={() => handleVerifyBackup(b.id)}
+                            title="Verify SHA256 checksum"
+                            aria-label="Verify SHA256 checksum"
                           >
-                            {verifyingId === b.id ? 'Checking…' : 'Verify SHA'}
+                            <ShieldCheck className="w-3.5 h-3.5" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="btn-icon-only"
                             onClick={() => handleOpenRestorePreview(b)}
+                            title="Preview restore"
+                            aria-label="Preview restore"
                           >
-                            Preview restore
+                            <Eye className="w-3.5 h-3.5" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
+                            className="btn-icon-only"
                             disabled={downloadingId === b.id || b.status !== 'COMPLETED'}
-                            icon={<Download className="w-3.5 h-3.5" />}
                             onClick={() => handleDownload(b.restaurantId, b.id)}
+                            title={downloadingId === b.id ? 'Securing…' : 'Download backup'}
+                            aria-label="Download backup"
                           >
-                            {downloadingId === b.id ? 'Securing...' : 'Download'}
+                            <Download className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </td>

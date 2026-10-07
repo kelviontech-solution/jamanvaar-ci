@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCheck, Clock, Flame } from 'lucide-react';
+import { Bell, CheckCheck, Clock, Flame } from 'lucide-react';
 import type { ExpoDish, ExpoOrder } from './kdsLogic';
 import { COURSE_LABEL } from './kdsLogic';
 
@@ -7,6 +7,8 @@ interface Props {
   orders: ExpoOrder[];
   orderTypeLabel: (orderType: string) => string;
   onServeOrder: (order: ExpoOrder) => void;
+  /** False when this restaurant has no Captain app: then the pass is the only one who can ever send a table order out. */
+  captainHandlesService: boolean;
 }
 
 const AGE_STYLE: Record<ExpoOrder['age']['level'], string> = {
@@ -34,7 +36,7 @@ const Dish: React.FC<{ dish: ExpoDish }> = ({ dish }) => (
 );
 
 /** The pass: every order that still has food to bring together, one card per table, with what each station still owes. */
-export const KdsExpoBoard: React.FC<Props> = ({ orders, orderTypeLabel, onServeOrder }) => {
+export const KdsExpoBoard: React.FC<Props> = ({ orders, orderTypeLabel, onServeOrder, captainHandlesService }) => {
   if (orders.length === 0) {
     return (
       <div className="col-span-full text-center py-16" data-testid="kds-expo-empty">
@@ -74,14 +76,23 @@ export const KdsExpoBoard: React.FC<Props> = ({ orders, orderTypeLabel, onServeO
               </p>
             )}
 
-            <button
-              type="button"
-              disabled={!o.allReady}
-              onClick={() => onServeOrder(o)}
-              className={`w-full min-h-[48px] rounded-2xl text-sm font-black transition-all active:scale-95 ${o.allReady ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
-            >
-              {o.allReady ? 'All ready: send out' : 'Not everything is ready yet'}
-            </button>
+            {o.tableNumber && captainHandlesService ? (
+              <div
+                className={`w-full min-h-[48px] rounded-2xl text-sm font-black flex items-center justify-center gap-2 ${o.allReady ? 'bg-amber-50 border border-amber-300 text-amber-800' : 'bg-slate-100 text-slate-400'}`}
+                title="Only the captain who delivers this order to the table marks it served"
+              >
+                {o.allReady ? <><Bell className="w-4 h-4" /> All ready: waiting for captain</> : 'Not everything is ready yet'}
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={!o.allReady}
+                onClick={() => onServeOrder(o)}
+                className={`w-full min-h-[48px] rounded-2xl text-sm font-black transition-all active:scale-95 ${o.allReady ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
+              >
+                {o.allReady ? 'All ready: send out' : 'Not everything is ready yet'}
+              </button>
+            )}
           </section>
         );
       })}

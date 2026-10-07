@@ -5,7 +5,6 @@ import { OrderType } from '@jamanvaar/types';
 import { db, InventoryRepository, CustomerRepository } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, sound } from '@jamanvaar/ui';
 import { PosOrderNotesModal } from './PosOrderNotesModal';
-import { PosDiscountModal } from './PosDiscountModal';
 import { PosCustomerSearchDrawer } from '../customers/PosCustomerSearchDrawer';
 import { PosRepeatOrderModal } from '../orders/PosRepeatOrderModal';
 
@@ -717,9 +716,10 @@ export const PosCart: React.FC = () => {
         </div>
       </div>
 
-      {/* Modals & Drawers — PosHoldModal now mounts globally in App.tsx so its
-          F8 shortcut works from every tab, not just this one. */}
-      <PosDiscountModal isOpen={isDiscountModalOpen} onClose={() => setIsDiscountModalOpen(false)} />
+      {/* Modals & Drawers — PosHoldModal and PosDiscountModal now mount globally in App.tsx: PosHoldModal
+          so its F8 shortcut works from every tab, PosDiscountModal because this component's own root is
+          a flex item with an explicit z-index, which traps a fixed/z-50 descendant inside its local
+          stacking layer, letting PosSidebar's z-20 paint over the "dimmed" backdrop (see App.tsx). */}
       <PosOrderNotesModal isOpen={notesModalOpen} onClose={() => setNotesModalOpen(false)} />
       <PosCustomerSearchDrawer
         isOpen={customerDrawerOpen}

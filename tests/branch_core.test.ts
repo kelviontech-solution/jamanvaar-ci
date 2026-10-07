@@ -288,6 +288,17 @@ describe('Branch Core: multi-device business rules', () => {
     expect(bal.body[0]).toMatchObject({ itemId: 'paneer', netQuantity: -13, movementCount: 2 });
   });
 
+  it('public kiosk and kitchen credentials cannot read or alter the stock ledger', async () => {
+    h = await start();
+    for (const id of ['kiosk1', 'kds1', 'captain1']) {
+      expect((await h.call(tok(id), 'GET', '/api/v1/inventory/balances')).status).toBe(403);
+      expect((await h.call(tok(id), 'GET', '/api/v1/inventory/movements')).status).toBe(403);
+      expect((await h.call(tok(id), 'POST', '/api/v1/inventory/movements', { movements: [] })).status).toBe(403);
+    }
+    expect((await h.call(tok('kiosk1'), 'GET', '/api/v1/entity-sync/STAFF_USER')).body.entities).toEqual([]);
+    expect((await h.call(tok('admin'), 'GET', '/api/v1/entity-sync/UNKNOWN')).status).toBe(400);
+  });
+
   it('order and KOT numbers leased to different terminals never overlap, and continue after a restart', async () => {
     const file = join(dir, 'num.sqlite3');
     h = await start({ file });

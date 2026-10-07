@@ -8,4 +8,10 @@ describe('QR tables use the existing floor lifecycle',()=>{
  it('completing one of multiple table orders keeps the table occupied until all are completed',()=>{const a=add('qr-a'),b=add('qr-b');TableRepository.reconcileQrTableOrders();a.orderStatus='COMPLETED';TableRepository.releaseSettledTables();TableRepository.reconcileQrTableOrders();expect(db.tables[0].currentOrderId).toBe(b.id);b.orderStatus='COMPLETED';TableRepository.releaseSettledTables();TableRepository.reconcileQrTableOrders();expect(db.tables[0]).toMatchObject({status:'AVAILABLE',currentOrderId:undefined});});
  it('does not replace an active Captain order or unblock a manually blocked table',()=>{const active=add('captain-a');active.source_type='CAPTAIN';db.tables[0].currentOrderId=active.id;add('qr-b');expect(TableRepository.reconcileQrTableOrders()).toBe(0);db.tables[0].currentOrderId=undefined;db.tables[0].status='BLOCKED';expect(TableRepository.reconcileQrTableOrders()).toBe(0);});
  it('table identity prevents same-number tables in another branch receiving the order',()=>{add('qr-other','NEW','another-branch-table');expect(TableRepository.reconcileQrTableOrders()).toBe(0);});
+
+ // A guest choosing "Dine In" + a table on the self-order kiosk never touched db.tables either — the
+ // kiosk's own checkout only ever created the order, so every other screen (POS, Restaurant Admin,
+ // Captain) kept showing that table "Available" while a guest actually sat there with an open order.
+ it('a kiosk dine-in order occupies its table the same way a QR table order does',()=>{const k=add('kiosk-a','NEW');k.source_type='KIOSK';expect(TableRepository.reconcileQrTableOrders()).toBe(1);expect(db.tables[0]).toMatchObject({status:'OCCUPIED',currentOrderId:'kiosk-a'});});
+ it('a kiosk takeaway order (no table service) never occupies a table',()=>{const t=add('kiosk-takeaway','NEW');t.source_type='KIOSK';t.orderType='TAKEAWAY';expect(TableRepository.reconcileQrTableOrders()).toBe(0);expect(db.tables[0].status).toBe('AVAILABLE');});
 });

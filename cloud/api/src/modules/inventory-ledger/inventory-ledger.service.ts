@@ -50,6 +50,10 @@ export class InventoryLedgerService {
           continue;
         }
         const m = parsed.data;
+        if (device.branchId && m.branchId && m.branchId !== device.branchId) {
+          results.push({ movementId: m.movementId, status: 'error', error: 'BRANCH_FORBIDDEN: Inventory belongs to another branch' });
+          continue;
+        }
         let branchId: string | null = device.branchId;
         if (!device.branchId && m.branchId) {
           const branch = await tx.branch.findFirst({ where: { id: m.branchId, restaurantId: device.restaurantId }, select: { id: true } });
@@ -58,6 +62,14 @@ export class InventoryLedgerService {
             continue;
           }
           branchId = branch.id;
+        }
+        const prior = await tx.inventoryMovement.findFirst({ where: { restaurantId: device.restaurantId, movementId: m.movementId } });
+        const item = await tx.syncedEntity.findFirst({ where: { restaurantId: device.restaurantId, entityType: 'INVENTORY_ITEM', externalId: m.itemId }, select: { payload: true } });
+        const itemBranch = (item?.payload as { branchId?: string } | null)?.branchId;
+        const order = m.orderId ? await tx.syncedOrder.findFirst({ where: { restaurantId: device.restaurantId, externalOrderId: m.orderId }, select: { branchId: true } }) : null;
+        if ((prior && prior.branchId !== branchId) || (itemBranch && itemBranch !== branchId) || (order?.branchId && order.branchId !== branchId)) {
+          results.push({ movementId: m.movementId, status: 'error', error: 'BRANCH_FORBIDDEN: Movement, item and order must belong to this branch' });
+          continue;
         }
         const seq = await nextSyncSequence(tx, device.restaurantId);
         const inserted = await tx.$executeRaw`

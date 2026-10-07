@@ -35,7 +35,7 @@ export class PaymentOrdersController {
     if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the payments summary');
     }
-    return this.payments.tenantSummary(device.restaurantId, { from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
+    return this.payments.tenantSummary(device.restaurantId, { branchId: device.branchId, from: from ? new Date(from) : undefined, to: to ? new Date(to) : undefined });
   }
 
   @Get('tenant-recent')
@@ -43,7 +43,7 @@ export class PaymentOrdersController {
     if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only Kiosk Admin or POS Admin can list the restaurant\'s payments');
     }
-    return this.payments.tenantRecent(device.restaurantId, Number(limit) || 30);
+    return this.payments.tenantRecent(device.restaurantId, Number(limit) || 30, device.branchId);
   }
 
   @Get('tenant-statement')
@@ -51,7 +51,7 @@ export class PaymentOrdersController {
     if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only Kiosk Admin or POS Admin can read the day statement');
     }
-    return this.payments.tenantStatement(device.restaurantId, date);
+    return this.payments.tenantStatement(device.restaurantId, date, device.branchId);
   }
 
   /** Gross collection, Jamanvaar's fee, net payable, and how much of that is still pending payout vs already paid. */
@@ -74,12 +74,14 @@ export class PaymentOrdersController {
   @Throttle({ paymentStatus: { limit: 120, ttl: 60_000, getTracker: deviceTracker } })
   @Get(':paymentId/status')
   async getStatus(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    await this.payments.assertDevicePaymentScope(device, paymentId);
     return this.payments.getPaymentStatus(device.restaurantId, paymentId);
   }
 
   @Throttle({ paymentQr: { limit: 20, ttl: 60_000, getTracker: deviceTracker } })
   @Post(':paymentId/qr')
   async createQr(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    await this.payments.assertDevicePaymentScope(device, paymentId);
     if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN') {
       throw new ForbiddenException('Only a Kiosk device can show a payment QR');
     }
@@ -88,6 +90,7 @@ export class PaymentOrdersController {
 
   @Post(':paymentId/kot-claim')
   async claimKitchenTicket(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    await this.payments.assertDevicePaymentScope(device, paymentId);
     if (device.type !== 'KIOSK') {
       throw new ForbiddenException('Only a kiosk can claim a kitchen ticket');
     }
@@ -96,6 +99,7 @@ export class PaymentOrdersController {
 
   @Post(':paymentId/fulfilled')
   async fulfilled(@Param('paymentId') paymentId: string, @CurrentDevice() device: Device) {
+    await this.payments.assertDevicePaymentScope(device, paymentId);
     if (device.type !== 'KIOSK' && device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('This device cannot mark a payment fulfilled');
     }
@@ -107,6 +111,7 @@ export class PaymentOrdersController {
   @UseGuards(RefundAuthorizationGuard)
   @UsePipes(new ZodValidationPipe(createRefundSchema))
   async refund(@Param('paymentId') paymentId: string, @Body() body: CreateRefundDto, @CurrentDevice() device: Device, @Req() request: { refundActor: string; refundActorId: string }) {
+    await this.payments.assertDevicePaymentScope(device, paymentId);
     if (device.type !== 'POS' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') {
       throw new ForbiddenException('Only POS, POS Admin or Kiosk Admin can initiate a refund');
     }

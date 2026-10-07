@@ -23,6 +23,11 @@ describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
     expect(JSON.stringify(payload)).not.toContain(issuedPin);
   });
 
+  it('retains branch membership when a pulled staff record is edited and sent again', () => {
+    StaffRepository.applyRemoteUser({id:'branch-chef',branchId:'branch-a',fullName:'Chef',roleId:'role-chef',pinHash:'pinv2:salt:hash',isActive:true});
+    expect(StaffRepository.toSyncPayload(db.users.find(u=>u.id==='branch-chef')!).branchId).toBe('branch-a');
+  });
+
   it('a remote user is created locally on first pull, and its PIN works', async () => {
     const remote = { id: 'usr-remote-1', username: 'poojashah', fullName: 'Pooja Shah', email: '', phone: '', roleId: 'role-manager', isActive: true, pinHash: 'pinv1:aabbccddeeff0011', createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z' };
 

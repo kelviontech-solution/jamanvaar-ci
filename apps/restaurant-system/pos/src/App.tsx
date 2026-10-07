@@ -26,6 +26,7 @@ import { PosSettingsView } from './components/settings/PosSettingsView';
 import { PosInventoryView } from './components/inventory/PosInventoryView';
 import { PosPaymentModal } from './components/payment/PosPaymentModal';
 import { PosHoldModal } from './components/cart/PosHoldModal';
+import { PosDiscountModal } from './components/cart/PosDiscountModal';
 import { PosInstantBillConfirmationModal } from './components/payment/PosInstantBillConfirmationModal';
 import { PosThermalReceiptModal } from './components/receipt/PosThermalReceiptModal';
 import { PosPrintQueueModal } from './components/receipt/PosPrintQueueModal';
@@ -77,7 +78,9 @@ export const App: React.FC = () => {
     setIsShiftModalOpen,
     setIsChatbotOpen,
     restoreSession,
-    cart
+    cart,
+    isDiscountModalOpen,
+    setIsDiscountModalOpen
   } = usePosStore();
 
   // Restore session state on mount
@@ -425,6 +428,14 @@ export const App: React.FC = () => {
       <PosPaymentModal />
       {/* Mounted globally (not tab-scoped) so F8 works from any tab, not just Menu. */}
       <PosHoldModal />
+      {/* Mounted here, not inside PosCart, for the same reason PosHoldModal already is: PosCart's own
+          root div is a flex item with an explicit z-index (z-10), which — per the CSS flex-item
+          z-index rule — makes it a stacking context of its own even though it is not positioned. A
+          fixed, z-50 modal rendered as its descendant still nests INSIDE that z-10 layer for paint
+          order, so PosSidebar's z-20 (a sibling, not a descendant) painted over it: the category
+          sidebar, and even PosCart's own header/cart list, stayed visible above the "dimmed" backdrop
+          instead of being covered by it. Rendering from here, outside PosCart entirely, sidesteps it. */}
+      <PosDiscountModal isOpen={isDiscountModalOpen} onClose={() => setIsDiscountModalOpen(false)} />
       <PosInstantBillConfirmationModal />
       <PosThermalReceiptModal />
       <PosPrintQueueModal />

@@ -1,0 +1,226 @@
+{
+  "recordedAt": "2026-10-07T17:46:19.595Z",
+  "scope": "repository implementation and isolated QA; not deployed",
+  "browser": {
+    "ownerScenarios": 7,
+    "ownerRunFinalFailure": {
+      "name": "Two KDS screens share a branch ticket and Ready/Served updates; another branch cannot see it",
+      "status": "FAIL",
+      "error": "POST /api/v1/activation-keys: 500: {\"statusCode\":500,\"message\":\"Internal server error\"}"
+    },
+    "kds": [
+      {
+        "name": "Two KDS screens share a branch ticket and Ready/Served updates; another branch cannot see it",
+        "status": "PASS",
+        "ms": 15914,
+        "evidence": {
+          "sameBranchScreens": 2,
+          "foreignBranchScreens": 1,
+          "arrivalMs": 1602,
+          "kitchenServedBeforeSettlement": true,
+          "counterPaymentPreserved": true,
+          "completedAfterPosSettlement": true
+        }
+      }
+    ],
+    "kdsPageErrors": []
+  },
+  "compiledDashboard": {
+    "environment": "dedicated local QA database",
+    "compiledProductionService": true,
+    "additionalOrders": 10000,
+    "additionalDevices": 1001,
+    "serviceRequestMs": [
+      198,
+      2337,
+      4098
+    ],
+    "productionAwsMeasured": false,
+    "results": [
+      {
+        "name": "10,000 sales reconcile exactly across all branches and charts",
+        "status": "PASS"
+      },
+      {
+        "name": "partial refunds and null unpaid states retain exact cents",
+        "status": "PASS"
+      },
+      {
+        "name": "fleet totals and fault alerts include devices beyond the detail cap",
+        "status": "PASS"
+      },
+      {
+        "name": "each branch returns its own sales and devices",
+        "status": "PASS"
+      },
+      {
+        "name": "all four order-source filters agree with consolidated totals",
+        "status": "PASS"
+      },
+      {
+        "name": "manager scope cannot request consolidated or foreign branch data",
+        "status": "PASS"
+      },
+      {
+        "name": "three measured aggregate reads each remain below five seconds",
+        "status": "PASS"
+      }
+    ]
+  },
+  "builds": [
+    {
+      "workspace": "pos-admin",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 34426,
+      "log": "logs/multi-branch-final-build-pos-admin.log"
+    },
+    {
+      "workspace": "pos",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 27916,
+      "log": "logs/multi-branch-final-build-pos.log"
+    },
+    {
+      "workspace": "captain",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 13620,
+      "log": "logs/multi-branch-final-build-captain.log"
+    },
+    {
+      "workspace": "kds",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 11492,
+      "log": "logs/multi-branch-final-build-kds.log"
+    },
+    {
+      "workspace": "kiosk-user",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 19986,
+      "log": "logs/multi-branch-final-build-kiosk-user.log"
+    },
+    {
+      "workspace": "qr-guest",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 6558,
+      "log": "logs/multi-branch-final-build-qr-guest.log"
+    },
+    {
+      "workspace": "super-admin-web",
+      "status": "PASS",
+      "exitCode": 0,
+      "ms": 23617,
+      "log": "logs/multi-branch-final-build-super-admin-web.log"
+    }
+  ],
+  "apiBuild": {
+    "status": "PASS",
+    "log": "logs/multi-branch-final-api-build.log"
+  },
+  "regressionChecks": [
+    {
+      "cases": 21,
+      "status": "PASS",
+      "scope": "staff PIN/cross-device/coalescer, branch cache, order outbox",
+      "log": "logs/multi-branch-final-bounded-tests.log",
+      "note": "The same run also had one Core timeout; use the separate Core rerun."
+    },
+    {
+      "cases": 24,
+      "status": "PASS",
+      "scope": "Branch Core isolated rerun",
+      "log": "logs/multi-branch-final-core-tests.log"
+    },
+    {
+      "cases": 97,
+      "status": "PASS",
+      "scope": "API security/QR/entity/device/auth/inventory regressions",
+      "log": "logs/multi-branch-regression.log"
+    },
+    {
+      "cases": 67,
+      "status": "PASS",
+      "scope": "Core outage/operations/storage",
+      "log": "logs/multi-branch-completion-core.log"
+    },
+    {
+      "cases": 42,
+      "status": "PASS",
+      "scope": "Captain/KDS/QR role regressions",
+      "log": "logs/multi-branch-role-regression.log"
+    },
+    {
+      "cases": 35,
+      "status": "PASS",
+      "scope": "refund/outbox regressions",
+      "log": "logs/multi-branch-refund-tests.log"
+    }
+  ],
+  "limitations": [
+    "Test counts overlap; do not sum into a unique total.",
+    "Earlier scale/API and combined browser timeout failures remain recorded; compiled dashboard and isolated KDS reruns passed.",
+    "Provider payments simulated; AWS, physical printers, production LAN and mobile UPI handoff unverified.",
+    "Production migrations/deployment not performed."
+  ],
+  "migration": "20261007160000_branch_membership_constraints",
+  "finalApiAcceptance": {
+    "cases": 39,
+    "status": "PASS",
+    "files": [
+      "multi-branch-dashboard.e2e.spec.ts",
+      "order-sync-payload.e2e.spec.ts"
+    ],
+    "log": "logs/multi-branch-final-acceptance-api.log"
+  },
+  "finalHttpPerformance": {
+    "environment": "isolated local database",
+    "recordedAt": "2026-10-07T17:46:00.948Z",
+    "additionalOrders": 10000,
+    "additionalDevices": 1001,
+    "dashboardRequestMs": [
+      152,
+      131,
+      134
+    ],
+    "underFiveSecondLimit": true,
+    "canonicalNetSales": 10500,
+    "operationalBranchFanoutMs": [
+      128.70110000000022
+    ],
+    "fullFlowTimings": [
+      {
+        "source": "POS",
+        "commitMs": 19
+      },
+      {
+        "source": "CAPTAIN",
+        "commitMs": 19
+      },
+      {
+        "source": "KIOSK",
+        "commitMs": 17
+      },
+      {
+        "source": "QR",
+        "commitMs": 67
+      },
+      {
+        "phase": "KDS ready and served to POS/Captain/Kiosk/QR",
+        "roundTripMs": 205
+      }
+    ],
+    "devicesResponseCappedAt": 1000,
+    "aggregateTotalsIncludeAllDevices": true,
+    "productionAwsMeasured": false
+  },
+  "migrationChecks": {
+    "cases": 8,
+    "status": "PASS",
+    "log": "logs/multi-branch-final-migration.log"
+  }
+}

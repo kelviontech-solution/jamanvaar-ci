@@ -5,6 +5,8 @@ import { mergeOrderItems, paymentViolation } from './rules';
 import { canonicalCommand } from '../../sync/src/command_signing';
 import { kioskConfigurationSchema } from '../../../cloud/api/src/modules/entity-sync/kiosk-configuration-schema';
 import { requiredConsoleApps } from '../../../cloud/api/src/common/security/admin-product-access';
+import { BRANCH_ENTITY_TYPES } from '../../../cloud/api/src/modules/entity-sync/branch-entity-scope';
+import { mayWrite, mayRead, staffVisibleTo } from '../../../cloud/api/src/modules/entity-sync/entity-authority';
 
 /** Version of the shared sync protocol this core speaks (bump on any wire-format change). */
 export const SYNC_PROTOCOL_VERSION = 1;
@@ -97,6 +99,7 @@ const movementSchema = z.object({
   quantityDelta: z.number().finite(),
   unit: z.string().min(1).max(32),
   orderId: z.string().max(128).optional(),
+  branchId: z.string().max(128).optional(),
   reason: z.string().max(500).default(''),
   occurredAt: z.string()
 });
@@ -363,6 +366,10 @@ export class BranchCore {
           continue;
         }
         const m = parsed.data;
+        if (m.branchId && m.branchId !== this.cfg.branchId) {
+          results.push({movementId:m.movementId,status:'error',error:'WRONG_BRANCH: Inventory belongs to another branch'});
+          continue;
+        }
         if (this.store.get('SELECT 1 FROM movements WHERE movement_id = ?', m.movementId)) {
           results.push({ movementId: m.movementId, status: 'ok', duplicate: true });
           continue;
@@ -420,6 +427,7 @@ export class BranchCore {
   // ------------------------------------------------------------------ generic entities (menu, staff, tables ...)
 
   pushEntities(device: { id: string; type?: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any> }>, origin: 'device' | 'cloud' = 'device') {
+    if (origin === 'device' && device.type && !mayWrite(type as never,device.type as never)) throw new CoreError(403,'FORBIDDEN',`This device may not write ${type}`);
     if (type === 'KIOSK_CONFIGURATION') {
       if (origin === 'device' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') throw new CoreError(403, 'FORBIDDEN', 'Only a restaurant console can edit kiosk configuration');
       for (const event of events) {
@@ -432,13 +440,19 @@ export class BranchCore {
         }
       }
     }
-    const results: Array<{ externalId: string; status: 'ok' | 'error'; syncVersion?: number }> = [];
+    const results: Array<{ externalId: string; status: 'ok' | 'error'; syncVersion?: number; error?: string }> = [];
     let changed = false;
     const now = this.now();
     this.store.transaction(() => {
       for (const e of events) {
         const existing = this.store.get<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND external_id = ?', type, e.externalId);
         const existingPayload = existing ? JSON.parse(existing.payload) : null;
+        if ((BRANCH_ENTITY_TYPES.has(type) || type === 'STAFF_USER') && ((e.payload.branchId && e.payload.branchId !== this.cfg.branchId) || (existingPayload?.branchId && existingPayload.branchId !== this.cfg.branchId))) {
+          results.push({externalId:e.externalId,status:'error',error:'WRONG_BRANCH: Entity belongs to another branch'});
+          continue;
+        }
+        if (BRANCH_ENTITY_TYPES.has(type) && !e.payload.branchId) e.payload={...e.payload,branchId:this.cfg.branchId};
+        if (type === 'STAFF_USER' && !e.payload.branchId && (existingPayload?.branchId || (!existing && origin === 'device'))) e.payload={...e.payload,branchId:existingPayload?.branchId ?? this.cfg.branchId};
         // A deletion is sticky: a device holding an old copy can never bring the record back.
         if (existingPayload?.deleted === true && e.payload.deleted !== true) {
           results.push({ externalId: e.externalId, status: 'ok', syncVersion: existing!.sync_version });
@@ -464,14 +478,15 @@ export class BranchCore {
     return { results, serverTime: new Date(now).toISOString() };
   }
 
-  pullEntities(type: string, since?: string, afterSeq?: number) {
+  pullEntities(type: string, since?: string, afterSeq?: number, deviceType?: string) {
+    if (deviceType && !mayRead(type as never,deviceType as never)) throw new CoreError(403,'FORBIDDEN',`This device may not read ${type}`);
     const sinceMs = since ? Date.parse(since) || 0 : 0;
     const rows = afterSeq !== undefined
       ? this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND seq > ? ORDER BY seq ASC LIMIT 501', type, afterSeq)
       : this.store.all<Record<string, any>>('SELECT * FROM entities WHERE entity_type = ? AND updated_at > ? ORDER BY updated_at ASC, external_id ASC LIMIT 501', type, sinceMs);
     const page = rows.slice(0, 500);
     return {
-      entities: page.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), updatedAt: new Date(r.updated_at).toISOString() })),
+      entities: page.map((r) => ({ externalId: r.external_id, payload: JSON.parse(r.payload), updatedAt: new Date(r.updated_at).toISOString() })).filter(e=>!deviceType||type!=='STAFF_USER'||staffVisibleTo(deviceType as never,e.payload)),
       latestSeq: page.length ? page[page.length - 1].seq : afterSeq ?? 0, hasMore: rows.length > 500,
       serverTime: new Date(this.now()).toISOString()
     };

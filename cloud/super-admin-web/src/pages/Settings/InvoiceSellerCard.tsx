@@ -25,7 +25,7 @@ const FIELDS = [
 type Values = Record<(typeof FIELDS)[number]['key'], string>;
 
 /** The company that issues invoices and receipts. Everything here is printed on them, and the state drives the GST split. */
-export function InvoiceSellerCard({ value, onSaved }: { value: Record<string, string> | null; onSaved: (message: string) => void }) {
+export function InvoiceSellerCard({ value, onSaved, className = '' }: { value: Record<string, string> | null; onSaved: (message: string) => void; className?: string }) {
   const [form, setForm] = useState<Values | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -53,7 +53,7 @@ export function InvoiceSellerCard({ value, onSaved }: { value: Record<string, st
   if (!form) return null;
 
   return (
-    <Card className="settings-card">
+    <Card className={`settings-card ${className}`}>
       <div className="settings-card-header">
         <div className="settings-card-icon">
           <Receipt className="w-5 h-5" />

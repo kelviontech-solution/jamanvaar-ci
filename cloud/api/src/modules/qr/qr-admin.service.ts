@@ -98,7 +98,7 @@ export class QrAdminService {
 
   // ------------------------------------------------------------------ tables and codes
 
-  async listTables(restaurantId: string) {
+  async listTables(restaurantId: string, branchId?: string | null) {
     const { tables, codes, branches } = await this.prisma.runAsTenant(restaurantId, async (tx) => ({
       tables: await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE' }, select: { externalId: true, payload: true } }),
       codes: await tx.qrCode.findMany({ where: { restaurantId }, orderBy: { createdAt: 'desc' } }),
@@ -132,6 +132,7 @@ export class QrAdminService {
             : null
         };
       })
+      .filter(t => !branchId || t.branchId === branchId)
       .sort((a, b) => a.displayNumber.localeCompare(b.displayNumber, undefined, { numeric: true }));
   }
 
@@ -139,7 +140,7 @@ export class QrAdminService {
   async createTable(device: Device, dto: CreateTable) {
     const restaurantId = device.restaurantId;
     return this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const branchId = await this.resolveBranch(tx, restaurantId, dto.branchId, null);
+      const branchId = await this.resolveBranch(tx, restaurantId, this.scopedBranch(device, dto.branchId), null);
       const live = (await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE' }, select: { payload: true } })).map((r) => r.payload as Record<string, unknown>).filter((p) => isObject(p) && p.deleted !== true);
       if (live.some((p) => String(p.tableNumber ?? '').toLowerCase() === dto.tableNumber.toLowerCase() && (p.branchId === undefined || p.branchId === branchId))) throw new ConflictException(`Table ${dto.tableNumber} already exists in this branch.`);
       const id = `tbl-${Date.now().toString(36)}-${randomBytes(4).toString('hex')}`;
@@ -156,7 +157,7 @@ export class QrAdminService {
     const out = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const row = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'DINING_TABLE', externalId: tableId } } });
       const current = isObject(row?.payload) && (row!.payload as Record<string, unknown>).deleted !== true ? (row!.payload as Record<string, unknown>) : null;
-      if (!row || !current) throw new NotFoundException('That table does not exist.');
+      if (!row || !current || (device.branchId && current.branchId !== device.branchId)) throw new NotFoundException('That table does not exist.');
       if (dto.tableNumber && dto.tableNumber.toLowerCase() !== String(current.tableNumber ?? '').toLowerCase()) {
         const others = (await tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE', NOT: { id: row.id } }, select: { payload: true } })).map((r) => r.payload as Record<string, unknown>);
         if (others.some((p) => isObject(p) && p.deleted !== true && String(p.tableNumber ?? '').toLowerCase() === dto.tableNumber!.toLowerCase() && (p.branchId ?? null) === (current.branchId ?? null))) throw new ConflictException(`Table ${dto.tableNumber} already exists in this branch.`);
@@ -172,8 +173,13 @@ export class QrAdminService {
     return out;
   }
 
-  async listBranches(restaurantId: string) {
-    return this.prisma.runAsTenant(restaurantId, (tx) => tx.branch.findMany({ where: { restaurantId }, select: { id: true, name: true, status: true }, orderBy: { name: 'asc' } }));
+  async listBranches(restaurantId: string, branchId?: string | null) {
+    return this.prisma.runAsTenant(restaurantId, (tx) => tx.branch.findMany({ where: { restaurantId, ...(branchId ? { id: branchId } : {}) }, select: { id: true, name: true, status: true }, orderBy: { name: 'asc' } }));
+  }
+
+  scopedBranch(device: Device, requested?: string): string | undefined {
+    if (device.branchId && requested && device.branchId !== requested) throw new ForbiddenException('Branch is outside this console workspace');
+    return device.branchId ?? requested;
   }
 
   private async resolveBranch(tx: Tx, restaurantId: string, requested: string | undefined, tablePayload: Record<string, unknown> | null): Promise<string> {
@@ -197,13 +203,14 @@ export class QrAdminService {
         if (!dto.tableId) throw new BadRequestException('Choose a table.');
         const row = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'DINING_TABLE', externalId: dto.tableId } } });
         tablePayload = isObject(row?.payload) && (row!.payload as Record<string, unknown>).deleted !== true ? (row!.payload as Record<string, unknown>) : null;
-        if (!tablePayload) throw new NotFoundException('That table does not exist.');
+        if (!tablePayload || (device.branchId && tablePayload.branchId !== device.branchId)) throw new NotFoundException('That table does not exist.');
+        if (dto.branchId && tablePayload.branchId && dto.branchId !== tablePayload.branchId) throw new ConflictException('Table and QR branch must match.');
         tableNumber = String(tablePayload.tableNumber ?? '');
         const existing = await tx.qrCode.findFirst({ where: { restaurantId, tableId: dto.tableId, status: QR_STATUS.ACTIVE, mode: QR_MODE.TABLE_ORDER } });
         if (existing) throw new ConflictException('This table already has an active QR code. Regenerate it to replace it.');
       }
       await this.assertTableLimit(tx, restaurantId, ent.limits);
-      const branchId = await this.resolveBranch(tx, restaurantId, dto.branchId, tablePayload);
+      const branchId = await this.resolveBranch(tx, restaurantId, this.scopedBranch(device, dto.branchId), tablePayload);
       const code = await tx.qrCode.create({
         data: { restaurantId, branchId, tableId: dto.tableId ?? null, tableNumber: tableNumber ?? dto.label ?? null, mode: dto.mode, publicToken: newPublicToken(), status: QR_STATUS.ACTIVE, metadata: dto.label ? { label: dto.label } : undefined }
       });
@@ -218,7 +225,7 @@ export class QrAdminService {
     const restaurantId = device.restaurantId;
     await this.requireEnabled(restaurantId);
     const next = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const current = await this.own(tx, restaurantId, codeId);
+      const current = await this.own(tx, restaurantId, codeId, device.branchId);
       if (current.status === QR_STATUS.REVOKED) throw new ConflictException('This code was already revoked. Generate a new one for the table.');
       // The old code stops working in the same transaction the new one starts, so there is never a moment with two live tokens.
       await tx.qrCode.update({ where: { id: current.id }, data: { status: QR_STATUS.REVOKED, revokedAt: new Date() } });
@@ -248,7 +255,7 @@ export class QrAdminService {
     const restaurantId = device.restaurantId;
     const ent = to === QR_STATUS.ACTIVE ? await this.requireEnabled(restaurantId) : null;
     const updated = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const current = await this.own(tx, restaurantId, codeId);
+      const current = await this.own(tx, restaurantId, codeId, device.branchId);
       if (current.status === QR_STATUS.REVOKED) throw new ConflictException('A revoked code cannot be changed. Generate a new one.');
       if (to === QR_STATUS.ACTIVE && ent) {
         await this.assertTableLimit(tx, restaurantId, ent.limits);
@@ -263,8 +270,8 @@ export class QrAdminService {
     return this.view(updated);
   }
 
-  private async own(tx: Tx, restaurantId: string, codeId: string) {
-    const code = await tx.qrCode.findFirst({ where: { id: codeId, restaurantId } });
+  private async own(tx: Tx, restaurantId: string, codeId: string, branchId?: string | null) {
+    const code = await tx.qrCode.findFirst({ where: { id: codeId, restaurantId, ...(branchId ? { branchId } : {}) } });
     if (!code) throw new NotFoundException('QR code not found.');
     return code;
   }
@@ -281,9 +288,9 @@ export class QrAdminService {
   }
 
   /** Everything the print layout needs and nothing internal: no ids, no tokens beyond the URL the QR itself encodes. */
-  async printData(restaurantId: string, codeId: string) {
+  async printData(restaurantId: string, codeId: string, branchId?: string | null) {
     const { code, restaurant, branch } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
-      const found = await this.own(tx, restaurantId, codeId);
+      const found = await this.own(tx, restaurantId, codeId, branchId);
       return {
         code: found,
         restaurant: await tx.restaurant.findFirstOrThrow({ where: { id: restaurantId }, select: { name: true } }),
@@ -307,9 +314,9 @@ export class QrAdminService {
   }
 
   /** Everything still open at one table (QR orders and staff orders alike), so a waiter can see the table's whole tab. */
-  async tableOrders(restaurantId: string, tableId: string) {
+  async tableOrders(restaurantId: string, tableId: string, branchId?: string | null) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.syncedOrder.findMany({ where: { restaurantId, tableId, status: { notIn: ['COMPLETED', 'CANCELLED', 'REFUNDED'] } }, orderBy: { createdAt: 'asc' }, take: 200 })
+      tx.syncedOrder.findMany({ where: { restaurantId, tableId, ...(branchId ? { branchId } : {}), status: { notIn: ['COMPLETED', 'CANCELLED', 'REFUNDED'] } }, orderBy: { createdAt: 'asc' }, take: 200 })
     );
     return rows.map((o) => {
       const meta = (o.meta ?? {}) as Record<string, unknown>;
@@ -317,17 +324,17 @@ export class QrAdminService {
     });
   }
 
-  async overview(restaurantId: string) {
+  async overview(restaurantId: string, branchId?: string | null) {
     const entitlement = await this.entitlement(restaurantId);
     const data = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const restaurant = await tx.restaurant.findFirstOrThrow({ where: { id: restaurantId }, select: { timezone: true } });
       const dayStart = startOfDayIn(restaurant.timezone);
       const [tables, activeCodes, totalCodes, orders, events] = await Promise.all([
-        tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE' }, select: { payload: true } }),
-        tx.qrCode.count({ where: { restaurantId, status: QR_STATUS.ACTIVE } }),
-        tx.qrCode.count({ where: { restaurantId } }),
-        tx.syncedOrder.findMany({ where: { restaurantId, source: 'QR', createdAt: { gte: dayStart } }, select: { status: true, paymentStatus: true, totalAmount: true, tableLabel: true, branchId: true } }),
-        tx.qrEvent.groupBy({ by: ['type'], where: { restaurantId, createdAt: { gte: dayStart } }, _count: { _all: true } })
+        tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'DINING_TABLE', ...(branchId ? { payload: { path: ['branchId'], equals: branchId } } : {}) }, select: { payload: true } }),
+        tx.qrCode.count({ where: { restaurantId, ...(branchId ? { branchId } : {}), status: QR_STATUS.ACTIVE } }),
+        tx.qrCode.count({ where: { restaurantId, ...(branchId ? { branchId } : {}) } }),
+        tx.syncedOrder.findMany({ where: { restaurantId, source: 'QR', ...(branchId ? { branchId } : {}), createdAt: { gte: dayStart } }, select: { status: true, paymentStatus: true, totalAmount: true, tableLabel: true, branchId: true } }),
+        tx.qrEvent.groupBy({ by: ['type'], where: { restaurantId, ...(branchId ? { branchId } : {}), createdAt: { gte: dayStart } }, _count: { _all: true } })
       ]);
       return { tables, activeCodes, totalCodes, orders, events };
     });
@@ -362,7 +369,7 @@ export class QrAdminService {
 
   async updateSettings(device: Device, changes: QrSettingsUpdate, branchId?: string) {
     await this.requireEnabled(device.restaurantId);
-    return this.settings.update(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes, branchId ?? null);
+    return this.settings.update(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes, this.scopedBranch(device, branchId) ?? null);
   }
 
   getBranding(restaurantId: string) {

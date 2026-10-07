@@ -167,6 +167,8 @@ export class MenuPublicationsService {
 
   async listBranchOverrides(device: Device, branchId?: string) {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can manage branch menus');
+    if (device.branchId && branchId && branchId !== device.branchId) throw new ForbiddenException('Branch is outside this workspace');
+    branchId = device.branchId ?? branchId;
     const rows = await this.prisma.runAsTenant(device.restaurantId, (tx) => tx.syncedEntity.findMany({ where: { restaurantId: device.restaurantId, entityType: 'BRANCH_MENU_OVERRIDE' }, select: { payload: true } }));
     const all = rows.map((r) => r.payload as Record<string, unknown>).filter((p) => p && p.deleted !== true && (p.price !== undefined || p.isAvailable !== undefined));
     return { overrides: branchId ? all.filter((p) => p.branchId === branchId) : all };
@@ -175,6 +177,7 @@ export class MenuPublicationsService {
   /** Sets (or, with both fields null, clears) a branch's price/availability for a dish. Guests see it after the next publish. */
   async setBranchOverride(device: Device, dto: BranchOverrideDto) {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can manage branch menus');
+    if (device.branchId && dto.branchId !== device.branchId) throw new ForbiddenException('Branch is outside this workspace');
     const restaurantId = device.restaurantId;
     const result = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const branch = await tx.branch.findFirst({ where: { id: dto.branchId, restaurantId }, select: { id: true } });

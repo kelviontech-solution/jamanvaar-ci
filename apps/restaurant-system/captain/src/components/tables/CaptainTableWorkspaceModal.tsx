@@ -27,7 +27,8 @@ import {
   ChevronDown,
   Ban,
   User,
-  Star
+  Star,
+  DoorOpen
 } from 'lucide-react';
 
 interface CaptainTableWorkspaceModalProps {
@@ -65,7 +66,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
     repeatPreviousOrder,
     markItemServed,
     attachedCustomer,
-    setIsCustomerModalOpen
+    setIsCustomerModalOpen,
+    closeTable
   } = useCaptainStore();
 
   // A freshly-opened table with nothing ordered yet should land straight on the menu.
@@ -546,6 +548,28 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Discard order</span>
+                  </button>
+                )}
+
+                {/* Manual recovery: a guest walked out, or a self-order (kiosk/QR) left a table occupied with
+                    nothing really left to serve. Any order still open on this table is settled as Completed
+                    first (see closeTable), so freeing it never silently abandons an unbilled order. */}
+                {currentCaptain?.permissions.CAN_TRANSFER_TABLE && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const warn = total > 0
+                        ? `Free Table ${table!.tableNumber}? It still shows ${formatINR(total)} owed — this will mark that bill as paid/completed without collecting it. Only do this if the guest already paid another way or left without paying.`
+                        : `Free Table ${table!.tableNumber}? It will show as available for the next guest.`;
+                      if (window.confirm(warn)) {
+                        closeTable(table!.tableNumber);
+                        onClose();
+                      }
+                    }}
+                    className="min-h-[40px] py-2 px-4 rounded-2xl bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <DoorOpen className="w-3.5 h-3.5" />
+                    <span>Free table</span>
                   </button>
                 )}
               </div>

@@ -3,6 +3,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 20px;
+  align-items: start;
+}
+
+/* Invoice seller details has far more fields (15) than any other card here — squeezed into the
+   same narrow column as a 3- or 4-field card, its own internal field grid could only ever show one
+   column, stacking all 15 fields vertically into a card several times taller than its neighbours.
+   Spanning the full grid row lets its fields lay out side by side instead. */
+.settings-card-wide {
+  grid-column: 1 / -1;
 }
 
 .settings-card {

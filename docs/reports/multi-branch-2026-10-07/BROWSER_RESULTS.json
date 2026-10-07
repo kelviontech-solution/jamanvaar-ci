@@ -1,0 +1,4005 @@
+{
+  "results": [
+    {
+      "name": "Owner signs in once and opens consolidated five-branch sales",
+      "status": "PASS",
+      "ms": 25422,
+      "evidence": {
+        "branches": 5,
+        "netSales": 500
+      }
+    },
+    {
+      "name": "All-restaurant overview requires branch selection for operational pages",
+      "status": "PASS",
+      "ms": 1008
+    },
+    {
+      "name": "Branch switch loads only that branch’s tables and preserves the registered console",
+      "status": "PASS",
+      "ms": 8378
+    },
+    {
+      "name": "Refresh and period/source filters keep branch scope and correct amounts",
+      "status": "PASS",
+      "ms": 28939
+    },
+    {
+      "name": "Opening the other product preserves the same selected branch and complete kiosk pages",
+      "status": "PASS",
+      "ms": 22691
+    },
+    {
+      "name": "Dashboard fits mobile, tablet and TV without page overflow",
+      "status": "PASS",
+      "ms": 22177
+    },
+    {
+      "name": "Custom dates use the same branch scope and reconcile the sales widgets",
+      "status": "PASS",
+      "ms": 3500
+    },
+    {
+      "name": "Two KDS screens share a branch ticket and Ready/Served updates; another branch cannot see it",
+      "status": "FAIL",
+      "error": "POST /api/v1/activation-keys: 500: {\"statusCode\":500,\"message\":\"Internal server error\"}"
+    }
+  ],
+  "pageErrors": [],
+  "network": [
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/login-owner",
+      "status": 200,
+      "ms": 989
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/activate-device",
+      "status": 200,
+      "ms": 221
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 493
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 4256
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 6166
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 6227
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 71
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 331
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 39
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 41
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 97
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 33
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 10
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 30
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 45
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 28
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 28
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 33
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 41
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 28
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 221
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 228
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 260
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 275
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 291
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 310
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 327
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 327
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 336
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 352
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 363
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 368
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 377
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 378
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 126
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 409
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 410
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 132
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 91
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 91
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 57
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 23
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 23
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 26
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 24
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/inventory/movements",
+      "status": 200,
+      "ms": 31
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 574
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 883
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 14
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 48
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 43
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 31
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 34
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 48
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 64
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 65
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 75
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 78
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 82
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 90
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 96
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 100
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 108
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 119
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 100
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 128
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 100
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 135
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 85
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 25
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 23
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 28
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 24
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 20
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 29
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 23
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 26
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/inventory/movements",
+      "status": 200,
+      "ms": 32
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "error": "net::ERR_ABORTED",
+      "ms": 1040
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 9
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 31
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 22
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 36
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 21
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 29
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 57
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 36
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 53
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 51
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 53
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 61
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 53
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 64
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 73
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 73
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 78
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 78
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 93
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 101
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 101
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 103
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 103
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 57
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 64
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 79
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 129
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 129
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 84
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 74
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 72
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 49
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 45
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 46
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 57
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 58
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 63
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 64
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 66
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 74
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 77
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 87
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 90
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 87
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 71
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 20
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 21
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 15
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 19
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 15
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 14
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 18
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/inventory/movements",
+      "status": 200,
+      "ms": 23
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 46
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "error": "net::ERR_ABORTED",
+      "ms": 5506
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 911
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 718
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 1001
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 945
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 460
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 1179
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 832
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 1190
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 669
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 1029
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 985
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 2393
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 4225
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 1626
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 1707
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 3317
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 3055
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 3618
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 3670
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 3862
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 4079
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 4026
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 3975
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 4474
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 4604
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 4850
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 4840
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 5274
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 4767
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 5738
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 6056
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 6214
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 5413
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 6317
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 4087
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 2484
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 4885
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 7390
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 5901
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 5477
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 3048
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 5898
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 3466
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 4298
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 3712
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 3831
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 1740
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 4104
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 4605
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 4130
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 2592
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 5554
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 5646
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 4935
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 3656
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "error": "net::ERR_ABORTED",
+      "ms": 2172
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 995
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "error": "net::ERR_ABORTED",
+      "ms": 1794
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 3865
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "error": "net::ERR_ABORTED",
+      "ms": 2208
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 6066
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 308
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "error": "net::ERR_ABORTED",
+      "ms": 1795
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "error": "net::ERR_ABORTED",
+      "ms": 2208
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 2192
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "error": "net::ERR_ABORTED",
+      "ms": 12587
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1796
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "error": "net::ERR_ABORTED",
+      "ms": 1685
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "error": "net::ERR_ABORTED",
+      "ms": 1803
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 2296
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "error": "net::ERR_ABORTED",
+      "ms": 1690
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 298
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 2298
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 432
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 373
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 53
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 70
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 55
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 176
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 310
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 305
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "error": "net::ERR_ABORTED",
+      "ms": 1736
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/payments/payout-summary",
+      "error": "net::ERR_ABORTED",
+      "ms": 904
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 2090
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1985
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 2203
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 2324
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "error": "net::ERR_ABORTED",
+      "ms": 1506
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "error": "net::ERR_ABORTED",
+      "ms": 1142
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1591
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "error": "net::ERR_ABORTED",
+      "ms": 2089
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 2204
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "error": "net::ERR_ABORTED",
+      "ms": 1840
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 2205
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "error": "net::ERR_ABORTED",
+      "ms": 1987
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "error": "net::ERR_ABORTED",
+      "ms": 1508
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 1372
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 1361
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1986
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "error": "net::ERR_ABORTED",
+      "ms": 1961
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 371
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 479
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 1123
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 2179
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 1330
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 665
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 660
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 1059
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 2285
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1121
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1229
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 670
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "error": "net::ERR_ABORTED",
+      "ms": 1230
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/welcome-designs",
+      "error": "net::ERR_ABORTED",
+      "ms": 2254
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 2285
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "error": "net::ERR_ABORTED",
+      "ms": 384
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "error": "net::ERR_ABORTED",
+      "ms": 1078
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 802
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "error": "net::ERR_ABORTED",
+      "ms": 1237
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "error": "net::ERR_ABORTED",
+      "ms": 1088
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 1446
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "error": "net::ERR_ABORTED",
+      "ms": 1123
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 1635
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 2207
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "error": "net::ERR_ABORTED",
+      "ms": 1381
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "error": "net::ERR_ABORTED",
+      "ms": 1221
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401,
+      "ms": 1085
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 2164
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant-auth/refresh",
+      "status": 200,
+      "ms": 689
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 1900
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/restaurant/qr/entitlement",
+      "status": 200,
+      "ms": 3456
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/branches",
+      "status": 200,
+      "ms": 1404
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 1758
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 1760
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 1481
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 2805
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 2854
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 3811
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 4752
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 4484
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 5202
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 5363
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 6565
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 6739
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 6853
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 7023
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 7149
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 7166
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 7196
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 5038
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 7688
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 5400
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 7700
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 5475
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 7857
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 5393
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 4499
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 5678
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 2551
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 4871
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 5595
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 3650
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 5481
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 3541
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 3751
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 3832
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 4141
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 3934
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 4235
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 4315
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 4373
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 4464
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 3992
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 1845
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 3819
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 2275
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 2382
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 1782
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 1937
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 1782
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 2187
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 1786
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 2209
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 2149
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 2254
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 2429
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 3477
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 3483
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 4017
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 4122
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 4367
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 4751
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 4842
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 5448
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 5384
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 5825
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 5861
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 6606
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 6348
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 7058
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 5887
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 6137
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 6299
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 7503
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 2998
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 7566
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 5671
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 5701
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 3144
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 3359
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 4613
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 3999
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 3624
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 1750
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 1794
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 2389
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 1557
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 1532
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 1541
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 1863
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 2220
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 2532
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 3148
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 2555
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "status": 200,
+      "ms": 3572
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 4949
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 4960
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 5460
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 6005
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 6386
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 6387
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "status": 200,
+      "ms": 6176
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 7939
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 8089
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 8302
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 9356
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 9360
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 7916
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 12825
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 11231
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 10437
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 11119
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 5664
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 12124
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "status": 200,
+      "ms": 10786
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 12235
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "status": 200,
+      "ms": 10261
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "status": 200,
+      "ms": 13504
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 5366
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 8512
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 9196
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 9758
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 9684
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 8925
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 6978
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 12557
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 9610
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 12435
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 8114
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/platform-notice",
+      "status": 200,
+      "ms": 6893
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 13582
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 10665
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 10987
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 6546
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 11679
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 12339
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 12004
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 13515
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 8361
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 5326
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 5716
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 9853
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 6295
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 15742
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 7582
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 10805
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 8514
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 19016
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 18428
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 7380
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 15110
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "status": 200,
+      "ms": 24486
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 10458
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 14819
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 13098
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "status": 200,
+      "ms": 26226
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 18298
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 19962
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 11980
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 27402
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 18926
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 27565
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "status": 200,
+      "ms": 28479
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 19638
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 7141
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 13504
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 11230
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 19964
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 7715
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 10129
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 4365
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 27525
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 20226
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 8107
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 4963
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 20956
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "status": 200,
+      "ms": 23229
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 6536
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 6543
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 7824
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "status": 200,
+      "ms": 24481
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 5172
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "status": 200,
+      "ms": 24385
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 4407
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 4416
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 24972
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "status": 400,
+      "ms": 26106
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 14910
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "error": "net::ERR_ABORTED",
+      "ms": 31378
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 19188
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 19576
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 11553
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 22372
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 16618
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 13718
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 13553
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 13723
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 26676
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 17297
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 17043
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 27370
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 7531
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 28376
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 28274
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 29793
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SUPPLIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 29646
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 11744
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 7164
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 12723
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 12479
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 12867
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 13152
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "error": "net::ERR_ABORTED",
+      "ms": 29689
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "error": "net::ERR_ABORTED",
+      "ms": 29655
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "error": "net::ERR_ABORTED",
+      "ms": 29580
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 7747
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 7277
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 8454
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 8958
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 15524
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 17315
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 15196
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 28936
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "error": "net::ERR_ABORTED",
+      "ms": 29242
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 17082
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 18239
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 28661
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 8139
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 9228
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 18621
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/platform-notice",
+      "status": 200,
+      "ms": 7824
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 13495
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 10769
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 8727
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 9850
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 2057
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 13379
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 21191
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "error": "net::ERR_ABORTED",
+      "ms": 26279
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 8900
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 13761
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 9444
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 9646
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 5132
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 21991
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 23440
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 7123
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 9549
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/realtime/stream",
+      "status": 200,
+      "ms": 5799
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 4514
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "error": "net::ERR_ABORTED",
+      "ms": 23485
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 23337
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "error": "net::ERR_ABORTED",
+      "ms": 23180
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 2964
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 8788
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 7969
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 18312
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 4520
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 7805
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "status": 400,
+      "ms": 18195
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 9226
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 27201
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 4589
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 7557
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 13726
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 13109
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 10268
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 10425
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 7488
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "status": 200,
+      "ms": 25210
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 10610
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 10603
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 11761
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 25951
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 27242
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "status": 400,
+      "ms": 28105
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "status": 200,
+      "ms": 8602
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 14675
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 8555
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 7625
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 7712
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 7475
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 21023
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 12231
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 15340
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 6077
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/INVENTORY_ITEM",
+      "error": "net::ERR_ABORTED",
+      "ms": 30292
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 8720
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 9539
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 24699
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 13691
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 30791
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 10447
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 22613
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 12502
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MENU_ITEM",
+      "status": 200,
+      "ms": 8335
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 24894
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 25407
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 16814
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 11448
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 11650
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 11896
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 13015
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 12592
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 30089
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COMBO",
+      "error": "net::ERR_ABORTED",
+      "ms": 29470
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 29221
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 29256
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 13446
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 16319
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 11360
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 7833
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 18267
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 21424
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 29958
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 18980
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 12937
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 11865
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 11601
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/sync/number-leases",
+      "status": 201,
+      "ms": 14435
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/entity-sync/TAX_GROUP",
+      "status": 200,
+      "ms": 14267
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 14680
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/menu/version",
+      "status": 200,
+      "ms": 22613
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/orders/sync",
+      "status": 200,
+      "ms": 15614
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 13919
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "status": 200,
+      "ms": 27638
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "status": 200,
+      "ms": 25349
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/commands",
+      "status": 200,
+      "ms": 25323
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/dashboard",
+      "status": 200,
+      "ms": 18518
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 16352
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 12263
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "status": 200,
+      "ms": 12881
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/devices/me/ai-config",
+      "status": 200,
+      "ms": 20050
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER",
+      "error": "net::ERR_ABORTED",
+      "ms": 29753
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SHIFT",
+      "error": "net::ERR_ABORTED",
+      "ms": 29752
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CUSTOMER_FEEDBACK",
+      "error": "net::ERR_ABORTED",
+      "ms": 29730
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_TIER",
+      "error": "net::ERR_ABORTED",
+      "ms": 29722
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_REWARD",
+      "error": "net::ERR_ABORTED",
+      "ms": 29721
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/LOYALTY_PROGRAM_SETTINGS",
+      "error": "net::ERR_ABORTED",
+      "ms": 29714
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 28981
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RECIPE",
+      "error": "net::ERR_ABORTED",
+      "ms": 29182
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 29505
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/MENU_CATEGORY",
+      "error": "net::ERR_ABORTED",
+      "ms": 29248
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 28253
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 28160
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 26396
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "status": 200,
+      "ms": 27747
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 200,
+      "ms": 24585
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "status": 200,
+      "ms": 25042
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 31777
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 31679
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/fleet",
+      "error": "net::ERR_ABORTED",
+      "ms": 31088
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 22985
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 31449
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 30852
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/COUPON",
+      "error": "net::ERR_ABORTED",
+      "ms": 30836
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 30448
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 30068
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/entity-sync/MODIFIER_GROUP",
+      "status": 200,
+      "ms": 25897
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 32226
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "status": 200,
+      "ms": 25691
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/menu/version",
+      "error": "net::ERR_ABORTED",
+      "ms": 30957
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 30553
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/SERVICE_MESSAGE",
+      "error": "net::ERR_ABORTED",
+      "ms": 30002
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 30174
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 30031
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/sync/number-leases",
+      "error": "net::ERR_ABORTED",
+      "ms": 30002
+    },
+    {
+      "app": "kds-2",
+      "path": "/api/v1/orders/sync",
+      "error": "net::ERR_ABORTED",
+      "ms": 30070
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 30113
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 30112
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 30088
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/menu/version",
+      "error": "net::ERR_ABORTED",
+      "ms": 29945
+    },
+    {
+      "app": "kds-0",
+      "path": "/api/v1/devices/me/commands",
+      "error": "net::ERR_ABORTED",
+      "ms": 29944
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/DINING_TABLE",
+      "error": "net::ERR_ABORTED",
+      "ms": 29833
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/menu/version",
+      "error": "net::ERR_ABORTED",
+      "ms": 30124
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/commands",
+      "error": "net::ERR_ABORTED",
+      "ms": 29953
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 27233
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 27036
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/RESERVATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 24382
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/entitlements",
+      "error": "net::ERR_ABORTED",
+      "ms": 20821
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/KIOSK_CONFIGURATION",
+      "error": "net::ERR_ABORTED",
+      "ms": 24381
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/CASH_MOVEMENT",
+      "error": "net::ERR_ABORTED",
+      "ms": 24380
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/tenant/me/applications",
+      "error": "net::ERR_ABORTED",
+      "ms": 20710
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 22329
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/heartbeat",
+      "error": "net::ERR_ABORTED",
+      "ms": 24678
+    },
+    {
+      "app": "kds-1",
+      "path": "/api/v1/devices/me/restaurant",
+      "error": "net::ERR_ABORTED",
+      "ms": 22325
+    },
+    {
+      "app": "admin",
+      "path": "/api/v1/entity-sync/STAFF_USER",
+      "error": "net::ERR_ABORTED",
+      "ms": 21275
+    }
+  ]
+}

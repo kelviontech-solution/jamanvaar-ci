@@ -4,6 +4,8 @@ import { X509Certificate } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { BranchCore, CoreError, type AuthedDevice, type RealtimeEvent } from './core';
+import { mayRead } from '../../../cloud/api/src/modules/entity-sync/entity-authority';
+import { SYNCABLE_ENTITY_TYPES } from '../../../cloud/api/src/modules/entity-sync/dto/push-entity-sync.dto';
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.mjs': 'application/javascript; charset=utf-8',
@@ -112,6 +114,7 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
       }
 
       if (p === '/api/v1/inventory/movements') {
+        if (!mayRead('INVENTORY_ITEM', device.type as never)) throw new CoreError(403,'FORBIDDEN','This device cannot access the inventory ledger');
         if (req.method === 'POST') {
           const body = await readBody(req);
           if (!Array.isArray(body.movements) || body.movements.length < 1 || body.movements.length > 200) throw new CoreError(400, 'BAD_REQUEST', 'movements must be a list of 1 to 200');
@@ -119,7 +122,10 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
         }
         if (req.method === 'GET') return send(res, 200, core.pullMovements(Number(url.searchParams.get('afterSeq') ?? 0) || 0));
       }
-      if (p === '/api/v1/inventory/balances' && req.method === 'GET') return send(res, 200, core.balances());
+      if (p === '/api/v1/inventory/balances' && req.method === 'GET') {
+        if (!mayRead('INVENTORY_ITEM', device.type as never)) throw new CoreError(403,'FORBIDDEN','This device cannot access the inventory ledger');
+        return send(res, 200, core.balances());
+      }
 
       if (p === '/api/v1/sync/number-leases' && req.method === 'POST') {
         const body = await readBody(req);
@@ -128,6 +134,7 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
 
       const ent = /^\/api\/v1\/entity-sync\/([A-Z_]+)$/.exec(p);
       if (ent) {
+        if (!(SYNCABLE_ENTITY_TYPES as readonly string[]).includes(ent[1])) throw new CoreError(400,'BAD_REQUEST','Unknown entity type');
         if (req.method === 'POST') {
           const body = await readBody(req);
           if (!Array.isArray(body.events)) throw new CoreError(400, 'BAD_REQUEST', 'events must be a list');
@@ -137,7 +144,7 @@ export function createServer(core: BranchCore, opts: ServerOptions = {}): http.S
           const raw = url.searchParams.get('afterSeq');
           const after = raw === null ? undefined : Number(raw);
           if (after !== undefined && (!Number.isSafeInteger(after) || after < 0)) throw new CoreError(400, 'BAD_REQUEST', 'afterSeq must be a non-negative integer');
-          return send(res, 200, core.pullEntities(ent[1], url.searchParams.get('since') ?? undefined, after));
+          return send(res, 200, core.pullEntities(ent[1], url.searchParams.get('since') ?? undefined, after, device.type));
         }
       }
 

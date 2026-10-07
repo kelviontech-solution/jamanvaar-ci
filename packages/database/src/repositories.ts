@@ -995,6 +995,7 @@ export class OrderRepository {
     // A full refund gives the stock back; a partial refund cannot say which items were returned, so it leaves stock alone.
     if (refundAmount >= order.totalAmount) InventoryRepository.restoreForOrder(order, `Refund: ${reason}`);
     order.orderStatus = 'REFUNDED';
+    order.refundAmount = refundAmount;
     // A partial refund settles a lesser amount back to the guest but the
     // order itself was still genuinely paid — only a full refund reverses
     // paymentStatus itself, matching the same distinction createOrder's own
@@ -1314,15 +1315,24 @@ export class TableRepository {
     return released;
   }
 
-  /** QR guests can order without Captain seating them. Associate admitted orders with the existing floor lifecycle. */
+  /**
+   * A guest can place a dine-in order without a captain ever seating them — scanning the table's QR
+   * code, or choosing "Dine In" + a table on the self-order kiosk. Neither of those flows touches
+   * `db.tables` itself (a QR order is created purely server-side with no local device to update it;
+   * the kiosk's own checkout never did either), so without this, the table stayed "Available" on
+   * every other screen — POS, Restaurant Admin, Captain — while a guest was actually sitting there
+   * with an open order, and the next party or a captain seating a walk-in could be sent to the same
+   * table. This associates any such order with the table's existing floor lifecycle instead.
+   */
   public static reconcileQrTableOrders(): number {
     let changed = 0;
     const closed = new Set(['DRAFT', 'COMPLETED', 'COLLECTED', 'CANCELLED', 'REFUNDED', 'VOID', 'VOIDED']);
+    const selfService = new Set(['QR_TABLE', 'KIOSK']);
     for (const table of db.tables) {
       if (table.status === 'BLOCKED' || table.isActive === false) continue;
       const current = db.orders.find(order => order.id === table.currentOrderId);
       if (current && !closed.has(current.orderStatus)) continue;
-      const next = db.orders.filter(order => order.source_type === 'QR_TABLE' && order.orderType === 'DINE_IN' && order.tableId === table.id && !closed.has(order.orderStatus))
+      const next = db.orders.filter(order => selfService.has(order.source_type ?? '') && order.orderType === 'DINE_IN' && order.tableId === table.id && !closed.has(order.orderStatus))
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))[0];
       if (!next) continue;
       table.status = 'OCCUPIED';
@@ -3911,7 +3921,7 @@ export class StaffRepository {
     const { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt } = user;
     // `pinScope` is the restaurant id this PIN was hashed under. A staff member created before this console was bound to its real
     // restaurant (under the placeholder id) would otherwise fail to verify on the POS, which hashes under its own id.
-    return { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt, pinHash: (user as User & { pinHash?: string }).pinHash, pinScope: user.restaurantId };
+    return { id, username, fullName, email, phone, roleId, isActive, createdAt, updatedAt, branchId: user.branchId, pinHash: (user as User & { pinHash?: string }).pinHash, pinScope: user.restaurantId };
   }
 
   /** Applies one STAFF_USER record pulled from the cloud: creates it locally, or updates it in place by id. */
@@ -3923,6 +3933,7 @@ export class StaffRepository {
       id,
       restaurantId: db.restaurant.id,
       username: typeof remote.username === 'string' ? remote.username : id,
+      branchId: typeof remote.branchId === 'string' ? remote.branchId : undefined,
       fullName: typeof remote.fullName === 'string' ? remote.fullName : 'Staff',
       email: typeof remote.email === 'string' ? remote.email : '',
       phone: typeof remote.phone === 'string' ? remote.phone : '',

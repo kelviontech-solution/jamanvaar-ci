@@ -45,6 +45,17 @@
   justify-content: center;
 }
 
+/* A button whose only content is its icon (no text children) — square instead of text-padded, so a
+   row of actions in a dense table fits without forcing the table to scroll sideways. */
+.btn-icon-only {
+  padding: 0;
+  width: 38px;
+  flex-shrink: 0;
+}
+.btn-icon-only.btn-sm {
+  width: 32px;
+}
+
 .btn-primary {
   background: var(--jv-primary);
   color: var(--jv-on-primary);

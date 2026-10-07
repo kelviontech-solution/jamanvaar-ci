@@ -35,8 +35,8 @@ export const BranchDirectoryModal: React.FC<BranchDirectoryModalProps> = ({ isOp
     <Modal isOpen={isOpen} onClose={onClose} title="Your Restaurant's Branches" maxWidth="lg">
       <div className="space-y-3 py-1">
         <p className="text-xs text-slate-500">
-          Every outlet is managed independently from its own on-site Restaurant Admin terminal —
-          this is a read-only directory, not a way to view another branch's live orders or menu from here.
+          Use the Workspace selector in the header to view consolidated restaurant totals
+          or manage a specific branch. Branch creation and deactivation remain in Super Admin.
         </p>
 
         {loading && <div className="text-xs text-slate-500 py-6 text-center">Loading branches…</div>}

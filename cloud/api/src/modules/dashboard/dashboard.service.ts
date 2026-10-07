@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { healthWhere } from '../../common/device-health';
 
 const PROCESS_START_TIME = Date.now();
 
@@ -69,7 +70,7 @@ export class DashboardService {
           where: { status: 'ACTIVE', expiresAt: { lte: thirtyDaysFromNow } }
         }),
         tx.device.count(),
-        tx.device.count({ where: { status: 'ACTIVE' } }),
+        tx.device.count({ where: healthWhere('online') }),
         tx.restaurant.count({ where: { deletedAt: null, createdAt: { gte: startOfMonth } } }),
         tx.auditLog.findMany({ orderBy: { createdAt: 'desc' }, take: 15 }),
         // MRR: real sums over actually-active subscriptions × their plan's real price

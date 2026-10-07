@@ -213,6 +213,7 @@ model Branch {
   activationKeys ActivationKey[]
 
   @@unique([restaurantId, code])
+  @@unique([restaurantId, id])
   @@index([restaurantId])
 }
 

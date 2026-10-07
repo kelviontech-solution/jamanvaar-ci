@@ -1,0 +1,51 @@
+[
+  {
+    "workspace": "pos-admin",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 34426,
+    "log": "logs/multi-branch-final-build-pos-admin.log"
+  },
+  {
+    "workspace": "pos",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 27916,
+    "log": "logs/multi-branch-final-build-pos.log"
+  },
+  {
+    "workspace": "captain",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 13620,
+    "log": "logs/multi-branch-final-build-captain.log"
+  },
+  {
+    "workspace": "kds",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 11492,
+    "log": "logs/multi-branch-final-build-kds.log"
+  },
+  {
+    "workspace": "kiosk-user",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 19986,
+    "log": "logs/multi-branch-final-build-kiosk-user.log"
+  },
+  {
+    "workspace": "qr-guest",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 6558,
+    "log": "logs/multi-branch-final-build-qr-guest.log"
+  },
+  {
+    "workspace": "super-admin-web",
+    "status": "PASS",
+    "exitCode": 0,
+    "ms": 23617,
+    "log": "logs/multi-branch-final-build-super-admin-web.log"
+  }
+]

@@ -60,6 +60,7 @@ export interface OrderSyncMeta {
   acceptedBy?: string;
   businessDayId?: string;
   paymentTransactionId?: string;
+  refundAmountPaise?: number;
   tenderedAmountPaise?: number;
   paymentSplits?: Array<{ method: string; amountPaise: number }>;
   cgstPaise?: number;
@@ -249,6 +250,7 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       acceptedBy: order.acceptedByDeviceId,
       businessDayId: order.businessDayId,
       paymentTransactionId: order.paymentTransactionId,
+      refundAmountPaise: order.refundAmount === undefined ? undefined : toPaise(order.refundAmount),
       tenderedAmountPaise: order.tenderedAmount !== undefined ? toPaise(order.tenderedAmount) : undefined,
       paymentSplits: order.paymentSplits?.map((l) => ({ method: l.method, amountPaise: toPaise(l.amount) })),
       cgstPaise: toPaise(order.cgstAmount),
@@ -344,6 +346,7 @@ function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolea
   if (remote.meta?.acceptedBy) local.acceptedByDeviceId = remote.meta.acceptedBy;
   if (remote.meta?.billRequestedAt) local.billRequestedAt = remote.meta.billRequestedAt;
   if (remote.meta?.billSplitNote) local.billSplitNote = remote.meta.billSplitNote;
+  if (remote.meta?.refundAmountPaise !== undefined) local.refundAmount = fromPaise(remote.meta.refundAmountPaise);
   let addedItems = false;
   remote.items.forEach((ri) => {
     const li = local.items.find((i) => i.id === ri.externalItemId);
@@ -408,6 +411,7 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     tableId: remote.tableId || undefined,
     tableNumber: remote.tableLabel || undefined,
     guestCount: m.guestCount,
+    refundAmount: m.refundAmountPaise === undefined ? undefined : fromPaise(m.refundAmountPaise),
     customerName: m.customerName,
     customerPhone: m.customerPhone,
     cashierName: m.cashierName,

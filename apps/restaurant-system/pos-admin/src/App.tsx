@@ -1,3 +1,7 @@
+import { activeAdminBranch } from './adminBranchScope';
+import { AdminBranchWorkspace } from './components/header/AdminBranchWorkspace';
+import { BranchBusinessDashboard } from './components/dashboard/BranchBusinessDashboard';
+import { OnboardingChecklistCard } from './components/dashboard/OnboardingChecklistCard';
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
 import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
 import { KioskComboPanel } from './components/settings/KioskComboPanel';
@@ -261,6 +265,7 @@ export default function PosAdminApp() {
   };
 
   // Authentication State — restored from persisted session
+  const [branchScopeReady,setBranchScopeReady]=useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(
     () => SessionPersistence.isValid('admin')
   );
@@ -561,7 +566,7 @@ export default function PosAdminApp() {
   // the device token specifically (not cloudConnected/the user session),
   // since entity-sync is a DeviceAuthGuard endpoint.
   useEffect(() => {
-    if (!isAdminLoggedIn || entitlementsLoading || entitlementError || !getStoredDeviceToken()) return;
+    if (!branchScopeReady || activeAdminBranch === 'all' || !isAdminLoggedIn || entitlementsLoading || entitlementError || !getStoredDeviceToken()) return;
     const restaurantAccess = hasApp('POS_ADMIN');
     const kioskAccess = hasApp('KIOSK_ADMIN');
     if (!restaurantAccess && !kioskAccess) return;
@@ -645,7 +650,7 @@ export default function PosAdminApp() {
       SyncOutboxEngine.configureTransport(null);
       InventoryLedgerSync.configureTransport(null);
     };
-  }, [cloudConnected, isAdminLoggedIn, entitlementsLoading, entitlementError, hasApp]);
+  }, [branchScopeReady, cloudConnected, isAdminLoggedIn, entitlementsLoading, entitlementError, hasApp]);
 
   // Kiosk fleet polling for the Kiosk Terminals tab. Deliberately its own effect, not merged into
   // the sync effect above: that effect already calls SyncOutboxEngine/EntitySyncEngine
@@ -1105,7 +1110,7 @@ export default function PosAdminApp() {
           availableProducts={availableProducts}
           selectedProduct={product}
           onSwitchProduct={app => context.navigate(app)}
-          showRestaurantActions={!isKioskAdmin}
+          showRestaurantActions={!isKioskAdmin && activeAdminBranch !== 'all' && branchScopeReady}
           restaurantName={db.restaurant.name}
           outletName={db.outlet.name}
           isCloudConnected={cloudConnected}
@@ -1121,6 +1126,8 @@ export default function PosAdminApp() {
           onAdminLogout={handleAdminLogout}
           onOpenNav={() => setNavOpen(true)}
         />
+
+        <AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} />
 
         {/* BODY WITH FULL SIDEBAR & MAIN CONTENT */}
         {entitlementError && (
@@ -1240,66 +1247,24 @@ export default function PosAdminApp() {
 
             {/* The header actions that do not fit a phone's header live here on small screens */}
             <div className="sm:hidden mt-4 pt-3 border-t border-[#EAE3D6] grid grid-cols-2 gap-2">
-              {!isKioskAdmin && <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-brand/[0.07] border border-brand/30 text-brand text-xs font-bold cursor-pointer">EOD Report</button>}
-              {!isKioskAdmin && <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>}
+              {!isKioskAdmin && activeAdminBranch !== 'all' && branchScopeReady && <button type="button" onClick={() => { setNavOpen(false); setIsEodModalOpen(true); }} className="min-h-[44px] rounded-xl bg-brand/[0.07] border border-brand/30 text-brand text-xs font-bold cursor-pointer">EOD Report</button>}
+              {!isKioskAdmin && activeAdminBranch !== 'all' && branchScopeReady && <button type="button" onClick={() => { setNavOpen(false); setIsReconModalOpen(true); }} className="min-h-[44px] rounded-xl bg-[#EFF6FF] border border-[#BFDBFE]/70 text-[#1E40AF] text-xs font-bold cursor-pointer">Reconciliation</button>}
               <button type="button" onClick={() => { setNavOpen(false); handleOpenAssistant(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold cursor-pointer">Assistant</button>
               <button type="button" onClick={() => { setNavOpen(false); handleAdminLogout(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-rose-700 text-xs font-bold cursor-pointer">Log out</button>
             </div>
           </aside>
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
+          {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.</p></div></main> :
           <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
-            {activeTab === 'DASHBOARD' && isKioskAdmin && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}
-            {activeTab === 'DASHBOARD' && !isKioskAdmin && (
-              <RestaurantDashboard
-                dashFilter={dashFilter}
-                setDashFilter={setDashFilter}
-                dashPeriodReport={dashPeriodReport}
-                hourlySales={hourlySales}
-                peakHours={peakHours}
-                topDishes={topDishes}
-                pendingKotsCount={pendingKotsCount}
-                occupiedTablesCount={occupiedTablesCount}
-                tablesTotalCount={tables.length}
-                lowStockCount={lowStockCount}
-                activeShift={activeShift}
-                setActiveTab={setActiveTab}
-                setReportSubTab={setReportSubTab}
-                setIsReconModalOpen={setIsReconModalOpen}
-                onboardingItems={[
-                  { id: 'menu', label: 'Add dishes to your menu', hint: 'Add your categories and dishes with prices, then press Publish so the Captain, POS and QR menu all show them.', done: menuItems.length > 0, onGo: () => setActiveTab('MENU') },
-                  { id: 'tables', label: 'Set up your floor & tables', hint: 'Add your tables (you can add many at once) so the Captain can open them and guests can scan their QR code.', done: tables.length > 0, onGo: () => setActiveTab('TABLES') },
-                  { id: 'printer', label: 'Connect a receipt printer', hint: 'Add the counter printer and any kitchen printers so bills and kitchen tickets print.', done: configuredPrinters.length > 0, onGo: () => setActiveTab('HARDWARE') },
-                  { id: 'staff', label: 'Add your team members', hint: 'Add each waiter, cashier and cook. Each gets a PIN to sign in on the Captain, POS and kitchen screen.', done: users.length > 1, onGo: () => setActiveTab('STAFF') },
-                  {
-                    id: 'captain_order',
-                    label: 'Take a practice order on a Captain tablet',
-                    hint: 'Open the Captain app, sign in with a staff PIN, pick a table, add a dish and press Send to kitchen. Then check the next step.',
-                    done: orders.some((o) => o.source_type === 'CAPTAIN'),
-                    onGo: () => setActiveTab('TABLES')
-                  },
-                  {
-                    id: 'kitchen_seen',
-                    label: 'See it on the kitchen screen and mark it ready',
-                    hint: 'The ticket appears on the kitchen screen by itself. Tap the dish when it is cooked; the Captain tablet buzzes to say it is ready.',
-                    done: db.kots.some((k) => !!k.readyAt || k.items.some((i) => !!i.readyAt) || k.status === 'READY' || k.status === 'SERVED'),
-                    onGo: () => setActiveTab('LIVE_KDS')
-                  },
-                  {
-                    id: 'first_order',
-                    label: 'Take your first payment at the counter',
-                    hint: 'On the POS, open that table and press Settle. When the bill is paid, your restaurant is ready for service.',
-                    done: orders.some((o) => o.orderStatus === 'COMPLETED' && o.paymentStatus === 'SUCCESS'),
-                    onGo: () => setActiveTab('BILLING_SALES')
-                  }
-                ]}
-                onRefresh={() => {
-                  setDbTick((t) => t + 1);
-                  showToast('Dashboard metrics refreshed');
-                }}
-              />
-            )}
+            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} />{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
+            {activeTab === 'DASHBOARD' && branchScopeReady && !isKioskAdmin && activeAdminBranch !== 'all' && <OnboardingChecklistCard items={[
+              {id:'menu',label:'Add and publish your menu',hint:'Add categories and dishes so all devices share the same menu.',done:menuItems.length>0,onGo:()=>setActiveTab('MENU')},
+              {id:'tables',label:'Set up this branch’s tables',done:tables.length>0,onGo:()=>setActiveTab('TABLES')},
+              {id:'staff',label:'Add your team',done:users.length>0,onGo:()=>setActiveTab('STAFF')},
+              {id:'printer',label:'Connect receipt and kitchen printers',done:configuredPrinters.length>0,onGo:()=>setActiveTab('HARDWARE')}
+            ]} />}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
             {activeTab === 'QR_ORDERING' && <QrConsole onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} />}
@@ -1648,7 +1613,7 @@ export default function PosAdminApp() {
                 onRequestConfirm={setConfirmDialog}
               />
             )}
-          </main>
+          </main>}
         </div>
 
         {/* ALL SPECIALIZED MODAL DIALOGS */}

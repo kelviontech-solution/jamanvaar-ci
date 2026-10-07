@@ -362,7 +362,7 @@ export class TenantAuthService {
 
     // Check device activation state
     let isDeviceActive = false;
-    let activeDevice: { id: string; type: string; status: string; deviceTokenHash: string | null } | null = null;
+    let activeDevice: { id: string; type: string; status: string; branchId: string | null; deviceTokenHash: string | null } | null = null;
 
     if (deviceId) {
       activeDevice = await this.prisma.runAsTenant(matchedUser.restaurantId, async (tx) => {
@@ -372,7 +372,7 @@ export class TenantAuthService {
             restaurantId: matchedUser.restaurantId,
             status: 'ACTIVE'
           },
-          select: { id: true, type: true, status: true, deviceTokenHash: true }
+          select: { id: true, type: true, status: true, branchId: true, deviceTokenHash: true }
         });
       });
 
@@ -396,6 +396,8 @@ export class TenantAuthService {
 
     // Case 1: Device is registered and active -> LOGIN_SUCCESS
     if (isDeviceActive && activeDevice) {
+      if (deviceType && activeDevice.type !== deviceType) throw new ForbiddenException('Device belongs to a different application');
+      if (matchedUser.role !== 'OWNER' && matchedUser.branchId && activeDevice.branchId !== matchedUser.branchId) throw new ForbiddenException('Sign in on a device assigned to your branch');
       const accessToken = this.signAccessToken(matchedUser, activeDevice.id);
       const { token: refreshToken, expiresAt } = await this.issueRefreshToken(matchedUser.id, matchedUser.restaurantId, activeDevice.id);
 

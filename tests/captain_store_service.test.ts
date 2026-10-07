@@ -448,4 +448,43 @@ describe('Captain service workflow', () => {
       expect(OrderRepository.getOrderById(orderId)!.customerPhone).toBeUndefined();
     });
   });
+
+  describe('freeing a table recovers from a stuck occupancy without abandoning its bill (manual "Free table")', () => {
+    it('a self-order (kiosk/QR) table that never had a captain seat it shows occupied on every device, and a captain can free it', async () => {
+      await signIn();
+      // Simulates a guest choosing "Dine In" + Table 6 on the self-order kiosk, or scanning the
+      // table's own QR code: createOrder's own tableId handling occupies the table immediately on
+      // whichever device created it (verified here); other devices that only ever PULL the order —
+      // never creating it themselves — self-heal the same way via TableRepository.reconcileQrTableOrders,
+      // covered directly in tests/qr_table_lifecycle.test.ts.
+      const t6 = table('6');
+      const kioskOrder = OrderRepository.createOrder({
+        orderType: 'DINE_IN', items: [], subtotal: 200, taxAmount: 10, totalAmount: 210,
+        paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'PREPARING',
+        source_type: 'KIOSK', tableId: t6.id, tableNumber: t6.tableNumber
+      });
+      expect(t6).toMatchObject({ status: 'OCCUPIED', currentOrderId: kioskOrder.id });
+
+      store().selectTable(t6);
+      expect(store().selectedTable?.tableNumber).toBe('6');
+
+      expect(store().closeTable('6')).toBe(true);
+      expect(t6).toMatchObject({ status: 'AVAILABLE', currentOrderId: undefined });
+      expect(OrderRepository.getOrderById(kioskOrder.id)!.orderStatus).toBe('COMPLETED');
+    });
+
+    it('freeing a table with a live KOT completes that order instead of leaving it open forever', async () => {
+      await signIn();
+      store().openTable('1', 2);
+      addDish(0, 1);
+      store().sendKOT();
+      const orderId = table('1').currentOrderId!;
+      expect(OrderRepository.getOrderById(orderId)!.orderStatus).not.toBe('COMPLETED');
+
+      expect(store().closeTable('1')).toBe(true);
+
+      expect(table('1')).toMatchObject({ status: 'AVAILABLE', currentOrderId: undefined });
+      expect(OrderRepository.getOrderById(orderId)!.orderStatus).toBe('COMPLETED');
+    });
+  });
 });

@@ -49,14 +49,13 @@
   overflow: hidden;
 }
 
-/* A wide ledger scrolls sideways inside its card instead of clipping the last action buttons. */
+/* Icon-only actions and a merged Source column (BUG: eight text columns plus three full-width
+   action buttons forced this table past any normal window width, so every row scrolled sideways
+   by default) keep this comfortably under 1000px — overflow-x stays only as a safety net for a
+   genuinely narrow window, not the normal case. */
 .backups-table-card .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.backups-table-card .data-table {
-  min-width: 1180px;
 }
 
 .backups-table-card .data-table td:last-child,
@@ -64,9 +63,11 @@
   white-space: nowrap;
 }
 
-.restaurant-cell {
+.restaurant-cell,
+.source-cell {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .snapshot-warning-notice {

@@ -324,11 +324,11 @@ export class OrderSyncService {
             const ref = (evt.meta as { paymentTransactionId?: string } | undefined)?.paymentTransactionId;
             const settled = payStatus === 'SUCCESS' && ref
               ? await tx.paymentTransaction.findFirst({
-                  where: { restaurantId: device.restaurantId, status: 'SUCCESS', OR: [{ id: ref }, { providerOrderId: ref }, { providerPaymentId: ref }] },
+                  where: { restaurantId: device.restaurantId, status: 'SUCCESS', order: { externalOrderId: evt.externalOrderId, ...(device.branchId ? { OR: [{ branchId: device.branchId }, { branchId: null, kiosk: { branchId: device.branchId } }] } : {}) }, OR: [{ id: ref }, { providerOrderId: ref }, { providerPaymentId: ref }] },
                   select: { amount: true }
                 })
               : null;
-            if (!settled || settled.amount < evt.totalAmount) {
+            if (!settled || settled.amount !== evt.totalAmount) {
               await tx.syncConflict.create({
                 data: {
                   restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
@@ -346,10 +346,19 @@ export class OrderSyncService {
           // session without a manager approval is refused; no proof at all (an offline sign-in) is accepted but flagged, or refused when
           // the deployment sets REQUIRE_STAFF_SESSION=true. The tokens themselves are never stored.
           const staffFinalMeta = finalMeta as Record<string, unknown>;
+          if (evt.meta?.refundAmountPaise !== undefined) {
+            if (!PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)) {
+              if (typeof priorMeta.refundAmountPaise === 'number') staffFinalMeta.refundAmountPaise = priorMeta.refundAmountPaise;
+              else delete staffFinalMeta.refundAmountPaise;
+            } else if (evt.meta.refundAmountPaise > header.totalAmount || !existing || decision.status !== 'REFUNDED') {
+              throw new Error('Refund amount requires an existing refunded order and cannot exceed its total');
+            }
+          }
           delete staffFinalMeta.staffSession;
           delete staffFinalMeta.approvalSession;
           const takesBack = !!existing && (['CANCELLED', 'VOID', 'VOIDED', 'REFUNDED'].includes(decision.status) && existing.status !== decision.status
             || (payStatus === 'REFUNDED' && existing.paymentStatus !== 'REFUNDED')
+              || (typeof evt.meta?.refundAmountPaise === 'number' && evt.meta.refundAmountPaise !== priorMeta.refundAmountPaise && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type))
             || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status));
           if (takesBack && !STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type)) {
             const at = Date.parse(evt.updatedAt) || Date.now();
@@ -640,7 +649,8 @@ export class OrderSyncService {
    * missed in one shot rather than only future pushes.
    */
   async catchUp(device: Device, since?: string, afterSeq?: number) {
-    const branchFilter = device.branchId ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : {};
+    const singleBranch = device.branchId && (await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } }))) === 1;
+    const branchFilter = device.branchId ? singleBranch ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : { branchId: device.branchId } : {};
 
     // Sequence cursor (preferred): strictly increasing, gapless, independent of any clock.
     if (afterSeq !== undefined) {

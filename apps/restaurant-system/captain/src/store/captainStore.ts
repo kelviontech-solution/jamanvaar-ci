@@ -714,6 +714,18 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     if (!tbl) return false;
     saveHeld(tableNumber, []);
 
+    // Freeing an occupied table must never orphan a still-open order (unbilled, forever stuck
+    // PREPARING) — a walkout, or a table recovered from a stuck self-service order (BUG: a kiosk
+    // dine-in order never occupied its table at all, so the next guest could be seated on top of
+    // one already eating), both need the table AND its order closed together, matching how POS's
+    // own "Mark Available" already force-completes a lingering order rather than abandoning it.
+    if (tbl.currentOrderId) {
+      const lingering = OrderRepository.getOrderById(tbl.currentOrderId);
+      if (lingering && lingering.orderStatus !== 'COMPLETED' && lingering.orderStatus !== 'CANCELLED') {
+        OrderRepository.updateOrderStatus(lingering.id, 'COMPLETED', 'Table Vacated');
+      }
+    }
+
     tbl.status = 'AVAILABLE';
     tbl.currentGuests = undefined;
     tbl.currentOrderId = undefined;

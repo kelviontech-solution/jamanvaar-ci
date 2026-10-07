@@ -74,6 +74,7 @@ export const orderSyncMetaSchema = z
     approvalSession: z.string().max(1200).optional(),
     businessDayId: z.string().max(64).optional(),
     paymentTransactionId: z.string().max(128).optional(),
+    refundAmountPaise: z.number().int().min(0).optional(),
     tenderedAmountPaise: z.number().int().optional(),
     paymentSplits: z.array(z.object({ method: z.string().max(32), amountPaise: z.number().int() })).optional(),
     cgstPaise: z.number().int().optional(),

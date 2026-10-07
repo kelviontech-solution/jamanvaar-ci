@@ -70,11 +70,13 @@ describe('Inventory stock integrity (BUG-044/045)', () => {
   it('a full refund puts the stock back; a partial refund does not guess', () => {
     const paid = makeOrder(2, { paymentStatus: 'SUCCESS', orderStatus: 'COMPLETED', totalAmount: 400 });
     OrderRepository.refundOrder(paid.id, 100, 'partial', 'Manager');
+    expect(paid.refundAmount).toBe(100);
     expect(stock('inv-paneer')).toBeCloseTo(9.5);
 
     const paid2 = makeOrder(2, { paymentStatus: 'SUCCESS', orderStatus: 'COMPLETED', totalAmount: 400 });
     expect(stock('inv-paneer')).toBeCloseTo(9.0);
     OrderRepository.refundOrder(paid2.id, 400, 'full', 'Manager');
+    expect(paid2.refundAmount).toBe(400);
     expect(stock('inv-paneer')).toBeCloseTo(9.5);
   });
 

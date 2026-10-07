@@ -19,18 +19,18 @@ export function istDayRange(date: string | undefined): { start: Date; end: Date;
 
 /** Day totals retain frozen commission snapshots. Refund exposure is held for review;
  * Route is pending and no refund fee-reversal policy has been agreed. */
-export async function buildDayStatement(tx: Prisma.TransactionClient, restaurantId: string, date: string | undefined) {
+export async function buildDayStatement(tx: Prisma.TransactionClient, restaurantId: string, date: string | undefined, branchId?: string | null) {
   const range = istDayRange(date);
   await tx.$executeRawUnsafe('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
 
   const [payments, refunds] = await Promise.all([
     tx.paymentTransaction.findMany({
-      where: { restaurantId, status: { in: [...SUCCESS_FAMILY] }, paidAt: { gte: range.start, lt: range.end } },
+      where: { restaurantId, ...(branchId ? { order: { OR: [{branchId},{branchId:null,kiosk:{branchId}}] } } : {}), status: { in: [...SUCCESS_FAMILY] }, paidAt: { gte: range.start, lt: range.end } },
       orderBy: { paidAt: 'asc' },
       include: { order: { select: { externalOrderId: true } }, refunds: { select: { status: true } } }
     }),
     tx.refund.findMany({
-      where: { restaurantId, status: 'SUCCESS', processedAt: { gte: range.start, lt: range.end } },
+      where: { restaurantId, ...(branchId ? { payment: { order: { OR: [{branchId},{branchId:null,kiosk:{branchId}}] } } } : {}), status: 'SUCCESS', processedAt: { gte: range.start, lt: range.end } },
     })
   ]);
 

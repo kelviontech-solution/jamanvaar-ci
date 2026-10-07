@@ -40,6 +40,16 @@ describe('SyncOutboxEngine reliability', () => {
   });
   afterEach(() => SyncOutboxEngine.configureTransport(null));
 
+  it('sends the exact partial refund in paise instead of reversing the whole sale', async () => {
+    const order = makeOrder('partial-sync');
+    order.orderStatus = 'REFUNDED';order.refundAmount = 30.25;
+    db.orders.push(order);
+    const t = transport(() => 'ok');SyncOutboxEngine.configureTransport(t);
+    await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    expect(t.calls[0][0].meta?.refundAmountPaise).toBe(3025);
+    expect(t.calls[0][0].totalAmount).toBe(10500);
+  });
+
   it('every pushed order carries a stable eventId that changes only when the order changes', async () => {
     const order = makeOrder('ord-evt-1');
     db.orders.push(order);
