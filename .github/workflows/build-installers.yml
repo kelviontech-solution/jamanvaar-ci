@@ -111,10 +111,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
-
       - name: Install Android NDK
-        run: sdkmanager --install "ndk;27.0.12077973"
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
 
       - uses: dtolnay/rust-toolchain@stable
         with:
