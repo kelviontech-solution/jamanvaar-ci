@@ -1,0 +1,103 @@
+{
+    "results":  [
+                    {
+                        "app":  "pos",
+                        "status":  "PASS",
+                        "masterSize":  1024,
+                        "icoSizes":  [
+                                         16,
+                                         24,
+                                         32,
+                                         48,
+                                         64,
+                                         128,
+                                         256
+                                     ],
+                        "androidDensities":  5,
+                        "adaptiveSafeZone":  "66dp circle within 108dp",
+                        "iosOpaque":  true,
+                        "bundlePathsExist":  true,
+                        "pwaRelativePaths":  true
+                    },
+                    {
+                        "app":  "restaurant-admin",
+                        "status":  "PASS",
+                        "masterSize":  1024,
+                        "icoSizes":  [
+                                         16,
+                                         24,
+                                         32,
+                                         48,
+                                         64,
+                                         128,
+                                         256
+                                     ],
+                        "androidDensities":  5,
+                        "adaptiveSafeZone":  "66dp circle within 108dp",
+                        "iosOpaque":  true,
+                        "bundlePathsExist":  true,
+                        "pwaRelativePaths":  true
+                    },
+                    {
+                        "app":  "captain",
+                        "status":  "PASS",
+                        "masterSize":  1024,
+                        "icoSizes":  [
+                                         16,
+                                         24,
+                                         32,
+                                         48,
+                                         64,
+                                         128,
+                                         256
+                                     ],
+                        "androidDensities":  5,
+                        "adaptiveSafeZone":  "66dp circle within 108dp",
+                        "iosOpaque":  true,
+                        "bundlePathsExist":  true,
+                        "pwaRelativePaths":  true
+                    },
+                    {
+                        "app":  "kds",
+                        "status":  "PASS",
+                        "masterSize":  1024,
+                        "icoSizes":  [
+                                         16,
+                                         24,
+                                         32,
+                                         48,
+                                         64,
+                                         128,
+                                         256
+                                     ],
+                        "androidDensities":  5,
+                        "adaptiveSafeZone":  "66dp circle within 108dp",
+                        "iosOpaque":  true,
+                        "bundlePathsExist":  true,
+                        "pwaRelativePaths":  true
+                    },
+                    {
+                        "app":  "kiosk",
+                        "status":  "PASS",
+                        "masterSize":  1024,
+                        "icoSizes":  [
+                                         16,
+                                         24,
+                                         32,
+                                         48,
+                                         64,
+                                         128,
+                                         256
+                                     ],
+                        "androidDensities":  5,
+                        "adaptiveSafeZone":  "66dp circle within 108dp",
+                        "iosOpaque":  true,
+                        "bundlePathsExist":  true,
+                        "pwaRelativePaths":  true
+                    }
+                ],
+    "artworkGeneration":  "built-in image_gen",
+    "installedBinaryChecked":  false,
+    "androidDeviceChecked":  false,
+    "windowsNativeDecode":  "PASS: user32 LoadImage verified all 35 ICO frames"
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "app": "pos",
+    "status": "PASS",
+    "log": "logs/product-icon-build-pos.log"
+  },
+  {
+    "app": "pos-admin",
+    "status": "PASS",
+    "log": "logs/product-icon-build-pos-admin.log"
+  },
+  {
+    "app": "captain",
+    "status": "PASS",
+    "log": "logs/product-icon-build-captain.log"
+  },
+  {
+    "app": "kds",
+    "status": "PASS",
+    "log": "logs/product-icon-build-kds.log"
+  },
+  {
+    "app": "kiosk-user",
+    "status": "PASS",
+    "log": "logs/product-icon-build-kiosk-user.log"
+  }
+]

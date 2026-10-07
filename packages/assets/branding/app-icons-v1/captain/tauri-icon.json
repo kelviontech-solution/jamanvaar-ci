@@ -1,0 +1,8 @@
+{
+  "default": "master-windows.png",
+  "bg_color": "#B5651D",
+  "android_bg": "background.png",
+  "android_fg": "../adaptive-foreground.png",
+  "android_fg_scale": 100,
+  "android_monochrome": "../adaptive-monochrome.png"
+}

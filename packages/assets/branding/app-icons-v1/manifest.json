@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "artwork": "JAMANVAAR hospitality cloche, presenting hand and three steam wisps",
+  "generator": "built-in image_gen; platform formats generated with local Tauri CLI and Sharp",
+  "apps": [
+    { "id": "pos", "label": "POS", "accent": "#0E4D3C", "directory": "apps/restaurant-system/pos", "route": "/pos/" },
+    { "id": "restaurant-admin", "label": "Restaurant Admin", "accent": "#0B253A", "directory": "apps/restaurant-system/pos-admin", "route": "/restaurant-admin/" },
+    { "id": "captain", "label": "Captain", "accent": "#B5651D", "directory": "apps/restaurant-system/captain", "route": "/captain/" },
+    { "id": "kds", "label": "KDS", "accent": "#9A3324", "directory": "apps/restaurant-system/kds", "route": "/kds/" },
+    { "id": "kiosk", "label": "Kiosk", "accent": "#1E6FA8", "directory": "apps/kiosk-system/kiosk-user", "route": "/kiosk/" }
+  ]
+}
