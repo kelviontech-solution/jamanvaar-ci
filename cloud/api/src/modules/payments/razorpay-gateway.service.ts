@@ -68,6 +68,9 @@ export class RazorpayGatewayService {
 
   /** A one-time payment link for a WhatsApp order (https://razorpay.com/docs/api/payments/payment-links/create/). Razorpay sends no SMS or email; the connector sends the link itself. */
   async createPaymentLink(input: { referenceId: string; amountPaise: number; description: string; customerName: string; customerPhone: string; expireByUnix: number; currency?: string; callbackUrl?: string }): Promise<{ linkId: string; shortUrl: string; status: string }> {
+    const name = input.customerName.trim();
+    const contact = input.customerPhone.trim().replace(/[\s-]/g, '');
+    const customer = { ...(name ? { name } : {}), ...(contact ? { contact } : {}) };
     const { response: res, body } = await upstreamJson('https://api.razorpay.com/v1/payment_links', {
       method: 'POST',
       headers: this.headers(),
@@ -77,7 +80,8 @@ export class RazorpayGatewayService {
         accept_partial: false,
         description: input.description,
         reference_id: input.referenceId,
-        customer: { ...(input.customerName ? { name: input.customerName } : {}), ...(input.customerPhone ? { contact: input.customerPhone } : {}) },
+        // Guest details are optional. Razorpay rejects an empty customer object.
+        ...(Object.keys(customer).length ? { customer } : {}),
         notify: { sms: false, email: false },
         reminder_enable: false,
         expire_by: input.expireByUnix,
@@ -85,8 +89,9 @@ export class RazorpayGatewayService {
       })
     });
     if (!res.ok) {
-      throw new ServiceUnavailableException(`Razorpay payment link creation failed: ${body?.error?.description ?? res.statusText}`);
+      throw new ServiceUnavailableException({ code: [400, 422].includes(res.status) ? 'PAYMENT_LINK_REJECTED' : 'UPSTREAM_RESULT_UNKNOWN', message: `Razorpay payment link creation failed: ${body?.error?.description ?? res.statusText}` });
     }
+    if (typeof body.id !== 'string' || !body.id.startsWith('plink_') || typeof body.short_url !== 'string' || !body.short_url.startsWith('https://')) throw new ServiceUnavailableException({ code: 'UPSTREAM_RESULT_UNKNOWN', message: 'Checkout could not be confirmed. Check payment status before trying again.' });
     return { linkId: body.id, shortUrl: body.short_url, status: body.status };
   }
 
@@ -100,8 +105,15 @@ export class RazorpayGatewayService {
   async findPaymentLink(referenceId: string): Promise<{ id: string; reference_id: string; amount: number; currency: string; short_url: string; status: string; expire_by?: number } | null> {
     const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/payment_links/?reference_id=${encodeURIComponent(referenceId)}`, { method: 'GET', headers: this.headers() });
     if (!response.ok) throw new ServiceUnavailableException('The previous payment attempt could not be checked. Please try again.');
+    if (!Array.isArray(body.payment_links) && typeof body.id !== 'string') throw new ServiceUnavailableException('The previous payment attempt returned an unreadable status. Please try again.');
     const links = Array.isArray(body.payment_links) ? body.payment_links : body.id ? [body] : [];
     return links.find((link: { reference_id?: string }) => link.reference_id === referenceId) ?? null;
+  }
+
+  async cancelPaymentLink(id: string): Promise<{ id: string; status: string; amount_paid: number }> {
+    const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/payment_links/${encodeURIComponent(id)}/cancel`, { method: 'POST', headers: this.headers() });
+    if (!response.ok) throw new ServiceUnavailableException('The online payment could not be closed safely. Check its status before paying at the counter.');
+    return body;
   }
 
   /** A refund of part or all of one captured Razorpay payment (https://razorpay.com/docs/api/refunds/create-normal/). */

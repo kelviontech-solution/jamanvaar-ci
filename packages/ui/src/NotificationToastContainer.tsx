@@ -26,7 +26,9 @@ export const NotificationToastContainer: React.FC<NotificationToastContainerProp
 
   useEffect(() => {
     const unsub = db.subscribe(() => {
-      const all = NotificationRepository.getNotifications(role);
+      // GUEST_HELP has its own full-attention popup (UrgentGuestAlertModal) — showing it here too,
+      // as a small auto-dismissing corner card, is how it used to go unnoticed in the first place.
+      const all = NotificationRepository.getNotifications(role).filter((n) => n.type !== 'GUEST_HELP');
       if (all.length > 0) {
         const newest = all[0];
         if (newest.id !== lastProcessedId && !newest.isRead) {

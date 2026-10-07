@@ -116,6 +116,18 @@ export function customerStatusFor(canonical: string): CustomerOrderStatus {
   }
 }
 
+/** Kitchen completion and payment settlement are separate. A served unpaid meal is completed for the guest. */
+export function customerKitchenStatus(canonical: string, items: unknown): CustomerOrderStatus {
+  if (['CANCELLED', 'REFUNDED', 'VOIDED'].includes(canonical)) return 'CANCELLED';
+  if (!Array.isArray(items) || !items.length) return customerStatusFor(canonical);
+  const live = items.filter(item => item?.kitchenStatus !== 'CANCELLED');
+  if (!live.length) return 'CANCELLED';
+  if (live.every(item => item?.kitchenStatus === 'SERVED')) return 'COMPLETED';
+  if (live.every(item => ['READY', 'SERVED'].includes(item?.kitchenStatus))) return 'READY';
+  if (canonical === 'COMPLETED' || canonical === 'SERVED') return 'PREPARING';
+  return customerStatusFor(canonical);
+}
+
 /** Midnight (start of today) in a restaurant's own timezone, as a UTC instant. */
 export function startOfDayIn(timeZone: string, now: Date = new Date()): Date {
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(now);

@@ -447,10 +447,20 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
   if (placed.currency) currencyCode = placed.currency;
   const [error,setError]=useState<string|null>(null);
   const [busy,setBusy]=useState(false);
-  const mounted=useRef(true),checking=useRef(false);
+  const mounted=useRef(true),checking=useRef(false),acting=useRef(false),revision=useRef(0);
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
-  const refresh=async()=>{if(checking.current)return;checking.current=true;try{const p=await QrApi.status(placed.publicOrderId);if(mounted.current){setPlaced(p);setError(null);}}catch(e){if(mounted.current)setError((e as Error).message);}finally{checking.current=false;}};
-  const retry=async()=>{if(busy)return;setBusy(true);try{const p=await QrApi.retryPayment(placed.publicOrderId);setPlaced(p);const url=paymentUrl(p.payment?.url);if(url)location.assign(url);setError(null);}catch(e){setError((e as Error).message);}finally{setBusy(false);}};
+  const refresh=async()=>{if(checking.current||acting.current)return;checking.current=true;const version=revision.current;try{const p=await QrApi.status(placed.publicOrderId);if(mounted.current&&version===revision.current){setPlaced(p);setError(null);}}catch(e){if(mounted.current&&version===revision.current)setError((e as Error).message);}finally{checking.current=false;}};
+  const changePayment=async(counter=false)=>{
+    if(acting.current)return;acting.current=true;revision.current+=1;setBusy(true);setError(null);
+    try{
+      const p=await (counter?QrApi.switchToCounter(placed.publicOrderId):QrApi.retryPayment(placed.publicOrderId));
+      if(!mounted.current)return;
+      setPlaced(p);const url=counter?null:paymentUrl(p.payment?.url);
+      if(url)location.assign(url);
+      else if(!counter&&p.status==='PENDING_PAYMENT')setError('Checkout is not ready yet. Please check payment status or choose pay at counter.');
+    }catch(e){if(mounted.current)setError((e as Error).message);}
+    finally{acting.current=false;if(mounted.current)setBusy(false);}
+  };
   useEffect(() => {
     if (placed.status === 'COMPLETED' || placed.status === 'CANCELLED' || (!showStatus && placed.status !== 'PENDING_PAYMENT')) return;
     const t = setInterval(() => { void refresh(); }, 5000);
@@ -462,7 +472,7 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
   return (
     <section className="page center-text">
       <div className={`status-seal ${placed.status === 'PENDING_PAYMENT' ? 'pending' : ''}`}><Icon name={placed.status === 'PENDING_PAYMENT' ? 'shield' : placed.status === 'CANCELLED' ? 'plate' : 'check'} /></div>
-      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Payment pending':'Order confirmed'}</h2>
+      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Payment pending':placed.status==='COMPLETED'?'Order completed':placed.status==='READY'?'Your order is ready':'Order confirmed'}</h2>
       <p className="big">{placed.orderNumber ?? placed.publicOrderId}</p>
       <p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>
       {showStatus && placed.status !== 'CANCELLED' && placed.status!=='PENDING_PAYMENT' && (
@@ -470,7 +480,12 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
       )}
       {placed.status === 'CANCELLED' && <p className="warn">The restaurant could not take this order. Please ask a team member.</p>}
       <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?'Payment verified':placed.paymentMethod==='ONLINE'?'Your payment is being checked. The kitchen will receive this order after payment is verified.':'Pay at the counter when you are done.'}</p>
-      {placed.status==='PENDING_PAYMENT'&&<><button className="primary" disabled={busy} onClick={()=>void retry()}>{busy?'Checking…':placed.payment?.status==='FAILED'?'Try payment again':'Continue payment'}</button><button className="link" onClick={()=>void refresh()}>Check payment status</button></>}
+      {placed.status==='PENDING_PAYMENT'&&<>
+        <button className="primary" disabled={busy} onClick={()=>void changePayment()}>{busy?'Checking…':placed.payment?.status==='FAILED'?'Try payment again':'Continue payment'}</button>
+        <p className="muted">Choose UPI on secure Razorpay checkout, then select your preferred payment app. Return here to see the verified result.</p>
+        {placed.allowCounterPayment&&<button className="link" disabled={busy} onClick={()=>void changePayment(true)}>Pay at counter instead</button>}
+        <button className="link" disabled={busy} onClick={()=>void refresh()}>Check payment status</button>
+      </>}
       {error&&<p role="alert" className="warn">{error}<button className="link" onClick={()=>void refresh()}>Check again</button></p>}
       <details className="receipt"><summary>Order details / receipt</summary>
         <p><b>{placed.restaurantName}</b>{placed.branchName && ` · ${placed.branchName}`}</p>

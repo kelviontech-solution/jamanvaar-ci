@@ -76,6 +76,19 @@ describe('Staff messages and bill requests across devices (BUG-099/100)', () => 
     expect(ServiceMessages.applyRemote(remote({ id: 'c-1', recipient: 'CAPTAIN' }), 'CAPTAIN')).toBeNull();
   });
 
+  it('a guest\'s own Call Staff tap raises a GUEST_HELP/URGENT notification, distinct from an ordinary staff message, so it can be shown as a full-attention popup instead of the small auto-dismissing toast', () => {
+    ServiceMessages.applyRemote(remote({ id: 'call-1', kind: 'CALL_STAFF', recipient: 'COUNTER', senderName: 'Self-order kiosk', presetText: 'A guest asked for help.', tableNumber: '5' }), 'POS_ADMIN');
+
+    const [notif] = NotificationRepository.getNotifications('POS_ADMIN');
+    expect(notif).toMatchObject({ type: 'GUEST_HELP', priority: 'URGENT' });
+    expect(notif.title).toContain('Table 5');
+
+    // An ordinary staff-to-staff message is unaffected: still MANAGER_ALERT/HIGH, not urgent.
+    ServiceMessages.applyRemote(remote({ id: 'msg-ordinary', recipient: 'MANAGER', presetText: 'Running low on naan' }), 'POS_ADMIN');
+    const ordinary = NotificationRepository.getNotifications('POS_ADMIN').find((n) => n.id === 'notif-msg-ordinary')!;
+    expect(ordinary).toMatchObject({ type: 'MANAGER_ALERT', priority: 'HIGH' });
+  });
+
   it('old and malformed messages are ignored', () => {
     ServiceMessages.applyRemote(remote({ id: 'old', createdAt: new Date(Date.now() - 20 * 3600_000).toISOString() }), 'KDS');
     ServiceMessages.applyRemote({} as never, 'KDS');

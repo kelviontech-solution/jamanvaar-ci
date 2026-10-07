@@ -39,6 +39,7 @@ import { CaptainNotificationsModal } from './components/modals/CaptainNotificati
 import { CaptainQuickMessageModal } from './components/modals/CaptainQuickMessageModal';
 import { CaptainTransferMergeModal } from './components/modals/CaptainTransferMergeModal';
 import { CaptainJamanAiModal } from './components/assistant/CaptainJamanAiModal';
+import { CaptainUrgentHelpAlert } from './components/modals/CaptainUrgentHelpAlert';
 
 import {
   AlertCircle,
@@ -667,6 +668,9 @@ export const App: React.FC = () => {
             setIsAiAssistantOpen(false);
           }}
         />
+
+        {/* 8. Urgent: a guest's own "Call Staff" tap — full-attention, stays up until accepted */}
+        <CaptainUrgentHelpAlert />
       </div>
     </JAMANVAARStartup>
   );

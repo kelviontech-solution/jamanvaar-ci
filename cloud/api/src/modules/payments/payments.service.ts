@@ -334,16 +334,18 @@ export class PaymentsService {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-payment:' + restaurantId + ':' + publicOrderId}))`;
       const synced = await tx.syncedOrder.findFirst({ where: { publicOrderId, restaurantId, source: 'QR', paymentMethod: 'ONLINE' } });
       if (!synced || synced.status === 'CANCELLED') throw new NotFoundException('Online order not found');
+      const switchAt = Number((synced.meta as Record<string, unknown> | null)?.qrCounterSwitchAt ?? 0);
+      if (Date.now() - switchAt < 60_000) throw new ConflictException('Switching this order to counter payment. Please check its status.');
       let order = await tx.order.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: synced.externalOrderId } }, include: { paymentTransactions: { orderBy: { createdAt: 'desc' } } } });
       if (order && order.source !== 'QR') throw new ConflictException('Payment channel mismatch');
       const prior = order?.paymentTransactions[0];
-      const previous = prior?.providerResponse as { linkId?: string } | null;
+      const previous = prior?.providerResponse as { linkId?: string; linkCreateRejected?: boolean } | null;
       if (prior && !previous?.linkId && !PAID_STATUSES.includes(prior.status)) {
         // A timed-out create may already exist at Razorpay. Reuse its unique reference;
         // never issue a new payment attempt while the old result is unknown.
         if (prior.status === 'CREATED' && Date.now() - prior.updatedAt.getTime() < 30_000) return { payment: prior, created: false, synced, recover: false };
         const payment = await tx.paymentTransaction.update({ where: { id: prior.id }, data: { status: 'CREATED', failureReason: null } });
-        return { payment, created: true, synced, recover: true };
+        return { payment, created: true, synced, recover: !previous?.linkCreateRejected };
       }
       if (prior && (PAID_STATUSES.includes(prior.status) || NON_TERMINAL_STATUSES.includes(prior.status) || (previous?.linkId && !/^Payment link (expired|cancelled)$/.test(prior.failureReason ?? '')))) return { payment: prior, created: false, synced };
       if (synced.status !== 'DRAFT') throw new ConflictException('This order is already confirmed');
@@ -384,7 +386,8 @@ export class PaymentsService {
       });
       return this.qrPaymentView(payment);
     } catch (error) {
-      await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.updateMany({ where: { id: attempt.payment.id, status: 'CREATED' }, data: { status: 'FAILED', failureReason: 'Payment link could not be created' } }));
+      const rejected = error instanceof ServiceUnavailableException && (error.getResponse() as { code?: string }).code === 'PAYMENT_LINK_REJECTED';
+      await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.updateMany({ where: { id: attempt.payment.id, status: 'CREATED' }, data: { status: 'FAILED', failureReason: 'Payment link could not be created', ...(rejected ? { providerResponse: { linkCreateRejected: true } } : {}) } }));
       this.logger.warn(`event=qr_payment_creation_failed paymentId=${attempt.payment.id} reason=${error instanceof Error ? error.constructor.name : 'UnknownError'}`);
       throw error;
     }
@@ -403,6 +406,56 @@ export class PaymentsService {
     const current = await this.prisma.runAsTenant(restaurantId, tx => tx.paymentTransaction.findFirstOrThrow({ where: { id: payment.id, restaurantId } }));
     if (current.status === 'SUCCESS') await this.orderSync.confirmPaidQrOrder(restaurantId, externalOrderId, current.id);
     return this.qrPaymentView(current);
+  }
+
+  /** Close the provider attempt before admitting the SAME order for counter collection. */
+  async switchQrToCounter(restaurantId: string, publicOrderId: string) {
+    const switchToken = randomUUID();
+    const attempt = await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-payment:' + restaurantId + ':' + publicOrderId}))`;
+      const synced = await tx.syncedOrder.findFirstOrThrow({ where: { publicOrderId, restaurantId, source: 'QR' } });
+      if (synced.paymentMethod === 'CASH_AT_COUNTER' || synced.paymentStatus === 'SUCCESS') return null;
+      if (synced.status !== 'DRAFT' || synced.paymentMethod !== 'ONLINE') throw new ConflictException('This order cannot switch payment method');
+      const meta = (synced.meta ?? {}) as Record<string, any>;
+      if (Date.now() - Number(meta.qrCounterSwitchAt ?? 0) < 60_000) throw new ConflictException('The payment method is already being changed. Check order status.');
+      const payment = await tx.paymentTransaction.findFirst({ where: { restaurantId, order: { externalOrderId: synced.externalOrderId, source: 'QR' } }, orderBy: { createdAt: 'desc' } });
+      if (payment?.status === 'CREATED' && Date.now() - payment.updatedAt.getTime() < 30_000) throw new ConflictException('Online checkout is still opening. Check payment status before switching.');
+      await tx.syncedOrder.update({ where: { id: synced.id }, data: { meta: { ...meta, qrCounterSwitchAt: Date.now(), qrCounterSwitchToken: switchToken } as Prisma.InputJsonValue } });
+      return { synced, payment };
+    });
+    if (!attempt) return;
+    try {
+      const pay = attempt.payment;
+      if (pay) {
+        if (PAID_STATUSES.includes(pay.status)) {
+          await this.qrPaymentStatus(restaurantId, attempt.synced.externalOrderId);
+          return;
+        }
+        const response = (pay.providerResponse ?? {}) as { linkId?: string; linkCreateRejected?: boolean };
+        const link = response.linkId ? await this.razorpay.fetchPaymentLink(response.linkId) : response.linkCreateRejected ? null : await this.razorpay.findPaymentLink(pay.providerOrderId);
+        if (link) {
+          if (link.reference_id !== pay.providerOrderId || link.amount !== pay.amount || link.currency !== pay.currency) throw new ConflictException('Online payment does not match this order');
+          if (link.status === 'paid') {
+            await this.qrPaymentStatus(restaurantId, attempt.synced.externalOrderId);
+            throw new ConflictException('Online payment was received. Check payment status; do not pay again.');
+          }
+          if (!['cancelled', 'expired'].includes(link.status)) {
+            const closed = await this.razorpay.cancelPaymentLink(link.id);
+            if (closed.id !== link.id || closed.status !== 'cancelled' || closed.amount_paid !== 0) throw new ConflictException('Online payment is still being checked. Do not pay twice.');
+          }
+        }
+      }
+      await this.orderSync.admitCounterQrOrder(restaurantId, attempt.synced.externalOrderId, pay?.id ?? null, switchToken);
+    } finally {
+      await this.prisma.runAsTenant(restaurantId, async tx => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-payment:' + restaurantId + ':' + publicOrderId}))`;
+        const row = await tx.syncedOrder.findUniqueOrThrow({ where: { id: attempt.synced.id } });
+        const meta = (row.meta ?? {}) as Record<string, any>;
+        if (meta.qrCounterSwitchToken !== switchToken) return;
+        delete meta.qrCounterSwitchAt; delete meta.qrCounterSwitchToken;
+        await tx.syncedOrder.update({ where: { id: row.id }, data: { meta: meta as Prisma.InputJsonValue } });
+      });
+    }
   }
 
   async tenantSummary(restaurantId: string, filters: { from?: Date; to?: Date }) {

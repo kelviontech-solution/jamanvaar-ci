@@ -539,6 +539,30 @@ export class OrderSyncService {
     return result.order;
   }
 
+  async admitCounterQrOrder(restaurantId: string, externalOrderId: string, paymentId: string | null, switchToken: string) {
+    const result = await this.prisma.runAsTenant(restaurantId, async tx => {
+      if (paymentId) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'payment-settle:' + paymentId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + restaurantId + ':' + externalOrderId}))`;
+      const order = await tx.syncedOrder.findUniqueOrThrow({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId } } });
+      if (order.paymentStatus === 'SUCCESS' || order.paymentMethod === 'CASH_AT_COUNTER') return { order, changed: false };
+      const meta = (order.meta ?? {}) as Record<string, any>;
+      if (order.source !== 'QR' || order.status !== 'DRAFT' || meta.qrCounterSwitchToken !== switchToken) throw new BadRequestException('Payment method change is no longer valid');
+      if (paymentId) {
+        const payment = await tx.paymentTransaction.findFirstOrThrow({ where: { id: paymentId, restaurantId } });
+        if (['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'].includes(payment.status)) throw new BadRequestException('Online payment has already been received. Check order status.');
+        await tx.paymentTransaction.update({ where: { id: paymentId }, data: { status: 'FAILED', failureReason: 'Payment link cancelled', providerResponse: { ...(payment.providerResponse as Record<string, any> ?? {}), switchedToCounter: true } } });
+        await tx.order.update({ where: { id: payment.orderId }, data: { status: 'CANCELLED' } });
+      }
+      delete meta.qrCounterSwitchAt; delete meta.qrCounterSwitchToken;
+      const seq = await nextSyncSequence(tx, restaurantId);
+      const saved = await tx.syncedOrder.update({ where: { id: order.id }, data: { paymentMethod: 'CASH_AT_COUNTER', paymentStatus: 'PENDING', status: meta.qrAutoAccept ? 'PREPARING' : 'NEW', meta, seq, syncVersion: { increment: 1 } } });
+      await tx.syncEventLog.create({ data: { restaurantId, branchId: saved.branchId, entityType: 'ORDER', entityId: externalOrderId, action: 'UPDATE', status: 'SUCCESS', traceId: externalOrderId } });
+      return { order: saved, changed: true };
+    });
+    if (result.changed) this.realtime.publish({ restaurantId, branchId: result.order.branchId, kind: 'orders', seq: result.order.seq ?? undefined });
+    return result.order;
+  }
+
   async ingestServerOrder(input: ServerOrderInput) {
     const startedAt = Date.now();
     const result = await this.prisma.runAsTenant(input.restaurantId, async (tx) => {

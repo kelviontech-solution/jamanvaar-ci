@@ -29,7 +29,7 @@ export interface Menu { menuVersion: number; etag: string; categories: Array<{ t
 
 export interface Quote { menuVersion?: number; lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
 export interface Placed { publicOrderId: string; restaurantName?: string; branchName?: string; currency?: string; orderNumber: string | null; status: 'PENDING_PAYMENT' | 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string;
-  paymentStatus?: string; paymentMethod?: string; subtotal?: number; tax?: number; discount?: number;
+  paymentStatus?: string; paymentMethod?: string; allowCounterPayment?: boolean; subtotal?: number; tax?: number; discount?: number;
   items?: Array<{name:string;quantity:number;unitPrice:number;lineTotal:number;options:string[];note?:string}>;
   payment?: {status:string;url:string|null;expiresAt:string|null} | null }
 
@@ -83,5 +83,6 @@ export const QrApi = {
   place: async (token: string, body: Record<string, unknown>, session: string) =>
     (await call<Placed>(`/${encodeURIComponent(token)}/orders`, { method: 'POST', body: JSON.stringify(body), session })).data as Placed,
   status: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}`)).data as Placed,
-  retryPayment: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}/payment`, { method: 'POST' })).data as Placed
+  retryPayment: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}/payment`, { method: 'POST' })).data as Placed,
+  switchToCounter: async (publicOrderId: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}/counter-payment`, { method: 'POST', signal: AbortSignal.timeout(25000) })).data as Placed
 };

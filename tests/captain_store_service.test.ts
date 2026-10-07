@@ -367,6 +367,28 @@ describe('Captain service workflow', () => {
       expect(store().messages.some((m) => m.id === 'svc-call-1')).toBe(false);
       expect(store().notifications.some((n) => n.type === 'GUEST_HELP' && n.message.includes('Table 5'))).toBe(true);
     });
+
+    it('accepting the urgent GUEST_HELP popup (its id derivation, the same one CaptainUrgentHelpAlert uses) resolves the matching Guest Request, not a different one', () => {
+      signIn();
+      store().receiveMessages([{
+        id: 'svc-call-2',
+        kind: 'CALL_STAFF' as const,
+        recipient: 'COUNTER' as const,
+        senderName: 'Self-order kiosk',
+        presetText: 'A guest at Table 9 asked for help.',
+        tableNumber: '9',
+        createdAt: new Date().toISOString()
+      }]);
+
+      const notif = store().notifications.find((n) => n.type === 'GUEST_HELP')!;
+      // CaptainUrgentHelpAlert's accept(): markNotificationRead(notif.id) + acknowledgeCustomerRequest('svc-' + base).
+      const base = notif.id.replace(/^notif-/, '');
+      store().markNotificationRead(notif.id);
+      store().acknowledgeCustomerRequest(`svc-${base}`);
+
+      expect(store().notifications.find((n) => n.id === notif.id)?.isRead).toBe(true);
+      expect(store().customerRequests.find((r) => r.tableNumber === '9')).toMatchObject({ isAcknowledged: true, isResolved: false });
+    });
   });
 
   describe('attaching a guest reaches the real order and the CRM (SaaS flow: Restaurant Admin loyalty program, on the floor)', () => {

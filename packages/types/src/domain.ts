@@ -1598,7 +1598,8 @@ export type NotificationType =
   | 'LOW_STOCK'
   | 'SHIFT_OPENED'
   | 'SHIFT_CLOSED'
-  | 'MANAGER_ALERT';
+  | 'MANAGER_ALERT'
+  | 'GUEST_HELP';
 
 export type NotificationRole = 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'ALL';
 

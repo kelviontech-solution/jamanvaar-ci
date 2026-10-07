@@ -12,7 +12,7 @@ import { QrResolutionCache } from './qr-resolution-cache';
 import { PaymentsService } from '../payments/payments.service';
 import { QrSettingsService, QrSettingsView } from './qr-settings.service';
 import {
-  businessDateIn, customerStatusFor, newPublicOrderId, PUBLIC_ORDER_ID_PATTERN, QR_APP_CODE, QR_EVENT, QR_MODE, QR_STATUS, QR_TOKEN_PATTERN,
+  businessDateIn, customerKitchenStatus, newPublicOrderId, PUBLIC_ORDER_ID_PATTERN, QR_APP_CODE, QR_EVENT, QR_MODE, QR_STATUS, QR_TOKEN_PATTERN,
   QrUnavailableCode, QrUnavailableException, startOfDayIn
 } from './qr.support';
 
@@ -368,7 +368,7 @@ export class QrPublicService {
       restaurantName: typeof meta.restaurantName === 'string' ? meta.restaurantName : undefined,
       branchName: typeof meta.branchName === 'string' ? meta.branchName : undefined,
       currency: typeof meta.currency === 'string' ? meta.currency : undefined,
-      status: order.status === 'DRAFT' ? 'PENDING_PAYMENT' : customerStatusFor(order.status),
+      status: order.status === 'DRAFT' ? 'PENDING_PAYMENT' : customerKitchenStatus(order.status, order.items),
       paymentStatus: order.paymentStatus ?? 'PENDING',
       paymentMethod: order.paymentMethod,
       subtotal: (order.subtotal ?? 0) / 100, tax: (order.taxAmount ?? 0) / 100, discount: (order.discountAmount ?? 0) / 100,
@@ -390,7 +390,19 @@ export class QrPublicService {
     if (payment?.status === 'SUCCESS') order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { publicOrderId } }));
     const settings = await this.settingsService.effective(order.restaurantId, order.branchId);
     const view = this.confirmation(order);
-    return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), payment };
+    return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), payment, allowCounterPayment: settings.allowCash && order.status === 'DRAFT' && order.paymentMethod === 'ONLINE' };
+  }
+
+  async switchToCounter(publicOrderId: string) {
+    if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId)) throw new NotFoundException('Order not found');
+    const order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
+    if (!order || order.source !== 'QR' || !order.qrCodeId) throw new NotFoundException('Order not found');
+    if (order.paymentStatus === 'SUCCESS' || order.paymentMethod === 'CASH_AT_COUNTER') return this.orderStatus(publicOrderId);
+    const code = await this.prisma.runAsTenant(order.restaurantId, tx => tx.qrCode.findUniqueOrThrow({ where: { id: order.qrCodeId! } }));
+    const ctx = await this.resolveFresh(code.publicToken);
+    if (!ctx.settings.allowCash) throw new ForbiddenException('Counter payment is unavailable');
+    await this.payments.switchQrToCounter(order.restaurantId, publicOrderId);
+    return this.orderStatus(publicOrderId);
   }
 
   async retryPayment(publicOrderId: string) {

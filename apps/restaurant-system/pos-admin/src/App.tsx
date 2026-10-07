@@ -45,6 +45,7 @@ import {
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
+  UrgentGuestAlertModal,
   useAiAccess,
   ActivationNoticeBanner,
   Logo
@@ -1951,6 +1952,7 @@ export default function PosAdminApp() {
         />
 
         <NotificationToastContainer role="POS_ADMIN" />
+        <UrgentGuestAlertModal role="POS_ADMIN" />
 
         {ai.showButton(db.restaurant?.showJamanAI !== false) && (
           <JamanAiFloatingButton

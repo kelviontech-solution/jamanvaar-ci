@@ -15,6 +15,7 @@ export * from './ThermalReceiptView';
 export * from './BrandHeader';
 export * from './JamanvaarVectorLogo';
 export * from './NotificationToastContainer';
+export * from './UrgentGuestAlertModal';
 export * from './NotificationDrawerModal';
 export * from './JAMANVAARStartup';
 export * from './SplashCornerArtwork';

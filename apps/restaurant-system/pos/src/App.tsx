@@ -35,7 +35,7 @@ import { PosChatbot } from './components/assistant/PosChatbot';
 import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
-import { NotificationToastContainer, JAMANVAARStartup, JamanvaarAuthLayout, APP_HERO_IMAGES, ActivationWelcomeScreen, ActivationNoticeBanner, ActivationHelpNote } from '@jamanvaar/ui';
+import { NotificationToastContainer, UrgentGuestAlertModal, JAMANVAARStartup, JamanvaarAuthLayout, APP_HERO_IMAGES, ActivationWelcomeScreen, ActivationNoticeBanner, ActivationHelpNote } from '@jamanvaar/ui';
 import { UtensilsCrossed, ArrowRight, AlertCircle } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -436,6 +436,7 @@ export const App: React.FC = () => {
 
       {/* Real-time Push Notifications */}
       <NotificationToastContainer role="POS" />
+      <UrgentGuestAlertModal role="POS" />
     </div>
     </JAMANVAARStartup>
   );

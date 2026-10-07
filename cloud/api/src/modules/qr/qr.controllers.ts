@@ -58,6 +58,12 @@ export class QrPublicController {
     return this.qr.retryPayment(publicOrderId);
   }
 
+  @Post('orders/:publicOrderId/counter-payment')
+  @HttpCode(200)
+  switchToCounter(@Param('publicOrderId') publicOrderId: string) {
+    return this.qr.switchToCounter(publicOrderId);
+  }
+
   @Get(':token')
   describe(@Param('token') token: string, @Req() req: Request & { qrSession?: string }) {
     return this.qr.describe(token, req.qrSession);

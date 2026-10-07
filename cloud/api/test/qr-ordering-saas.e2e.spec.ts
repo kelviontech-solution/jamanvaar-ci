@@ -356,7 +356,10 @@ describe('QR ordering (SaaS)', () => {
       expect(names).toEqual(expect.arrayContaining(['Paneer Pizza a', 'Cold Coffee a', 'Sized a']));
       expect(names).not.toContain('Secret a'); // POS only
       expect(names).not.toContain('Sold Out a');
-      expect(names).not.toContain('Unpublished tax a'); // names a tax group the restaurant never published
+      // An invalid old tax reference inherits the restaurant's published default (menu-snapshot.spec.ts).
+      expect(names).toContain('Unpublished tax a');
+      const recovered = await http().post(`/api/v1/public/qr/${tokenA12}/quote`).send({ items: [{ itemId: 'untaxed-a', quantity: 1, optionIds: [] }] });
+      expect(recovered.status).toBe(200);expect(recovered.body.total).toBe(52.5);
       expect(res.body.modifierGroups.find((g: any) => g.name === 'Add-ons').options[0]).toMatchObject({ name: 'Extra Cheese', priceDelta: 35 });
       expect(res.body.items.every((i: any) => !('taxRate' in i) && !('basePrice' in i))).toBe(true);
       expect(res.headers.etag).toBeTruthy();
@@ -605,9 +608,12 @@ describe('QR ordering (SaaS)', () => {
           as('post', '/api/v1/orders/sync', F.A.pos1).send({ events: [{ externalOrderId: order.externalOrderId, orderType: 'DINE_IN', status, items: order.items, subtotal: order.subtotal, taxAmount: order.taxAmount, totalAmount: order.totalAmount, updatedAt: now(), ...extra }] });
         expect((await update('PREPARING')).status).toBe(201);
         expect((await http().get(`/api/v1/public/qr/orders/${pub}`)).body.status).toBe('PREPARING');
-        await update('READY');
+        const readyItems = order.items.map((item: any) => ({ ...item, kitchenStatus: 'READY' }));
+        await update('READY', { items: readyItems });
         expect((await http().get(`/api/v1/public/qr/orders/${pub}`)).body.status).toBe('READY');
-        await update('COMPLETED', { paymentStatus: 'SUCCESS', paymentMethod: 'CASH_AT_COUNTER' });
+        await update('COMPLETED', { items: readyItems, paymentStatus: 'SUCCESS', paymentMethod: 'CASH_AT_COUNTER' });
+        expect((await http().get(`/api/v1/public/qr/orders/${pub}`)).body.status).toBe('READY'); // Paid is not served.
+        await update('COMPLETED', { items: readyItems.map((item: any) => ({ ...item, kitchenStatus: 'SERVED' })), paymentStatus: 'SUCCESS', paymentMethod: 'CASH_AT_COUNTER' });
         expect((await http().get(`/api/v1/public/qr/orders/${pub}`)).body.status).toBe('COMPLETED');
         const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId: pub } }));
         expect(row?.source).toBe('QR'); // a device update never changes the channel

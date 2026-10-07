@@ -59,6 +59,10 @@ async function main() {
       };
       gateway.fetchPaymentLink = async id => { const link = links.get(id); if (!link) throw Error('QA link not found'); return link; };
       gateway.findPaymentLink = async reference => [...links.values()].find(link => link.reference_id === reference) || null;
+      gateway.cancelPaymentLink = async id => {
+        const link = links.get(id); if (!link || link.amount_paid) throw Error('QA link cannot be cancelled');
+        link.status = 'cancelled'; return link;
+      };
     }
   }
   // Signature validation remains the actual gateway implementation with a throw-away QA secret.

@@ -186,12 +186,17 @@ export class ServiceMessages {
     // "asked for the bill" message from an older build would show the counter a table and no bill, so it raises nothing.
     if (msg.kind === 'BILL_REQUEST') return msg;
     const where = msg.tableNumber ? ` — Table ${msg.tableNumber}` : '';
+    // A guest standing at the kiosk waiting for help is a different urgency than a staff-to-staff
+    // note: its own type/priority (GUEST_HELP/URGENT) is what tells UrgentGuestAlertModal to raise it
+    // as a full-attention popup instead of the small, auto-dismissing corner toast every other
+    // notification gets — a staff member looking away from the screen for a few seconds used to miss
+    // it entirely and only discover it later as a stale badge count on the bell.
     NotificationRepository.createNotification({
       id: `notif-${msg.id}`,
-      type: 'MANAGER_ALERT',
+      type: msg.kind === 'CALL_STAFF' ? 'GUEST_HELP' : 'MANAGER_ALERT',
       title: msg.kind === 'CALL_STAFF' ? `🙋 Guest needs help${where}` : `💬 Message from ${msg.senderName}${where}`,
       message: msg.customNote || msg.presetText,
-      priority: 'HIGH',
+      priority: msg.kind === 'CALL_STAFF' ? 'URGENT' : 'HIGH',
       targetRoles: roles,
       tableNumber: msg.tableNumber,
       timestamp: msg.createdAt

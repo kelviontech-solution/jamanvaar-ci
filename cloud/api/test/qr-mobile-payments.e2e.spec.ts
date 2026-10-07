@@ -1,4 +1,5 @@
 import { createHmac } from 'node:crypto';
+import { ServiceUnavailableException } from '@nestjs/common';
 import request from 'supertest';
 import { beforeAll, afterAll, it, expect, vi } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
@@ -87,4 +88,52 @@ it('verified payment wins when the link-create response fails after its signed w
 it('online payment is unavailable without a webhook verification secret',async()=>{
  const previous=process.env.RAZORPAY_WEBHOOK_SECRET;process.env.RAZORPAY_WEBHOOK_SECRET='';
  try{const info=await http().get(`/api/v1/public/qr/${qr}`);expect(info.body.ordering.settings.allowOnlinePayment).toBe(false);const r=await http().post(`/api/v1/public/qr/${qr}/orders`).send(body('no-webhook-secret-123'));expect(r.status).toBe(400);expect(r.body.message).toContain('payment method is not available');}finally{process.env.RAZORPAY_WEBHOOK_SECRET=previous;}
+});
+
+it('a definitely rejected anonymous checkout retries the SAME payment reference without provider recovery lookup', async () => {
+ vi.mocked(gateway.createPaymentLink).mockRejectedValueOnce(new ServiceUnavailableException({ code: 'PAYMENT_LINK_REJECTED', message: 'customer rejected' }));
+ const p=await place('rejected-empty-customer-123'),pay=await payment(p.publicOrderId);
+ expect(pay.status).toBe('FAILED');
+ const before=vi.mocked(gateway.findPaymentLink).mock.calls.length;
+ const retry=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/payment`);
+ expect(retry.status,JSON.stringify(retry.body)).toBe(200);expect(retry.body.payment.url).toBe('https://rzp.io/i/qa-only');
+ expect((await payment(p.publicOrderId)).id).toBe(pay.id);expect(gateway.findPaymentLink).toHaveBeenCalledTimes(before);
+});
+it('a rejected online checkout can switch to cash without duplicating its order or charging it', async () => {
+ vi.mocked(gateway.createPaymentLink).mockRejectedValueOnce(new ServiceUnavailableException({ code: 'PAYMENT_LINK_REJECTED', message: 'customer rejected' }));
+ const p=await place('rejected-then-cash-123'),o=await stored(p.publicOrderId);
+ expect(p.allowCounterPayment).toBe(true);
+ const switched=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`);
+ expect(switched.status,JSON.stringify(switched.body)).toBe(200);expect(switched.body).toMatchObject({ publicOrderId:p.publicOrderId,paymentMethod:'CASH_AT_COUNTER',paymentStatus:'PENDING',total:249,payment:null });
+ expect((await stored(p.publicOrderId)).externalOrderId).toBe(o.externalOrderId);
+ expect((await stored(p.publicOrderId)).seq).toBeGreaterThan(o.seq!);
+ const again=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`);expect(again.status).toBe(200);
+});
+it('an existing payable link must be cancelled at the provider before admitting cash', async () => {
+ const p=await place('live-link-then-cash-123'),pay=await payment(p.publicOrderId);
+ vi.mocked(gateway.fetchPaymentLink).mockResolvedValueOnce({id:`plink_${pay.providerOrderId}`,reference_id:pay.providerOrderId,amount:pay.amount,amount_paid:0,currency:'INR',status:'created'});
+ const cancel=vi.spyOn(gateway,'cancelPaymentLink').mockResolvedValueOnce({id:`plink_${pay.providerOrderId}`,status:'cancelled',amount_paid:0});
+ const switched=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`);
+ expect(switched.status,JSON.stringify(switched.body)).toBe(200);expect(cancel).toHaveBeenCalledWith(`plink_${pay.providerOrderId}`);expect(switched.body.paymentMethod).toBe('CASH_AT_COUNTER');
+});
+it('unknown cancellation keeps the online draft blocked and permits a later safe retry', async () => {
+ const p=await place('unsafe-cancel-cash-123'),pay=await payment(p.publicOrderId);
+ vi.mocked(gateway.fetchPaymentLink).mockResolvedValueOnce({id:`plink_${pay.providerOrderId}`,reference_id:pay.providerOrderId,amount:pay.amount,amount_paid:0,currency:'INR',status:'created'});
+ vi.mocked(gateway.cancelPaymentLink).mockRejectedValueOnce(new ServiceUnavailableException('Provider timeout'));
+ expect((await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`)).status).toBe(503);
+ expect(await stored(p.publicOrderId)).toMatchObject({status:'DRAFT',paymentMethod:'ONLINE'});
+ expect((await stored(p.publicOrderId)).meta).not.toHaveProperty('qrCounterSwitchToken');
+});
+it('a captured webhook racing cash fallback wins without creating an unpaid kitchen order', async () => {
+ const p=await place('paid-during-counter-switch-123'),pay=await payment(p.publicOrderId);
+ vi.mocked(gateway.fetchPaymentLink).mockResolvedValueOnce({id:`plink_${pay.providerOrderId}`,reference_id:pay.providerOrderId,amount:pay.amount,amount_paid:0,currency:'INR',status:'created'});
+ vi.mocked(gateway.cancelPaymentLink).mockImplementationOnce(async()=>{await webhook(pay);return {id:`plink_${pay.providerOrderId}`,status:'cancelled',amount_paid:0};});
+ const r=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`);expect(r.status).toBe(200);
+ expect(r.body).toMatchObject({paymentStatus:'SUCCESS',paymentMethod:'RAZORPAY'});expect((await payment(p.publicOrderId)).status).toBe('SUCCESS');
+});
+it('the owner can disable cash fallback and a paid order never switches to unpaid cash', async () => {
+ const p=await place('cash-disabled-fallback-123');await auth('put','/api/v1/restaurant/qr/settings').send({allowCash:false});
+ expect((await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`)).status).toBe(403);
+ await auth('put','/api/v1/restaurant/qr/settings').send({allowCash:true});await webhook(await payment(p.publicOrderId));
+ const r=await http().post(`/api/v1/public/qr/orders/${p.publicOrderId}/counter-payment`);expect(r.status).toBe(200);expect(r.body.paymentStatus).toBe('SUCCESS');expect(r.body.paymentMethod).toBe('RAZORPAY');
 });
