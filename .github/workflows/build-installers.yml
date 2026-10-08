@@ -111,12 +111,6 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Free up disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk-bundle /opt/ghc /usr/local/.ghcup "$AGENT_TOOLSDIRECTORY" /opt/hostedtoolcache/CodeQL || true
-          docker image prune -af || true
-          df -h /
-
       - name: Install Android NDK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
