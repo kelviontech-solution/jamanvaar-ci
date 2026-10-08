@@ -119,7 +119,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi
+          targets: aarch64-linux-android
 
       - name: Install workspace dependencies
         run: npm ci
@@ -134,9 +134,11 @@ jobs:
 
       - name: Build Android APK (${{ matrix.app.name }}, debug-signed)
         working-directory: ${{ matrix.app.path }}
-        # arm64 + armv7 only -- covers essentially every real Android phone; x86/x86_64 are
-        # emulator-only architectures and building all 4 was filling the runner's disk.
-        run: npx --yes "@tauri-apps/cli@2.11.4" android build --debug --target aarch64 --target armv7
+        # arm64 only -- covers virtually every Android device sold in the last 5+ years.
+        # Rust compiles a complete, separate dependency tree per target architecture, and
+        # even arm64+armv7 together still filled the runner's disk; armv7 is effectively
+        # obsolete at this point, and x86/x86_64 are emulator-only anyway.
+        run: npx --yes "@tauri-apps/cli@2.11.4" android build --debug --target aarch64
 
       - uses: actions/upload-artifact@v4
         with:
