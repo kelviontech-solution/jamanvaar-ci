@@ -113,9 +113,11 @@ jobs:
 
       - name: Install Android NDK
         run: |
+          df -h / || true
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.0.12077973"
           echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> "$GITHUB_ENV"
+          df -h / || true
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -135,10 +137,14 @@ jobs:
       - name: Build Android APK (${{ matrix.app.name }}, debug-signed)
         working-directory: ${{ matrix.app.path }}
         # arm64 only -- covers virtually every Android device sold in the last 5+ years.
-        # Rust compiles a complete, separate dependency tree per target architecture, and
-        # even arm64+armv7 together still filled the runner's disk; armv7 is effectively
-        # obsolete at this point, and x86/x86_64 are emulator-only anyway.
-        run: npx --yes "@tauri-apps/cli@2.11.4" android build --debug --target aarch64
+        # CARGO_PROFILE_DEV_DEBUG=0 strips full debug symbols from the dev profile, which
+        # is usually the single biggest contributor to target/ directory size and was
+        # filling the runner's disk even with one architecture.
+        env:
+          CARGO_PROFILE_DEV_DEBUG: "0"
+        run: |
+          df -h / || true
+          npx --yes "@tauri-apps/cli@2.11.4" android build --debug --target aarch64
 
       - uses: actions/upload-artifact@v4
         with:
