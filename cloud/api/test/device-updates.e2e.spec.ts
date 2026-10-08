@@ -80,7 +80,7 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
     });
 
     it('marks the offer mandatory when the release is, and carries the download link', async () => {
-      await prisma.appRelease.update({ where: { appCode_version: { appCode: 'POS', version: '91.0.0' } }, data: { isMandatory: true, downloadUrl: 'https://example.com/pos-91.exe' } });
+      await prisma.appRelease.update({ where: { appCode_version: { appCode: 'POS', version: '91.0.0' } }, data: { isMandatory: true, downloadUrls: { windows: 'https://example.com/pos-91.exe' } } });
       const pos = await enroll('POS');
       expect((await heartbeat(pos.token, { appVersion: '1.0.0' })).body.update).toMatchObject({ mandatory: true, downloadUrl: 'https://example.com/pos-91.exe' });
     });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, Monitor, Smartphone, Globe, Package, Clock } from 'lucide-react';
+import { Monitor, Smartphone, Globe, Package, Clock } from 'lucide-react';
 import { fetchCloudApplications, type CloudAppCatalogEntry } from '../../cloud/cloudClient';
 
 const PLATFORM_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -12,8 +12,10 @@ const PLATFORM_ICON: Record<string, React.ComponentType<{ className?: string }>>
 /**
  * One card per JAMANVAAR app, backed by the real release data Super Admin publishes
  * (ApplicationsPage's "Publish Version" flow) via GET /api/v1/tenant/applications.
- * `downloadUrl` is null until a release is actually published for that app — shown
- * here as a disabled "Not yet available" state, never a fake/placeholder link.
+ * `downloadUrls` is null until a release is actually published for that app — shown
+ * here as a disabled "Not yet available" state, never a fake/placeholder link. A
+ * version can have a different file per platform (Windows .exe vs Android .apk), so
+ * each available platform gets its own download button.
  */
 export function AppDownloadsModule() {
   const [apps, setApps] = useState<CloudAppCatalogEntry[] | null>(null);
@@ -57,7 +59,8 @@ export function AppDownloadsModule() {
       {apps && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {apps.map((app) => {
-            const hasRelease = Boolean(app.downloadUrl);
+            const downloads = Object.entries(app.downloadUrls || {});
+            const hasRelease = downloads.length > 0;
             return (
               <div
                 key={app.code}
@@ -96,15 +99,23 @@ export function AppDownloadsModule() {
                 </div>
 
                 {hasRelease ? (
-                  <a
-                    href={app.downloadUrl!}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-jaman-navy text-white font-bold text-sm py-2.5 hover:bg-jaman-navy/90 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </a>
+                  <div className="flex flex-col gap-2 mt-1">
+                    {downloads.map(([platform, url]) => {
+                      const Icon = PLATFORM_ICON[platform] || Package;
+                      return (
+                        <a
+                          key={platform}
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-jaman-navy text-white font-bold text-sm py-2.5 hover:bg-jaman-navy/90 transition-colors"
+                        >
+                          <Icon className="w-4 h-4" />
+                          Download for {platform === 'electron' ? 'Windows' : platform[0].toUpperCase() + platform.slice(1)}
+                        </a>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <button
                     type="button"

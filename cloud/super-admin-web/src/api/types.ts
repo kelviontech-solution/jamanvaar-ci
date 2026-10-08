@@ -832,7 +832,8 @@ export interface ApplicationSummary {
   channel: 'STABLE' | 'BETA';
   minSupportedVersion: string | null;
   supportedPlatforms: string[];
-  downloadUrl: string | null;
+  /** Keyed by platform (e.g. "windows", "android") -- one version can need a different file per platform. */
+  downloadUrls: Record<string, string> | null;
   releaseNotes: string | null;
   releasedAt: string | null;
   totalDevices: number;

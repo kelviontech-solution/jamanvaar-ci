@@ -18,7 +18,9 @@ export const publishReleaseSchema = z.object({
   minSupportedVersion: z.string().optional(),
   supportedPlatforms: z.array(z.string()).min(1),
   releaseNotes: z.string().optional(),
-  downloadUrl: httpsUrl.optional(),
+  // One version can need a different file per platform (a Windows .exe vs an Android
+  // .apk) -- keyed by the same platform strings as supportedPlatforms.
+  downloadUrls: z.record(z.string(), httpsUrl).optional(),
   isMandatory: z.boolean().default(false)
 });
 

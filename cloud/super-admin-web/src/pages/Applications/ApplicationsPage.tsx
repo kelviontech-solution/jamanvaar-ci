@@ -20,9 +20,9 @@ import {
 } from 'lucide-react';
 
 /**
- * security-audit MED-04/SAW-04: the server now validates `downloadUrl` as `https://`
- * only (see cloud/api's `publishReleaseSchema`), but this page renders it as a raw
- * `<a href>` — defense-in-depth in case a row was written before that validation
+ * security-audit MED-04/SAW-04: the server now validates each downloadUrls entry as
+ * `https://` only (see cloud/api's `publishReleaseSchema`), but this page renders it as a
+ * raw `<a href>` — defense-in-depth in case a row was written before that validation
  * existed, or the check is ever bypassed. `target="_blank"` + `noopener` alone does not
  * stop a `javascript:` URL from executing in this page's own origin.
  */
@@ -48,7 +48,7 @@ export function ApplicationsPage() {
   const [newChannel, setNewChannel] = useState<'STABLE' | 'BETA'>('STABLE');
   const [newPlatforms, setNewPlatforms] = useState<string[]>(['windows']);
   const [newReleaseNotes, setNewReleaseNotes] = useState('');
-  const [newDownloadUrl, setNewDownloadUrl] = useState('');
+  const [newDownloadUrls, setNewDownloadUrls] = useState<Record<string, string>>({});
   const [isMandatory, setIsMandatory] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
@@ -100,7 +100,7 @@ export function ApplicationsPage() {
     }
     setNewPlatforms(app.supportedPlatforms || ['web']);
     setNewReleaseNotes('');
-    setNewDownloadUrl(app.downloadUrl || '');
+    setNewDownloadUrls(app.downloadUrls || {});
     setIsMandatory(false);
     setPublishError(null);
   }
@@ -112,13 +112,18 @@ export function ApplicationsPage() {
     setPublishing(true);
     setPublishError(null);
     try {
+      const downloadUrls = Object.fromEntries(
+        Object.entries(newDownloadUrls)
+          .map(([platform, url]) => [platform, url.trim()] as const)
+          .filter(([, url]) => url.length > 0)
+      );
       await api.post('/api/v1/applications/releases', {
         appCode: publishModalApp.code,
         version: newVersion.trim(),
         channel: newChannel,
         supportedPlatforms: newPlatforms,
         releaseNotes: newReleaseNotes.trim() || undefined,
-        downloadUrl: newDownloadUrl.trim() || undefined,
+        downloadUrls: Object.keys(downloadUrls).length > 0 ? downloadUrls : undefined,
         isMandatory
       });
       setPublishModalApp(null);
@@ -134,6 +139,10 @@ export function ApplicationsPage() {
     setNewPlatforms((prev) =>
       prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
     );
+  }
+
+  function setDownloadUrlForPlatform(platform: string, url: string) {
+    setNewDownloadUrls((prev) => ({ ...prev, [platform]: url }));
   }
 
   const totalFleetDevices = apps.reduce((sum, a) => sum + a.totalDevices, 0);
@@ -276,18 +285,22 @@ export function ApplicationsPage() {
                     <span>Publish Version</span>
                   </Button>
 
-                  {isSafeHttpsUrl(app.downloadUrl) && (
-                    <a
-                      href={app.downloadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-ghost btn-sm"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download / Open</span>
-                    </a>
-                  )}
+                  {app.downloadUrls &&
+                    Object.entries(app.downloadUrls)
+                      .filter(([, url]) => isSafeHttpsUrl(url))
+                      .map(([platform, url]) => (
+                        <a
+                          key={platform}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-ghost btn-sm"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{platform.toUpperCase()}</span>
+                        </a>
+                      ))}
 
                   <button
                     type="button"
@@ -389,12 +402,25 @@ export function ApplicationsPage() {
             </div>
 
             <div className="form-field">
-              <label>Binary / Setup Download URL</label>
-              <Input
-                value={newDownloadUrl}
-                onChange={(e) => setNewDownloadUrl(e.target.value)}
-                placeholder="/releases/jamanvaar-pos-setup-2.4.1.exe or https://..."
-              />
+              <label>Binary / Setup Download URL (per platform)</label>
+              {newPlatforms.length === 0 ? (
+                <p style={{ color: 'var(--jv-text-muted)', margin: '0.25rem 0 0' }}>
+                  Select a target platform above to set its download URL.
+                </p>
+              ) : (
+                newPlatforms.map((platform) => (
+                  <div key={platform} style={{ marginTop: '0.5rem' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--jv-text-muted)' }}>
+                      {platform.toUpperCase()}
+                    </label>
+                    <Input
+                      value={newDownloadUrls[platform] || ''}
+                      onChange={(e) => setDownloadUrlForPlatform(platform, e.target.value)}
+                      placeholder="https://system.kelviontech.in/downloads/..."
+                    />
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="form-field">

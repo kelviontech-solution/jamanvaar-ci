@@ -286,7 +286,7 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
     { appCode: 'KDS', supportedPlatforms: ['web', 'android'], releaseNotes: 'Multi-station kitchen routing, cook time color alerts, bump bar support, course synchronization.' },
     { appCode: 'KIOSK', supportedPlatforms: ['windows', 'android'], releaseNotes: 'Self-ordering guest kiosk, dynamic combos, custom modifiers, UPI BharatQR display, auto-idle reset.' },
     { appCode: 'KIOSK_ADMIN', supportedPlatforms: ['web', 'windows'], releaseNotes: 'Kiosk terminal administration, station lock, screen branding, peripheral hardware configuration.' }
-  ].map((r) => ({ ...r, version: '1.0.0', channel: 'STABLE' as const, minSupportedVersion: '1.0.0', downloadUrl: null as string | null }));
+  ].map((r) => ({ ...r, version: '1.0.0', channel: 'STABLE' as const, minSupportedVersion: '1.0.0', downloadUrls: undefined as Record<string, string> | undefined }));
 
   // Databases seeded before this fix hold the invented releases; remove exactly those (and only those).
   const inventedReleases: Array<[string, string]> = [

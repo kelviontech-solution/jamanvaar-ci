@@ -17,7 +17,14 @@ describe('compareVersions', () => {
 });
 
 describe('updateFor', () => {
-  const rel = (version: string, over: object = {}) => ({ version, isMandatory: false, minSupportedVersion: null, downloadUrl: 'https://x/y', releaseNotes: 'n', ...over });
+  const rel = (version: string, over: object = {}) => ({
+    version,
+    isMandatory: false,
+    minSupportedVersion: null,
+    downloadUrls: { windows: 'https://x/y.exe', android: 'https://x/y.apk' },
+    releaseNotes: 'n',
+    ...over
+  });
 
   it('is null when the terminal is current, ahead, or there is no release', () => {
     expect(updateFor('2.0.0', rel('2.0.0'))).toBeNull();
@@ -26,7 +33,7 @@ describe('updateFor', () => {
   });
 
   it('offers a newer release, optional unless marked mandatory', () => {
-    expect(updateFor('1.0.0', rel('2.0.0'))).toMatchObject({ latestVersion: '2.0.0', mandatory: false, downloadUrl: 'https://x/y' });
+    expect(updateFor('1.0.0', rel('2.0.0'))).toMatchObject({ latestVersion: '2.0.0', mandatory: false, downloadUrl: 'https://x/y.exe' });
     expect(updateFor('1.0.0', rel('2.0.0', { isMandatory: true }))?.mandatory).toBe(true);
   });
 
@@ -37,5 +44,15 @@ describe('updateFor', () => {
 
   it('treats a terminal that never reported a version as needing the update', () => {
     expect(updateFor(null, rel('2.0.0'))).toMatchObject({ latestVersion: '2.0.0' });
+  });
+
+  it('picks the Android download URL for a device reporting an Android osPlatform, Windows otherwise', () => {
+    expect(updateFor('1.0.0', rel('2.0.0'), 'Android')?.downloadUrl).toBe('https://x/y.apk');
+    expect(updateFor('1.0.0', rel('2.0.0'), 'Windows 11')?.downloadUrl).toBe('https://x/y.exe');
+    expect(updateFor('1.0.0', rel('2.0.0'), null)?.downloadUrl).toBe('https://x/y.exe');
+  });
+
+  it('is null (not a crash) when the matching platform has no URL yet', () => {
+    expect(updateFor('1.0.0', rel('2.0.0', { downloadUrls: { windows: 'https://x/y.exe' } }), 'Android')?.downloadUrl).toBeNull();
   });
 });

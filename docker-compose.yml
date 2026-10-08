@@ -307,6 +307,11 @@ services:
       # certificate itself once nginx is reconfigured to serve HTTPS with it.
       - certbot_www:/var/www/certbot:ro
       - certbot_conf:/etc/letsencrypt:ro
+      # App installer downloads (.exe / .apk) -- a plain host directory, not a named Docker
+      # volume, specifically so whoever holds SSH access can `scp` a new release straight
+      # in with no `docker cp`/volume-mount lookup. See tooling/deployment/upload-to-oracle.sh
+      # and docs/deployment/RELEASE_HOSTING.md.
+      - /opt/jamanvaar/downloads:/var/www/jamanvaar-downloads:ro
     ports:
       - "80:80"
       - "443:443"

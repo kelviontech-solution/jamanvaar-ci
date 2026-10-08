@@ -663,14 +663,15 @@ export interface CloudAppCatalogEntry {
   description: string;
   currentVersion: string | null;
   supportedPlatforms: string[];
-  downloadUrl: string | null;
+  /** Keyed by platform (e.g. "windows", "android") -- one version can need a different file per platform. */
+  downloadUrls: Record<string, string> | null;
   releaseNotes: string | null;
   releasedAt: string | null;
 }
 
 /**
  * The app catalog and each app's current downloadable version, as Super Admin's
- * "Publish Version" flow has set it — backs the Downloads page. `downloadUrl` is
+ * "Publish Version" flow has set it — backs the Downloads page. `downloadUrls` is
  * null until a real release has been published for that app.
  */
 export async function fetchCloudApplications(): Promise<CloudAppCatalogEntry[]> {

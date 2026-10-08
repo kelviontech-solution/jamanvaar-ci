@@ -189,13 +189,17 @@ export class DevicesService {
   };
 
   /** The newest STABLE release of the terminal's own app, as an offer relative to the version it runs. */
-  private async latestUpdateFor(deviceType: string, currentVersion: string | null) {
+  private async latestUpdateFor(deviceType: string, currentVersion: string | null, osPlatform: string | null) {
     const releases = await this.prisma.runAsPlatform((tx) =>
       tx.appRelease.findMany({ where: { appCode: DevicesService.APP_CODE_FOR_DEVICE[deviceType] ?? deviceType, channel: 'STABLE' } })
     );
     // Versions compare numerically, so pick the newest in code rather than trusting a database sort.
     const newest = releases.sort((a, b) => compareVersions(b.version, a.version))[0] ?? null;
-    return updateFor(currentVersion, newest);
+    return updateFor(
+      currentVersion,
+      newest ? { ...newest, downloadUrls: newest.downloadUrls as Record<string, string> | null } : null,
+      osPlatform
+    );
   }
 
   /** The longest-running active extension aimed at this restaurant, this branch (or every branch), this terminal (or every terminal). */
@@ -387,10 +391,15 @@ export class DevicesService {
       })
     );
     const branchInactive = !!updated.branch && updated.branch.status !== 'ACTIVE';
-    const [update, extension, restaurant] = await Promise.all([
-      this.latestUpdateFor(updated.type, updated.appVersion),
+    const [update, extension, restaurant, captainHandlesService] = await Promise.all([
+      this.latestUpdateFor(updated.type, updated.appVersion, updated.osPlatform),
       this.activeExtensionFor(updated),
-      this.prisma.runAsTenant(device.restaurantId, (tx) => tx.restaurant.findUnique({ where: { id: device.restaurantId }, select: { displayScalePercent: true } }))
+      this.prisma.runAsTenant(device.restaurantId, (tx) => tx.restaurant.findUnique({ where: { id: device.restaurantId }, select: { displayScalePercent: true } })),
+      device.type === 'KDS' ? this.prisma.runAsTenant(device.restaurantId, async tx => {
+        const entitled = await tx.applicationEntitlement.findFirst({where:{restaurantId:device.restaurantId,appCode:'CAPTAIN',enabled:true,subscription:{status:{in:['ACTIVE','TRIAL']},expiresAt:{gt:new Date()}}},select:{id:true}});
+        if (!entitled) return false;
+        return !!(await tx.device.findFirst({where:{restaurantId:device.restaurantId,branchId:device.branchId,type:'CAPTAIN',status:'ACTIVE'},select:{id:true}}));
+      }) : undefined
     ]);
     // Only what the terminal needs. This used to return the whole device row,
     // including the stored credential hash.
@@ -402,6 +411,8 @@ export class DevicesService {
       deviceId: device.id,
       // The station this KDS screen was assigned by Restaurant Admin (null: it chooses).
       station: updated.kitchenStation ?? null,
+      // Service handoff follows this branch's actual Captain deployment, not a seeded local PRO license.
+      ...(captainHandlesService !== undefined ? { captainHandlesService } : {}),
       // A deactivated branch locks its terminals just as an MDM lock does (BUG-048).
       locked: updated.isLocked || branchInactive,
       lockCode: updated.isLocked ? 'DEVICE_LOCKED' : branchInactive ? 'BRANCH_INACTIVE' : null,

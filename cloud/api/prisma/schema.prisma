@@ -790,7 +790,7 @@ model AppRelease {
   minSupportedVersion String?
   supportedPlatforms  Json // ["windows", "android", "web", "electron"]
   releaseNotes        String?
-  downloadUrl         String?
+  downloadUrls        Json? // { "windows": "https://...exe", "android": "https://...apk" } -- one version can need a different file per platform
   isMandatory         Boolean           @default(false)
   releasedAt          DateTime          @default(now())
   createdAt           DateTime          @default(now())

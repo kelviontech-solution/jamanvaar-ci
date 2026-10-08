@@ -23,12 +23,30 @@ export interface UpdateOffer {
   releaseNotes: string | null;
 }
 
+/** The device's own free-form `osPlatform` string ("Windows 11", "Android", ...) to a downloadUrls key. */
+function downloadUrlKeyFor(osPlatform: string | null | undefined): string {
+  return osPlatform && /android/i.test(osPlatform) ? 'android' : 'windows';
+}
+
 /** What a terminal should be told about the newest stable release (BUG-065). Null when it is already current. */
 export function updateFor(
   currentVersion: string | null | undefined,
-  latest: { version: string; isMandatory: boolean; minSupportedVersion: string | null; downloadUrl: string | null; releaseNotes: string | null } | null
+  latest: {
+    version: string;
+    isMandatory: boolean;
+    minSupportedVersion: string | null;
+    downloadUrls: Record<string, string> | null;
+    releaseNotes: string | null;
+  } | null,
+  devicePlatform?: string | null
 ): UpdateOffer | null {
   if (!latest || compareVersions(currentVersion, latest.version) >= 0) return null;
   const belowMinimum = !!latest.minSupportedVersion && compareVersions(currentVersion, latest.minSupportedVersion) < 0;
-  return { latestVersion: latest.version, mandatory: latest.isMandatory || belowMinimum, downloadUrl: latest.downloadUrl, releaseNotes: latest.releaseNotes };
+  const key = downloadUrlKeyFor(devicePlatform);
+  return {
+    latestVersion: latest.version,
+    mandatory: latest.isMandatory || belowMinimum,
+    downloadUrl: latest.downloadUrls?.[key] ?? null,
+    releaseNotes: latest.releaseNotes
+  };
 }

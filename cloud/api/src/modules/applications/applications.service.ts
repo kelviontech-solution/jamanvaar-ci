@@ -142,7 +142,7 @@ export class ApplicationsService {
           channel: latestRelease?.channel || 'STABLE',
           minSupportedVersion: latestRelease?.minSupportedVersion || null,
           supportedPlatforms: (latestRelease?.supportedPlatforms as string[]) || ['web'],
-          downloadUrl: latestRelease?.downloadUrl || null,
+          downloadUrls: (latestRelease?.downloadUrls as Record<string, string>) || null,
           releaseNotes: latestRelease?.releaseNotes || null,
           releasedAt: latestRelease?.releasedAt || null,
           totalDevices: matchingDevices.length,
@@ -182,7 +182,7 @@ export class ApplicationsService {
           description: meta.description,
           currentVersion: latestRelease?.version ?? null,
           supportedPlatforms: (latestRelease?.supportedPlatforms as string[]) || ['web'],
-          downloadUrl: latestRelease?.downloadUrl || null,
+          downloadUrls: (latestRelease?.downloadUrls as Record<string, string>) || null,
           releaseNotes: latestRelease?.releaseNotes || null,
           releasedAt: latestRelease?.releasedAt || null
         };
@@ -216,7 +216,7 @@ export class ApplicationsService {
           minSupportedVersion: dto.minSupportedVersion,
           supportedPlatforms: dto.supportedPlatforms,
           releaseNotes: dto.releaseNotes,
-          downloadUrl: dto.downloadUrl,
+          downloadUrls: dto.downloadUrls,
           isMandatory: dto.isMandatory
         }
       });
