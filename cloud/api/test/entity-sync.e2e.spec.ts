@@ -72,6 +72,32 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     expect(res.status).toBe(400);
   });
 
+  it.each([
+    ['LOYALTY_TIER', { id: 'loyalty-test-tier', name: 'Silver', minLifetimeSpend: 1000, pointsMultiplier: 1.25, perks: [] }],
+    ['LOYALTY_REWARD', { id: 'loyalty-test-reward', name: '\u20b9100 off', description: 'Bill reward', pointsCost: 150, isActive: true, discountKind: 'FIXED', discountAmount: 100 }],
+    ['LOYALTY_PROGRAM_SETTINGS', { id: 'default', earnPoints: 2, perRupeesSpent: 10, enabled: true }]
+  ])('admin settings for %s reach POS; POS cannot overwrite them', async (type, payload) => {
+    const record = { ...payload, updatedAt: new Date().toISOString() };
+    const write = await authed('post', `/api/v1/entity-sync/${type}`, posAdminToken).send({ events: [{ externalId: record.id, payload: record }] });
+    expect(write.status).toBe(201); expect(write.body.results[0].status).toBe('ok');
+    const pull = await authed('get', `/api/v1/entity-sync/${type}`, posToken); expect(pull.status).toBe(200);
+    expect(pull.body.entities.find((r: any) => r.externalId === record.id)?.payload).toMatchObject(payload);
+    const forged = await authed('post', `/api/v1/entity-sync/${type}`, posToken).send({ events: [{ externalId: record.id, payload: record }] }); expect(forged.status).toBe(403);
+  });
+
+  it('rejects invalid reward cost and preserves both concurrent customer purchases on retries', async () => {
+    const invalid = await authed('post', '/api/v1/entity-sync/LOYALTY_REWARD', posAdminToken).send({ events: [{ externalId: 'bad-reward', payload: { name: 'Bad', description: '', pointsCost: -150, isActive: true } }] }); expect(invalid.body.results[0].status).toBe('error');
+    const opening = { phone: '9888777666', name: 'Daksh', loyaltyPoints: 200, totalSpend: 0, totalVisits: 0, recentOrderIds: [] as string[], loyaltyBaseline: { points: 200, spend: 0, visits: 0 } };
+    const a = { ...opening, loyaltyPoints: 250, totalSpend: 500, totalVisits: 1, loyaltyLedger: { 'earn:a': { points: 50, spend: 500, visits: 1, at: '2026-10-08T10:00:00Z' } }, updatedAt: '2026-10-08T10:01:00Z' };
+    const b = { ...opening, loyaltyPoints: 230, totalSpend: 300, totalVisits: 1, loyaltyLedger: { 'earn:b': { points: 30, spend: 300, visits: 1, at: '2026-10-08T10:00:00Z' } }, updatedAt: '2026-10-08T10:00:00Z' };
+    for (const payload of [a, b, a, b]) {
+      const result = await authed('post', '/api/v1/entity-sync/CUSTOMER', posToken).send({ events: [{ externalId: opening.phone, payload }] }); expect(result.body.results[0].status).toBe('ok');
+    }
+    const pull = await authed('get', '/api/v1/entity-sync/CUSTOMER', posAdminToken); const account = pull.body.entities.find((r: any) => r.externalId === opening.phone).payload;
+    expect(account.loyaltyPoints).toBe(280); expect(account.totalSpend).toBe(800); expect(account.totalVisits).toBe(2);
+    await prisma.runAsTenant(restaurantId, tx => tx.syncedEntity.deleteMany({ where: { entityType: 'CUSTOMER', externalId: opening.phone } }));
+  });
+
   it('pushes and pulls a CUSTOMER record end to end', async () => {
     const pushRes = await authed('post', '/api/v1/entity-sync/CUSTOMER', posToken).send({
       events: [{ externalId: '9876543210', payload: { name: 'Priya Sharma', loyaltyPoints: 120, tags: ['VIP'] } }]

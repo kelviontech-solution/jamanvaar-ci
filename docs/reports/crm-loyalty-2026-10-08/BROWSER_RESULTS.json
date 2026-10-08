@@ -1,0 +1,36 @@
+{
+  "environment": "compiled POS and Restaurant Admin, isolated API/database",
+  "results": [
+    {
+      "name": "Admin reward configuration syncs through the actual backend",
+      "status": "PASS"
+    },
+    {
+      "name": "Manual percentage input works during checkout with exactly one discount dialog",
+      "status": "PASS"
+    },
+    {
+      "name": "Cashier may select or decline ₹100 for 150 points; no points are spent before settlement",
+      "status": "PASS"
+    },
+    {
+      "name": "Successful POS payment updates CRM balance, spend and visits across apps",
+      "status": "PASS",
+      "evidence": {
+        "balance": 90,
+        "totalSpend": 400,
+        "totalVisits": 1
+      }
+    },
+    {
+      "name": "A repeat visit earns again; insufficient points disable redemption without blocking payment",
+      "status": "PASS",
+      "evidence": {
+        "balance": 140,
+        "totalSpend": 900,
+        "totalVisits": 2
+      }
+    }
+  ],
+  "pageErrors": []
+}

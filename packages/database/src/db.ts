@@ -241,7 +241,7 @@ export class JamanvaarDatabase {
 
   public loyaltyRewards: LoyaltyReward[] = [
     { id: 'reward-dessert', name: 'Free Dessert', description: 'Any dessert on the menu, on the house', pointsCost: 100, isActive: true },
-    { id: 'reward-100off', name: '₹100 Off Bill', description: 'Flat ₹100 off the total bill', pointsCost: 150, isActive: true },
+    { id: 'reward-100off', name: '₹100 Off Bill', description: 'Flat ₹100 off the total bill', pointsCost: 150, isActive: true, discountKind: 'FIXED', discountAmount: 100 },
     { id: 'reward-starter', name: 'Free Starter', description: 'Any starter under ₹250', pointsCost: 200, isActive: true },
     { id: 'reward-meal', name: 'Free Meal for Two', description: 'A full meal for two guests', pointsCost: 800, isActive: true }
   ];

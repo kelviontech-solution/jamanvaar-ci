@@ -34,12 +34,15 @@ async function main() {
   installBodyParsers(app);
   app.use(require('helmet')({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(require('cookie-parser')());
-  const allowedOrigins = [5174, 5175, 5176, 5177, 5179, 5180, 5190, 5284, 5286].map(p => `http://localhost:${p}`);
-  app.enableCors((req, cb) => cb(null, corsFor({ allowedOrigins, qrOrigins: ['http://localhost:5190'] }, req.url, req.headers.origin)));
-  app.get(EmailService).send = async (to, subject, html) => {
+  const allowedOrigins = [5174, 5175, 5176, 5177, 5179, 5180, 5190, 5284, 5286, 5288].map(p => `http://localhost:${p}`);
+  app.enableCors((req, cb) => cb(null, corsFor({ allowedOrigins, qrOrigins: ['http://localhost:5190', 'http://localhost:5288'] }, req.url, req.headers.origin)));
+  // Receipt QA exercises the actual PDF endpoint while provider transport
+  // remains captured locally. This flag exists only in this isolated harness.
+  if (process.env.JAMANVAAR_QA_RECEIPTS === '1') Object.defineProperty(app.get(EmailService), 'configured', { get: () => true });
+  app.get(EmailService).send = async (to, subject, html, attachments = []) => {
     const match = /(\d{6})<\/span>/.exec(html);
     const emails = fs.existsSync(path.join(dir, 'private-mail.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'private-mail.json'))) : {};
-    emails[to] = { otp: match?.[1], subject, html };
+    emails[to] = { otp: match?.[1], subject, html, attachments: attachments.map(a => ({ filename: a.filename, contentType: a.contentType, bytes: Buffer.isBuffer(a.content) ? a.content.length : 0, pdfHeader: Buffer.isBuffer(a.content) ? a.content.subarray(0,5).toString() : '' })) };
     fs.writeFileSync(path.join(dir, 'private-mail.json'), JSON.stringify(emails));
     return true;
   };

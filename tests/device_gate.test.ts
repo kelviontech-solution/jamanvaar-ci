@@ -20,6 +20,23 @@ describe('DeviceGate', () => {
     expect(DeviceGate.getState().locked).toBe(false);
   });
 
+  it('retains the branch service policy across successful requests and heartbeats that omit it', async () => {
+    await DeviceGate.applyHeartbeatAsync({ captainHandlesService: false }, { restaurantId: 'r1', branchId: 'b1', deviceId: 'kds1' });
+    DeviceGate.reportSuccess();
+    expect(DeviceGate.getState().captainHandlesService).toBe(false);
+    await DeviceGate.applyHeartbeatAsync({}, { restaurantId: 'r1', branchId: 'b1', deviceId: 'kds1' });
+    expect(DeviceGate.getState().captainHandlesService).toBe(false);
+  });
+
+  it('does not carry another branch or restaurant service policy into a new binding', async () => {
+    await DeviceGate.applyHeartbeatAsync({ captainHandlesService: true }, { restaurantId: 'r1', branchId: 'b1', deviceId: 'kds1' });
+    await DeviceGate.applyHeartbeatAsync({}, { restaurantId: 'r1', branchId: 'b2', deviceId: 'kds1' });
+    expect(DeviceGate.getState().captainHandlesService).toBeUndefined();
+    await DeviceGate.applyHeartbeatAsync({ captainHandlesService: true }, { restaurantId: 'r1', branchId: 'b2', deviceId: 'kds1' });
+    await DeviceGate.applyHeartbeatAsync({}, { restaurantId: 'r2', branchId: 'b2', deviceId: 'kds2' });
+    expect(DeviceGate.getState().captainHandlesService).toBeUndefined();
+  });
+
   it('locks on a refusal that carries a known reason code', async () => {
     await DeviceGate.observe(json(403, { code: 'APP_DISABLED', message: 'POS is not enabled for this restaurant.' }));
     const s = DeviceGate.getState();

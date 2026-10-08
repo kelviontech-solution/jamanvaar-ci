@@ -240,7 +240,10 @@ export class QrPublicService {
     const prior = await this.prisma.runAsTenant(ctx.restaurant.id, tx => tx.syncedOrder.findUnique({where:{restaurantId_externalOrderId:{restaurantId:ctx.restaurant.id,externalOrderId}}}));
     if(prior){
       if(prior.status==='DRAFT' && prior.paymentMethod==='ONLINE' && settings.allowOnlinePayment){
-        try { await this.payments.createQrPayment(ctx.restaurant.id,prior.publicOrderId!); } catch { /* Status exposes the failed attempt and its explicit retry action. */ }
+        try {
+          const checkout = await this.payments.createQrPayment(ctx.restaurant.id,prior.publicOrderId!);
+          if (checkout.status !== 'SUCCESS') return this.orderStatus(prior.publicOrderId!, checkout);
+        } catch { /* Status exposes the failed attempt and its explicit retry action. */ }
       }
       return this.orderStatus(prior.publicOrderId!);
     }
@@ -371,7 +374,12 @@ export class QrPublicService {
 
     if (!duplicate) await this.track(ctx, QR_EVENT.ORDER_PLACED, sessionId, { totalPaise: order.totalAmount });
     if (online && order.status === 'DRAFT') {
-      try { await this.payments.createQrPayment(ctx.restaurant.id, order.publicOrderId!); return this.orderStatus(order.publicOrderId!); }
+      try {
+        const checkout = await this.payments.createQrPayment(ctx.restaurant.id, order.publicOrderId!);
+        // Opening checkout does not need another provider status round trip.
+        // Payment is verified independently on return/status or by signed webhook.
+        return this.orderStatus(order.publicOrderId!, checkout.status === 'SUCCESS' ? undefined : checkout);
+      }
       catch {
         // The provider may have delivered a signed success while its create response timed out.
         try { return await this.orderStatus(order.publicOrderId!); }
@@ -411,11 +419,11 @@ export class QrPublicService {
   // ------------------------------------------------------------------ status (spec 35, 56)
 
   /** The public reference is the capability: unguessable, random, and it reveals only this order's customer-safe state. */
-  async orderStatus(publicOrderId: string) {
+  async orderStatus(publicOrderId: string, checkout?: Awaited<ReturnType<PaymentsService['createQrPayment']>>) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId ?? '')) throw new NotFoundException('Order not found.');
     let order = await this.prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR') throw new NotFoundException('Order not found.');
-    const payment = order.paymentMethod === 'ONLINE' || order.paymentMethod === 'RAZORPAY' ? await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId) : null;
+    const payment = order.paymentMethod === 'ONLINE' || order.paymentMethod === 'RAZORPAY' ? checkout ?? await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId) : null;
     if (payment?.status === 'SUCCESS') order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { publicOrderId } }));
     const settings = await this.settingsService.effective(order.restaurantId, order.branchId);
     const view = this.confirmation(order);
@@ -444,8 +452,8 @@ export class QrPublicService {
     if (!ctx.settings.allowOnlinePayment) throw new ForbiddenException('Online payments are currently unavailable');
     const payment = await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId);
     if (payment.status === 'SUCCESS') return this.orderStatus(publicOrderId);
-    await this.payments.createQrPayment(order.restaurantId, publicOrderId);
-    return this.orderStatus(publicOrderId);
+    const checkout = await this.payments.createQrPayment(order.restaurantId, publicOrderId);
+    return this.orderStatus(publicOrderId, checkout.status === 'SUCCESS' ? undefined : checkout);
   }
 
   // ------------------------------------------------------------------ events (spec 47)

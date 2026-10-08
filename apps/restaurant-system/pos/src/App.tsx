@@ -168,7 +168,7 @@ export const App: React.FC = () => {
     void SyncOutboxEngine.catchUpFromCloud();
     void SyncOutboxEngine.processOutbox();
     void syncCrm();
-    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: false });
+    const stopLocalChanges = startLocalChangeSync({ customers: true, menu: true, tables: true, staff: false });
     void syncMenuCatalog({ push: true });
     void syncStaff();
     // Restaurant Admin is the only place the Loyalty Program (tier multipliers, rewards catalog) is

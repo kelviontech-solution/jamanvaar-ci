@@ -1,0 +1,49 @@
+{
+  "environment": "compiled apps, isolated API/database",
+  "provider": "simulated; no real funds or external payments",
+  "results": [
+    {
+      "name": "A QR scan during a partial first upload does not freeze an empty published version",
+      "status": "PASS"
+    },
+    {
+      "name": "Restaurant Admin imports 100 CSV dishes and automatically publishes all 100 to the same table QR",
+      "status": "PASS",
+      "evidence": {
+        "items": 100,
+        "explicitManualPublishNeeded": false
+      }
+    },
+    {
+      "name": "Online checkout opens payment first, without flashing order confirmation or an unpaid KDS ticket",
+      "status": "PASS",
+      "evidence": {
+        "statusBeforePayment": "PENDING_PAYMENT",
+        "confirmedBeforePayment": false,
+        "kdsBeforePayment": 0,
+        "providerSimulated": true
+      }
+    },
+    {
+      "name": "A signed verified payment confirms the same order once, appears on KDS, then Served completes the QR screen",
+      "status": "PASS",
+      "evidence": {
+        "sameOrder": true,
+        "verified": true,
+        "kitchenTickets": 1,
+        "servedStatus": "COMPLETED"
+      }
+    },
+    {
+      "name": "Staff removal disappears from the active roster, synchronizes inactive status and rejects the old PIN",
+      "status": "PASS",
+      "evidence": {
+        "hidden": true,
+        "cloudIsActive": false,
+        "oldPinDenied": true,
+        "reloadPersists": true
+      }
+    }
+  ],
+  "pageErrors": []
+}

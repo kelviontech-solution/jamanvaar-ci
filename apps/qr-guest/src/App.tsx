@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { ApiError, QrApi, imageSrc, type Describe, type Menu, type MenuGroup, type MenuItem, type Placed, type Quote } from './api';
 import { addLine, emptyCart, itemCount, parseCart, removeLine, setQuantity, toOrderItems, unavailableLines, withAttempt, estimatedSubtotal, type Cart } from './cart';
 
@@ -89,9 +90,17 @@ function Ordering({ token }: { token: string }) {
   useEffect(()=>{const restore=()=>setScreen(currentScreen());window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore);},[]);
   const [cart, setCart] = useState<Cart>(() => parseCart(store.get(`jv_qr_cart:${token}`)));
   const [placed, setPlaced] = useState<Placed | null>(null);
+  const [openingPayment, setOpeningPayment] = useState<string | null>(null);
   const [restoreError,setRestoreError]=useState<string|null>(null);
   const [restoreAttempt,setRestoreAttempt]=useState(0);
   const etag = useRef<string | null>(null);
+  useEffect(() => {
+    const resume = (event: PageTransitionEvent) => {
+      if (event.persisted && openingPayment) { setOpeningPayment(null); navigate('STATUS'); }
+    };
+    window.addEventListener('pageshow', resume);
+    return () => window.removeEventListener('pageshow', resume);
+  }, [openingPayment]);
 
   const load = useCallback(async () => {
     setProblem(null);
@@ -110,7 +119,7 @@ function Ordering({ token }: { token: string }) {
         network
           ? { title: 'No connection', text: err.message, retry: true }
           : err.code === 'MENU_NOT_PUBLISHED'
-            ? { title: 'The menu is not available yet', text: 'This restaurant has not published its menu for QR ordering. Please order at the counter.', retry: false }
+            ? { title: 'The menu is not available yet', text: 'The restaurant is preparing its menu. Check again, or ask the team to publish it from Menu & Catalog.', retry: true }
             : { title: 'QR Ordering is currently unavailable', text: err.status === 410 && (err.code === 'QR_REVOKED' || err.code === 'QR_DISABLED') ? err.message : 'QR Ordering is currently unavailable for this restaurant. Please ask a team member.', retry: false }
       );
     }
@@ -140,6 +149,7 @@ function Ordering({ token }: { token: string }) {
         if(!active)return;
         setInfo(d);
         if(m.menu){etag.current=m.etag;seenMenuVersion=m.menu.menuVersion;setMenu(m.menu);}
+        setProblem(null);
       } catch { /* Existing menu remains visible; checkout always checks current server availability. */ }
       finally {running=false;}
     };
@@ -151,6 +161,7 @@ function Ordering({ token }: { token: string }) {
 
   useEffect(() => { store.set(`jv_qr_cart:${token}`, JSON.stringify(cart)); }, [cart, token]);
 
+  if (openingPayment) return <Message title="Opening secure payment" text="Choose UPI or another payment method on Razorpay. Your order is confirmed only after payment is verified." action={{ label: 'Continue to Razorpay', run: () => location.assign(openingPayment) }} />;
   if (problem && placed && screen === 'STATUS') return <StatusScreen placed={placed} setPlaced={setPlaced} showStatus onMore={()=>void load().then(()=>navigate('MENU'))} />;
   if (problem) return <Message title={problem.title} text={problem.text} action={problem.retry ? { label: 'Try again', run: () => { setRestoreAttempt(a=>a+1);void load(); } } : undefined} />;
   if (!info || !menu) return <Message title="Setting your table" text="Your restaurant’s fresh menu is on its way…" />;
@@ -167,13 +178,18 @@ function Ordering({ token }: { token: string }) {
         </div>
         <div className="mode"><span className="live-dot" />{info.table ? `Table ${info.table.displayNumber}` : 'Guest menu'}</div>
       </header>
-      {screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => <span key={step} className={step === screen ? 'current' : ''} aria-current={step === screen ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>)}</nav>}
+      {screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
 
       {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} />}
       {screen === 'CART' && <CartScreen token={token} menu={menu} cart={cart} setCart={setCart} gone={gone.map((g) => g.key)} onBack={() => navigate('MENU')} onNext={() => navigate('CHECKOUT')} />}
       {screen === 'CHECKOUT' && (
         <Checkout token={token} info={info} cart={cart} setCart={setCart} onBack={() => navigate('CART')}
-          onPlaced={(p) => { store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart()); navigate('STATUS'); const url=paymentUrl(p.payment?.url);if(url)location.assign(url); }} />
+          onPlaced={(p) => {
+            store.set(`jv_qr_last:${token}`, p.publicOrderId); setPlaced(p); setCart(emptyCart());
+            const url = p.status === 'PENDING_PAYMENT' ? paymentUrl(p.payment?.url) : null;
+            if (url) { flushSync(() => setOpeningPayment(url)); location.assign(url); }
+            else navigate('STATUS');
+          }} />
       )}
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
       {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError||"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
@@ -433,7 +449,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
       {!s.allowCash&&!s.allowOnlinePayment&&<p className="warn">No payment method is currently available. Please ask a team member.</p>}
       {quoteError&&<p className="warn" role="alert">{quoteError}</p>}
       {error && <p className="warn" role="alert">{error}</p>}
-      <button className="primary" disabled={busy || !quote || !ready || !(s.allowCash||s.allowOnlinePayment)} onClick={() => void submit()}>{busy ? 'Placing…' : quote ? `${paymentMethod==='ONLINE'?'Pay online':info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
+      <button className="primary" disabled={busy || !quote || !ready || !(s.allowCash||s.allowOnlinePayment)} onClick={() => void submit()}>{busy ? paymentMethod === 'ONLINE' ? 'Opening secure payment…' : 'Placing…' : quote ? `${paymentMethod==='ONLINE'?'Pay online':info.branding?.orderButtonLabel || 'Place order'} · ${inr(quote.total)}` : (info.branding?.orderButtonLabel || 'Place order')}</button>
       <div className="secure-note"><Icon name="shield" />Confirmed prices. Secure checkout.</div>
     </section>
   );
@@ -447,6 +463,7 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
   if (placed.currency) currencyCode = placed.currency;
   const [error,setError]=useState<string|null>(null);
   const [busy,setBusy]=useState(false);
+  const [opening,setOpening]=useState<string|null>(null);
   const mounted=useRef(true),checking=useRef(false),acting=useRef(false),revision=useRef(0);
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
   const refresh=async()=>{if(checking.current||acting.current)return;checking.current=true;const version=revision.current;try{const p=await QrApi.status(placed.publicOrderId);if(mounted.current&&version===revision.current){setPlaced(p);setError(null);}}catch(e){if(mounted.current&&version===revision.current)setError((e as Error).message);}finally{checking.current=false;}};
@@ -455,8 +472,8 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
     try{
       const p=await (counter?QrApi.switchToCounter(placed.publicOrderId):QrApi.retryPayment(placed.publicOrderId));
       if(!mounted.current)return;
-      setPlaced(p);const url=counter?null:paymentUrl(p.payment?.url);
-      if(url)location.assign(url);
+      setPlaced(p);const url=counter||p.status!=='PENDING_PAYMENT'?null:paymentUrl(p.payment?.url);
+      if(url){flushSync(()=>setOpening(url));location.assign(url);}
       else if(!counter&&p.status==='PENDING_PAYMENT')setError('Checkout is not ready yet. Please check payment status or choose pay at counter.');
     }catch(e){if(mounted.current)setError((e as Error).message);}
     finally{acting.current=false;if(mounted.current)setBusy(false);}
@@ -465,26 +482,31 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
     if (placed.status === 'COMPLETED' || placed.status === 'CANCELLED' || (!showStatus && placed.status !== 'PENDING_PAYMENT')) return;
     const t = setInterval(() => { void refresh(); }, 5000);
     const onResume=()=>{if(!document.hidden)void refresh();};
+    void refresh();
     window.addEventListener('focus',onResume);document.addEventListener('visibilitychange',onResume);
     return () => {clearInterval(t);window.removeEventListener('focus',onResume);document.removeEventListener('visibilitychange',onResume);};
   }, [placed.publicOrderId, placed.status, setPlaced, showStatus]);
+  useEffect(()=>{const resume=(event:PageTransitionEvent)=>{if(event.persisted){setOpening(null);void refresh();}};window.addEventListener('pageshow',resume);return()=>window.removeEventListener('pageshow',resume);},[placed.publicOrderId]);
+  if(opening)return <Message title="Opening secure payment" text="Finish payment on Razorpay, then return here for the verified result." action={{label:'Continue to Razorpay',run:()=>location.assign(opening)}} />;
   const at = STEPS.findIndex(([s]) => s === placed.status);
   return (
     <section className="page center-text">
       <div className={`status-seal ${placed.status === 'PENDING_PAYMENT' ? 'pending' : ''}`}><Icon name={placed.status === 'PENDING_PAYMENT' ? 'shield' : placed.status === 'CANCELLED' ? 'plate' : 'check'} /></div>
-      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Payment pending':placed.status==='COMPLETED'?'Order completed':placed.status==='READY'?'Your order is ready':'Order confirmed'}</h2>
+      <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Complete your payment':placed.status==='COMPLETED'?'Order completed':placed.status==='READY'?'Your order is ready':'Order confirmed'}</h2>
       <p className="big">{placed.orderNumber ?? placed.publicOrderId}</p>
       <p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>
       {showStatus && placed.status !== 'CANCELLED' && placed.status!=='PENDING_PAYMENT' && (
         <ol className="steps">{STEPS.map(([s, label], i) => <li key={s} className={i <= at ? 'done' : ''}>{label}</li>)}</ol>
       )}
       {placed.status === 'CANCELLED' && <p className="warn">The restaurant could not take this order. Please ask a team member.</p>}
-      <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?'Payment verified':placed.paymentMethod==='ONLINE'?'Your payment is being checked. The kitchen will receive this order after payment is verified.':'Pay at the counter when you are done.'}</p>
+      <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?'Payment verified':placed.paymentMethod==='ONLINE'?'Complete secure checkout to confirm your order. The kitchen receives it after payment is verified.':'Pay at the counter when you are done.'}</p>
       {placed.status==='PENDING_PAYMENT'&&<>
         <button className="primary" disabled={busy} onClick={()=>void changePayment()}>{busy?'Checking…':placed.payment?.status==='FAILED'?'Try payment again':'Continue payment'}</button>
         <p className="muted">Choose UPI on secure Razorpay checkout, then select your preferred payment app. Return here to see the verified result.</p>
-        {placed.allowCounterPayment&&<button className="link" disabled={busy} onClick={()=>void changePayment(true)}>Pay at counter instead</button>}
-        <button className="link" disabled={busy} onClick={()=>void refresh()}>Check payment status</button>
+        <div className="payment-actions">
+          {placed.allowCounterPayment&&<button className="link" disabled={busy} onClick={()=>void changePayment(true)}>Pay at counter instead</button>}
+          <button className="link" disabled={busy} onClick={()=>void refresh()}>Check payment status</button>
+        </div>
       </>}
       {error&&<p role="alert" className="warn">{error}<button className="link" onClick={()=>void refresh()}>Check again</button></p>}
       <details className="receipt"><summary>Order details / receipt</summary>

@@ -1,7 +1,7 @@
 import { syncStaffUsers, startLocalChangeSync, verifyPinWithSync } from '@jamanvaar/sync';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore, setKitchenPriority } from '@jamanvaar/database';
-import { getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
+import { DeviceGate, getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
 import { KdsTicketCard } from './KdsTicketCard';
 import { KdsExpoBoard } from './KdsExpoBoard';
@@ -70,6 +70,8 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 export const App: React.FC = () => {
   const ai = useAiAccess();
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [captainServicePolicy, setCaptainServicePolicy] = useState(() => DeviceGate.getState().captainHandlesService);
+  useEffect(() => DeviceGate.subscribe(() => setCaptainServicePolicy(DeviceGate.getState().captainHandlesService)), []);
   const [kots, setKots] = useState<KOTRecord[]>(kdsDb.kots);
 
   // A new ticket needs an audible cue: cooks are not watching the screen. Tickets normally arrive from the cloud (a Captain
@@ -499,7 +501,7 @@ export const App: React.FC = () => {
   // put Captain's own "Food Ready for Delivery" queue there in the first place. This only applies when the
   // restaurant actually has the Captain app (a paid add-on): without it, nobody else can ever mark a dine-in
   // ticket served, so the kitchen keeps that ability rather than stranding every table order at "Ready" forever.
-  const captainHandlesService = EntitlementService.checkCaptainAppAccess().allowed;
+  const captainHandlesService = captainServicePolicy ?? EntitlementService.checkCaptainAppAccess().allowed;
 
   const toCook = useMemo(() => prepSummary(stationKots), [stationKots]);
   const prepTimeOf = useMemo(() => {

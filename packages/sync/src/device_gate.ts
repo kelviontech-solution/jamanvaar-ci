@@ -42,6 +42,7 @@ export interface DeviceGateState {
   restaurantId?: string;
   branchId?: string | null;
   deviceId?: string | null;
+  captainHandlesService?: boolean;
 }
 
 const CLOUD_LOCK_CODES: DeviceGateCode[] = [
@@ -135,6 +136,8 @@ const MESSAGES: Record<DeviceGateCode, string> = {
 };
 
 export interface HeartbeatAnswer {
+  /** KDS service handoff for this terminal's own branch. */
+  captainHandlesService?: boolean;
   restaurantId?: string;
   branchId?: string | null;
   deviceId?: string;
@@ -318,8 +321,8 @@ export class DeviceGate {
 
   /** What survives a clear: the extension window and who this terminal is. */
   private static remembered(): Partial<DeviceGateState> {
-    const { graceUntil, restaurantId, branchId, deviceId } = this.state;
-    return { ...(graceUntil ? { graceUntil } : {}), ...(restaurantId ? { restaurantId } : {}), ...(branchId !== undefined ? { branchId } : {}), ...(deviceId !== undefined ? { deviceId } : {}) };
+    const { graceUntil, restaurantId, branchId, deviceId, captainHandlesService } = this.state;
+    return { ...(graceUntil ? { graceUntil } : {}), ...(restaurantId ? { restaurantId } : {}), ...(branchId !== undefined ? { branchId } : {}), ...(deviceId !== undefined ? { deviceId } : {}), ...(captainHandlesService !== undefined ? { captainHandlesService } : {}) };
   }
 
   private static trustedKeys: LicensePublicKey[] = LICENSE_PUBLIC_KEYS;
@@ -389,6 +392,7 @@ export class DeviceGate {
     DisplayScale.setCloudDefault(body.displayScalePercent);
     // ...and, for a KDS screen, the kitchen station Restaurant Admin assigned to it.
     if (body.station !== undefined) setAssignedStation(body.station);
+    if (typeof body.captainHandlesService === 'boolean') this.set({ ...this.state, captainHandlesService: body.captainHandlesService });
     // ...and whether a newer version of this app exists (BUG-065).
     AppUpdate.apply(body.update);
     if (body.locked) {
@@ -405,7 +409,10 @@ export class DeviceGate {
 
   /** The heartbeat answer plus the emergency extension it may carry (verified before it is trusted). */
   static async applyHeartbeatAsync(body: HeartbeatAnswer, ctx: { restaurantId?: string; branchId?: string | null; deviceId?: string | null } = {}): Promise<void> {
-    if (ctx.restaurantId) this.set({ ...this.state, restaurantId: ctx.restaurantId, branchId: ctx.branchId ?? null, deviceId: ctx.deviceId ?? null });
+    if (ctx.restaurantId) {
+      const sameBranch = this.state.restaurantId === ctx.restaurantId && this.state.branchId === (ctx.branchId ?? null);
+      this.set({ ...this.state, restaurantId: ctx.restaurantId, branchId: ctx.branchId ?? null, deviceId: ctx.deviceId ?? null, captainHandlesService: sameBranch ? this.state.captainHandlesService : undefined });
+    }
     this.applyHeartbeat(body);
     if (body.extension) await this.applyExtension(body.extension, ctx);
   }

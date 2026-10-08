@@ -35,8 +35,8 @@ export const PosCustomersView: React.FC = () => {
     e.preventDefault();
     if (!newPhone.trim()) return;
 
-    const acc = CustomerRepository.getOrCreateAccount(newPhone.trim(), newName.trim() || undefined);
-    if (newPoints > 0) acc.loyaltyPoints = newPoints;
+    const existing = CustomerRepository.getByPhone(newPhone.trim());
+    const acc = existing ?? CustomerRepository.createCustomer({ phone: newPhone.trim(), name: newName.trim() || 'Valued Guest', loyaltyPoints: Math.max(0, Math.floor(newPoints)) });
     db.notify();
 
     setSelectedCustomer(acc);
@@ -117,8 +117,8 @@ export const PosCustomersView: React.FC = () => {
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
-                  <div>Recent Orders: <strong>{account.recentOrderIds?.length || 1} visits</strong></div>
-                  <div>Redeemable Value: <strong className="text-emerald-700">₹{account.loyaltyPoints}</strong></div>
+                  <div>Recent Orders: <strong>{account.totalVisits ?? account.recentOrderIds?.length ?? 0} visits</strong></div>
+                  <div>Rewards available: <strong className="text-emerald-700">{CustomerRepository.getRewards().filter(r => r.isActive && r.pointsCost <= account.loyaltyPoints && (r.discountAmount || r.id === 'reward-100off')).length}</strong></div>
                 </div>
               </div>
 

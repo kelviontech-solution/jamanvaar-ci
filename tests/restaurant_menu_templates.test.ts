@@ -10,6 +10,17 @@ afterEach(() => { vi.restoreAllMocks(); KeyValueStore.reset(); globalThis.localS
 const load = (id = 'tpl-pizza', keys: string[] = [], extra = {}) => MenuBuilderService.executeSelectiveImport([id], keys, {}, {}, { duplicateStrategy: 'SKIP_DUPLICATE', ...extra });
 const csv = (body: string) => 'sku,name,description,category,price,food_type,is_available\n' + body;
 describe('restaurant niche templates and one real menu', () => {
+  it.each(['CSV', 'template'])('%s imports remain publishable when a legacy category has no valid display order', kind => {
+    db.categories.push({ id: 'legacy-unordered', name: 'Legacy category', slug: 'legacy', isActive: true } as any);
+    db.categories.push({ id: 'legacy-invalid', name: 'Invalid order', slug: 'invalid', isActive: true, sortOrder: NaN });
+    db.categories.push({ id: 'ordered', name: 'Existing ordered category', slug: 'ordered', isActive: true, sortOrder: 12 });
+    if (kind === 'CSV') applyMenuCsv(previewMenuCsv(csv('QA-1,New dish,Freshly prepared,New mains,150,VEG,true')));
+    else load();
+    const imported = db.categories.filter(category => !['legacy-unordered', 'legacy-invalid', 'ordered'].includes(category.id));
+    expect(imported.length).toBeGreaterThan(0);
+    expect(imported.every(category => Number.isFinite(category.sortOrder) && category.sortOrder > 12)).toBe(true);
+    expect(JSON.parse(JSON.stringify(imported)).every((category: any) => typeof category.sortOrder === 'number')).toBe(true);
+  });
   it('has at least 25 real items and accurate counts for each requested niche', () => {
     for (const id of ['tpl-pizza','tpl-gujarati','tpl-punjabi','tpl-north-indian','tpl-south-indian','tpl-chinese','tpl-fast-food','tpl-cafe','tpl-bakery','tpl-biryani','tpl-kathiyawadi','tpl-chaat','tpl-desserts','tpl-multicuisine','tpl-jain']) {
       const t = PREBUILT_MENU_TEMPLATES.find(t => t.id === id)!; const items = t.categories.flatMap(c => c.items);

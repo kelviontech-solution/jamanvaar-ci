@@ -67,6 +67,10 @@ const diningTable = z
   .passthrough();
 
 const SCHEMAS: Record<string, z.ZodTypeAny> = { KIOSK_CONFIGURATION: kioskConfigurationSchema, DINING_TABLE: diningTable, MENU_ITEM: menuItem, MENU_CATEGORY: category, MODIFIER_GROUP: modifierGroup, TAX_GROUP: taxGroup };
+SCHEMAS.LOYALTY_TIER = z.object({ name: nonEmpty(120), minLifetimeSpend: money, pointsMultiplier: z.number().finite().positive().max(100), perks: z.array(text(500)).max(50), colorHex: text(40).optional() }).passthrough();
+SCHEMAS.LOYALTY_REWARD = z.object({ name: nonEmpty(120), description: text(1000), pointsCost: z.number().int().positive(), isActive: z.boolean(), discountKind: z.enum(['FIXED', 'ITEM']).optional(), discountAmount: money.optional(), categoryId: text(128).optional() }).passthrough();
+SCHEMAS.LOYALTY_PROGRAM_SETTINGS = z.object({ id: z.literal('default'), earnPoints: z.number().finite().nonnegative(), perRupeesSpent: z.number().finite().positive(), enabled: z.boolean().optional() }).passthrough();
+SCHEMAS.CUSTOMER = z.object({ phone: nonEmpty(40).optional(), loyaltyPoints: z.number().finite().optional(), loyaltyBaseline: z.object({ points: z.number().finite(), spend: z.number().finite(), visits: z.number().int() }).optional(), loyaltyLedger: z.record(z.string(), z.object({ points: z.number().finite(), spend: z.number().finite(), visits: z.number().int(), at: text(40) })).optional() }).passthrough();
 
 /** A readable reason when the record is not acceptable, otherwise null. */
 export function menuEntityProblem(entityType: string, payload: Record<string, unknown>): string | null {

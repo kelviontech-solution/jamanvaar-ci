@@ -61,7 +61,6 @@ const PUBLIC_FAVICONS = [
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos', 'public', 'favicon.svg'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'pos-admin', 'public', 'favicon.svg'),
   path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-user', 'public', 'favicon.svg'),
-  path.join(ROOT_DIR, 'apps', 'kiosk-system', 'kiosk-admin', 'public', 'favicon.svg'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'captain', 'public', 'favicon.svg'),
   path.join(ROOT_DIR, 'apps', 'restaurant-system', 'kds', 'public', 'favicon.svg')
 ];
@@ -73,3 +72,6 @@ for (const fav of PUBLIC_FAVICONS) {
 }
 
 console.log('🎉 Brand assets, proper logo extraction & desktop icons preparation complete!');
+
+// Restore the versioned per-product launcher art after preparing shared logos.
+await import('../packaging/sync_product_icons.mjs');

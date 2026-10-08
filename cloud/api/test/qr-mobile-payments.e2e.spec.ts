@@ -43,6 +43,13 @@ beforeAll(async()=>{
 },120000);
 afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])delete process.env[k];});
 it('guest QR resolves without login, with gated online payment',async()=>{const r=await http().get(`/api/v1/public/qr/${qr}`);expect(r.status).toBe(200);expect(r.body.ordering.settings.allowOnlinePayment).toBe(true);});
+it('opening checkout returns its payment URL without another status request and keeps the order unpaid and DRAFT',async()=>{
+ const before=vi.mocked(gateway.fetchPaymentLink).mock.calls.length;
+ const result=await place('fast-checkout-opening-'+stamp);
+ expect(result.status).toBe('PENDING_PAYMENT');expect(result.payment.status).toBe('PENDING');expect(result.payment.url).toBe('https://rzp.io/i/qa-only');
+ expect(vi.mocked(gateway.fetchPaymentLink).mock.calls.length).toBe(before);
+ const order=await stored(result.publicOrderId);expect(order.status).toBe('DRAFT');expect(order.paymentStatus).toBe('PENDING');
+});
 it('an active verified gateway offers online checkout by default without a QR settings row',async()=>{
  await prisma.runAsTenant(restaurantId,tx=>tx.qrSettings.deleteMany({where:{restaurantId}}));
  expect((await http().get(`/api/v1/public/qr/${qr}`)).body.ordering.onlinePayment.available).toBe(true);

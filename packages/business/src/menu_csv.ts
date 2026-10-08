@@ -95,7 +95,7 @@ export function applyMenuCsv(preview: MenuCsvPreview, strategy = 'SKIP_DUPLICATE
         let cat = db.categories.find(c => normalizeMenuText(c.name) === normalizeMenuText(row.category));
         const existing = db.menuItems.find(i => (row.sku && normalizeMenuText(i.sku) === normalizeMenuText(row.sku) || cat && i.categoryId === cat.id && normalizeMenuText(i.name) === normalizeMenuText(row.name)));
         if (existing && ['KEEP_EXISTING', 'SKIP_DUPLICATE'].includes(strategy)) { applied.set(rowKey, { item: existing, skip: true }); result.itemsSkipped++; continue; }
-        if (!cat) { cat = { id: newAuthoringId('cat'), name: row.category, slug: normalizeMenuText(row.category), sortOrder: Math.max(0, ...db.categories.map(c => c.sortOrder)) + 1, isActive: true, updatedAt: now }; db.categories.push(cat); result.categoriesCreated++; }
+        if (!cat) { cat = { id: newAuthoringId('cat'), name: row.category, slug: normalizeMenuText(row.category), sortOrder: Math.max(0, ...db.categories.map(c => Number.isFinite(c.sortOrder) ? c.sortOrder : 0)) + 1, isActive: true, updatedAt: now }; db.categories.push(cat); result.categoriesCreated++; }
         let taxGroupId = existing?.taxGroupId;
         if (row.taxRate !== undefined) {
           let tax = db.taxGroups.find(t => t.isActive && t.cgstPercent + t.sgstPercent === row.taxRate);

@@ -5,6 +5,7 @@ import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
 import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { MenuBuilderService, previewMenuCsv, MENU_CSV_SAMPLE, type MenuCsvPreview } from '@jamanvaar/business';
 import { MenuCsvPreviewModal, MenuDuplicateModal, downloadMenuFile } from './MenuImportModals';
+import { publishMenuToGuests, MenuPublishRefused } from '../../cloud/cloudClient';
 import {
   Plus,
   Search,
@@ -99,6 +100,19 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   const [csvPreview, setCsvPreview] = useState<MenuCsvPreview | null>(null);
   const [csvError, setCsvError] = useState('');
   const [cleanupOpen, setCleanupOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publicationMessage, setPublicationMessage] = useState('');
+  const publish = async () => {
+    if (publishing) return;
+    setPublishing(true); setPublicationMessage('Sending your menu and publishing it for guests…');
+    try {
+      const result = await publishMenuToGuests('Publish from menu manager');
+      setPublicationMessage(`Menu version ${result.version} published to QR ordering and connected terminals.${result.warnings.length ? ' '+result.warnings.join(' ') : ''}`);
+      showToast('Menu published to QR ordering and connected terminals.');
+    } catch (error) {
+      setPublicationMessage(error instanceof MenuPublishRefused ? `${error.message}: ${error.errors.join(' ')}` : (error as Error).message);
+    } finally { setPublishing(false); }
+  };
 
   const handleCsvFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; e.target.value = ''; setCsvError('');
@@ -204,6 +218,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {csvError && <p role="alert" className="text-rose-700">{csvError}</p>}
+      {publicationMessage && <p role="status" className="rounded-xl bg-orange-50 border border-orange-200 p-3 text-sm text-jaman-navy">{publicationMessage}</p>}
       {csvPreview && <MenuCsvPreviewModal key={JSON.stringify(csvPreview)} preview={csvPreview} onClose={() => setCsvPreview(null)} />}
       {cleanupOpen && <MenuDuplicateModal onClose={() => setCleanupOpen(false)} />}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -218,6 +233,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button type="button" disabled={publishing || !menuItems.length} onClick={() => void publish()} className="px-3.5 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold disabled:opacity-50">{publishing ? 'Publishing…' : 'Publish to QR / Kiosk'}</button>
           <button
             onClick={() => onOpenItemModal(null)}
             className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"

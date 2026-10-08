@@ -141,6 +141,11 @@ export class PosPrinterService {
     if (order.discountAmount > 0) {
       lines.push(pad('Discount:', `-₹${order.discountAmount}`));
     }
+    if (order.loyaltyPointsRedeemed) {
+      lines.push(pad('Loyalty points used:', String(order.loyaltyPointsRedeemed)));
+      if (order.loyaltyRedemption) lines.push(order.loyaltyRedemption.name.slice(0, width));
+    }
+    if (order.loyaltyPointsEarned !== undefined) lines.push(pad('Loyalty points earned:', String(order.loyaltyPointsEarned)));
     lines.push(pad(`CGST (${halfRate(order.cgstAmount)}%):`, `₹${order.cgstAmount || 0}`));
     lines.push(pad(`SGST (${halfRate(order.sgstAmount)}%):`, `₹${order.sgstAmount || 0}`));
     if (order.roundOffAmount !== 0) {

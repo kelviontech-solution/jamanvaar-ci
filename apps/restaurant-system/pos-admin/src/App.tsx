@@ -600,7 +600,7 @@ export default function PosAdminApp() {
     // still applies whatever it pulls back in case another admin device edited a record first.
     const syncStaff = () => syncStaffUsers({ push: true });
 
-    const stopLocalChanges = startLocalChangeSync({ menu: true, tables: true, staff: true, promotions: true, inventory: restaurantAccess });
+    const stopLocalChanges = startLocalChangeSync({ customers: true, menu: true, tables: true, staff: true, promotions: true, inventory: restaurantAccess });
     void syncMenuCatalog({ push: true });
     void syncPromotions({ pushCombos: true, pushCoupons: true });
     if (restaurantAccess) void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM

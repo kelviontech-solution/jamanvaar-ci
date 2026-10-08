@@ -1,10 +1,10 @@
+import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { AuditRepository, OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
-import { PosDiscountModal } from '../cart/PosDiscountModal';
 import { PosSplitByGuestModal, type GuestSplitPlan } from './PosSplitByGuestModal';
 import {
   X,
@@ -184,7 +184,7 @@ export const PosPaymentModal: React.FC = () => {
   }, [allocations]);
 
   const remainingDue = Number((totalPayable - totalAllocated).toFixed(2));
-  const isFullyAllocated = totalAllocated === totalPayable && totalPayable > 0;
+  const isFullyAllocated = totalAllocated === totalPayable && totalPayable >= 0 && itemsCount > 0;
   const isOverAllocated = totalAllocated > totalPayable;
   const isUnderAllocated = totalAllocated < totalPayable;
 
@@ -367,7 +367,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Keyboard Shortcuts Listener
   useEffect(() => {
-    if (!isPaymentOpen) return;
+    if (!isPaymentOpen || isDiscountModalOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -391,7 +391,7 @@ export const PosPaymentModal: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPaymentOpen, isReadyToSettle]);
+  }, [isPaymentOpen, isReadyToSettle, isDiscountModalOpen]);
 
   // Settle and Confirm Payment
   const handleSettle = () => {
@@ -1074,6 +1074,7 @@ export const PosPaymentModal: React.FC = () => {
                 )}
               </div>
 
+              <PosLoyaltyRewards />
               {/* Financial Breakdown with Subtotal & Discount */}
               <div className="space-y-1.5 text-xs text-slate-600 font-medium">
                 <div className="flex justify-between">
@@ -1236,11 +1237,6 @@ export const PosPaymentModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Nested Discount Modal for on-the-fly discounts during checkout */}
-        <PosDiscountModal
-          isOpen={isDiscountModalOpen}
-          onClose={() => setIsDiscountModalOpen(false)}
-        />
       </div>
     </div>
     </>

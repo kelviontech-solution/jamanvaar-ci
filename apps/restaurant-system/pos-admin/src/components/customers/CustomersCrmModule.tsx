@@ -432,7 +432,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
             {kpis.totalPointsPool} Pts
           </div>
           <span className="text-[11px] text-slate-600 font-bold block">
-            ₹{kpis.totalPointsPool} Total Redeemable Value
+            Redeem against the configured rewards catalog
           </span>
         </div>
 
@@ -829,7 +829,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                 <div>
                   <h4 className="font-bold text-xs text-amber-950 flex items-center gap-1.5">
                     <Award className="w-4 h-4 text-amber-600" />
-                    <span>Loyalty Points Management (1 Pt = ₹1 Discount)</span>
+                    <span>Loyalty Points Management (Rewards Catalog)</span>
                   </h4>
                   <p className="text-[11px] text-amber-800 mt-0.5">
                     Current Redeemable Balance: <strong>{detailCustomer.loyaltyPoints || 0} Points</strong>

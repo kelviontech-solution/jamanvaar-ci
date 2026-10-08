@@ -150,7 +150,10 @@ export class MenuPublicationsService {
       version = await this.prisma.runAsTenant(restaurantId, async (tx) => {
         const existing = await tx.menuSnapshot.findFirst({ where: { restaurantId }, orderBy: { version: 'desc' }, select: { version: true } });
         if (existing) return existing.version;
-        if ((await this.draftRows(tx, restaurantId)).length === 0) return 0;
+        // Categories/tax groups arrive before dishes during the first sync.
+        // Freezing that partial upload would leave guests on an empty version.
+        const draft = buildContent(await this.draftRows(tx, restaurantId));
+        if (!draft.content.items.length || draft.errors.length) return 0;
         try {
           return (await this.publishTx(tx, restaurantId, null, 'Automatic first publication')).created.version;
         } catch (e) {
@@ -160,7 +163,22 @@ export class MenuPublicationsService {
       });
       if (version === 0) return null;
     }
-    return this.snapshotAt(restaurantId, version);
+    const snapshot = await this.snapshotAt(restaurantId, version);
+    if (snapshot && snapshot.content.items.length === 0) {
+      // Recover the old automatic empty first snapshot once dishes arrive.
+      // An owner's explicit publication (including an intentionally empty one)
+      // must still be stable until they choose Publish again.
+      const recovered = await this.prisma.runAsTenant(restaurantId, async tx => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'menu-publish:' + restaurantId}))`;
+        const latest = await tx.menuSnapshot.findFirst({where:{restaurantId},orderBy:{version:'desc'}});
+        if (!latest || latest.version !== version || latest.note !== 'Automatic first publication') return latest?.version ?? version;
+        const draft = buildContent(await this.draftRows(tx, restaurantId));
+        if (!draft.content.items.length || draft.errors.length) return version;
+        return (await this.publishTx(tx, restaurantId, null, 'Recovered first menu publication')).created.version;
+      });
+      if (recovered !== version) return this.snapshotAt(restaurantId, recovered);
+    }
+    return snapshot;
   }
 
   // ---------------------------------------------------------------- branch overrides (draft until published)

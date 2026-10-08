@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CachedImg, Modal, Button, MenuCategoryIcon } from '@jamanvaar/ui';
 import { PREBUILT_MENU_TEMPLATES, db, AuditRepository, KeyValueStore } from '@jamanvaar/database';
 import { MenuBuilderService, templateItemKey, templateCategoryKey, existingTemplateItem, exactCategory } from '@jamanvaar/business';
-import { publishCatalogNow } from '@jamanvaar/sync';
+import { publishMenuToGuests } from '../cloud/cloudClient';
 interface Props { isOpen: boolean; onClose: () => void; onImported: (count: number) => void }
 // Keep old miniature presets compatible with saved IDs, but offer complete restaurant catalogs for onboarding.
 const onboardingTemplates = PREBUILT_MENU_TEMPLATES.filter(template => template.approxItemCount >= 25);
@@ -52,7 +52,7 @@ export const PrebuiltMenuModal: React.FC<Props> = ({ isOpen, onClose, onImported
           const result = MenuBuilderService.executeSelectiveImport([template.id], selected, {}, {}, { selectedOnly: true, selectedCategoryKeys: categories, duplicateStrategy: strategy, ...(taxId ? { taxGroupId: taxId } : {}) });
           AuditRepository.log({ action: 'MENU_TEMPLATE_IMPORTED', category: 'MENU', details: `${template.name}: ${result.summaryMessage}`, username: 'Manager' });
           onImported(result.importedItemsCount + result.updatedItemsCount);
-          try { const sync = await publishCatalogNow(); setMessage(result.summaryMessage + (sync.delivered ? ' Published to connected terminals.' : ` ${sync.pending} changes await synchronization.`)); }
+          try { const published = await publishMenuToGuests('Restaurant menu template import'); setMessage(`${result.summaryMessage} Published menu version ${published.version} to QR ordering and connected terminals.`); }
           catch (error) { setMessage(`${result.summaryMessage} Saved locally; publication pending: ${(error as Error).message}`); }
         } catch (error) { setMessage((error as Error).message); } finally { setBusy(false); }
       }}>{busy ? 'Loading…' : `Load ${selected.length} Selected Items`}</Button></div>

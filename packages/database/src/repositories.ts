@@ -1,3 +1,4 @@
+import { initializeLoyaltyLedger, refreshLoyaltyBalance } from '@jamanvaar/types';
 import { normalizeMenuText } from './menu_identity';
 import { scanMenuDuplicates, archiveConfirmedDuplicates } from './menu_cleanup';
 import { KioskConfigurationRepository } from './kiosk_configuration';
@@ -78,7 +79,7 @@ import { resetEntitySyncCursors } from './sync_cursors';
 import { kitchenRank, resolveKitchenState, deriveTicketStatus } from './kitchen_status';
 import { TableSync } from './table_sync';
 import { canMoveTable } from './table_state';
-import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync } from './collection_sync';
+import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync, LoyaltyTierSync, LoyaltyRewardSync } from './collection_sync';
 import { InventoryItemSync, RecipeSync, SupplierSync } from './inventory_sync';
 import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin, pinFingerprint } from './pin';
@@ -721,6 +722,7 @@ export class OrderRepository {
       guestCount: orderData.guestCount,
       customerPhone: orderData.customerPhone,
       customerName: orderData.customerName,
+      loyaltyRedemption: orderData.loyaltyRedemption,
       items: orderData.items || [],
       subtotal: validatedSubtotal,
       discountAmount: orderData.discountAmount || 0,
@@ -773,6 +775,7 @@ export class OrderRepository {
       updatedAt: nowIso
     };
 
+    if (newOrder.paymentStatus === 'SUCCESS' && newOrder.loyaltyRedemption) CustomerRepository.commitOrderRedemption(newOrder);
     db.orders.unshift(newOrder);
     BusinessDayRepository.recalculateMetrics(businessDayId);
 
@@ -790,6 +793,7 @@ export class OrderRepository {
 
     // Update active shift stats if payment is already successful (e.g. Counter instant bill / kiosk order)
     if (newOrder.paymentStatus === 'SUCCESS') {
+      if (newOrder.customerPhone) newOrder.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(newOrder.customerPhone, newOrder.totalAmount, newOrder.id);
       // getActiveShift() derives the shift totals from the orders themselves, so
       // refreshing it is enough. Adding the amounts again here double-counted
       // every settlement until the next read.
@@ -853,6 +857,7 @@ export class OrderRepository {
   ): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
+    if (order.orderStatus === 'REFUNDED' || order.orderStatus === 'CANCELLED' || order.paymentStatus === 'REFUNDED' || order.paymentStatus === 'CANCELLED') throw new Error('A cancelled or refunded bill cannot be settled again');
 
     // Settling is idempotent: the same payment again changes nothing; a different one is refused.
     if (order.paymentStatus === 'SUCCESS' && order.paymentTransactionId) {
@@ -868,6 +873,9 @@ export class OrderRepository {
       throw new Error(`Payment lines do not add up to the bill total (₹${order.totalAmount})`);
     }
 
+    if (order.loyaltyRedemption && !order.loyaltyPointsRedeemed) {
+      CustomerRepository.commitOrderRedemption(order);
+    }
     const now = new Date().toISOString();
     order.paymentMethod = paymentMethod;
     if (splits && splits.length > 0) {
@@ -1032,6 +1040,15 @@ export class OrderRepository {
     }
     if (order.businessDayId) {
       BusinessDayRepository.recalculateMetrics(order.businessDayId);
+    }
+
+    if (order.customerPhone && !order.loyaltyRefundApplied) {
+      const customer = CustomerRepository.getByPhone(order.customerPhone);
+      if (customer && (order.loyaltyPointsEarned !== undefined || order.loyaltyPointsRedeemed)) {
+        const reversed = isFullRefund ? (order.loyaltyPointsEarned ?? 0) : Math.floor((order.loyaltyPointsEarned ?? 0) * refundAmount / order.totalAmount);
+        CustomerRepository.recordLoyaltyEvent(customer, `refund:${order.id}`, -reversed + (isFullRefund ? order.loyaltyPointsRedeemed ?? 0 : 0), -refundAmount, isFullRefund ? -1 : 0);
+        order.loyaltyRefundApplied = true;
+      }
     }
 
     AuditRepository.log({
@@ -1529,7 +1546,7 @@ export class CustomerRepository {
   }
 
   public static getAccount(phone: string): CustomerAccount | undefined {
-    return db.customerAccounts.find((a) => a.phone === phone);
+    return this.getByPhone(phone);
   }
 
   // B2-043: matched by exact string, so "+91 92222 22223" (kiosk guest self-signup) and
@@ -1558,32 +1575,38 @@ export class CustomerRepository {
         favoriteItemIds: [],
         recentOrderIds: []
       };
+      initializeLoyaltyLedger(account);
       db.customerAccounts.push(account);
       db.notify();
     }
     return account;
   }
 
+  public static recordLoyaltyEvent(account: CustomerAccount, key: string, points: number, spend = 0, visits = 0): boolean {
+    initializeLoyaltyLedger(account);
+    if (account.loyaltyLedger![key]) return false;
+    account.loyaltyLedger![key] = { points, spend, visits, at: new Date().toISOString() };
+    refreshLoyaltyBalance(account);
+    account.updatedAt = new Date().toISOString();
+    return true;
+  }
+
   public static addPoints(phone: string, points: number): void {
-    const account = db.customerAccounts.find((a) => a.phone === phone);
-    if (account) {
-      account.loyaltyPoints += points;
+    const account = this.getByPhone(phone);
+    if (account && Number.isSafeInteger(points) && points > 0) {
+      this.recordLoyaltyEvent(account, `adjust:${generateUUID()}`, points);
       db.notify();
     }
   }
 
-  public static addLoyaltyPoints(phone: string, points: number): void {
-    this.addPoints(phone, points);
-  }
+  public static addLoyaltyPoints(phone: string, points: number): void { this.addPoints(phone, points); }
 
   public static redeemPoints(phone: string, points: number): boolean {
-    const account = db.customerAccounts.find((a) => a.phone === phone);
-    if (account && account.loyaltyPoints >= points) {
-      account.loyaltyPoints -= points;
-      db.notify();
-      return true;
-    }
-    return false;
+    const account = this.getByPhone(phone);
+    if (!account || !Number.isSafeInteger(points) || points <= 0 || account.loyaltyPoints < points) return false;
+    this.recordLoyaltyEvent(account, `adjust:${generateUUID()}`, -points);
+    db.notify();
+    return true;
   }
 
   public static createCustomer(cust: Partial<CustomerAccount> & { phone: string; name: string }): CustomerAccount {
@@ -1594,7 +1617,9 @@ export class CustomerRepository {
     const existing = db.customerAccounts.find((c) => c.phone === cust.phone || c.phone === normalizedPhone);
     if (existing) {
       existing.name = cust.name || existing.name;
-      if (cust.loyaltyPoints !== undefined) existing.loyaltyPoints = cust.loyaltyPoints;
+      if (cust.loyaltyPoints !== undefined && cust.loyaltyPoints !== existing.loyaltyPoints) {
+        this.recordLoyaltyEvent(existing, `adjust:${generateUUID()}`, cust.loyaltyPoints - existing.loyaltyPoints);
+      }
       // Was silently dropping every other field the CRM "Add Customer" form
       // collects (email, address, dob, anniversary, notes, tags) on repeat
       // calls — a staff member re-attaching an existing phone number with
@@ -1617,11 +1642,12 @@ export class CustomerRepository {
       anniversary: cust.anniversary,
       notes: cust.notes,
       tags: cust.tags || [],
-      loyaltyPoints: cust.loyaltyPoints || 50,
+      loyaltyPoints: cust.loyaltyPoints ?? 50,
       favoriteItemIds: cust.favoriteItemIds || [],
       recentOrderIds: cust.recentOrderIds || [],
       createdAt: cust.createdAt || new Date().toISOString()
     };
+    initializeLoyaltyLedger(newCust);
     db.customerAccounts.push(newCust);
     AuditRepository.log({
       action: 'CUSTOMER_CREATED',
@@ -1636,7 +1662,11 @@ export class CustomerRepository {
   public static updateCustomer(phone: string, updates: Partial<CustomerAccount>): CustomerAccount | null {
     const idx = db.customerAccounts.findIndex((c) => c.phone === phone);
     if (idx === -1) return null;
-    db.customerAccounts[idx] = { ...db.customerAccounts[idx], ...updates };
+    const prior = db.customerAccounts[idx];
+    if (updates.loyaltyPoints !== undefined && updates.loyaltyPoints !== prior.loyaltyPoints) {
+      this.recordLoyaltyEvent(prior, `adjust:${generateUUID()}`, updates.loyaltyPoints - prior.loyaltyPoints);
+    }
+    db.customerAccounts[idx] = { ...prior, ...updates };
     AuditRepository.log({
       action: 'CUSTOMER_UPDATED',
       category: 'CUSTOMER',
@@ -1682,8 +1712,9 @@ export class CustomerRepository {
     return db.loyaltyProgramSettings[0] ?? { id: 'default', earnPoints: 1, perRupeesSpent: 10 };
   }
 
-  public static updateProgramSettings(updates: { earnPoints: number; perRupeesSpent: number }): LoyaltyProgramSettings {
-    const updated: LoyaltyProgramSettings = { id: 'default', earnPoints: updates.earnPoints, perRupeesSpent: updates.perRupeesSpent, updatedAt: new Date().toISOString() };
+  public static updateProgramSettings(updates: { earnPoints: number; perRupeesSpent: number; enabled?: boolean }): LoyaltyProgramSettings {
+    if (!Number.isFinite(updates.earnPoints) || updates.earnPoints < 0 || !Number.isFinite(updates.perRupeesSpent) || updates.perRupeesSpent <= 0) throw new Error('Invalid loyalty earn rate');
+    const updated: LoyaltyProgramSettings = { ...this.getProgramSettings(), enabled: updates.enabled ?? this.getProgramSettings().enabled, id: 'default', earnPoints: updates.earnPoints, perRupeesSpent: updates.perRupeesSpent, updatedAt: new Date().toISOString() };
     db.loyaltyProgramSettings = [updated];
     AuditRepository.log({
       action: 'LOYALTY_PROGRAM_RATE_CHANGED',
@@ -1727,6 +1758,7 @@ export class CustomerRepository {
     const idx = db.loyaltyTiers.findIndex((t) => t.id === id);
     if (idx === -1) return false;
     db.loyaltyTiers.splice(idx, 1);
+    LoyaltyTierSync.recordDeletion(id);
     db.notify();
     return true;
   }
@@ -1757,8 +1789,48 @@ export class CustomerRepository {
     const idx = db.loyaltyRewards.findIndex((r) => r.id === id);
     if (idx === -1) return false;
     db.loyaltyRewards.splice(idx, 1);
+    LoyaltyRewardSync.recordDeletion(id);
     db.notify();
     return true;
+  }
+
+  public static rewardDiscount(reward: LoyaltyReward, items: Array<{ item: MenuItem; unitPrice: number; itemTotal: number }>, subtotal: number): number {
+    const amount = reward.discountAmount ?? (reward.id === 'reward-100off' ? 100 : 0);
+    if (!Number.isFinite(amount) || amount <= 0) return 0;
+    // Cart.subtotal excludes embedded GST. Discounts use gross line prices, otherwise
+    // a reward covering the full dish price incorrectly leaves a small payable balance.
+    const grossSubtotal = items.reduce((sum, line) => sum + line.itemTotal, 0);
+    if (reward.discountKind === 'ITEM') {
+      const eligible = items.filter(line => !reward.categoryId || line.item.categoryId === reward.categoryId);
+      return Math.min(amount, grossSubtotal, Math.max(0, ...eligible.map(line => Math.min(line.unitPrice, line.itemTotal))));
+    }
+    return Math.min(grossSubtotal, amount);
+  }
+
+  public static validateOrderRedemption(order: Pick<Order, 'loyaltyRedemption' | 'customerPhone' | 'discountAmount'>): void {
+    const redemption = order.loyaltyRedemption;
+    if (!redemption) return;
+    const account = this.getByPhone(order.customerPhone ?? '');
+    const reward = this.getRewards().find(r => r.id === redemption.rewardId && r.isActive);
+    if (this.getProgramSettings().enabled === false) throw new Error('Loyalty program is paused');
+    if (!account || account.phone !== redemption.customerPhone || !reward || !Number.isSafeInteger(reward.pointsCost) || reward.pointsCost <= 0 || reward.pointsCost !== redemption.pointsCost) throw new Error('Loyalty reward has changed. Select the reward again.');
+    if (account.loyaltyPoints < redemption.pointsCost) throw new Error('Not enough loyalty points for this reward');
+    if (order.discountAmount !== redemption.discountAmount || redemption.discountAmount <= 0) throw new Error('Loyalty reward discount does not match the bill');
+    const amount = reward.discountAmount ?? (reward.id === 'reward-100off' ? 100 : 0);
+    if (redemption.discountAmount > amount) throw new Error('Loyalty reward value has changed. Select the reward again.');
+  }
+
+  public static commitOrderRedemption(order: Order): void {
+    const redemption = order.loyaltyRedemption;
+    if (!redemption || order.loyaltyPointsRedeemed) return;
+    const customer = this.getByPhone(order.customerPhone ?? '');
+    if (customer?.loyaltyLedger?.[`redeem:${order.id}`]) {
+      order.loyaltyPointsRedeemed = redemption.pointsCost;
+      return;
+    }
+    this.validateOrderRedemption(order);
+    this.recordLoyaltyEvent(customer!, `redeem:${order.id}`, -redemption.pointsCost);
+    order.loyaltyPointsRedeemed = redemption.pointsCost;
   }
 
   /** Redeems a catalog reward against the customer's points balance — replaces the previous flat "any point = ₹1" assumption. */
@@ -1769,7 +1841,8 @@ export class CustomerRepository {
     if (!reward) return { ok: false, reason: 'Reward not found or inactive' };
     if (account.loyaltyPoints < reward.pointsCost) return { ok: false, reason: 'Not enough points' };
 
-    account.loyaltyPoints -= reward.pointsCost;
+    if (!Number.isSafeInteger(reward.pointsCost) || reward.pointsCost <= 0 || this.getProgramSettings().enabled === false) return { ok: false, reason: 'Loyalty program or reward is invalid' };
+    this.recordLoyaltyEvent(account, `adjust:${generateUUID()}`, -reward.pointsCost);
     AuditRepository.log({
       action: 'LOYALTY_REWARD_REDEEMED',
       category: 'CUSTOMER',
@@ -1787,25 +1860,18 @@ export class CustomerRepository {
    * nothing ever updated — a customer's tier could never actually change from real activity.
    */
   public static earnPointsForOrder(phone: string, orderTotal: number, orderId?: string): number {
+    if (!Number.isFinite(orderTotal) || orderTotal < 0) throw new Error('Invalid loyalty order amount');
     const account = this.getOrCreateAccount(phone);
+    const eventKey = orderId ? `earn:${orderId}` : `earn:${generateUUID()}`;
+    if (account.loyaltyLedger?.[eventKey]) return account.loyaltyLedger[eventKey].points;
     const tierBefore = this.getTierForAccount(account);
-
-    account.totalSpend = (account.totalSpend || 0) + orderTotal;
-    account.totalVisits = (account.totalVisits || 0) + 1;
-    account.lastVisitAt = new Date().toISOString();
-    // Was only ever initialized to [] and never appended to — a customer's
-    // "360° view" (Restaurant Admin CRM) could never show their actual
-    // order history even after totalSpend/totalVisits were wired up.
-    if (orderId) {
-      if (!account.recentOrderIds) account.recentOrderIds = [];
-      account.recentOrderIds = [orderId, ...account.recentOrderIds.filter((id) => id !== orderId)].slice(0, 20);
-    }
-
-    const tier = this.getTierForAccount(account) || tierBefore;
+    const tier = this.getTiers().filter(t => (account.totalSpend ?? 0) + orderTotal >= t.minLifetimeSpend).pop() ?? tierBefore;
     const rate = this.getProgramSettings();
-    const basePoints = rate.perRupeesSpent > 0 ? Math.floor(orderTotal / rate.perRupeesSpent) * rate.earnPoints : 0;
-    const earned = Math.floor(basePoints * (tier?.pointsMultiplier ?? 1));
-    account.loyaltyPoints += earned;
+    const basePoints = rate.enabled !== false && rate.perRupeesSpent > 0 ? Math.floor(orderTotal / rate.perRupeesSpent) * rate.earnPoints : 0;
+    const earned = Math.max(0, Math.floor(basePoints * (tier?.pointsMultiplier ?? 1)));
+    this.recordLoyaltyEvent(account, eventKey, earned, orderTotal, 1);
+    account.lastVisitAt = new Date().toISOString();
+    if (orderId) account.recentOrderIds = [orderId, ...(account.recentOrderIds ?? []).filter(id => id !== orderId)].slice(0, 20);
 
     if (tierBefore && tier && tier.id !== tierBefore.id) {
       AuditRepository.log({

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoyaltyTier, LoyaltyReward } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
-import { CustomerRepository } from '@jamanvaar/database';
+import { syncLoyaltyProgramSettings, syncLoyaltyRewards, syncLoyaltyTiers } from '@jamanvaar/sync';
+import { db, CustomerRepository } from '@jamanvaar/database';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
 
 interface LoyaltyProgramModalProps {
@@ -24,13 +25,18 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
   const [tierDraft, setTierDraft] = useState<{ name: string; minLifetimeSpend: string; pointsMultiplier: string; perks: string }>({
     name: '', minLifetimeSpend: '0', pointsMultiplier: '1', perks: ''
   });
-  const [newReward, setNewReward] = useState({ name: '', description: '', pointsCost: '100' });
+  const emptyReward = { name: '', description: '', pointsCost: '100', discountKind: 'FIXED' as 'FIXED' | 'ITEM', discountAmount: '100', categoryId: '' };
+  const [editingRewardId, setEditingRewardId] = useState<string | null>(null);
+  const [newReward, setNewReward] = useState(emptyReward);
 
   const refresh = () => {
     setTiers(CustomerRepository.getTiers());
     setRewards(CustomerRepository.getRewards());
     setRate(CustomerRepository.getProgramSettings());
   };
+
+  useEffect(() => db.subscribe(refresh), []);
+  const syncProgram = () => { void Promise.all([syncLoyaltyProgramSettings({ push: true }), syncLoyaltyRewards({ push: true }), syncLoyaltyTiers({ push: true })]); };
 
   const startEditTier = (tier: LoyaltyTier) => {
     setEditingTierId(tier.id);
@@ -63,21 +69,23 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
   };
 
   const addReward = () => {
-    if (!newReward.name.trim() || !newReward.pointsCost) return;
-    CustomerRepository.createReward({
-      name: newReward.name.trim(),
-      description: newReward.description.trim(),
-      pointsCost: Number(newReward.pointsCost) || 0,
-      isActive: true
-    });
-    setNewReward({ name: '', description: '', pointsCost: '100' });
-    refresh();
-    showToast('Reward added to catalog');
+    const pointsCost = Number(newReward.pointsCost);
+    const discountAmount = Number(newReward.discountAmount);
+    if (!newReward.name.trim() || !Number.isSafeInteger(pointsCost) || pointsCost <= 0 || !Number.isFinite(discountAmount) || discountAmount <= 0) {
+      showToast('Enter a reward name, positive whole points cost and rupee value'); return;
+    }
+    const reward = { name: newReward.name.trim(), description: newReward.description.trim(), pointsCost, discountAmount, discountKind: newReward.discountKind, categoryId: newReward.categoryId || undefined };
+    if (editingRewardId) CustomerRepository.updateReward(editingRewardId, reward);
+    else CustomerRepository.createReward({ ...reward, isActive: true });
+    setNewReward(emptyReward);
+    setEditingRewardId(null);
+    refresh(); syncProgram();
+    showToast('Reward saved');
   };
 
   const toggleReward = (reward: LoyaltyReward) => {
     CustomerRepository.updateReward(reward.id, { isActive: !reward.isActive });
-    refresh();
+    refresh(); syncProgram();
   };
 
   const removeReward = (reward: LoyaltyReward) => {
@@ -96,12 +104,16 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
     }
     const saved = CustomerRepository.updateProgramSettings({ earnPoints, perRupeesSpent });
     setRate(saved);
+    syncProgram();
     showToast(`Saved: ${earnPoints} point(s) per ₹${perRupeesSpent} spent`);
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Loyalty Program Settings" maxWidth="lg">
       <div className="space-y-6 py-1">
+        <button type="button" onClick={() => { CustomerRepository.updateProgramSettings({ ...CustomerRepository.getProgramSettings(), enabled: rate.enabled === false }); refresh(); syncProgram(); }} className="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-3 font-bold text-emerald-800">
+          Loyalty program: {rate.enabled === false ? 'Paused' : 'Active'} - click to {rate.enabled === false ? 'enable' : 'pause'}
+        </button>
         {/* Base earn rate — this is the direct answer to "how many points do I give". Every tier below
             multiplies this rate; it does not replace it. */}
         <div className="space-y-2">
@@ -208,6 +220,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
                 <div className="min-w-0">
                   <div className="font-bold text-xs text-jaman-navy truncate">{reward.name} — {reward.pointsCost} pts</div>
                   <div className="text-[11px] text-slate-500 truncate">{reward.description}</div>
+                  <div className="text-[11px] text-emerald-700">{reward.discountAmount || reward.id === 'reward-100off' ? `\u20b9${reward.discountAmount ?? 100} ${reward.discountKind === 'ITEM' ? 'maximum for one item' : 'off bill'}` : 'Set a rupee value before POS redemption'}</div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
@@ -218,6 +231,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
                   >
                     {reward.isActive ? 'Active' : 'Paused'}
                   </button>
+                  <button aria-label={`Edit reward ${reward.name}`} onClick={() => { setEditingRewardId(reward.id); setNewReward({ name: reward.name, description: reward.description, pointsCost: String(reward.pointsCost), discountKind: reward.discountKind ?? 'FIXED', discountAmount: String(reward.discountAmount ?? (reward.id === 'reward-100off' ? 100 : '')), categoryId: reward.categoryId ?? '' }); }} className="p-1.5 hover:bg-white rounded-lg text-slate-500"><Edit2 className="w-3.5 h-3.5" /></button>
                   <button onClick={() => removeReward(reward)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -246,11 +260,20 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
               placeholder="Points"
               className="bg-jaman-ivory border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-mono"
             />
-            <button
+            <label className="text-xs font-semibold">Reward type
+              <select aria-label="Reward type" value={newReward.discountKind} onChange={e => setNewReward(d => ({ ...d, discountKind: e.target.value as 'FIXED' | 'ITEM' }))} className="w-full border rounded-lg p-2"><option value="FIXED">Bill discount</option><option value="ITEM">One free item (value cap)</option></select>
+            </label>
+            <label className="text-xs font-semibold">Value / maximum (INR)
+              <input aria-label="Reward rupee value" type="number" min="0.01" step="0.01" value={newReward.discountAmount} onChange={e => setNewReward(d => ({ ...d, discountAmount: e.target.value }))} className="w-full border rounded-lg p-2" />
+            </label>
+            {newReward.discountKind === 'ITEM' && <label className="text-xs font-semibold sm:col-span-2">Eligible category
+              <select aria-label="Reward category" value={newReward.categoryId} onChange={e => setNewReward(d => ({ ...d, categoryId: e.target.value }))} className="w-full border rounded-lg p-2"><option value="">Any category</option>{db.categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+            </label>}
+                        <button
               onClick={addReward}
               className="sm:col-span-4 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-jaman-navy hover:bg-jaman-darkBorder text-white text-xs font-bold rounded-lg cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" /> Add Reward
+              <Plus className="w-3.5 h-3.5" /> {editingRewardId ? 'Save Reward' : 'Add Reward'}
             </button>
           </div>
         </div>

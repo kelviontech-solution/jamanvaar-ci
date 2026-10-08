@@ -118,6 +118,22 @@ describe('branch prices on devices, KDS stations, device verdict cache', () => {
     });
   });
 
+  it('KDS hands table service to Captain only when Captain is enabled and activated in its own branch', async () => {
+    const policy = async () => (await as('patch', '/api/v1/devices/me/heartbeat', F.kds.token).send({})).body.captainHandlesService;
+    expect(await policy()).toBe(false);
+    await prisma.runAsTenant(F.rid, tx => tx.applicationEntitlement.upsert({where:{subscriptionId_appCode:{subscriptionId:F.sub,appCode:'CAPTAIN'}},create:{restaurantId:F.rid,subscriptionId:F.sub,appCode:'CAPTAIN',enabled:true},update:{enabled:true}}));
+    const otherBranch = await redeem(F.rid, 'CAPTAIN', { branchId: F.brB });
+    expect(await policy()).toBe(false);
+    const local = await redeem(F.rid, 'CAPTAIN', { branchId: F.brA });
+    expect(await policy()).toBe(true);
+    await prisma.runAsTenant(F.rid, tx => tx.device.update({where:{id:local.id},data:{status:'REVOKED'}}));
+    expect(await policy()).toBe(false);
+    await prisma.runAsTenant(F.rid, tx => tx.device.update({where:{id:local.id},data:{status:'ACTIVE'}}));
+    await prisma.runAsTenant(F.rid, tx => tx.applicationEntitlement.update({where:{subscriptionId_appCode:{subscriptionId:F.sub,appCode:'CAPTAIN'}},data:{enabled:false}}));
+    expect(await policy()).toBe(false);
+    expect(otherBranch.id).not.toBe(local.id);
+  });
+
   describe('the device verdict cache never hides a decision', () => {
     it('a cached device is stopped at once by revoke, lock, entitlement and subscription changes, and heartbeats do not flush it', async () => {
       const previous = process.env.DEVICE_AUTH_CACHE_MS;

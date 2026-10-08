@@ -3,6 +3,7 @@ import { Modal, Button } from '@jamanvaar/ui';
 import { db, AuditRepository, scanMenuDuplicates, archiveConfirmedDuplicates, captureMenuCleanupBackup, restoreMenuCleanupBackup, menuCleanupReportIsCurrent, type MenuCleanupReport } from '@jamanvaar/database';
 import { applyMenuCsv, type MenuCsvPreview } from '@jamanvaar/business';
 import { publishCatalogNow } from '@jamanvaar/sync';
+import { publishMenuToGuests } from '../../cloud/cloudClient';
 import { toCsvRow } from '@jamanvaar/utils';
 export function downloadMenuFile(name: string, body: string, type = 'text/csv;charset=utf-8') { const url = URL.createObjectURL(new Blob([body], { type })); const link = document.createElement('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 export function MenuCsvPreviewModal({ preview, onClose }: { preview: MenuCsvPreview | null; onClose: () => void }) {
@@ -18,7 +19,8 @@ export function MenuCsvPreviewModal({ preview, onClose }: { preview: MenuCsvPrev
       setBusy(true); try {
         const result = applyMenuCsv(preview, strategy); AuditRepository.log({ action: 'MENU_CSV_IMPORTED', category: 'MENU', details: `${result.itemsImported} imported, ${result.itemsSkipped} existing skipped, ${preview.errors.length} invalid rows omitted.`, username: 'Manager' });
         let publication = 'Saved locally; publication pending.';
-        try { const synced = await publishCatalogNow(); publication = synced.delivered ? 'Published to connected terminals.' : `${synced.pending} changes await synchronization.`; } catch {}
+        try { const published = await publishMenuToGuests('CSV menu import'); publication = `Published menu version ${published.version} to QR ordering and connected terminals.`; }
+        catch (error) { publication = `Saved locally; guest publication pending: ${(error as Error).message}`; }
         setMessage(`${result.itemsImported} items imported, ${result.itemsSkipped} skipped, ${result.categoriesCreated} categories created. ${publication}`);
       } catch (error) { setMessage((error as Error).message); } finally { setBusy(false); }
     }}>{busy ? 'Importing…' : `Import ${preview.rows.length} Valid Rows`}</Button></div>

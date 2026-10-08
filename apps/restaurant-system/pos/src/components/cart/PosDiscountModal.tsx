@@ -3,6 +3,7 @@ import { usePosStore, isManagerOrAboveRole, isHighDiscount } from '../../store/p
 import { formatINR } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
+import { calculateCart } from '@jamanvaar/business';
 import {
   X,
   Percent,
@@ -45,6 +46,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
     discountScope: currentScope,
     discountCode: currentCode,
     applyDiscount,
+    applyDiscountUnchecked,
     removeDiscount,
     requestManagerOverride
   } = usePosStore();
@@ -114,55 +116,18 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
     const rawSubtotal = cart.items.reduce((acc, it) => acc + (it.itemTotal || 0), 0);
     const numVal = parseFloat(discountValue) || 0;
 
-    let calculatedDiscount = 0;
-
-    if (scope === 'BILL') {
-      if (discountType === 'PERCENTAGE') {
-        const pct = Math.min(100, Math.max(0, numVal));
-        calculatedDiscount = Number(((rawSubtotal * pct) / 100).toFixed(2));
-      } else {
-        calculatedDiscount = Number(Math.min(rawSubtotal, Math.max(0, numVal)).toFixed(2));
-      }
-    } else {
-      // Items scope
-      let itemSum = 0;
-      cart.items.forEach((it) => {
-        if (selectedItemIds.includes(it.cartItemId)) {
-          if (discountType === 'PERCENTAGE') {
-            const pct = Math.min(100, Math.max(0, numVal));
-            itemSum += Number(((it.itemTotal * pct) / 100).toFixed(2));
-          } else {
-            const fixedPerItem = Math.min(it.itemTotal, numVal);
-            itemSum += Number(fixedPerItem.toFixed(2));
-          }
-        }
-      });
-      calculatedDiscount = Number(Math.min(rawSubtotal, itemSum).toFixed(2));
-    }
-
-    const taxable = Number(Math.max(0, rawSubtotal - calculatedDiscount).toFixed(2));
-    const cgst = Number(((taxable * 2.5) / 100).toFixed(2));
-    const sgst = Number(((taxable * 2.5) / 100).toFixed(2));
-    const totalTax = Number((cgst + sgst).toFixed(2));
-    const unroundedTotal = taxable + totalTax;
-    const roundedTotal = Math.round(unroundedTotal);
-    const roundOff = Number((roundedTotal - unroundedTotal).toFixed(2));
-
-    return {
-      rawSubtotal,
-      calculatedDiscount,
-      taxable,
-      totalTax,
-      totalPayable: roundedTotal,
-      roundOff
-    };
+    const items = cart.items.map(it => scope === 'ITEMS' && selectedItemIds.includes(it.cartItemId)
+      ? { ...it, itemDiscountPercent: discountType === 'PERCENTAGE' ? numVal : 0, itemDiscountAmount: discountType === 'FIXED' ? numVal : 0 }
+      : it);
+    const priced = calculateCart({ items, taxGroups: db.taxGroups, discountType, discountValue: numVal, discountScope: scope });
+    return { rawSubtotal, calculatedDiscount: priced.discountAmount, taxable: Number(Math.max(0, priced.subtotal - priced.discountAmount).toFixed(2)), totalTax: priced.taxAmount, totalPayable: priced.totalPayable, roundOff: priced.roundOffAmount };
   }, [cart.items, scope, discountType, discountValue, selectedItemIds]);
 
   const handleApply = () => {
     setErrorMessage('');
-    const numVal = parseFloat(discountValue) || 0;
+    const numVal = Number(discountValue);
 
-    if (numVal <= 0 && discountType !== 'PERCENTAGE') {
+    if (!discountValue.trim() || !Number.isFinite(numVal) || numVal <= 0) {
       setErrorMessage('Please enter a valid discount amount greater than 0.');
       return;
     }
@@ -201,7 +166,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
         `High Discount Approval (${discountType === 'PERCENTAGE' ? `${numVal}%` : `₹${numVal}`})`,
         `Cashier ${currentUser?.fullName} is applying ${discountType === 'PERCENTAGE' ? `${numVal}%` : `₹${numVal}`} discount for "${finalReason}".`,
         (managerName) => {
-          applyDiscount({
+          applyDiscountUnchecked({
             scope,
             type: discountType,
             value: numVal,
@@ -398,7 +363,8 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
                 type="number"
                 min="0"
                 max={discountType === 'PERCENTAGE' ? 100 : preview.rawSubtotal}
-                step={discountType === 'PERCENTAGE' ? '1' : '5'}
+                step="0.01"
+                aria-label="Discount value"
                 value={discountValue}
                 onChange={(e) => setDiscountValue(e.target.value)}
                 placeholder={discountType === 'PERCENTAGE' ? 'Enter percentage (e.g. 10)' : 'Enter amount in ₹'}

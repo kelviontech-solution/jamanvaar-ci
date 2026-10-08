@@ -54,6 +54,10 @@ export interface OrderSyncMeta {
   billSplitNote?: string;
   customerName?: string;
   customerPhone?: string;
+  loyaltyRedemption?: Order['loyaltyRedemption'];
+  loyaltyPointsEarned?: number;
+  loyaltyPointsRedeemed?: number;
+  loyaltyRefundApplied?: boolean;
   guestCount?: number;
   createdAt?: string;
   sourceType?: string;
@@ -244,6 +248,10 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       billSplitNote: order.billSplitNote,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
+      loyaltyRedemption: order.loyaltyRedemption,
+      loyaltyPointsEarned: order.loyaltyPointsEarned,
+      loyaltyPointsRedeemed: order.loyaltyPointsRedeemed,
+      loyaltyRefundApplied: order.loyaltyRefundApplied,
       guestCount: order.guestCount,
       createdAt: order.createdAt,
       sourceType: order.source_type,
@@ -313,6 +321,12 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
   if (remote.paymentMethod) local.paymentMethod = remote.paymentMethod as Order['paymentMethod'];
   const m = remote.meta;
   if (m) {
+    if (m.customerPhone !== undefined) local.customerPhone = m.customerPhone;
+    if (m.customerName !== undefined) local.customerName = m.customerName;
+    if (m.loyaltyRedemption) local.loyaltyRedemption = m.loyaltyRedemption;
+    if (m.loyaltyPointsEarned !== undefined) local.loyaltyPointsEarned = m.loyaltyPointsEarned;
+    if (m.loyaltyPointsRedeemed !== undefined) local.loyaltyPointsRedeemed = m.loyaltyPointsRedeemed;
+    if (m.loyaltyRefundApplied !== undefined) local.loyaltyRefundApplied = m.loyaltyRefundApplied;
     if (m.kitchenPriority && compareKitchenPriority(m, local) >= 0) {
       local.kitchenPriority = m.kitchenPriority;
       local.kitchenPriorityRev = m.kitchenPriorityRev;
@@ -414,6 +428,10 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     refundAmount: m.refundAmountPaise === undefined ? undefined : fromPaise(m.refundAmountPaise),
     customerName: m.customerName,
     customerPhone: m.customerPhone,
+    loyaltyRedemption: m.loyaltyRedemption,
+    loyaltyPointsEarned: m.loyaltyPointsEarned,
+    loyaltyPointsRedeemed: m.loyaltyPointsRedeemed,
+    loyaltyRefundApplied: m.loyaltyRefundApplied,
     cashierName: m.cashierName,
     captainName: m.captainName,
     items,

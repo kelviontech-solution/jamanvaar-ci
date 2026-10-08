@@ -1,3 +1,4 @@
+import { mergeCustomerLoyalty, CustomerAccount } from './customer-loyalty-merge';
 import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
@@ -46,7 +47,7 @@ const CATCH_UP_MAX_ROWS = 500;
  * in here too (BUG-149): a device holding an old copy of a dish, or a dish someone deleted, must not overwrite
  * the newer edit or bring the deleted record back.
  */
-const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'KIOSK_CONFIGURATION']);
+const LAST_CHANGE_WINS_TYPES: ReadonlySet<string> = new Set(['LOYALTY_TIER', 'LOYALTY_REWARD', 'LOYALTY_PROGRAM_SETTINGS', 'STAFF_USER', 'TAX_GROUP', 'DINING_TABLE', 'MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'COMBO', 'COUPON', 'CUSTOMER', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'KIOSK_CONFIGURATION']);
 
 function changedAt(payload: unknown): number {
   const value = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).updatedAt : undefined;
@@ -168,6 +169,9 @@ export class EntitySyncService {
           const deletionBranch = existingBranch ?? deviceBranchId;
           if ((BRANCH_ENTITY_TYPES.has(entityType) || entityType === 'STAFF_USER') && evt.payload.deleted === true && deletionBranch && typeof evt.payload.branchId !== 'string') {
             evt = { ...evt, payload: { ...evt.payload, branchId: deletionBranch } };
+          }
+          if (entityType === 'CUSTOMER' && existing && !isDeleted(existing.payload) && !isDeleted(evt.payload)) {
+            evt = { ...evt, payload: mergeCustomerLoyalty(existing.payload as unknown as CustomerAccount, evt.payload as unknown as CustomerAccount) as unknown as Record<string, unknown> };
           }
           if (existing && JSON.stringify(existing.payload) === JSON.stringify(evt.payload)) {
             results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });

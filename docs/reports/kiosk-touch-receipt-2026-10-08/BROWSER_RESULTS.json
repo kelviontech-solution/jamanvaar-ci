@@ -1,0 +1,58 @@
+{
+  "environment": "isolated local QA; compiled kiosk; touch input",
+  "emailProvider": "captured, no external delivery",
+  "whatsappProvider": "simulated",
+  "results": [
+    {
+      "name": "A customer completes actual kiosk cash checkout using touch",
+      "status": "PASS"
+    },
+    {
+      "name": "Email address is entered only through the themed touch keyboard; modal survives the old return deadline",
+      "status": "PASS",
+      "evidence": {
+        "physicalKeyboardUsed": false,
+        "heldBeyond15Seconds": true
+      }
+    },
+    {
+      "name": "A real PDF email request stays open while sending and shows persistent success before customer acknowledgement",
+      "status": "PASS",
+      "evidence": {
+        "realApi": true,
+        "pdfEmailCaptured": true,
+        "pdfBytes": 2282,
+        "externalEmailSent": false,
+        "persistentSuccess": true
+      }
+    },
+    {
+      "name": "WhatsApp uses a numeric touch keypad; failure stays editable and explicit retry succeeds",
+      "status": "PASS",
+      "evidence": {
+        "providerSimulated": true,
+        "phonePreservedOnFailure": true,
+        "explicitRetry": true
+      }
+    },
+    {
+      "name": "Closing and reopening clears the previous recipient, and the keyboard fits portrait, tablet and landscape screens",
+      "status": "PASS",
+      "evidence": {
+        "recipientCleared": true,
+        "viewports": 4
+      }
+    },
+    {
+      "name": "The kiosk still returns automatically for the next customer after an untouched confirmation window",
+      "status": "PASS",
+      "evidence": {
+        "autoReturnRetained": true,
+        "pageErrors": 0
+      }
+    }
+  ],
+  "pageErrors": [],
+  "emailCalls": 1,
+  "whatsappCalls": 2
+}

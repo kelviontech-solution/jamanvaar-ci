@@ -9,6 +9,8 @@ import { syncStaffUsers } from '@jamanvaar/sync';
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
+import { KioskReceiptDeliveryDialog, type ReceiptDeliveryChannel, type ReceiptDeliveryResult } from './KioskReceiptDeliveryDialog';
+import { useKioskConfirmationReturn } from './useKioskConfirmationReturn';
 import { cancelAbandonedKioskDraft, confirmKioskCashOrder } from './kioskOrderLifecycle';
 import {
   activateKioskDevice,
@@ -577,15 +579,11 @@ export default function KioskUserApp() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Digital E-Bill & Email Receipt States (Sections 130-152)
-  const [isEBillModalOpen, setIsEBillModalOpen] = useState(false);
-  const [eBillEmailInput, setEBillEmailInput] = useState('');
+  const [receiptDeliveryChannel, setReceiptDeliveryChannel] = useState<ReceiptDeliveryChannel | null>(null);
+  const [receiptDeliveryBusy, setReceiptDeliveryBusy] = useState(false);
+  const [confirmationActivity, setConfirmationActivity] = useState(0);
+  const receiptGeneration = useRef(0);
   const [eBillSuccessMessage, setEBillSuccessMessage] = useState<string | null>(null);
-  const [eBillError, setEBillError] = useState<string | null>(null);
-  const [eBillSending, setEBillSending] = useState(false);
-  const [isWhatsAppBillModalOpen, setIsWhatsAppBillModalOpen] = useState(false);
-  const [whatsAppBillPhone, setWhatsAppBillPhone] = useState('');
-  const [isSendingWhatsAppBill, setIsSendingWhatsAppBill] = useState(false);
-  const [whatsAppBillError, setWhatsAppBillError] = useState<string | null>(null);
 
   // Modals for Extra Features
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
@@ -678,6 +676,7 @@ export default function KioskUserApp() {
   // Idle Timer Reset on Touch/Interaction
   const resetIdleTimer = () => {
     setIdleSeconds(0);
+    if (step === 'CONFIRMATION') setConfirmationActivity(version => version + 1);
     if (showIdleWarning) {
       setShowIdleWarning(false);
       setIdleCountdown(idleThresholds.resetCountdown);
@@ -687,7 +686,7 @@ export default function KioskUserApp() {
   const awaitingOnlinePayment = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && !onlinePaymentUnavailable && paymentStatus !== 'EXPIRED';
 
   useEffect(() => {
-    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT' || awaitingOnlinePayment) return;
+    if (step === 'WELCOME' || step === 'LANGUAGE_SELECT' || awaitingOnlinePayment || receiptDeliveryBusy) return;
 
     const interval = setInterval(() => {
       setIdleSeconds((prev) => {
@@ -700,7 +699,7 @@ export default function KioskUserApp() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [step, showIdleWarning, awaitingOnlinePayment]);
+  }, [step, showIdleWarning, awaitingOnlinePayment, receiptDeliveryBusy]);
 
   // Idle Countdown
   useEffect(() => {
@@ -858,18 +857,7 @@ export default function KioskUserApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-return to the Welcome screen after the confirmation screen has had
-  // its receipt print attempt settle, AND its confirmation voice announcement 
-  // has completely finished (plus a 3.5 second read/tap window).
-  useEffect(() => {
-    if (step !== 'CONFIRMATION' || !printSettled || !speechSettled) return;
-    const POST_CONFIRMATION_DELAY = 3500;
-    const timer = setTimeout(() => {
-      handleFullSessionReset();
-    }, POST_CONFIRMATION_DELAY);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, printSettled, speechSettled]);
+  // The return hook is called below, after the session reset handler exists.
 
   // Periodic Heartbeat to Authoritative Local Service
   useEffect(() => {
@@ -902,6 +890,7 @@ export default function KioskUserApp() {
 
   // Full Session Memory Scrub (Sections 224-226: No customer data leaks)
   const handleFullSessionReset = () => {
+    receiptGeneration.current += 1;
     const currentDisplay = KioskDisplaySettingsRepository.getSettings();
     const nextSessionCopy = (key: string, fallback: string) => currentDisplay.texts?.[currentDisplay.defaultLanguage]?.[key] || fallback;
     cancelAbandonedPendingOrder();
@@ -935,12 +924,10 @@ export default function KioskUserApp() {
     setFeedbackSubmitted(false);
     setFeedbackRating(0);
     setFeedbackTags([]);
-    setEBillEmailInput('');
     setIsChatbotOpen(false);
-    setIsEBillModalOpen(false);
-    setIsWhatsAppBillModalOpen(false);
-    setWhatsAppBillPhone('');
-    setWhatsAppBillError(null);
+    setReceiptDeliveryChannel(null);
+    setReceiptDeliveryBusy(false);
+    setIsHandoffModalOpen(false);
     setEBillSuccessMessage(null);
     setChatMessages([
       {
@@ -957,6 +944,24 @@ export default function KioskUserApp() {
         ]
       }
     ]);
+  };
+
+  useKioskConfirmationReturn({
+    active: step === 'CONFIRMATION',
+    ready: printSettled && speechSettled,
+    blocked: receiptDeliveryChannel !== null || receiptDeliveryBusy || isHandoffModalOpen,
+    activityVersion: confirmationActivity,
+    onReturn: handleFullSessionReset
+  });
+
+  const openReceiptDelivery = (channel: ReceiptDeliveryChannel) => {
+    resetIdleTimer();
+    setReceiptDeliveryChannel(channel);
+  };
+  const closeReceiptDelivery = () => {
+    if (receiptDeliveryBusy) return;
+    resetIdleTimer();
+    setReceiptDeliveryChannel(null);
   };
 
   // Cart Calculations with loyalty redemption & staff override discounts
@@ -1644,59 +1649,37 @@ export default function KioskUserApp() {
     await proceedToConfirmation(order, networkState === 'ONLINE');
   };
 
-  // Dispatch the e-bill by email — a real, server-generated PDF tax invoice, replacing the old
-  // WhatsApp e-bill (which only ever forwarded display text to a notification API, never an
-  // actual invoice). Works for a cash order too — the server resolves placedOrder.id to whichever
-  // of its own tables (online payment or the cash order's synced record) actually has it.
-  const handleDispatchEBill = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!placedOrder || !eBillEmailInput) return;
-    setEBillSending(true);
-    setEBillError(null);
+  // Entry and acknowledgement belong to the touch dialog; retain the existing
+  // cloud-order synchronization recovery without letting it reset this session.
+  const handleReceiptDelivery = async (channel: ReceiptDeliveryChannel, recipient: string): Promise<ReceiptDeliveryResult> => {
+    if (!placedOrder || receiptDeliveryBusy) return { success: false, message: 'Your order is not available for receipt delivery. Please ask the counter.' };
+    const generation = receiptGeneration.current;
+    const order = placedOrder;
+    resetIdleTimer();
+    setReceiptDeliveryBusy(true);
     try {
-      // The order's cloud copy is pushed in the background, after the receipt already printed, so it can
-      // still be a few seconds behind when the guest emails the bill right away. Retry through that window
-      // (driving the push ourselves each time) instead of failing on the server's first honest "not yet" —
-      // the guest never sees this, the modal just takes a moment longer on a fresh order.
-      let res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
-      for (let attempt = 0; !res.success && isOrderStillSyncingMessage(res.message) && attempt < 4; attempt++) {
-        await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        res = await EBillService.sendEmailEBill(placedOrder, eBillEmailInput, emailReceipt);
+      let res;
+      if (channel === 'EMAIL') {
+        res = await EBillService.sendEmailEBill(order, recipient, emailReceipt);
+        for (let attempt = 0; !res.success && isOrderStillSyncingMessage(res.message) && attempt < 4 && generation === receiptGeneration.current; attempt++) {
+          await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          if (generation !== receiptGeneration.current) return { success: false, message: 'The kiosk session has ended.' };
+          res = await EBillService.sendEmailEBill(order, recipient, emailReceipt);
+        }
+      } else {
+        res = await EBillService.sendWhatsAppBill(order, recipient, whatsappReceipt);
       }
       ReceiptRepository.addRecord(res.record);
-      if (res.success) {
-        setIsEBillModalOpen(false);
-        setEBillSuccessMessage(res.message);
-        showToast(res.message);
-      } else {
-        setEBillError(res.message);
-      }
+      if (res.success && generation === receiptGeneration.current) setEBillSuccessMessage(res.message);
+      return { success: res.success, message: res.message };
+    } catch {
+      return { success: false, message: 'Your bill could not be sent. Please try again or ask the counter for help.' };
     } finally {
-      setEBillSending(false);
-    }
-  };
-
-  // Send the bill to the guest's WhatsApp. The server builds it from the real order and sends it from
-  // the restaurant's own WhatsApp number — the guest only types a mobile number.
-  const handleDispatchWhatsAppBill = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!placedOrder || isSendingWhatsAppBill) return;
-    setWhatsAppBillError(null);
-    setIsSendingWhatsAppBill(true);
-    try {
-      const res = await EBillService.sendWhatsAppBill(placedOrder, whatsAppBillPhone, whatsappReceipt);
-      ReceiptRepository.addRecord(res.record);
-      if (res.success) {
-        setEBillSuccessMessage(res.message);
-        showToast(res.message);
-        setIsWhatsAppBillModalOpen(false);
-        setWhatsAppBillPhone('');
-      } else {
-        setWhatsAppBillError(res.message);
+      if (generation === receiptGeneration.current) {
+        setReceiptDeliveryBusy(false);
+        resetIdleTimer();
       }
-    } finally {
-      setIsSendingWhatsAppBill(false);
     }
   };
 
@@ -3422,13 +3405,13 @@ export default function KioskUserApp() {
                   <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_print_receipt_98bad4', 'Print Receipt')}</span>
                 </button>
                 {receiptConfig.enableEmail && (
-                  <button type="button" onClick={() => { setEBillError(null); setIsEBillModalOpen(true); }} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                  <button type="button" onClick={() => openReceiptDelivery('EMAIL')} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-emerald-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
                     <Mail className="w-7 h-7 text-emerald-600" />
                     <span className="text-sm font-bold text-jaman-navy">{kioskCopy('screen_email_bill_64ee94', 'Email Bill')}</span>
                   </button>
                 )}
                 {receiptConfig.enableWhatsApp && (
-                  <button type="button" onClick={() => { setWhatsAppBillError(null); setIsWhatsAppBillModalOpen(true); }} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-green-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                  <button type="button" onClick={() => openReceiptDelivery('WHATSAPP')} className="min-h-[96px] p-4 rounded-2xl bg-jaman-ivory border border-jaman-border hover:border-green-500 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
                     <MessageCircle className="w-7 h-7 text-green-600" />
                     <span className="text-sm font-bold text-jaman-navy">WhatsApp Bill</span>
                   </button>
@@ -3499,74 +3482,17 @@ export default function KioskUserApp() {
         );
       })()}
 
-      {/* MODAL: DIGITAL E-BILL & EMAIL DELIVERY */}
-      <Modal
-        isOpen={isEBillModalOpen}
-        onClose={() => setIsEBillModalOpen(false)}
-        title="Email Your Bill"
-      >
-        <form onSubmit={handleDispatchEBill} className="space-y-4 py-2">
-          <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_your_email_address_to_receive_your_official_jaman_350fe2", "Enter your email address to receive your official JAMANVAAR tax invoice as a PDF.")}</p>
-
-          <div>
-            <label className="block text-xs font-bold text-jaman-navy mb-1">{kioskCopy("screen_email_address_09bf25", "Email Address")}</label>
-            <input
-              type="email"
-              required
-              value={eBillEmailInput}
-              onChange={(e) => setEBillEmailInput(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
-            />
-          </div>
-
-          {eBillError && (
-            <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5">{eBillError}</p>
-          )}
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" type="button" disabled={eBillSending} onClick={() => setIsEBillModalOpen(false)}>{kioskCopy("screen_cancel_19766e", "Cancel")}</Button>
-            <Button variant="accent" type="submit" disabled={eBillSending} leftIcon={<Send className="w-3.5 h-3.5" />}>
-              {eBillSending ? 'Sending…' : kioskCopy("screen_email_my_bill_dd97a2", "Email My Bill")}
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* MODAL: WHATSAPP BILL */}
-      <Modal
-        isOpen={isWhatsAppBillModalOpen}
-        onClose={() => setIsWhatsAppBillModalOpen(false)}
-        title="Get Your Bill on WhatsApp"
-      >
-        <form onSubmit={handleDispatchWhatsAppBill} className="space-y-4 py-2">
-          <p className="text-xs text-[#4A5568]">Enter your mobile number and we will send your bill to your WhatsApp right away.</p>
-          <div>
-            <label className="block text-xs font-bold text-jaman-navy mb-1">WhatsApp Number</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-jaman-navy bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2">+91</span>
-              <input
-                type="tel"
-                inputMode="numeric"
-                autoComplete="off"
-                required
-                maxLength={10}
-                value={whatsAppBillPhone}
-                onChange={(e) => setWhatsAppBillPhone(EBillService.sanitizePhoneInput(e.target.value))}
-                placeholder="98765 43210"
-                className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-jaman-navy"
-              />
-            </div>
-          </div>
-          {whatsAppBillError && <p role="alert" className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{whatsAppBillError}</p>}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setIsWhatsAppBillModalOpen(false)}>Cancel</Button>
-            <Button variant="accent" type="submit" disabled={isSendingWhatsAppBill || !/^[6-9]\d{9}$/.test(whatsAppBillPhone)} leftIcon={<Send className="w-3.5 h-3.5" />}>
-              {isSendingWhatsAppBill ? 'Sending…' : 'Send Bill'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      {/* Contact entry and success acknowledgement remain on this touch screen. */}
+      {receiptDeliveryChannel && (
+        <KioskReceiptDeliveryDialog
+          key={receiptDeliveryChannel}
+          channel={receiptDeliveryChannel}
+          onClose={closeReceiptDelivery}
+          onDone={handleFullSessionReset}
+          onActivity={resetIdleTimer}
+          onSend={recipient => handleReceiptDelivery(receiptDeliveryChannel, recipient)}
+        />
+      )}
 
       {/* MODAL: ITEM CUSTOMIZATION & MODIFIERS */}
       {customizingItem && (

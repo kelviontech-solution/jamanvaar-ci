@@ -1,3 +1,4 @@
+import { mergeCustomerLoyalty } from '@jamanvaar/types';
 import { KeyValueStore } from './key_value_store';
 import type { CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, LoyaltyTier, LoyaltyReward, LoyaltyProgramSettings, MenuItem, ModifierGroup, Reservation, ShiftRecord, TaxGroup } from '@jamanvaar/types';
 import { db } from './db';
@@ -69,7 +70,8 @@ export class CollectionSync<T extends Syncable> {
     /** The field that identifies a record: `id`, or `phone` for a customer. */
     private readonly idKey: string = 'id',
     private readonly serialize?: (record: T) => Record<string, unknown>,
-    private readonly materialize?: (record: T) => T
+    private readonly materialize?: (record: T) => T,
+    private readonly merge?: (existing: T, incoming: T) => T
   ) {}
 
   private idOf(record: T): string {
@@ -189,8 +191,10 @@ export class CollectionSync<T extends Syncable> {
     if (!opts.authoritative && deletedAt && time(deletedAt) >= remoteTime) return;
 
     const parsed = { ...remote } as unknown as T;
-    const incoming = this.materialize ? this.materialize(parsed) : parsed;
+    let incoming = this.materialize ? this.materialize(parsed) : parsed;
     if (typeof remote.updatedAt !== 'string') incoming.updatedAt = EPOCH;
+    const remoteSig = this.signature(incoming as unknown as Record<string, unknown>);
+    if (idx >= 0 && this.merge) incoming = this.merge(list[idx], incoming);
 
     const unchanged = idx >= 0 && remoteTime === time(list[idx].updatedAt)
       && this.signature(list[idx] as unknown as Record<string, unknown>) === this.signature(incoming as unknown as Record<string, unknown>);
@@ -199,7 +203,7 @@ export class CollectionSync<T extends Syncable> {
       list.push(incoming);
     } else {
       const local = list[idx];
-      if (!opts.authoritative && remoteTime < time(local.updatedAt)) return;
+      if (!this.merge && !opts.authoritative && remoteTime < time(local.updatedAt)) return;
       // Update in place: screens may hold references to these objects.
       const target = local as unknown as Record<string, unknown>;
       for (const key of Object.keys(target)) delete target[key];
@@ -209,7 +213,7 @@ export class CollectionSync<T extends Syncable> {
     const applied = this.list().find((r) => this.idOf(r) === id)!;
     const sig = this.signature(applied as unknown as Record<string, unknown>);
     if (state.sigs) state.sigs[id] = sig;
-    state.pushed[id] = sig;
+    state.pushed[id] = this.merge ? remoteSig : sig;
     delete state.tombstones[id];
     this.save();
     if (!unchanged) db.notify();
@@ -312,7 +316,7 @@ export const CustomerSync = new CollectionSync<CustomerAccount>(
   'jamanvaar_customer_sync_v1',
   () => db.customerAccounts,
   (r) => typeof r.phone === 'string' && r.phone.length > 0,
-  'phone'
+  'phone', undefined, undefined, mergeCustomerLoyalty
 );
 
 // B2-056: cash-drawer shifts and their cash movements (payouts/cash-drops) only ever lived on the

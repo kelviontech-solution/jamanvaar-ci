@@ -441,6 +441,7 @@ export interface CartItem {
 }
 
 export interface Cart {
+  loyaltyRedemption?: Order['loyaltyRedemption'];
   items: CartItem[];
   subtotal: number;
   discountAmount: number;
@@ -602,6 +603,9 @@ export interface Order {
   /** Loyalty points this order has already credited to customerPhone, if any — also the idempotency
    *  marker, so a re-settlement attempt or a page reload never credits the same order twice. */
   loyaltyPointsEarned?: number;
+  loyaltyRedemption?: { rewardId: string; name: string; pointsCost: number; discountAmount: number; customerPhone: string };
+  loyaltyPointsRedeemed?: number;
+  loyaltyRefundApplied?: boolean;
   cashierName?: string;
   captainName?: string;
   items: OrderItem[];
@@ -916,7 +920,10 @@ export interface CustomerAccount {
   anniversary?: string; // YYYY-MM-DD Anniversary
   notes?: string;
   tags?: string[]; // 'VIP' | 'REGULAR' | 'CORPORATE' | 'FAMILY' | 'VEGAN' | 'JAIN'
-  loyaltyPoints: number; // e.g. 150 pts = ₹150 redeemable
+  loyaltyPoints: number;
+  /** Opening balances plus immutable, uniquely keyed adjustments prevent lost earnings during device sync. */
+  loyaltyBaseline?: { points: number; spend: number; visits: number };
+  loyaltyLedger?: Record<string, { points: number; spend: number; visits: number; at: string }>;
   favoriteItemIds: string[];
   recentOrderIds: string[];
   totalVisits?: number;
@@ -949,6 +956,10 @@ export interface LoyaltyReward {
   description: string;
   pointsCost: number;
   isActive: boolean;
+  discountKind?: 'FIXED' | 'ITEM';
+  /** Rupee discount, or the maximum value of a single eligible free item. */
+  discountAmount?: number;
+  categoryId?: string;
 }
 
 /**
@@ -962,6 +973,7 @@ export interface LoyaltyProgramSettings {
   /** Points earned per perRupeesSpent of the bill, e.g. earnPoints: 1, perRupeesSpent: 10 -> "1 point per ₹10 spent". */
   earnPoints: number;
   perRupeesSpent: number;
+  enabled?: boolean;
   updatedAt?: string;
 }
 

@@ -37,7 +37,7 @@ export function executeTemplateImport(templateIds: string[], selectedItemKeys: s
           result.matchedCategoriesCount++; return cat;
         }
         if (options.importCategories === false) throw Error(`Create or map category ${name} first.`);
-        cat = { id: mapping?.action === 'CREATE_NEW' ? newAuthoringId('cat') : stable('tplcat', key), name, slug, description, iconName, imageUrl: options.importImages === false ? undefined : imageUrl, isActive: true, sortOrder: Math.max(0, ...db.categories.map(c => c.sortOrder)) + 1, templateCategoryKey: key, updatedAt: now };
+        cat = { id: mapping?.action === 'CREATE_NEW' ? newAuthoringId('cat') : stable('tplcat', key), name, slug, description, iconName, imageUrl: options.importImages === false ? undefined : imageUrl, isActive: true, sortOrder: Math.max(0, ...db.categories.map(c => Number.isFinite(c.sortOrder) ? c.sortOrder : 0)) + 1, templateCategoryKey: key, updatedAt: now };
         db.categories.push(cat); result.importedCategoriesCount++; return cat;
       };
       for (const category of template.categories) {

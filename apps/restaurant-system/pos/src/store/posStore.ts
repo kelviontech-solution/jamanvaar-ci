@@ -22,6 +22,7 @@ import {
   PaymentSplit
 } from '@jamanvaar/types';
 import {
+  CustomerRepository,
   AuditRepository,
   db,
   HeldOrderRepository,
@@ -163,6 +164,7 @@ interface PosState {
   setOrderType: (type: OrderType) => void;
   setSelectedTable: (table: DiningTable | null) => void;
   setSelectedCustomer: (customer: CustomerAccount | null) => void;
+  selectLoyaltyReward: (rewardId: string) => void;
   setDeliveryDetails: (details: Partial<DeliveryDetails>) => void;
   setGuestCount: (count: number) => void;
   setOrderNotes: (notes: string) => void;
@@ -378,6 +380,12 @@ function syncOrderToCart(order: Order, cart: Cart): void {
   order.items = cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }));
   order.subtotal = cart.subtotal;
   order.discountAmount = cart.discountAmount;
+  order.loyaltyRedemption = cart.loyaltyRedemption;
+  order.discountType = cart.discountType;
+  order.discountValue = cart.discountValue;
+  order.discountScope = cart.discountScope;
+  order.discountReason = cart.discountReason;
+  order.discountCode = cart.discountCode;
   order.cgstAmount = cart.cgstAmount;
   order.sgstAmount = cart.sgstAmount;
   order.taxAmount = cart.taxAmount;
@@ -394,6 +402,15 @@ function syncOrderToCart(order: Order, cart: Cart): void {
   // BUG-044: items added to a running order after the first KOT were never deducted from
   // stock (only order creation deducted). Reconcile consumes just the new/increased quantity.
   InventoryRepository.reconcileOrder(order);
+}
+
+function saveDiscountDraft(state: PosState): void {
+  PosRecoveryService.saveDraft({
+    terminalId: state.posTerminalId, orderType: state.orderType,
+    selectedTable: state.selectedTable, selectedCustomer: state.selectedCustomer,
+    guestCount: state.guestCount, cart: state.cart,
+    billDiscountPercent: state.billDiscountPercent, billDiscountFlat: state.billDiscountFlat
+  });
 }
 
 export const usePosStore = create<PosState>((set, get) => {
@@ -635,6 +652,7 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     setSelectedCustomer: (customer) => {
+      if (get().cart.loyaltyRedemption && customer?.phone !== get().selectedCustomer?.phone) get().removeDiscount();
       set({ selectedCustomer: customer });
       PosRecoveryService.saveDraft({
         terminalId: get().posTerminalId,
@@ -646,6 +664,22 @@ export const usePosStore = create<PosState>((set, get) => {
         billDiscountPercent: get().billDiscountPercent,
         billDiscountFlat: get().billDiscountFlat
       });
+    },
+
+    selectLoyaltyReward: (rewardId) => {
+      const state = get();
+      const customer = CustomerRepository.getByPhone(state.selectedCustomer?.phone ?? '');
+      const reward = CustomerRepository.getRewards().find(r => r.id === rewardId && r.isActive);
+      if (!customer || !reward || !state.cart.items.length || CustomerRepository.getProgramSettings().enabled === false) throw new Error('Select a customer and an active loyalty reward');
+      if (!Number.isSafeInteger(reward.pointsCost) || reward.pointsCost <= 0 || customer.loyaltyPoints < reward.pointsCost) throw new Error('Not enough points for this reward');
+      const discountAmount = CustomerRepository.rewardDiscount(reward, state.cart.items, state.cart.subtotal);
+      if (discountAmount <= 0) throw new Error('This reward needs an eligible item or a configured discount value');
+      // The owner explicitly authorizes catalog rewards; arbitrary manual discounts retain their PIN gate.
+      get().removeDiscount();
+      get().applyDiscountUnchecked({ scope: 'BILL', type: 'FIXED', value: discountAmount, reason: `Loyalty reward: ${reward.name}` });
+      const cart = { ...get().cart, loyaltyRedemption: { rewardId, name: reward.name, pointsCost: reward.pointsCost, discountAmount, customerPhone: customer.phone } };
+      set({ cart, selectedCustomer: customer });
+      PosRecoveryService.saveDraft({ terminalId: state.posTerminalId, orderType: state.orderType, selectedTable: state.selectedTable, selectedCustomer: customer, guestCount: state.guestCount, cart, billDiscountPercent: 0, billDiscountFlat: discountAmount });
     },
 
     setDeliveryDetails: (details) =>
@@ -725,7 +759,7 @@ export const usePosStore = create<PosState>((set, get) => {
         state.discountCode
       );
 
-      set({ cart: updatedCart });
+      set({ cart: { ...updatedCart, loyaltyRedemption: state.cart.loyaltyRedemption ? { ...state.cart.loyaltyRedemption, discountAmount: updatedCart.discountAmount } : undefined } });
 
       // Auto-save draft
       PosRecoveryService.saveDraft({
@@ -768,7 +802,7 @@ export const usePosStore = create<PosState>((set, get) => {
         state.discountCode
       );
 
-      set({ cart: updatedCart });
+      set({ cart: { ...updatedCart, loyaltyRedemption: state.cart.loyaltyRedemption ? { ...state.cart.loyaltyRedemption, discountAmount: updatedCart.discountAmount } : undefined } });
 
       PosRecoveryService.saveDraft({
         terminalId: state.posTerminalId,
@@ -813,7 +847,7 @@ export const usePosStore = create<PosState>((set, get) => {
         state.discountCode
       );
 
-      set({ cart: updatedCart });
+      set({ cart: { ...updatedCart, loyaltyRedemption: state.cart.loyaltyRedemption ? { ...state.cart.loyaltyRedemption, discountAmount: updatedCart.discountAmount } : undefined } });
 
       PosRecoveryService.saveDraft({
         terminalId: state.posTerminalId,
@@ -847,7 +881,7 @@ export const usePosStore = create<PosState>((set, get) => {
         state.discountCode
       );
 
-      set({ cart: updatedCart });
+      set({ cart: { ...updatedCart, loyaltyRedemption: state.cart.loyaltyRedemption ? { ...state.cart.loyaltyRedemption, discountAmount: updatedCart.discountAmount } : undefined } });
       PosRecoveryService.saveDraft({
         terminalId: state.posTerminalId,
         orderType: state.orderType,
@@ -872,7 +906,7 @@ export const usePosStore = create<PosState>((set, get) => {
         state.discountCode
       );
 
-      set({ cart: updatedCart });
+      set({ cart: { ...updatedCart, loyaltyRedemption: state.cart.loyaltyRedemption ? { ...state.cart.loyaltyRedemption, discountAmount: updatedCart.discountAmount } : undefined } });
 
       PosRecoveryService.saveDraft({
         terminalId: state.posTerminalId,
@@ -1011,6 +1045,7 @@ export const usePosStore = create<PosState>((set, get) => {
         billDiscountFlat: params.scope === 'BILL' && params.type === 'FIXED' ? params.value : 0,
         cart: updatedCart
       });
+      saveDiscountDraft(get());
 
       AuditRepository.log({
         action: 'DISCOUNT_APPLIED',
@@ -1040,6 +1075,7 @@ export const usePosStore = create<PosState>((set, get) => {
         billDiscountFlat: 0,
         cart: updatedCart
       });
+      saveDiscountDraft(get());
 
       AuditRepository.log({
         action: 'DISCOUNT_REMOVED',
@@ -1100,6 +1136,13 @@ export const usePosStore = create<PosState>((set, get) => {
 
       set({
         cart: recalled.cart,
+        selectedCustomer: recalled.customerPhone ? CustomerRepository.getByPhone(recalled.customerPhone) ?? null : null,
+        discountType: recalled.cart.discountType === 'COUPON' ? 'FIXED' : recalled.cart.discountType ?? 'NONE',
+        discountValue: recalled.cart.discountValue ?? 0,
+        discountScope: recalled.cart.discountScope ?? 'BILL',
+        discountReason: recalled.cart.discountReason ?? '',
+        billDiscountPercent: recalled.cart.discountType === 'PERCENTAGE' ? recalled.cart.discountValue ?? 0 : 0,
+        billDiscountFlat: recalled.cart.discountType === 'FIXED' ? recalled.cart.discountValue ?? 0 : 0,
         orderType: recalled.orderType,
         selectedTable: foundTable,
         orderNotes: recalled.notes || '',
@@ -1135,6 +1178,7 @@ export const usePosStore = create<PosState>((set, get) => {
           guestCount: state.guestCount,
           customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
           customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
+          loyaltyRedemption: state.cart.loyaltyRedemption,
           items: cartLinesToOrderItems(linkedItems),
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,
@@ -1221,6 +1265,7 @@ export const usePosStore = create<PosState>((set, get) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
 
+      CustomerRepository.validateOrderRedemption({ loyaltyRedemption: state.cart.loyaltyRedemption, customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone, discountAmount: state.cart.discountAmount });
       // 1. Settle the running order if there is one (items added after the KOT
       // are sent to the kitchen first, so nothing that is paid for is missed).
       const running = findRunningOrder(state);
@@ -1232,6 +1277,8 @@ export const usePosStore = create<PosState>((set, get) => {
       let order = findRunningOrder(afterSend);
       if (order) {
         syncOrderToCart(order, afterSend.cart);
+        order.customerPhone = afterSend.selectedCustomer?.phone || afterSend.deliveryDetails.phone;
+        order.customerName = afterSend.selectedCustomer?.name || afterSend.deliveryDetails.name;
       }
 
       if (!order) {
@@ -1260,6 +1307,7 @@ export const usePosStore = create<PosState>((set, get) => {
           guestCount: state.guestCount,
           customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
           customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
+          loyaltyRedemption: state.cart.loyaltyRedemption,
           items: orderItems,
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,
@@ -1276,8 +1324,8 @@ export const usePosStore = create<PosState>((set, get) => {
           totalAmount: state.cart.totalPayable,
           roundOffAmount: state.cart.roundOffAmount,
           paymentMethod: method,
-          paymentStatus: 'SUCCESS',
-          orderStatus: 'COMPLETED',
+          paymentStatus: 'PENDING',
+          orderStatus: 'CONFIRMED',
           source_type: 'POS'
         });
       }
@@ -1426,7 +1474,8 @@ export const usePosStore = create<PosState>((set, get) => {
       set({
         selectedTable: table,
         orderType: 'DINE_IN',
-        cart: updatedCart,
+        cart: { ...updatedCart, loyaltyRedemption: order.loyaltyRedemption },
+        selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
     },
@@ -1453,6 +1502,10 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: draft.guestCount || 2,
         billDiscountPercent: draft.billDiscountPercent || 0,
         billDiscountFlat: draft.billDiscountFlat || 0,
+        discountType: draft.cart.discountType === 'COUPON' ? 'FIXED' : draft.cart.discountType ?? 'NONE',
+        discountValue: draft.cart.discountValue ?? 0,
+        discountScope: draft.cart.discountScope ?? 'BILL',
+        discountReason: draft.cart.discountReason ?? '',
         recoverableDraft: null,
         activeTab: 'MENU'
       });
@@ -1591,6 +1644,7 @@ export const usePosStore = create<PosState>((set, get) => {
 
     executeInstantBill: async (overridePaymentMethod?: PaymentMethod) => {
       const state = get();
+      CustomerRepository.validateOrderRedemption({ loyaltyRedemption: state.cart.loyaltyRedemption, customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone, discountAmount: state.cart.discountAmount });
       if (state.cart.items.length === 0 || state.isInstantBillProcessing) return null;
 
       const cfg: InstantBillConfig = db.restaurant?.instantBillConfig || {
@@ -1656,6 +1710,7 @@ export const usePosStore = create<PosState>((set, get) => {
           customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone,
           cashierName: state.currentUser?.fullName,
           customerName: state.selectedCustomer?.name || state.deliveryDetails.name,
+          loyaltyRedemption: state.cart.loyaltyRedemption,
           items: orderItems,
           subtotal: state.cart.subtotal,
           discountAmount: state.cart.discountAmount,

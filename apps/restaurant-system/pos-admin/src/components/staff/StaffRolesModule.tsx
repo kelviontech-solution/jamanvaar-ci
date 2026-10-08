@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, StaffShiftSchedule, AttendanceStatus, DeliveryRider } from '@jamanvaar/types';
 import { StaffRepository, StaffScheduleRepository, RiderRepository } from '@jamanvaar/database';
 import { formatRestaurantDate } from '@jamanvaar/utils';
+import { syncStaffUsers, pendingStaffChanges } from '@jamanvaar/sync';
 import {
   Plus,
   Shield,
@@ -35,7 +36,7 @@ interface StaffRolesModuleProps {
 }
 
 export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
-  users,
+  users: allUsers,
   onOpenStaffModal,
   showToast,
   onRequestConfirm
@@ -51,6 +52,16 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   const [riderToEdit, setRiderToEdit] = useState<DeliveryRider | null>(null);
   const [, setTick] = useState(0);
   const refresh = () => setTick((t) => t + 1);
+  const users = allUsers.filter(user => user.isActive !== false);
+  const removeStaff = async (usr: User) => {
+    if (!StaffRepository.deleteUser(usr.id)) { showToast('Staff account was not found. Please refresh the list.'); return; }
+    refresh();
+    showToast(`Staff access removed: ${usr.fullName}. Synchronizing devices…`);
+    try {
+      await syncStaffUsers({ push: true });
+      showToast(pendingStaffChanges() ? `Staff removed locally; access revocation is pending synchronization. Keep this admin connected.` : `Staff access removed and synchronized: ${usr.fullName}`);
+    } catch { showToast('Staff removed locally; reconnect this admin to synchronize access revocation.'); }
+  };
 
   const schedulesForDay = StaffScheduleRepository.getSchedules().filter((s) => s.date === selectedDate);
   const attendanceForDay = StaffScheduleRepository.getAttendanceForDate(selectedDate);
@@ -106,15 +117,11 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         message: `Are you sure you want to deactivate and remove staff access for "${usr.fullName}"?`,
         confirmText: 'Remove Staff',
         isDanger: true,
-        onConfirm: () => {
-          StaffRepository.deleteUser(usr.id);
-          showToast(`Staff removed: ${usr.fullName}`);
-        }
+        onConfirm: () => { void removeStaff(usr); }
       });
     } else {
       if (window.confirm(`Remove staff access for "${usr.fullName}"?`)) {
-        StaffRepository.deleteUser(usr.id);
-        showToast(`Staff removed: ${usr.fullName}`);
+        void removeStaff(usr);
       }
     }
   };
@@ -223,6 +230,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                   onClick={() => handleDeleteStaff(usr)}
                   className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                   title="Delete Staff"
+                  aria-label={`Remove staff ${usr.fullName}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
