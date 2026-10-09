@@ -387,10 +387,15 @@ export default function PosAdminApp() {
       // No local credential store exists for admin accounts, so a failed cloud
       // auth call cannot be resolved locally — surface the real error instead
       // of granting access on username/role match alone.
+      //
+      // The generic branch below used to show one fixed sentence regardless of
+      // WHY the request failed (CORS block, DNS failure, timeout, TLS error...),
+      // which made every non-HTTP failure look identical and undiagnosable from
+      // the UI alone. It now includes the real error's name/message too.
       setAuthError(
         err instanceof CloudApiError
           ? err.message
-          : 'Unable to reach the server to verify credentials. Please check your connection and try again.'
+          : `Unable to reach the server to verify credentials. Please check your connection and try again. (${err instanceof Error ? `${err.name}: ${err.message}` : String(err)})`
       );
     } finally {
       setLoginBusy(false);
