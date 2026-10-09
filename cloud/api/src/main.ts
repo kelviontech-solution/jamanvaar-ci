@@ -60,12 +60,22 @@ async function bootstrap() {
 
   // The local development consoles are only a default outside production; production must list its own origins (an unset list allows none).
   const devOrigins = 'http://localhost:5180,http://localhost:5176,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5177,http://localhost:5179';
-  const allowedOrigins = (
-    config.get<string>('CORS_ALLOWED_ORIGINS') ?? (config.get<string>('NODE_ENV') === 'production' ? '' : devOrigins)
-  )
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean);
+  // Every officially-shipped POS/Admin/Kiosk/Captain/KDS desktop and Android build is a Tauri
+  // app, and Tauri maps its own custom-scheme frontend to this fixed origin on Windows and
+  // Android (http://tauri.localhost; tauri://localhost on older Tauri/other platforms) --
+  // never the console's own https://system.kelviontech.in origin. This has nothing to do with
+  // which restaurant or deployment is calling in, so it is not something CORS_ALLOWED_ORIGINS
+  // should need to list per-environment -- every installed terminal app needs it, always.
+  const tauriAppOrigins = ['http://tauri.localhost', 'https://tauri.localhost', 'tauri://localhost'];
+  const allowedOrigins = [
+    ...(
+      config.get<string>('CORS_ALLOWED_ORIGINS') ?? (config.get<string>('NODE_ENV') === 'production' ? '' : devOrigins)
+    )
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
+    ...tauriAppOrigins
+  ];
   const qrOrigins = qrOriginsFrom({ QR_ORDER_BASE_URL: config.get<string>('QR_ORDER_BASE_URL'), QR_ALLOWED_ORIGINS: config.get<string>('QR_ALLOWED_ORIGINS'), NODE_ENV: config.get<string>('NODE_ENV') });
   // Per-request decision: consoles and terminals by the configured list, the public QR routes by the ordering website only.
   app.enableCors(((req: { url?: string; headers: { origin?: string } }, callback: (err: Error | null, options?: Record<string, unknown>) => void) => {
