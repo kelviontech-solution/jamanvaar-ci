@@ -1,6 +1,8 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { ApplicationsService } from './applications.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
+import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
 
 /**
  * A restaurant's own read-only view of the app catalog and its current downloadable
@@ -15,7 +17,7 @@ export class TenantApplicationsController {
   constructor(private readonly applications: ApplicationsService) {}
 
   @Get()
-  list() {
-    return this.applications.listForTenant();
+  list(@CurrentTenantUser() user: User) {
+    return this.applications.listForTenant(user.restaurantId);
   }
 }

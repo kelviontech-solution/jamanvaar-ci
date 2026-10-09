@@ -667,6 +667,8 @@ export interface CloudAppCatalogEntry {
   downloadUrls: Record<string, string> | null;
   releaseNotes: string | null;
   releasedAt: string | null;
+  /** False when this restaurant's current plan doesn't include this app -- the card locks instead of offering a download. */
+  isEnabledForRestaurant: boolean;
 }
 
 /**

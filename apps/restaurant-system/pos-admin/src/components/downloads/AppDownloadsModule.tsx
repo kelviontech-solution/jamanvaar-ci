@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Monitor, Smartphone, Globe, Package, Clock } from 'lucide-react';
+import { Monitor, Smartphone, Globe, Package, Clock, Lock } from 'lucide-react';
 import { fetchCloudApplications, type CloudAppCatalogEntry } from '../../cloud/cloudClient';
 
 const PLATFORM_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -61,10 +61,11 @@ export function AppDownloadsModule() {
           {apps.map((app) => {
             const downloads = Object.entries(app.downloadUrls || {});
             const hasRelease = downloads.length > 0;
+            const locked = !app.isEnabledForRestaurant;
             return (
               <div
                 key={app.code}
-                className="rounded-2xl border border-jaman-border bg-white p-5 flex flex-col gap-3"
+                className={`rounded-2xl border border-jaman-border bg-white p-5 flex flex-col gap-3 ${locked ? 'opacity-70' : ''}`}
                 data-testid={`app-download-card-${app.code}`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -72,13 +73,20 @@ export function AppDownloadsModule() {
                     <h2 className="font-bold text-jaman-navy">{app.name}</h2>
                     <p className="text-xs text-slate-500 mt-0.5">{app.category}</p>
                   </div>
-                  <span
-                    className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full ${
-                      hasRelease ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                    }`}
-                  >
-                    {app.currentVersion ? `v${app.currentVersion}` : 'Not released'}
-                  </span>
+                  {locked ? (
+                    <span className="shrink-0 inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700">
+                      <Lock className="w-3 h-3" />
+                      Not in your plan
+                    </span>
+                  ) : (
+                    <span
+                      className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-full ${
+                        hasRelease ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {app.currentVersion ? `v${app.currentVersion}` : 'Not released'}
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-sm text-slate-600 flex-1">{app.description}</p>
@@ -98,7 +106,22 @@ export function AppDownloadsModule() {
                   })}
                 </div>
 
-                {hasRelease ? (
+                {locked ? (
+                  <div className="flex flex-col gap-1 mt-1">
+                    <button
+                      type="button"
+                      disabled
+                      title="Ask your JAMANVAAR account manager to add this app to your plan"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 text-slate-400 font-bold text-sm py-2.5 cursor-not-allowed"
+                    >
+                      <Lock className="w-4 h-4" />
+                      Locked — Not in your plan
+                    </button>
+                    <p className="text-[11px] text-slate-500 text-center">
+                      Contact your JAMANVAAR account manager to add this app.
+                    </p>
+                  </div>
+                ) : hasRelease ? (
                   <div className="flex flex-col gap-2 mt-1">
                     {downloads.map(([platform, url]) => {
                       const Icon = PLATFORM_ICON[platform] || Package;
@@ -128,7 +151,7 @@ export function AppDownloadsModule() {
                   </button>
                 )}
 
-                {app.releaseNotes && hasRelease && (
+                {app.releaseNotes && hasRelease && !locked && (
                   <p className="text-xs text-slate-500 border-t border-jaman-border pt-2 mt-1 line-clamp-2">
                     {app.releaseNotes}
                   </p>

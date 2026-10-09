@@ -2,6 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { AppCode, DeviceType, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { PublishReleaseDto } from './dto/application.dto';
 
 export interface AppMetadata {
@@ -87,7 +88,8 @@ import { deviceHealth } from '../../common/device-health';
 export class ApplicationsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
   async list() {
@@ -165,7 +167,12 @@ export class ApplicationsService {
    * which belong to Super Admin only and are meaningless (or a cross-tenant data leak) to a
    * single restaurant's admin console.
    */
-  async listForTenant() {
+  async listForTenant(restaurantId: string) {
+    const enabledApps = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      this.appEntitlements.listEnabledAppCodesForTenant(tx, restaurantId)
+    );
+    const enabledSet = new Set(enabledApps);
+
     return this.prisma.runAsPlatform(async (tx) => {
       const allReleases = await tx.appRelease.findMany({
         orderBy: { releasedAt: 'desc' }
@@ -184,7 +191,10 @@ export class ApplicationsService {
           supportedPlatforms: (latestRelease?.supportedPlatforms as string[]) || ['web'],
           downloadUrls: (latestRelease?.downloadUrls as Record<string, string>) || null,
           releaseNotes: latestRelease?.releaseNotes || null,
-          releasedAt: latestRelease?.releasedAt || null
+          releasedAt: latestRelease?.releasedAt || null,
+          // Whether this restaurant's current plan actually includes this app -- the
+          // Downloads page locks a card instead of offering a download for one it doesn't.
+          isEnabledForRestaurant: enabledSet.has(meta.entitlementAppCode)
         };
       });
     });
