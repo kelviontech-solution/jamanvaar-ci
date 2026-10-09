@@ -4175,6 +4175,13 @@ export class PrinterRepository {
       driverName: data.driverName || 'Generic / ESC-POS',
       interfaceType: data.interfaceType || 'USB',
       port: data.port || 'USB001',
+      // BUG: these three used to be dropped here even when the caller passed them --
+      // the only fields the real print dispatch (print_transport.ts) actually reads for
+      // NETWORK_LAN / USB / WINDOWS_DRIVER / SERIAL, so every printer this created could
+      // never really print no matter what the admin form sent.
+      ipAddress: data.ipAddress,
+      systemPrinterName: data.systemPrinterName,
+      baudRate: data.baudRate,
       paperSize: data.paperSize || '80mm',
       status: data.status || 'READY',
       isDefault: data.isDefault || false,

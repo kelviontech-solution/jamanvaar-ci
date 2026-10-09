@@ -1717,6 +1717,7 @@ export default function PosAdminApp() {
           isOpen={isPrinterModalOpen}
           onClose={() => setIsPrinterModalOpen(false)}
           printerToEdit={printerToEdit}
+          configuredPrinters={configuredPrinters}
           onSaved={() => showToast(printerToEdit ? 'Printer updated!' : 'Printer registered!')}
         />
 
