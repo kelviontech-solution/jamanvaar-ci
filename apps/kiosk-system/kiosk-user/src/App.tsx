@@ -1111,14 +1111,6 @@ export default function KioskUserApp() {
     SoundService.playAdd();
     const unitPrice = calculateItemUnitPrice(item.price, modifiers);
 
-    // The cart drawer (below, isCartOpen) is a real right-side sidebar
-    // already — the gap was that reaching it always meant an extra tap on
-    // the floating bar. Auto-opening it the first time the cart goes from
-    // empty to non-empty gives an immediate "yes, that worked, here's your
-    // order" without interrupting a guest who's still browsing and adding
-    // more items afterward (which would re-open the drawer on every tap).
-    const wasEmpty = cartItems.length === 0;
-
     applyCart((prev) => {
       // Adding the exact same item with the exact same customization and
       // notes should increase that line's quantity, not create a second,
@@ -1156,10 +1148,6 @@ export default function KioskUserApp() {
       };
       return [...prev, newCartItem];
     });
-
-    if (wasEmpty) {
-      setIsCartOpen(true);
-    }
   };
 
   const handleSelectCombo = (combo: ComboDeal) => {
