@@ -21,6 +21,10 @@ export const publishReleaseSchema = z.object({
   // One version can need a different file per platform (a Windows .exe vs an Android
   // .apk) -- keyed by the same platform strings as supportedPlatforms.
   downloadUrls: z.record(z.string(), httpsUrl).optional(),
+  // Tauri updater signature (the contents of the .sig file the CI build produces next
+  // to the Windows installer) -- required for the desktop auto-updater to trust and
+  // install that platform's downloadUrls entry. Keyed the same way as downloadUrls.
+  signatures: z.record(z.string(), z.string()).optional(),
   isMandatory: z.boolean().default(false)
 });
 

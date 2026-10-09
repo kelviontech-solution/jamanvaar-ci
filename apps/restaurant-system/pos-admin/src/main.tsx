@@ -19,6 +19,25 @@ DeviceGate.onIdentityInvalid(() => {
 
 startPlatformNoticePolling();
 
+// Desktop auto-update: silent by design -- these run as unattended restaurant
+// terminals, not something a person sits and watches for a prompt. Rejects (and is
+// ignored) outside the Tauri desktop shell -- dev server, Docker/web build, Android.
+async function checkForDesktopUpdate() {
+  if (!import.meta.env.PROD) return;
+  try {
+    const { check } = await import('@tauri-apps/plugin-updater');
+    const { relaunch } = await import('@tauri-apps/plugin-process');
+    const update = await check();
+    if (update) {
+      await update.downloadAndInstall();
+      await relaunch();
+    }
+  } catch {
+    // Not the Tauri desktop shell, or the updater endpoint has nothing newer -- either way, carry on.
+  }
+}
+void checkForDesktopUpdate();
+
 // The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
 void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !storedAdminBranch(), restaurantId: localStorage.getItem('jamanvaar_cloud_restaurant_id') }).then(() => {
   const branch=storedAdminBranch();if(branch&&branch!=='all')KioskConfigurationRepository.bindBranch(branch);

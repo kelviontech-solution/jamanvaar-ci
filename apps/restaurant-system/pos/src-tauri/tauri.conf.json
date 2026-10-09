@@ -26,8 +26,15 @@
       "csp": "default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; connect-src 'self' https: http:"
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlDN0ExNEYyMjZCRkI3NjAKUldSZ3Q3OG04aFI2bk1pd3l1QjNLQjdSdmlqK3RZQXVic0tFNUdKNzJYMEo4ZU9Oc3dUVE5hbFIK",
+      "endpoints": ["https://system.kelviontech.in/api/v1/updater/POS/latest.json"]
+    }
+  },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/32x32.png",

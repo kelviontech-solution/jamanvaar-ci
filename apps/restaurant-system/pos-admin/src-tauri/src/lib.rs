@@ -55,8 +55,17 @@ async fn send_escpos_bytes(ip: String, port: u16, bytes: Vec<u8>) -> Result<(), 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
+    let builder = tauri::Builder::default().plugin(tauri_plugin_shell::init());
+
+    // Auto-update: checked and applied from the frontend (see src/update.ts) via
+    // tauri-plugin-updater's own JS API -- no custom Rust command needed. Desktop-only;
+    // the plugin has no Android/iOS support, so it's never registered on mobile.
+    #[cfg(windows)]
+    let builder = builder
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init());
+
+    builder
         .invoke_handler(tauri::generate_handler![
             get_machine_ip,
             list_system_printers,

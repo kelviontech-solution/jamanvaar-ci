@@ -791,6 +791,7 @@ model AppRelease {
   supportedPlatforms  Json // ["windows", "android", "web", "electron"]
   releaseNotes        String?
   downloadUrls        Json? // { "windows": "https://...exe", "android": "https://...apk" } -- one version can need a different file per platform
+  signatures          Json? // { "windows": "<tauri .sig contents>" } -- lets the desktop auto-updater verify downloadUrls.windows before installing it
   isMandatory         Boolean           @default(false)
   releasedAt          DateTime          @default(now())
   createdAt           DateTime          @default(now())

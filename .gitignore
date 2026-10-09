@@ -1,4 +1,7 @@
 node_modules/
+.tauri-updater-key.private
+.tauri-updater-key.private.pub
+.tauri-updater-key.password.txt
 .env
 .env.*.local
 !.env.example

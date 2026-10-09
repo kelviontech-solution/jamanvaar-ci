@@ -53,6 +53,13 @@ jobs:
 
       - name: Build Tauri installer (${{ matrix.app.name }})
         working-directory: ${{ matrix.app.path }}
+        # TAURI_SIGNING_PRIVATE_KEY(_PASSWORD) makes tauri-cli sign the NSIS installer and
+        # write a matching .exe.sig file next to it -- required for the desktop auto-updater
+        # to trust and install this release. Missing/empty secrets just skip signing (a
+        # normal, usable installer still comes out, it just won't offer as an auto-update).
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npx --yes "@tauri-apps/cli@2.11.4" build
 
       - name: Smoke test (${{ matrix.app.name }})
@@ -83,7 +90,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.app.name }}-installer
-          path: ${{ matrix.app.path }}/src-tauri/target/release/bundle/nsis/*.exe
+          # The .sig sits alongside the .exe only when the signing secrets above were set;
+          # its contents are what gets pasted into Super Admin's "Windows Updater Signature"
+          # field when publishing this version.
+          path: |
+            ${{ matrix.app.path }}/src-tauri/target/release/bundle/nsis/*.exe
+            ${{ matrix.app.path }}/src-tauri/target/release/bundle/nsis/*.exe.sig
           if-no-files-found: error
 
   build-android:

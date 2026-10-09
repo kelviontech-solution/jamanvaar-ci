@@ -107,7 +107,17 @@ pub fn run() {
     start_lan_beacon(5178);
 
     let builder = tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_shell::init());
+
+    // Auto-update: checked and applied from the frontend via tauri-plugin-updater's own
+    // JS API -- no custom Rust command needed. Desktop-only; the plugin has no
+    // Android/iOS support, so it's never registered on mobile.
+    #[cfg(windows)]
+    let builder = builder
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init());
+
+    let builder = builder
         .invoke_handler(tauri::generate_handler![
             get_local_core_info,
             get_machine_ip,

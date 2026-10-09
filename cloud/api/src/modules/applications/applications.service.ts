@@ -199,6 +199,37 @@ export class ApplicationsService {
     });
   }
 
+  /**
+   * The exact JSON shape Tauri's updater plugin expects at its configured endpoint
+   * (https://v2.tauri.app/plugin/updater/#update-server-json-format). Public and
+   * unauthenticated -- every installed desktop app polls this directly, the same way
+   * it would fetch a static file, and has no platform session to send.
+   *
+   * Returns null when there is no signed Windows build to offer (nothing published
+   * yet, or a release exists without a signature) -- the caller turns that into
+   * HTTP 204, which the updater plugin treats as "no update available", never an error.
+   */
+  async getUpdaterManifest(appCode: string) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const releases = await tx.appRelease.findMany({ where: { appCode, channel: 'STABLE' } });
+      const latest = releases.sort((a, b) => compareVersions(b.version, a.version))[0];
+      if (!latest) return null;
+      const downloadUrls = latest.downloadUrls as Record<string, string> | null;
+      const signatures = latest.signatures as Record<string, string> | null;
+      const url = downloadUrls?.windows;
+      const signature = signatures?.windows;
+      if (!url || !signature) return null;
+      return {
+        version: latest.version,
+        notes: latest.releaseNotes ?? '',
+        pub_date: latest.releasedAt.toISOString(),
+        platforms: {
+          'windows-x86_64': { signature, url }
+        }
+      };
+    });
+  }
+
   async publishRelease(dto: PublishReleaseDto, actor: PlatformUser) {
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.appRelease.findUnique({
@@ -217,6 +248,7 @@ export class ApplicationsService {
           supportedPlatforms: dto.supportedPlatforms,
           releaseNotes: dto.releaseNotes,
           downloadUrls: dto.downloadUrls,
+          signatures: dto.signatures,
           isMandatory: dto.isMandatory
         }
       });

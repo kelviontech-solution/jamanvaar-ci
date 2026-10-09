@@ -49,6 +49,10 @@ export function ApplicationsPage() {
   const [newPlatforms, setNewPlatforms] = useState<string[]>(['windows']);
   const [newReleaseNotes, setNewReleaseNotes] = useState('');
   const [newDownloadUrls, setNewDownloadUrls] = useState<Record<string, string>>({});
+  // Only "windows" is meaningful here -- the desktop auto-updater refuses to install
+  // downloadUrls.windows without a matching signature (the .sig file CI produces
+  // alongside the installer when the signing secrets are set).
+  const [newSignatures, setNewSignatures] = useState<Record<string, string>>({});
   const [isMandatory, setIsMandatory] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
@@ -101,6 +105,7 @@ export function ApplicationsPage() {
     setNewPlatforms(app.supportedPlatforms || ['web']);
     setNewReleaseNotes('');
     setNewDownloadUrls(app.downloadUrls || {});
+    setNewSignatures({});
     setIsMandatory(false);
     setPublishError(null);
   }
@@ -124,6 +129,7 @@ export function ApplicationsPage() {
         supportedPlatforms: newPlatforms,
         releaseNotes: newReleaseNotes.trim() || undefined,
         downloadUrls: Object.keys(downloadUrls).length > 0 ? downloadUrls : undefined,
+        signatures: newSignatures.windows?.trim() ? { windows: newSignatures.windows.trim() } : undefined,
         isMandatory
       });
       setPublishModalApp(null);
@@ -422,6 +428,24 @@ export function ApplicationsPage() {
                 ))
               )}
             </div>
+
+            {newPlatforms.includes('windows') && (
+              <div className="form-field">
+                <label>Windows Updater Signature (.sig file contents)</label>
+                <p style={{ color: 'var(--jv-text-muted)', fontSize: '0.8rem', margin: '0 0 0.25rem' }}>
+                  CI writes a matching <code>.sig</code> file next to the Windows installer when the
+                  signing secrets are configured. Paste its full contents here -- without it, installed
+                  desktop apps will see this release but their auto-updater will skip it.
+                </p>
+                <textarea
+                  value={newSignatures.windows || ''}
+                  onChange={(e) => setNewSignatures((prev) => ({ ...prev, windows: e.target.value }))}
+                  rows={2}
+                  className="input-textarea"
+                  placeholder="dW50cnVzdGVkIGNvbW1lbnQ6..."
+                />
+              </div>
+            )}
 
             <div className="form-field">
               <label>Changelog & Release Notes</label>

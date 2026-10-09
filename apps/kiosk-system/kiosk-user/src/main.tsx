@@ -14,6 +14,25 @@ DeviceGate.onIdentityInvalid(() => {
   window.location.reload();
 });
 
+// Desktop auto-update: silent by design -- these run as unattended restaurant
+// terminals, not something a person sits and watches for a prompt. Rejects (and is
+// ignored) outside the Tauri desktop shell -- dev server, Docker/web build, Android.
+async function checkForDesktopUpdate() {
+  if (!import.meta.env.PROD) return;
+  try {
+    const { check } = await import('@tauri-apps/plugin-updater');
+    const { relaunch } = await import('@tauri-apps/plugin-process');
+    const update = await check();
+    if (update) {
+      await update.downloadAndInstall();
+      await relaunch();
+    }
+  } catch {
+    // Not the Tauri desktop shell, or the updater endpoint has nothing newer -- either way, carry on.
+  }
+}
+void checkForDesktopUpdate();
+
 // Reuse the platform app-shell strategy so refreshing a configured kiosk works offline too.
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
