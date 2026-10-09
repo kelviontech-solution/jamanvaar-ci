@@ -6,6 +6,16 @@ on:
 jobs:
   build-desktop:
     runs-on: windows-latest
+    # Job-level, not per-step: tauri.conf.json's beforeBuildCommand re-runs "npm run build"
+    # a SECOND time, unattended, inside `tauri build` itself -- a step-scoped env block on
+    # only the first "npm run build" step left that second, silent rebuild unconfigured,
+    # which overwrote the correctly-built frontend with one defaulting to localhost:4000
+    # right before bundling it into the installer. Every step in this job needs these.
+    env:
+      VITE_CLOUD_API_BASE_URL: https://system.kelviontech.in
+      VITE_QR_ORDER_URL: https://system.kelviontech.in
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
     strategy:
       fail-fast: false
       matrix:
@@ -46,20 +56,16 @@ jobs:
 
       - name: Build frontend (${{ matrix.app.name }})
         working-directory: ${{ matrix.app.path }}
-        env:
-          VITE_CLOUD_API_BASE_URL: https://system.kelviontech.in
-          VITE_QR_ORDER_URL: https://system.kelviontech.in
         run: npm run build
 
       - name: Build Tauri installer (${{ matrix.app.name }})
         working-directory: ${{ matrix.app.path }}
-        # TAURI_SIGNING_PRIVATE_KEY(_PASSWORD) makes tauri-cli sign the NSIS installer and
-        # write a matching .exe.sig file next to it -- required for the desktop auto-updater
-        # to trust and install this release. Missing/empty secrets just skip signing (a
-        # normal, usable installer still comes out, it just won't offer as an auto-update).
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        # TAURI_SIGNING_PRIVATE_KEY(_PASSWORD) (job-level) makes tauri-cli sign the NSIS
+        # installer and write a matching .exe.sig file next to it -- required for the
+        # desktop auto-updater to trust and install this release. Missing/empty secrets
+        # just skip signing (a normal, usable installer still comes out, it just won't
+        # offer as an auto-update). This step re-runs "npm run build" itself (tauri.conf.json's
+        # beforeBuildCommand) -- the job-level env above is what makes that rebuild correct too.
         run: npx --yes "@tauri-apps/cli@2.11.4" build
 
       - name: Smoke test (${{ matrix.app.name }})
@@ -100,6 +106,13 @@ jobs:
 
   build-android:
     runs-on: ubuntu-latest
+    # Job-level for the same reason as build-desktop: tauri.conf.json's beforeBuildCommand
+    # re-runs "npm run build" again inside both `tauri android init` and `tauri android build`
+    # themselves, unconfigured, unless every step in this job carries these.
+    env:
+      VITE_CLOUD_API_BASE_URL: https://system.kelviontech.in
+      VITE_QR_ORDER_URL: https://system.kelviontech.in
+      CARGO_PROFILE_DEV_DEBUG: "0"
     strategy:
       fail-fast: false
       matrix:
@@ -143,9 +156,6 @@ jobs:
 
       - name: Build frontend (${{ matrix.app.name }})
         working-directory: ${{ matrix.app.path }}
-        env:
-          VITE_CLOUD_API_BASE_URL: https://system.kelviontech.in
-          VITE_QR_ORDER_URL: https://system.kelviontech.in
         run: npm run build
 
       - name: Init Android project (${{ matrix.app.name }})
@@ -155,11 +165,9 @@ jobs:
       - name: Build Android APK (${{ matrix.app.name }}, debug-signed)
         working-directory: ${{ matrix.app.path }}
         # arm64 only -- covers virtually every Android device sold in the last 5+ years.
-        # CARGO_PROFILE_DEV_DEBUG=0 strips full debug symbols from the dev profile, which
-        # is usually the single biggest contributor to target/ directory size and was
-        # filling the runner's disk even with one architecture.
-        env:
-          CARGO_PROFILE_DEV_DEBUG: "0"
+        # CARGO_PROFILE_DEV_DEBUG=0 (job-level) strips full debug symbols from the dev
+        # profile, which is usually the single biggest contributor to target/ directory
+        # size and was filling the runner's disk even with one architecture.
         run: |
           df -h / || true
           npx --yes "@tauri-apps/cli@2.11.4" android build --debug --target aarch64
