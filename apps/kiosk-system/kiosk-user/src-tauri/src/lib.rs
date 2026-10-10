@@ -135,7 +135,7 @@ async fn print_serial(port: String, baud: u32, bytes: Vec<u8>) -> Result<(), Str
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let builder = tauri::Builder::default();
+    let builder = tauri::Builder::default().plugin(tauri_plugin_shell::init());
 
     // Auto-update: checked and applied from the frontend via tauri-plugin-updater's own
     // JS API -- no custom Rust command needed. Desktop-only; the plugin has no

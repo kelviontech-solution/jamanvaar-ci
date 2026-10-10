@@ -28,6 +28,21 @@ function isSafeHttpsUrl(url: string | null | undefined): url is string {
 }
 
 /**
+ * A packaged Tauri app has no browser tab for `<a target="_blank">` to open into, so clicking
+ * it silently did nothing (confirmed live: Super Admin publishes a version, the banner shows it,
+ * "Download" is dead). Opens through the shell plugin when running as a Tauri app (desktop or
+ * Android), falling back to a normal new-tab open in a real browser (the web/Docker build).
+ */
+async function openDownloadUrl(url: string): Promise<void> {
+  try {
+    const { open } = await import('@tauri-apps/plugin-shell');
+    await open(url);
+  } catch {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
+
+/**
  * The platform team's announcement (maintenance etc.), shown as a thin bar at the
  * very top of a restaurant app. It says plainly that selling is not affected, and
  * can be dismissed for the session.
@@ -59,9 +74,13 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
         <span className="min-w-0 flex-1">
           Version {update.latestVersion} is available.
           {isSafeHttpsUrl(update.downloadUrl) && (
-            <a href={update.downloadUrl} target="_blank" rel="noreferrer" className="ml-2 underline">
+            <button
+              type="button"
+              onClick={() => void openDownloadUrl(update.downloadUrl as string)}
+              className="ml-2 underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-white"
+            >
               Download
-            </a>
+            </button>
           )}
         </span>
         <button
