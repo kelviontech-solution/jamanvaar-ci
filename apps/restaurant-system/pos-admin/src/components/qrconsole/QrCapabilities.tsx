@@ -1,4 +1,4 @@
-import { QrCountedStock } from './QrCountedStock';
+import { QrCountedStock } from "./QrCountedStock";
 import { QrBranchPreferences } from "./QrBranchPreferences";
 import { QrPromotions } from "./QrPromotions";
 import { useEffect, useState, useRef } from "react";
@@ -19,7 +19,7 @@ type Configuration = {
   identity: { reason: string };
 };
 const toggles = [
-  ["inventoryEnabled","QR_INVENTORY_SYNC","Counted dish stock reservations"],
+  ["inventoryEnabled", "QR_INVENTORY_SYNC", "Counted dish stock reservations"],
   ["loyaltyEnabled", "QR_LOYALTY", "Verified customer loyalty"],
   ["groupEnabled", "QR_GROUP_ORDERING", "Shared table sessions"],
   ["multilingualEnabled", "QR_MULTILINGUAL", "Multilingual menu"],
@@ -41,14 +41,24 @@ const labels: Record<string, string> = {
 
 export function QrCapabilities({
   showToast,
+  section: requestedSection,
+  hideNavigation = false,
 }: {
   showToast: (message: string) => void;
+  section?: string;
+  hideNavigation?: boolean;
 }) {
   const [data, setData] = useState<Configuration | null>(null),
     [changes, setChanges] = useState<Record<string, any>>({}),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [section, setSection] = useState("Settings");
+    [section, setSection] = useState(requestedSection || "Settings");
+  useEffect(() => {
+    if (requestedSection) {
+      setSection(requestedSection);
+      setError("");
+    }
+  }, [requestedSection]);
   const [preview, setPreview] = useState<{
     items: Array<{ id: string; name: string }>;
     categories: Array<{ id: string; name: string }>;
@@ -58,8 +68,17 @@ export function QrCapabilities({
     [itemId, setItemId] = useState(""),
     [name, setName] = useState(""),
     [description, setDescription] = useState("");
-  const [feedbackFrom, setFeedbackFrom] = useState(""), [feedbackTo, setFeedbackTo] = useState(""), [feedbackRating, setFeedbackRating] = useState("");
-  const feedbackPath = () => base + "/feedback?" + new URLSearchParams({ ...(feedbackFrom ? {from: feedbackFrom} : {}), ...(feedbackTo ? {to: feedbackTo} : {}), ...(feedbackRating ? {rating: feedbackRating} : {}) });
+  const [feedbackFrom, setFeedbackFrom] = useState(""),
+    [feedbackTo, setFeedbackTo] = useState(""),
+    [feedbackRating, setFeedbackRating] = useState("");
+  const feedbackPath = () =>
+    base +
+    "/feedback?" +
+    new URLSearchParams({
+      ...(feedbackFrom ? { from: feedbackFrom } : {}),
+      ...(feedbackTo ? { to: feedbackTo } : {}),
+      ...(feedbackRating ? { rating: feedbackRating } : {}),
+    });
   const [feedback, setFeedback] = useState<any>(null),
     [alerts, setAlerts] = useState<any>(null),
     [orders, setOrders] = useState<QrOrderRow[]>([]),
@@ -69,10 +88,13 @@ export function QrCapabilities({
     [refundAmount, setRefundAmount] = useState(""),
     [refundReason, setRefundReason] = useState("");
   // Keep a failed request's allocation reference until its outcome is known.
-  const allocationAttempt = useRef<{ identity: string; key: string } | null>(null);
+  const allocationAttempt = useRef<{ identity: string; key: string } | null>(
+    null,
+  );
   const attemptKey = (kind: string, amount: number, reason = "") => {
     const identity = JSON.stringify([selected, kind, amount, reason]);
-    if (allocationAttempt.current?.identity !== identity) allocationAttempt.current = { identity, key: crypto.randomUUID() };
+    if (allocationAttempt.current?.identity !== identity)
+      allocationAttempt.current = { identity, key: crypto.randomUUID() };
     return allocationAttempt.current.key;
   };
   const reload = async () => {
@@ -173,30 +195,34 @@ export function QrCapabilities({
           Optional access comes from Super Admin plans and add-ons. Existing
           ordering continues to work independently.
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[
-            "Settings",
-            "Translations",
-            "Promotions",
-            "Feedback",
-            "Alerts",
-            "Collections",
-            "License",
-          ].map((s) => (
-            <button
-              key={s}
-              className={
-                section === s ? button : "rounded-xl border px-4 py-2.5 text-sm"
-              }
-              onClick={() => {
-                setSection(s);
-                setError("");
-              }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+        {!hideNavigation && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              "Settings",
+              "Translations",
+              "Promotions",
+              "Feedback",
+              "Alerts",
+              "Collections",
+              "License",
+            ].map((s) => (
+              <button
+                key={s}
+                className={
+                  section === s
+                    ? button
+                    : "rounded-xl border px-4 py-2.5 text-sm"
+                }
+                onClick={() => {
+                  setSection(s);
+                  setError("");
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {error && (
         <p
@@ -349,7 +375,9 @@ export function QrCapabilities({
           >
             Save changes
           </button>
-          {licensed("QR_INVENTORY_SYNC")&&<QrCountedStock showToast={showToast}/>}
+          {licensed("QR_INVENTORY_SYNC") && (
+            <QrCountedStock showToast={showToast} />
+          )}
           {licensed("QR_MULTI_BRANCH") && (
             <QrBranchPreferences
               changes={changes}
@@ -554,17 +582,89 @@ export function QrCapabilities({
       {section === "Feedback" && (
         <div className="rounded-2xl border bg-white p-5">
           <h3 className="font-bold">Verified private feedback</h3>
-          {licensed("QR_FEEDBACK") && <div className="mt-3 flex flex-wrap gap-3 items-end">
-            <label className="text-xs">From date (UTC)<input className={input} type="date" value={feedbackFrom} onChange={e=>setFeedbackFrom(e.target.value)}/></label>
-            <label className="text-xs">To date (UTC)<input className={input} type="date" value={feedbackTo} onChange={e=>setFeedbackTo(e.target.value)}/></label>
-            <label className="text-xs">Rating<select aria-label="Feedback rating" className={input} value={feedbackRating} onChange={e=>setFeedbackRating(e.target.value)}><option value="">All ratings</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n} stars</option>)}</select></label>
-            <button className={button} disabled={busy} onClick={()=>void run(async()=>setFeedback(await qrApi(feedbackPath())))}>Filter feedback</button>
-            {feedback && <button className={button} onClick={()=>{
-              const cell=(v:unknown)=>{let text=String(v??"");if(/^[\s]*[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"';};
-              const csv=[["Order","Branch","Rating","Comment","Date"],...feedback.feedback.map((r:any)=>[r.orderNumber||r.orderId,r.branchId,r.rating,r.comment,r.createdAt])].map(row=>row.map(cell).join(",")).join("\r\n");
-              const url=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download="qr-verified-feedback.csv";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-            }}>Export feedback CSV</button>}
-          </div>}
+          {licensed("QR_FEEDBACK") && (
+            <div className="mt-3 flex flex-wrap gap-3 items-end">
+              <label className="text-xs">
+                From date (UTC)
+                <input
+                  className={input}
+                  type="date"
+                  value={feedbackFrom}
+                  onChange={(e) => setFeedbackFrom(e.target.value)}
+                />
+              </label>
+              <label className="text-xs">
+                To date (UTC)
+                <input
+                  className={input}
+                  type="date"
+                  value={feedbackTo}
+                  onChange={(e) => setFeedbackTo(e.target.value)}
+                />
+              </label>
+              <label className="text-xs">
+                Rating
+                <select
+                  aria-label="Feedback rating"
+                  className={input}
+                  value={feedbackRating}
+                  onChange={(e) => setFeedbackRating(e.target.value)}
+                >
+                  <option value="">All ratings</option>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>
+                      {n} stars
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                className={button}
+                disabled={busy}
+                onClick={() =>
+                  void run(async () => setFeedback(await qrApi(feedbackPath())))
+                }
+              >
+                Filter feedback
+              </button>
+              {feedback && (
+                <button
+                  className={button}
+                  onClick={() => {
+                    const cell = (v: unknown) => {
+                      let text = String(v ?? "");
+                      if (/^[\s]*[=+@-]/.test(text)) text = "'" + text;
+                      return '"' + text.replaceAll('"', '""') + '"';
+                    };
+                    const csv = [
+                      ["Order", "Branch", "Rating", "Comment", "Date"],
+                      ...feedback.feedback.map((r: any) => [
+                        r.orderNumber || r.orderId,
+                        r.branchId,
+                        r.rating,
+                        r.comment,
+                        r.createdAt,
+                      ]),
+                    ]
+                      .map((row) => row.map(cell).join(","))
+                      .join("\r\n");
+                    const url = URL.createObjectURL(
+                        new Blob(["\ufeff" + csv], {
+                          type: "text/csv;charset=utf-8",
+                        }),
+                      ),
+                      link = document.createElement("a");
+                    link.href = url;
+                    link.download = "qr-verified-feedback.csv";
+                    link.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                  }}
+                >
+                  Export feedback CSV
+                </button>
+              )}
+            </div>
+          )}
           {!licensed("QR_FEEDBACK") ? (
             <p className="mt-3">Feedback is not included in this license.</p>
           ) : feedback ? (
@@ -732,7 +832,11 @@ export function QrCapabilities({
                                   Number(refundAmount) * 100,
                                 ),
                                 version: current.version,
-                                idempotencyKey: attemptKey("refund", Math.round(Number(refundAmount) * 100), refundReason.trim()),
+                                idempotencyKey: attemptKey(
+                                  "refund",
+                                  Math.round(Number(refundAmount) * 100),
+                                  refundReason.trim(),
+                                ),
                                 reason: refundReason.trim(),
                               }),
                             },
@@ -799,7 +903,10 @@ export function QrCapabilities({
                               body: JSON.stringify({
                                 amountPaise: Math.round(Number(amount) * 100),
                                 version: current.version,
-                                idempotencyKey: attemptKey("collect", Math.round(Number(amount) * 100)),
+                                idempotencyKey: attemptKey(
+                                  "collect",
+                                  Math.round(Number(amount) * 100),
+                                ),
                               }),
                             },
                           );

@@ -1,0 +1,22 @@
+{
+  "tool": "Built-in image_gen.imagegen",
+  "purpose": "JAMANVAAR QR Ordering public website, authentication and workspace imagery",
+  "assets": [
+    {
+      "file": "apps/restaurant-system/pos-admin/public/assets/qr-experience/dining.webp",
+      "source": "exec-2183e854-3442-43ce-a02a-ec59917ec224.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: JAMANVAAR QR Ordering website editorial hospitality photograph. A refined modern Gujarati Indian restaurant table: beautifully plated brass Gujarati thali with rotli, dal, colorful vegetarian curries, chutneys and dessert, warm ivory linen, amber ceramic accents, dark navy upholstered chair subtly in background. An adult diner's hand uses a smartphone beside the meal, screen is angled away with soft abstract cream and orange shapes, no readable words. A small elegant unbranded table tent in background with a blank cream face. Natural warm daylight, premium editorial food photography, realistic appetizing detail, restrained shallow depth of field, inviting hospitality. Landscape 1536x1024 composition, usable center crop, main thali centered lower right, warm uncluttered upper left. No text, no logos, no watermarks, no fake QR codes, no floating UI. Intended brand palette cream/navy/amber/orange.",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/public/assets/qr-experience/kitchen.webp",
+      "source": "exec-a815b6a4-2c63-4a7f-8532-7cea3202252d.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: JAMANVAAR restaurant ordering website feature image, distinct from dining photo. A calm modern Indian restaurant kitchen pass with a chef in a simple cream apron carefully finishing an elegant vegetarian paneer dish in a warm ceramic bowl, other appetizing prepared vegetarian dishes waiting beside it, brass details, navy tile and clean ivory stone counter, subtle saffron orange accents. Hands and food in focus, no faces necessary, warm natural editorial hospitality photography, high quality realistic texture, organized and welcoming restaurant workflow. Landscape 1536x1024, center-safe crop, no text, logos, watermarks, screens, UI or fake QR codes.",
+      "width": 1200,
+      "height": 800
+    }
+  ],
+  "optimization": "JPEG-compatible RGB WebP, quality 84, lazy loading for non-hero photos",
+  "containsEmbeddedUiOrText": false
+}

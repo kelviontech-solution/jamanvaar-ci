@@ -1,4 +1,6 @@
+import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { useEffect, useState } from "react";
+import { CachedImg } from "@jamanvaar/ui";
 import {
   previewMenuCsv,
   MENU_CSV_SAMPLE,
@@ -34,12 +36,10 @@ async function writeMany(type: string, rows: any[]) {
   for (let start = 0; start < rows.length; start += 50) {
     const r = await pushEntitySync(
       type,
-      rows
-        .slice(start, start + 50)
-        .map((payload) => ({
-          externalId: payload.id,
-          payload: { ...payload, updatedAt: new Date().toISOString() },
-        })),
+      rows.slice(start, start + 50).map((payload) => ({
+        externalId: payload.id,
+        payload: { ...payload, updatedAt: new Date().toISOString() },
+      })),
     );
     const error = r.results.find((r) => r.status === "error");
     if (error)
@@ -59,6 +59,23 @@ export function QrCatalog() {
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false),
     [preview, setPreview] = useState<MenuCsvPreview | null>(null);
+  const [search, setSearch] = useState(""),
+    [categoryFilter, setCategoryFilter] = useState(""),
+    [page, setPage] = useState(0);
+  const filtered = items.filter(
+    (i) =>
+      (!categoryFilter || i.categoryId === categoryFilter) &&
+      [i.name, i.description, i.sku]
+        .join(" ")
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
+  );
+  const pages = Math.max(1, Math.ceil(filtered.length / 24));
+  const currentPage = Math.min(page, pages - 1);
+  useEffect(() => {
+    setPage(0);
+  }, [search, categoryFilter]);
+  useQrUnsavedChanges(!!draft || !!categoryDraft);
   const load = async () => {
     try {
       const [i, c, g, t] = await Promise.all([
@@ -82,6 +99,7 @@ export function QrCatalog() {
     if (busy) return;
     setBusy(true);
     setError("");
+    setNotice('');
     try {
       await fn();
       await load();
@@ -488,6 +506,31 @@ export function QrCatalog() {
               ))}
             </select>
           </label>
+          <label>
+            Dietary type
+            <select
+              className={input}
+              value={draft.dietaryType || "VEG"}
+              onChange={(e) =>
+                setDraft({ ...draft, dietaryType: e.target.value })
+              }
+            >
+              <option value="VEG">Vegetarian</option>
+              <option value="NON_VEG">Non vegetarian</option>
+              <option value="EGG">Egg</option>
+              <option value="JAIN">Jain</option>
+              <option value="VEGAN">Vegan</option>
+            </select>
+          </label>
+          <label>
+            SKU
+            <input
+              className={input}
+              maxLength={80}
+              value={draft.sku || ""}
+              onChange={(e) => setDraft({ ...draft, sku: e.target.value })}
+            />
+          </label>
           {!!groups.length && (
             <fieldset className="rounded-xl border p-3 sm:col-span-2">
               <legend>Variants & add-ons</legend>
@@ -545,39 +588,112 @@ export function QrCatalog() {
       <p role="status" className="text-emerald-700">
         {notice}
       </p>
-      <p className="text-sm">{items.length} dishes in draft</p>
-      <div className="max-h-96 overflow-auto divide-y">
-        {items.map((i) => (
-          <div className="flex justify-between gap-3 py-3 text-sm" key={i.id}>
-            <span>
-              <b>{i.name}</b> · ₹{i.price}
-              <small className="block text-slate-500">
-                {categories.find((c) => c.id === i.categoryId)?.name} ·{" "}
-                {i.isAvailable === false ? "Unavailable" : "Available"}
-              </small>
-            </span>
-            <button
-              className="font-bold text-orange-700"
-              onClick={() => setDraft({ ...i })}
-            >
-              Edit
-            </button>
-            <button
-              disabled={busy}
-              className="font-bold text-rose-700"
-              onClick={() => {
-                if (window.confirm(`Delete ${i.name} from the menu draft?`))
-                  void run(
-                    () => write("MENU_ITEM", i.id, { ...i, deleted: true }),
-                    "Dish deleted from draft. Publish to apply.",
-                  );
-              }}
-            >
-              Delete dish
-            </button>
-          </div>
+      <div className="qr-catalog-tools">
+        <label>
+          Find a dish
+          <input
+            className={input}
+            type="search"
+            aria-label="Search shared menu"
+            placeholder="Dish name, description or SKU"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
+        <label>
+          Filter by category
+          <select
+            className={input}
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="">All categories</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-sm text-slate-500">{items.length} dishes in draft</p>
+      </div>
+      <div className="qr-catalog-grid">
+        {filtered.slice(currentPage * 24, (currentPage + 1) * 24).map((i) => (
+          <article className="qr-dish-card" key={i.id}>
+            <CachedImg
+              src={i.imageUrl}
+              dishName={i.name}
+              alt={i.name}
+              loading="lazy"
+            />
+            <div>
+              <h3>{i.name}</h3>
+              <p>
+                {categories.find((c) => c.id === i.categoryId)?.name ||
+                  "Uncategorised"}{" "}
+                · {i.isAvailable === false ? "Unavailable" : "Available"}
+              </p>
+              <footer>
+                <strong>₹{Number(i.price).toLocaleString("en-IN")}</strong>
+                <div className="qr-dish-actions">
+                  <button
+                    className="font-bold text-orange-700"
+                    onClick={() => setDraft({ ...i })}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    disabled={busy}
+                    className="font-bold text-rose-700"
+                    onClick={() => {
+                      if (
+                        window.confirm(`Delete ${i.name} from the menu draft?`)
+                      )
+                        void run(
+                          () =>
+                            write("MENU_ITEM", i.id, { ...i, deleted: true }),
+                          "Dish deleted from draft. Publish to apply.",
+                        );
+                    }}
+                  >
+                    Delete dish
+                  </button>
+                </div>
+              </footer>
+            </div>
+          </article>
         ))}
       </div>
+      {!filtered.length && (
+        <p className="rounded-xl bg-slate-50 p-5 text-sm text-slate-500">
+          {items.length
+            ? "No dishes match your filters. Try another name or category."
+            : "Add your first dish or import a CSV to start building your menu."}
+        </p>
+      )}
+      {pages > 1 && (
+        <div className="qr-catalog-paging">
+          <span>
+            {currentPage * 24 + 1}–
+            {Math.min((currentPage + 1) * 24, filtered.length)} of{" "}
+            {filtered.length} dishes
+          </span>
+          <div className="flex gap-2">
+            <button
+              disabled={currentPage === 0}
+              onClick={() => setPage(currentPage - 1)}
+            >
+              Previous dishes
+            </button>
+            <button
+              disabled={currentPage >= pages - 1}
+              onClick={() => setPage(currentPage + 1)}
+            >
+              Next dishes
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

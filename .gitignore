@@ -5,6 +5,8 @@ node_modules/
 # committed by mistake before this rule existed.
 **/src-tauri/target/
 **/src-tauri/gen/
+# Same story for the standalone Android plugin crate's own Gradle build cache.
+packages/tauri-plugin-apk-updater/android/.gradle/
 .tauri-updater-key.private
 .tauri-updater-key.private.pub
 .tauri-updater-key.password.txt

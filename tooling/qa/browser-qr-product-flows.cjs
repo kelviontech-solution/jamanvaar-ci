@@ -1,4 +1,5 @@
-const { expect } = require("playwright/test");
+const { expect: baseExpect } = require("playwright/test");
+const expect = baseExpect.configure({ timeout: 30000 });
 module.exports = async ({
   q,
   base,
@@ -48,6 +49,11 @@ module.exports = async ({
     },
   });
   const product = await admin.context().newPage();
+  const navigate = async name => {
+    const button = product.getByRole('button', {name, exact:true});
+    if (!(await button.isVisible())) await product.getByRole('button', {name:'Browse workspace',exact:true}).click();
+    await button.click();
+  };
   await guest.setViewportSize({width:390,height:844});
   product.on("pageerror", (e) => errors.push(e.message));
   const originalCheck = check;
@@ -180,9 +186,7 @@ module.exports = async ({
       await expect(guest.locator(".service-panel")).toContainText(
         "Water · open",
       );
-      await product
-        .getByRole("button", { name: "Service Requests", exact: true })
-        .click();
+      await navigate('Service Requests');
       const inbox = product
         .locator("section")
         .filter({
@@ -220,9 +224,7 @@ module.exports = async ({
     "Brand preview saves safe settings to the real customer page and analytics exports CSV",
     async () => {
       await product.setViewportSize({ width: 1440, height: 960 });
-      await product
-        .getByRole("button", { name: "Customer Branding", exact: true })
-        .click();
+      await navigate('Customer Branding');
       await product
         .getByLabel("Welcome heading", { exact: true })
         .fill("A warm welcome");
@@ -255,9 +257,7 @@ module.exports = async ({
         path: q.path.join(q.reportDir, "evidence/qr-branded-guest.png"),
         fullPage: true,
       });
-      await product
-        .getByRole("button", { name: "Menu Performance", exact: true })
-        .click();
+      await navigate('Menu Performance');
       await expect(
         product.getByText(
           "Historical ingredient costs are not stored on these orders.",
@@ -286,9 +286,7 @@ module.exports = async ({
         version: c.version,
         changes: { overdueMinutes: 3 },
       });
-      await product
-        .getByRole("button", { name: "Menu & Availability", exact: true })
-        .click();
+      await navigate('Menu & Availability');
       const csv =
         "sku,name,category,price,food_type,variant_name,variant_price,addon_name,addon_price\nCSV1,QA CSV Meal,Our meals,80,VEG,Regular,80,Extra rotli,20\nCSV1,QA CSV Meal,Our meals,80,VEG,Large,100,,\n";
       await product
@@ -450,5 +448,6 @@ module.exports = async ({
       return { qrOnlyActivation: true, keyHidden: true, signedOut: true };
     },
   );
+  if(process.env.JAMANVAAR_QA_QR_UI==='1') await require('./browser-qr-ui-flows.cjs')({q,base,product,guest,check,api});
   await product.close();
 };

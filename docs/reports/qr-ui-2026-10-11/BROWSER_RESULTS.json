@@ -1,0 +1,20 @@
+{
+  "environment": "compiled apps, isolated API/database",
+  "provider": "simulated SDK and provider; no real funds",
+  "results": [
+    {
+      "name": "QR-only Restaurant Admin has all nine console sections and a working live design preview/export",
+      "status": "PASS",
+      "evidence": {
+        "sections": 9,
+        "svgExport": true
+      }
+    },
+    {
+      "name": "Rules and payment controls save, reach the actual guest API and hide disabled cash",
+      "status": "FAIL",
+      "error": "expect(locator).toContainText(expected) failed\n\nLocator: getByRole('status')\nExpected substring: \"saved\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for getByRole('status')\n    - locator resolved to <div role=\"status\" aria-live=\"polite\" class=\"fixed top-4 right-4 z-50 bg-jaman-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-white/20 animate-in fade-in slide-in-from-top-2\">…</div>\n    - unexpected value \"Saving settings…\"\n"
+    }
+  ],
+  "pageErrors": []
+}

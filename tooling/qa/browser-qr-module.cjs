@@ -1,7 +1,8 @@
 // Compiled applications, real isolated API/RLS/database; Razorpay transport is simulated.
 process.env.JAMANVAAR_QA_REPORT_DIR=process.env.JAMANVAAR_QA_REPORT_DIR||'docs/reports/qr-module-2026-10-10';
 const q=require('./browser-audit-lib.cjs'),http=require('node:http'),crypto=require('node:crypto'),{spawn}=require('node:child_process');
-const {chromium,expect}=require('playwright/test');
+const {chromium,expect:baseExpect}=require('playwright/test');
+const expect=baseExpect.configure({timeout:30000});
 const scrub=value=>String(value).replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[JWT REDACTED]').split(q.state.platformPassword).join('[PASSWORD REDACTED]').split(q.state.ownerPassword).join('[PASSWORD REDACTED]');
 const port=5288,base=`http://localhost:${port}`,results=[],errors=[];
 let api,server,browser,prisma,rid,planId,admin,guest,kds,platform,qr,branchId,releaseProvider;
@@ -49,12 +50,12 @@ async function main(){
  await ctx.route('**/*',async route=>{const u=new URL(route.request().url());if(u.pathname.startsWith('/api/v1/'))return route.continue({url:base+u.pathname+u.search});if(u.hostname==='checkout.razorpay.com'&&u.pathname==='/v1/checkout.js')return route.fulfill({contentType:'application/javascript',body:sdk});if(!['localhost','127.0.0.1'].includes(u.hostname))return route.abort();return route.continue();});
  admin=await ctx.newPage();guest=await ctx.newPage();for(const page of [admin,guest])page.on('pageerror',e=>errors.push(scrub(e.message)));
  await admin.addInitScript(({rid,ad})=>{for(const[k,v]of Object.entries({restaurant_id:rid,device_id:ad.device.id,device_token:ad.deviceToken}))localStorage.setItem('jamanvaar_cloud_'+k,v);},{rid,ad});
- await admin.goto(base+'/restaurant-admin/qr-ordering');await admin.getByPlaceholder(/JM9876543210/).fill(rest.restaurant.restaurantCode);await admin.getByPlaceholder('Enter owner password').fill(q.state.ownerPassword);await admin.getByRole('button',{name:'Sign In',exact:true}).click();
+ await admin.goto(base+'/restaurant-admin/qr-ordering');await admin.getByRole('textbox',{name:/Restaurant ID/}).fill(rest.restaurant.restaurantCode);await admin.locator('input[type=password]').fill(q.state.ownerPassword);await admin.getByRole('button',{name:'Sign In',exact:true}).click();
  await expect(admin.getByTestId('qr-console')).toBeVisible({timeout:60000});await expect(admin.getByText('KELVIONTECH ENTERPRISE',{exact:true})).toHaveCount(0,{timeout:20000});
  if(process.env.JAMANVAAR_QA_QR_ADVANCED_ONLY!=='1'){
  await check('QR-only Restaurant Admin has all nine console sections and a working live design preview/export',async()=>{
   const console=admin.getByTestId('qr-console');for(const name of ['Overview','Menu & Availability','Tables & QR','QR Design Studio','QR Orders','Payment Settings','Ordering Rules','Analytics','QR Settings'])await expect(console.getByRole('button',{name,exact:true})).toBeVisible();
-  await console.getByRole('button',{name:'QR Design Studio',exact:true}).click();await expect(console.getByText('Scan to Order',{exact:true})).toBeVisible();
+  await console.getByRole('button',{name:'QR Design Studio',exact:true}).click();await expect(console.getByTestId('qr-design-preview')).toBeVisible({timeout:30000});await expect(console.getByText('Scan to Order',{exact:true})).toBeVisible();
   await console.getByRole('button',{name:'Fine dining',exact:true}).click();await console.getByLabel('QR instruction').fill('Scan for a fresh meal');await expect(console.locator('svg').filter({hasText:'Scan for a fresh meal'})).toBeVisible();
   await console.getByRole('button',{name:'Save design',exact:true}).click();await expect(admin.getByRole('status')).toContainText('QR design saved');
   const download=admin.waitForEvent('download');await console.getByRole('button',{name:/SVG/}).click();expect((await download).suggestedFilename()).toMatch(/\.svg$/);

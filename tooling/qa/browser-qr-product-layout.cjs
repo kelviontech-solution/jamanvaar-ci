@@ -2,9 +2,10 @@
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const { chromium, expect } = require('playwright/test');
 const root = path.resolve(__dirname, '../../apps/restaurant-system/pos-admin/dist');
-const report = path.resolve(__dirname, '../../docs/reports/qr-product-2026-10-10');
+const report = path.resolve(__dirname, '../..', process.env.JAMANVAAR_QA_REPORT_DIR || 'docs/reports/qr-product-2026-10-10');
 let browser, server;
 (async () => {
+  fs.mkdirSync(path.join(report, 'evidence'), {recursive:true});
   server = http.createServer((req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
     const file = path.resolve(root, pathname.replace(/^\/qr\//, '') || 'qr.html');
@@ -32,10 +33,17 @@ let browser, server;
   }
   await page.setViewportSize({width:1440,height:960}); await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   await page.screenshot({path:path.join(report,'evidence/qr-product-hero.png')});
+  const editorialImages = page.locator('.qr-editorial-image img');
+  for (let i=0;i<await editorialImages.count();i++) {
+    await editorialImages.nth(i).scrollIntoViewIfNeeded();
+    await expect.poll(()=>editorialImages.nth(i).evaluate(e=>e.complete && e.naturalWidth>0)).toBe(true);
+  }
+  await page.locator('.qr-editorial').first().screenshot({path:path.join(report,'evidence/qr-site-guest-experience.png')});
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
   await page.setViewportSize({width:390,height:844}); await page.getByRole('button',{name:'Menu',exact:true}).click();
   await expect(page.locator('#qr-site-nav')).toBeVisible();
   await page.screenshot({path:path.join(report,'evidence/qr-product-mobile.png'),fullPage:true});
   expect(apiRequests).toEqual([]); expect(errors).toEqual([]);
-  fs.writeFileSync(path.join(report,'PUBLIC_LAYOUT_RESULTS.json'), JSON.stringify({status:'PASS',widths,normalScrolling:true,horizontalOverflow:false,apiRequests,pageErrors:errors},null,2));
+  fs.writeFileSync(path.join(report,'PUBLIC_LAYOUT_RESULTS.json'), JSON.stringify({status:'PASS',widths,normalScrolling:true,horizontalOverflow:false,editorialImagesLoaded:true,apiRequests,pageErrors:errors},null,2));
   console.log('Public QR entry fits five widths, scrolls normally, and makes no API requests.');
 })().catch(e=>{console.error(e.message);process.exitCode=1;}).finally(async()=>{await browser?.close(); if(server){server.closeAllConnections();await new Promise(r=>server.close(r));}});

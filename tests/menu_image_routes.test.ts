@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { resolveMenuImage } from '../packages/utils/src/menu_image';
 
 describe('Catalog photos on shared-origin app routes', () => {
-  for (const app of ['restaurant-admin', 'pos-admin', 'pos', 'captain', 'kds', 'kiosk', 'q']) {
+  for (const app of ['restaurant-admin', 'pos-admin', 'pos', 'captain', 'kds', 'kiosk', 'qr', 'q']) {
     it(`uses ${app}'s own images even on a nested screen`, () => {
       expect(resolveMenuImage('/assets/menu/pizza/margherita.jpg', { pathname: `/${app}/menu/details` })).toBe(`/${app}/assets/menu/pizza/margherita.jpg`);
       expect(resolveMenuImage('/assets/menu/common/menu-placeholder-v2.svg', { pathname: `/${app}/` })).toBe(`/${app}/assets/menu/common/menu-placeholder-v2.svg`);

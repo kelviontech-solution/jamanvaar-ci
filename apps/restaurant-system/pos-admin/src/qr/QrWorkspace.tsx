@@ -117,6 +117,15 @@ function AuthPage({
           restaurant's own workspace.
         </p>
         <a href="/qr/#demo">Explore the interactive demo →</a>
+        <div className="qr-auth-photo">
+          <img
+            src="/qr/assets/qr-experience/dining.webp"
+            alt="A warm restaurant table with a Gujarati meal"
+            width="1200"
+            height="800"
+          />
+          <span>Your hospitality. A simpler way to order.</span>
+        </div>
       </aside>
       <form onSubmit={submit}>
         <img className="qr-auth-logo" src={logo} alt="Jamanvaar" />
@@ -239,6 +248,7 @@ function AuthPage({
 }
 function Dashboard({ toast }: { toast: (s: string) => void }) {
   const [branches, setBranches] = useState<QrBranch[]>([]),
+    [accountName, setAccountName] = useState(""),
     [allBranches, setAllBranches] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
@@ -251,6 +261,7 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
     let active = true;
     cloudQrAccount()
       .then(async (account) => {
+        if (active) setAccountName(account.fullName);
         if (active) setAllBranches(account.role === "OWNER");
         if (!["OWNER", "MANAGER"].includes(account.role))
           throw new Error("Owner or manager access is required");
@@ -289,6 +300,10 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
           <img src={logo} alt="Jamanvaar" />
           <span>QR ADMIN</span>
         </a>
+        <div className="qr-header-context">
+          <strong>Your restaurant workspace</strong>
+          <small>{accountName || "QR Ordering management"}</small>
+        </div>
         <label>
           Branch
           <select
@@ -329,6 +344,7 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
           </div>
         ) : ready ? (
           <QrConsole
+            layout="workspace"
             onViewPlan={() =>
               toast(
                 "Your platform administrator manages QR licenses and optional features.",

@@ -1,4 +1,11 @@
+import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { useEffect, useState } from "react";
+import {
+  CheckCircle2,
+  CircleAlert,
+  ClipboardCheck,
+  RefreshCw,
+} from "lucide-react";
 import { QrServiceInbox } from "@jamanvaar/ui";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi } from "../../cloud/qrAdminClient";
@@ -23,19 +30,40 @@ export function QrSetupHealth({
   navigate: (tab: string) => void;
 }) {
   const [data, setData] = useState<any>(null),
-    [error, setError] = useState("");
-  const load = () =>
-    qrRequestsApi<any>("/health")
-      .then(setData)
-      .catch((e) => setError(e.message));
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
+  const load = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      setData(await qrRequestsApi<any>("/health"));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
   useEffect(() => {
     void load();
   }, []);
   return (
-    <section className={box}>
-      <div className="flex flex-wrap justify-between gap-3">
-        <h2 className="text-xl font-bold">Before your first guest</h2>
-        <button className={button} onClick={() => void load()}>
+    <section className="qr-health-card">
+      <div className="qr-health-title">
+        <div>
+          <ClipboardCheck size={24} />
+          <div>
+            <h2 className="text-xl font-bold">Before your first guest</h2>
+            <span className="text-xs text-slate-500">
+              Your branch setup checklist
+            </span>
+          </div>
+        </div>
+        <button
+          className="qr-btn secondary"
+          disabled={busy}
+          onClick={() => void load()}
+        >
+          <RefreshCw size={14} className={busy ? "animate-spin" : ""} />
           Check setup again
         </button>
       </div>
@@ -57,30 +85,46 @@ export function QrSetupHealth({
             {data.scope} · {data.completed}/{data.total} checks passed ·{" "}
             {data.ready ? "Required setup is ready" : "Finish the checks below"}
           </p>
-          <ul className="divide-y">
-            {data.checks.map((c: any) => (
-              <li
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
-                key={c.id}
-              >
-                <span>
-                  {c.ready ? "✓" : "○"} {c.label}{" "}
-                  {!c.required && <small>(optional)</small>}
-                  {!c.ready && (
-                    <p className="text-sm text-slate-600">{c.action}</p>
-                  )}
-                </span>
-                {!c.ready && (
-                  <button
-                    className="text-sm font-bold text-orange-700"
-                    onClick={() => navigate(c.tab)}
-                  >
-                    Open settings →
-                  </button>
-                )}
-              </li>
-            ))}
+          <div className="qr-health-progress" aria-hidden="true">
+            <span
+              style={{
+                width: `${data.total ? (data.completed / data.total) * 100 : 0}%`,
+              }}
+            />
+          </div>
+          <ul className="qr-health-grid">
+            {data.checks
+              .filter((c: any) => !c.ready)
+              .map((c: any) => (
+                <li key={c.id} className="needs-action">
+                  <CircleAlert size={17} />
+                  <div>
+                    <strong>{c.label}</strong>
+                    {!c.required && <small>Optional</small>}
+                    <p>{c.action}</p>
+                    <button onClick={() => navigate(c.tab)}>
+                      Open settings →
+                    </button>
+                  </div>
+                </li>
+              ))}
           </ul>
+          <details>
+            <summary>View completed checks ({data.completed})</summary>
+            <ul className="qr-health-grid">
+              {data.checks
+                .filter((c: any) => c.ready)
+                .map((c: any) => (
+                  <li key={c.id}>
+                    <CheckCircle2 size={17} />
+                    <div>
+                      <strong>{c.label}</strong>
+                      {!c.required && <small>Optional</small>}
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          </details>
         </>
       )}
     </section>
@@ -115,6 +159,7 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
   useEffect(() => {
     void load();
   }, [mode]);
+  useQrUnsavedChanges(!!data && JSON.stringify(draft) !== JSON.stringify(data.settings));
   const licensed = data?.capabilities.capabilities.some(
     (c: any) =>
       c.code ===
@@ -148,6 +193,7 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
   const save = async () => {
     setBusy(true);
     setError("");
+    setNotice("");
     try {
       const changes = Object.fromEntries(
         keys
@@ -705,6 +751,7 @@ export function QrMenuPerformance() {
 }
 export function QrBrandStudio() {
   const [draft, setDraft] = useState<any>(null),
+    [original, setOriginal] = useState<any>(null),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [images, setImages] = useState<any>({}),
@@ -712,9 +759,10 @@ export function QrBrandStudio() {
     [previewSize, setPreviewSize] = useState("MOBILE"),
     [busy, setBusy] = useState(false),
     [licensed, setLicensed] = useState(false);
+  useQrUnsavedChanges(!!original && (JSON.stringify(original) !== JSON.stringify(draft) || Object.keys(images).length > 0));
   useEffect(() => {
     QrAdminApi.branding()
-      .then(setDraft)
+      .then(r => {setDraft(r);setOriginal(r);})
       .catch((e) => setError(e.message));
     qrRequestsApi<any>("")
       .then((r) =>
@@ -750,6 +798,7 @@ export function QrBrandStudio() {
     if (busy) return;
     setBusy(true);
     setError("");
+    setNotice("");
     try {
       const body = reset
         ? { reset: true }
@@ -781,6 +830,7 @@ export function QrBrandStudio() {
         body: JSON.stringify(body),
       });
       setDraft(r);
+      setOriginal(r);
       setImages({});
       setNotice(
         reset
@@ -918,6 +968,7 @@ export function QrBrandStudio() {
                 void QrAdminApi.branding()
                   .then((r) => {
                     setDraft(r);
+                    setOriginal(r);
                     setImages({});
                     setNotice("Unsaved changes discarded.");
                   })

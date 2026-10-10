@@ -15,6 +15,11 @@ export function QrProduct() {
     : location.pathname + "/";
   const [toast, setToast] = useState("");
   useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(''), 7000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+  useEffect(() => {
     const robots =
       document.querySelector("meta[name=robots]") ??
       document.head.appendChild(document.createElement("meta"));
@@ -39,7 +44,7 @@ export function QrProduct() {
       </div>
     );
   return (
-    <div className="qr-product">
+    <div className={path === "/qr/admin/" ? "qr-admin-app" : "qr-product"}>
       {path === "/qr/" ? (
         <Landing />
       ) : path === "/qr/admin/" ? (
@@ -281,6 +286,65 @@ function Landing() {
             ))}
           </div>
         </section>
+        <section className="qr-section qr-editorial">
+          <div className="qr-editorial-image">
+            <img
+              src="/qr/assets/qr-experience/dining.webp"
+              alt="A guest choosing a meal from their phone at a beautifully set restaurant table"
+              loading="lazy"
+              width="1200"
+              height="800"
+            />
+            <span>Less waiting. More enjoying.</span>
+          </div>
+          <div>
+            <span className="qr-eyebrow">DESIGNED AROUND YOUR GUESTS</span>
+            <h2>
+              A menu that feels
+              <br />
+              like your restaurant.
+            </h2>
+            <p>
+              Your food, your photos, your welcome. Let guests find a favourite,
+              choose their extras and see clear totals before checkout.
+            </p>
+            <ul className="qr-editorial-list">
+              <li>
+                <b>01</b>
+                <div>
+                  <h3>Make it personal</h3>
+                  <p>
+                    Keep your logo, colours and welcome message in the customer
+                    experience.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <b>02</b>
+                <div>
+                  <h3>Make ordering comfortable</h3>
+                  <p>
+                    Mobile-friendly menus, useful choices and table assistance
+                    when enabled.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <b>03</b>
+                <div>
+                  <h3>Keep guests informed</h3>
+                  <p>
+                    Real preparation, readiness and completion updates from your
+                    team.
+                  </p>
+                </div>
+              </li>
+            </ul>
+            <a className="qr-btn secondary" href="#demo">
+              Try the guest experience →
+            </a>
+          </div>
+        </section>
         <section id="how-it-works" className="qr-section qr-how">
           <span className="qr-eyebrow">YOUR FIRST TABLE, STEP BY STEP</span>
           <h2>Set up once. Serve every day.</h2>
@@ -320,6 +384,57 @@ function Landing() {
               Enable counter collection independently. Staff record money
               received, while guests see the balance due.
             </p>
+          </div>
+          <div
+            className="qr-payment-preview"
+            aria-label="Illustrative payment summary"
+          >
+            <span className="qr-demo-label">ILLUSTRATIVE CHECKOUT</span>
+            <h3>One meal. Clear choices.</h3>
+            <div className="qr-payment-choice">
+              <span>Online checkout</span>
+              <small>Verified by your payment provider</small>
+            </div>
+            <div className="qr-payment-choice">
+              <span>Pay at counter</span>
+              <small>Collected and recorded by staff</small>
+            </div>
+            <p className="qr-fine">
+              Guests see the methods you enable. Both use the same order record.
+            </p>
+          </div>
+        </section>
+        <section className="qr-section qr-editorial qr-editorial-reverse">
+          <div>
+            <span className="qr-eyebrow">FROM THE FLOOR TO THE PASS</span>
+            <h2>
+              Good food deserves
+              <br />a smooth handoff.
+            </h2>
+            <p>
+              Bring QR orders into your branch’s workflow. Follow progress in QR
+              Admin and connect your licensed POS, Captain and kitchen displays.
+            </p>
+            <div className="qr-workflow">
+              <span>Guest order</span>
+              <i>→</i>
+              <span>Your team</span>
+              <i>→</i>
+              <span>Ready to serve</span>
+            </div>
+            <a className="qr-btn" href="/qr/login/">
+              Explore your workspace →
+            </a>
+          </div>
+          <div className="qr-editorial-image">
+            <img
+              src="/qr/assets/qr-experience/kitchen.webp"
+              alt="A chef finishing vegetarian dishes at an organised restaurant kitchen pass"
+              loading="lazy"
+              width="1200"
+              height="800"
+            />
+            <span>One branch. One connected team.</span>
           </div>
         </section>
         <section id="integrations" className="qr-section">
@@ -404,6 +519,14 @@ function Demo() {
   return (
     <div className="qr-demo" aria-label="Interactive sample menu">
       <span className="qr-demo-label">DEMO · NO REAL ORDERS OR PAYMENTS</span>
+      <img
+        className="qr-demo-food"
+        src="/qr/assets/menu/thali/gujarati-thali.jpg"
+        alt="Gujarati thali with curries, rotli and rice"
+        loading="lazy"
+        width="640"
+        height="360"
+      />
       <h3>Gujarati Thali</h3>
       <p>Shaak, dal, rice, rotli and a sweet finish.</p>
       <div className="qr-sample-line">
