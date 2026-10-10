@@ -3,6 +3,7 @@ import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableE
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
+import { readSavedBillNumber } from './whatsapp-bill-settings.service';
 
 const SEND_BILL_PATH = '/api/v1/webhooks/jamanvaar/send-bill';
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
@@ -56,11 +57,14 @@ export class ReceiptWhatsAppService {
     if (!baseUrl || !secret) throw new ServiceUnavailableException('WhatsApp billing is not configured on this server');
 
     const bill = await this.loadBill(restaurantId, orderId, branchId);
+    // The number the admin chose in Receipt settings; empty = the restaurant's default connected number.
+    const fromNumber = await readSavedBillNumber(this.prisma, restaurantId);
     const orderNo = bill.externalOrderId.slice(-10).toUpperCase();
 
     const rawBody = JSON.stringify({
       restaurantId,
       phone: normalized,
+      ...(fromNumber ? { fromNumber } : {}),
       billText: this.formatBill(bill, orderNo),
       // Template fallback (customer outside the 24h window): {{1}} order, {{2}} reference, {{3}} total.
       templateParams: [orderNo, orderNo, inr(bill.totalAmount)]

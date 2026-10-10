@@ -126,6 +126,7 @@ import { PrintersDevicesModule } from './components/hardware/PrintersDevicesModu
 import { KitchenPrinterRoutingPanel } from './components/hardware/KitchenPrinterRoutingPanel';
 import { PrintQueuePanel } from './components/hardware/PrintQueuePanel';
 import { ReceiptEBillPanel } from './components/receipts/ReceiptEBillPanel';
+import { WhatsAppBillNumberPanel } from './components/receipts/WhatsAppBillNumberPanel';
 import { FeedbackPanel } from './components/kiosk/FeedbackPanel';
 import { ReportBrandingSettings } from './components/settings/ReportBrandingSettings';
 import { SubscriptionPlansView } from './components/settings/SubscriptionPlansView';
@@ -1576,7 +1577,10 @@ export default function PosAdminApp() {
 
             {/* TAB: RECEIPT & E-BILL SETTINGS (relocated from kiosk-admin, not kiosk-specific) */}
             {activeTab === 'RECEIPTS' && (
-              <ReceiptEBillPanel showToast={showToast} onGoToSettings={() => setActiveTab('SETTINGS')} />
+              <>
+                <ReceiptEBillPanel showToast={showToast} onGoToSettings={() => setActiveTab('SETTINGS')} />
+                <WhatsAppBillNumberPanel showToast={showToast} />
+              </>
             )}
 
             {/* TAB 15: SETTINGS & BRANDING */}
