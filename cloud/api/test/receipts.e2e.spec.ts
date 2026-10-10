@@ -144,6 +144,22 @@ describe('Receipt e-bill delivery', () => {
     return externalOrderId;
   }
 
+  /** What a kiosk cash order really leaves behind: the online-payment attempt stuck at PENDING (the guest
+   *  then chose to pay at the counter) AND the confirmed cash order, both under the same external id. */
+  async function seedCashOrderWithAbandonedOnlineAttempt(): Promise<string> {
+    const externalOrderId = await seedOnlinePayment('PENDING');
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedOrder.create({
+        data: {
+          restaurantId, externalOrderId, orderType: 'TOKEN_QR', status: 'CONFIRMED',
+          items: [{ externalItemId: 'itm-9', name: 'Veg Thali', quantity: 1, unitPrice: 22000, lineTotal: 22000 }],
+          subtotal: 22000, taxAmount: 1100, totalAmount: 23100, paymentMethod: 'CASH_AT_COUNTER', paymentStatus: 'PENDING', source: 'KIOSK'
+        }
+      })
+    );
+    return externalOrderId;
+  }
+
   afterAll(async () => {
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.platformUser.deleteMany({ where: { email: adminEmail } });
@@ -261,6 +277,13 @@ describe('Receipt e-bill delivery', () => {
       expect(res.status).toBe(404);
     });
 
+    it('emails the bill for a cash order that also has an abandoned, still-PENDING online attempt', async () => {
+      const id = await seedCashOrderWithAbandonedOnlineAttempt();
+      const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: id, email: 'guest@example.com' });
+      expect(res.status).toBe(201);
+      expect(emailSendMock).toHaveBeenCalledTimes(1);
+    });
+
     it('refuses to email an invoice for an online order that never paid', async () => {
       const res = await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: pendingOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(400);
@@ -323,6 +346,13 @@ describe('Receipt e-bill delivery', () => {
         .update(`POST\n/api/v1/webhooks/jamanvaar/send-bill\n${headers['X-Timestamp']}\n${createHash('sha256').update(init.body as string).digest('hex')}`)
         .digest('hex');
       expect(headers['X-Signature']).toBe(expected);
+    });
+
+    it('a cash order that also has an abandoned, still-PENDING online attempt is billed from the confirmed cash order', async () => {
+      const id = await seedCashOrderWithAbandonedOnlineAttempt();
+      const res = await send(kioskToken, id, '9876543210');
+      expect(res.status).toBe(201);
+      expect(JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string).billText).toContain('Veg Thali');
     });
 
     it('sends from the number the admin chose in Receipt settings (fromNumber), and from the default when none is set', async () => {

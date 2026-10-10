@@ -71,11 +71,13 @@ export class ReceiptEmailService {
           restaurant: { select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true } }
         }
       });
+      // A kiosk cash order leaves TWO records: the online-payment attempt (Order, stuck at PENDING because the
+      // guest chose to pay at the counter instead) and the real, confirmed cash order (SyncedOrder). An unpaid
+      // Order must therefore not end the search -- only refuse when no confirmed order exists either.
+      let unpaid: string | null = null;
       if (order) {
         const payment = order.paymentTransactions[0];
-        if (!payment || !PAID_STATUSES.includes(payment.status)) {
-          throw new BadRequestException(`Cannot email an invoice for an order with no successful payment (status: ${payment?.status ?? 'none'})`);
-        }
+        if (payment && PAID_STATUSES.includes(payment.status)) {
         return this.buildPdf(order.restaurant, {
           externalOrderId: order.externalOrderId,
           paidAt: payment.paidAt,
@@ -85,13 +87,18 @@ export class ReceiptEmailService {
           taxAmount: order.taxAmount,
           totalAmount: order.totalAmount
         }, await presentation(order.branchId || order.kiosk?.branchId));
+        }
+        unpaid = `Cannot email an invoice for an order with no successful payment (status: ${payment?.status ?? 'none'})`;
       }
 
       const synced = await tx.syncedOrder.findUnique({
         where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: orderId } },
         include: { restaurant: { select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true } } }
       });
-      if (!synced) return null;
+      if (!synced) {
+        if (unpaid) throw new BadRequestException(unpaid);
+        return null;
+      }
       if (CLOSED_ORDER_STATUSES.includes(synced.status)) {
         throw new BadRequestException(`Cannot email an invoice for an order with status ${synced.status}`);
       }
