@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
 import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
-import { Upload, Sparkles, Image as ImageIcon, Sliders } from 'lucide-react';
+import { Upload, Sparkles, Image as ImageIcon, Sliders, Plus } from 'lucide-react';
+import { GroupEditor } from './menu/MenuOptionsModule';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
 const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
@@ -46,6 +47,11 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [isFeatured, setIsFeatured] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [modifierGroupIds, setModifierGroupIds] = useState<string[]>([]);
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+  // db.modifierGroups is read fresh on every render, not reactively -- this just forces one
+  // after a save, the same "bump" pattern the Customisations & Tax page itself uses.
+  const [groupsTick, setGroupsTick] = useState(0);
+  void groupsTick;
   const [taxGroupId, setTaxGroupId] = useState('');
   const [sellOnQr, setSellOnQr] = useState(true);
   const [sortOrder, setSortOrder] = useState('');
@@ -448,8 +454,30 @@ export const ItemModal: React.FC<ItemModalProps> = ({
             </span>
           </div>
           <p className="text-[11px] text-slate-500">
-            Select modifier options applicable to this dish (Spice Level, Portions, Add-ons, etc.):
+            Select modifier options applicable to this dish (Spice Level, Portions, Add-ons, etc.). This
+            list is shared across every dish in the restaurant — if none of these fit (e.g. editing a
+            thali but only pizza groups exist), create a new one scoped to this dish below.
           </p>
+
+          {isCreatingGroup ? (
+            <GroupEditor
+              group={null}
+              onCancel={() => setIsCreatingGroup(false)}
+              onSaved={(g) => {
+                setModifierGroupIds((prev) => [...prev, g.id]);
+                setIsCreatingGroup(false);
+                setGroupsTick((t) => t + 1);
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsCreatingGroup(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline"
+            >
+              <Plus className="w-3.5 h-3.5" /> New group for this dish
+            </button>
+          )}
 
           <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
             {db.modifierGroups.map((group) => {

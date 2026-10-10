@@ -52,7 +52,11 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fadeIn">
+    // No backdrop-blur: a full-viewport backdrop-filter forces continuous GPU recompositing of
+    // everything behind the dialog, which on kiosk-grade hardware was visible as real cursor/UI
+    // lag for as long as any modal stayed open (reported live). A plain tinted overlay reads the
+    // same to a user but costs the GPU almost nothing.
+    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-fadeIn">
       {/* Backdrop */}
       <div className="fixed inset-0" onClick={onClose} />
 

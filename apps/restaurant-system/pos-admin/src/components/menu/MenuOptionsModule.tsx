@@ -109,7 +109,7 @@ export const MenuPublishPanel: React.FC<{ showToast: (m: string) => void; change
 
 const blankOption = (): ModifierOption => ({ id: '', groupId: '', name: '', priceDelta: 0, isAvailable: true, sortOrder: 0 });
 
-const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: ModifierGroup) => void; onCancel: () => void }> = ({ group, onSaved, onCancel }) => {
+export const GroupEditor: React.FC<{ group: ModifierGroup | null; onSaved: (g: ModifierGroup) => void; onCancel: () => void }> = ({ group, onSaved, onCancel }) => {
   const [name, setName] = useState(group?.name ?? '');
   const [description, setDescription] = useState(group?.description ?? '');
   const [isRequired, setIsRequired] = useState(group?.isRequired ?? false);

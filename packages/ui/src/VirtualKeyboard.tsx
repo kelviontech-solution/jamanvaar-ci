@@ -114,7 +114,10 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
     'h-11 min-w-[2.5rem] px-2 rounded-lg bg-white border border-[#EBE6DD] text-sm font-bold text-[#0B253A] hover:bg-[#FFF4ED] hover:border-[#E66817] active:scale-95 transition-all shadow-xs';
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
+    // No backdrop-blur: shows on every text field tap on a touch kiosk, and a full-viewport
+    // backdrop-filter is one of the most GPU-expensive effects to keep recompositing -- exactly
+    // what was reported as "mouse lag" while any popup (this one most often) stayed open.
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 animate-fadeIn" onClick={onClose}>
       <div
         className="relative w-full max-w-3xl bg-[#FBF9F5] border-t-2 border-[#E66817] rounded-t-3xl shadow-2xl p-4 sm:p-6 space-y-3"
         onClick={(e) => e.stopPropagation()}

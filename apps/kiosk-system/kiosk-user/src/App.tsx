@@ -3591,7 +3591,7 @@ export default function KioskUserApp() {
               <CachedImg
                 src={customizingItem.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                 alt={customizingItem.name}
-                className="w-full h-40 sm:h-48 object-cover"
+                className="w-full aspect-[4/3] object-cover"
               />
               <div className="absolute top-3 left-3">
                 <StatusBadge status={customizingItem.dietaryType} type="dietary" />
@@ -3727,7 +3727,7 @@ export default function KioskUserApp() {
       {/* DRAWER: CUSTOMER ASSISTANT CHATBOT ("Need Help?" / Complete Conversational Ordering) */}
       {isChatbotOpen && !AiConfig.isEnabled() && <JamanAiAccessNotice isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />}
       {isChatbotOpen && showCustomerAi && AiConfig.isEnabled() && (
-        <div role="dialog" aria-modal="true" aria-label="JAMAN AI Food Assistant" className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-label="JAMAN AI Food Assistant" className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 animate-fadeIn">
           <div className="fixed inset-0" onClick={() => setIsChatbotOpen(false)} />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between z-10 animate-slideLeft">
             {/* Header with Live Status & Close */}
@@ -4150,9 +4150,12 @@ export default function KioskUserApp() {
         </div>
       </Modal>
 
-      {/* MODAL: INACTIVITY IDLE WARNING */}
+      {/* MODAL: INACTIVITY IDLE WARNING -- no backdrop-blur below: a full-viewport backdrop-filter
+          is one of the most GPU-expensive effects to keep recompositing, and this modal fires
+          automatically on every idle timeout -- exactly the "mouse lag while a popup is open"
+          reported live. */}
       {showIdleWarning && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-fadeIn select-none">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-6 bg-black/80 animate-fadeIn select-none">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl border-2 border-amber-400 animate-scaleUp">
             <div className="w-20 h-20 rounded-full bg-amber-50 text-jaman-saffron flex items-center justify-center mx-auto">
               <Clock className="w-10 h-10 animate-spin" />
