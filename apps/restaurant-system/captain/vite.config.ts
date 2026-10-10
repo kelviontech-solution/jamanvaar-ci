@@ -4,7 +4,11 @@ import path from 'path';
 import { readFileSync } from 'fs';
 import { appShellCache } from '../../../tooling/vite/app_shell_cache';
 
-const appVersion = (JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8')) as { version: string }).version;
+// tauri.conf.json, not package.json: this value is baked into __APP_VERSION__ and reported to the
+// cloud as this device's own appVersion (heartbeat, update-offer banner). package.json's version is
+// never bumped; reading it here meant the update banner offered "a newer version" forever, even on
+// a terminal already running the latest build, since the version it reported never changed.
+const appVersion = (JSON.parse(readFileSync(path.resolve(__dirname, 'src-tauri/tauri.conf.json'), 'utf-8')) as { version: string }).version;
 
 export default defineConfig({
   base: './',
