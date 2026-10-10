@@ -698,6 +698,10 @@ export interface Order {
   stockConsumedQty?: Record<string, number>;
   /** Counted dishes already reserved by the canonical QR backend; recipe movements remain local/ledger-owned. */
   serverDishStockConsumed?: Record<string, number>;
+  /** Server-authoritative confirmed collections, in paise. */
+  paymentAllocationSummary?: { collectedPaise: number; outstandingPaise: number };
+  counterSettlementAmountPaise?: number;
+  serverQrLoyalty?: boolean;
 }
 
 export type DeliveryStatus = 'UNASSIGNED' | 'ASSIGNED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'FAILED';

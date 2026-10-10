@@ -43,6 +43,10 @@ export interface OrderSyncPushItem {
 }
 
 export interface OrderSyncMeta {
+  serverDishStockConsumed?:Record<string,number>;
+  paymentAllocationSummary?: Order['paymentAllocationSummary'];
+  counterSettlementAmountPaise?: number;
+  verifiedCustomerId?: string;
   kitchenPriority?: 'NORMAL' | 'URGENT';
   kitchenPriorityRev?: number;
   kitchenPriorityChangeId?: string;
@@ -109,6 +113,7 @@ export interface OrderSyncPushResult {
 }
 
 export interface CloudSyncedOrder {
+  source?: string;
   externalOrderId: string;
   orderType: string;
   status: string;
@@ -255,6 +260,7 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       guestCount: order.guestCount,
       createdAt: order.createdAt,
       sourceType: order.source_type,
+      counterSettlementAmountPaise: order.counterSettlementAmountPaise,
       acceptedBy: order.acceptedByDeviceId,
       businessDayId: order.businessDayId,
       paymentTransactionId: order.paymentTransactionId,
@@ -320,6 +326,8 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
   if (remote.paymentStatus) local.paymentStatus = remote.paymentStatus as Order['paymentStatus'];
   if (remote.paymentMethod) local.paymentMethod = remote.paymentMethod as Order['paymentMethod'];
   const m = remote.meta;
+  if (m?.paymentAllocationSummary) local.paymentAllocationSummary = m.paymentAllocationSummary;
+  if (m?.sourceType === "QR_TABLE" && m?.verifiedCustomerId) local.serverQrLoyalty = true;
   if (m) {
     if (m.customerPhone !== undefined) local.customerPhone = m.customerPhone;
     if (m.customerName !== undefined) local.customerName = m.customerName;
@@ -357,6 +365,7 @@ function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolea
     if (destination) local.tableId = destination.id;
     db.kots.filter(k => k.orderId === local.id).forEach(k => { k.tableNumber = local.tableNumber; });
   }
+  if(remote.meta?.serverDishStockConsumed)local.serverDishStockConsumed=remote.meta.serverDishStockConsumed;
   if (remote.meta?.acceptedBy) local.acceptedByDeviceId = remote.meta.acceptedBy;
   if (remote.meta?.billRequestedAt) local.billRequestedAt = remote.meta.billRequestedAt;
   if (remote.meta?.billSplitNote) local.billSplitNote = remote.meta.billSplitNote;
@@ -428,6 +437,9 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     refundAmount: m.refundAmountPaise === undefined ? undefined : fromPaise(m.refundAmountPaise),
     customerName: m.customerName,
     customerPhone: m.customerPhone,
+    serverDishStockConsumed:m.serverDishStockConsumed,
+    paymentAllocationSummary: m.paymentAllocationSummary,
+    serverQrLoyalty: m.sourceType === "QR_TABLE" && !!m.verifiedCustomerId,
     loyaltyRedemption: m.loyaltyRedemption,
     loyaltyPointsEarned: m.loyaltyPointsEarned,
     loyaltyPointsRedeemed: m.loyaltyPointsRedeemed,

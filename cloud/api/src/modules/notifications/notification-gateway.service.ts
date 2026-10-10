@@ -98,4 +98,20 @@ export class NotificationGatewayService {
     }
     return { success: true, providerMessageId: body.message };
   }
+
+  isQrLoyaltyOtpConfigured(): boolean {
+    return Boolean(this.config.get<string>('MSG91_AUTH_KEY') && this.config.get<string>('QR_LOYALTY_MSG91_FLOW_ID'));
+  }
+
+  /** Dedicated approved OTP flow; never reuse an onboarding or receipt template for verification. */
+  async sendQrLoyaltyOtp(phoneNumber: string, otp: string): Promise<NotificationSendResult> {
+    if (!this.isQrLoyaltyOtpConfigured()) throw new ServiceUnavailableException('QR loyalty phone verification is not configured');
+    const response = await fetch('https://api.msg91.com/api/v5/flow/', {
+      method: 'POST', signal: AbortSignal.timeout(10000),
+      headers: { authkey: this.config.getOrThrow<string>('MSG91_AUTH_KEY'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ flow_id: this.config.getOrThrow<string>('QR_LOYALTY_MSG91_FLOW_ID'), sender: this.config.get<string>('MSG91_SENDER_ID') ?? undefined, recipients: [{ mobiles: phoneNumber, VAR1: otp }] })
+    });
+    const result = await response.json();
+    return response.ok && result?.type === 'success' ? { success: true, providerMessageId: result.message } : { success: false, errorMessage: 'Verification message could not be delivered' };
+  }
 }

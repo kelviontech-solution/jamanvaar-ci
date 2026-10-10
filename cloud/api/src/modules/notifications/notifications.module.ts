@@ -10,6 +10,6 @@ import { ReceiptWhatsAppService } from './receipt-whatsapp.service';
 @Module({
   controllers: [ReceiptsController],
   providers: [EmailService, NotificationGatewayService, ReceiptEmailService, ReceiptWhatsAppService],
-  exports: [EmailService]
+  exports: [EmailService, NotificationGatewayService]
 })
 export class NotificationsModule {}

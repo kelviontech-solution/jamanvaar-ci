@@ -89,7 +89,9 @@ export const PosPaymentModal: React.FC = () => {
     requestManagerOverride
   } = usePosStore();
 
-  const totalPayable = Number(cart?.totalPayable) || 0;
+  const runningPaymentOrder = runningOrderId ? OrderRepository.getOrderById(runningOrderId) : null;
+  const collectedPaise = runningPaymentOrder?.paymentAllocationSummary?.collectedPaise ?? 0;
+  const totalPayable = runningPaymentOrder?.paymentAllocationSummary ? runningPaymentOrder.paymentAllocationSummary.outstandingPaise / 100 : Number(cart?.totalPayable) || 0;
   const itemsCount = cart?.items?.length || 0;
 
   // Is Split Mode active?
@@ -161,7 +163,7 @@ export const PosPaymentModal: React.FC = () => {
   // Initialize or synchronize on modal open & payable change
   useEffect(() => {
     if (isPaymentOpen) {
-      const payable = Number(cart?.totalPayable) || 0;
+      const payable = totalPayable;
       if (!isSplitMode) {
         setAllocations({
           CASH: 0,
@@ -176,7 +178,7 @@ export const PosPaymentModal: React.FC = () => {
         }
       }
     }
-  }, [isPaymentOpen, cart?.totalPayable, isSplitMode, activeChannel]);
+  }, [isPaymentOpen, totalPayable, isSplitMode, activeChannel]);
 
   // Derived Calculations
   const totalAllocated = useMemo(() => {
@@ -528,12 +530,14 @@ export const PosPaymentModal: React.FC = () => {
               </span>
             </div>
             <div className="flex items-baseline gap-3 mt-1">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Payable:</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">{collectedPaise ? "Remaining balance:" : "Total Payable:"}</span>
               <h2 className="text-2xl sm:text-3xl font-black text-jaman-navy font-mono leading-tight">
                 {formatINR(totalPayable)}
               </h2>
+              {collectedPaise > 0 && <span className="text-xs text-emerald-700">Already collected: {formatINR(collectedPaise / 100)}</span>}
               <button
                 type="button"
+                disabled={collectedPaise > 0}
                 onClick={() => setIsDiscountModalOpen(true)}
                 className={`px-2.5 py-1 rounded-xl border text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
                   cart.discountAmount > 0

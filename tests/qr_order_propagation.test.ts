@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db } from '@jamanvaar/database';
+import { db, OrderRepository } from '@jamanvaar/database';
 import { SyncOutboxEngine, CloudSyncedOrder } from '@jamanvaar/sync';
 
 /**
@@ -65,5 +65,24 @@ describe('a guest QR order arrives on a device with its real prices and snapshot
     expect(sent).toBeTruthy();
     expect(sent.items[0].snapshot).toMatchObject({ menuVersion: 7, basePrice: 24900 });
     expect(sent.items[0].modifierDetails[0]).toMatchObject({ optionId: 'extra', groupId: 'cheese', priceDelta: 4000 });
+  });
+
+  it('collects only the remaining QR balance and sends its exact amount for server validation', async () => {
+    const remote = qrOrder();
+    remote.paymentStatus = 'PARTIALLY_PAID';
+    remote.meta = { ...remote.meta, paymentAllocationSummary: { collectedPaise: 10000, outstandingPaise: 50690 } };
+    const pushed: any[] = [];
+    SyncOutboxEngine.configureTransport({
+      push: async (events: any[]) => { pushed.push(...events); return { results: events.map(e => ({ externalOrderId: e.externalOrderId, status: 'ok' })), serverTime: new Date().toISOString() }; },
+      pull: async () => ({ orders: [remote], serverTime: new Date().toISOString() })
+    } as never);
+    await SyncOutboxEngine.catchUpFromCloud();
+    expect(() => OrderRepository.settleOrder(remote.externalOrderId, 'CASH', 606.9, 'wrong-total', 'Cashier', [{ method: 'CASH', amount: 606.9 }])).toThrow();
+    const settled = OrderRepository.settleOrder(remote.externalOrderId, 'CASH', 510, 'correct-balance', 'Cashier', [{ method: 'CASH', amount: 506.9 }])!;
+    expect(settled.totalAmount).toBe(606.9);
+    expect(settled.changeAmount).toBe(3.1);
+    expect(settled.paymentSplits?.reduce((n, p) => n + p.amount, 0)).toBe(606.9);
+    await SyncOutboxEngine.processOutbox();
+    expect(pushed.find(e => e.externalOrderId === remote.externalOrderId).meta.counterSettlementAmountPaise).toBe(50690);
   });
 });

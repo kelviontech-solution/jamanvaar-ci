@@ -151,7 +151,11 @@ export class QrRateLimitInterceptor implements NestInterceptor {
     // Only a session this system issued counts; a made-up one is ignored, so it cannot be used to dodge or to spoil limits.
     req.qrSession = this.sessions.verify(req.headers['x-qr-session']);
     const started = Date.now();
-    const kind = req.method === 'POST' ? 'order' : /\/menu$/.test(req.url ?? '') ? 'menu' : 'other';
+    const path = (req.url ?? '').split('?')[0];
+    // Quotes, analytics and payment recovery are not new order submissions.
+    // Counting those against six orders/session blocked ordinary cart editing.
+    const isOrder = req.method === 'POST' && !!req.params?.token && /(?:\/orders\/?$|\/groups\/[^/]+\/submit\/?$)/.test(path);
+    const kind = isOrder ? 'order' : /\/menu$/.test(path) ? 'menu' : 'other';
     const res = context.switchToHttp().getResponse<{ statusCode?: number }>();
     const done = (status: number) => this.metrics.record(status, Date.now() - started, kind);
     return from(
@@ -160,7 +164,7 @@ export class QrRateLimitInterceptor implements NestInterceptor {
         token,
         publicOrderId: req.params?.publicOrderId,
         session: req.qrSession,
-        isOrder: req.method === 'POST'
+        isOrder
       })
     ).pipe(
       mergeMap(() =>

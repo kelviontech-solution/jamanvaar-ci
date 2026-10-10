@@ -24,6 +24,16 @@ const KIOSK_FORBIDDEN = new Set(['READY', 'SERVED', 'DELIVERED', 'COMPLETED', 'R
 
 export const statusRank = (s: string | null | undefined): number | undefined => (s ? RANK[s.toUpperCase()] : undefined);
 
+/** Explicit operator actions share one definition; sync still accepts the established offline aliases. */
+export function validateQrOrderAction(current: string, action: string, paid: boolean, reason?: string): string | null {
+  const allowed: Record<string, string[]> = { PREPARING: ['NEW', 'CONFIRMED', 'ACCEPTED'], READY: ['PREPARING', 'COOKING'], COMPLETED: ['READY', 'SERVED'], CANCELLED: ['NEW', 'CONFIRMED', 'PREPARING', 'READY'] };
+  if (!allowed[action]?.includes(current)) return 'This status change is no longer available';
+  if (action === 'CANCELLED' && (paid || !reason?.trim())) return 'Unpaid cancellations need a reason. Paid orders must use the refund workflow.';
+  if (action === 'COMPLETED' && !paid) return 'Collect the outstanding payment before completing the order';
+  const decision = decideStatus(current, action, 'POS_ADMIN');
+  return decision.apply ? null : decision.message;
+}
+
 export type StatusDecision =
   | { apply: true; status: string }
   | { apply: false; status: string; reason: 'STATUS_REGRESSION' | 'STATUS_TERMINAL' | 'STATUS_NOT_PERMITTED'; message: string };

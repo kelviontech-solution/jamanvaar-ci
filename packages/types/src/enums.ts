@@ -38,6 +38,8 @@ export type PaymentStatus =
   | 'PENDING'
   | 'WAITING_FOR_USER'
   | 'PROCESSING'
+  | 'PARTIALLY_PAID'
+  | 'PARTIALLY_REFUNDED'
   | 'SUCCESS'
   | 'FAILED'
   | 'CANCELLED'

@@ -187,6 +187,7 @@ model Restaurant {
   menuImages                MenuImage[]
   qrBranding                QrBranding?
   syncedEntities            SyncedEntity[]
+  orderPaymentEntries       OrderPaymentEntry[]
   aiAccess                  RestaurantAiAccess?
   aiUsage                   AiUsageDaily[]
 }
@@ -1514,8 +1515,10 @@ model SyncedOrder {
   menuVersion     Int?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+  paymentEntries  OrderPaymentEntry[]
 
   @@unique([restaurantId, externalOrderId])
+  @@unique([restaurantId, id])
   @@index([restaurantId, branchId, source, createdAt])
   @@index([restaurantId, source, createdAt])
   @@index([restaurantId, tableId, status])
@@ -1523,6 +1526,28 @@ model SyncedOrder {
   @@index([restaurantId, branchId, seq])
   @@index([deviceId])
   @@index([branchId])
+}
+
+/// Append-only confirmed collection/refund allocations. Gateway attempts remain PaymentTransaction records.
+/// Money is integer paise; every entry belongs to the same canonical operational order, tenant and branch.
+model OrderPaymentEntry {
+  id              String     @id @default(uuid())
+  restaurantId    String
+  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderId         String
+  order           SyncedOrder @relation(fields: [restaurantId, orderId], references: [restaurantId, id], onDelete: Cascade)
+  branchId        String?
+  kind            String     // COLLECTION | REFUND
+  amount          Int
+  currency        String     @default("INR")
+  method          String
+  reference       String     @unique // server-derived gateway/refund id, or tenant-scoped cash idempotency key
+  actorId         String?
+  evidence        Json?      // provenance only, never credentials or card details
+  createdAt       DateTime   @default(now())
+
+  @@index([restaurantId, branchId, createdAt])
+  @@index([restaurantId, orderId])
 }
 
 /// A QR code that customers scan (spec: QrCode). The token is minted by the server, unguessable, and tied to exactly
@@ -1570,8 +1595,12 @@ model QrSettings {
   autoAccept           Boolean    @default(false)
   requireCustomerName  Boolean    @default(false)
   requireCustomerPhone Boolean    @default(false)
+  rules                Json?
+  overrides            Json?
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
+
+  @@index([restaurantId, branchId], map: "QrSettings_restaurant_branch_idx")
 }
 
 /// Facts about guest behaviour (scan, menu view, cart, order started/placed/failed). Analytics are computed from
@@ -1817,6 +1846,7 @@ model QrBranding {
   orderButtonLabel String?
   accentColor      String?
   logoRef          String?
+  printDesign      Json?
   updatedAt        DateTime   @default(now()) @updatedAt
 }
 

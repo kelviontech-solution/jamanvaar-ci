@@ -23,7 +23,7 @@ const webhook=(pay:any,extra:any={},signature?:string)=>{
  const raw=JSON.stringify(payload);return http().post('/api/v1/payments/razorpay/webhook').set('content-type','application/json').set('x-razorpay-signature',signature??createHmac('sha256',secret).update(raw).digest('hex')).send(raw);
 };
 beforeAll(async()=>{
- Object.assign(process.env,{RAZORPAY_KEY_ID:'qa_key',RAZORPAY_KEY_SECRET:'qa_secret',RAZORPAY_WEBHOOK_SECRET:secret,QR_ORDER_BASE_URL:'http://localhost:5290'});
+ Object.assign(process.env,{QR_PAYMENT_CHECKOUT_MODE:'HOSTED',RAZORPAY_KEY_ID:'qa_key',RAZORPAY_KEY_SECRET:'qa_secret',RAZORPAY_WEBHOOK_SECRET:secret,QR_ORDER_BASE_URL:'http://localhost:5290'});
  app=await createTestApp();prisma=app.get(PrismaService);gateway=app.get(RazorpayGatewayService);
  vi.spyOn(gateway,'createPaymentLink').mockImplementation(async i=>({linkId:`plink_${i.referenceId}`,shortUrl:'https://rzp.io/i/qa-only',status:'created'}));
  vi.spyOn(gateway,'fetchPaymentLink').mockRejectedValue(Error('No external provider traffic in QA'));
@@ -41,7 +41,7 @@ beforeAll(async()=>{
  await prisma.runAsTenant(restaurantId,tx=>tx.restaurantPaymentConnection.create({data:{restaurantId,status:'ACTIVE'}}));
  expect((await auth('put','/api/v1/restaurant/qr/settings').send({allowOnlinePayment:true})).status).toBe(200);
 },120000);
-afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET'])delete process.env[k];});
+afterAll(async()=>{vi.restoreAllMocks();if(restaurantId)await prisma.runAsPlatform(tx=>tx.restaurant.deleteMany({where:{id:restaurantId}}));if(planId)await prisma.runAsPlatform(tx=>tx.plan.deleteMany({where:{id:planId}}));await prisma.platformUser.deleteMany({where:{email}});await app?.close();for(const k of ['RAZORPAY_KEY_ID','RAZORPAY_KEY_SECRET','RAZORPAY_WEBHOOK_SECRET','QR_PAYMENT_CHECKOUT_MODE'])delete process.env[k];});
 it('guest QR resolves without login, with gated online payment',async()=>{const r=await http().get(`/api/v1/public/qr/${qr}`);expect(r.status).toBe(200);expect(r.body.ordering.settings.allowOnlinePayment).toBe(true);});
 it('opening checkout returns its payment URL without another status request and keeps the order unpaid and DRAFT',async()=>{
  const before=vi.mocked(gateway.fetchPaymentLink).mock.calls.length;

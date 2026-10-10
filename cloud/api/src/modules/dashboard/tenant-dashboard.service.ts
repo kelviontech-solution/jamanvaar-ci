@@ -56,11 +56,14 @@ export class TenantDashboardService {
         JOIN "PaymentTransaction" p ON p.id=r."paymentId" JOIN "Order" po ON po.id=p."orderId"
         WHERE r."restaurantId"=${user.restaurantId} AND po."restaurantId"=${user.restaurantId} AND r.status='SUCCESS'
         GROUP BY po."externalOrderId"
+      ), allocation_totals AS (
+        SELECT "orderId", SUM(amount) FILTER (WHERE kind='COLLECTION')::bigint AS collected, COALESCE(SUM(amount) FILTER (WHERE kind='REFUND'),0)::bigint AS refunded
+        FROM "OrderPaymentEntry" WHERE "restaurantId"=${user.restaurantId} GROUP BY "orderId"
       ), original AS (
         SELECT o."branchId",o.source,o.status,o."paymentStatus",o."totalAmount",o.items,o.meta,o."createdAt",o."externalOrderId",o."tableLabel", ${local} AS local_time,
-          CASE WHEN o."paymentStatus" IN ('SUCCESS','PAID','PARTIALLY_REFUNDED','REFUND_PENDING','REFUNDED') AND o.status NOT IN ('CANCELLED','VOID','VOIDED') THEN o."totalAmount" ELSE 0 END::bigint AS gross,
-          COALESCE(refund_totals.amount,0)::bigint AS gateway_refund
-        FROM "SyncedOrder" o LEFT JOIN refund_totals ON refund_totals."externalOrderId"=o."externalOrderId" WHERE ${scope} AND ${range}
+          COALESCE(allocation_totals.collected, CASE WHEN o."paymentStatus" IN ('SUCCESS','PAID','PARTIALLY_REFUNDED','REFUND_PENDING','REFUNDED') AND o.status NOT IN ('CANCELLED','VOID','VOIDED') THEN o."totalAmount" ELSE 0 END)::bigint AS gross,
+          GREATEST(COALESCE(refund_totals.amount,0),COALESCE(allocation_totals.refunded,0))::bigint AS gateway_refund
+        FROM "SyncedOrder" o LEFT JOIN allocation_totals ON allocation_totals."orderId"=o.id LEFT JOIN refund_totals ON refund_totals."externalOrderId"=o."externalOrderId" WHERE ${scope} AND ${range}
       ), rows AS (SELECT *, LEAST(gross, CASE WHEN status='REFUNDED' OR "paymentStatus"='REFUNDED' THEN
           CASE WHEN jsonb_typeof(meta->'refundAmountPaise')='number' THEN GREATEST(gateway_refund,(meta->>'refundAmountPaise')::bigint) ELSE gross END
           ELSE gateway_refund END) AS refunded FROM original),
@@ -69,7 +72,7 @@ export class TenantDashboardService {
       // this CTE in six round trips multiplied scans and refund reconciliation.
       const financialQuery = Prisma.sql`${base}
         SELECT 'totals' AS kind, COALESCE(jsonb_agg(q),'[]'::jsonb) AS data FROM (
-          SELECT COUNT(*) FILTER(WHERE status NOT IN ('DRAFT','CANCELLED','VOID','VOIDED'))::int AS orders, COUNT(*) FILTER(WHERE gross>0)::int AS paid, COALESCE(SUM(gross),0)::float8 AS gross, COALESCE(SUM(refunded),0)::float8 AS refunds, COALESCE(SUM(net),0)::float8 AS sales, COUNT(*) FILTER(WHERE COALESCE("paymentStatus",'PENDING') NOT IN ('SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING') AND status NOT IN ('CANCELLED','VOID','VOIDED','REFUNDED'))::int AS pending, COALESCE(SUM("totalAmount") FILTER(WHERE COALESCE("paymentStatus",'PENDING') NOT IN ('SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING') AND status NOT IN ('CANCELLED','VOID','VOIDED','REFUNDED')),0)::float8 AS pending_amount FROM sales
+          SELECT COUNT(*) FILTER(WHERE status NOT IN ('DRAFT','CANCELLED','VOID','VOIDED'))::int AS orders, COUNT(*) FILTER(WHERE gross>0)::int AS paid, COALESCE(SUM(gross),0)::float8 AS gross, COALESCE(SUM(refunded),0)::float8 AS refunds, COALESCE(SUM(net),0)::float8 AS sales, COUNT(*) FILTER(WHERE COALESCE("paymentStatus",'PENDING') NOT IN ('SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING') AND status NOT IN ('CANCELLED','VOID','VOIDED','REFUNDED'))::int AS pending, COALESCE(SUM(GREATEST(0,"totalAmount"-gross)) FILTER(WHERE COALESCE("paymentStatus",'PENDING') NOT IN ('SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING') AND status NOT IN ('CANCELLED','VOID','VOIDED','REFUNDED')),0)::float8 AS pending_amount FROM sales
         ) q
         UNION ALL SELECT 'trend', COALESCE(jsonb_agg(q),'[]'::jsonb) FROM (
           SELECT to_char(local_time, ${dates.from === dates.to ? 'HH24:00' : 'YYYY-MM-DD'}) AS bucket, COALESCE(SUM(net),0)::float8 AS sales, COUNT(*) FILTER(WHERE gross>0)::int AS orders FROM sales GROUP BY 1 ORDER BY 1

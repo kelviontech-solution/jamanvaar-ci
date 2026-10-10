@@ -6,7 +6,7 @@ const dir = path.join(root, '.jamanvaar/browser-audit');
 const state = JSON.parse(fs.readFileSync(path.join(dir, 'private-state.json')));
 const qrPayments = process.env.JAMANVAAR_QA_QR_PAYMENTS === '1';
 const qrOrigin = process.env.JAMANVAAR_QA_QR_ORIGIN || 'http://localhost:5190';
-if (qrPayments) state.simulatedGateway = true;
+if (qrPayments) { state.simulatedGateway = true; process.env.QR_PAYMENT_CHECKOUT_MODE = process.env.JAMANVAAR_QA_QR_STANDARD === '1' ? 'STANDARD' : 'HOSTED'; }
 // Prisma eagerly reads .env at import time. Load it BEFORE sanitizing environment values.
 require('@prisma/client');
 Object.assign(process.env, { NODE_ENV: 'test', DATABASE_URL: state.databaseUrl, JWT_ACCESS_SECRET: state.jwtSecret, PAYMENT_CREDENTIAL_ENCRYPTION_KEY: state.encryptionKey, PORT: String(state.port), SMTP_HOST: '', BACKUP_SCHEDULE: 'off', BACKUP_LOCAL_DIR: path.join(dir, 'backups'), QR_ORDER_BASE_URL: qrOrigin });
@@ -46,6 +46,11 @@ async function main() {
     fs.writeFileSync(path.join(dir, 'private-mail.json'), JSON.stringify(emails));
     return true;
   };
+  if (process.env.JAMANVAAR_QA_QR_ADVANCED==='1') {
+    const {NotificationGatewayService}=require(path.join(root,'cloud/api/dist/src/modules/notifications/notification-gateway.service'));
+    const notify=app.get(NotificationGatewayService);notify.isQrLoyaltyOtpConfigured=()=>true;
+    notify.sendQrLoyaltyOtp=async(phone,otp)=>{fs.writeFileSync(path.join(dir,'private-qr-loyalty-otp.json'),JSON.stringify({phone,otp}));return {success:true,providerMessageId:'qa-local-capture'};};
+  }
   if (state.simulatedGateway) {
     const { RazorpayGatewayService } = require(path.join(root, 'cloud/api/dist/src/modules/payments/razorpay-gateway.service'));
     const gateway = app.get(RazorpayGatewayService);
@@ -53,6 +58,22 @@ async function main() {
     gateway.listQrPayments = async () => [];
     gateway.createRefund = async input => ({ refundId: `qa_refund_${input.receipt}`, status: 'processed', amountPaise: input.amountPaise });
     if (qrPayments) {
+      const checkoutOrders = new Map();
+      gateway.createCheckoutOrder = async input => {
+        const order = { id: `order_${input.reference.replace(/[^a-z0-9]/gi, '')}`, receipt: input.reference, amount: input.amount, currency: input.currency };
+        checkoutOrders.set(order.id, order);
+        fs.writeFileSync(path.join(dir, 'private-qr-standard-orders.json'), JSON.stringify([...checkoutOrders.values()]));
+        return order;
+      };
+      gateway.findCheckoutOrder = async reference => {
+        const order = [...checkoutOrders.values()].find(o => o.receipt === reference);
+        if (!order) throw Error('QA checkout outcome unknown');
+        return order;
+      };
+      gateway.fetchCheckoutPayments = async id => {
+        const file = path.join(dir, 'private-qr-standard-payments.json');
+        return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)).filter(p => p.order_id === id) : [];
+      };
       const links = new Map();
       gateway.createPaymentLink = async input => {
         const link = { id: `plink_${input.referenceId}`, reference_id: input.referenceId, amount: input.amountPaise, amount_paid: 0, currency: input.currency || 'INR', status: 'created', short_url: `https://rzp.io/i/${input.referenceId}`, callbackUrl: input.callbackUrl, payments: [] };

@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-10",
+  "environment": "local isolated QA database; real auth and tenant RLS; simulated provider and OTP transport",
+  "api": {
+    "passed": 276,
+    "failed": 0,
+    "suites": 15,
+    "log": "logs/qr-advanced-api-regression.log"
+  },
+  "client": {
+    "passed": 82,
+    "failed": 0,
+    "suites": 10,
+    "log": "logs/qr-advanced-client-tests.log"
+  },
+  "browser": {
+    "passed": 13,
+    "failed": 0,
+    "pageErrors": [],
+    "evidence": "BROWSER_RESULTS.json"
+  },
+  "builds": {
+    "cloud-api": "PASS",
+    "pos-admin": "PASS",
+    "qr-guest": "PASS",
+    "pos": "PASS",
+    "captain": "PASS",
+    "kds": "PASS"
+  },
+  "load": {
+    "sameTableOrders": 100,
+    "sameTableElapsedMs": 2155,
+    "menuReaders": 500,
+    "menuElapsedMs": 1875,
+    "harnessOrders": 120,
+    "harnessOrdersPerSecond": 64.7,
+    "orderP95Ms": 428,
+    "menuP95Ms": 167,
+    "productionGuarantee": false
+  },
+  "visualInspection": [
+    "qr-advanced-mobile-menu.png",
+    "qr-shared-confirmation.png",
+    "qr-text-only-mobile.png",
+    "qr-verified-feedback.png"
+  ],
+  "diffCheck": "PASS",
+  "productionDeployed": false,
+  "pushedDuringTask": false,
+  "externalAcceptanceRemaining": [
+    "Deploy additive migrations and rebuilt apps with production API origin",
+    "Verify merchant Razorpay checkout/capture/refund using real configured integration",
+    "Configure approved MSG91 loyalty OTP flow and verify SMS delivery",
+    "Enable licensed optional capabilities and desired branch settings"
+  ],
+  "supportedBoundary": "Online group checkout is one host full-bill payment. Online partial obligations are unavailable; individual checkout and authorized partial cash collection remain available."
+}

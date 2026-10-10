@@ -61,6 +61,23 @@ export interface PricedCart {
   totalAmount: number;
 }
 
+/** Shared integer-paise discount allocation: proportional eligible lines, then tax on the discounted amount. */
+export function discountPricedCart(cart: PricedCart, discountPaise: number, eligibleIds?: Set<string>): PricedCart & { discountAmount: number } {
+  if (!Number.isSafeInteger(discountPaise) || discountPaise < 0) throw new PriceValidationError('Invalid discount amount');
+  const eligible = cart.lines.map((line,index) => ({line,index})).filter(({line}) => !eligibleIds || eligibleIds.has(line.externalItemId));
+  const gross = (line:PricedLine) => line.unitPrice * line.quantity;
+  const eligibleGross = eligible.reduce((n,{line}) => n+gross(line),0);
+  const discountAmount = Math.min(discountPaise,eligibleGross);
+  const allocations = new Map<number,number>();let allocated=0;
+  eligible.forEach(({line,index},position)=>{const discount=position===eligible.length-1?discountAmount-allocated:Math.min(gross(line),discountAmount-allocated,Math.round(discountAmount*gross(line)/Math.max(1,eligibleGross)));allocations.set(index,discount);allocated+=discount;});
+  const lines=cart.lines.map((line,index)=>{const discount=allocations.get(index)??0,listed=gross(line),net=listed-discount;
+    const lineTax=Math.round(net*line.taxRate/(line.taxInclusive?10000+line.taxRate:10000));
+    const lineSubtotal=listed-(line.taxInclusive?lineTax:0);
+    return {...line,lineSubtotal,lineTax,lineTotal:lineSubtotal-discount+lineTax,discountAmount:discount};
+  });
+  return {lines,subtotal:lines.reduce((n,l)=>n+l.lineSubtotal,0),taxAmount:lines.reduce((n,l)=>n+l.lineTax,0),totalAmount:lines.reduce((n,l)=>n+l.lineTotal,0),discountAmount};
+}
+
 export class PriceValidationError extends Error {}
 
 /**

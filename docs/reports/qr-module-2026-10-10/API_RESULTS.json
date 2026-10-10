@@ -1,0 +1,58 @@
+{
+  "success": true,
+  "tests": 178,
+  "passed": 178,
+  "failed": 0,
+  "suites": [
+    {
+      "file": "branch-roster.e2e.spec.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "menu-versioning.e2e.spec.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "multi-branch-dashboard.e2e.spec.ts",
+      "status": "passed",
+      "tests": 34
+    },
+    {
+      "file": "payments-webhook.e2e.spec.ts",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "file": "qr-live-availability.e2e.spec.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "qr-menu-control.e2e.spec.ts",
+      "status": "passed",
+      "tests": 18
+    },
+    {
+      "file": "qr-mobile-payments.e2e.spec.ts",
+      "status": "passed",
+      "tests": 22
+    },
+    {
+      "file": "qr-module.e2e.spec.ts",
+      "status": "passed",
+      "tests": 22
+    },
+    {
+      "file": "qr-ordering-saas.e2e.spec.ts",
+      "status": "passed",
+      "tests": 52
+    },
+    {
+      "file": "qr-rules.spec.ts",
+      "status": "passed",
+      "tests": 5
+    }
+  ]
+}

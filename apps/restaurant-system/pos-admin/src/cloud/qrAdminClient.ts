@@ -58,6 +58,12 @@ export interface QrOverview {
 }
 
 export interface QrOrderRow {
+  id: string;
+  version: number;
+  items: Array<{ name: string; quantity: number; lineTotal: number; modifiers?: string[]; specialInstructions?: string }>;
+  notes?: string;
+  history: Array<{action:string;at:string;reason?:string}>;
+  customerName?: string;
   orderNumber: string | null;
   table: string | null;
   branchId: string | null;
@@ -81,9 +87,15 @@ export interface QrSettings {
   autoAccept: boolean;
   requireCustomerName: boolean;
   requireCustomerPhone: boolean;
+  rules?: QrRules;
 }
+export interface QrRules { hours: Array<{day:number;open:string;close:string}>; pausedUntil:string|null; minimumOrderPaise:number; preparationMinutes:number; maxPendingOrders:number; maxOrdersPerWindow:number; windowMinutes:number; customerInstructions:string; paymentInstructions:string; orderingModes:Array<'DINE_IN'|'TAKEAWAY'> }
+export interface QrAnalytics { byCode:Array<{codeId:string;table:string;branchId:string|null;version:number;status:string;scans:number;orders:number;sales:number}>; metrics: Record<string,number>; byBranch:Array<{branchId:string;orders:number;sales:number}>; trend:Array<{date:string;orders:number;sales:number}>; popular:Array<{name:string;quantity:number}>; payments:Array<{status:string;amount:number;createdAt:string;failureReason?:string;providerPaymentId?:string}> }
+export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
 
 export interface QrPrintData {
+  logoUrl?: string | null;
+  design?: QrPrintDesign;
   restaurantName: string;
   branchName: string | null;
   tableLabel: string;
@@ -92,6 +104,7 @@ export interface QrPrintData {
 }
 
 const base = '/api/v1/restaurant/qr';
+const branchQuery = (branch?:string) => branch ? `?branchId=${encodeURIComponent(branch)}` : '';
 export interface QrBrandingView { welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
 
 const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) });
@@ -102,9 +115,17 @@ export const QrAdminApi = {
   branches: () => qrApi<QrBranch[]>(`${base}/branches`),
   tables: () => qrApi<QrTableRow[]>(`${base}/tables`),
   orders: (branchId?: string) => qrApi<QrOrderRow[]>(`${base}/orders${branchId ? `?branchId=${encodeURIComponent(branchId)}` : ''}`),
-  settings: () => qrApi<QrSettings>(`${base}/settings`),
-  paymentReadiness: () => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string }>(`${base}/settings/payment-readiness`),
-  saveSettings: (changes: Partial<QrSettings>) => qrApi<QrSettings>(`${base}/settings`, { method: 'PUT', body: JSON.stringify(changes) }),
+  settings: (branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`),
+  paymentReadiness: (branch?:string) => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string; provider?:string; mode?:string; checkout?:string }>(`${base}/settings/payment-readiness${branchQuery(branch)}`),
+  saveSettings: (changes: Partial<QrSettings>,branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`, { method: 'PUT', body: JSON.stringify(changes) }),
+  inheritSettings: (branch:string) => qrApi<QrSettings>(`${base}/settings/inherit${branchQuery(branch)}`,json({})),
+  orderAction: (id:string,action:string,version:number,reason?:string) => qrApi(`${base}/orders/${encodeURIComponent(id)}/action`,json({action,version,...(reason?{reason}:{})})),
+  analytics: (from:string,to:string,branch?:string) => qrApi<QrAnalytics>(`${base}/analytics?from=${from}&to=${to}${branch?`&branchId=${encodeURIComponent(branch)}`:''}`),
+  printDesign: () => qrApi<QrPrintDesign>(`${base}/print-design`),
+  savePrintDesign: (design:QrPrintDesign) => qrApi<QrPrintDesign>(`${base}/print-design`,{method:'PUT',body:JSON.stringify(design)}),
+  menuPreview: (branch?:string) => qrApi<{categories:Array<{id:string;name:string}>;items:Array<{id:string;name:string;price:number}>;hidden:Array<{itemId:string;name:string;reason:string}>}>(`/api/v1/menu/preview${branchQuery(branch)}`),
+  publishMenu: () => qrApi('/api/v1/menu/publish',json({note:'Published from QR Admin'})),
+  branchAvailability: (branchId:string,itemId:string,isAvailable:boolean) => qrApi('/api/v1/menu/branch-overrides',{method:'PUT',body:JSON.stringify({branchId,itemId,isAvailable})}),
   branding: () => qrApi<QrBrandingView>(`${base}/branding`),
   updateBranding: (body: Partial<Record<'welcomeTitle' | 'welcomeMessage' | 'footerMessage' | 'orderButtonLabel' | 'accentColor', string>> & { logo?: string | null }) => qrApi<QrBrandingView>(`${base}/branding`, { method: 'PUT', body: JSON.stringify(body) }),
   createTable: (body: { tableNumber: string; capacity: number; branchId?: string; zone?: string }) => qrApi<{ id: string }>(`${base}/tables`, json(body)),

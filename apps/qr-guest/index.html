@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta name="referrer" content="no-referrer" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0b253a" />
@@ -11,12 +12,12 @@
     <div id="root"><p style="padding:24px;font-family:system-ui">Loading your restaurant menu…</p></div>
     <script>
       window.addEventListener('error', function (event) {
-        if (event.target && event.target.tagName === 'SCRIPT') {
+        if (event.target && event.target.tagName === 'SCRIPT' && event.target.id === 'qr-app-entry') {
           var root = document.getElementById('root');
           if (root) root.innerHTML = '<main style="padding:24px;font-family:system-ui"><h1>Ordering could not load</h1><p>Please check your connection and try again, or ask a team member.</p><button onclick="location.reload()" style="padding:14px">Try again</button></main>';
         }
       }, true);
     </script>
-    <script type="module" src="/src/main.tsx"></script>
+    <script id="qr-app-entry" type="module" src="/src/main.tsx"></script>
   </body>
 </html>

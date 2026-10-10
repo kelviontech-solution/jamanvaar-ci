@@ -921,11 +921,12 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
 async function adminScopeHeaders(path:string):Promise<Record<string,string>> {
   const branch=activeAdminBranch;
   const restaurantPayout=/^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(path);
-  if(!restaurantPayout&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
+  const restaurantQrScope=branch==='all'&&/^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(path);
+  if(!restaurantPayout&&!restaurantQrScope&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
   let expired=true;
   try { expired=!accessToken||JSON.parse(atob(accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000<Date.now()+30000; } catch { /* refresh malformed/absent token */ }
   if(expired&&(await refreshAccessToken())!=='ok')throw new CloudApiError('Sign in to manage this branch',401);
-  return {...(branch&&branch!=='all'?{'x-admin-branch':branch}:{}),'x-owner-authorization':accessToken!};
+  return {...(branch&&(branch!=='all'||restaurantQrScope)?{'x-admin-branch':branch}:{}),'x-owner-authorization':accessToken!};
 }
 async function deviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getStoredDeviceToken();

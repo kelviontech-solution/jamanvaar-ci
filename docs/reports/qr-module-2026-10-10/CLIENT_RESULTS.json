@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "tests": 19,
+  "passed": 19,
+  "failed": 0,
+  "suites": [
+    {
+      "file": "qr_checkout_sdk.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "qr_code_generation.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "qr_design_studio.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "qr_guest_cart.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "qr_order_propagation.test.ts",
+      "status": "passed",
+      "tests": 2
+    }
+  ]
+}

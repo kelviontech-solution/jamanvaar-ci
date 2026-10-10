@@ -81,8 +81,8 @@ describe('Refund creation', () => {
   });
 
   const seedPaidOrder = async (amount: number) => {
-    const order = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({ data: { restaurantId, externalOrderId: `refund-test-${Date.now()}-${Math.random()}`, items: [], subtotal: amount, taxAmount: 0, totalAmount: amount, status: 'PAID' } })
+    const order = await prisma.runAsTenant(restaurantId, async (tx) =>
+      tx.order.create({ data: { restaurantId, branchId: (await tx.device.findFirstOrThrow({where:{restaurantId,type:"POS"}})).branchId, externalOrderId: `refund-test-${Date.now()}-${Math.random()}`, items: [], subtotal: amount, taxAmount: 0, totalAmount: amount, status: 'PAID' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, orderId: order.id, restaurantId, providerOrderId: `pay_${Date.now()}_${Math.random()}`, amount, currency: 'INR', status: 'SUCCESS' } })
@@ -131,8 +131,8 @@ describe('Refund creation', () => {
   });
 
   it('rejects a refund on a payment that was never SUCCESS', async () => {
-    const order = await prisma.runAsTenant(restaurantId, (tx) =>
-      tx.order.create({ data: { restaurantId, externalOrderId: `refund-unpaid-${Date.now()}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PENDING_PAYMENT' } })
+    const order = await prisma.runAsTenant(restaurantId, async (tx) =>
+      tx.order.create({ data: { restaurantId, branchId: (await tx.device.findFirstOrThrow({where:{restaurantId,type:"POS"}})).branchId, externalOrderId: `refund-unpaid-${Date.now()}`, items: [], subtotal: 5000, taxAmount: 0, totalAmount: 5000, status: 'PENDING_PAYMENT' } })
     );
     const payment = await prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.create({ data: { provider: 'RAZORPAY', providerPaymentId: `pay_rzp_${Date.now()}_${Math.random()}`, orderId: order.id, restaurantId, providerOrderId: `pay_unpaid_${Date.now()}`, amount: 5000, currency: 'INR', status: 'PENDING' } })

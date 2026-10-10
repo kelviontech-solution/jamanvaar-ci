@@ -1105,7 +1105,7 @@ export default function PosAdminApp() {
       <div className="h-screen w-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans select-none antialiased overflow-hidden">
         {/* Toast Notification Banner */}
         {toastMessage && (
-          <div className="fixed top-4 right-4 z-50 bg-jaman-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-white/20 animate-in fade-in slide-in-from-top-2">
+          <div role="status" aria-live="polite" className="fixed top-4 right-4 z-50 bg-jaman-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-white/20 animate-in fade-in slide-in-from-top-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="text-xs font-bold">{toastMessage}</span>
           </div>
@@ -1262,7 +1262,7 @@ export default function PosAdminApp() {
           </aside>
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
-          {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.</p></div></main> :
+          {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.</p></div></main> :
           <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} />{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}

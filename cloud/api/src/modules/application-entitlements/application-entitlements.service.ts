@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
 import { getDependentsOf } from './feature-catalog';
+import { QR_CAPABILITIES, QrCapability } from './qr-capabilities';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -64,6 +65,30 @@ export class ApplicationEntitlementsService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService
   ) {}
+
+  async resolveQrCapability(tx: TxClient, restaurantId: string, code: QrCapability) {
+    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING');
+    const feature = await tx.feature.findUnique({ where: { code }, select: { isActive: true, legacyEntitlementKey: true } });
+    const key = feature?.legacyEntitlementKey ?? QR_CAPABILITIES[code];
+    const enabled = base.enabled && feature?.isActive === true && base.limits[key] === true;
+    return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
+  }
+
+  async resolveQrCapabilities(tx: TxClient, restaurantId: string) {
+    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING');
+    const features = await tx.feature.findMany({ where: { code: { in: Object.keys(QR_CAPABILITIES) } } });
+    return { module: base, capabilities: Object.entries(QR_CAPABILITIES).map(([code, key]) => {
+      const feature = features.find(f => f.code === code);
+      const enabled = base.enabled && feature?.isActive === true && base.limits[feature.legacyEntitlementKey ?? key] === true;
+      return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED' };
+    }) };
+  }
+
+  async assertQrCapability(tx: TxClient, restaurantId: string, code: QrCapability) {
+    const capability = await this.resolveQrCapability(tx, restaurantId, code);
+    if (!capability.enabled) throw new ForbiddenException({ code: 'QR_FEATURE_NOT_LICENSED', feature: code, message: 'This optional QR feature is not included in the current license. Contact your platform administrator.' });
+    return capability;
+  }
 
   /**
    * Creates (or resyncs) one row per AppCode for a subscription — always all

@@ -5,6 +5,7 @@ import { parseInlineImage, publicImageUrl } from '../menu-publications/menu-snap
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { QR_AUDIT } from './qr.support';
+import { DEFAULT_QR_RULES, qrRulesSchema, type QrRules } from './qr-rules';
 
 export const qrSettingsSchema = z
   .object({
@@ -18,7 +19,8 @@ export const qrSettingsSchema = z
     showOrderStatus: z.boolean(),
     autoAccept: z.boolean(),
     requireCustomerName: z.boolean(),
-    requireCustomerPhone: z.boolean()
+    requireCustomerPhone: z.boolean(),
+    rules: qrRulesSchema
   })
   .partial()
   .strict();
@@ -37,6 +39,7 @@ export const qrBrandingSchema = z
   .partial()
   .strict();
 export type QrBrandingUpdate = z.infer<typeof qrBrandingSchema>;
+export const qrPrintDesignSchema = z.object({ template: z.enum(['minimal', 'premium', 'colorful', 'cafe', 'fine-dining', 'family', 'casual', 'takeaway', 'table']), accent: z.string().regex(/^#[0-9a-fA-F]{6}$/), instruction: z.string().trim().min(1).max(70), footer: z.string().trim().max(100), showLogo: z.boolean(), layout: z.enum(['CARD', 'TENT', 'LABEL']) }).strict();
 
 export interface QrSettingsView {
   orderingEnabled: boolean;
@@ -50,9 +53,10 @@ export interface QrSettingsView {
   autoAccept: boolean;
   requireCustomerName: boolean;
   requireCustomerPhone: boolean;
+  rules?: QrRules;
 }
 
-const FIELDS: Array<keyof QrSettingsView> = ['orderingEnabled', 'tableOrderingEnabled', 'menuOnlyEnabled', 'allowCustomerNotes', 'allowModifiers', 'allowCash', 'allowOnlinePayment', 'showOrderStatus', 'autoAccept', 'requireCustomerName', 'requireCustomerPhone'];
+const FIELDS: Array<Exclude<keyof QrSettingsView, 'rules'>> = ['orderingEnabled', 'tableOrderingEnabled', 'menuOnlyEnabled', 'allowCustomerNotes', 'allowModifiers', 'allowCash', 'allowOnlinePayment', 'showOrderStatus', 'autoAccept', 'requireCustomerName', 'requireCustomerPhone'];
 
 /** New restaurants offer online checkout when gateway readiness permits it; explicit opt-outs remain authoritative. */
 export const DEFAULT_QR_SETTINGS: QrSettingsView = {
@@ -84,10 +88,12 @@ export class QrSettingsService {
     );
     const base = rows.find((r) => r.branchId === null);
     const branch = branchId ? rows.find((r) => r.branchId === branchId) : undefined;
-    const merged: QrSettingsView = { ...DEFAULT_QR_SETTINGS };
+    const merged: QrSettingsView = { ...DEFAULT_QR_SETTINGS, rules: { ...DEFAULT_QR_RULES } };
     for (const row of [base, branch]) {
       if (!row) continue;
-      for (const f of FIELDS) merged[f] = row[f] as boolean;
+      const overrides = row.overrides as string[] | null;
+      for (const f of FIELDS) if (!row.branchId || !overrides || overrides.includes(f)) merged[f] = row[f] as boolean;
+      merged.rules = { ...merged.rules!, ...(row.rules as Partial<QrRules> ?? {}) };
     }
     return merged;
   }
@@ -100,13 +106,21 @@ export class QrSettingsService {
     if (Object.keys(changes).length === 0) throw new BadRequestException('No settings supplied');
     const before = await this.effective(restaurantId, branchId);
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-settings:' + restaurantId}))`;
       if (branchId) {
         const branch = await tx.branch.findFirst({ where: { id: branchId, restaurantId } });
         if (!branch) throw new BadRequestException('Unknown branch');
       }
       const existing = await tx.qrSettings.findFirst({ where: { restaurantId, branchId } });
-      if (existing) await tx.qrSettings.update({ where: { id: existing.id }, data: changes });
-      else await tx.qrSettings.create({ data: { restaurantId, branchId, ...before, ...changes } });
+      const { rules, ...flags } = changes;
+      const keys = existing?.overrides as string[] | null;
+      const overrides = branchId ? [...new Set([...(existing && !keys ? FIELDS : keys ?? []), ...Object.keys(flags)])] : [];
+      const data = { ...flags, overrides, ...(rules ? { rules: { ...(existing?.rules as object ?? {}), ...rules } } : {}) };
+      if (existing) await tx.qrSettings.update({ where: { id: existing.id }, data });
+      else {
+        const { rules: _rules, ...baseFlags } = before;
+        await tx.qrSettings.create({ data: { restaurantId, branchId, ...baseFlags, ...data } });
+      }
       await this.audit.log(
         { actorType: 'TENANT', actorId: actor.id, restaurantId, action: QR_AUDIT.SETTINGS_CHANGED, category: 'QR_ORDERING', details: { branchId, changes, actorKind: actor.type } },
         tx
@@ -114,6 +128,30 @@ export class QrSettingsService {
     });
     this.bus.publishInvalidation(restaurantId);
     return { ...before, ...(await this.effective(restaurantId, branchId)) };
+  }
+
+  async inherit(restaurantId: string, actorId: string, branchId: string) {
+    await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-settings:' + restaurantId}))`;
+      if (!await tx.branch.findFirst({ where: { id: branchId, restaurantId } })) throw new BadRequestException('Unknown branch');
+      await tx.qrSettings.deleteMany({ where: { restaurantId, branchId } });
+      await this.audit.log({ actorType: 'TENANT', actorId, restaurantId, action: QR_AUDIT.SETTINGS_CHANGED, category: 'QR_ORDERING', details: { branchId, inherit: true } }, tx);
+    });
+    this.bus.publishInvalidation(restaurantId);
+    return this.effective(restaurantId, branchId);
+  }
+
+  async printDesign(restaurantId: string) {
+    const row = await this.prisma.runAsTenant(restaurantId, tx => tx.qrBranding.findUnique({ where: { restaurantId } }));
+    return row?.printDesign ?? { template: 'premium', accent: '#0B253A', instruction: 'Scan to Order', footer: 'Freshly prepared. Thoughtfully served.', showLogo: true, layout: 'CARD' };
+  }
+
+  async savePrintDesign(restaurantId: string, actorId: string, body: z.infer<typeof qrPrintDesignSchema>) {
+    await this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.qrBranding.upsert({ where: { restaurantId }, create: { restaurantId, printDesign: body }, update: { printDesign: body } });
+      await this.audit.log({ actorType: 'TENANT', actorId, restaurantId, action: 'QR_PRINT_DESIGN_CHANGED', category: 'QR_ORDERING', details: { template: body.template, layout: body.layout } }, tx);
+    });
+    return body;
   }
 
   // ---------------------------------------------------------------- branding (the restaurant's own words, colour and logo)

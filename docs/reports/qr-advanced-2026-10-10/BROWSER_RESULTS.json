@@ -1,0 +1,121 @@
+{
+  "environment": "compiled apps, isolated API/database",
+  "provider": "simulated SDK and provider; no real funds",
+  "results": [
+    {
+      "name": "QR-only Restaurant Admin has all nine console sections and a working live design preview/export",
+      "status": "PASS",
+      "evidence": {
+        "sections": 9,
+        "svgExport": true
+      }
+    },
+    {
+      "name": "Rules and payment controls save, reach the actual guest API and hide disabled cash",
+      "status": "PASS",
+      "evidence": {
+        "cashHiddenByAdmin": true,
+        "preparationMinutes": 25
+      }
+    },
+    {
+      "name": "Mobile guests can customize, edit choices, keep carts across refresh and retry the same payment after dismissal",
+      "status": "PASS",
+      "evidence": {
+        "sameOrder": true,
+        "sameProviderOrder": true,
+        "serverVerified": true,
+        "modifierEdited": true
+      }
+    },
+    {
+      "name": "A second phone scanning the same table has an independent empty cart",
+      "status": "PASS",
+      "evidence": {
+        "independentCart": true,
+        "tabletFits": true
+      }
+    },
+    {
+      "name": "QR Admin accepts, marks ready and completes the paid order without a POS; the mobile tracker follows",
+      "status": "PASS",
+      "evidence": {
+        "status": "COMPLETED",
+        "posRequired": false
+      }
+    },
+    {
+      "name": "Cash checkout stays unpaid until authorized collection, then completes in QR Admin",
+      "status": "PASS",
+      "evidence": {
+        "cashCollected": true,
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "name": "Bulk generation creates mapped codes, and QR Admin fits a narrow mobile screen",
+      "status": "PASS",
+      "evidence": {
+        "bulkMapped": true,
+        "mobileFits": true
+      }
+    },
+    {
+      "name": "Advanced QR Admin saves reviewed translations; customer language changes preserve the cart",
+      "status": "PASS",
+      "evidence": {
+        "translationSaved": true,
+        "canonicalPrice": 250,
+        "cartPreserved": true
+      }
+    },
+    {
+      "name": "Two real phones join by invitation and the host submits one authoritative consolidated bill",
+      "status": "PASS",
+      "evidence": {
+        "independentPhones": true,
+        "total": 500,
+        "canonicalOrders": 1
+      }
+    },
+    {
+      "name": "The real collection screen records partial cash, preserves the balance, and completed KDS-equivalent status enables feedback",
+      "status": "PASS",
+      "evidence": {
+        "partial": 100,
+        "remaining": 400,
+        "final": "COMPLETED",
+        "verifiedFeedback": true
+      }
+    },
+    {
+      "name": "Customer verifies OTP, explicitly redeems 150 of 200 points, and settlement awards points once",
+      "status": "PASS",
+      "evidence": {
+        "openingPoints": 200,
+        "redeemed": 150,
+        "earned": 15,
+        "closingPoints": 65
+      }
+    },
+    {
+      "name": "Promotion editing and mobile coupon checkout use the same real discount records",
+      "status": "PASS",
+      "evidence": {
+        "total": 225,
+        "discount": 25,
+        "uses": 1
+      }
+    },
+    {
+      "name": "Guest history recovers only browser-owned orders; text-only mode avoids food-image loading on a narrow phone",
+      "status": "PASS",
+      "evidence": {
+        "browserScopedHistory": true,
+        "textOnly": true,
+        "mobileFits": true
+      }
+    }
+  ],
+  "pageErrors": []
+}

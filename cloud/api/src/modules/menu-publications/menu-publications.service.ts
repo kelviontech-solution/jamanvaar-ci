@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { buildContent, explainHidden, extractImages, publicImageUrl, SnapshotContent, viewForBranch } from './menu-snapshot';
 
 export const publishMenuSchema = z.object({ note: z.string().trim().max(200).optional() });
@@ -15,7 +16,8 @@ export const branchOverrideSchema = z
     branchId: z.string().uuid(),
     itemId: z.string().min(1).max(128),
     price: z.number().min(0).max(100000).nullable().optional(),
-    isAvailable: z.boolean().nullable().optional()
+    isAvailable: z.boolean().nullable().optional(),
+    stockQuantity: z.number().int().min(0).max(1000000).nullable().optional()
   })
   .strict();
 export type BranchOverrideDto = z.infer<typeof branchOverrideSchema>;
@@ -29,7 +31,8 @@ export class MenuPublicationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly realtime: RealtimeBus
+    private readonly realtime: RealtimeBus,
+    private readonly entitlements: ApplicationEntitlementsService
   ) {}
 
   async latest(restaurantId: string) {
@@ -62,6 +65,8 @@ export class MenuPublicationsService {
   /** What a guest at this branch WOULD see if the draft were published now, and why each other dish is hidden. Creates nothing. */
   async preview(device: Device, branchId: string | null) {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can preview the menu');
+    if (device.branchId && branchId && branchId !== device.branchId) throw new ForbiddenException('Branch is outside this workspace');
+    branchId = device.branchId ?? branchId;
     return this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       if (branchId) {
         const b = await tx.branch.findFirst({ where: { id: branchId, restaurantId: device.restaurantId }, select: { id: true } });
@@ -198,17 +203,25 @@ export class MenuPublicationsService {
     if (device.branchId && dto.branchId !== device.branchId) throw new ForbiddenException('Branch is outside this workspace');
     const restaurantId = device.restaurantId;
     const result = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      if(dto.stockQuantity!==undefined&&dto.stockQuantity!==null)await this.entitlements.assertQrCapability(tx,restaurantId,'QR_INVENTORY_SYNC');
       const branch = await tx.branch.findFirst({ where: { id: dto.branchId, restaurantId }, select: { id: true } });
       if (!branch) throw new NotFoundException('Branch not found');
       const item = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'MENU_ITEM', externalId: dto.itemId } } });
       if (!item || (item.payload as Record<string, unknown>).deleted === true) throw new BadRequestException('That dish is not on the menu');
       const externalId = `${dto.branchId}:${dto.itemId}`;
+      const existing = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE', externalId } } });
+      const prior = (existing?.payload ?? {}) as Record<string, unknown>;
       const payload = {
+        ...prior,
         id: externalId, branchId: dto.branchId, itemId: dto.itemId,
         ...(dto.price !== null && dto.price !== undefined ? { price: dto.price } : {}),
         ...(dto.isAvailable !== null && dto.isAvailable !== undefined ? { isAvailable: dto.isAvailable } : {}),
+        ...(dto.stockQuantity !== null && dto.stockQuantity !== undefined ? {stockQuantity:dto.stockQuantity} : {}),
         updatedAt: new Date().toISOString()
       };
+      if (dto.price === null) delete payload.price;
+      if (dto.isAvailable === null) delete payload.isAvailable;
+      if(dto.stockQuantity===null)delete (payload as Record<string,unknown>).stockQuantity;
       await tx.syncedEntity.upsert({
         where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE', externalId } },
         create: { restaurantId, deviceId: device.id, entityType: 'BRANCH_MENU_OVERRIDE', externalId, payload },

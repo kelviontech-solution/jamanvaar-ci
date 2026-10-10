@@ -1,12 +1,14 @@
+import { QrCapabilities } from './QrCapabilities';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Lock, QrCode, CheckCircle2, RefreshCw, Printer, Download, Ban, RotateCcw, Trash2, Copy, Plus, WifiOff } from 'lucide-react';
 import { generateQrDataUrl } from '@jamanvaar/utils';
 import { CloudApiError } from '../../cloud/cloudClient';
 import { QrAdminApi, type QrBranch, type QrOrderRow, type QrOverview, type QrSettings, type QrTableRow } from '../../cloud/qrAdminClient';
 import { useQrEntitlement } from './useQrEntitlement';
-import { downloadCardPng, printCards } from './qrPrint';
+import { downloadCardPng, printCards, withLogo } from './qrPrint';
+import { QrDesignStudio, QrOrderingRules, QrOperationalOrders, QrAnalyticsView, QrMenuAvailability } from './QrAdvanced';
 
-type Tab = 'OVERVIEW' | 'TABLES' | 'ORDERS' | 'SETTINGS';
+type Tab = 'OVERVIEW' | 'MENU' | 'TABLES' | 'DESIGN' | 'ORDERS' | 'PAYMENTS' | 'RULES' | 'ANALYTICS' | 'SETTINGS' | 'ADVANCED';
 
 const errText = (e: unknown) => (e instanceof CloudApiError || e instanceof Error ? e.message : 'Something went wrong');
 
@@ -35,7 +37,7 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
   const { entitlement, fromCache } = state;
   if (!entitlement.enabled) return <LockedView message={entitlement.lockedMessage} planName={entitlement.planName} onViewPlan={onViewPlan} />;
 
-  const tabs: Array<[Tab, string]> = [['OVERVIEW', 'Overview'], ['TABLES', 'Tables & QR'], ['ORDERS', 'QR Orders'], ['SETTINGS', 'QR Settings']];
+  const tabs: Array<[Tab, string]> = [['OVERVIEW', 'Overview'], ['MENU', 'Menu & Availability'], ['TABLES', 'Tables & QR'], ['DESIGN', 'QR Design Studio'], ['ORDERS', 'QR Orders'], ['PAYMENTS', 'Payment Settings'], ['RULES', 'Ordering Rules'], ['ANALYTICS', 'Analytics'], ['SETTINGS', 'QR Settings'], ['ADVANCED','Advanced Features']];
   return (
     <div className="space-y-5" data-testid="qr-console">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -49,15 +51,21 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
       </div>
       {fromCache && <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">Showing your last known plan. Connect to the internet to refresh it; QR changes need a connection.</div>}
 
-      <div className="flex gap-1 bg-white border border-jaman-border p-1 rounded-2xl w-fit">
+      <div className="flex flex-wrap gap-1 bg-white border border-jaman-border p-1 rounded-2xl w-fit" aria-label="QR administration">
         {tabs.map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)} className={`px-4 py-1.5 rounded-xl text-xs font-bold ${tab === id ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold' : 'text-slate-600 hover:bg-brand/[0.05]'}`}>{label}</button>
         ))}
       </div>
 
-      {tab === 'OVERVIEW' && <Overview />}
+      {tab === 'OVERVIEW' && <div className="space-y-5"><Overview /><QrAnalyticsView /></div>}
       {tab === 'TABLES' && <TablesAndQr showToast={showToast} />}
-      {tab === 'ORDERS' && <Orders />}
+      {tab === 'MENU' && <QrMenuAvailability showToast={showToast} />}
+      {tab === 'ADVANCED' && <QrCapabilities showToast={showToast} />}
+      {tab === 'DESIGN' && <QrDesignStudio showToast={showToast} />}
+      {tab === 'ORDERS' && <QrOperationalOrders showToast={showToast} />}
+      {tab === 'PAYMENTS' && <div className="space-y-5"><QrOrderingRules showToast={showToast} payments /><QrAnalyticsView paymentsOnly /></div>}
+      {tab === 'RULES' && <QrOrderingRules showToast={showToast} />}
+      {tab === 'ANALYTICS' && <QrAnalyticsView />}
       {tab === 'SETTINGS' && <div className="space-y-6"><Settings showToast={showToast} /><BrandingForm showToast={showToast} /></div>}
     </div>
   );
@@ -118,7 +126,7 @@ function Overview() {
         <Tile label="Tables" value={data.tables} />
         <Tile label="Active QR codes" value={data.activeCodes} />
         <Tile label="QR orders today" value={t.ordersPlaced} />
-        <Tile label="QR sales today" value={inr(t.sales)} />
+        <Tile label="Accepted order value today" value={inr(t.sales)} />
         <Tile label="Waiting / in kitchen" value={t.ordersPending} />
         <Tile label="Completed" value={t.ordersCompleted} />
         <Tile label="Scans today" value={t.scans} />
@@ -129,7 +137,7 @@ function Overview() {
         {t.ordersByTable.length === 0 ? <div className="text-sm text-slate-500">No QR orders yet today.</div> : (
           <ul className="text-sm divide-y">{t.ordersByTable.map((r) => <li key={r.table} className="py-1.5 flex justify-between"><span>Table {r.table}</span><b>{r.orders}</b></li>)}</ul>
         )}
-        <div className="text-[11px] text-slate-500 mt-3">Counted by the server from real orders. Sales are what guests ordered; only counter-settled bills are paid sales ({inr(t.paidSales)} so far).</div>
+        <div className="text-[11px] text-slate-500 mt-3">Counted by the server from real orders. Order value excludes unpaid online drafts and cancellations; paid sales include verified online payments and collected counter bills ({inr(t.paidSales)} so far).</div>
       </div>
     </div>
   );
@@ -164,20 +172,20 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   };
 
   const printOne = async (row: QrTableRow) => {
-    try { printCards([await QrAdminApi.printData(row.qr!.id)]); } catch (e) { showToast(errText(e)); }
+    try { printCards([await QrAdminApi.printData(row.qr!.id).then(withLogo)], await QrAdminApi.printDesign()); } catch (e) { showToast(errText(e)); }
   };
   const printAll = async () => {
     try {
       const rows = (tables.data ?? []).filter((r) => r.qr?.status === 'ACTIVE');
       if (rows.length === 0) return showToast('There are no active QR codes to print.');
-      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id))));
+      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id).then(withLogo))), await QrAdminApi.printDesign());
     } catch (e) { showToast(errText(e)); }
   };
   const printSelected = async () => {
     try {
       const rows = (tables.data ?? []).filter((r) => selected.has(r.tableId) && r.qr?.status === 'ACTIVE');
       if (rows.length === 0) return showToast('Tick tables that have an active QR code first.');
-      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id))));
+      printCards(await Promise.all(rows.map((r) => QrAdminApi.printData(r.qr!.id).then(withLogo))), await QrAdminApi.printDesign());
     } catch (e) { showToast(errText(e)); }
   };
   const addTable = () => run('add', async () => {
@@ -189,8 +197,22 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
     try {
       const rows = (tables.data ?? []).filter((r) => r.qr?.status === 'ACTIVE');
       if (rows.length === 0) return showToast('There are no active QR codes to download.');
-      for (const r of rows) await downloadCardPng(await QrAdminApi.printData(r.qr!.id), `table-${r.displayNumber}`);
+      const design = await QrAdminApi.printDesign();
+      for (const r of rows) await downloadCardPng(await QrAdminApi.printData(r.qr!.id).then(withLogo), `table-${r.displayNumber}`, design);
     } catch (e) { showToast(errText(e)); }
+  };
+
+  const generateSelected = async () => {
+    const targets = (tables.data ?? []).filter(row => selected.has(row.tableId) && row.isActive && (!row.qr || row.qr.status === 'REVOKED'));
+    if (!targets.length) return showToast('Select active tables without a QR code.');
+    setBusy('bulk');
+    let created = 0;
+    try {
+      // Sequential generation gives partial progress and preserves server-enforced plan limits.
+      for (const row of targets) { await QrAdminApi.generate(row.tableId, row.branchId || chosenBranch || undefined); created++; }
+      showToast(`${created} table QR codes generated.`);
+    } catch (e) { showToast(`${created} codes generated. ${errText(e)}`); }
+    finally { tables.reload(); setBusy(null); }
   };
 
   if (tables.error) return <div className="text-sm text-rose-700">{tables.error}</div>;
@@ -205,6 +227,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
           </select>
         )}
         <button onClick={() => setAdding((a) => !a)} className="px-3 py-2 rounded-xl bg-jaman-navy text-white text-xs font-bold flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> Add table</button>
+        <button onClick={generateSelected} disabled={!selected.size || !!busy} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold disabled:opacity-40">Generate selected QR codes</button>
         <button onClick={printSelected} disabled={selected.size === 0} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"><Printer className="w-3.5 h-3.5" /> Print selected ({selected.size})</button>
         <button onClick={printAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Printer className="w-3.5 h-3.5" /> Print All</button>
         <button onClick={downloadAll} className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"><Download className="w-3.5 h-3.5" /> Download All</button>
@@ -233,7 +256,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
             const q = row.qr;
             return (
               <div key={row.tableId} className="p-3 flex flex-wrap items-center gap-3 text-sm">
-                <input type="checkbox" checked={selected.has(row.tableId)} onChange={() => toggle(row.tableId)} aria-label={`Select table ${row.displayNumber}`} disabled={row.qr?.status !== 'ACTIVE'} />
+                <input type="checkbox" checked={selected.has(row.tableId)} onChange={() => toggle(row.tableId)} aria-label={`Select table ${row.displayNumber}`} disabled={!row.isActive || busy === 'bulk'} />
                 {renaming?.id === row.tableId ? (
                   <span className="w-40 flex gap-1"><input autoFocus value={renaming.value} maxLength={20} onChange={(e) => setRenaming({ id: row.tableId, value: e.target.value })} className="w-24 rounded-lg border border-slate-300 px-2 py-1 text-xs" />
                     <button onClick={() => { const v = renaming.value.trim(); setRenaming(null); if (v && v !== row.displayNumber) void run(row.tableId, () => QrAdminApi.updateTable(row.tableId, { tableNumber: v }), 'Table renamed'); }} className="text-xs font-bold text-brand">Save</button></span>
@@ -290,8 +313,8 @@ function QrDialog({ row, onClose, showToast }: { row: QrTableRow; onClose: () =>
         <div className="text-[11px] text-slate-500 break-all">{url}</div>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <button onClick={() => { void navigator.clipboard?.writeText(url); showToast('Link copied'); }} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><Copy className="w-3.5 h-3.5" /> Copy link</button>
-          <button onClick={async () => { try { await downloadCardPng(await QrAdminApi.printData(row.qr!.id), `table-${row.displayNumber}`); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> PNG</button>
-          <button onClick={async () => { try { printCards([await QrAdminApi.printData(row.qr!.id)]); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> Print / PDF</button>
+          <button onClick={async () => { try { await downloadCardPng(await QrAdminApi.printData(row.qr!.id).then(withLogo), `table-${row.displayNumber}`); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> PNG</button>
+          <button onClick={async () => { try { printCards([await QrAdminApi.printData(row.qr!.id).then(withLogo)], await QrAdminApi.printDesign()); } catch (e) { showToast(errText(e)); } }} className="px-3 py-1.5 rounded-lg bg-jaman-navy text-white text-xs font-bold flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> Print / PDF</button>
         </div>
         <button onClick={onClose} className="mt-4 text-xs text-slate-500">Close</button>
       </div>
@@ -327,7 +350,7 @@ function Orders() {
   );
 }
 
-const SETTING_ROWS: Array<[keyof QrSettings, string, string, boolean?]> = [
+const SETTING_ROWS: Array<[Exclude<keyof QrSettings, 'rules'>, string, string, boolean?]> = [
   ['orderingEnabled', 'QR ordering', 'Turn all QR ordering on or off at once.'],
   ['tableOrderingEnabled', 'Table ordering', 'Codes on tables that identify the table.'],
   ['menuOnlyEnabled', 'Menu-only codes', 'Codes for menu cards; the guest chooses dine-in with a table number, or takeaway.'],

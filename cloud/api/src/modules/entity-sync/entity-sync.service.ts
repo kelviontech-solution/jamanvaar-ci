@@ -100,6 +100,7 @@ export class EntitySyncService {
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
       // Acquire the entity counter before record locks so every entity writer uses the same lock order.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
+      if (entityType === 'COUPON') await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-promotions:' + restaurantId}))`;
       for (let evt of events) {
         await tx.$executeRaw`SAVEPOINT entity_event`;
         try {
@@ -118,6 +119,18 @@ export class EntitySyncService {
               const base = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'MENU_ITEM', externalId: evt.externalId } } });
               const basePrice = (base?.payload as { price?: number } | undefined)?.price;
               if (typeof basePrice === 'number') evt = { ...evt, payload: { ...evt.payload, price: basePrice } };
+            }
+          }
+          if (entityType === 'MENU_ITEM' && deviceBranchId && evt.payload.deleted !== true) {
+            // Counted branch portions are changed through their scoped stock API. A pulled branch view cannot overwrite restaurant defaults.
+            const ov = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE', externalId: `${deviceBranchId}:${evt.externalId}` } } });
+            if (typeof (ov?.payload as any)?.stockQuantity === 'number') {
+              const base = await tx.syncedEntity.findUnique({ where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'MENU_ITEM', externalId: evt.externalId } } });
+              const payload = { ...evt.payload };
+              const stock = (base?.payload as any)?.stockQuantity;
+              if (stock === undefined) delete payload.stockQuantity; else payload.stockQuantity = stock;
+              if ((base?.payload as any)?.isAvailable !== undefined) payload.isAvailable = (base!.payload as any).isAvailable;
+              evt = { ...evt, payload };
             }
           }
           if (entityType === 'COUPON' && deviceType === 'KIOSK' && evt.payload.deleted !== true) {
@@ -173,6 +186,7 @@ export class EntitySyncService {
           if (entityType === 'CUSTOMER' && existing && !isDeleted(existing.payload) && !isDeleted(evt.payload)) {
             evt = { ...evt, payload: mergeCustomerLoyalty(existing.payload as unknown as CustomerAccount, evt.payload as unknown as CustomerAccount) as unknown as Record<string, unknown> };
           }
+          if (existing && entityType === 'COUPON') evt = { ...evt, payload: { ...evt.payload, usageCount: Math.max(Number((existing.payload as any).usageCount) || 0, Number(evt.payload.usageCount) || 0) } };
           if (existing && JSON.stringify(existing.payload) === JSON.stringify(evt.payload)) {
             results.push({ externalId: evt.externalId, status: 'ok', syncVersion: existing.syncVersion });
             continue;
@@ -310,17 +324,17 @@ export class EntitySyncService {
       // This branch's own price and availability, applied on the way out: POS, Kiosk and Captain of the branch receive the dish
       // as the branch sells it, with no change to any device. The restaurant-wide record itself is never modified.
       const overrides = await this.prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.findMany({ where: { restaurantId, entityType: 'BRANCH_MENU_OVERRIDE' }, select: { payload: true } }));
-      const mine = new Map<string, { price?: number; isAvailable?: boolean }>();
+      const mine = new Map<string, { price?: number; isAvailable?: boolean;stockQuantity?:number }>();
       for (const o of overrides) {
-        const p = o.payload as { branchId?: string; itemId?: string; price?: number; isAvailable?: boolean } | null;
-        if (p && p.branchId === branchId && typeof p.itemId === 'string') mine.set(p.itemId, { price: p.price, isAvailable: p.isAvailable });
+        const p = o.payload as { branchId?: string; itemId?: string; price?: number; isAvailable?: boolean;stockQuantity?:number } | null;
+        if (p && p.branchId === branchId && typeof p.itemId === 'string') mine.set(p.itemId, { price: p.price, isAvailable: p.isAvailable,stockQuantity:p.stockQuantity });
       }
       const applied = page.map((e) => {
         const o = mine.get(e.externalId);
         const p = e.payload as Record<string, unknown> | null;
         if (!p || p.deleted === true) return e;
         const hidden = Array.isArray(p.branchIds) && p.branchIds.length > 0 && !p.branchIds.includes(branchId);
-        return { ...e, payload: { ...p, ...(hidden ? { deleted: true } : {}), ...(typeof o?.price === 'number' ? { price: o.price } : {}), ...(typeof o?.isAvailable === 'boolean' ? { isAvailable: o.isAvailable } : {}) } };
+        return { ...e, payload: { ...p, ...(hidden ? { deleted: true } : {}), ...(typeof o?.price === 'number' ? { price: o.price } : {}), ...(typeof o?.isAvailable === 'boolean' ? { isAvailable: o.isAvailable } : {}),...(typeof o?.stockQuantity==='number'?{stockQuantity:o.stockQuantity}:{}),...(typeof (o?.stockQuantity??p.stockQuantity)==='number'&&(o?.stockQuantity??Number(p.stockQuantity))<=0?{isAvailable:false}:{}) } };
       });
       return { entities: applied, ...metadata };
     }

@@ -377,6 +377,8 @@ function findRunningOrder(state: { selectedTable: DiningTable | null; runningOrd
 
 /** Brings an open order's lines and totals in line with the cart, and flags it for cloud sync. */
 function syncOrderToCart(order: Order, cart: Cart): void {
+  // A partially collected QR bill keeps its canonical prices and reward reservation.
+  if (order.paymentAllocationSummary?.collectedPaise || (order.source_type === "QR_TABLE" && order.discountAmount > 0)) return;
   order.items = cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }));
   order.subtotal = cart.subtotal;
   order.discountAmount = cart.discountAmount;

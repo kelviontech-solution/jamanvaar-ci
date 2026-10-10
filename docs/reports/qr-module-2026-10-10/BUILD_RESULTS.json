@@ -1,0 +1,16 @@
+{
+  "api": {
+    "status": "PASS",
+    "command": "npm run build --workspace=@jamanvaar/cloud-api"
+  },
+  "admin": {
+    "status": "PASS",
+    "command": "npm run build --workspace=@jamanvaar/pos-admin",
+    "note": "Existing large bundle warning"
+  },
+  "guest": {
+    "status": "PASS",
+    "command": "npm run build --workspace=@jamanvaar/qr-guest",
+    "note": "VITE_CLOUD_API_BASE_URL points at isolated browser QA origin for this verification build; deployment uses PUBLIC_ORIGIN"
+  }
+}

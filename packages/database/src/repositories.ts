@@ -870,24 +870,26 @@ export class OrderRepository {
     // No screen and no sync path may record a UPI payment as taken while the internet is unverified.
     PaymentPolicy.assertAllowed(paymentMethod);
 
-    if (splits && splits.length > 0 && !splitsMatchTotal(splits, order.totalAmount)) {
+    const outstanding = order.paymentAllocationSummary?.outstandingPaise === undefined ? order.totalAmount : order.paymentAllocationSummary.outstandingPaise / 100;
+    if (splits && splits.length > 0 && !splitsMatchTotal(splits, outstanding)) {
       throw new Error(`Payment lines do not add up to the bill total (₹${order.totalAmount})`);
     }
 
-    if (order.loyaltyRedemption && !order.loyaltyPointsRedeemed) {
+    if (!order.serverQrLoyalty && order.loyaltyRedemption && !order.loyaltyPointsRedeemed) {
       CustomerRepository.commitOrderRedemption(order);
     }
     const now = new Date().toISOString();
+    if (order.paymentAllocationSummary) order.counterSettlementAmountPaise = Math.round(outstanding * 100);
     order.paymentMethod = paymentMethod;
     if (splits && splits.length > 0) {
-      order.paymentSplits = splits.map((l) => ({ ...l }));
+      order.paymentSplits = [...(order.paymentAllocationSummary?.collectedPaise ? [{ method: 'CASH' as const, amount: order.paymentAllocationSummary.collectedPaise / 100 }] : []), ...splits.map((l) => ({ ...l }))];
     }
     order.paymentStatus = 'SUCCESS';
     order.orderStatus = 'COMPLETED';
     order.paymentTransactionId = transactionId || `TXN-${Date.now()}`;
     if (tenderedAmount !== undefined) {
       order.tenderedAmount = tenderedAmount;
-      order.changeAmount = Math.max(0, Number((tenderedAmount - order.totalAmount).toFixed(2)));
+      order.changeAmount = Math.max(0, Number((tenderedAmount - outstanding).toFixed(2)));
     }
     order.updatedAt = now;
     // The paid state must reach the cloud too, not just the KOT-time copy.
@@ -922,7 +924,7 @@ export class OrderRepository {
     // (settleOrder is itself idempotent above, but this block previously was not): without it, a
     // retried settle — the same real-world path a flaky sync or a double-tap can produce — credited
     // the account a second time for one purchase.
-    if (order.customerPhone && order.loyaltyPointsEarned === undefined) {
+    if (!order.serverQrLoyalty && order.customerPhone && order.loyaltyPointsEarned === undefined) {
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
     }
 
@@ -1045,7 +1047,7 @@ export class OrderRepository {
 
     if (order.customerPhone && !order.loyaltyRefundApplied) {
       const customer = CustomerRepository.getByPhone(order.customerPhone);
-      if (customer && (order.loyaltyPointsEarned !== undefined || order.loyaltyPointsRedeemed)) {
+      if (!order.serverQrLoyalty && customer && (order.loyaltyPointsEarned !== undefined || order.loyaltyPointsRedeemed)) {
         const reversed = isFullRefund ? (order.loyaltyPointsEarned ?? 0) : Math.floor((order.loyaltyPointsEarned ?? 0) * refundAmount / order.totalAmount);
         CustomerRepository.recordLoyaltyEvent(customer, `refund:${order.id}`, -reversed + (isFullRefund ? order.loyaltyPointsRedeemed ?? 0 : 0), -refundAmount, isFullRefund ? -1 : 0);
         order.loyaltyRefundApplied = true;

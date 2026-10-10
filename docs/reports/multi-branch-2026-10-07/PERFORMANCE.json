@@ -1,38 +1,38 @@
 {
   "environment": "isolated local database",
-  "recordedAt": "2026-10-07T17:46:00.948Z",
+  "recordedAt": "2026-10-10T10:57:13.139Z",
   "additionalOrders": 10000,
   "additionalDevices": 1001,
   "dashboardRequestMs": [
-    152,
-    131,
-    134
+    116,
+    115,
+    109
   ],
   "underFiveSecondLimit": true,
   "canonicalNetSales": 10500,
   "operationalBranchFanoutMs": [
-    128.70110000000022
+    73.08809999999994
   ],
   "fullFlowTimings": [
     {
       "source": "POS",
-      "commitMs": 19
+      "commitMs": 14
     },
     {
       "source": "CAPTAIN",
-      "commitMs": 19
+      "commitMs": 14
     },
     {
       "source": "KIOSK",
-      "commitMs": 17
+      "commitMs": 13
     },
     {
       "source": "QR",
-      "commitMs": 67
+      "commitMs": 53
     },
     {
       "phase": "KDS ready and served to POS/Captain/Kiosk/QR",
-      "roundTripMs": 205
+      "roundTripMs": 133
     }
   ],
   "devicesResponseCappedAt": 1000,

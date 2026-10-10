@@ -15,7 +15,9 @@ import { MenuPublicationsService } from '../menu-publications/menu-publications.
 import { QrBusyException } from './qr-resilience';
 import { QrAdminService, generateQrSchema, GenerateQr, createTableSchema, CreateTable, updateTableSchema, UpdateTable } from './qr-admin.service';
 import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
-import { qrSettingsSchema, QrSettingsUpdate, qrBrandingSchema, QrBrandingUpdate } from './qr-settings.service';
+import { qrSettingsSchema, QrSettingsUpdate, qrBrandingSchema, QrBrandingUpdate, qrPrintDesignSchema } from './qr-settings.service';
+import { z } from 'zod';
+const orderActionSchema = z.object({ action: z.enum(['PREPARING', 'READY', 'COMPLETED', 'CANCELLED', 'COLLECT']), version: z.number().int().min(1), reason: z.string().trim().max(300).optional() }).strict();
 
 /**
  * The customer's endpoints. No login, no device credential: the token in the path is the whole identity, and
@@ -64,6 +66,13 @@ export class QrPublicController {
     return this.qr.switchToCounter(publicOrderId);
   }
 
+  @Post('orders/:publicOrderId/verify-payment')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(z.object({ paymentId: z.string().regex(/^pay_[A-Za-z0-9]+$/).max(128), signature: z.string().regex(/^[a-f0-9]{64}$/i) }).strict()))
+  verifyCheckout(@Param('publicOrderId') publicOrderId: string, @Body() body: { paymentId: string; signature: string }) {
+    return this.qr.verifyCheckout(publicOrderId, body);
+  }
+
   @Get(':token')
   describe(@Param('token') token: string, @Req() req: Request & { qrSession?: string }) {
     return this.qr.describe(token, req.qrSession);
@@ -84,8 +93,15 @@ export class QrPublicController {
   @Post(':token/quote')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(quoteQrOrderSchema))
-  quote(@Param('token') token: string, @Body() body: QuoteQrOrder) {
-    return this.qr.quote(token, body);
+  quote(@Param('token') token: string, @Body() body: QuoteQrOrder, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.quote(token, body, req.qrSession);
+  }
+
+  @Post(':token/events')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(z.object({ type: z.enum(['QR_CART_CREATED', 'QR_CHECKOUT_STARTED', 'QR_ITEM_ADDED']) }).strict()))
+  event(@Param('token') token: string, @Body() body: { type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' }, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.guestEvent(token, body.type, req.qrSession);
   }
 
   @Post(':token/orders')
@@ -199,6 +215,27 @@ export class QrRestaurantController {
     return this.qr.listOrders(device.restaurantId, { branchId: this.qr.scopedBranch(device, branchId), limit: limit ? Number(limit) : undefined });
   }
 
+  @Post('orders/:id/action')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(orderActionSchema))
+  orderAction(@CurrentDevice() device: Device, @Param('id') id: string, @Body() body: z.infer<typeof orderActionSchema>) {
+    this.qr.assertConsole(device);
+    return this.qr.manageOrder(device, id, body);
+  }
+
+  @Get('analytics')
+  analytics(@CurrentDevice() device: Device, @Query('from') from?: string, @Query('to') to?: string, @Query('branchId') branchId?: string) {
+    this.qr.assertConsole(device);
+    return this.qr.analytics(device, from, to, branchId);
+  }
+
+  @Post('settings/inherit')
+  @HttpCode(200)
+  inherit(@CurrentDevice() device: Device, @Query('branchId') branchId?: string) {
+    this.qr.assertConsole(device);
+    return this.qr.inheritSettings(device, branchId);
+  }
+
   @Get('tables/:tableId/orders')
   tableOrders(@CurrentDevice() device: Device, @Param('tableId') tableId: string) {
     this.qr.assertConsole(device);
@@ -209,6 +246,19 @@ export class QrRestaurantController {
   branding(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
     return this.qr.getBranding(device.restaurantId);
+  }
+
+  @Get('print-design')
+  printDesign(@CurrentDevice() device: Device) {
+    this.qr.assertConsole(device);
+    return this.qr.getPrintDesign(device.restaurantId);
+  }
+
+  @Put('print-design')
+  @UsePipes(new ZodValidationPipe(qrPrintDesignSchema))
+  savePrintDesign(@CurrentDevice() device: Device, @Body() body: z.infer<typeof qrPrintDesignSchema>) {
+    this.qr.assertConsole(device);
+    return this.qr.savePrintDesign(device, body);
   }
 
   @Put('branding')

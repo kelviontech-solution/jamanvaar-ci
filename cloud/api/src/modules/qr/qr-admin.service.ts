@@ -10,6 +10,7 @@ import { ApplicationEntitlementsService } from '../application-entitlements/appl
 import { QrResolutionCache } from './qr-resolution-cache';
 import { QrSettingsService, QrSettingsUpdate, QrBrandingUpdate } from './qr-settings.service';
 import { PaymentsService } from '../payments/payments.service';
+import { OrderSyncService } from '../order-sync/order-sync.service';
 import { newPublicToken, QR_APP_CODE, QR_AUDIT, QR_EVENT, QR_MODE, QR_STATUS, startOfDayIn } from './qr.support';
 
 export const generateQrSchema = z
@@ -61,7 +62,8 @@ export class QrAdminService {
     private readonly settings: QrSettingsService,
     private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>,
     private readonly realtime: RealtimeBus,
-    private readonly payments: PaymentsService
+    private readonly payments: PaymentsService,
+    private readonly orderSync: OrderSyncService
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -197,6 +199,7 @@ export class QrAdminService {
     const restaurantId = device.restaurantId;
     const ent = await this.requireEnabled(restaurantId);
     const created = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await this.assertTableLimit(tx, restaurantId, ent.limits);
       let tableNumber: string | null = null;
       let tablePayload: Record<string, unknown> | null = null;
       if (dto.mode === QR_MODE.TABLE_ORDER) {
@@ -209,8 +212,8 @@ export class QrAdminService {
         const existing = await tx.qrCode.findFirst({ where: { restaurantId, tableId: dto.tableId, status: QR_STATUS.ACTIVE, mode: QR_MODE.TABLE_ORDER } });
         if (existing) throw new ConflictException('This table already has an active QR code. Regenerate it to replace it.');
       }
-      await this.assertTableLimit(tx, restaurantId, ent.limits);
       const branchId = await this.resolveBranch(tx, restaurantId, this.scopedBranch(device, dto.branchId), tablePayload);
+      await this.assertBranchLimit(tx,restaurantId,ent.limits,branchId);
       const code = await tx.qrCode.create({
         data: { restaurantId, branchId, tableId: dto.tableId ?? null, tableNumber: tableNumber ?? dto.label ?? null, mode: dto.mode, publicToken: newPublicToken(), status: QR_STATUS.ACTIVE, metadata: dto.label ? { label: dto.label } : undefined }
       });
@@ -258,7 +261,8 @@ export class QrAdminService {
       const current = await this.own(tx, restaurantId, codeId, device.branchId);
       if (current.status === QR_STATUS.REVOKED) throw new ConflictException('A revoked code cannot be changed. Generate a new one.');
       if (to === QR_STATUS.ACTIVE && ent) {
-        await this.assertTableLimit(tx, restaurantId, ent.limits);
+        if(current.status!==QR_STATUS.ACTIVE)await this.assertTableLimit(tx, restaurantId, ent.limits);
+        if(current.branchId)await this.assertBranchLimit(tx,restaurantId,ent.limits,current.branchId);
         const clash = current.tableId ? await tx.qrCode.findFirst({ where: { restaurantId, tableId: current.tableId, status: QR_STATUS.ACTIVE, mode: QR_MODE.TABLE_ORDER, NOT: { id: current.id } } }) : null;
         if (clash) throw new ConflictException('This table already has another active QR code.');
       }
@@ -277,10 +281,17 @@ export class QrAdminService {
   }
 
   private async assertTableLimit(tx: Tx, restaurantId: string, limits: Record<string, unknown>) {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-codes:' + restaurantId}))`;
     const max = typeof limits.qrMaxActiveTables === 'number' ? (limits.qrMaxActiveTables as number) : typeof limits.maxActiveTables === 'number' ? (limits.maxActiveTables as number) : null;
     if (max === null) return;
     const active = await tx.qrCode.count({ where: { restaurantId, status: QR_STATUS.ACTIVE } });
     if (active >= max) throw new ConflictException(`This plan allows ${max} active QR code${max === 1 ? '' : 's'}. Revoke one or upgrade the plan.`);
+  }
+
+  private async assertBranchLimit(tx:Tx,restaurantId:string,limits:Record<string,unknown>,branchId:string){
+    const cap=limits.qrMaxBranches;if(typeof cap!=='number')return;
+    const active=await tx.qrCode.findMany({where:{restaurantId,status:QR_STATUS.ACTIVE},select:{branchId:true},distinct:['branchId']});
+    if(!active.some(b=>b.branchId===branchId)&&active.length>=cap)throw new ConflictException('This license has reached its configured active QR branch limit. Existing codes keep working.');
   }
 
   private view(code: { id: string; status: string; mode: string; version: number; tableId: string | null; tableNumber: string | null; branchId: string | null; publicToken: string }) {
@@ -298,7 +309,8 @@ export class QrAdminService {
       };
     });
     if (code.status !== QR_STATUS.ACTIVE) throw new ConflictException('Only an active code can be printed.');
-    return { restaurantName: restaurant.name, branchName: branch?.name ?? null, tableLabel: code.tableNumber ? `Table ${code.tableNumber}` : 'Scan to view menu', url: this.urlFor(code.publicToken), tagline: 'Scan • Order • Enjoy' };
+    const branding = await this.settings.branding(restaurantId);
+    return { restaurantName: restaurant.name, branchName: branch?.name ?? null, tableLabel: code.tableNumber ? `Table ${code.tableNumber}` : 'Scan to view menu', url: this.urlFor(code.publicToken), tagline: 'Scan • Order • Enjoy', logoUrl: branding.logoUrl, design: await this.settings.printDesign(restaurantId) };
   }
 
   // ------------------------------------------------------------------ orders and dashboard (from real data)
@@ -309,7 +321,8 @@ export class QrAdminService {
     );
     return rows.map((o) => {
       const meta = (o.meta ?? {}) as Record<string, unknown>;
-      return { orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0 };
+      return { id: o.externalOrderId, version: o.syncVersion, orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0,
+        items: o.items, notes: o.notes, history: meta.qrStatusHistory ?? [], customerName: meta.customerName ?? null };
     });
   }
 
@@ -339,7 +352,7 @@ export class QrAdminService {
       return { tables, activeCodes, totalCodes, orders, events };
     });
     const liveTables = data.tables.filter((t) => isObject(t.payload) && t.payload.deleted !== true);
-    const placed = data.orders.filter((o) => !['CANCELLED', 'VOIDED', 'REFUNDED'].includes(o.status));
+    const placed = data.orders.filter((o) => !['DRAFT', 'CANCELLED', 'VOIDED', 'REFUNDED'].includes(o.status));
     const done = data.orders.filter((o) => ['COMPLETED', 'SERVED'].includes(o.status));
     const count = (type: string) => data.events.find((e) => e.type === type)?._count._all ?? 0;
     const byTable = new Map<string, number>();
@@ -372,11 +385,84 @@ export class QrAdminService {
     return this.settings.update(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes, this.scopedBranch(device, branchId) ?? null);
   }
 
+  async inheritSettings(device: Device, branchId?: string) {
+    await this.requireEnabled(device.restaurantId);
+    const branch = this.scopedBranch(device, branchId);
+    if (!branch) throw new BadRequestException('Select a branch first');
+    return this.settings.inherit(device.restaurantId, device.id, branch);
+  }
+
+  async manageOrder(device: Device, orderId: string, body: { action: string; version: number; reason?: string }) {
+    await this.requireEnabled(device.restaurantId);
+    return this.orderSync.manageQrOrder(device, orderId, body.action, body.version, body.reason);
+  }
+
+  async analytics(device: Device, from?: string, to?: string, branchId?: string) {
+    await this.requireEnabled(device.restaurantId);
+    const branch = this.scopedBranch(device, branchId);
+    for (const date of [from, to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date)) throw new BadRequestException('Use valid calendar dates');
+    const start = from ? new Date(from + 'T00:00:00Z') : new Date(Date.now() - 7 * 86400000);
+    const end = to ? new Date(to + 'T00:00:00Z') : new Date();
+    if (to) end.setUTCDate(end.getUTCDate() + 1);
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start || end.getTime() - start.getTime() > 367 * 86400000) throw new BadRequestException('Choose a valid date range of up to one year');
+    const where = { restaurantId: device.restaurantId, ...(branch ? { branchId: branch } : {}), createdAt: { gte: start, lt: end } };
+    const [orders, events, payments, codeEvents, codes, refunds, allocations] = await this.prisma.runAsTenant(device.restaurantId, tx => Promise.all([
+      tx.syncedOrder.findMany({ where: { ...where, source: 'QR' } }),
+      tx.qrEvent.groupBy({ by: ['type'], where, _count: { _all: true } }),
+      tx.paymentTransaction.findMany({ where: { restaurantId: device.restaurantId, createdAt: where.createdAt, order: { source: 'QR', ...(branch ? { branchId: branch } : {}) } }, orderBy: { createdAt: 'desc' }, select: { status: true, amount: true, createdAt: true, failureReason: true, providerPaymentId: true } }),
+      tx.qrEvent.groupBy({ by: ['qrCodeId', 'type'], where, _count: { _all: true } }),
+      tx.qrCode.findMany({ where: { restaurantId: device.restaurantId, ...(branch ? { branchId: branch } : {}) }, select: { id: true, tableNumber: true, branchId: true, version: true, status: true } }),
+      // Refunds are attributed to the original order cohort, matching the shared dashboard.
+      tx.refund.findMany({ where: { restaurantId: device.restaurantId, status: 'SUCCESS', payment: { order: { source: 'QR', createdAt: where.createdAt, ...(branch ? { branchId: branch } : {}) } } }, select: { amount: true, payment: { select: { order: { select: { externalOrderId: true } } } } } }),
+      tx.orderPaymentEntry.findMany({where:{restaurantId:device.restaurantId,order:{source:'QR',createdAt:where.createdAt,...(branch?{branchId:branch}:{})}},select:{orderId:true,kind:true,amount:true}})
+    ]));
+    const live = orders.filter(o => !['DRAFT', 'CANCELLED', 'REFUNDED', 'VOIDED'].includes(o.status));
+    const count = (type: string) => events.find(e => e.type === type)?._count._all ?? 0;
+    const sum = (rows: typeof orders) => rows.reduce((n, o) => n + o.totalAmount, 0) / 100;
+    const refundByOrder = new Map<string, number>();
+    for (const refund of refunds) {
+      const id = refund.payment.order.externalOrderId;
+      refundByOrder.set(id, (refundByOrder.get(id) ?? 0) + refund.amount);
+    }
+    const paid = orders.filter(o => ['SUCCESS', 'PAID', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED'].includes(o.paymentStatus ?? '') && !['DRAFT', 'CANCELLED', 'VOID', 'VOIDED'].includes(o.status));
+    const legacyRefunds = new Map<string,number>();
+    const refundedPaise = paid.reduce((total, order) => {
+      const meta = isObject(order.meta) ? order.meta : {};
+      const gateway = refundByOrder.get(order.externalOrderId) ?? 0;
+      const full = order.status === 'REFUNDED' || order.paymentStatus === 'REFUNDED';
+      const amount=Math.min(order.totalAmount, Math.max(0, full ? typeof meta.refundAmountPaise === 'number' ? Math.max(gateway, meta.refundAmountPaise) : order.totalAmount : gateway));
+      legacyRefunds.set(order.id,amount);return total+amount;
+    }, 0);
+    const byOrder = new Map<string,{collected:number;refunded:number}>();
+    for(const entry of allocations){const row=byOrder.get(entry.orderId)??{collected:0,refunded:0};if(entry.kind==='COLLECTION')row.collected+=entry.amount;else row.refunded+=entry.amount;byOrder.set(entry.orderId,row);}
+    const grossSales = orders.reduce((n,o)=>n+(byOrder.get(o.id)?.collected??(paid.some(p=>p.id===o.id)?o.totalAmount:0)),0)/100;
+    const ledgerRefunds=orders.reduce((n,o)=>n+(byOrder.get(o.id)?.refunded??0),0);
+    const refundsTotal=orders.reduce((n,o)=>n+Math.max(legacyRefunds.get(o.id)??0,byOrder.get(o.id)?.refunded??0),0),netSales=grossSales-refundsTotal/100;
+    const outstanding=live.filter(o=>o.paymentMethod==='CASH_AT_COUNTER').reduce((n,o)=>n+Math.max(0,o.totalAmount-(byOrder.get(o.id)?.collected??(paid.some(p=>p.id===o.id)?o.totalAmount:0))),0)/100;
+    const byBranch = new Map<string, { orders: number; sales: number }>(), trend = new Map<string, { orders: number; sales: number }>(), popular = new Map<string, { name: string; quantity: number }>();
+    for (const o of live) {
+      for (const [map, key] of [[byBranch, o.branchId ?? 'Unassigned'], [trend, o.createdAt.toISOString().slice(0, 10)]] as const) { const row = map.get(key) ?? { orders: 0, sales: 0 }; row.orders++; row.sales += o.totalAmount; map.set(key, row); }
+      for (const i of Array.isArray(o.items) ? o.items : []) { const item = i as Record<string, any>; const key = String(item.menuItemId ?? item.name); const row = popular.get(key) ?? { name: String(item.name), quantity: 0 }; row.quantity += Number(item.quantity) || 0; popular.set(key, row); }
+    }
+    const byCode = codes.map(code => {
+      const own = live.filter(order => order.qrCodeId === code.id);
+      return { codeId: code.id, table: code.tableNumber ?? 'Counter / takeaway', branchId: code.branchId, version: code.version, status: code.status, scans: codeEvents.find(event => event.qrCodeId === code.id && event.type === QR_EVENT.SCANNED)?._count._all ?? 0, orders: own.length, sales: sum(own) };
+    }).filter(code => code.scans || code.orders);
+    return { from: start.toISOString(), to: end.toISOString(), metrics: { scans: count(QR_EVENT.SCANNED), menuViews: count(QR_EVENT.MENU_VIEWED), itemAdds: count('QR_ITEM_ADDED'), carts: count(QR_EVENT.CART_CREATED), checkoutStarts: count('QR_CHECKOUT_STARTED'), orders: live.length, preparing: live.filter(o => o.status === 'PREPARING').length, pending: live.filter(o => ['NEW', 'CONFIRMED', 'READY'].includes(o.status)).length, completed: live.filter(o => ['COMPLETED', 'SERVED'].includes(o.status)).length, cancelled: orders.filter(o => o.status === 'CANCELLED').length, grossOrderValue: sum(live), grossSales, netSales, collected: grossSales, outstandingCounter: outstanding, refunded: refundsTotal / 100, averageOrderValue: live.length ? sum(live) / live.length : 0, conversion: count(QR_EVENT.MENU_VIEWED) ? live.length / count(QR_EVENT.MENU_VIEWED) : 0, onlineSuccess: payments.filter(p => ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED'].includes(p.status)).length, onlineFailed: payments.filter(p => p.status === 'FAILED').length, onlinePending: payments.filter(p => ['PENDING', 'CREATED', 'AUTHORIZED'].includes(p.status)).length, cashOrders: live.filter(o => o.paymentMethod === 'CASH_AT_COUNTER').length }, byCode, byBranch: [...byBranch].map(([branchId, v]) => ({ branchId, orders: v.orders, sales: v.sales / 100 })), trend: [...trend].map(([date, v]) => ({ date, orders: v.orders, sales: v.sales / 100 })).sort((a,b) => a.date.localeCompare(b.date)), popular: [...popular.values()].sort((a,b) => b.quantity - a.quantity).slice(0, 10), payments: payments.slice(0, 50) };
+  }
+
   getBranding(restaurantId: string) {
     return this.settings.branding(restaurantId);
   }
 
-  updateBranding(device: Device, changes: QrBrandingUpdate) {
+  getPrintDesign(restaurantId: string) { return this.settings.printDesign(restaurantId); }
+  async savePrintDesign(device: Device, body: Parameters<QrSettingsService['savePrintDesign']>[2]) {
+    await this.requireEnabled(device.restaurantId);
+    return this.settings.savePrintDesign(device.restaurantId, device.id, body);
+  }
+
+  async updateBranding(device: Device, changes: QrBrandingUpdate) {
+    await this.requireEnabled(device.restaurantId);
     return this.settings.updateBranding(device.restaurantId, { id: device.id, type: 'DEVICE' }, changes);
   }
 

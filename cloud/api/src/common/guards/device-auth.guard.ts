@@ -170,10 +170,14 @@ export class DeviceAuthGuard implements CanActivate {
 
     let scopedDevice = device;
     const requestedBranch = request.headers['x-admin-branch'];
+    // Restaurant-wide QR management is an explicit owner-authorized request scope.
+    // It never changes the terminal binding or opens cross-branch POS/entity synchronization.
+    const restaurantQrScope = requestedBranch === 'all' && /^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(request.originalUrl ?? request.url ?? '');
     const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(request.originalUrl ?? request.url ?? '');
     const requiresRestaurantOwner = payoutPath && await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } })) > 1;
-    if (requestedBranch !== undefined || requiresRestaurantOwner) {
-      if (requestedBranch !== undefined && (device.type !== 'POS_ADMIN' || typeof requestedBranch !== 'string' || !/^[0-9a-f-]{36}$/i.test(requestedBranch))) throw new ForbiddenException('Invalid admin branch scope');
+    const requiresFinancialActor = /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(request.originalUrl ?? request.url ?? '');
+    if (requestedBranch !== undefined || requiresRestaurantOwner || requiresFinancialActor) {
+      if (requestedBranch !== undefined && (device.type !== 'POS_ADMIN' || typeof requestedBranch !== 'string' || (!restaurantQrScope && !/^[0-9a-f-]{36}$/i.test(requestedBranch)))) throw new ForbiddenException('Invalid admin branch scope');
       const proof = request.headers['x-owner-authorization'];
       let claims: TenantAccessTokenPayload;
       try {
@@ -184,14 +188,17 @@ export class DeviceAuthGuard implements CanActivate {
       const authorized = await this.prisma.runAsTenant(device.restaurantId, async tx => {
         const user = await tx.user.findFirst({ where: { id: claims.sub, restaurantId: device.restaurantId, status: 'ACTIVE' } });
         if (!user || !['OWNER', 'MANAGER'].includes(user.role)) return false;
+        if (restaurantQrScope) return user.role === 'OWNER';
         if (requiresRestaurantOwner && user.role !== 'OWNER') return false;
+        if (requiresFinancialActor && user.role !== 'OWNER' && user.branchId !== device.branchId) return false;
         if (requestedBranch === undefined) return true;
         if (user.role !== 'OWNER' && (user.branchId ?? device.branchId) !== requestedBranch) return false;
         return Boolean(await tx.branch.findFirst({ where: { id: requestedBranch, restaurantId: device.restaurantId, status: 'ACTIVE' } }));
       });
       if (!authorized) throw new ForbiddenException('You cannot manage this branch');
       // Request scope only: never move the registered terminal or rewrite its historical orders.
-      if (typeof requestedBranch === 'string') scopedDevice = { ...device, branchId: requestedBranch };
+      if (typeof requestedBranch === 'string') scopedDevice = { ...device, branchId: restaurantQrScope ? null : requestedBranch };
+      scopedDevice = { ...scopedDevice, adminActorId: claims.sub } as Device;
     }
     (request as Request & { device: Device }).device = scopedDevice as Device;
     return true;

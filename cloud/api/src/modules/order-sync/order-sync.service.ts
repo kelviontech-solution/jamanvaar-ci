@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException, Injectable } from '@nestjs/common';
 import { mergeKitchenPriority } from './kitchen-priority';
 import { randomUUID } from 'node:crypto';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
-import { decideStatus, integrityFlags } from './order-rules';
+import { decideStatus, integrityFlags, validateQrOrderAction } from './order-rules';
+import { allocateOrderPayment, paymentBalance, reconcileOrderPayments } from '../payments/order-payment-ledger';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { ConfigService } from '@nestjs/config';
 import { AuditService } from '../audit/audit.service';
@@ -143,6 +144,7 @@ export class OrderSyncService {
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + device.restaurantId + ':' + id}))`;
       }
 
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + device.restaurantId}))`;
       for (const raw of rawEvents) {
         const startedAt = Date.now();
         const parsed = orderSyncEventSchema.safeParse(raw);
@@ -197,6 +199,12 @@ export class OrderSyncService {
             throw new Error('BRANCH_FORBIDDEN: This order is outside this device branch');
           }
 
+          if (existing?.source === 'QR' && existing.paymentStatus === 'PARTIALLY_PAID' && evt.paymentStatus === 'SUCCESS') {
+            const entries = await tx.orderPaymentEntry.findMany({ where: { restaurantId: device.restaurantId, orderId: existing.id } });
+            const due = paymentBalance(existing.totalAmount, entries).outstandingPaise;
+            if ((evt.meta as any)?.counterSettlementAmountPaise !== due) throw new Error('PAYMENT_BALANCE_CHANGED: Refresh the counter balance before collecting money');
+          }
+
           // A settled payment is a business invariant, not an ordinary sync conflict: one order is paid
           // once, a paid order can be refunded but never silently reopened, and only a device with
           // payment authority may refund. Violations are refused and recorded, never applied.
@@ -243,6 +251,13 @@ export class OrderSyncService {
             existing || evt.meta || merge.foreignItemsKept
               ? { ...priorMeta, ...incomingMeta, ...(merge.foreignItemsKept ? { needsTotalsReview: true } : {}) }
               : undefined;
+          if (existing?.source === 'QR' && mergedMeta) {
+            // Kitchen/counter sync cannot invent a verified guest identity, earn rate, redemption or browser membership.
+            for (const key of ['verifiedCustomerId','qrLoyaltyRate','loyaltyRedemption','qrBrowserSession','promotion','qrAutoAccept','serverDishStockConsumed','paymentAllocationSummary','sharedGuests']) {
+              if (Object.prototype.hasOwnProperty.call(priorMeta,key)) mergedMeta[key]=priorMeta[key];
+              else delete mergedMeta[key];
+            }
+          }
           // Accepting an order is a claim: the first device to record it owns it, and a later claim cannot take it over.
           if (mergedMeta && typeof priorMeta.acceptedBy === 'string') mergedMeta.acceptedBy = priorMeta.acceptedBy;
           if (mergedMeta) mergeKitchenPriority(priorMeta, incomingMeta, mergedMeta, device.type);
@@ -320,6 +335,15 @@ export class OrderSyncService {
           // state (or starts unpaid) and the attempt is recorded. This is what stops a kiosk, kitchen screen or Captain from inserting
           // "paid" sales that no money stands behind.
           let payStatus = evt.paymentStatus;
+          if (existing) {
+            const allocations = await tx.orderPaymentEntry.findMany({ where: { restaurantId: device.restaurantId, orderId: existing.id } });
+            if (allocations.length) {
+              const balance = paymentBalance(header.totalAmount, allocations);
+              if (existing.source === 'QR' && balance.collectedPaise > 0 && header.totalAmount !== existing.totalAmount) throw new Error('COLLECTED_QR_ORDER_FROZEN: Collected QR totals cannot be rewritten');
+              if (existing.paymentStatus === 'PARTIALLY_PAID' && !payStatus?.includes('REFUND') && payStatus !== 'SUCCESS') payStatus = 'PARTIALLY_PAID';
+              if (existing.source === 'QR' && balance.collectedPaise > 0 && ['CANCELLED','VOID','VOIDED'].includes(decision.status)) throw new Error('COLLECTED_ORDER_REFUND_REQUIRED: Use the authorized refund workflow');
+            }
+          }
           if (payStatus && !PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type) && payStatus !== existing?.paymentStatus && TERMINAL_PAID_STATUSES.has(payStatus)) {
             const ref = (evt.meta as { paymentTransactionId?: string } | undefined)?.paymentTransactionId;
             const settled = payStatus === 'SUCCESS' && ref
@@ -420,6 +444,15 @@ export class OrderSyncService {
               })
             // The order belongs to the branch of the terminal that first pushed it (BUG-048).
             : await tx.syncedOrder.create({ data: { ...data, branchId: device.branchId, source, syncVersion: 1, seq } });
+          if (existing?.paymentStatus === 'PARTIALLY_PAID' && payStatus === 'SUCCESS' && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)) {
+            const entries = await tx.orderPaymentEntry.findMany({ where: { restaurantId: device.restaurantId, orderId: saved.id } });
+            const balance = paymentBalance(saved.totalAmount, entries);
+            if (balance.outstandingPaise) await allocateOrderPayment(tx, saved, { kind: 'COLLECTION', amount: balance.outstandingPaise, method: evt.paymentMethod ?? existing.paymentMethod ?? 'UNKNOWN', reference: 'pos-completion:' + saved.id, actorId: device.id, evidence: { provenance: 'AUTHORIZED_COUNTER_SETTLEMENT' } });
+          }
+          const reconciled = await reconcileOrderPayments(tx, saved, device.id);
+          if (existing?.source === 'QR' && (existing.paymentStatus === 'PARTIALLY_PAID' || (existing.meta as any)?.paymentAllocationSummary)) {
+            await tx.syncedOrder.update({ where: { id: saved.id }, data: { meta: { ...(saved.meta as object ?? {}), paymentAllocationSummary: { collectedPaise: reconciled.collectedPaise, outstandingPaise: reconciled.outstandingPaise } } } });
+          }
 
           // Phase 5 of the Jamanvaar<->WhatsApp connector: staff moving a WhatsApp order
           // through its lifecycle on POS/KDS (accepted/preparing/ready/completed/...) is
@@ -529,10 +562,12 @@ export class OrderSyncService {
   async confirmPaidQrOrder(restaurantId: string, externalOrderId: string, paymentId: string) {
     const result = await this.prisma.runAsTenant(restaurantId, async tx => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
       const payment = await tx.paymentTransaction.findFirst({ where: { id: paymentId, restaurantId, status: 'SUCCESS' }, include: { order: true } });
       const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId } } });
       if (!payment || payment.order.source !== 'QR' || payment.order.externalOrderId !== externalOrderId || !order || order.source !== 'QR' || order.totalAmount !== payment.amount) throw new BadRequestException('Verified QR payment does not match the order');
       if (order.status !== 'DRAFT') return { order, changed: false };
+      await reconcileOrderPayments(tx, order);
       const meta = (order.meta ?? {}) as Record<string, unknown>;
       const seq = await nextSyncSequence(tx, restaurantId);
       const saved = await tx.syncedOrder.update({ where: { id: order.id }, data: {
@@ -548,10 +583,119 @@ export class OrderSyncService {
     return result.order;
   }
 
+  /** QR-only management uses the same row/lock/sequence as POS and kitchen devices. */
+  async orderPaymentLedger(device: Device, externalOrderId: string) {
+    return this.prisma.runAsTenant(device.restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + device.restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + device.restaurantId}))`;
+      const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId } } });
+      if (!order || (device.branchId && device.branchId !== order.branchId)) throw new NotFoundException('Order not found');
+      const ledger = await reconcileOrderPayments(tx, order, device.id);
+      const attempts = await tx.paymentTransaction.findMany({ where: { restaurantId: device.restaurantId, order: { externalOrderId } }, orderBy: { createdAt: 'asc' }, select: { id: true, amount: true, status: true, method: true, createdAt: true, paidAt: true } });
+      return { ...ledger, attempts };
+    });
+  }
+
+  async recordQrPartialCash(device: Device, externalOrderId: string, input: { amountPaise: number; version: number; idempotencyKey: string }) {
+    const result = await this.prisma.runAsTenant(device.restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + device.restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + device.restaurantId}))`;
+      const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId } } });
+      if (!order || order.source !== 'QR' || (device.branchId && device.branchId !== order.branchId)) throw new NotFoundException('Order not found');
+      const reference = 'cash:' + device.restaurantId + ':' + input.idempotencyKey;
+      const previous = await tx.orderPaymentEntry.findUnique({ where: { reference } });
+      if (previous && previous.orderId === order.id && previous.amount === input.amountPaise) return { order, ledger: await reconcileOrderPayments(tx, order), duplicate: true };
+      if (order.syncVersion !== input.version) throw new ConflictException('This order changed. Refresh before collecting payment.');
+      if (order.paymentMethod !== 'CASH_AT_COUNTER' || ['DRAFT', 'CANCELLED', 'VOIDED', 'REFUNDED'].includes(order.status)) throw new BadRequestException('Only an accepted counter-payment order can receive a cash collection');
+      await reconcileOrderPayments(tx, order);
+      await allocateOrderPayment(tx, order, { kind: 'COLLECTION', amount: input.amountPaise, method: 'CASH', reference, actorId: (device as Device & { adminActorId?: string }).adminActorId ?? device.id, evidence: { deviceId: device.id } });
+      const ledger = await reconcileOrderPayments(tx, order);
+      const seq = await nextSyncSequence(tx, device.restaurantId);
+      const saved = await tx.syncedOrder.update({ where: { id: order.id }, data: { paymentStatus: ledger.outstandingPaise === 0 ? 'SUCCESS' : 'PARTIALLY_PAID', syncVersion: { increment: 1 }, seq, meta: { ...(order.meta as object ?? {}), paymentAllocationSummary: { collectedPaise: ledger.collectedPaise, outstandingPaise: ledger.outstandingPaise } } } });
+      await tx.syncEventLog.create({ data: { restaurantId: device.restaurantId, branchId: order.branchId, deviceId: device.id, entityType: 'ORDER', entityId: externalOrderId, action: 'UPDATE', status: 'SUCCESS' } });
+      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: 'QR_PARTIAL_CASH_COLLECTED', category: 'PAYMENTS', details: { externalOrderId, amountPaise: input.amountPaise, reference } }, tx);
+      await reconcileOrderPayments(tx, saved);
+      return { order: saved, ledger, duplicate: false };
+    });
+    if (!result.duplicate) this.realtime.publish({ restaurantId: device.restaurantId, branchId: result.order.branchId, kind: 'orders', seq: result.order.seq ?? undefined });
+    return { ...result.ledger, version: result.order.syncVersion, paymentStatus: result.order.paymentStatus, duplicate: result.duplicate };
+  }
+
+  async reconcilePaymentLedger(restaurantId: string, externalOrderId: string) {
+    return this.prisma.runAsTenant(restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
+      const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId } } });
+      return order ? reconcileOrderPayments(tx, order) : null;
+    });
+  }
+
+  async refundQrCash(device: Device, externalOrderId: string, input: { amountPaise:number; version:number; idempotencyKey:string; reason:string }) {
+    const result = await this.prisma.runAsTenant(device.restaurantId,async tx=>{
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:'+device.restaurantId+':'+externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:'+device.restaurantId}))`;
+      const order=await tx.syncedOrder.findUnique({where:{restaurantId_externalOrderId:{restaurantId:device.restaurantId,externalOrderId}}});
+      if(!order||order.source!=='QR'||(device.branchId&&device.branchId!==order.branchId))throw new NotFoundException('Order not found');
+      if(order.paymentMethod!=='CASH_AT_COUNTER')throw new BadRequestException('Online refunds must use the existing verified-payment refund workflow');
+      const reference='cash-refund:'+device.restaurantId+':'+input.idempotencyKey,previous=await tx.orderPaymentEntry.findUnique({where:{reference}});
+      if(previous&&previous.orderId===order.id&&previous.amount===input.amountPaise)return {order,duplicate:true,ledger:await reconcileOrderPayments(tx,order)};
+      if(order.syncVersion!==input.version)throw new ConflictException('This order changed. Refresh before recording a refund');
+      await reconcileOrderPayments(tx,order);
+      await allocateOrderPayment(tx,order,{kind:'REFUND',amount:input.amountPaise,method:'CASH',reference,actorId:(device as Device&{adminActorId?:string}).adminActorId??device.id,evidence:{reason:input.reason,deviceId:device.id}});
+      const ledger=await reconcileOrderPayments(tx,order),seq=await nextSyncSequence(tx,device.restaurantId);
+      const fullyReturned=ledger.netCollectedPaise===0;
+      const saved=await tx.syncedOrder.update({where:{id:order.id},data:{paymentStatus:fullyReturned?'REFUNDED':'PARTIALLY_REFUNDED',...(fullyReturned?{status:'REFUNDED'}:{}),seq,syncVersion:{increment:1},meta:{...(order.meta as object??{}),refundAmountPaise:ledger.refundedPaise,lastRefundReason:input.reason}}});
+      await reconcileOrderPayments(tx,saved);
+      await this.audit.log({actorType:'TENANT',actorId:(device as Device&{adminActorId?:string}).adminActorId??device.id,restaurantId:device.restaurantId,action:'QR_CASH_REFUND_RECORDED',category:'REFUNDS',details:{externalOrderId,amountPaise:input.amountPaise,reason:input.reason,reference}},tx);
+      await tx.syncEventLog.create({data:{restaurantId:device.restaurantId,branchId:order.branchId,deviceId:device.id,entityType:'ORDER',entityId:externalOrderId,action:'UPDATE',status:'SUCCESS'}});
+      return {order:saved,duplicate:false,ledger};
+    });
+    if(!result.duplicate)this.realtime.publish({restaurantId:device.restaurantId,branchId:result.order.branchId,kind:'orders',seq:result.order.seq??undefined});
+    return {...result.ledger,version:result.order.syncVersion,duplicate:result.duplicate};
+  }
+
+  async manageQrOrder(device: Device, externalOrderId: string, action: string, expectedVersion: number, reason?: string) {
+    const saved = await this.prisma.runAsTenant(device.restaurantId, async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + device.restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + device.restaurantId}))`;
+      const order = await tx.syncedOrder.findUnique({ where: { restaurantId_externalOrderId: { restaurantId: device.restaurantId, externalOrderId } } });
+      if (!order || order.source !== 'QR' || (device.branchId && order.branchId !== device.branchId)) throw new NotFoundException('QR order not found');
+      if (order.syncVersion !== expectedVersion) throw new ConflictException('This order changed on another screen. Refresh before continuing.');
+      if (['CANCELLED', 'REFUNDED', 'VOIDED'].includes(order.status)) throw new BadRequestException('This order is already closed');
+      const meta = (order.meta ?? {}) as Record<string, any>;
+      const collected = action === 'COLLECT';
+      if (collected) {
+        if (order.paymentMethod !== 'CASH_AT_COUNTER' || order.paymentStatus === 'SUCCESS' || order.status === 'DRAFT') throw new BadRequestException('This order has no counter payment due');
+        meta.counterCollection = { deviceId: device.id, staffId: (device as Device & { adminActorId?: string }).adminActorId ?? device.id, at: new Date().toISOString(), amountPaise: order.totalAmount };
+        const ledger = await reconcileOrderPayments(tx, order, device.id);
+        if (ledger.outstandingPaise) await allocateOrderPayment(tx, order, { kind: 'COLLECTION', amount: ledger.outstandingPaise, method: 'CASH', reference: 'counter:' + order.id, actorId: meta.counterCollection.staffId, evidence: { deviceId: device.id } });
+        meta.paymentAllocationSummary = { collectedPaise: order.totalAmount, outstandingPaise: 0 };
+      } else {
+        const ledger = await reconcileOrderPayments(tx, order);
+        const refusal = validateQrOrderAction(order.status, action, action === 'CANCELLED' ? ledger.collectedPaise > 0 : order.paymentStatus === 'SUCCESS', reason);
+        if (refusal) throw new BadRequestException(refusal);
+        if (action === 'PREPARING') { meta.acceptedBy = device.id; meta.acceptedAt = new Date().toISOString(); }
+      }
+      const history = Array.isArray(meta.qrStatusHistory) ? meta.qrStatusHistory.slice(-99) : [];
+      meta.qrStatusHistory = [...history, { action, deviceId: device.id, at: new Date().toISOString(), ...(reason ? { reason } : {}) }];
+      const kitchen = ({ PREPARING: 'COOKING', READY: 'READY', COMPLETED: 'SERVED', CANCELLED: 'CANCELLED' } as Record<string, string>)[action];
+      const items = Array.isArray(order.items) ? order.items.map((item: any) => kitchen && item.kitchenStatus !== 'CANCELLED' ? { ...item, kitchenStatus: kitchen, ...(action === 'CANCELLED' ? { statusRev: (item.statusRev ?? 0) + 1 } : {}) } : item) : order.items;
+      const seq = await nextSyncSequence(tx, device.restaurantId);
+      const result = await tx.syncedOrder.update({ where: { id: order.id }, data: { status: collected ? order.status : action, paymentStatus: collected ? 'SUCCESS' : order.paymentStatus, items: items as Prisma.InputJsonValue, meta: meta as Prisma.InputJsonValue, seq, syncVersion: { increment: 1 } } });
+      await tx.syncEventLog.create({ data: { restaurantId: device.restaurantId, branchId: order.branchId, deviceId: device.id, entityType: 'ORDER', entityId: externalOrderId, action: 'UPDATE', status: 'SUCCESS' } });
+      await reconcileOrderPayments(tx, result, device.id);
+      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: collected ? 'QR_COUNTER_COLLECTED' : 'QR_ORDER_STATUS_CHANGED', category: 'QR_ORDERING', details: { externalOrderId, action, reason: reason ?? null, amountPaise: collected ? order.totalAmount : null, branchId: order.branchId } }, tx);
+      return result;
+    });
+    this.realtime.publish({ restaurantId: device.restaurantId, branchId: saved.branchId, kind: 'orders', seq: saved.seq ?? undefined, originDeviceId: device.id });
+    return { version: saved.syncVersion, status: saved.status, paymentStatus: saved.paymentStatus };
+  }
+
   async admitCounterQrOrder(restaurantId: string, externalOrderId: string, paymentId: string | null, switchToken: string) {
     const result = await this.prisma.runAsTenant(restaurantId, async tx => {
       if (paymentId) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'payment-settle:' + paymentId}))`;
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + restaurantId + ':' + externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;
       const order = await tx.syncedOrder.findUniqueOrThrow({ where: { restaurantId_externalOrderId: { restaurantId, externalOrderId } } });
       if (order.paymentStatus === 'SUCCESS' || order.paymentMethod === 'CASH_AT_COUNTER') return { order, changed: false };
       const meta = (order.meta ?? {}) as Record<string, any>;
@@ -576,6 +720,7 @@ export class OrderSyncService {
     const startedAt = Date.now();
     const result = await this.prisma.runAsTenant(input.restaurantId, async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'order:' + input.restaurantId + ':' + input.externalOrderId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + input.restaurantId}))`;
       const existing = await tx.syncedOrder.findUnique({
         where: { restaurantId_externalOrderId: { restaurantId: input.restaurantId, externalOrderId: input.externalOrderId } }
       });
@@ -614,6 +759,7 @@ export class OrderSyncService {
           seq
         }
       });
+      await reconcileOrderPayments(tx, order);
       await tx.syncEventLog.create({
         data: {
           restaurantId: input.restaurantId,

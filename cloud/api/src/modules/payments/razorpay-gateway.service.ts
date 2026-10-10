@@ -24,6 +24,40 @@ export class RazorpayGatewayService {
     return Boolean(this.config.get<string>('RAZORPAY_KEY_ID') && this.config.get<string>('RAZORPAY_KEY_SECRET'));
   }
 
+  publicKey() { return this.config.get<string>('RAZORPAY_KEY_ID') ?? ''; }
+  mode() { return this.publicKey().startsWith('rzp_test_') ? 'TEST' : this.publicKey().startsWith('rzp_live_') ? 'LIVE' : 'UNKNOWN'; }
+
+  async createCheckoutOrder(input: { reference: string; amount: number; currency: string }) {
+    const { response, body } = await upstreamJson('https://api.razorpay.com/v1/orders', { method: 'POST', headers: this.headers(), body: JSON.stringify({ amount: input.amount, currency: input.currency, receipt: input.reference, notes: { payment_ref: input.reference } }) });
+    if (!response.ok || typeof body?.id !== 'string' || !body.id.startsWith('order_') || body.amount !== input.amount || body.currency !== input.currency) throw new ServiceUnavailableException('Secure checkout could not be opened. Check payment status before retrying.');
+    return body as { id: string; amount: number; currency: string; receipt: string };
+  }
+
+  /** Recover a timed-out create by its unique receipt. Never mint a new reference for an unknown outcome. */
+  async findCheckoutOrder(reference: string, since: Date) {
+    for (let skip = 0; skip < 1000; skip += 100) {
+      const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/orders?from=${Math.floor(since.getTime() / 1000) - 60}&count=100&skip=${skip}`, { method: 'GET', headers: this.headers() });
+      if (!response.ok || !Array.isArray(body?.items)) throw new ServiceUnavailableException('The previous payment attempt could not be checked.');
+      const found = body.items.find((o: any) => o.receipt === reference && o.notes?.payment_ref === reference);
+      if (found) return found as { id: string; amount: number; currency: string; receipt: string };
+      if (body.items.length < 100) break;
+    }
+    throw new ServiceUnavailableException('The previous checkout result is unknown. Please check again or ask staff; a second charge has not been started.');
+  }
+
+  async fetchCheckoutPayments(orderId: string): Promise<Array<{ id: string; order_id: string; amount: number; currency: string; status: string }>> {
+    const { response, body } = await upstreamJson(`https://api.razorpay.com/v1/orders/${encodeURIComponent(orderId)}/payments`, { method: 'GET', headers: this.headers() });
+    if (!response.ok || !Array.isArray(body?.items)) throw new ServiceUnavailableException('Payment status could not be checked. Please try again.');
+    return body.items;
+  }
+
+  verifyCheckoutSignature(orderId: string, paymentId: string, signature: string) {
+    const secret = this.config.get<string>('RAZORPAY_KEY_SECRET');
+    if (!secret || !/^[a-f0-9]{64}$/i.test(signature)) return false;
+    const expected = createHmac('sha256', secret).update(`${orderId}|${paymentId}`).digest();
+    return timingSafeEqual(expected, Buffer.from(signature, 'hex'));
+  }
+
   private headers(): Record<string, string> {
     const keyId = this.config.get<string>('RAZORPAY_KEY_ID');
     const keySecret = this.config.get<string>('RAZORPAY_KEY_SECRET');

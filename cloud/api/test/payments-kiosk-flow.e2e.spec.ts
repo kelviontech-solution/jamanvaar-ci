@@ -36,8 +36,8 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   const seedPayment = async (rid: string, opts: { amount: number; bps?: number; status?: string; paidAt?: Date; fulfilled?: boolean; providerOrderId?: string }) => {
     const bps = opts.bps ?? 0;
     const platformAmount = Math.round((opts.amount * bps) / 10000);
-    const order = await prisma.runAsTenant(rid, (tx) =>
-      tx.order.create({ data: { restaurantId: rid, externalOrderId: `kf-${Date.now()}-${Math.random()}`, items: [], subtotal: opts.amount, taxAmount: 0, totalAmount: opts.amount, status: 'PAID' } })
+    const order = await prisma.runAsTenant(rid, async (tx) =>
+      tx.order.create({ data: { restaurantId: rid, branchId: (await tx.device.findFirstOrThrow({where:{restaurantId:rid,type:"KIOSK"}})).branchId, kioskId: (await tx.device.findFirstOrThrow({where:{restaurantId:rid,type:"KIOSK"}})).id, externalOrderId: `kf-${Date.now()}-${Math.random()}`, items: [], subtotal: opts.amount, taxAmount: 0, totalAmount: opts.amount, status: 'PAID' } })
     );
     return prisma.runAsTenant(rid, (tx) =>
       tx.paymentTransaction.create({
@@ -95,8 +95,8 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     await app.close();
   });
 
-  const createKioskOrder = async (externalOrderId: string) => {
-    const res = await authed('post', '/api/v1/payments/orders', kioskToken).send({ externalOrderId, lines });
+  const createKioskOrder = async (externalOrderId: string, token = kioskToken) => {
+    const res = await authed('post', '/api/v1/payments/orders', token).send({ externalOrderId, lines });
     expect(res.status).toBe(201);
     return res.body as { paymentId: string; orderId: string; amount: number };
   };
@@ -113,11 +113,13 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
     expect(second.body.claimedAt).not.toBeNull();
   });
 
-  it('five kiosks claiming the same paid order at the same instant produce exactly one claim', async () => {
+  it('five retries by the owning kiosk claim once; another kiosk cannot adopt its payment', async () => {
     const p = await seedPayment(restaurantId, { amount: 10000, status: 'SUCCESS' });
-    const kiosks = await Promise.all([1, 2, 3, 4, 5].map(() => deviceFor(restaurantId, 'KIOSK')));
+    const kiosks = [kioskToken,kioskToken,kioskToken,kioskToken,kioskToken];
     const results = await Promise.all(kiosks.map((t) => authed('post', `/api/v1/payments/${p.id}/kot-claim`, t)));
     expect(results.filter((r) => r.body.claimed === true)).toHaveLength(1);
+    const foreign = await deviceFor(restaurantId, 'KIOSK');
+    expect((await authed('post', `/api/v1/payments/${p.id}/kot-claim`, foreign)).status).toBe(404);
   });
 
   it('only a kiosk can claim a kitchen ticket, and an unpaid order cannot be claimed', async () => {
@@ -128,13 +130,14 @@ describe('Kiosk QR payment flow: QR, fulfilment, attention, refunds, statement, 
   });
 
   it('one kiosk can ask for at most 20 QRs a minute; the 21st is refused with 429, and another kiosk is not affected', async () => {
-    const order = await createKioskOrder('kf-rate-qr');
     const busyKiosk = await deviceFor(restaurantId, 'KIOSK');
+    const order = await createKioskOrder('kf-rate-qr', busyKiosk);
     const statuses: number[] = [];
     for (let i = 0; i < 21; i += 1) statuses.push((await authed('post', `/api/v1/payments/${order.paymentId}/qr`, busyKiosk)).status);
     expect(statuses.slice(0, 20).every((s) => s === 201)).toBe(true);
     expect(statuses[20]).toBe(429);
-    const other = await authed('post', `/api/v1/payments/${order.paymentId}/qr`, kioskToken);
+    const otherOrder = await createKioskOrder('kf-rate-other');
+    const other = await authed('post', `/api/v1/payments/${otherOrder.paymentId}/qr`, kioskToken);
     expect(other.status).toBe(201);
   });
 
