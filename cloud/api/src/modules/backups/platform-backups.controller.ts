@@ -47,6 +47,16 @@ export class PlatformBackupsController {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(body);
   }
+
+  /** A full, readable PDF of the same backup -- a human-readable archive copy alongside the JSON above. */
+  @Get(':backupId/pdf')
+  async pdf(@Param('id') restaurantId: string, @Param('backupId') backupId: string, @Res() res: Response, @CurrentPlatformUser() actor: PlatformUser) {
+    assertCanDownloadBackups(actor);
+    const { buffer, filename } = await this.backups.getPdf(restaurantId, backupId, { actorType: 'PLATFORM', actorId: actor.id });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  }
 }
 
 /** Fleet-wide backup health, storage counters, and operator triggers. */

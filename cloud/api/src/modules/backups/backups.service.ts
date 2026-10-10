@@ -10,6 +10,7 @@ import { ts } from '../../common/sql';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BackupStorageService } from './backup-storage.service';
+import { buildBackupPdfBuffer } from './backup-pdf.util';
 
 @Injectable()
 export class BackupsService {
@@ -237,6 +238,34 @@ export class BackupsService {
       action: 'BACKUP_FILE_DOWNLOADED', category: 'OPS', details: { backupId }
     });
     return { body, filename: `jamanvaar-backup-${backup.createdAt.toISOString().slice(0, 10)}-${backup.id.slice(0, 8)}.json` };
+  }
+
+  /**
+   * A full, readable PDF rendering of the same backup `getFile` returns — every record listed
+   * (not just counts), for operators who want a human-readable archive copy. The JSON remains
+   * the one Preview restore / Restore actually reads; this is read-only reporting alongside it.
+   */
+  async getPdf(restaurantId: string, backupId: string, actor: { actorType: 'PLATFORM' | 'TENANT'; actorId: string }): Promise<{ buffer: Buffer; filename: string }> {
+    const backup = await this.prisma.runAsTenant(restaurantId, (tx) =>
+      tx.backup.findFirst({ where: { id: backupId, restaurantId }, include: { restaurant: { select: { name: true } } } })
+    );
+    if (!backup || backup.status !== 'COMPLETED') throw new NotFoundException('Backup not found');
+    const inspected = await this.inspectStoredBackup(backup);
+    if (!inspected.ok) throw new ConflictException(`This backup cannot be rendered: ${inspected.note}`);
+
+    const buffer = await buildBackupPdfBuffer(inspected.parsed as Record<string, unknown>, {
+      backupId: backup.id,
+      restaurantName: backup.restaurant.name,
+      createdAt: backup.createdAt,
+      sizeBytes: backup.sizeBytes,
+      method: backup.method
+    });
+
+    await this.audit.log({
+      actorType: actor.actorType, actorId: actor.actorId, restaurantId,
+      action: 'BACKUP_PDF_DOWNLOADED', category: 'OPS', details: { backupId }
+    });
+    return { buffer, filename: `jamanvaar-backup-${backup.createdAt.toISOString().slice(0, 10)}-${backup.id.slice(0, 8)}.pdf` };
   }
 
   async listAllForPlatform(query: { q?: string; status?: string; page?: unknown; pageSize?: unknown } = {}) {

@@ -18,6 +18,7 @@ import {
   Database,
   HardDrive,
   Download,
+  FileText,
   AlertTriangle,
   CheckCircle2,
   ShieldCheck,
@@ -89,6 +90,7 @@ export function BackupsPage() {
   const [triggerError, setTriggerError] = useState<string | null>(null);
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingPdfId, setDownloadingPdfId] = useState<string | null>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -198,6 +200,26 @@ export function BackupsPage() {
       showToast(e instanceof ApiError ? e.message : 'Failed to generate download link');
     } finally {
       setDownloadingId(null);
+    }
+  };
+
+  const handleDownloadPdf = async (restaurantId: string, backupId: string) => {
+    setDownloadingPdfId(backupId);
+    try {
+      const file = await api.download(`/api/v1/restaurants/${restaurantId}/backups/${backupId}/pdf`);
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(file.blob);
+      link.download = file.filename ?? `backup-${backupId.slice(0, 8)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      }, 200);
+    } catch (e) {
+      showToast(e instanceof ApiError ? e.message : 'Failed to generate the PDF report');
+    } finally {
+      setDownloadingPdfId(null);
     }
   };
 
@@ -455,6 +477,21 @@ export function BackupsPage() {
                             aria-label="Download backup"
                           >
                             <Download className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="btn-icon-only"
+                            disabled={downloadingPdfId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT'}
+                            onClick={() => handleDownloadPdf(b.restaurantId, b.id)}
+                            title={
+                              b.verificationStatus === 'CORRUPT'
+                                ? "This snapshot's stored file is missing or damaged and cannot be rendered — trigger a fresh snapshot instead."
+                                : downloadingPdfId === b.id ? 'Generating PDF…' : 'Download as a readable PDF report'
+                            }
+                            aria-label="Download as PDF"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </td>
