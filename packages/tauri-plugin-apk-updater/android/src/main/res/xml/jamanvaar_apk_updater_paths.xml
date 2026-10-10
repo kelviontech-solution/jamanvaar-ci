@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <!-- Matches DownloadManager.Request.setDestinationInExternalFilesDir(..., DIRECTORY_DOWNLOADS, ...)
-         in ApkUpdaterPlugin.kt -- FileProvider can only share a path it's explicitly told about. -->
+         in ApkUpdaterPlugin.kt; FileProvider can only share a path it's explicitly told about. -->
     <external-files-path name="jamanvaar-update-downloads" path="Download/" />
 </paths>

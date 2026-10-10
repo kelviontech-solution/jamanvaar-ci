@@ -3,7 +3,7 @@
 
     <!-- Required since Android 8.0 (API 26) for any app that wants to start a package install
          intent at all. The device-side "Install unknown apps" toggle (per-app, user-controlled)
-         is still required on top of this -- this permission alone does not bypass that. -->
+         is still required on top of this; this permission alone does not bypass that. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application>
