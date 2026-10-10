@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop-updater",
+  "description": "Windows-only: the updater and process plugins are never registered on mobile (see lib.rs's #[cfg(windows)] gate), so their permissions are scoped the same way here. Confirmed live against a real running build -- `plugin:updater|check` ALSO failed with \"not allowed by ACL\" with no capabilities file present, meaning the silent desktop auto-updater had never actually completed a real check through its own code path before this.",
+  "windows": ["main"],
+  "platforms": ["windows"],
+  "permissions": [
+    "updater:default",
+    "process:default"
+  ]
+}

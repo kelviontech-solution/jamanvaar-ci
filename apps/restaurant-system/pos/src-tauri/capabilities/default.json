@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "No capabilities file existed in this project before this: Tauri v2's ACL denies every plugin command by default without one. Confirmed live against a real running build -- `plugin:shell|open` failed with \"not allowed by ACL\", meaning the update banner's Download link could never open anything, on desktop or Android. Custom app-defined #[tauri::command]s (printing, LAN discovery, etc.) are unaffected -- the ACL only gates plugin-namespaced commands. Applies to both platforms since the shell plugin is registered unconditionally.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open"
+  ]
+}
