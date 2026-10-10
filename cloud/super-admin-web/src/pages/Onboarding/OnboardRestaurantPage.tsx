@@ -131,7 +131,10 @@ interface ModulesForm {
 }
 
 interface ActivationForm {
-  deviceTypes: Array<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN'>;
+  // 'QR_ORDERING' is a frontend-only sentinel (no QR-specific Device.type exists -- a QR console
+  // redeems as a POS_ADMIN-typed device, per the deployment doc); translated at submission below,
+  // same as GenerateActivationKeyModal.tsx does for the same reason.
+  deviceTypes: Array<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING'>;
   expiryDays: string;
 }
 
@@ -139,6 +142,10 @@ interface ProvisionedKey {
   id: string;
   code: string;
   deviceType: string;
+  /** What was actually requested before translation (e.g. 'QR_ORDERING' -> 'POS_ADMIN' on the
+   * wire) — deviceType alone can't tell a QR console apart from a regular Restaurant Admin key,
+   * since both redeem as the same Device.type. */
+  requestedType: string;
   qrSvg: string;
 }
 
@@ -372,7 +379,7 @@ export function OnboardRestaurantPage() {
     }));
   }
 
-  function handleDeviceTypeToggle(type: 'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN') {
+  function handleDeviceTypeToggle(type: 'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING') {
     setActivationForm((prev) => {
       const exists = prev.deviceTypes.includes(type);
       return {
@@ -488,7 +495,7 @@ export function OnboardRestaurantPage() {
               {
                 restaurantId: rId,
                 subscriptionId: sId,
-                allowedDeviceType: type,
+                allowedDeviceType: type === 'QR_ORDERING' ? 'POS_ADMIN' : type,
                 expiresAt: keyExpiresAt
               }
             );
@@ -497,6 +504,7 @@ export function OnboardRestaurantPage() {
               id: keyRes.id,
               code: keyRes.code,
               deviceType: keyRes.allowedDeviceType,
+              requestedType: type,
               qrSvg
             });
           } catch (keyErr) {
@@ -532,7 +540,7 @@ export function OnboardRestaurantPage() {
           {
             restaurantId,
             subscriptionId,
-            allowedDeviceType: type,
+            allowedDeviceType: type === 'QR_ORDERING' ? 'POS_ADMIN' : type,
             expiresAt: keyExpiresAt
           }
         );
@@ -541,6 +549,7 @@ export function OnboardRestaurantPage() {
           id: keyRes.id,
           code: keyRes.code,
           deviceType: keyRes.allowedDeviceType,
+          requestedType: type,
           qrSvg
         });
       }
@@ -1391,6 +1400,21 @@ export function OnboardRestaurantPage() {
                   <div className="device-key-option-desc">Kiosk Fleet & Self-Ordering Configuration ({KIOSK_ADMIN_URL})</div>
                 </div>
               </label>
+
+              {/* Solo QR Ordering: a restaurant with no POS/Kiosk at all, only QR table ordering.
+                  Redeems as a POS_ADMIN-typed device (the QR console lives in the same app), but
+                  needs its own checkbox here or there is no way to provision it during onboarding. */}
+              <label className="device-key-option">
+                <input
+                  type="checkbox"
+                  checked={activationForm.deviceTypes.includes('QR_ORDERING')}
+                  onChange={() => handleDeviceTypeToggle('QR_ORDERING')}
+                />
+                <div>
+                  <div className="device-key-option-label">QR Ordering Console</div>
+                  <div className="device-key-option-desc">Solo QR table ordering — no POS or Kiosk required</div>
+                </div>
+              </label>
             </div>
 
             <div className="form-grid" style={{ marginTop: 20 }}>
@@ -1726,11 +1750,13 @@ export function OnboardRestaurantPage() {
                   {provisionedKeys.map((k) => (
                     <div key={k.id} className="device-key-card" style={{ border: '1.5px solid #fed7aa', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
                       <div className="device-key-type-tag" style={{ background: 'var(--jv-accent)', color: '#fff', fontWeight: 800 }}>
-                        {k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN'
-                          ? 'RESTAURANT ADMIN CONSOLE'
-                          : k.deviceType === 'KIOSK_ADMIN'
-                            ? 'KIOSK ADMIN CONSOLE'
-                            : `${k.deviceType} TERMINAL`}
+                        {k.requestedType === 'QR_ORDERING'
+                          ? 'QR ORDERING CONSOLE'
+                          : k.deviceType === 'ANY' || k.deviceType === 'POS_ADMIN'
+                            ? 'RESTAURANT ADMIN CONSOLE'
+                            : k.deviceType === 'KIOSK_ADMIN'
+                              ? 'KIOSK ADMIN CONSOLE'
+                              : `${k.deviceType} TERMINAL`}
                       </div>
                       <div
                         className="device-qr-wrapper"

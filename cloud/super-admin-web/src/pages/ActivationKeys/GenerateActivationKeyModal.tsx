@@ -17,7 +17,13 @@ export function GenerateActivationKeyModal({
 }) {
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
   const [restaurantId, setRestaurantId] = useState(fixedRestaurantId ?? '');
-  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN'>('ANY');
+  // 'QR_ORDERING' is a frontend-only sentinel: the Device model has no QR-specific type (a QR
+  // console is a POS_ADMIN-typed device, per the deployment doc), but picking it here still needs
+  // to (a) show up as its own clearly-labeled choice instead of being invisible inside "POS_ADMIN",
+  // and (b) preview quota against the restaurant's actual QR_ORDERING entitlement, not POS_ADMIN's
+  // (a solo-QR restaurant has no POS_ADMIN entitlement row at all). Translated to 'POS_ADMIN' only
+  // at the moment of submission, below.
+  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING'>('ANY');
   const [expiryDays, setExpiryDays] = useState('30');
   // BUG-048: the branch this terminal belongs to, and the name it will carry ("Counter 1").
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -55,7 +61,10 @@ export function GenerateActivationKeyModal({
       api.get<ApplicationEntitlement[]>(`/api/v1/restaurants/${restaurantId}/applications`)
     ])
       .then(([restaurant, entitlements]) => {
-        const current = restaurant.devices.filter((d) => (d as { type: string }).type === deviceType && d.status !== 'REVOKED').length;
+        // A QR console redeems as a POS_ADMIN-typed device (no QR-specific Device.type exists) --
+        // count those, not a device type that can never actually appear in the database.
+        const countedType = deviceType === 'QR_ORDERING' ? 'POS_ADMIN' : deviceType;
+        const current = restaurant.devices.filter((d) => (d as { type: string }).type === countedType && d.status !== 'REVOKED').length;
         const row = entitlements.find((e) => e.appCode === deviceType);
         const activeSub = restaurant.subscriptions.find((s) => s.status === 'ACTIVE' || s.status === 'TRIAL') ?? restaurant.subscriptions[0];
         // No entitlement row yet (a pre-Phase-2 subscription) — fall back to the plan's overall cap.
@@ -74,7 +83,7 @@ export function GenerateActivationKeyModal({
       const expiresAt = new Date(Date.now() + Number(expiryDays) * 24 * 60 * 60 * 1000).toISOString();
       const key = await api.post<{ code: string }>('/api/v1/activation-keys', {
         restaurantId,
-        allowedDeviceType: deviceType,
+        allowedDeviceType: deviceType === 'QR_ORDERING' ? 'POS_ADMIN' : deviceType,
         expiresAt,
         branchId: branchId || undefined,
         label: label.trim() || undefined
@@ -157,6 +166,7 @@ export function GenerateActivationKeyModal({
                   <option value="KDS">Kitchen Order Display (KDS)</option>
                   <option value="KIOSK">Self-Order Kiosk</option>
                   <option value="KIOSK_ADMIN">Kiosk Admin Console</option>
+                  <option value="QR_ORDERING">QR Ordering Console (solo — no POS/Kiosk needed)</option>
                 </select>
               </div>
               <div className="field">

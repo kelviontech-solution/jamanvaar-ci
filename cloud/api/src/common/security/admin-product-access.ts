@@ -2,6 +2,11 @@ import type { Prisma } from '@prisma/client';
 
 export type AdminApp = 'POS_ADMIN' | 'KIOSK_ADMIN' | 'QR_ORDERING';
 const BOTH: readonly AdminApp[] = ['POS_ADMIN', 'KIOSK_ADMIN'];
+// A restaurant can be licensed for QR Ordering alone, with no POS_ADMIN/KIOSK_ADMIN entitlement
+// at all (DeviceAuthGuard already treats QR_ORDERING as a peer of the other two for a POS_ADMIN-
+// typed device) -- enabledConsoleApps must look for it too, or a solo-QR restaurant resolves to
+// zero enabled apps here even though its own device authenticates fine.
+const ALL_ADMIN_APPS: readonly AdminApp[] = ['POS_ADMIN', 'KIOSK_ADMIN', 'QR_ORDERING'];
 const RESTAURANT_ENTITIES = new Set(['CUSTOMER', 'INVENTORY_ITEM', 'RECIPE', 'SUPPLIER', 'PAYMENT_TRANSACTION', 'SHIFT', 'CASH_MOVEMENT', 'RESERVATION']);
 
 /** Existing resource permissions, independent of any browser-supplied product preference. */
@@ -24,7 +29,7 @@ export function requiredConsoleApps(pathname: string): readonly AdminApp[] {
 
 export async function enabledConsoleApps(tx: Prisma.TransactionClient, restaurantId: string): Promise<AdminApp[]> {
   const rows = await tx.applicationEntitlement.findMany({
-    where: { appCode: { in: [...BOTH] }, enabled: true, subscription: {
+    where: { appCode: { in: [...ALL_ADMIN_APPS] }, enabled: true, subscription: {
       restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() }
     } }, select: { appCode: true }
   });
