@@ -2,9 +2,30 @@ name: Build Desktop Installers
 
 on:
   workflow_dispatch:
+    inputs:
+      apps:
+        description: 'Comma-separated app names to build (POS, RestaurantAdmin, Kiosk, Captain, KDS), or "all"'
+        required: false
+        default: 'all'
 
 jobs:
+  # Filters the five-app matrix down to just what this run asked for -- fixing one app
+  # doesn't need to rebuild (and re-sign, re-release) all five every time.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      desktop_matrix: ${{ steps.filter.outputs.desktop_matrix }}
+      android_matrix: ${{ steps.filter.outputs.android_matrix }}
+      apps_csv: ${{ steps.filter.outputs.apps_csv }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        env:
+          APPS_INPUT: ${{ github.event.inputs.apps }}
+        run: node .github/scripts/filter-build-matrix.mjs
+
   build-desktop:
+    needs: setup
     runs-on: windows-latest
     # Job-level, not per-step: tauri.conf.json's beforeBuildCommand re-runs "npm run build"
     # a SECOND time, unattended, inside `tauri build` itself -- a step-scoped env block on
@@ -18,28 +39,7 @@ jobs:
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
     strategy:
       fail-fast: false
-      matrix:
-        app:
-          - name: POS
-            path: apps/restaurant-system/pos
-            binary: jamanvaar-pos.exe
-            title: "JAMANVAAR POS — High-Speed Counter Billing Terminal"
-          - name: RestaurantAdmin
-            path: apps/restaurant-system/pos-admin
-            binary: jamanvaar-pos-admin.exe
-            title: "JAMANVAAR POS Admin — Restaurant Operations & Intelligence"
-          - name: Kiosk
-            path: apps/kiosk-system/kiosk-user
-            binary: jamanvaar-kiosk-user.exe
-            title: "JAMANVAAR Kiosk — Customer Self-Order Terminal"
-          - name: Captain
-            path: apps/restaurant-system/captain
-            binary: jamanvaar-captain.exe
-            title: "JAMANVAAR Captain — Table-Side Ordering & Service"
-          - name: KDS
-            path: apps/restaurant-system/kds
-            binary: jamanvaar-kds.exe
-            title: "JAMANVAAR Kitchen Display — Prep Queue & Order Timing"
+      matrix: ${{ fromJSON(needs.setup.outputs.desktop_matrix) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -105,6 +105,7 @@ jobs:
           if-no-files-found: error
 
   build-android:
+    needs: setup
     runs-on: ubuntu-latest
     # Job-level for the same reason as build-desktop: tauri.conf.json's beforeBuildCommand
     # re-runs "npm run build" again inside both `tauri android init` and `tauri android build`
@@ -115,18 +116,7 @@ jobs:
       CARGO_PROFILE_DEV_DEBUG: "0"
     strategy:
       fail-fast: false
-      matrix:
-        app:
-          - name: POS
-            path: apps/restaurant-system/pos
-          - name: RestaurantAdmin
-            path: apps/restaurant-system/pos-admin
-          - name: Kiosk
-            path: apps/kiosk-system/kiosk-user
-          - name: Captain
-            path: apps/restaurant-system/captain
-          - name: KDS
-            path: apps/restaurant-system/kds
+      matrix: ${{ fromJSON(needs.setup.outputs.android_matrix) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -184,7 +174,7 @@ jobs:
   # is pasting the resulting URLs + signature into Super Admin's Publish Version form once
   # (deliberately -- nothing should reach real restaurant devices without that human decision).
   publish-release:
-    needs: [build-desktop, build-android]
+    needs: [setup, build-desktop, build-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -200,11 +190,14 @@ jobs:
           path: downloaded
 
       - name: Flatten into clearly-named release assets
+        env:
+          APPS_CSV: ${{ needs.setup.outputs.apps_csv }}
         run: |
           set -e
           mkdir -p release-assets
           declare -A slug=( [POS]=pos [RestaurantAdmin]=pos-admin [Kiosk]=kiosk [Captain]=captain [KDS]=kds )
-          for app in POS RestaurantAdmin Kiosk Captain KDS; do
+          IFS=',' read -ra apps <<< "$APPS_CSV"
+          for app in "${apps[@]}"; do
             name="${slug[$app]}"
             exe_src=$(find "downloaded/${app}-installer" -iname "*.exe" ! -iname "*.sig" | head -n1)
             sig_src=$(find "downloaded/${app}-installer" -iname "*.exe.sig" | head -n1)
