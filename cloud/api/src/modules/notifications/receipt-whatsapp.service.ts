@@ -133,20 +133,27 @@ export class ReceiptWhatsAppService {
         where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: orderId } },
         include: { paymentTransactions: { orderBy: { createdAt: 'desc' }, take: 1 }, restaurant: { select: restaurantSelect } }
       });
+      // A kiosk cash order leaves TWO records: the online-payment attempt (Order, stuck at PENDING because the
+      // guest chose to pay at the counter instead) and the real, confirmed cash order (SyncedOrder). An unpaid
+      // Order must therefore not end the search -- only refuse when no confirmed order exists either.
+      let unpaid: string | null = null;
       if (order) {
         if (branchId && order.branchId && branchId !== order.branchId) throw new NotFoundException('Order not found');
         const payment = order.paymentTransactions[0];
-        if (!payment || !PAID_STATUSES.includes(payment.status)) {
-          throw new BadRequestException(`Cannot send a bill for an order with no successful payment (status: ${payment?.status ?? 'none'})`);
+        if (payment && PAID_STATUSES.includes(payment.status)) {
+          await assertEnabled(order.branchId);
+          return this.toSource(order.restaurant, order.externalOrderId, payment.method, order);
         }
-        await assertEnabled(order.branchId);
-        return this.toSource(order.restaurant, order.externalOrderId, payment.method, order);
+        unpaid = `Cannot send a bill for an order with no successful payment (status: ${payment?.status ?? 'none'})`;
       }
       const synced = await tx.syncedOrder.findUnique({
         where: { restaurantId_externalOrderId: { restaurantId, externalOrderId: orderId } },
         include: { restaurant: { select: restaurantSelect } }
       });
-      if (!synced) return null;
+      if (!synced) {
+        if (unpaid) throw new BadRequestException(unpaid);
+        return null;
+      }
       if (branchId && synced.branchId && branchId !== synced.branchId) throw new NotFoundException('Order not found');
       if (CLOSED_ORDER_STATUSES.includes(synced.status)) {
         throw new BadRequestException(`Cannot send a bill for an order with status ${synced.status}`);
