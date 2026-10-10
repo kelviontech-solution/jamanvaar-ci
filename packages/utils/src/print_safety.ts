@@ -20,12 +20,40 @@
  */
 
 /**
+ * Characters outside a thermal printer's single-byte code page, mapped to the closest plain-ASCII
+ * equivalent it can actually render. ESC/POS printers do not speak UTF-8: `formatINR` (and anything
+ * else building printed text) writes the real ₹ sign, and when its 3-byte UTF-8 encoding
+ * (0xE2 0x82 0xB9) hits a printer whose firmware reads raw bytes through, say, a CJK code page,
+ * each byte is drawn as whatever glyph that code page has at that position -- confirmed live, this
+ * prints as a stray Chinese/Japanese character (e.g. 銃) in place of every amount on the receipt.
+ * Plain item names stay unaffected because they were already ASCII.
+ */
+const PRINT_SAFE_REPLACEMENTS: Record<string, string> = {
+  '₹': 'Rs.',
+  '–': '-',
+  '—': '-',
+  '’': "'",
+  '‘': "'",
+  '“': '"',
+  '”': '"',
+  '…': '...'
+};
+
+/**
  * Strips control characters from text before it is encoded into a raw printer byte stream.
  * Keeps `\n` and `\t` (real formatting the receipt/KOT templates rely on) and every printable
- * character; removes every other C0 control byte (0x00-0x1F), DEL (0x7F), and the C1 control
+ * ASCII character; removes every other C0 control byte (0x00-0x1F), DEL (0x7F), and the C1 control
  * range (0x80-0x9F) — the bytes ESC/POS command sequences are built from.
+ *
+ * Also rewrites the handful of non-ASCII characters printed text is actually expected to contain
+ * (the ₹ sign above all) to their closest ASCII equivalent, and replaces any other character
+ * outside printable ASCII with `?` rather than letting it reach the printer as raw UTF-8 bytes.
  */
 export function stripControlCharsForPrint(text: string): string {
+  const withoutControlChars = text
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
+    .replace(/[₹–—''""…]/g, (ch) => PRINT_SAFE_REPLACEMENTS[ch] ?? ch);
   // eslint-disable-next-line no-control-regex
-  return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
+  return withoutControlChars.replace(/[^\n\t\x20-\x7E]/g, '?');
 }
