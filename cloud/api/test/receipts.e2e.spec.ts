@@ -325,6 +325,24 @@ describe('Receipt e-bill delivery', () => {
       expect(headers['X-Signature']).toBe(expected);
     });
 
+    it('sends from the number the admin chose in Receipt settings (fromNumber), and from the default when none is set', async () => {
+      const bodyOf = () => JSON.parse((fetchSpy.mock.calls.at(-1)![1] as RequestInit).body as string);
+      await send(posToken, cashOrderId, '9876543210');
+      expect(bodyOf().fromNumber).toBeUndefined();
+
+      const where = { restaurantId_entityType_externalId: { restaurantId, entityType: 'WHATSAPP_BILL_SETTINGS', externalId: 'restaurant' } };
+      await prisma.runAsTenant(restaurantId, (tx) =>
+        tx.syncedEntity.upsert({ where, create: { restaurantId, entityType: 'WHATSAPP_BILL_SETTINGS', externalId: 'restaurant', payload: { number: '9428521735', status: 'READY' } }, update: { payload: { number: '9428521735', status: 'READY' } } })
+      );
+      try {
+        await send(posToken, cashOrderId, '9876543210');
+        expect(bodyOf().fromNumber).toBe('9428521735');
+        expect(bodyOf().phone).toBe('9876543210'); // the customer's number is untouched
+      } finally {
+        await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'WHATSAPP_BILL_SETTINGS' } }));
+      }
+    });
+
     it('sends a bill for a paid online order from the kiosk', async () => {
       const res = await send(kioskToken, paidOrderId, '9876543210');
       expect(res.status).toBe(201);

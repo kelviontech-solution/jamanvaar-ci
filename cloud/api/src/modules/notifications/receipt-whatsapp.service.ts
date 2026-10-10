@@ -3,6 +3,7 @@ import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableE
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
+import { readSavedBillNumber } from './whatsapp-bill-settings.service';
 
 const SEND_BILL_PATH = '/api/v1/webhooks/jamanvaar/send-bill';
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
@@ -56,11 +57,14 @@ export class ReceiptWhatsAppService {
     if (!baseUrl || !secret) throw new ServiceUnavailableException('WhatsApp billing is not configured on this server');
 
     const bill = await this.loadBill(restaurantId, orderId, branchId);
+    // The number the admin chose in Receipt settings; empty = the restaurant's default connected number.
+    const fromNumber = await readSavedBillNumber(this.prisma, restaurantId);
     const orderNo = bill.externalOrderId.slice(-10).toUpperCase();
 
     const rawBody = JSON.stringify({
       restaurantId,
       phone: normalized,
+      ...(fromNumber ? { fromNumber } : {}),
       billText: this.formatBill(bill, orderNo),
       // Template fallback (customer outside the 24h window): {{1}} order, {{2}} reference, {{3}} total.
       templateParams: [orderNo, orderNo, inr(bill.totalAmount)]
@@ -85,25 +89,29 @@ export class ReceiptWhatsAppService {
     return data?.success ? { success: true } : { success: false, errorMessage: data?.errorMessage ?? 'WhatsApp send failed' };
   }
 
-  private formatBill(b: BillSource, orderNo: string): string {
-    const items = b.items.map((it) => `• ${it.quantity} x ${it.name} — ${inr(it.lineTotal)}`).join('\n');
+  /** Minimal plain-text layout (WhatsApp _italic_ and dashed rules). Keep in step with the WhatsApp
+   *  service's bill_sender.format_bill_text, which renders the test sample. */
+  private formatBill(b: BillSource, orderNo: string, when: Date = new Date()): string {
+    const rule = Array(12).fill('-').join(' ');
+    const date = when.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
     const lines = [
-      `🍽️ *${b.restaurantName}*`,
+      `_${b.restaurantName}_`,
       b.address,
-      b.gstin ? `GSTIN: ${b.gstin}` : null,
-      '',
-      `*Bill — Order ${orderNo}*`,
-      '',
-      items,
-      '',
-      `Subtotal: ${inr(b.subtotal)}`,
-      `Tax: ${inr(b.taxAmount)}`,
-      `*TOTAL: ${inr(b.totalAmount)}*`,
-      b.method ? `Paid via: ${b.method}` : null,
-      '',
-      'Thank you for dining with us! 🙏'
+      b.gstin ? `GSTIN ${b.gstin}` : null,
+      rule,
+      `Order  ${orderNo}`,
+      date,
+      rule,
+      ...b.items.map((it) => `${it.name} x${it.quantity}  -  ${inr(it.lineTotal)}`),
+      rule,
+      `Subtotal  -  ${inr(b.subtotal)}`,
+      `Tax  -  ${inr(b.taxAmount)}`,
+      `_Total  -  ${inr(b.totalAmount)}_`,
+      rule,
+      b.method ? `Paid via ${b.method}` : null,
+      '_Thank you, visit again_'
     ];
-    return lines.filter((l): l is string => l !== null && l !== undefined).join('\n');
+    return lines.filter((l): l is string => l !== null && l !== undefined && l !== '').join('\n');
   }
 
   /** Online-paid order first (needs a real SUCCESS payment), then the cash-at-counter SyncedOrder

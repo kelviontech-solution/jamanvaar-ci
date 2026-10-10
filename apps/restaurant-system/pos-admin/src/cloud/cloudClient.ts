@@ -237,7 +237,7 @@ async function refreshAccessTokenLocked(): Promise<RefreshOutcome> {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   body?: unknown;
   skipAuthRetry?: boolean;
 }
@@ -1256,6 +1256,25 @@ export async function revokeWhatsAppChannelKey(): Promise<void> {
 export async function updateWhatsAppChannelSettings(input: { autoAccept?: boolean; prepTimeMinutes?: number; paused?: boolean }): Promise<WhatsAppChannelStatus> {
   return request<WhatsAppChannelStatus>('/api/v1/tenant/whatsapp-channel/settings', { method: 'PATCH', body: input });
 }
+
+/** The WhatsApp number this restaurant's bills are sent from, and how ready it is. */
+export interface WhatsAppBillSettings {
+  number: string | null;
+  status: 'NOT_SET' | 'READY' | 'NOT_FOUND' | 'NO_CREDENTIALS' | 'TOKEN_INVALID' | 'OWNED_BY_OTHER' | 'UNREACHABLE' | 'NOT_CONNECTED' | 'BAD_NUMBER';
+  message: string | null;
+  displayNumber: string | null;
+  verifiedName: string | null;
+  quality: string | null;
+  /** APPROVED | PENDING | REJECTED | MISSING | NOT_CONFIGURED | UNKNOWN (null until the number is READY). */
+  templateStatus: string | null;
+  checkedAt: string | null;
+}
+
+export const fetchWhatsAppBillSettings = () => request<WhatsAppBillSettings>('/api/v1/tenant/whatsapp-bill');
+export const saveWhatsAppBillNumber = (number: string) => request<WhatsAppBillSettings>('/api/v1/tenant/whatsapp-bill', { method: 'PUT', body: { number } });
+export const recheckWhatsAppBillNumber = () => request<WhatsAppBillSettings>('/api/v1/tenant/whatsapp-bill/recheck', { method: 'POST' });
+export const createWhatsAppBillTemplate = () => request<WhatsAppBillSettings>('/api/v1/tenant/whatsapp-bill/template', { method: 'POST' });
+export const clearWhatsAppBillNumber = () => request<WhatsAppBillSettings>('/api/v1/tenant/whatsapp-bill', { method: 'DELETE' });
 
 /** Reserves a block of human order/KOT numbers for this device so offline terminals never issue the same number. */
 export async function leaseNumberBlock(kind: 'ORDER' | 'KOT', count: number): Promise<{ kind: 'ORDER' | 'KOT'; prefix: string; businessDate: string; start: number; count: number }> {
