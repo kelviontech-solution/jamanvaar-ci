@@ -129,7 +129,7 @@ export class DeviceAuthGuard implements CanActivate {
       // Restaurant Admin is one POS_ADMIN device for both product families. Activation
       // accepts either admin entitlement; subsequent calls must use the same contract.
       // Keep the actual app rows distinct so kiosk access never enables POS-only modules.
-      const entitledApps = device.type === 'POS_ADMIN' ? ['POS_ADMIN', 'KIOSK_ADMIN'] as const : [device.type];
+      const entitledApps = device.type === 'POS_ADMIN' ? ['POS_ADMIN', 'KIOSK_ADMIN', 'QR_ORDERING'] as const : [device.type];
       const entitlements = await this.prisma.runAsPlatform((tx) =>
         tx.applicationEntitlement.findMany({
           where: { subscriptionId: { in: subscriptions.map((sub) => sub.id) }, appCode: { in: [...entitledApps] }, enabled: true },
@@ -137,7 +137,7 @@ export class DeviceAuthGuard implements CanActivate {
         })
       );
       if (!entitlements.length) {
-        const appName = device.type === 'POS_ADMIN' ? 'Restaurant Admin (POS_ADMIN or KIOSK_ADMIN)' : device.type;
+        const appName = device.type === 'POS_ADMIN' ? 'Management console (POS_ADMIN, KIOSK_ADMIN or QR_ORDERING)' : device.type;
         this.deny('forbidden', 'APP_DISABLED', `${appName} is not enabled for this restaurant. Please contact your platform administrator.`);
       }
 

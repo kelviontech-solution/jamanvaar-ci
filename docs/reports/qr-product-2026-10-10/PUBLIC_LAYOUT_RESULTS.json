@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "widths": [
+    320,
+    390,
+    768,
+    1440,
+    1920
+  ],
+  "normalScrolling": true,
+  "horizontalOverflow": false,
+  "apiRequests": [],
+  "pageErrors": []
+}

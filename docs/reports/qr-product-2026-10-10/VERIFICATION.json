@@ -1,0 +1,72 @@
+{
+  "status": "PASS_LOCAL",
+  "productionDeployed": false,
+  "environment": "Compiled applications and isolated QA API/database",
+  "apiRegression": {
+    "status": "PASS",
+    "suites": 7,
+    "tests": 137,
+    "log": "logs/qr-product-regression-api.log"
+  },
+  "finalOperationsRecheck": {
+    "status": "PASS",
+    "suites": 2,
+    "tests": 16,
+    "includesAdditionalBacklogCase": true,
+    "overlapsApiRegression": true,
+    "log": "logs/qr-product-final-operations.log"
+  },
+  "clientRegression": {
+    "status": "PASS",
+    "suites": 8,
+    "tests": 48,
+    "log": "logs/qr-product-client-tests.log"
+  },
+  "browserRegression": {
+    "status": "PASS",
+    "flows": 14,
+    "pageErrors": 0,
+    "evidence": "BROWSER_REGRESSION_RESULTS.json"
+  },
+  "finalProductBrowserRecheck": {
+    "status": "PASS",
+    "flows": 7,
+    "overlapsBrowserRegression": true,
+    "pageErrors": 0,
+    "evidence": "BROWSER_RESULTS.json"
+  },
+  "finalPublicLayout": {
+    "status": "PASS",
+    "widths": [320, 390, 768, 1440, 1920],
+    "normalScrolling": true,
+    "horizontalOverflow": false,
+    "apiRequests": 0,
+    "pageErrors": 0,
+    "evidence": "PUBLIC_LAYOUT_RESULTS.json"
+  },
+  "builds": {
+    "api": "PASS",
+    "restaurantAdminAndQr": "PASS",
+    "qrGuest": "PASS",
+    "pos": "PASS",
+    "captain": "PASS",
+    "kds": "PASS",
+    "warnings": ["Existing large administrator/device chunks"]
+  },
+  "migration": {
+    "name": "20261010180000_qr_operations_features",
+    "catalogAndIndexesValidated": true,
+    "appliedTo": "Isolated QA database only",
+    "productionMigrationRun": false
+  },
+  "paymentAndMessaging": {
+    "transports": "Simulated gateway SDK/provider and SMTP",
+    "realMoneyCharged": false,
+    "realCustomerMessagesSent": false
+  },
+  "deploymentChecks": {
+    "normalGuestBuildRestored": true,
+    "nginxRuntimeSyntaxCheck": "Requires deployment environment; binary unavailable locally",
+    "instructions": "DEPLOYMENT.md"
+  }
+}

@@ -22,6 +22,7 @@ export const syncedOrderItemSchema = z.object({
   snapshot: z
     .object({
       menuVersion: z.number().int().optional(),
+      categoryName:z.string().max(120).optional(),
       basePrice: z.number().int().optional(),
       taxGroupId: z.string().max(128).optional(),
       taxRateBp: z.number().int().optional(),

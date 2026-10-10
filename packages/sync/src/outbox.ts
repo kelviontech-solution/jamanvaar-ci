@@ -43,6 +43,7 @@ export interface OrderSyncPushItem {
 }
 
 export interface OrderSyncMeta {
+  pickupAt?:string;pickupTimezone?:string;pickupInstructions?:string;
   serverDishStockConsumed?:Record<string,number>;
   paymentAllocationSummary?: Order['paymentAllocationSummary'];
   counterSettlementAmountPaise?: number;
@@ -357,6 +358,7 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
 /** Merges a remote copy into an order this device already has locally. Returns true if items were added. */
 function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolean {
   applyPaymentAndTotals(local, remote);
+  local.pickupAt=remote.meta?.pickupAt;local.pickupTimezone=remote.meta?.pickupTimezone;local.pickupInstructions=remote.meta?.pickupInstructions;
   // A Captain table transfer changes an existing order, not its kitchen identity.
   // Update every already-created ticket instead of leaving the old destination on KDS/reprints.
   if (remote.tableLabel !== undefined) {
@@ -435,6 +437,7 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     tableNumber: remote.tableLabel || undefined,
     guestCount: m.guestCount,
     refundAmount: m.refundAmountPaise === undefined ? undefined : fromPaise(m.refundAmountPaise),
+    pickupAt:m.pickupAt,pickupTimezone:m.pickupTimezone,pickupInstructions:m.pickupInstructions,
     customerName: m.customerName,
     customerPhone: m.customerPhone,
     serverDishStockConsumed:m.serverDishStockConsumed,
@@ -493,6 +496,11 @@ function qrKotIdentity(order: Order): { idBase: string; numberBase: string } {
 }
 
 function ensureKotsForOrder(order: Order): void {
+  if (order.pickupAt) for (const kot of db.kots.filter(k => k.orderId === order.id)) {
+    kot.pickupAt = order.pickupAt;
+    kot.pickupTimezone = order.pickupTimezone;
+    kot.orderNotes = [order.customerNotes, `Scheduled pickup: ${new Date(order.pickupAt).toLocaleString(undefined, {timeZone: order.pickupTimezone})}. ${order.pickupInstructions || ''}`].filter(Boolean).join(' | ');
+  }
   if (['DRAFT', 'CANCELLED', 'REFUNDED'].includes(order.orderStatus)) return;
   // A paid counter bill may still have submitted dishes being prepared; unsent historical bills must not become tickets.
   if (order.orderStatus === 'COMPLETED' && order.source_type !== 'KIOSK' && !order.items.some(it => it.sentAt)) return;
@@ -550,7 +558,8 @@ function ensureKotsForOrder(order: Order): void {
     })),
     cashierName: order.captainName || order.cashierName || '',
     serverName: order.captainName,
-    orderNotes: order.customerNotes
+    pickupAt:order.pickupAt,pickupTimezone:order.pickupTimezone,
+    orderNotes:[order.customerNotes,order.pickupAt?`Scheduled pickup: ${new Date(order.pickupAt).toLocaleString(undefined,{timeZone:order.pickupTimezone})}. ${order.pickupInstructions||''}`:null].filter(Boolean).join(' | ')
   });
 }
 

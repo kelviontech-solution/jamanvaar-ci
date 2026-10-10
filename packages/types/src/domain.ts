@@ -645,6 +645,9 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   pickupCounter?: string;
+  pickupAt?: string;
+  pickupTimezone?: string;
+  pickupInstructions?: string;
   source_type?: 'KIOSK' | 'POS' | 'CAPTAIN' | 'QR_TABLE' | 'ONLINE' | 'OTHER';
   /** The device that accepted this order (QR orders wait for exactly one POS to accept them). First accept wins, everywhere. */
   acceptedByDeviceId?: string;
@@ -1334,6 +1337,7 @@ export interface KOTItem {
 }
 
 export interface KOTRecord {
+  pickupAt?:string;pickupTimezone?:string;
   id: string;
   kotNumber: string; // e.g. KOT-01
   orderId: string;

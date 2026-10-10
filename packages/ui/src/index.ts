@@ -38,3 +38,5 @@ export * from './ConnectionPanel';
 export * from './LocalCorePairing';
 
 export * from './JamanAiAccessNotice';
+
+export {QrServiceInbox,type QrServiceRequest} from './QrServiceInbox';

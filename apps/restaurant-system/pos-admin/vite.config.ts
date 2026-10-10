@@ -12,7 +12,8 @@ const appVersion = (JSON.parse(readFileSync(path.resolve(__dirname, 'src-tauri/t
 
 export default defineConfig({
   base: './',
-  plugins: [react(), appShellCache()],
+  plugins: [react(), appShellCache(), { name: 'qr-product-entry-paths', configureServer(server) { server.middlewares.use((req,_res,next)=>{if(req.url?.startsWith('/qr/assets/'))req.url=req.url.replace('/qr/','/');else if(req.url?.split('?')[0].match(/^\/qr(?:\/|$)/))req.url='/qr.html';next();}); }, enforce: 'post', generateBundle(_options,bundle) { const page=bundle['qr.html']; if(page?.type==='asset')page.source=String(page.source).replaceAll('="./assets/','="/qr/assets/'); } }],
+  build: { rollupOptions: { input: { admin: path.resolve(__dirname,'index.html'), qr: path.resolve(__dirname,'qr.html') } } },
   optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
   worker: { format: 'es' },
   define: { __APP_VERSION__: JSON.stringify(appVersion) },

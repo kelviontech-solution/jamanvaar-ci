@@ -126,6 +126,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           </div>
         )}
 
+        {kot.pickupAt&&<div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm font-bold text-indigo-900">Scheduled pickup: {new Date(kot.pickupAt).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}<p className="mt-1 text-xs">Start preparation by {new Date(Date.parse(kot.pickupAt)-age.prep*60000).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}</p></div>}
         {kot.orderNotes && (
           <div className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-start gap-1.5 border ${allergyText(kot.orderNotes) ? 'bg-rose-100 text-rose-900 border-rose-400' : 'bg-amber-100/80 text-amber-900 border-amber-300/60'}`}>
             <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />

@@ -99,9 +99,9 @@ export class QrPublicController {
 
   @Post(':token/events')
   @HttpCode(200)
-  @UsePipes(new ZodValidationPipe(z.object({ type: z.enum(['QR_CART_CREATED', 'QR_CHECKOUT_STARTED', 'QR_ITEM_ADDED']) }).strict()))
-  event(@Param('token') token: string, @Body() body: { type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' }, @Req() req: Request & { qrSession?: string }) {
-    return this.qr.guestEvent(token, body.type, req.qrSession);
+  @UsePipes(new ZodValidationPipe(z.object({ type: z.enum(['QR_CART_CREATED', 'QR_CHECKOUT_STARTED', 'QR_ITEM_ADDED', 'QR_ITEM_VIEWED']),itemId:z.string().max(100).optional() }).strict()))
+  event(@Param('token') token: string, @Body() body: { type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED';itemId?:string }, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.guestEvent(token, body.type, req.qrSession,body.itemId);
   }
 
   @Post(':token/orders')

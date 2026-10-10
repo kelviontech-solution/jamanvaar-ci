@@ -2700,6 +2700,7 @@ export class KOTRepository {
     cashierName: string;
     serverName?: string;
     orderNotes?: string;
+    pickupAt?:string;pickupTimezone?:string;
     /** When set, ticket ids and numbers derive from these instead of the clock and local counters (see qrKotIdentity). */
     idBase?: string;
     numberBase?: string;
@@ -2719,6 +2720,7 @@ export class KOTRepository {
     cashierName: string;
     serverName?: string;
     orderNotes?: string;
+    pickupAt?:string;pickupTimezone?:string;
     /** When set, ticket ids and numbers derive from these instead of the clock and local counters (see qrKotIdentity). */
     idBase?: string;
     numberBase?: string;
@@ -2770,6 +2772,7 @@ export class KOTRepository {
         createdAt: new Date().toISOString(),
         printed: true,
         status: 'PREPARING',
+        pickupAt:params.pickupAt,pickupTimezone:params.pickupTimezone,
         orderNotes: params.orderNotes
       };
 

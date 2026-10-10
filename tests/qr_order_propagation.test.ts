@@ -10,6 +10,7 @@ import { SyncOutboxEngine, CloudSyncedOrder } from '@jamanvaar/sync';
 describe('a guest QR order arrives on a device with its real prices and snapshot', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    db.kots = [];
     SyncOutboxEngine.configureTransport(null);
   });
 
@@ -47,6 +48,24 @@ describe('a guest QR order arrives on a device with its real prices and snapshot
     expect(line.snapshot).toMatchObject({ menuVersion: 7, basePrice: 24900, taxRateBp: 500, lineTax: 2890 });
     expect(line.kitchenStation).toBe('Oven');
     expect(order!.totalAmount).toBeCloseTo(606.9, 2);
+  });
+
+  it('projects scheduled pickup into the shared order and kitchen ticket without duplicating it on refresh', async () => {
+    const remote = qrOrder();
+    remote.orderType = 'TAKEAWAY';
+    remote.meta = {...remote.meta, pickupAt: '2026-10-11T08:00:00Z', pickupTimezone: 'Asia/Kolkata', pickupInstructions: 'Collect at reception'};
+    SyncOutboxEngine.configureTransport({
+      push: async () => ({results: [], serverTime: new Date().toISOString()}),
+      pull: async () => ({orders: [remote], serverTime: new Date().toISOString()})
+    } as never);
+    await SyncOutboxEngine.catchUpFromCloud();
+    const first = db.kots.filter(k => k.orderId === remote.externalOrderId);
+    expect(first.length).toBeGreaterThan(0);
+    expect(first[0]).toMatchObject({pickupAt: remote.meta.pickupAt, pickupTimezone: 'Asia/Kolkata'});
+    expect(first[0].orderNotes).toContain('Collect at reception');
+    await SyncOutboxEngine.catchUpFromCloud();
+    expect(db.kots.filter(k => k.orderId === remote.externalOrderId)).toHaveLength(first.length);
+    expect(db.orders.find(o => o.id === remote.externalOrderId)?.pickupAt).toBe(remote.meta.pickupAt);
   });
 
   it('the device pushes the order back (kitchen status changed) with the snapshot and option details intact', async () => {

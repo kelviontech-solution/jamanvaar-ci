@@ -277,7 +277,7 @@ export class TenantAuthService {
       deviceToken: dto.deviceToken,
       deviceType: dto.deviceType,
       appVersion: dto.appVersion,
-      adminOnly: dto.adminOnly
+      adminOnly: dto.adminOnly, requestedProduct: dto.requestedProduct
     });
   }
 
@@ -292,7 +292,7 @@ export class TenantAuthService {
   private async authenticateAndRespond(
     candidates: Array<User & { restaurant: RestaurantAuthCheck }>,
     password: string,
-    opts: { deviceId?: string; deviceToken?: string; deviceType?: string; appVersion?: string; adminOnly?: boolean }
+    opts: { deviceId?: string; deviceToken?: string; deviceType?: string; appVersion?: string; adminOnly?: boolean; requestedProduct?: 'QR_ORDERING' }
   ): Promise<TenantAuthResponse> {
     const { deviceId, deviceToken, deviceType, appVersion } = opts;
     const now = new Date();
@@ -358,6 +358,11 @@ export class TenantAuthService {
     const isAdminConsoleDevice = deviceType === 'POS_ADMIN';
     if ((opts.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
       throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
+    }
+
+    if (opts.requestedProduct === 'QR_ORDERING') {
+      if (deviceType !== 'POS_ADMIN' || !['OWNER','MANAGER'].includes(matchedUser.role)) throw new ForbiddenException('QR Admin requires an owner or manager account');
+      await this.prisma.runAsTenant(matchedUser.restaurantId, tx => this.appEntitlements.assertAppEnabled(tx, matchedUser.restaurantId, 'QR_ORDERING'));
     }
 
     // Check device activation state
@@ -435,7 +440,8 @@ export class TenantAuthService {
         sub: matchedUser.id,
         restaurantId: matchedUser.restaurantId,
         email: matchedUser.email,
-        type: 'DEVICE_ACTIVATION'
+        type: 'DEVICE_ACTIVATION',
+        ...(opts.requestedProduct ? { requestedProduct: opts.requestedProduct } : {})
       };
       const activationSessionToken = this.jwt.sign(activationPayload, {
         secret: this.config.get<string>('JWT_ACCESS_SECRET'),
@@ -505,7 +511,7 @@ export class TenantAuthService {
       deviceId: dto.deviceId,
       deviceToken: dto.deviceToken,
       deviceType: dto.deviceType,
-      appVersion: dto.appVersion
+      appVersion: dto.appVersion, requestedProduct: dto.requestedProduct
     });
   }
 
@@ -514,7 +520,7 @@ export class TenantAuthService {
    * Atomically validates the key, binds the device, and mints access credentials.
    */
   async activateDevice(dto: ActivateDeviceDto): Promise<TenantLoginSuccess & { deviceToken: string }> {
-    let decoded: { sub: string; restaurantId: string; email: string; type: string };
+    let decoded: { sub: string; restaurantId: string; email: string; type: string; requestedProduct?: string };
     try {
       decoded = this.jwt.verify(dto.activationSessionToken, {
         secret: this.config.get<string>('JWT_ACCESS_SECRET')
@@ -538,7 +544,7 @@ export class TenantAuthService {
         throw new NotFoundException('Invalid activation key. Please verify the code.');
       }
       if (key.restaurantId !== decoded.restaurantId) {
-        throw new BadRequestException('This activation key belongs to a different restaurant.');
+        throw new NotFoundException('Invalid activation key. Please verify the code.');
       }
       if (key.status === 'REVOKED') {
         throw new GoneException('This activation key has been revoked by Super Admin.');
@@ -548,6 +554,13 @@ export class TenantAuthService {
       }
       if (key.status === 'EXPIRED' || key.expiresAt < new Date()) {
         throw new GoneException('This activation key has expired. Request a new key in Super Admin.');
+      }
+
+      if (decoded.requestedProduct === 'QR_ORDERING') {
+        if (dto.deviceType !== 'POS_ADMIN' || !['POS_ADMIN','ANY'].includes(key.allowedDeviceType)) throw new BadRequestException('Use a management activation key issued for QR Admin');
+        const actor = await tx.user.findFirst({where:{id:decoded.sub,restaurantId:decoded.restaurantId,status:'ACTIVE',role:{in:['OWNER','MANAGER']}}});
+        if (!actor || (actor.role === 'MANAGER' && (!actor.branchId || key.branchId !== actor.branchId))) throw new ForbiddenException('This account cannot activate this management device');
+        await this.appEntitlements.assertAppEnabled(tx,key.restaurantId,'QR_ORDERING');
       }
 
       // Check device compatibility (for POS_ADMIN management console, any valid key for this restaurant is accepted)
@@ -599,7 +612,8 @@ export class TenantAuthService {
           this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'POS_ADMIN'),
           this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'KIOSK_ADMIN')
         ]);
-        if (!posAdminEnabled && !kioskAdminEnabled) {
+        const qrEnabled = decoded.requestedProduct === 'QR_ORDERING' && await this.appEntitlements.isAppEnabled(tx,key.restaurantId,'QR_ORDERING');
+        if (!posAdminEnabled && !kioskAdminEnabled && !qrEnabled) {
           throw new ForbiddenException(
             "Neither POS_ADMIN nor KIOSK_ADMIN is enabled on this restaurant's current subscription. Enable one under Applications before provisioning a device."
           );
@@ -607,7 +621,7 @@ export class TenantAuthService {
         // Quota is counted against whichever app actually grants access (POS_ADMIN takes
         // priority when a restaurant holds both, matching ApplicationEntitlementsService's
         // own "normally exactly one granting row" assumption elsewhere).
-        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, posAdminEnabled ? 'POS_ADMIN' : 'KIOSK_ADMIN');
+        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, posAdminEnabled ? 'POS_ADMIN' : kioskAdminEnabled ? 'KIOSK_ADMIN' : 'QR_ORDERING');
       } else {
         await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, appCodeForEntitlementCheck);
 

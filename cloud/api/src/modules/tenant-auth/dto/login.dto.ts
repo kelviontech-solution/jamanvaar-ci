@@ -35,7 +35,8 @@ export const tenantLoginSchema = z.object({
   // can't rely on the httpOnly/sameSite=lax cookie on cross-origin fetch.
   returnRefreshToken: z.boolean().optional(),
   // Opt-in: reject this login unless the matched user's role is OWNER or MANAGER.
-  adminOnly: z.boolean().optional()
+  adminOnly: z.boolean().optional(),
+  requestedProduct: z.literal('QR_ORDERING').optional()
 });
 export type TenantLoginDto = z.infer<typeof tenantLoginSchema>;
 
@@ -51,6 +52,7 @@ export const loginOwnerSchema = z.object({
   deviceToken: z.string().optional(),
   deviceType: deviceTypeEnum().optional(),
   appVersion: z.string().optional(),
+  requestedProduct: z.literal('QR_ORDERING').optional(),
   returnRefreshToken: z.boolean().optional()
 }).refine((v) => Boolean(v.restaurantCode || v.restaurantId), {
   message: 'Either restaurantCode or restaurantId is required',

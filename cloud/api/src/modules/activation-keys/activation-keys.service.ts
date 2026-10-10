@@ -234,7 +234,10 @@ export class ActivationKeysService {
       // actually is. A key generated for a specific app, though, should
       // fail here rather than mint a code nobody can ever legitimately use.
       if (dto.allowedDeviceType !== 'ANY') {
-        await this.appEntitlements.assertAppEnabled(tx, dto.restaurantId, dto.allowedDeviceType as AppCode);
+        if (dto.allowedDeviceType === 'POS_ADMIN') {
+          const grants = await Promise.all(['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'].map(code => this.appEntitlements.resolve(tx, dto.restaurantId, code as AppCode)));
+          if (!grants.some(g => g.enabled)) await this.appEntitlements.assertAppEnabled(tx, dto.restaurantId, 'POS_ADMIN');
+        } else await this.appEntitlements.assertAppEnabled(tx, dto.restaurantId, dto.allowedDeviceType as AppCode);
       }
 
       // Retry on the astronomically unlikely code collision rather than trusting uniqueness blindly.

@@ -45,7 +45,9 @@ export function prepMinutes(kot: KOTRecord, prepTimeOf: (menuItemId: string) => 
 
 /** Warns when a ticket has been waiting as long as its dishes should take, and marks it late at one and a half times that. */
 export function ticketAge(kot: KOTRecord, nowMs: number, prep: number): TicketAge {
-  const diff = Math.max(0, nowMs - new Date(kot.createdAt).getTime());
+  const created=new Date(kot.createdAt).getTime(),pickup=Date.parse(kot.pickupAt??'');
+  const dueStart=Number.isFinite(pickup)?Math.max(created,pickup-prep*60000):created;
+  const diff = Math.max(0, nowMs-dueStart);
   const mins = Math.floor(diff / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
   const level = mins >= Math.ceil(prep * 1.5) ? 'late' : mins >= prep ? 'warn' : 'ok';

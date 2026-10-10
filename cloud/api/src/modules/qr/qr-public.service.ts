@@ -1,3 +1,4 @@
+import {QrOperationsService} from './qr-operations.service';
 import { reserveQrDishStock } from '../payments/qr-dish-stock';
 import { BadRequestException, ConflictException, ForbiddenException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { createHash } from 'node:crypto';
@@ -50,6 +51,7 @@ export const placeQrOrderSchema = z
     expectedTotalPaise: z.number().int().min(0).optional(),
     couponCode: z.string().trim().max(40).optional(),
     loyaltyRewardId: z.string().min(1).max(128).optional(),
+    pickupAt: z.string().datetime().optional(),
     idempotencyKey: z.string().trim().min(8).max(80)
   })
   .strict();
@@ -62,7 +64,7 @@ export type QuoteQrOrder = z.infer<typeof quoteQrOrderSchema>;
 export interface QrContext {
   code: QrCode;
   restaurant: { id: string; name: string; address: string | null; city: string | null; timezone: string; currency: string };
-  branch: { id: string; name: string };
+  branch: { id: string; name: string; timezone: string };
   settings: QrSettingsView;
   entitlement: ResolvedEntitlement;
   /** For TABLE_ORDER: the table as the restaurant's own synced record describes it. */
@@ -74,6 +76,7 @@ const SCAN_TOUCH_MS = 60_000;
 @Injectable()
 export class QrPublicService {
   constructor(
+    private readonly operations:QrOperationsService,
     private readonly prisma: PrismaService,
     private readonly entitlements: ApplicationEntitlementsService,
     private readonly menus: QrMenuService,
@@ -115,7 +118,7 @@ export class QrPublicService {
     const [restaurant, branch, entitlement] = await this.prisma.runAsPlatform(async (tx) =>
       Promise.all([
         tx.restaurant.findFirst({ where: { id: code.restaurantId, deletedAt: null }, select: { id: true, name: true, address: true, city: true, timezone: true, currency: true, status: true } }),
-        tx.branch.findFirst({ where: { id: code.branchId!, restaurantId: code.restaurantId }, select: { id: true, name: true, status: true } }),
+        tx.branch.findFirst({ where: { id: code.branchId!, restaurantId: code.restaurantId }, select: { id: true, name: true, timezone: true, status: true } }),
         this.entitlements.resolve(tx, code.restaurantId, QR_APP_CODE)
       ])
     );
@@ -141,7 +144,7 @@ export class QrPublicService {
       table = { id: code.tableId, number: String(payload.tableNumber ?? code.tableNumber ?? ''), capacity: typeof payload.capacity === 'number' ? payload.capacity : undefined };
     }
 
-    return { code, restaurant, branch: { id: branch.id, name: branch.name }, settings, entitlement, table };
+    return { code, restaurant, branch: { id: branch.id, name: branch.name, timezone: branch.timezone }, settings, entitlement, table };
   }
 
   /**
@@ -185,8 +188,8 @@ export class QrPublicService {
       mode: ctx.code.mode,
       table: ctx.table ? { displayNumber: ctx.table.number, capacity: ctx.table.capacity } : null,
       ordering: {
-        enabled: orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.restaurant.timezone).available && !workload.atCapacity,
-        availability: workload.atCapacity ? { available:false,message:'Our kitchen is busy. Your cart is saved; please try again shortly.' } : orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.restaurant.timezone),
+        enabled: orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone).available && !workload.atCapacity,
+        availability: workload.atCapacity ? { available:false,message:'Our kitchen is busy. Your cart is saved; please try again shortly.' } : orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone),
         menuReady: menu.ready,
         menuVersion: menu.menuVersion,
         settings: { ...this.publicSettings(ctx.settings), preparationMinutes: workload.estimateMinutes, allowOnlinePayment: onlineAvailable },
@@ -287,8 +290,8 @@ export class QrPublicService {
       return this.orderStatus(prior.publicOrderId!);
     }
     const rules = settings.rules ?? DEFAULT_QR_RULES;
-    const availability = orderingAvailability(rules, ctx.restaurant.timezone);
-    if (!availability.available) throw new ConflictException({ code: 'ORDERING_CLOSED', message: availability.message });
+    const availability = orderingAvailability(rules, ctx.branch.timezone);
+    if (!availability.available && !dto.pickupAt) throw new ConflictException({ code: 'ORDERING_CLOSED', message: availability.message });
     const online = dto.paymentMethod === 'ONLINE';
     if (online ? !settings.allowOnlinePayment || !await this.payments.qrOnlineAvailable(ctx.restaurant.id) : !settings.allowCash) throw new BadRequestException('This payment method is not available for QR orders.');
     if (dto.orderNotes && !settings.allowCustomerNotes) throw new BadRequestException('This restaurant does not accept order notes.');
@@ -379,7 +382,7 @@ export class QrPublicService {
         unitPrice: line.unitPrice,
         modifiers: line.modifiers.map((m) => m.name),
         modifierDetails: line.modifiers.map((m) => ({ optionName: m.name, priceDelta: m.priceDelta, optionId: m.id, groupId: m.groupId, groupName: m.groupName })),
-        snapshot: { menuVersion: menu.menuVersion, basePrice: line.basePrice, taxGroupId: line.taxGroupId, taxRateBp: line.taxRate, taxInclusive: line.taxInclusive, lineTax: line.lineTax },
+        snapshot: { categoryName:menu.categories.find(c=>c.id===menu.items.find(i=>i.id===line.externalItemId)?.categoryId)?.name, menuVersion: menu.menuVersion, basePrice: line.basePrice, taxGroupId: line.taxGroupId, taxRateBp: line.taxRate, taxInclusive: line.taxInclusive, lineTax: line.lineTax },
         kitchenStatus: 'PENDING',
         ...(menu.stations.get(line.externalItemId) ? { kitchenStation: menu.stations.get(line.externalItemId) } : {}),
         lineTotal: line.lineTotal,
@@ -397,6 +400,7 @@ export class QrPublicService {
       beforeCreate: async (tx) => {
         // Recheck under the shared restaurant admission lock: simultaneous guests cannot overshoot capacity.
         const now = new Date();
+        const pickupMeta=await this.operations.reservePickupIn(tx,ctx,orderType,dto.pickupAt);
         const advancedSettings=await this.advanced.publicSettingsIn(tx,ctx.restaurant.id,ctx.branch.id);
         const serverDishStockConsumed=advancedSettings.inventoryEnabled?await reserveQrDishStock(tx,ctx.restaurant.id,ctx.branch.id,externalOrderId,dto.items):{};
         if(dto.loyaltyRewardId){const held=await this.loyalty.rewardIn(tx,ctx.restaurant.id,ctx.branch.id,sessionId,dto.loyaltyRewardId,priceCart(cart,menu.lookup),new Map(menu.items.map(i=>[i.id,i.categoryId])),externalOrderId);if(held.discountPaise!==reward?.discountPaise)throw this.menuChanged(menu.menuVersion);}
@@ -426,7 +430,7 @@ export class QrPublicService {
           ON CONFLICT ("restaurantId", "scope", "kind", "businessDate") DO UPDATE SET "next" = "NumberSequence"."next" + 1
           RETURNING "next"`;
         const number = `QR-${Number(rows[0].next) - 1}`;
-        return { tokenNumber: number, orderNumber: number, ...(Object.keys(serverDishStockConsumed).length?{serverDishStockConsumed}:{}), ...(reward?.customerId ? {qrLoyaltyRate:await this.loyalty.earnRateIn(tx,ctx.restaurant.id,ctx.branch.id,reward.customerId,priced.totalAmount)} : {}) };
+        return { ...pickupMeta, tokenNumber: number, orderNumber: number, ...(Object.keys(serverDishStockConsumed).length?{serverDishStockConsumed}:{}), ...(reward?.customerId ? {qrLoyaltyRate:await this.loyalty.earnRateIn(tx,ctx.restaurant.id,ctx.branch.id,reward.customerId,priced.totalAmount)} : {}) };
       },
       meta: {
         sourceType: 'QR_TABLE',
@@ -476,6 +480,7 @@ export class QrPublicService {
   private confirmation(order: { publicOrderId: string | null; totalAmount: number; status: string; createdAt: Date; tableLabel: string | null; meta: unknown; paymentStatus?: string | null; paymentMethod?: string | null; subtotal?: number; taxAmount?: number; discountAmount?: number; items?: unknown; notes?: string | null }) {
     const meta = (order.meta ?? {}) as Record<string, unknown>;
     return {
+      ...((order.meta as any)?.pickupAt ? {pickupAt:(order.meta as any).pickupAt,pickupTimezone:(order.meta as any).pickupTimezone} : {}),
       publicOrderId: order.publicOrderId,
       orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null,
       restaurantName: typeof meta.restaurantName === 'string' ? meta.restaurantName : undefined,
@@ -559,19 +564,21 @@ export class QrPublicService {
     const safeSession = sessionId && /^[A-Za-z0-9_-]{8,64}$/.test(sessionId) ? sessionId : null;
     await this.prisma
       .runAsTenant(ctx.restaurant.id, async (tx) => {
-        if (safeSession && [QR_EVENT.SCANNED, QR_EVENT.MENU_VIEWED, QR_EVENT.CART_CREATED, 'QR_CHECKOUT_STARTED'].includes(type)) {
-          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-event:' + ctx.code.id + ':' + safeSession + ':' + type}))`;
-          if (await tx.qrEvent.findFirst({ where: { qrCodeId: ctx.code.id, sessionId: safeSession, type, createdAt: { gte: startOfDayIn(ctx.restaurant.timezone) } } })) return;
+        if (safeSession && [QR_EVENT.SCANNED, QR_EVENT.MENU_VIEWED, QR_EVENT.CART_CREATED, 'QR_CHECKOUT_STARTED','QR_ITEM_ADDED','QR_ITEM_VIEWED'].includes(type)) {
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-event:' + ctx.code.id + ':' + safeSession + ':' + type + ':' + (metadata?.itemId ?? 'base')}))`;
+          if (await tx.qrEvent.findFirst({ where: { qrCodeId: ctx.code.id, sessionId: safeSession, type, ...(metadata?.itemId ? {metadata:{path:['itemId'],equals:metadata.itemId as string}} : {}), createdAt: { gte: startOfDayIn(ctx.restaurant.timezone) } } })) return;
         }
         await tx.qrEvent.create({ data: { restaurantId: ctx.restaurant.id, branchId: ctx.branch.id, qrCodeId: ctx.code.id, sessionId: safeSession, type, metadata: (metadata ?? undefined) as never } });
       })
       .catch(() => undefined);
   }
 
-  async guestEvent(token: string, type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED', session?: string) {
+  async guestEvent(token: string, type: 'QR_CART_CREATED' | 'QR_CHECKOUT_STARTED' | 'QR_ITEM_ADDED' | 'QR_ITEM_VIEWED', session?: string, itemId?:string) {
     const ctx = await this.resolve(token);
     if (!session) throw new BadRequestException('A guest session is required');
-    await this.track(ctx, type, session);
+    const menuItem=itemId?(await this.menus.build(ctx.restaurant.id,ctx.branch.id)).items.find(i=>i.id===itemId):undefined;
+    if(itemId&&!menuItem)throw new BadRequestException('Unknown menu item');
+    await this.track(ctx, type, session,menuItem?{itemId:menuItem.id,name:menuItem.name,category:(await this.menus.build(ctx.restaurant.id,ctx.branch.id)).categories.find(c=>c.id===menuItem.categoryId)?.name??menuItem.categoryId}:undefined);
     return { recorded: true };
   }
 

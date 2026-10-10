@@ -1,3 +1,4 @@
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { z } from 'zod';
@@ -34,7 +35,12 @@ export const qrBrandingSchema = z
     footerMessage: text(300),
     orderButtonLabel: text(30),
     accentColor: z.string().regex(/^(#[0-9a-fA-F]{6})?$/, 'Use a colour like #E4572E'),
-    logo: z.string().max(2_000_000).nullable()
+    logo: z.string().max(2_000_000).nullable(),
+    cover:z.string().max(2_000_000).nullable(),
+    backgroundColor:z.string().regex(/^#[0-9a-fA-F]{6}$/),
+    layout:z.enum(['CARDS','COMPACT']),
+    contactMessage:text(160),
+    reset:z.boolean()
   })
   .partial()
   .strict();
@@ -78,6 +84,7 @@ export class QrSettingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly entitlements:ApplicationEntitlementsService,
     private readonly bus: RealtimeBus
   ) {}
 
@@ -157,8 +164,9 @@ export class QrSettingsService {
   // ---------------------------------------------------------------- branding (the restaurant's own words, colour and logo)
 
   async branding(restaurantId: string) {
-    const row = await this.prisma.runAsTenant(restaurantId, (tx) => tx.qrBranding.findUnique({ where: { restaurantId } }));
+    const [row,extra]=await this.prisma.runAsTenant(restaurantId,async tx=>[await tx.qrBranding.findUnique({where:{restaurantId}}), (await this.entitlements.resolveQrCapability(tx,restaurantId,'QR_BRANDING')).enabled ? (await tx.syncedEntity.findUnique({where:{restaurantId_entityType_externalId:{restaurantId,entityType:'QR_BRAND_EXTRAS',externalId:'restaurant'}}}))?.payload as any : null]);
     return {
+      ...(extra?{coverUrl:publicImageUrl(extra.coverRef)??null,backgroundColor:extra.backgroundColor??'#FAF8F3',layout:extra.layout??'CARDS',contactMessage:extra.contactMessage??''}:{}),
       welcomeTitle: row?.welcomeTitle ?? null,
       welcomeMessage: row?.welcomeMessage ?? null,
       footerMessage: row?.footerMessage ?? null,
@@ -170,6 +178,10 @@ export class QrSettingsService {
 
   async updateBranding(restaurantId: string, actor: { id: string; type: string }, dto: QrBrandingUpdate) {
     const data: Record<string, string | null> = {};
+    if(dto.reset){for(const k of ['welcomeTitle','welcomeMessage','footerMessage','orderButtonLabel','accentColor','logoRef'])data[k]=null;}
+    let cover:ReturnType<typeof parseInlineImage>|null=null;
+    if(dto.cover){cover=parseInlineImage(dto.cover);if('error' in cover)throw new BadRequestException('Cover: '+cover.error);}
+    if(dto.backgroundColor&&Number.parseInt(dto.backgroundColor.slice(1,3),16)*.299+Number.parseInt(dto.backgroundColor.slice(3,5),16)*.587+Number.parseInt(dto.backgroundColor.slice(5,7),16)*.114<190)throw new BadRequestException('Choose a light background to keep the menu readable.');
     for (const k of ['welcomeTitle', 'welcomeMessage', 'footerMessage', 'orderButtonLabel', 'accentColor'] as const) if (dto[k] !== undefined) data[k] = dto[k] === '' ? null : (dto[k] as string);
     let image: ReturnType<typeof parseInlineImage> | null = null;
     if (dto.logo !== undefined) {
@@ -180,8 +192,16 @@ export class QrSettingsService {
         data.logoRef = `img:${image.image.hash}`;
       }
     }
-    if (Object.keys(data).length === 0) throw new BadRequestException('No changes supplied');
+    if (Object.keys(data).length === 0 && !['cover','backgroundColor','layout','contactMessage'].some(k=>k in dto)) throw new BadRequestException('No changes supplied');
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      if(['cover','backgroundColor','layout','contactMessage'].some(k=>k in dto)||dto.reset){
+        await this.entitlements.assertQrCapability(tx,restaurantId,'QR_BRANDING');
+        const where={restaurantId_entityType_externalId:{restaurantId,entityType:'QR_BRAND_EXTRAS',externalId:'restaurant'}};
+        const old=(await tx.syncedEntity.findUnique({where}))?.payload as any??{};
+        const next=dto.reset?{}:{...old,...(dto.cover!==undefined?{coverRef:cover&&'image' in cover?'img:'+cover.image.hash:null}:{}),...(dto.backgroundColor?{backgroundColor:dto.backgroundColor}:{}),...(dto.layout?{layout:dto.layout}:{}),...(dto.contactMessage!==undefined?{contactMessage:dto.contactMessage}: {})};
+        if(cover&&'image' in cover)await tx.menuImage.upsert({where:{restaurantId_hash:{restaurantId,hash:cover.image.hash}},create:{restaurantId,hash:cover.image.hash,contentType:cover.image.contentType,size:cover.image.data.length,data:cover.image.data},update:{}});
+        await tx.syncedEntity.upsert({where,create:{restaurantId,entityType:'QR_BRAND_EXTRAS',externalId:'restaurant',payload:next},update:{payload:next,syncVersion:{increment:1}}});
+      }
       if (image && 'image' in image) {
         await tx.menuImage.upsert({
           where: { restaurantId_hash: { restaurantId, hash: image.image.hash } },

@@ -1,3 +1,6 @@
+import {QrServiceInbox} from '@jamanvaar/ui';
+import {deviceFetch} from '../../cloud/cloudClient';
+const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok)throw new Error(d.message||'Request unavailable');return d;};
 import React, { useState, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, BusinessDayRepository, summarizeStations, RiderRepository } from '@jamanvaar/database';
@@ -184,7 +187,7 @@ export const PosOrdersView: React.FC = () => {
   return (
     <>
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
-      <QrOrdersInbox actor={currentUser?.fullName || 'Cashier'} />
+      <QrOrdersInbox actor={currentUser?.fullName || 'Cashier'} /><QrServiceInbox api={qrRequestsApi}/>
       {/* Header & Session Scope Indicator */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 shrink-0">
         <div>

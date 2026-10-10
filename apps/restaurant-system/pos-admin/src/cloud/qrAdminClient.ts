@@ -58,6 +58,7 @@ export interface QrOverview {
 }
 
 export interface QrOrderRow {
+  pickupAt?:string;pickupTimezone?:string;pickupInstructions?:string;
   id: string;
   version: number;
   items: Array<{ name: string; quantity: number; lineTotal: number; modifiers?: string[]; specialInstructions?: string }>;

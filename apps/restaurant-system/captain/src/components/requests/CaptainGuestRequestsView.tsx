@@ -1,3 +1,6 @@
+import {QrServiceInbox} from '@jamanvaar/ui';
+import {deviceFetch} from '../../cloud/cloudClient';
+const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json();if(!r.ok)throw new Error(data.message||'Service request unavailable');return data;};
 import React, { useState } from 'react';
 import { useCaptainStore, CustomerRequest } from '../../store/captainStore';
 import {
@@ -62,7 +65,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5"><QrServiceInbox api={qrRequestsApi}/>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
         <div>

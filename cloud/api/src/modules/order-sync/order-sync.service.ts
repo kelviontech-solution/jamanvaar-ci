@@ -253,7 +253,7 @@ export class OrderSyncService {
               : undefined;
           if (existing?.source === 'QR' && mergedMeta) {
             // Kitchen/counter sync cannot invent a verified guest identity, earn rate, redemption or browser membership.
-            for (const key of ['verifiedCustomerId','qrLoyaltyRate','loyaltyRedemption','qrBrowserSession','promotion','qrAutoAccept','serverDishStockConsumed','paymentAllocationSummary','sharedGuests']) {
+            for (const key of ['verifiedCustomerId','qrLoyaltyRate','loyaltyRedemption','qrBrowserSession','promotion','qrAutoAccept','serverDishStockConsumed','paymentAllocationSummary','sharedGuests','pickupAt','pickupTimezone','pickupInstructions']) {
               if (Object.prototype.hasOwnProperty.call(priorMeta,key)) mergedMeta[key]=priorMeta[key];
               else delete mergedMeta[key];
             }

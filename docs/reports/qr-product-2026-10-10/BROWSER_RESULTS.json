@@ -1,0 +1,66 @@
+{
+  "environment": "compiled apps, isolated API/database",
+  "provider": "simulated SDK and provider; no real funds",
+  "results": [
+    {
+      "name": "Public QR website and local demo work without credentials or order/payment traffic",
+      "status": "PASS",
+      "evidence": {
+        "demoTotal": 618,
+        "productionRequests": 0,
+        "mobileFits": true
+      }
+    },
+    {
+      "name": "Dedicated QR login uses current owner credentials and keeps a safe destination",
+      "status": "PASS",
+      "evidence": {
+        "safeRedirect": true,
+        "currentSession": true
+      }
+    },
+    {
+      "name": "Customer requests appear in QR Admin and durable completion returns to the customer",
+      "status": "PASS",
+      "evidence": {
+        "durable": true,
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "name": "Brand preview saves safe settings to the real customer page and analytics exports CSV",
+      "status": "PASS",
+      "evidence": {
+        "savedBranding": true,
+        "costsUnavailable": true,
+        "csv": true
+      }
+    },
+    {
+      "name": "QR-only console edits the shared catalog and publishes a new dish",
+      "status": "PASS",
+      "evidence": {
+        "posAdminLicenseRequired": false,
+        "sharedMenu": true
+      }
+    },
+    {
+      "name": "Scheduled takeaway pickup is selectable at customer checkout and appears in staff orders",
+      "status": "PASS",
+      "evidence": {
+        "canonicalPickup": true,
+        "visibleOnCustomer": true
+      }
+    },
+    {
+      "name": "A fresh QR-only console activates securely and signs out without exposing its activation key",
+      "status": "PASS",
+      "evidence": {
+        "qrOnlyActivation": true,
+        "keyHidden": true,
+        "signedOut": true
+      }
+    }
+  ],
+  "pageErrors": []
+}

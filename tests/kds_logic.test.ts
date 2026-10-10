@@ -44,6 +44,14 @@ describe('allergy and diet notes are never read past', () => {
 });
 
 describe('how late a ticket is depends on how long its dishes should take', () => {
+  it('starts a scheduled pickup clock at preparation time and preserves ordinary ticket timing', () => {
+    const createdAt = '2026-10-10T06:00:00Z', pickupAt = '2026-10-11T06:00:00Z';
+    const scheduled = ticket('pickup', [item('x', 'Meal')], { createdAt, pickupAt });
+    expect(ticketAge(scheduled, Date.parse('2026-10-11T05:35:00Z'), 20)).toMatchObject({mins: 0, level: 'ok'});
+    expect(ticketAge(scheduled, Date.parse(pickupAt), 20)).toMatchObject({mins: 20, level: 'warn'});
+    expect(ticketAge(scheduled, Date.parse('2026-10-11T06:10:00Z'), 20).level).toBe('late');
+    expect(ticketAge({...scheduled, pickupAt: undefined}, Date.parse(pickupAt), 20).level).toBe('late');
+  });
   const at = (minsAgo: number) => ticket('t', [item('x', 'Biryani')], { createdAt: new Date(Date.now() - minsAgo * 60_000).toISOString() });
 
   it('takes the longest prep time on the ticket, 10 minutes when the menu does not say, and keeps it sensible', () => {

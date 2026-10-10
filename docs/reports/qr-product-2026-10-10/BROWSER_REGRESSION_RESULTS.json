@@ -1,0 +1,124 @@
+{
+  "environment": "compiled apps, isolated API/database",
+  "provider": "simulated SDK and provider; no real funds",
+  "results": [
+    {
+      "name": "QR-only Restaurant Admin has all nine console sections and a working live design preview/export",
+      "status": "PASS",
+      "evidence": {
+        "sections": 9,
+        "svgExport": true
+      }
+    },
+    {
+      "name": "Rules and payment controls save, reach the actual guest API and hide disabled cash",
+      "status": "PASS",
+      "evidence": {
+        "cashHiddenByAdmin": true,
+        "preparationMinutes": 25
+      }
+    },
+    {
+      "name": "Mobile guests can customize, edit choices, keep carts across refresh and retry the same payment after dismissal",
+      "status": "PASS",
+      "evidence": {
+        "sameOrder": true,
+        "sameProviderOrder": true,
+        "serverVerified": true,
+        "modifierEdited": true
+      }
+    },
+    {
+      "name": "A second phone scanning the same table has an independent empty cart",
+      "status": "PASS",
+      "evidence": {
+        "independentCart": true,
+        "tabletFits": true
+      }
+    },
+    {
+      "name": "QR Admin accepts, marks ready and completes the paid order without a POS; the mobile tracker follows",
+      "status": "PASS",
+      "evidence": {
+        "status": "COMPLETED",
+        "posRequired": false
+      }
+    },
+    {
+      "name": "Cash checkout stays unpaid until authorized collection, then completes in QR Admin",
+      "status": "PASS",
+      "evidence": {
+        "cashCollected": true,
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "name": "Bulk generation creates mapped codes, and QR Admin fits a narrow mobile screen",
+      "status": "PASS",
+      "evidence": {
+        "bulkMapped": true,
+        "mobileFits": true
+      }
+    },
+    {
+      "name": "Public QR website and local demo work without credentials or order/payment traffic",
+      "status": "PASS",
+      "evidence": {
+        "demoTotal": 618,
+        "productionRequests": 0,
+        "mobileFits": true
+      }
+    },
+    {
+      "name": "Dedicated QR login uses current owner credentials and keeps a safe destination",
+      "status": "PASS",
+      "evidence": {
+        "safeRedirect": true,
+        "currentSession": true
+      }
+    },
+    {
+      "name": "Customer requests appear in QR Admin and durable completion returns to the customer",
+      "status": "PASS",
+      "evidence": {
+        "durable": true,
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "name": "Brand preview saves safe settings to the real customer page and analytics exports CSV",
+      "status": "PASS",
+      "evidence": {
+        "savedBranding": true,
+        "costsUnavailable": true,
+        "csv": true
+      }
+    },
+    {
+      "name": "QR-only console edits the shared catalog and publishes a new dish",
+      "status": "PASS",
+      "evidence": {
+        "posAdminLicenseRequired": false,
+        "sharedMenu": true
+      }
+    },
+    {
+      "name": "Scheduled takeaway pickup is selectable at customer checkout and appears in staff orders",
+      "status": "PASS",
+      "evidence": {
+        "canonicalPickup": true,
+        "visibleOnCustomer": true
+      }
+    },
+    {
+      "name": "A fresh QR-only console activates securely and signs out without exposing its activation key",
+      "status": "PASS",
+      "evidence": {
+        "qrOnlyActivation": true,
+        "keyHidden": true,
+        "signedOut": true
+      }
+    }
+  ],
+  "pageErrors": []
+}

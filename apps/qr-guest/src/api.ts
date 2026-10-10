@@ -5,7 +5,8 @@ import { menuDishImage } from '../../../packages/utils/src/dish_photos';
  * The public QR API, and nothing else. No credentials, no cookies: the token in the address is the whole identity,
  * and the server derives restaurant, branch and table from it.
  */
-export interface Branding { welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
+export interface OperationsOptions {serviceEnabled:boolean;requestTypes:Array<{id:string;label:string}>;pickupEnabled:boolean;asapEnabled:boolean;pickupInstructions:string}
+export interface Branding {coverUrl?:string|null;backgroundColor?:string;layout?:string;contactMessage?:string; welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
 
 export interface Describe {
   advanced?: { loyaltyEnabled:boolean; promotionsEnabled:boolean; feedbackEnabled:boolean; historyEnabled:boolean; groupEnabled:boolean; languages:string[]; defaultLanguage:string; recommendationIds:string[]; workload:{estimateMinutes:number;atCapacity:boolean} };
@@ -30,7 +31,7 @@ export interface MenuGroup { id: string; name: string; description?: string; isR
 export interface Menu { languages?:string[]; defaultLanguage?:string; menuVersion: number; etag: string; categories: Array<{ translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
 
 export interface Quote { discount?:number; menuVersion?: number; lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number; lineTotal: number; options: string[] }>; subtotal: number; tax: number; total: number }
-export interface Placed { publicOrderId: string; restaurantName?: string; branchName?: string; currency?: string; orderNumber: string | null; status: 'PENDING_PAYMENT' | 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string;
+export interface Placed {pickupAt?:string;pickupTimezone?:string; publicOrderId: string; restaurantName?: string; branchName?: string; currency?: string; orderNumber: string | null; status: 'PENDING_PAYMENT' | 'RECEIVED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED'; total: number; table: string | null; placedAt: string;
   balance?:{totalPaise:number;collectedPaise:number;refundedPaise:number;outstandingPaise:number;settlement:string};
   paymentStatus?: string; paymentMethod?: string; preparationMinutes?: number; allowCounterPayment?: boolean; subtotal?: number; tax?: number; discount?: number;
   items?: Array<{name:string;quantity:number;unitPrice:number;lineTotal:number;options:string[];note?:string}>;
@@ -75,11 +76,12 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
 }
 
 export const QrApi = {
+  operations:async<T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/operations${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   loyalty: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/loyalty${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   group: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/groups${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   history: async (token:string,session:string) => (await call<Array<{publicOrderId:string;orderNumber:string;total:number;status:string;paymentStatus:string;createdAt:string;items:Array<{itemId:string;name:string;quantity:number;optionIds:string[];note?:string}>}>>(`/${encodeURIComponent(token)}/history`,{session})).data!,
   feedback: async (id:string,rating:number,comment:string) => (await call(`/orders/${encodeURIComponent(id)}/feedback`,{method:'POST',body:JSON.stringify({rating,comment})})).data,
-  event: async (token: string, type: string, session: string) => call(`/${encodeURIComponent(token)}/events`, { method: 'POST', body: JSON.stringify({ type }), session }),
+  event: async (token: string, type: string, session: string,itemId?:string) => call(`/${encodeURIComponent(token)}/events`, { method: 'POST', body: JSON.stringify({ type,...(itemId?{itemId}:{}) }), session }),
   verifyPayment: async (publicOrderId: string, paymentId: string, signature: string) => (await call<Placed>(`/orders/${encodeURIComponent(publicOrderId)}/verify-payment`, { method: 'POST', body: JSON.stringify({ paymentId, signature }), signal: AbortSignal.timeout(25000) })).data as Placed,
   session: async () => (await call<{ session: string }>('/session', { method: 'POST' })).data as { session: string },
   describe: async (token: string, session: string) => (await call<Describe>(`/${encodeURIComponent(token)}`, { session })).data as Describe,

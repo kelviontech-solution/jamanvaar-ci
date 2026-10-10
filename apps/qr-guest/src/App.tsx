@@ -1,3 +1,4 @@
+import {ServiceRequests,PickupSelector} from './Operations';
 import { LoyaltyPanel } from './LoyaltyPanel';
 import { GroupOrder } from './GroupOrder';
 import { OrderFeedback, GuestHistory } from './AdvancedGuest';
@@ -193,7 +194,7 @@ function Ordering({ token }: { token: string }) {
   };
 
   return (
-    <div className="app" style={info.branding?.accentColor ? ({ ['--saffron' as string]: info.branding.accentColor } as React.CSSProperties) : undefined}>
+    <div className={`app brand-${info.branding?.layout??'CARDS'}`} style={{'--saffron':info.branding?.accentColor||'#c2570c','--bg':info.branding?.backgroundColor||'#faf7f2','--accent-ink':accentInk(info.branding?.accentColor||'#c2570c'),'--accent-text':accentInk(info.branding?.accentColor||'#c2570c')==='#0b253a'?'#0b253a':info.branding?.accentColor||'#c2570c'} as React.CSSProperties}>
       <header className="top">
         <img src={imageSrc(info.branding?.logoUrl || '/assets/branding/jamanvaar-logo.png')} alt={info.branding?.logoUrl ? info.restaurant.name : 'Jamanvaar by Kelviontech'} className="logo" />
         <div className="restaurant-heading">
@@ -202,7 +203,7 @@ function Ordering({ token }: { token: string }) {
         </div>
         <div className="mode"><span className="live-dot" />{info.table ? `Table ${info.table.displayNumber}` : 'Guest menu'}</div>
       </header>
-      {screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
+      <ServiceRequests token={token} session={sessionId}/>{screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
 
       {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} />}
       {screen==='MENU'&&info.advanced?.historyEnabled&&<GuestHistory token={token} session={sessionId} onRecover={async id=>{try{setPlaced(await QrApi.status(id));store.set(`jv_qr_last:${token}`,id);navigate('STATUS');}catch(err){setPaymentNotice((err as Error).message);}}} onReorder={items=>{let next=cart;let skipped=0;for(const line of items){const item=menu.items.find(i=>i.id===line.itemId);const options=item?item.modifierGroupIds.flatMap(id=>menu.modifierGroups.find(g=>g.id===id)?.options??[]):[];const chosen=line.optionIds.map(id=>options.find(o=>o.id===id));if(!item||chosen.some(o=>!o)){skipped++;continue;}next=addLine(next,{itemId:item.id,name:item.name,quantity:line.quantity,unitPrice:item.price+chosen.reduce((n,o)=>n+(o?.priceDelta??0),0),optionIds:line.optionIds,optionNames:chosen.map(o=>o!.name),note:line.note});}setCart(next);setPaymentNotice(skipped?`${skipped} previous item(s) are no longer available. Review your cart and required choices.`:'Previous items added at current menu prices. Review your cart before ordering.');navigate('CART');}}/>}
@@ -216,7 +217,7 @@ function Ordering({ token }: { token: string }) {
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
       {screen==='STATUS'&&placed?.status==='COMPLETED'&&info.advanced?.feedbackEnabled&&<OrderFeedback key={placed.publicOrderId} order={placed}/>}
       {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError||"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
-      {info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
+      {info.branding?.contactMessage&&<p className="muted pad">{info.branding.contactMessage}</p>}{info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
       <footer className="brand-footer">Thoughtfully served with <strong>Jamanvaar</strong><span>by Kelviontech</span></footer>
     </div>
   );
@@ -240,16 +241,17 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
   const quickAdd = (item: MenuItem) => {
     // A dish with nothing to choose goes straight into the cart; one with options (or a required choice) opens the sheet.
     const needsChoice = (item.minQuantity ?? 1) > 1 || item.modifierGroupIds.some((id) => groups.get(id)?.isRequired || (info.ordering.settings.allowModifiers && !!groups.get(id)));
+    void QrApi.event(tokenFromPath()!, 'QR_ITEM_VIEWED', sessionId,item.id).catch(()=>undefined);
     if (needsChoice) return setPicking(item);
     setCart(addLine(cart, { itemId: item.id, name: item.name, unitPrice: item.price, quantity: 1, optionIds: [], optionNames: [] }));
-    void QrApi.event(tokenFromPath()!, 'QR_ITEM_ADDED', sessionId).catch(() => undefined);
+    void QrApi.event(tokenFromPath()!, 'QR_ITEM_ADDED', sessionId,item.id).catch(() => undefined);
   };
 
   return (
     <>
       <section className={`menu-hero ${lowBandwidth?'text-only':''}`}>
         <div className="hero-copy"><span className="eyebrow">FRESH FROM OUR KITCHEN</span><h1>Good food.<br /><em>Great company.</em></h1><p>{info.branding?.welcomeMessage || 'Pick your favourites, make them yours, and let us take care of the rest.'}</p><div className="hero-note"><Icon name="plate" />{info.table ? `Delivered to table ${info.table.displayNumber}` : 'Prepared fresh for you'}</div></div>
-        {!lowBandwidth&&<div className="hero-photo"><DishPhoto source={(menu.items.find(i => i.imageUrl && /\.(?:jpe?g|png|webp)(?:\?|$)|\/public\/qr\/images\//i.test(i.imageUrl)) || menu.items.find(i => i.imageUrl && !i.imageUrl.includes('placeholder')))?.imageUrl} name="From our menu" /><span>{info.restaurant.name}</span></div>}
+        {!lowBandwidth&&<div className="hero-photo"><DishPhoto source={info.branding?.coverUrl||(menu.items.find(i => i.imageUrl && /\.(?:jpe?g|png|webp)(?:\?|$)|\/public\/qr\/images\//i.test(i.imageUrl)) || menu.items.find(i => i.imageUrl && !i.imageUrl.includes('placeholder')))?.imageUrl} name="From our menu" /><span>{info.restaurant.name}</span></div>}
       </section>
       {!info.ordering.enabled && <p className="availability-note" role="status">{info.ordering.availability?.message || 'Ordering is currently paused. You can still browse the menu.'}</p>}
       {info.ordering.settings.customerInstructions && <p className="availability-note">{info.ordering.settings.customerInstructions}</p>}
@@ -284,7 +286,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
         <button className="cartbar" onClick={onCart}><Icon name="bag" /><span>{itemCount(cart)} item{itemCount(cart) === 1 ? '' : 's'}<small>{inr(estimatedSubtotal(cart))}</small></span><span className="cart-action">View Cart <Icon name="arrow" /></span></button>
       )}
       {picking && <Picker item={picking} groups={picking.modifierGroupIds.map((id) => groups.get(id)).filter((g): g is MenuGroup => !!g)} allowMods={info.ordering.settings.allowModifiers} allowNotes={info.ordering.settings.allowCustomerNotes} onClose={() => setPicking(null)}
-        onAdd={(line) => { setCart(addLine(cart, line)); setPicking(null); void QrApi.event(tokenFromPath()!, 'QR_ITEM_ADDED', sessionId).catch(() => undefined); }} />}
+        onAdd={(line) => { setCart(addLine(cart, line)); setPicking(null); void QrApi.event(tokenFromPath()!, 'QR_ITEM_ADDED', sessionId,line.itemId).catch(() => undefined); }} />}
     </>
   );
 }
@@ -432,12 +434,13 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
   const [phone, setPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [orderType, setOrderType] = useState<'DINE_IN' | 'TAKEAWAY' | ''>('');
+  const [pickupAt,setPickupAt]=useState(''),[asap,setAsap]=useState(true);
   const [tableNumber, setTableNumber] = useState('');
   const [busy, setBusy] = useState(false);
   const submitLock = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const menuOnly = info.mode === 'MENU_ONLY';
-  const ready = info.ordering.enabled && (!s.minimumOrder || (quote?.total ?? 0) >= s.minimumOrder) && (!s.requireCustomerName || name.trim()) && (!s.requireCustomerPhone || phone.trim()) && (!menuOnly || orderType === 'TAKEAWAY' || (orderType === 'DINE_IN' && tableNumber.trim()));
+  const ready = (info.ordering.enabled||(!!pickupAt&&orderType==='TAKEAWAY')) && (orderType!=='TAKEAWAY'||asap||!!pickupAt) && (!s.minimumOrder || (quote?.total ?? 0) >= s.minimumOrder) && (!s.requireCustomerName || name.trim()) && (!s.requireCustomerPhone || phone.trim()) && (!menuOnly || orderType === 'TAKEAWAY' || (orderType === 'DINE_IN' && tableNumber.trim()));
 
   const submit = async () => {
     if (submitLock.current) return; // Latch before React renders, including two taps in the same event turn.
@@ -451,6 +454,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
       const placed = await QrApi.place(token, {
         items: toOrderItems(attempt),
         paymentMethod,
+        ...(pickupAt&&orderType==='TAKEAWAY'?{pickupAt}:{}),
         ...(couponCode?{couponCode}:{}),
         ...(rewardId?{loyaltyRewardId:rewardId}:{}),
         ...(quote ? {expectedTotalPaise:Math.round(quote.total*100)} : {}),
@@ -491,7 +495,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
           {orderType === 'DINE_IN' && <input placeholder="Your table number" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} maxLength={20} />}
         </fieldset>
       )}
-      <div className="guest-details"><label>Your name {s.requireCustomerName ? '*' : <small>(optional)</small>}<input placeholder="How should we call you?" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoComplete="name" /></label>
+      {menuOnly&&orderType==='TAKEAWAY'&&<PickupSelector token={token} session={sessionId} onChange={s=>{setPickupAt(s);setCart({...cart,attemptKey:null});}} onOptions={s=>setAsap(s.asapEnabled)}/>}<div className="guest-details"><label>Your name {s.requireCustomerName ? '*' : <small>(optional)</small>}<input placeholder="How should we call you?" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoComplete="name" /></label>
       <label>Mobile number {s.requireCustomerPhone ? '*' : <small>(optional)</small>}<input placeholder="Your mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} autoComplete="tel" /></label>
       {s.allowCustomerNotes && <label>Note for the kitchen <small>(optional)</small><textarea placeholder="Any special requests?" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} /></label>}</div>
       {info.advanced?.promotionsEnabled&&<section className="coupon-panel"><label>Coupon code <small>(optional)</small><input maxLength={40} value={couponInput} onChange={e=>setCouponInput(e.target.value.toUpperCase())} placeholder="Enter coupon code"/></label><button className="link" onClick={()=>{setCouponCode(couponInput.trim());setRewardId('');setCart({...cart,attemptKey:null});}}>Apply coupon</button>{couponCode&&<button className="link" onClick={()=>{setCouponCode('');setCouponInput('');setCart({...cart,attemptKey:null});}}>Remove coupon</button>}</section>}
@@ -559,8 +563,8 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
       <div className={`status-seal ${placed.status === 'PENDING_PAYMENT' ? 'pending' : ''}`}><Icon name={placed.status === 'PENDING_PAYMENT' ? 'shield' : placed.status === 'CANCELLED' ? 'plate' : 'check'} /></div>
       <h2>{placed.status === 'CANCELLED' ? 'Order cancelled' : placed.status==='PENDING_PAYMENT'?'Complete your payment':placed.status==='COMPLETED'?'Order completed':placed.status==='READY'?'Your order is ready':'Order confirmed'}</h2>
       <p className="big">{placed.orderNumber ?? placed.publicOrderId}</p>
-      <p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>
-      {placed.status === 'RECEIVED' && !!placed.preparationMinutes && <p className="muted">Usually ready in about {placed.preparationMinutes} minutes.</p>}
+      {placed.pickupAt&&<p className="pickup-confirmation">Pickup: {new Date(placed.pickupAt).toLocaleString(undefined,{timeZone:placed.pickupTimezone})}</p>}<p className="muted">Reference {placed.publicOrderId}{placed.table ? ` · Table ${placed.table}` : ''} · {inr(placed.total)}</p>
+      {placed.status === 'RECEIVED' && !placed.pickupAt && !!placed.preparationMinutes && <p className="muted">Usually ready in about {placed.preparationMinutes} minutes.</p>}
       {showStatus && placed.status !== 'CANCELLED' && placed.status!=='PENDING_PAYMENT' && (
         <ol className="steps">{STEPS.map(([s, label], i) => <li key={s} className={i <= at ? 'done' : ''}>{label}</li>)}</ol>
       )}
@@ -587,3 +591,5 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
     </section>
   );
 }
+
+function accentInk(hex:string){const c=hex.replace('#','');return .299*parseInt(c.slice(0,2),16)+.587*parseInt(c.slice(2,4),16)+.114*parseInt(c.slice(4,6),16)>160?'#0b253a':'#ffffff';}

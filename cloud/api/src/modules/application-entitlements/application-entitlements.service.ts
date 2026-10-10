@@ -374,11 +374,8 @@ export class ApplicationEntitlementsService {
    * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
    */
   async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
-    // QR_ORDERING/WHATSAPP_ORDERING are never an activated Device's own type (see
-    // DEVICE_BACKED_APP_CODES above) — in practice this method is only ever called with a
-    // real device type (activation-key redemption), but guarded defensively so a future
-    // caller can't hit the same DeviceType cast crash this fixed elsewhere in this file.
-    if (!DEVICE_BACKED_APP_CODES.has(appCode)) return;
+    // QR-only management uses POS_ADMIN records; never cast QR_ORDERING to DeviceType.
+    if (!DEVICE_BACKED_APP_CODES.has(appCode) && appCode !== 'QR_ORDERING') return;
     // Counting and then inserting is a race: N simultaneous activations would all count the same "free seats" and all succeed.
     // The lock is held to the end of the caller's transaction, so the next activation counts AFTER this one's device exists.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'device-quota:' + restaurantId + ':' + appCode}))`;
@@ -402,7 +399,7 @@ export class ApplicationEntitlementsService {
     const quota = row.deviceQuota ?? featureQuota ?? owningSub.plan.maxDevices;
 
     const activeDeviceCount = await tx.device.count({
-      where: { restaurantId, type: { in: await this.deviceTypesForEntitlement(tx, restaurantId, appCode) }, status: { not: 'REVOKED' } }
+      where: { restaurantId, type: { in: appCode === 'QR_ORDERING' ? ['POS_ADMIN'] : await this.deviceTypesForEntitlement(tx, restaurantId, appCode) }, status: { not: 'REVOKED' } }
     });
     if (activeDeviceCount >= quota) {
       throw new ConflictException(

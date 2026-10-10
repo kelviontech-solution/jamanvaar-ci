@@ -348,7 +348,8 @@ export async function cloudLogin(
       // security-audit HIGH-04: the server now enforces this unconditionally for
       // deviceType POS_ADMIN regardless of this flag, but sending it explicitly keeps
       // this call self-documenting and matches kiosk-admin's equivalent call.
-      adminOnly: true
+      adminOnly: true,
+      ...(location.pathname.startsWith('/qr/') ? { requestedProduct: 'QR_ORDERING' } : {})
     }
   });
 
@@ -405,7 +406,7 @@ export async function cloudLoginOwner(restaurantCode: string, password: string):
       }
   >('/api/v1/tenant-auth/login-owner', {
     method: 'POST',
-    body: { restaurantCode, password, deviceId, deviceToken, deviceType: 'POS_ADMIN' }
+    body: { restaurantCode, password, deviceId, deviceToken, deviceType: 'POS_ADMIN', ...(location.pathname.startsWith('/qr/') ? { requestedProduct: 'QR_ORDERING' } : {}) }
   });
 
   if (result.status === 'LOGIN_SUCCESS') {
@@ -461,7 +462,7 @@ export async function cloudActivateDevice(
       activationSessionToken,
       activationKey,
       deviceType: 'POS_ADMIN',
-      deviceName: 'Restaurant Admin Console',
+      deviceName: location.pathname.startsWith('/qr/') ? 'QR Admin Console' : 'Restaurant Admin Console',
       ...(publicKeyJwk ? { publicKeyJwk } : {})
     }
   });
@@ -921,8 +922,9 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
 async function adminScopeHeaders(path:string):Promise<Record<string,string>> {
   const branch=activeAdminBranch;
   const restaurantPayout=/^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(path);
+  const qrProduct=/^\/qr\//.test(globalThis.location?.pathname??'')&&/^\/api\/v1\/(restaurant\/qr|menu)/.test(path);
   const restaurantQrScope=branch==='all'&&/^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(path);
-  if(!restaurantPayout&&!restaurantQrScope&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
+  if(!qrProduct&&!restaurantPayout&&!restaurantQrScope&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
   let expired=true;
   try { expired=!accessToken||JSON.parse(atob(accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000<Date.now()+30000; } catch { /* refresh malformed/absent token */ }
   if(expired&&(await refreshAccessToken())!=='ok')throw new CloudApiError('Sign in to manage this branch',401);
@@ -1432,6 +1434,11 @@ export async function publishMenu(note?: string): Promise<{ version: number }> {
 /** A JSON call to the cloud as this Restaurant Admin console (its device credential). Throws CloudApiError with the server's own message. */
 export async function qrApi<T>(path: string, init: RequestInit = {}): Promise<T> {
   return jsonOrThrowCloud<T>(await deviceFetch(path, init), 'QR ordering');
+}
+
+/** Standalone QR Admin always recovers a current user session before rendering private data. */
+export function cloudQrAccount():Promise<{role:string;branchId:string|null;restaurantId:string;fullName:string}> {
+  return request('/api/v1/tenant/me');
 }
 
 /** First-time activation: the Restaurant ID, the owner's email, the invitation token from the welcome email, and the password they choose. */

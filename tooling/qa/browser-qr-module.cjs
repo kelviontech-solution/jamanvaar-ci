@@ -25,8 +25,8 @@ async function main(){
      });return;
    }
    if(pathname.startsWith('/api/')){const headers={...req.headers,host:`localhost:${q.state.port}`};const proxy=http.request({hostname:'localhost',port:q.state.port,path:req.url,method:req.method,headers},up=>{res.writeHead(up.statusCode,{...up.headers,'access-control-allow-origin':base});up.pipe(res);});proxy.on('error',()=>{if(!res.headersSent)res.writeHead(502);res.end();});res.on('close',()=>proxy.destroy());req.pipe(proxy);return;}
-   const app=pathname.split('/')[1],roots={'restaurant-admin':'apps/restaurant-system/pos-admin/dist',q:'apps/qr-guest/dist',kds:'apps/restaurant-system/kds/dist'},root=q.path.join(q.root,roots[app]||roots.q),relative=roots[app]?pathname.slice(app.length+2):pathname.slice(1);let file=q.path.resolve(root,relative||'index.html');
-   if(!file.startsWith(root+q.path.sep)){res.writeHead(403);res.end();return;}if(!q.fs.existsSync(file)||q.fs.statSync(file).isDirectory())file=q.path.join(root,'index.html');
+   const app=pathname.split('/')[1],roots={qr:'apps/restaurant-system/pos-admin/dist','restaurant-admin':'apps/restaurant-system/pos-admin/dist',q:'apps/qr-guest/dist',kds:'apps/restaurant-system/kds/dist'},root=q.path.join(q.root,roots[app]||roots.q),relative=roots[app]?pathname.slice(app.length+2):pathname.slice(1);let file=q.path.resolve(root,relative||(app==='qr'?'qr.html':'index.html'));
+   if(!file.startsWith(root+q.path.sep)){res.writeHead(403);res.end();return;}if(!q.fs.existsSync(file)||q.fs.statSync(file).isDirectory())file=q.path.join(root,app==='qr'?'qr.html':'index.html');
    res.writeHead(200,{'Content-Type':({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.wasm':'application/wasm'})[q.path.extname(file)]||'application/octet-stream'});q.fs.createReadStream(file).pipe(res);
  });await new Promise(r=>server.listen(port,'localhost',r));
  const challenge=await q.mustApi('POST','/api/v1/platform-auth/login',{email:q.state.platformEmail,password:q.state.platformPassword}),mail=JSON.parse(q.fs.readFileSync(q.path.join(q.privateDir,'private-mail.json')))[q.state.platformEmail];platform=(await q.mustApi('POST','/api/v1/platform-auth/verify-otp',{otpToken:challenge.otpToken,otp:mail.otp})).accessToken;
@@ -99,6 +99,7 @@ async function main(){
   await admin.setViewportSize({width:390,height:844});await console.getByRole('button',{name:'Ordering Rules',exact:true}).click();await expect(console.getByLabel('Preparation estimate (minutes)')).toBeVisible();expect(await admin.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await admin.screenshot({path:q.path.join(q.reportDir,'evidence/qr-admin-mobile.png')});return {bulkMapped:true,mobileFits:true};
  });
  }
+ if(process.env.JAMANVAAR_QA_QR_PRODUCT==='1')await require('./browser-qr-product-flows.cjs')({q,base,browser,admin,guest,prisma,rid,branchId,qr,ad,rest,platform,check,errors});
  if(process.env.JAMANVAAR_QA_QR_ADVANCED==='1')await require('./browser-qr-advanced-flows.cjs')({q,base,browser,admin,guest,prisma,rid,branchId,qr,ad,check,errors});
  expect(errors).toEqual([]);
 }

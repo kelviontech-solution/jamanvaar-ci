@@ -1,3 +1,5 @@
+import {QrCatalog} from './QrCatalog';
+import {QrSetupHealth,QrServiceOperations,QrPickupOperations,QrMenuPerformance,QrBrandStudio} from './QrOperations';
 import { QrCapabilities } from './QrCapabilities';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Lock, QrCode, CheckCircle2, RefreshCw, Printer, Download, Ban, RotateCcw, Trash2, Copy, Plus, WifiOff } from 'lucide-react';
@@ -8,7 +10,7 @@ import { useQrEntitlement } from './useQrEntitlement';
 import { downloadCardPng, printCards, withLogo } from './qrPrint';
 import { QrDesignStudio, QrOrderingRules, QrOperationalOrders, QrAnalyticsView, QrMenuAvailability } from './QrAdvanced';
 
-type Tab = 'OVERVIEW' | 'MENU' | 'TABLES' | 'DESIGN' | 'ORDERS' | 'PAYMENTS' | 'RULES' | 'ANALYTICS' | 'SETTINGS' | 'ADVANCED';
+type Tab = 'OVERVIEW' | 'MENU' | 'TABLES' | 'DESIGN' | 'ORDERS' | 'PAYMENTS' | 'RULES' | 'ANALYTICS' | 'SETTINGS' | 'ADVANCED' | 'SERVICE' | 'PICKUP' | 'PERFORMANCE' | 'BRAND';
 
 const errText = (e: unknown) => (e instanceof CloudApiError || e instanceof Error ? e.message : 'Something went wrong');
 
@@ -21,7 +23,7 @@ const inr = (n: number) => `₹${n.toLocaleString('en-IN', { maximumFractionDigi
  */
 export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; showToast: (msg: string) => void }) {
   const { state, refresh } = useQrEntitlement();
-  const [tab, setTab] = useState<Tab>('OVERVIEW');
+  const [tab, setTab] = useState<Tab>(()=>{const q=new URLSearchParams(location.search).get('tab');return ['MENU','TABLES','ORDERS','SETTINGS','SERVICE','PICKUP','PERFORMANCE','BRAND','PAYMENTS'].includes(q??'')?q as Tab:'OVERVIEW';});
 
   if (state.status === 'loading') return <div className="p-8 text-sm text-slate-500">Checking your plan…</div>;
   if (state.status === 'unknown') {
@@ -37,9 +39,10 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
   const { entitlement, fromCache } = state;
   if (!entitlement.enabled) return <LockedView message={entitlement.lockedMessage} planName={entitlement.planName} onViewPlan={onViewPlan} />;
 
-  const tabs: Array<[Tab, string]> = [['OVERVIEW', 'Overview'], ['MENU', 'Menu & Availability'], ['TABLES', 'Tables & QR'], ['DESIGN', 'QR Design Studio'], ['ORDERS', 'QR Orders'], ['PAYMENTS', 'Payment Settings'], ['RULES', 'Ordering Rules'], ['ANALYTICS', 'Analytics'], ['SETTINGS', 'QR Settings'], ['ADVANCED','Advanced Features']];
+  const tabs: Array<[Tab, string]> = [['OVERVIEW', 'Overview'], ['MENU', 'Menu & Availability'], ['TABLES', 'Tables & QR'], ['DESIGN', 'QR Design Studio'], ['ORDERS', 'QR Orders'], ['PAYMENTS', 'Payment Settings'], ['RULES', 'Ordering Rules'], ['ANALYTICS', 'Analytics'], ['SETTINGS', 'QR Settings'], ['ADVANCED','Advanced Features'],['SERVICE','Service Requests'],['PICKUP','Pickup Scheduling'],['PERFORMANCE','Menu Performance'],['BRAND','Customer Branding']];
   return (
     <div className="space-y-5" data-testid="qr-console">
+      <p className="text-xs text-slate-600">QR Ordering license active{entitlement.planName ? ` · ${entitlement.planName}` : ''}{entitlement.validUntil ? ` · Valid through ${new Date(entitlement.validUntil).toLocaleDateString()}` : ''}. Your platform administrator manages licenses and device reassignment.</p>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">QR Ordering</h1>
@@ -57,9 +60,10 @@ export function QrConsole({ onViewPlan, showToast }: { onViewPlan: () => void; s
         ))}
       </div>
 
-      {tab === 'OVERVIEW' && <div className="space-y-5"><Overview /><QrAnalyticsView /></div>}
+      {tab === 'OVERVIEW' && <div className="space-y-5"><QrSetupHealth navigate={t=>setTab(t as Tab)}/><Overview /><QrAnalyticsView /></div>}
+      {tab === 'SERVICE'&&<QrServiceOperations/>}{tab === 'PICKUP'&&<QrPickupOperations/>}{tab === 'PERFORMANCE'&&<QrMenuPerformance/>}{tab === 'BRAND'&&<QrBrandStudio/>}
       {tab === 'TABLES' && <TablesAndQr showToast={showToast} />}
-      {tab === 'MENU' && <QrMenuAvailability showToast={showToast} />}
+      {tab === 'MENU' && <div className="space-y-5">{/^\/qr\//.test(location.pathname)&&<QrCatalog/>}<QrMenuAvailability showToast={showToast} /></div>}
       {tab === 'ADVANCED' && <QrCapabilities showToast={showToast} />}
       {tab === 'DESIGN' && <QrDesignStudio showToast={showToast} />}
       {tab === 'ORDERS' && <QrOperationalOrders showToast={showToast} />}
@@ -129,7 +133,7 @@ function Overview() {
         <Tile label="Accepted order value today" value={inr(t.sales)} />
         <Tile label="Waiting / in kitchen" value={t.ordersPending} />
         <Tile label="Completed" value={t.ordersCompleted} />
-        <Tile label="Scans today" value={t.scans} />
+        <Tile label="Landing sessions today" value={t.scans} />
         <Tile label="Average order" value={inr(t.averageOrderValue)} />
       </div>
       <div className="rounded-2xl border border-jaman-border bg-white p-4">

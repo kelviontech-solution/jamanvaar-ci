@@ -322,7 +322,7 @@ export class QrAdminService {
     return rows.map((o) => {
       const meta = (o.meta ?? {}) as Record<string, unknown>;
       return { id: o.externalOrderId, version: o.syncVersion, orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0,
-        items: o.items, notes: o.notes, history: meta.qrStatusHistory ?? [], customerName: meta.customerName ?? null };
+        pickupAt:meta.pickupAt??null,pickupTimezone:meta.pickupTimezone??null,pickupInstructions:meta.pickupInstructions??null,items: o.items, notes: o.notes, history: meta.qrStatusHistory ?? [], customerName: meta.customerName ?? null };
     });
   }
 

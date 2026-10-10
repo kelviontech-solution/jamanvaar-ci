@@ -42,7 +42,7 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
       <div className="grid gap-2">
         {pending.map((o) => (
           <div key={o.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-jaman-cream p-3">
-            <div className="font-black text-jaman-navy">{o.orderNumber}</div>
+            <div className="font-black text-jaman-navy">{o.orderNumber}</div>{o.pickupAt&&<p className="text-xs text-orange-800">Pickup {new Date(o.pickupAt).toLocaleString(undefined,{timeZone:o.pickupTimezone})}</p>}
             <div className="text-sm">{o.tableNumber ? `Table ${o.tableNumber}` : o.orderType === 'TAKEAWAY' ? 'Takeaway' : 'No table'}</div>
             <div className="text-xs text-slate-600 flex-1 min-w-[12rem]">{o.items.map((i) => `${i.quantity} × ${i.name}`).join(', ')}{o.customerNotes ? ` — “${o.customerNotes}”` : ''}</div>
             <div className="font-bold">{formatINR(o.totalAmount)}</div>

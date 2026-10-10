@@ -1,3 +1,5 @@
+import {QrOperationsService} from './qr-operations.service';
+import {QrOperationsController,QrOperationsPublicController} from './qr-operations.controller';
 import { QrLoyaltyService } from './qr-loyalty.service';
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -33,8 +35,8 @@ import { QrPromotionsService } from './qr-promotions.service';
  */
 @Module({
   imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule],
-  controllers: [QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
-  providers: [QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
+  controllers: [QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
+  providers: [QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}
