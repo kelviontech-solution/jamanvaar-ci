@@ -18,6 +18,7 @@
     "@jamanvaar/database": "*",
     "@jamanvaar/i18n": "*",
     "@jamanvaar/sync": "*",
+    "@jamanvaar/tauri-plugin-apk-updater": "*",
     "@jamanvaar/types": "*",
     "@jamanvaar/ui": "*",
     "@jamanvaar/utils": "*",

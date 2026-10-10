@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile-updater",
+  "description": "Android-only: grants the custom apk-updater plugin (packages/tauri-plugin-apk-updater), which downloads an update .apk through DownloadManager and hands it to the system install prompt -- Android's equivalent of the Windows updater's desktop-updater capability.",
+  "windows": ["main"],
+  "platforms": ["android"],
+  "permissions": [
+    "apk-updater:default"
+  ]
+}

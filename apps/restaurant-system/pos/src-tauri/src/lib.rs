@@ -117,6 +117,10 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init());
 
+    // Android's own equivalent of the Windows updater above -- see packages/tauri-plugin-apk-updater.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_apk_updater::init());
+
     let builder = builder
         .invoke_handler(tauri::generate_handler![
             get_local_core_info,
