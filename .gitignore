@@ -1,4 +1,10 @@
 node_modules/
+# Rust/Tauri build output -- never had a rule, so a local `cargo check`/`tauri build`
+# left hundreds of compiler intermediates (.d/.rlib/.rmeta files, fingerprints) showing
+# as untracked changes, and one build.rs-adjacent file (target/.rustc_info.json) was
+# committed by mistake before this rule existed.
+**/src-tauri/target/
+**/src-tauri/gen/
 .tauri-updater-key.private
 .tauri-updater-key.private.pub
 .tauri-updater-key.password.txt
