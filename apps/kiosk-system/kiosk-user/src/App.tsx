@@ -57,8 +57,10 @@ import {
   TableRepository,
   WelcomeScreenSettingsRepository,
   StaffRepository,
-  RestaurantIdentityRepository
+  RestaurantIdentityRepository,
+  KioskLocalPrinterRepository
 } from '@jamanvaar/database';
+import { KioskPrinterSettingsModal } from './KioskPrinterSettingsModal';
 import {
   CartItem,
   Category,
@@ -592,6 +594,12 @@ export default function KioskUserApp() {
   const [isStaffPinModalOpen, setIsStaffPinModalOpen] = useState(false);
   const [staffPin, setStaffPin] = useState('');
   const [staffOverrideActive, setStaffOverrideActive] = useState(false);
+  // Separate PIN gate for this Kiosk's own hardware setup -- deliberately distinct from the
+  // customer-assistance Staff PIN above (which applies a manager discount on success), so
+  // printer configuration never gets mixed into that flow's single-purpose fast path.
+  const [isKioskPrinterPinModalOpen, setIsKioskPrinterPinModalOpen] = useState(false);
+  const [kioskPrinterPin, setKioskPrinterPin] = useState('');
+  const [isKioskPrinterSettingsOpen, setIsKioskPrinterSettingsOpen] = useState(false);
   // B2-059: was pre-filled at 5 with no requirement to actually choose one — a guest tapping
   // "Submit Rating" without picking a star recorded a perfect score, inflating the average.
   const [feedbackRating, setFeedbackRating] = useState<number>(0);
@@ -1588,12 +1596,11 @@ export default function KioskUserApp() {
 
     // 1. Automatically dispatch receipt to thermal printer (Zero user prompts required)
     try {
-      const activePrn = PrinterService.getActivePrinter();
-      const printRes = await PrinterService.printReceipt(order);
+      const printRes = await printKioskReceipt(order);
       setAutoPrintStatus({
         printed: printRes.success,
         message: printRes.message,
-        printerName: activePrn?.name ?? 'No printer configured'
+        printerName: printRes.printerName
       });
       if (printRes.success) {
         showToast(`Receipt dispatch: ${printRes.message}`);
@@ -1758,6 +1765,61 @@ export default function KioskUserApp() {
         category: 'STAFF_OVERRIDE',
         details: 'Staff override PIN entry failed verification'
       });
+    }
+  };
+
+  /**
+   * Prints to this Kiosk's own local printer when one is configured (see
+   * KioskPrinterSettingsModal) -- never resolved through the shared, LAN-synced
+   * db.configuredPrinters list, which has no notion of which physical machine a printer is
+   * plugged into. Falls back to the shared system only when this Kiosk has no local printer
+   * set up, preserving existing behaviour for any install that still relies on it.
+   */
+  const printKioskReceipt = async (order: Order): Promise<{ success: boolean; message: string; printerName: string }> => {
+    const local = KioskLocalPrinterRepository.get();
+    if (local) {
+      const res = await PrinterService.printReceiptOnPrinter(order, {
+        id: 'kiosk-local-printer',
+        name: local.name,
+        interfaceType: local.interfaceType,
+        port: local.port,
+        ipAddress: local.ipAddress,
+        systemPrinterName: local.systemPrinterName,
+        baudRate: local.baudRate,
+        paperSize: local.paperSize,
+        status: 'READY',
+        isDefault: true,
+        isKioskBuiltIn: true,
+        modelName: 'Kiosk Local Printer'
+      });
+      return { ...res, printerName: local.name };
+    }
+    const activePrn = PrinterService.getActivePrinter();
+    const res = await PrinterService.printReceipt(order);
+    return { ...res, printerName: activePrn?.name ?? 'No printer configured' };
+  };
+
+  const handleKioskPrinterPinVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const approved = await verifyManagerPin(kioskPrinterPin);
+      if (approved) {
+        setIsKioskPrinterPinModalOpen(false);
+        setKioskPrinterPin('');
+        setIsKioskPrinterSettingsOpen(true);
+        AuditRepository.log({
+          kioskId,
+          action: 'STAFF_OVERRIDE_PIN_SUCCESS',
+          category: 'STAFF_OVERRIDE',
+          details: `Kiosk printer settings opened by ${approved.staffName}`
+        });
+        return;
+      }
+      setKioskPrinterPin('');
+      showToast('Invalid staff PIN.');
+    } catch (err) {
+      setKioskPrinterPin('');
+      showToast(err instanceof Error ? err.message : 'A staff PIN check needs a connection to the restaurant server.');
     }
   };
 
@@ -3378,11 +3440,10 @@ export default function KioskUserApp() {
                 <button
                   type="button"
                   onClick={async () => {
-                    const activePrn = PrinterService.getActivePrinter();
-                    const res = await PrinterService.printReceipt(placedOrder);
+                    const res = await printKioskReceipt(placedOrder);
                     if (res.success) {
-                      setAutoPrintStatus({ printed: true, message: res.message, printerName: activePrn?.name ?? 'No printer configured' });
-                      showToast(`Print job sent to ${activePrn?.name ?? 'the print queue'}`);
+                      setAutoPrintStatus({ printed: true, message: res.message, printerName: res.printerName });
+                      showToast(`Print job sent to ${res.printerName}`);
                     } else {
                       showToast(res.message);
                     }
@@ -4023,6 +4084,44 @@ export default function KioskUserApp() {
           </div>
         </form>
       </Modal>
+
+      {/* MODAL: KIOSK PRINTER SETUP PIN GATE -- separate from the Staff PIN above, see state declarations */}
+      <Modal
+        isOpen={isKioskPrinterPinModalOpen}
+        onClose={() => setIsKioskPrinterPinModalOpen(false)}
+        title="Kiosk Printer Setup"
+      >
+        <form onSubmit={handleKioskPrinterPinVerify} className="space-y-4 py-2">
+          <p className="text-xs text-[#4A5568]">Enter staff PIN to configure this Kiosk's receipt printer.</p>
+          <input
+            type="password"
+            maxLength={4}
+            value={kioskPrinterPin}
+            onChange={(e) => setKioskPrinterPin(e.target.value)}
+            placeholder="••••"
+            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+          />
+          <div className="flex gap-2">
+            <Button variant="ghost" type="button" className="flex-1" onClick={() => setIsKioskPrinterPinModalOpen(false)}>Cancel</Button>
+            <Button variant="accent" type="submit" className="flex-1">Verify PIN</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <KioskPrinterSettingsModal
+        isOpen={isKioskPrinterSettingsOpen}
+        onClose={() => setIsKioskPrinterSettingsOpen(false)}
+        showToast={showToast}
+      />
+
+      {/* Deliberately tiny and low-contrast -- a staff-known tap target for printer setup,
+          not something a customer browsing the kiosk would notice or try. */}
+      <button
+        type="button"
+        onClick={() => setIsKioskPrinterPinModalOpen(true)}
+        aria-label="Kiosk printer setup"
+        className="fixed bottom-1 right-1 w-6 h-6 opacity-10 hover:opacity-40 z-50 cursor-pointer"
+      />
 
       {/* Installer-only entry URL; a physical console PIN is still required to pair. */}
       <Modal isOpen={localCoreSetupOpen} onClose={() => {

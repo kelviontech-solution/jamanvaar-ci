@@ -571,6 +571,62 @@ export class PrinterService {
   }
 
   /**
+   * Prints a receipt directly to `printer`, bypassing getActivePrinter()/db.configuredPrinters
+   * entirely. For a terminal whose own printer is never added to that shared, LAN-synced list --
+   * a Kiosk's locally-configured printer lives only on that one physical device (see
+   * KioskLocalPrinterRepository), and resolving it through the shared list would risk a Kiosk
+   * picking up (or printing to) a printer actually plugged into a completely different machine,
+   * like the Restaurant Admin laptop's own receipt printer.
+   */
+  public static async printReceiptOnPrinter(order: Order, printer: PrinterDevice): Promise<{ success: boolean; message: string }> {
+    const config = ReceiptRepository.getConfig();
+    const text = this.generateReceiptText(order, config, printer.paperSize);
+    const qrPayload = this.upiQrPayloadFor(config, order.totalAmount);
+
+    const job: PrintJob = {
+      id: `prn-job-${generateUUID()}`,
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      tokenNumber: order.tokenNumber,
+      printerId: printer.id,
+      printerName: printer.name,
+      status: 'PENDING',
+      attempts: 1,
+      maxAttempts: 1,
+      formattedText: text,
+      qrPayload,
+      paperSize: printer.paperSize,
+      createdAt: new Date().toISOString()
+    };
+    db.printJobs.unshift(job);
+
+    try {
+      await this.dispatchToPrinter(printer, text, qrPayload);
+      job.status = 'PRINTED';
+      job.printedAt = new Date().toISOString();
+      db.notify();
+      return { success: true, message: `Receipt printed on ${printer.name}` };
+    } catch (err: any) {
+      const message: string = err?.message || 'Printer communication failed';
+      job.status = 'FAILED';
+      job.lastError = message;
+      db.notify();
+      return { success: false, message };
+    }
+  }
+
+  /** Same explicit-printer bypass as printReceiptOnPrinter, for a diagnostic slip instead of a real order. */
+  public static async printTestSlipOnPrinter(printer: PrinterDevice): Promise<{ success: boolean; message: string }> {
+    const text = `JAMANVAAR — Diagnostic Test Slip\nPrinter: ${printer.name}\nInterface: ${printer.interfaceType}\nTime: ${new Date().toLocaleString('en-IN')}`;
+    try {
+      await this.dispatchToPrinter(printer, text);
+      return { success: true, message: `Test slip printed on ${printer.name}` };
+    } catch (err: any) {
+      return { success: false, message: err?.message || `Could not reach ${printer.name}` };
+    }
+  }
+
+  /**
    * High-level auto-print entry point called upon order confirmation
    */
   public static async printReceipt(order: Order): Promise<{ success: boolean; message: string; text?: string }> {

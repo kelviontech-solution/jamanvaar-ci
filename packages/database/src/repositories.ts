@@ -2,6 +2,7 @@ import { initializeLoyaltyLedger, refreshLoyaltyBalance } from '@jamanvaar/types
 import { normalizeMenuText } from './menu_identity';
 import { scanMenuDuplicates, archiveConfirmedDuplicates } from './menu_cleanup';
 import { KioskConfigurationRepository } from './kiosk_configuration';
+import { KeyValueStore } from './key_value_store';
 import { PaymentPolicy } from './payment_policy';
 import { NumberAllocator } from './number_allocator';
 import {
@@ -4236,6 +4237,52 @@ export class PrinterRepository {
     });
     db.notify();
     return true;
+  }
+}
+
+/** The one printer physically plugged into THIS Kiosk terminal, kept entirely on this device. */
+export interface KioskLocalPrinterConfig {
+  name: string;
+  interfaceType: PrinterDevice['interfaceType'];
+  port?: string;
+  ipAddress?: string;
+  systemPrinterName?: string;
+  baudRate?: number;
+  paperSize: PrinterDevice['paperSize'];
+}
+
+const KIOSK_LOCAL_PRINTER_KEY = 'jamanvaar_kiosk_local_printer';
+
+/**
+ * A Kiosk's own receipt printer, stored only in this device's local storage -- never synced
+ * over the LAN mesh like db.configuredPrinters is. That shared list has no notion of which
+ * physical machine a printer is actually plugged into (PrinterService.getActivePrinter() does
+ * not filter by terminal), so a Kiosk resolving its printer from it could pick up -- or try to
+ * print to -- a USB/driver printer that is really sitting on the Restaurant Admin laptop. See
+ * PrinterService.printReceiptOnPrinter, which this repository's config is handed to directly.
+ */
+export class KioskLocalPrinterRepository {
+  public static get(): KioskLocalPrinterConfig | null {
+    try {
+      const raw = KeyValueStore.get(KIOSK_LOCAL_PRINTER_KEY);
+      return raw ? (JSON.parse(raw) as KioskLocalPrinterConfig) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public static set(config: KioskLocalPrinterConfig): void {
+    KeyValueStore.set(KIOSK_LOCAL_PRINTER_KEY, JSON.stringify(config));
+    AuditRepository.log({
+      action: 'PRINTER_UPDATED',
+      category: 'HARDWARE',
+      details: `Configured this Kiosk's own local printer: ${config.name}`,
+      username: 'Staff'
+    });
+  }
+
+  public static clear(): void {
+    KeyValueStore.remove(KIOSK_LOCAL_PRINTER_KEY);
   }
 }
 
