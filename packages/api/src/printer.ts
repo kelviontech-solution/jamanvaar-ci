@@ -1,6 +1,6 @@
 import { KOTRecord, Order, PrinterDevice, PrinterHardwareStatus, PrinterRole, PrintJob, ReceiptConfig, ReceiptPaperSize } from '@jamanvaar/types';
 import { Platform, ESC_POS_DRAWER_KICK } from './platform';
-import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatSplitTax, formatTime, generateUUID, stripControlCharsForPrint, restaurantGstRate, taxLabels, buildUpiPaymentUri, escPosQrBitmapBytes } from '@jamanvaar/utils';
 import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 
 // B2-023: a kiosk order's `kioskId` is the real activation UUID (needed internally for device
@@ -359,8 +359,19 @@ export class PrinterService {
    * Generates binary ESC/POS command bytecode for physical thermal printers
    */
   public static generateEscPosBytecode(order: Order, paperSize: ReceiptPaperSize = '80mm'): Uint8Array {
-    const text = this.generateReceiptText(order, undefined, paperSize);
-    return this.wrapEscPos(text);
+    const config = ReceiptRepository.getConfig();
+    const text = this.generateReceiptText(order, config, paperSize);
+    return this.wrapEscPos(text, this.upiQrPayloadFor(config, order.totalAmount));
+  }
+
+  /** The UPI payment URI for this order's exact total, or undefined when no UPI QR is configured. */
+  private static upiQrPayloadFor(config: ReceiptConfig, amount: number): string | undefined {
+    if (!config.showUpiQrOnReceipt || !config.upiId) return undefined;
+    return buildUpiPaymentUri({
+      vpa: config.upiId,
+      payeeName: config.upiPayeeName || config.restaurantName || 'Restaurant',
+      amount
+    });
   }
 
   /**
@@ -370,7 +381,7 @@ export class PrinterService {
    * a job's own formattedText directly, without regenerating it from an
    * Order the queue may not have (a KOT job never had one).
    */
-  private static wrapEscPos(text: string): Uint8Array {
+  private static wrapEscPos(text: string, qrPayload?: string): Uint8Array {
     // B2-063: every free-text field that ends up on a receipt/KOT (dish name, customer name,
     // Chef Notes, ...) is concatenated into `text` upstream with no filtering — a name
     // containing a raw ESC/GS control-byte sequence (e.g. the standard "kick cash drawer"
@@ -379,7 +390,9 @@ export class PrinterService {
     // before hitting hardware, so stripping control characters here (rather than at each
     // individual free-text field) catches every current and future one.
     const encoder = new TextEncoder();
-    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n\n');
+    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n');
+    const qrBytes = qrPayload ? escPosQrBitmapBytes(qrPayload) : new Uint8Array(0);
+    const trailerBytes = encoder.encode(qrPayload ? 'Scan to pay via UPI\n\n\n' : '\n\n\n');
 
     // ESC/POS Commands:
     // ESC @ (Initialize): 0x1B, 0x40
@@ -387,10 +400,13 @@ export class PrinterService {
     const initCmd = new Uint8Array([0x1b, 0x40]);
     const cutCmd = new Uint8Array([0x1d, 0x56, 0x42, 0x00]);
 
-    const fullPayload = new Uint8Array(initCmd.length + textBytes.length + cutCmd.length);
-    fullPayload.set(initCmd, 0);
-    fullPayload.set(textBytes, initCmd.length);
-    fullPayload.set(cutCmd, initCmd.length + textBytes.length);
+    const fullPayload = new Uint8Array(initCmd.length + textBytes.length + qrBytes.length + trailerBytes.length + cutCmd.length);
+    let offset = 0;
+    fullPayload.set(initCmd, offset); offset += initCmd.length;
+    fullPayload.set(textBytes, offset); offset += textBytes.length;
+    fullPayload.set(qrBytes, offset); offset += qrBytes.length;
+    fullPayload.set(trailerBytes, offset); offset += trailerBytes.length;
+    fullPayload.set(cutCmd, offset);
 
     return fullPayload;
   }
@@ -409,8 +425,8 @@ export class PrinterService {
    * (port 9100 by default — the standard raw-print port most networked
    * ESC/POS printers support), via the send_escpos_bytes Tauri command.
    */
-  private static async dispatchToPrinter(printer: PrinterDevice, text: string): Promise<void> {
-    await Platform.printer.send(printer, this.wrapEscPos(text));
+  private static async dispatchToPrinter(printer: PrinterDevice, text: string, qrPayload?: string): Promise<void> {
+    await Platform.printer.send(printer, this.wrapEscPos(text, qrPayload));
   }
 
   /**
@@ -461,6 +477,7 @@ export class PrinterService {
       attempts: 0,
       maxAttempts: 3,
       formattedText,
+      qrPayload: this.upiQrPayloadFor(config, order.totalAmount),
       paperSize: activePrinter.paperSize,
       createdAt: new Date().toISOString(),
       isReprint
@@ -514,7 +531,7 @@ export class PrinterService {
         // BUG-024/026: only a real transport may mark a job PRINTED. Every real interface has a real
         // transport in the desktop app (network, USB / Windows printer, serial); outside it the job
         // fails with that reason. Only the developer simulator (VIRTUAL_EMULATOR) sends nothing.
-        await this.dispatchToPrinter(printer, job.formattedText || job.rawPayload || '');
+        await this.dispatchToPrinter(printer, job.formattedText || job.rawPayload || '', job.qrPayload);
         job.status = 'PRINTED';
         job.printedAt = new Date().toISOString();
         printer.lastPrintAt = new Date().toISOString();

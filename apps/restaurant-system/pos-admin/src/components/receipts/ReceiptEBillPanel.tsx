@@ -114,6 +114,47 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
               </div>
             </div>
 
+            <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">UPI Payment QR</h3>
+            <p className="text-[11px] text-[#4A5568] -mt-2">
+              When set, every receipt shows a "Scan to pay" QR for the exact bill total — any UPI app (GPay, PhonePe,
+              Paytm...) opens pre-filled, ready to confirm. Pays straight into this UPI ID, no gateway involved.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant UPI ID (VPA)</label>
+                <input
+                  type="text"
+                  value={config.upiId || ''}
+                  onChange={(e) => setConfig({ ...config, upiId: e.target.value.trim() })}
+                  placeholder="restaurant@upi"
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-jaman-navy mb-1">Payee Name Shown in UPI App</label>
+                <input
+                  type="text"
+                  value={config.upiPayeeName || ''}
+                  onChange={(e) => setConfig({ ...config, upiPayeeName: e.target.value })}
+                  placeholder={config.restaurantName || 'Restaurant name'}
+                  className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                />
+              </div>
+            </div>
+            <label className="flex items-center gap-2 text-xs font-semibold text-jaman-navy cursor-pointer">
+              <input
+                type="checkbox"
+                checked={config.showUpiQrOnReceipt === true}
+                disabled={!config.upiId?.trim()}
+                onChange={(e) => setConfig({ ...config, showUpiQrOnReceipt: e.target.checked })}
+                className="rounded text-brand"
+              />
+              <span>
+                Show UPI payment QR on receipts
+                {!config.upiId?.trim() && <span className="font-normal text-slate-500"> (enter a UPI ID above first)</span>}
+              </span>
+            </label>
+
             <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">Logo</h3>
             <p className="text-[11px] text-[#4A5568] -mt-2">
               Shown on the on-screen and WhatsApp receipt and printed at the top of the physical slip.

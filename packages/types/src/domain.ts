@@ -696,6 +696,8 @@ export interface Order {
   deliveredAt?: string;
   /** Quantity of each order line whose recipe stock has already been consumed, keyed by order item id (BUG-044: makes stock deduction idempotent per line). */
   stockConsumedQty?: Record<string, number>;
+  /** Counted dishes already reserved by the canonical QR backend; recipe movements remain local/ledger-owned. */
+  serverDishStockConsumed?: Record<string, number>;
 }
 
 export type DeliveryStatus = 'UNASSIGNED' | 'ASSIGNED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'FAILED';
@@ -1146,6 +1148,12 @@ export interface ReceiptConfig {
   showCashWatermark?: boolean;
   /** The word repeated in that watermark (default "CASH"). */
   cashWatermarkText?: string;
+  /** This restaurant's own UPI VPA (e.g. "restaurant@upi") a guest can scan the receipt QR to pay directly, for the exact bill total. Separate from payments.settlementUpiVpa (the platform payout destination) -- this one is printed in plain text on every bill, so it is never auto-filled from that field. */
+  upiId?: string;
+  /** Payee name shown in the UPI app when a guest scans the receipt QR (defaults to restaurantName). */
+  upiPayeeName?: string;
+  /** Prints/shows a "scan to pay" UPI QR on the receipt for the exact order total. Off unless upiId is also set. */
+  showUpiQrOnReceipt?: boolean;
   /** @deprecated Ignored: the KOT preview is black on white. Was: background color of the on-screen Kitchen Order Ticket preview (the kiosk's own "what got
    *  sent to the kitchen" card, not the physical KOT printout, which is monochrome). Must stay a
    *  dark tone for the light ticket text to stay legible, so this is chosen from a curated set
@@ -1217,6 +1225,8 @@ export interface PrintJob {
   rawEscPos?: string;
   rawPayload?: string;
   formattedText?: string;
+  /** A UPI payment URI ("upi://pay?...") printed as a QR code after the text, for a receipt whose restaurant has a UPI ID configured. Never set on a KOT job. */
+  qrPayload?: string;
   paperSize: ReceiptPaperSize;
   createdAt: string;
   printedAt?: string;

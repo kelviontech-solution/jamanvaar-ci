@@ -4,6 +4,8 @@ export * from './time';
 export * from './sound';
 export * from './timezone';
 export * from './qrcode';
+export * from './escpos_qr';
+export * from './upi';
 export * from './localization';
 export * from './transliteration';
 export * from './clipboard';

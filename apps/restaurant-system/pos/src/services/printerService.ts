@@ -1,7 +1,7 @@
 import { db, PrintQueueRepository, ReceiptRepository, AuditRepository, PrinterRepository } from '@jamanvaar/database';
 import { detectPrinters, describeDiscovered, isAlreadyConfigured, sendRawToPrinter, type DetectionResult, type DiscoveredPrinter } from '@jamanvaar/api';
 import { Order, KOTRecord, PrintJob, ReceiptPaperSize, PrinterDevice, PrinterRole } from '@jamanvaar/types';
-import { stripControlCharsForPrint } from '@jamanvaar/utils';
+import { stripControlCharsForPrint, buildUpiPaymentUri, escPosQrBitmapBytes } from '@jamanvaar/utils';
 
 export class PosPrinterService {
   /**
@@ -224,7 +224,7 @@ export class PosPrinterService {
    * Wraps already-formatted receipt/KOT text in real ESC/POS init + cut
    * command bytes.
    */
-  private static wrapEscPos(text: string): Uint8Array {
+  private static wrapEscPos(text: string, qrPayload?: string): Uint8Array {
     // B2-063: every free-text field that ends up on a receipt/KOT (dish name, customer name,
     // Chef Notes, ...) is concatenated into `text` upstream with no filtering — a name
     // containing a raw ESC/GS control-byte sequence (e.g. the standard "kick cash drawer"
@@ -233,22 +233,38 @@ export class PosPrinterService {
     // before hitting hardware (mirrors the identical fix in packages/api/src/printer.ts), so
     // stripping control characters here catches every current and future field.
     const encoder = new TextEncoder();
-    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n\n');
+    const textBytes = encoder.encode(stripControlCharsForPrint(text) + '\n\n');
+    const qrBytes = qrPayload ? escPosQrBitmapBytes(qrPayload) : new Uint8Array(0);
+    const trailerBytes = encoder.encode(qrPayload ? 'Scan to pay via UPI\n\n\n' : '\n\n\n');
     const initCmd = new Uint8Array([0x1b, 0x40]);
     const cutCmd = new Uint8Array([0x1d, 0x56, 0x42, 0x00]);
-    const fullPayload = new Uint8Array(initCmd.length + textBytes.length + cutCmd.length);
-    fullPayload.set(initCmd, 0);
-    fullPayload.set(textBytes, initCmd.length);
-    fullPayload.set(cutCmd, initCmd.length + textBytes.length);
+    const fullPayload = new Uint8Array(initCmd.length + textBytes.length + qrBytes.length + trailerBytes.length + cutCmd.length);
+    let offset = 0;
+    fullPayload.set(initCmd, offset); offset += initCmd.length;
+    fullPayload.set(textBytes, offset); offset += textBytes.length;
+    fullPayload.set(qrBytes, offset); offset += qrBytes.length;
+    fullPayload.set(trailerBytes, offset); offset += trailerBytes.length;
+    fullPayload.set(cutCmd, offset);
     return fullPayload;
+  }
+
+  /** The UPI payment URI for this order's exact total, or undefined when no UPI QR is configured. */
+  private static upiQrPayloadFor(amount: number): string | undefined {
+    const config = ReceiptRepository.getConfig();
+    if (!config.showUpiQrOnReceipt || !config.upiId) return undefined;
+    return buildUpiPaymentUri({
+      vpa: config.upiId,
+      payeeName: config.upiPayeeName || config.restaurantName || 'Restaurant',
+      amount
+    });
   }
 
   /**
    * Sends already-formatted text to a real NETWORK_LAN printer over raw TCP
    * via the send_escpos_bytes Tauri command.
    */
-  private static async dispatchToPrinter(printer: PrinterDevice, text: string): Promise<void> {
-    await sendRawToPrinter(printer, this.wrapEscPos(text));
+  private static async dispatchToPrinter(printer: PrinterDevice, text: string, qrPayload?: string): Promise<void> {
+    await sendRawToPrinter(printer, this.wrapEscPos(text, qrPayload));
   }
 
   /**
@@ -279,13 +295,13 @@ export class PosPrinterService {
    * driver exists yet) or NETWORK_LAN outside the desktop app — used to "simulate success"
    * and is now a real, explained failure instead.
    */
-  private static async dispatchAndFinalize(job: PrintJob, printer: PrinterDevice, payload: string): Promise<PrintJob> {
+  private static async dispatchAndFinalize(job: PrintJob, printer: PrinterDevice, payload: string, qrPayload?: string): Promise<PrintJob> {
     const stored = db.printJobs.find((j) => j.id === job.id);
     if (stored) stored.attempts += 1;
     try {
       // Real transports for network, USB / Windows printers and serial, in the desktop app; only the
       // developer simulator sends nothing.
-      await this.dispatchToPrinter(printer, payload);
+      await this.dispatchToPrinter(printer, payload, qrPayload);
       return PrintQueueRepository.updateJobStatus(job.id, 'PRINTED') || job;
     } catch (err: any) {
       return PrintQueueRepository.updateJobStatus(job.id, 'FAILED', err?.message || 'Printer communication failed') || job;
@@ -306,6 +322,7 @@ export class PosPrinterService {
     }
     const effectivePaperSize = paperSize || printer.paperSize || '80mm';
     const payload = this.generateReceiptText(order, effectivePaperSize);
+    const qrPayload = this.upiQrPayloadFor(order.totalAmount);
 
     printer.lastPrintAt = new Date().toISOString();
     db.notify();
@@ -318,10 +335,11 @@ export class PosPrinterService {
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
       rawPayload: payload,
+      qrPayload,
       paperSize: effectivePaperSize
     });
 
-    return this.dispatchAndFinalize(job, printer, payload);
+    return this.dispatchAndFinalize(job, printer, payload, qrPayload);
   }
 
   /**
@@ -385,6 +403,7 @@ export class PosPrinterService {
     }
     const effectivePaperSize = printer.paperSize || '80mm';
     const payload = this.generateReceiptText(order, effectivePaperSize);
+    const qrPayload = this.upiQrPayloadFor(order.totalAmount);
 
     let job = PrintQueueRepository.addJob({
       type: effectivePaperSize === '80mm' ? 'RECEIPT_80MM' : 'RECEIPT_58MM',
@@ -394,11 +413,12 @@ export class PosPrinterService {
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
       rawPayload: payload,
+      qrPayload,
       paperSize: effectivePaperSize
     });
 
     job.isReprint = true;
-    job = { ...(await this.dispatchAndFinalize(job, printer, payload)), isReprint: true };
+    job = { ...(await this.dispatchAndFinalize(job, printer, payload, qrPayload)), isReprint: true };
 
     AuditRepository.log({
       action: 'RECEIPT_REPRINT',

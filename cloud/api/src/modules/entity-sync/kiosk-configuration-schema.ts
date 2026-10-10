@@ -28,6 +28,7 @@ const welcome = welcomePresentation.extend({
 const receipt = z.object({
   logoUrl: image.optional(), restaurantName: text, address: text, phone: text, gstin: text, fssaiNumber: text, footerMessage: text, thankYouMessage: text,
   paperSize: z.enum(['58mm', '80mm']), showCustomerPhone: z.boolean(), showTaxBreakup: z.boolean(), showTokenBig: z.boolean(), enableWhatsApp: z.boolean(), enableSms: z.boolean(), enableEmail: z.boolean(), enableQrReceipt: z.boolean(),
-  accentColor: text.optional(), showCashWatermark: z.boolean().optional(), cashWatermarkText: text.optional(), kotThemeColor: text.optional()
+  accentColor: text.optional(), showCashWatermark: z.boolean().optional(), cashWatermarkText: text.optional(), kotThemeColor: text.optional(),
+  upiId: text.optional(), upiPayeeName: text.optional(), showUpiQrOnReceipt: z.boolean().optional()
 }).strict();
 export const kioskConfigurationSchema = z.object({ branchId: z.string().min(1).max(128).optional(), updatedAt: z.string().datetime(), display, welcome, receipt }).strict();

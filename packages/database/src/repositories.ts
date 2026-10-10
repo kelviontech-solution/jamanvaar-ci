@@ -3235,6 +3235,7 @@ export class PrintQueueRepository {
     kotId?: string;
     kotNumber?: string;
     rawPayload: string;
+    qrPayload?: string;
     paperSize?: PrintJob['paperSize'];
   }): PrintJob {
     const defaultPrinter = db.configuredPrinters.find((p) => p.isDefault) || db.configuredPrinters[0];
@@ -3250,6 +3251,7 @@ export class PrintQueueRepository {
       kotId: params.kotId,
       kotNumber: params.kotNumber,
       rawPayload: params.rawPayload,
+      qrPayload: params.qrPayload,
       paperSize: params.paperSize || defaultPrinter?.paperSize || '80mm',
       // BUG-024: this used to be created as SUCCESS before any hardware was ever contacted,
       // so a printer that never actually printed still looked like it had. A job is PENDING
@@ -3620,7 +3622,7 @@ export class InventoryRepository {
           });
         });
       }
-      this.applyDishStockChange(it.menuItemId, -delta);
+      if(!order.serverDishStockConsumed?.[it.id])this.applyDishStockChange(it.menuItemId, -delta);
       consumed[it.id] = it.quantity;
     });
   }
@@ -3651,7 +3653,7 @@ export class InventoryRepository {
           });
         });
       }
-      this.applyDishStockChange(it.menuItemId, qtyConsumed);
+      if(!order.serverDishStockConsumed?.[it.id])this.applyDishStockChange(it.menuItemId, qtyConsumed);
       consumed[it.id] = 0;
     });
   }

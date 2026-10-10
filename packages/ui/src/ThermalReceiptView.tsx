@@ -1,6 +1,6 @@
 import React from 'react';
 import { Order, ReceiptConfig, KOTRecord } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime, splitTax } from '@jamanvaar/utils';
+import { formatDate, formatINR, formatTime, splitTax, buildUpiPaymentUri, generateQrDataUrl } from '@jamanvaar/utils';
 import { JAMANVAAR_LOGOS } from './assets';
 import { CheckCircle2, Phone, Mail } from 'lucide-react';
 
@@ -104,6 +104,17 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
   const is80mm = paperSize === '80mm';
   // Receipts are standard black and white on screen and on paper; the restaurant cannot change their colours.
   const watermark = cashWatermarkFor(order, config);
+  const upiQrDataUrl =
+    config.showUpiQrOnReceipt && config.upiId
+      ? generateQrDataUrl(
+          buildUpiPaymentUri({
+            vpa: config.upiId,
+            payeeName: config.upiPayeeName || restaurantName || 'Restaurant',
+            amount: order.totalAmount ?? 0
+          }),
+          { size: is80mm ? 140 : 110 }
+        )
+      : null;
 
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
@@ -282,6 +293,13 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           )}
         </div>
 
+        {upiQrDataUrl && (
+          <div className="py-3 border-b border-dashed border-[#A0AEC0] flex flex-col items-center gap-1.5" style={{ position: 'relative', zIndex: 1 }}>
+            <img src={upiQrDataUrl} alt="Scan to pay via UPI" width={is80mm ? 140 : 110} height={is80mm ? 140 : 110} />
+            <span className="text-[10px] font-bold text-black">Scan to pay ₹{order.totalAmount ?? 0} via UPI</span>
+          </div>
+        )}
+
         {/* Footer with Optional QR and Brand Credits */}
         <div className="text-center pt-3 text-[10px] space-y-1.5 text-[#718096]">
           <div className="font-bold text-[#2D3748]">{thankYouMessage}</div>
@@ -319,6 +337,20 @@ export function printThermalReceipt(
   const footerMessage = config?.footerMessage || '';
 
   const watermark = cashWatermarkFor(order, config);
+  const upiQrHtml =
+    config?.showUpiQrOnReceipt && config.upiId
+      ? `<div class="divider"></div><div class="text-center" style="padding: 6px 0;">
+          <img src="${generateQrDataUrl(
+            buildUpiPaymentUri({
+              vpa: config.upiId,
+              payeeName: config.upiPayeeName || restaurantName || 'Restaurant',
+              amount: order.totalAmount ?? 0
+            }),
+            { size: is80mm ? 140 : 110 }
+          )}" width="${is80mm ? 140 : 110}" height="${is80mm ? 140 : 110}" />
+          <div style="font-size: 10px; font-weight: bold; margin-top: 4px;">Scan to pay ₹${(order.totalAmount ?? 0).toFixed(2)} via UPI</div>
+        </div>`
+      : '';
   const watermarkHtml = watermark
     ? `<div style="position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;"><div style="position: absolute; top: 50%; left: 50%; width: 220%; transform: translate(-50%, -50%) rotate(-28deg); display: flex; flex-direction: column; gap: ${is80mm ? 26 : 18}px; align-items: center; color: #d4d4d4; font-weight: 900; font-size: ${is80mm ? 30 : 22}px; letter-spacing: 0.18em; white-space: nowrap;">${[0, 1, 2, 3].map((i) => `<span style="margin-left: ${i % 2 ? 24 : 0}px;">${watermark} ${watermark} ${watermark}</span>`).join('')}</div></div>`
     : '';
@@ -471,7 +503,7 @@ export function printThermalReceipt(
           <span class="bold">${paymentLabelFor(order.paymentMethod)}</span>
         </div>
         ${order.paymentTransactionId ? `<div class="row" style="font-size: 9px;"><span>Payment ref:</span><span>${order.paymentTransactionId}</span></div>` : ''}
-
+        ${upiQrHtml}
         <div class="divider"></div>
 
         <div class="text-center" style="font-size: 10px; margin-top: 6px;">
