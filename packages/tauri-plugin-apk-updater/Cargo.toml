@@ -1,0 +1,18 @@
+[package]
+name = "tauri-plugin-apk-updater"
+version = "1.0.0"
+description = "Downloads and prompts installation of an Android APK update, using DownloadManager and the system's own install-complete notification -- a real, visible download plus one tap to install, since Android has no silent-install path for an ordinary app."
+edition = "2021"
+
+[lib]
+name = "tauri_plugin_apk_updater"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }
+
+[dependencies]
+tauri = { version = "2.0.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1"

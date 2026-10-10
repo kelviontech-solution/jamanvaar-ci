@@ -145,6 +145,13 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init());
 
+    // Android has no equivalent of the Windows updater plugin above (no silent-install
+    // permission exists for an ordinary app) -- this downloads through DownloadManager and
+    // hands the finished file to the system's own install prompt instead. See
+    // packages/tauri-plugin-apk-updater.
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_apk_updater::init());
+
     builder
         .invoke_handler(tauri::generate_handler![
             discover_local_core,

@@ -32,8 +32,23 @@ function isSafeHttpsUrl(url: string | null | undefined): url is string {
  * it silently did nothing (confirmed live: Super Admin publishes a version, the banner shows it,
  * "Download" is dead). Opens through the shell plugin when running as a Tauri app (desktop or
  * Android), falling back to a normal new-tab open in a real browser (the web/Docker build).
+ *
+ * Android has no silent-install permission for an ordinary app (see tauri-plugin-apk-updater's
+ * own doc comment), so on Android this tries that plugin first -- a real, visible download
+ * through the system's own DownloadManager, followed automatically by its install prompt, one
+ * tap to confirm, instead of opening a browser and leaving the file to be found manually. Falls
+ * back to the shell-open path on any app that hasn't wired that plugin in yet.
  */
 async function openDownloadUrl(url: string): Promise<void> {
+  if (/android/i.test(navigator.userAgent)) {
+    try {
+      const { downloadAndInstall } = await import('@jamanvaar/tauri-plugin-apk-updater');
+      await downloadAndInstall(url);
+      return;
+    } catch {
+      // Not wired into this app yet, or not actually running as Tauri on Android -- fall through.
+    }
+  }
   try {
     const { open } = await import('@tauri-apps/plugin-shell');
     await open(url);

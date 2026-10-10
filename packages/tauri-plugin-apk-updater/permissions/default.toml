@@ -1,0 +1,16 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "allow-download-and-install"
+description = "Enables the download_and_install command, which downloads a given .apk URL through Android's own DownloadManager and hands the finished file to the system install prompt."
+commands.allow = ["download_and_install"]
+
+[[permission]]
+identifier = "deny-download-and-install"
+description = "Denies the download_and_install command."
+commands.deny = ["download_and_install"]
+
+[[set]]
+identifier = "default"
+description = "Allows downloading and installing an Android app update through the system's own download manager and install prompt."
+permissions = ["allow-download-and-install"]

@@ -1,0 +1,7 @@
+{
+  "name": "@jamanvaar/tauri-plugin-apk-updater",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./guest-js/index.ts",
+  "types": "./guest-js/index.ts"
+}
