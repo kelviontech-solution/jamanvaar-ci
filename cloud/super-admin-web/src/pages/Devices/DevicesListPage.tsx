@@ -1,5 +1,5 @@
 import { RefreshButton } from '../../components/RefreshButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Device } from '../../api/types';
@@ -67,6 +67,15 @@ export function DevicesListPage() {
     devices.reload();
     restaurants.reload();
   };
+
+  // A lock/unlock takes effect immediately server-side, but other dispatched commands (sync, cache
+  // clear, restart...) only resolve once the terminal itself checks in - so health/lock state here
+  // can change on its own. Refresh quietly so it does not look frozen between manual reloads.
+  useEffect(() => {
+    const timer = setInterval(reload, 15000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, q, typeFilter, restaurant?.id, health, lockedOnly]);
 
   const [confirmTarget, setConfirmTarget] = useState<Device | null>(null);
   const [actionPending, setActionPending] = useState(false);

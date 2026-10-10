@@ -53,9 +53,9 @@ export function DeviceDetailPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const loadData = useCallback(() => {
+  const loadData = useCallback((opts: { silent?: boolean } = {}) => {
     if (!id) return;
-    setLoading(true);
+    if (!opts.silent) setLoading(true);
     setError(null);
     Promise.all([
       api.get<Device>(`/api/v1/devices/${id}`),
@@ -65,11 +65,21 @@ export function DeviceDetailPage() {
         setDevice(devData);
         setCommands(cmdData);
       })
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load device details'))
-      .finally(() => setLoading(false));
+      .catch((err) => { if (!opts.silent) setError(err instanceof ApiError ? err.message : 'Failed to load device details'); })
+      .finally(() => { if (!opts.silent) setLoading(false); });
   }, [id]);
 
-  useEffect(loadData, [loadData]);
+  useEffect(() => loadData(), [loadData]);
+
+  // A dispatched command only leaves PENDING/SENT once the real terminal itself checks in and
+  // acknowledges it (see device-commands.service.ts). Without this, the history table looks
+  // permanently frozen even on a command that resolves moments after the user looks away.
+  useEffect(() => {
+    const hasOpenCommand = commands.some((c) => c.status === 'PENDING' || c.status === 'SENT');
+    if (!hasOpenCommand) return;
+    const timer = setInterval(() => loadData({ silent: true }), 5000);
+    return () => clearInterval(timer);
+  }, [commands, loadData]);
 
   async function handleSendCommand() {
     if (!id) return;
@@ -258,6 +268,11 @@ export function DeviceDetailPage() {
       {/* Remote Commands Audit History */}
       <Card className="card-pad">
         <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Remote Command History ({commands.length})</h3>
+        {commands.some((c) => c.status === 'PENDING' || c.status === 'SENT') && !isOnline && (
+          <div style={{ background: 'var(--jv-surface-muted, #f1f5f9)', border: '1px solid var(--jv-border-subtle)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12.5, color: 'var(--jv-text-muted)' }}>
+            This terminal is <strong>offline</strong> (last check-in {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'never'}). A command below waits in queue and is only marked executed once the terminal itself checks in and confirms it — it is not stuck, it is waiting on the device. Lock/Unlock take effect immediately regardless (enforced on every cloud request), independent of this row.
+          </div>
+        )}
         {commands.length === 0 ? (
           <div style={{ padding: 32, textAlign: 'center', color: 'var(--jv-text-light)' }}>
             No remote commands have been dispatched to this terminal yet.
@@ -287,13 +302,19 @@ export function DeviceDetailPage() {
                             ? 'success'
                             : cmd.status === 'FAILED'
                             ? 'error'
-                            : cmd.status === 'PENDING'
+                            : (cmd.status === 'PENDING' || cmd.status === 'SENT')
                             ? 'warning'
                             : 'neutral'
                         }
                       >
                         {cmd.status}
                       </Badge>
+                      {(cmd.status === 'PENDING' || cmd.status === 'SENT') && (cmd.commandType === 'LOCK' || cmd.commandType === 'UNLOCK') && (
+                        <div style={{ fontSize: 11, color: '#16a34a', marginTop: 3, fontWeight: 700 }}>Applied already — awaiting device confirmation</div>
+                      )}
+                      {(cmd.status === 'PENDING' || cmd.status === 'SENT') && cmd.commandType !== 'LOCK' && cmd.commandType !== 'UNLOCK' && !isOnline && (
+                        <div style={{ fontSize: 11, color: 'var(--jv-text-light)', marginTop: 3 }}>Waiting for terminal to check in</div>
+                      )}
                     </td>
                     <td style={{ padding: '12px 14px', color: 'var(--jv-text-muted)' }}>
                       {new Date(cmd.issuedAt).toLocaleString()}
@@ -340,6 +361,12 @@ export function DeviceDetailPage() {
                 <option value="RESTART_APP">Request Application Restart</option>
               </select>
             </div>
+
+            {!isOnline && selectedCommand !== 'LOCK' && selectedCommand !== 'UNLOCK' && (
+              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 12px', fontSize: 12.5, color: '#92400e' }}>
+                This terminal is offline. {selectedCommand === 'FORCE_LOGOUT' ? 'The logout' : 'This command'} will stay queued and only run once the terminal checks in again — it will not take effect immediately.
+              </div>
+            )}
 
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6, color: 'var(--jv-text)' }}>

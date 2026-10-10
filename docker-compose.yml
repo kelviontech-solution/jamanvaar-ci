@@ -68,6 +68,7 @@ services:
       # `location /q/`), so this is the same origin every other app above builds against.
       - QR_ORDER_BASE_URL=${PUBLIC_ORIGIN:-}
       - QR_SESSION_SECRET=${QR_SESSION_SECRET:-}
+      - QR_PAYMENT_CHECKOUT_MODE=${QR_PAYMENT_CHECKOUT_MODE:-STANDARD}
       - JAMANVAAR_SERVICE_SECRET=${JAMANVAAR_SERVICE_SECRET:-}
       - WHATSAPP_CONNECTOR_BASE_URL=${WHATSAPP_CONNECTOR_BASE_URL:-}
       - LICENSE_SIGNING_PRIVATE_KEY_B64=${LICENSE_SIGNING_PRIVATE_KEY_B64:-}
@@ -100,6 +101,16 @@ services:
       - SEED_DEMO_DATA=${SEED_DEMO_DATA:-}
       - SEED_DEMO_OWNER_PASSWORD=${SEED_DEMO_OWNER_PASSWORD:-}
       - SEED_RESET_DEMO_OWNER_PASSWORD=${SEED_RESET_DEMO_OWNER_PASSWORD:-false}
+      # Pinned to an absolute path, mounted on the named volume below, instead of the
+      # backup-storage.service.ts default (process.cwd()/data/backups). That default lives on
+      # the container's own writable layer: every rebuild/recreate (i.e. every deploy) replaced
+      # it with an empty directory, so every backup written before the last deploy silently
+      # vanished from disk while its "COMPLETED" row stayed in Postgres forever -- Super Admin's
+      # Verify/Download/Preview-restore then failed (or reported CORRUPT) for any backup older
+      # than the current deploy. A named volume survives container recreation; the DB does not.
+      - BACKUP_LOCAL_DIR=/data/backups
+    volumes:
+      - backend_backups:/data/backups
     depends_on:
       db:
         condition: service_healthy
@@ -353,6 +364,8 @@ networks:
 volumes:
   postgres_data:
     name: kiosk_postgres_data
+  backend_backups:
+    name: kiosk_backend_backups
   certbot_www:
     name: kiosk_certbot_www
   certbot_conf:

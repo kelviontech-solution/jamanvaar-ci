@@ -445,9 +445,13 @@ export function BackupsPage() {
                             variant="ghost"
                             size="sm"
                             className="btn-icon-only"
-                            disabled={downloadingId === b.id || b.status !== 'COMPLETED'}
+                            disabled={downloadingId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT'}
                             onClick={() => handleDownload(b.restaurantId, b.id)}
-                            title={downloadingId === b.id ? 'Securing…' : 'Download backup'}
+                            title={
+                              b.verificationStatus === 'CORRUPT'
+                                ? "This snapshot's stored file is missing or damaged and cannot be downloaded — trigger a fresh snapshot instead."
+                                : downloadingId === b.id ? 'Securing…' : 'Download backup'
+                            }
                             aria-label="Download backup"
                           >
                             <Download className="w-3.5 h-3.5" />
