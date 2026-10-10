@@ -10,7 +10,7 @@
         <!-- ${applicationId} is resolved against whichever app (Kiosk, POS, ...) actually embeds
              this plugin, so each app gets its own non-colliding authority automatically. -->
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="com.jamanvaar.apkupdater.JamanvaarApkFileProvider"
             android:authorities="${applicationId}.jamanvaar.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
