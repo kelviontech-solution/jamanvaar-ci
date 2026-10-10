@@ -177,3 +177,48 @@ jobs:
           name: ${{ matrix.app.name }}-apk
           path: ${{ matrix.app.path }}/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
+
+  # Closes the loop this build pipeline used to leave manual: every previous release was built
+  # here, then hand-downloaded, renamed and re-uploaded as a GitHub Release one file at a time.
+  # This job does that automatically, so the only thing a new feature/fix still needs by hand
+  # is pasting the resulting URLs + signature into Super Admin's Publish Version form once
+  # (deliberately -- nothing should reach real restaurant devices without that human decision).
+  publish-release:
+    needs: [build-desktop, build-android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read release version
+        id: version
+        run: echo "version=$(node -p "require('./apps/restaurant-system/pos-admin/src-tauri/tauri.conf.json').version")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+
+      - name: Flatten into clearly-named release assets
+        run: |
+          set -e
+          mkdir -p release-assets
+          declare -A slug=( [POS]=pos [RestaurantAdmin]=pos-admin [Kiosk]=kiosk [Captain]=captain [KDS]=kds )
+          for app in POS RestaurantAdmin Kiosk Captain KDS; do
+            name="${slug[$app]}"
+            exe_src=$(find "downloaded/${app}-installer" -iname "*.exe" ! -iname "*.sig" | head -n1)
+            sig_src=$(find "downloaded/${app}-installer" -iname "*.exe.sig" | head -n1)
+            apk_src=$(find "downloaded/${app}-apk" -iname "*.apk" | head -n1)
+            cp "$exe_src" "release-assets/jamanvaar-${name}.exe"
+            [ -n "$sig_src" ] && cp "$sig_src" "release-assets/jamanvaar-${name}.exe.sig"
+            cp "$apk_src" "release-assets/jamanvaar-${name}.apk"
+          done
+          ls -la release-assets
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: JAMANVAAR v${{ steps.version.outputs.version }}
+          body: Automated release build -- see commit history for what changed. Paste these files' URLs (and the matching .sig contents) into Super Admin's Publish Version form to make this version live.
+          files: release-assets/*
+          make_latest: true
