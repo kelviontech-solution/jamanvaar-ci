@@ -230,12 +230,6 @@ export class TenantMeController {
     private readonly audit: AuditService
   ) {}
 
-  /** The platform announcement (maintenance etc.) to show at the top of Restaurant Admin, or null. */
-  @Get('platform-notice')
-  async platformNotice() {
-    return { notice: await readActivePlatformNotice(this.prisma) };
-  }
-
   @Get('me')
   me(@CurrentTenantUser() user: User) {
     return {
@@ -325,5 +319,24 @@ export class TenantMeController {
     @CurrentTenantUser() user: User
   ) {
     return this.authService.setUserStatus(user, id, body.status);
+  }
+}
+
+/**
+ * Deliberately unguarded: a platform-wide maintenance message is not restaurant- or user-specific
+ * and carries nothing sensitive (the same content every device already receives over its own
+ * heartbeat, which needs only a device token). This used to live on TenantMeController, behind
+ * TenantAuthGuard -- requiring a live owner/manager session just to poll a public announcement.
+ * Confirmed live: Restaurant Admin's fast poll (every 60s, independent of the heartbeat cadence)
+ * went silent the moment that session token expired or nobody was actively signed in, so the
+ * notice only ever caught up on the next (slower) heartbeat instead.
+ */
+@Controller('api/v1/tenant')
+export class PublicPlatformNoticeController {
+  constructor(private readonly prisma: PrismaService) {}
+
+  @Get('platform-notice')
+  async platformNotice() {
+    return { notice: await readActivePlatformNotice(this.prisma) };
   }
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TenantAuthController, TenantMeController } from './tenant-auth.controller';
+import { TenantAuthController, TenantMeController, PublicPlatformNoticeController } from './tenant-auth.controller';
 import { TenantAuthService } from './tenant-auth.service';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { AuditModule } from '../audit/audit.module';
@@ -9,7 +9,7 @@ import { RestaurantsModule } from '../restaurants/restaurants.module';
 
 @Module({
   imports: [JwtModule.register({}), AuditModule, ApplicationEntitlementsModule, RestaurantsModule],
-  controllers: [TenantAuthController, TenantMeController],
+  controllers: [TenantAuthController, TenantMeController, PublicPlatformNoticeController],
   providers: [TenantAuthService, TenantAuthGuard],
   exports: [TenantAuthGuard, TenantAuthService, JwtModule]
 })

@@ -1113,13 +1113,15 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
  * (maintenance etc.) itself. Offline or signed out, it keeps whatever it last knew.
  */
 export function startPlatformNoticePolling(intervalMs = 60_000): void {
+  // No login gate: the endpoint itself is unguarded (platform-wide, nothing restaurant-specific
+  // or sensitive) -- this used to silently stop refreshing the moment nobody was actively signed
+  // in or a session token expired, which looked exactly like "maintenance mode isn't showing up."
   const poll = async () => {
     try {
-      if (!isCloudLoggedIn()) return;
       const res = await request<{ notice: PlatformNoticeData | null }>('/api/v1/tenant/platform-notice');
       PlatformNotice.apply(res.notice);
     } catch {
-      // Offline or signed out: keep the last known notice.
+      // Offline: keep the last known notice.
     }
   };
   void poll();
