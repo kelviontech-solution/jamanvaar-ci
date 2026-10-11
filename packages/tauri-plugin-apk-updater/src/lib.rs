@@ -50,7 +50,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             app.manage(ApkUpdater(handle));
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![download_and_install])
+        .invoke_handler(tauri::generate_handler![download_and_install, get_update_status, install_downloaded])
         .build()
 }
 
@@ -60,4 +60,14 @@ fn download_and_install<R: Runtime>(
     payload: DownloadAndInstallRequest,
 ) -> Result<DownloadAndInstallResponse> {
     app.apk_updater().download_and_install(payload)
+}
+
+#[tauri::command]
+fn get_update_status<R: Runtime>(app: tauri::AppHandle<R>) -> Result<serde_json::Value> {
+    app.apk_updater().0.run_mobile_plugin("getUpdateStatus", serde_json::json!({})).map_err(Into::into)
+}
+
+#[tauri::command]
+fn install_downloaded<R: Runtime>(app: tauri::AppHandle<R>) -> Result<serde_json::Value> {
+    app.apk_updater().0.run_mobile_plugin("installDownloaded", serde_json::json!({})).map_err(Into::into)
 }

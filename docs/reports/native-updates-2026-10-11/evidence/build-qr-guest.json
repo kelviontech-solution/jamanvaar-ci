@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "run",
+    "build",
+    "--workspace",
+    "apps/qr-guest"
+  ],
+  "startedAt": "2026-10-11T10:09:11.883Z",
+  "finishedAt": "2026-10-11T10:10:04.625Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

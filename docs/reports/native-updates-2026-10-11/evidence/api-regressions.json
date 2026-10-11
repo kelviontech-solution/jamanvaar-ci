@@ -1,0 +1,19 @@
+{
+  "command": [
+    "node",
+    "docs/reports/ecosystem-remediation-2026-10-11/run_qa.cjs",
+    "test/native-release-verification.unit.spec.ts",
+    "test/release-provenance.unit.spec.ts",
+    "test/device-updates.e2e.spec.ts",
+    "test/billing-applications-support.e2e.spec.ts",
+    "test/licensing.e2e.spec.ts",
+    "test/activation-redeem.e2e.spec.ts",
+    "test/tenant-isolation.spec.ts",
+    "test/tenant-my-applications.e2e.spec.ts",
+    "test/plans-dynamic-entitlements.e2e.spec.ts"
+  ],
+  "startedAt": "2026-10-11T09:32:18.814Z",
+  "finishedAt": "2026-10-11T09:33:11.855Z",
+  "exitCode": 0,
+  "signal": null
+}

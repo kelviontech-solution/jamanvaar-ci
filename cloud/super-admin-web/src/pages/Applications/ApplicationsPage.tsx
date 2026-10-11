@@ -331,6 +331,7 @@ export function ApplicationsPage() {
                     <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--jv-text)' }}>
                       Recent Releases ({app.recentReleases.length})
                     </div>
+                    {app.updateTelemetry && <p>Device-reported updates: {app.updateTelemetry.reportedVerified} verified after restart · {app.updateTelemetry.awaitingVerification} awaiting verification · {app.updateTelemetry.reportedFailed} failed or not installed</p>}
                     {app.recentReleases.length === 0 ? (
                       <div style={{ color: 'var(--jv-text-muted)' }}>No previous releases recorded.</div>
                     ) : (
@@ -402,7 +403,7 @@ export function ApplicationsPage() {
             <div className="form-field">
               <label>Target Platforms</label>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
-                {['windows', 'electron', 'android', 'web'].map((p) => {
+                {['windows', 'android', 'web'].map((p) => {
                   const selected = newPlatforms.includes(p);
                   return (
                     <button

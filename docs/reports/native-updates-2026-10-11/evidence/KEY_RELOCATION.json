@@ -1,0 +1,10 @@
+﻿{
+    "keyRotated":  false,
+    "keyContentsRead":  false,
+    "length":  348,
+    "moved":  true,
+    "sourceAbsent":  true,
+    "target":  "C:\\Users\\OM Sanjhira\\.jamanvaar-signing\\tauri-updater-key.private",
+    "restrictedToCurrentUserAndSystem":  true,
+    "note":  "Native Move-Item relocated the existing file; initial FileInfo comparison was stale after move. Actual source absence, target presence and ACL verified."
+}

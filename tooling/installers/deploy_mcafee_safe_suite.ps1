@@ -1,3 +1,6 @@
+﻿# Archived wrapper builder; migration reference only.
+throw 'Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.'
+<#
 # 100% McAfee, Windows Defender, SmartScreen Compliant Deployment Pipeline
 $ErrorActionPreference = "Stop"
 
@@ -114,3 +117,5 @@ Start-Sleep -Seconds 1
 Write-Host "==============================================================="
 Write-Host "  SUCCESS: 100% McAfee-Safe Suite Deployed and Active!         "
 Write-Host "==============================================================="
+
+#>

@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "docs/reports/native-updates-2026-10-11/archive-legacy-builders.cjs"
+  ],
+  "startedAt": "2026-10-11T10:26:40.590Z",
+  "finishedAt": "2026-10-11T10:26:48.809Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

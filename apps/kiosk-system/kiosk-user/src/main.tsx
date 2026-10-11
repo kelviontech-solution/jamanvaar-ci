@@ -29,6 +29,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
 void bootDurableStorage({ appId: 'kiosk-user', restaurantId: localStorage.getItem('jamanvaar_kiosk_user_restaurant_id') }).then(() => {
   DeviceGate.reload();
   void verifyInstalledUpdate();
+  window.addEventListener('focus', () => void verifyInstalledUpdate());
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />

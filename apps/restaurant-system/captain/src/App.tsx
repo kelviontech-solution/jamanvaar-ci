@@ -1,6 +1,7 @@
 import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
 import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
+import { registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { DiningTable, MenuItem, Category } from '@jamanvaar/types';
 import { captainDb, StaffRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
@@ -48,6 +49,8 @@ import {
 } from 'lucide-react';
 
 export const App: React.FC = () => {
+  useEffect(() => registerNativeUpdateGuard(() => useCaptainStore.getState().cartItems.some(item => !item.isFired)
+    ? 'Send or clear the current Captain order before updating.' : null), []);
   const ai = useAiAccess();
   const {
     isLoggedIn,

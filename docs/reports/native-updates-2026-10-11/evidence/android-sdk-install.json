@@ -1,0 +1,14 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "docs/reports/native-updates-2026-10-11/install-android-sdk.ps1"
+  ],
+  "startedAt": "2026-10-11T10:06:20.551Z",
+  "finishedAt": "2026-10-11T10:09:36.251Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

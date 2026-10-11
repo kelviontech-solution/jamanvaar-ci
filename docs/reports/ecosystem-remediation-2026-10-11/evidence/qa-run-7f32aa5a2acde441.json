@@ -1,0 +1,11 @@
+{
+  "arguments": [
+    "test/device-updates.e2e.spec.ts",
+    "test/native-release-verification.unit.spec.ts",
+    "test/release-provenance.unit.spec.ts",
+    "test/billing-applications-support.e2e.spec.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "runnerError": null
+}

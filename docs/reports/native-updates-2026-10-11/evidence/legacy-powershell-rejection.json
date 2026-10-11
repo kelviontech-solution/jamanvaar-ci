@@ -1,0 +1,14 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "tooling/installers/build_production_release.ps1"
+  ],
+  "startedAt": "2026-10-11T10:25:38.729Z",
+  "finishedAt": "2026-10-11T10:25:44.665Z",
+  "status": "FAILED",
+  "exitCode": 1,
+  "signal": null
+}

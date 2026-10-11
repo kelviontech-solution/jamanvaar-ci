@@ -144,12 +144,14 @@ describe('New SaaS Modules: Invoices, Applications, Support, and Platform Settin
         appCode: 'POS',
         version: newVersion,
         channel: 'STABLE',
-        supportedPlatforms: ['windows', 'electron'],
+        supportedPlatforms: ['web'],
         releaseNotes: 'Performance improvements and new bill printer driver'
       });
 
       expect(res.status).toBe(201);
       expect(res.body.version).toBe(newVersion);
+      const incomplete = await authed('post', '/api/v1/applications/releases').send({ appCode: 'POS', version: `2.6.${Date.now()}`, supportedPlatforms: ['windows'] });
+      expect(incomplete.status).toBe(400);
 
       await prisma.runAsPlatform((tx) =>
         tx.appRelease.deleteMany({ where: { appCode: 'POS', version: newVersion } })

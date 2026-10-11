@@ -5,6 +5,12 @@ export const heartbeatSchema = z.object({
   lastBackupAt: z.coerce.date().optional(),
   syncStatus: z.string().max(200).optional(),
   appVersion: z.string().max(50).optional(),
+  updateReport: z.object({
+    version: z.string().min(1).max(50),
+    status: z.enum(['AWAITING_RESTART', 'VERIFIED', 'NOT_INSTALLED', 'FAILED']),
+    installedVersion: z.string().max(50).optional(),
+    message: z.string().max(200).optional()
+  }).optional(),
   osPlatform: z.string().max(80).optional(),
   pendingSyncCount: z.number().int().min(0).max(1_000_000).optional(),
   syncError: z.string().max(300).nullable().optional(),

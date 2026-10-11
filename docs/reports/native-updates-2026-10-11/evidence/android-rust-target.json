@@ -1,0 +1,13 @@
+{
+  "command": [
+    "rustup",
+    "target",
+    "add",
+    "aarch64-linux-android"
+  ],
+  "startedAt": "2026-10-11T10:08:00.708Z",
+  "finishedAt": "2026-10-11T10:08:19.129Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

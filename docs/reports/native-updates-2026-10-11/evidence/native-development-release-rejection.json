@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "apps/restaurant-system/kds/src-tauri/Cargo.toml"
+  ],
+  "startedAt": "2026-10-11T10:13:12.543Z",
+  "finishedAt": "2026-10-11T10:13:17.346Z",
+  "status": "FAILED",
+  "exitCode": 101,
+  "signal": null
+}

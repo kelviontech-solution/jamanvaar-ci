@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-10-11T11:05:11.195Z",
+  "scope": "Read-only repository/environment configuration names and public runner metadata; no secret contents read, no CI run triggered, no configuration changed. Organization-level secrets/runner groups and external key stores are not ruled out.",
+  "repos": [
+    {
+      "repository": "om7867/kiosk",
+      "secretNames": {
+        "status": "read",
+        "data": []
+      },
+      "variableNames": {
+        "status": "read",
+        "data": []
+      },
+      "environments": {
+        "status": "read",
+        "names": []
+      },
+      "environmentConfiguration": [],
+      "runners": {
+        "status": "unavailable",
+        "exitCode": 1,
+        "reason": "API metadata not accessible; absence cannot be inferred"
+      }
+    },
+    {
+      "repository": "kelviontech-solution/jamanvaar-ci",
+      "secretNames": {
+        "status": "read",
+        "data": [
+          {
+            "name": "TAURI_SIGNING_PRIVATE_KEY"
+          },
+          {
+            "name": "TAURI_SIGNING_PRIVATE_KEY_PASSWORD"
+          }
+        ]
+      },
+      "variableNames": {
+        "status": "read",
+        "data": []
+      },
+      "environments": {
+        "status": "read",
+        "names": []
+      },
+      "environmentConfiguration": [],
+      "runners": {
+        "status": "read",
+        "registered": []
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import type { MenuItem, Category } from '@jamanvaar/types';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, syncKioskConfiguration, onAppResume } from '@jamanvaar/sync';
-import { sound } from '@jamanvaar/ui';
+import { sound, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
 import { PosSidebar } from './components/layout/PosSidebar';
@@ -82,6 +82,12 @@ export const App: React.FC = () => {
     isDiscountModalOpen,
     setIsDiscountModalOpen
   } = usePosStore();
+
+  useEffect(() => registerNativeUpdateGuard(() => {
+    const state = usePosStore.getState();
+    return state.cart.items.length || state.isPaymentOpen
+      ? 'Finish or hold the current POS order and close payment before updating.' : null;
+  }), []);
 
   // Restore session state on mount
   useEffect(() => {

@@ -46,7 +46,7 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
   }, 60_000);
 
   afterAll(async () => {
-    await prisma.appRelease.deleteMany({ where: { version: { in: ['91.0.0', '91.1.0', '91.2.0', '91.9.0', '91.10.0'] } } });
+    await prisma.appRelease.deleteMany({ where: { version: { in: ['91.0.0', '91.1.0', '91.2.0', '91.3.0', '91.9.0', '91.10.0'] } } });
     await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId } }));
     await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: planId } }));
     await prisma.platformUser.deleteMany({ where: { email } });
@@ -60,6 +60,28 @@ describe('Heartbeat delivers update offers and offline extensions (BUG-065/077)'
       expect(res.status).toBe(200);
       const device = await prisma.runAsPlatform((tx) => tx.device.findUniqueOrThrow({ where: { id: pos.id } }));
       expect(device).toMatchObject({ appVersion: '1.4.2', osPlatform: 'Windows 11', pendingSyncCount: 7 });
+    });
+
+    it('records installer handoff separately from native restart confirmation, and release management stays platform protected', async () => {
+      const pos = await enroll('POS');
+      expect((await heartbeat(pos.token, { appVersion: '1.0.0', updateReport: { version: '2.0.0', status: 'AWAITING_RESTART' } })).status).toBe(200);
+      const awaiting = await prisma.runAsPlatform(tx => tx.device.findUniqueOrThrow({ where: { id: pos.id } }));
+      expect(awaiting.updateReport).toMatchObject({ status: 'AWAITING_RESTART' });
+      expect((await heartbeat(pos.token, { appVersion: '2.0.0', updateReport: { version: '2.0.0', installedVersion: '2.0.0', status: 'VERIFIED' } })).status).toBe(200);
+      const verified = await prisma.runAsPlatform(tx => tx.device.findUniqueOrThrow({ where: { id: pos.id } }));
+      expect(verified.updateReport).toMatchObject({ status: 'VERIFIED', installedVersion: '2.0.0' });
+      const summaries = await platform('get', '/api/v1/applications');
+      expect(summaries.body.find((a: { code: string }) => a.code === 'POS').updateTelemetry.reportedVerified).toBeGreaterThan(0);
+      expect((await request(app.getHttpServer()).post('/api/v1/applications/releases').send({})).status).toBe(401);
+      expect((await request(app.getHttpServer()).post('/api/v1/applications/releases/unknown/pause').set('Authorization', `Bearer ${pos.token}`).send({})).status).toBe(401);
+    });
+    it('authorized platform users can withdraw a published release without changing installed devices', async () => {
+      const created = await platform('post', '/api/v1/applications/releases').send({ appCode: 'POS', version: '91.3.0', supportedPlatforms: ['web'] });
+      expect(created.status).toBe(201);
+      const paused = await platform('post', `/api/v1/applications/releases/${created.body.id}/pause`).send({});
+      expect(paused.status).toBe(201); expect(paused.body.status).toBe('PAUSED');
+      const pos = await enroll('POS');
+      expect((await heartbeat(pos.token, { appVersion: '91.0.0' })).body.update?.latestVersion).not.toBe('91.3.0');
     });
 
     it('offers a newer stable release for this terminal\'s app, and nothing once it is current', async () => {

@@ -1,0 +1,311 @@
+{
+  "capturedAt": "2026-10-11T11:07:02.192Z",
+  "head": "8c4ec527e5e4d0b2d5b26e3aad3c162b55e84624",
+  "scope": "Relevant implementation paths and verification files; includes preceding-stage changes already in HEAD and prior audit build profiles. Not a claim that every file first changed in this continuation.",
+  "sourceFiles": [
+    {
+      "file": ".gitignore",
+      "sha256": "ff0171d1980f1884187c015cc2edda6315a44edb575d9a29915e077413c53345"
+    },
+    {
+      "file": ".github/workflows/build-installers.yml",
+      "sha256": "1d6f4810d06d7b1f3bcaa06db390a7854d23820b2a171db2853a2dbfe34a0c72"
+    },
+    {
+      "file": "tooling/installers/build_release.cjs",
+      "sha256": "ae97f9e352ac093844ec8c840bb7d56a1fed25f9de79e392645524e99b4cf903"
+    },
+    {
+      "file": "tooling/installers/build_production_release.ps1",
+      "sha256": "6b1be169bbf01e8fefa68553e6cb5d57152df4b2c035f93ccca0c07b123dc738"
+    },
+    {
+      "file": "tooling/installers/build_windows_installers.cjs",
+      "sha256": "fc4f70c14ed95dd80549e8d979634129366cef103ea7fcaa30b4c8b5541deede"
+    },
+    {
+      "file": "tooling/installers/build_production_suite_v2.cjs",
+      "sha256": "af53515dc702cd8065607746bb88ffb394e39a87b3d79552389fa9d900c3631f"
+    },
+    {
+      "file": "tooling/installers/build_and_deploy_autostart_suite.cjs",
+      "sha256": "af9ee6d99f668b9f47074c269dca6aeaecf9a307d61f2c6a10b9ed4bf7ce4f9e"
+    },
+    {
+      "file": "tooling/installers/deploy_mcafee_safe_suite.cjs",
+      "sha256": "b7c89967b48609cc32fd257996d5c5db865712fa0a0b7b87b4916f814438df73"
+    },
+    {
+      "file": "tooling/installers/package_zip_release.cjs",
+      "sha256": "0a6606772bcc94b87afc79a73fdf6d30f2d8eadaf41a6c9b0b63f2c7bc40f2c7"
+    },
+    {
+      "file": "tooling/installers/build_full_native_app_suite.ps1",
+      "sha256": "7b1fee6250384ab2c7b10f9bfab54ab458ddc5ec535fde5573a5c930bee6d87f"
+    },
+    {
+      "file": "tooling/installers/build_desktop_executables.ps1",
+      "sha256": "7164e113b1bc6104f4f8df78cf67c0d9ab93955df80b9917f22bb37e89ee150f"
+    },
+    {
+      "file": "tooling/installers/build_clean_antivirus_safe_package.ps1",
+      "sha256": "6e8e5423e82455713887afd147453cfe2e3e4260bb17b2a63c7ccad24e07cdbe"
+    },
+    {
+      "file": "tooling/installers/deploy_mcafee_safe_suite.ps1",
+      "sha256": "421e58cba330692f649ce7d865b2ca91a88b23263714cb7749bc4bfe58c676c4"
+    },
+    {
+      "file": ".github/scripts/validate-release-config.mjs",
+      "sha256": "b4301ea7105138ec55395be24191a5f29a8975c4c09c237048bb2db85a1e94b1"
+    },
+    {
+      "file": ".github/scripts/harden-android-release.mjs",
+      "sha256": "87171de34819aaf42497b7d29e1e93bf88a18368060b50917bb3fa6874a09943"
+    },
+    {
+      "file": ".github/scripts/sign-android.sh",
+      "sha256": "eae77a6b57260ebaa36eeefbdd599bc5ff2eac55daf58c5e761fdf0fe4ecb82d"
+    },
+    {
+      "file": ".github/scripts/sign-windows.ps1",
+      "sha256": "8cbe81ab0b4c488d8fb704a404321db103c289474a732f12e8da5827aba49ee1"
+    },
+    {
+      "file": ".github/scripts/release-inventory.mjs",
+      "sha256": "f9343763323f7bceeb7dc7a86af2d92ca135a271198f8e09c018602f20460e3d"
+    },
+    {
+      "file": ".github/scripts/verify-android-identity.mjs",
+      "sha256": "a736fc5ccefa40466e1bdc2c5fc17936ae883bc66699cb6c1666c34eec7b1f19"
+    },
+    {
+      "file": ".github/scripts/validate-sidecar-provenance.mjs",
+      "sha256": "1e7c4902bf744752fbed12bc2dea0c07e8106d6625cca5ebbb344ed34d1c4f84"
+    },
+    {
+      "file": "cloud/api/src/common/version.ts",
+      "sha256": "3adf7133d2a73cbfa2e86941c66170c4bfe9cfe7265728f8989cb7bd0f94bb28"
+    },
+    {
+      "file": "cloud/api/src/modules/applications/dto/application.dto.ts",
+      "sha256": "bf306e66949b4ce4001873d34cf389be2992c343f2e6b7d041b551b2e1c5d54d"
+    },
+    {
+      "file": "cloud/api/src/modules/applications/release-verification.ts",
+      "sha256": "33200193df144b9b7b49076b4b6a55829de5ba2a5d51a1a41576d3db1ec8e0b3"
+    },
+    {
+      "file": "cloud/api/src/modules/applications/applications.service.ts",
+      "sha256": "5cfa812dd02f9abcb7aed37a5db742beae055505db4d832336395738be39a165"
+    },
+    {
+      "file": "cloud/api/src/modules/applications/applications.controller.ts",
+      "sha256": "8c818047976de946dfa969bf9669611d1ec4c1e6274e7316c5562d7678813b7d"
+    },
+    {
+      "file": "cloud/api/src/modules/applications/updater-manifest.controller.ts",
+      "sha256": "74ffcac5c5126a9cb3294fd3977183d061c8766f2dda5b0573411622b951fd37"
+    },
+    {
+      "file": "cloud/api/src/modules/devices/devices.service.ts",
+      "sha256": "cf22daded1872f067ef8ef7876644e0e9f08bd365a8aa706f81a7367260d50b6"
+    },
+    {
+      "file": "cloud/api/src/modules/devices/dto/heartbeat.dto.ts",
+      "sha256": "06c68838bd9848c59224c82dcf030b0f4e196b6d6ff3243432028680d8758983"
+    },
+    {
+      "file": "cloud/api/prisma/schema.prisma",
+      "sha256": "6de96b28604bced58e8bbf2ec4e95f79c1c07424a72314685ac5aea1860bf148"
+    },
+    {
+      "file": "cloud/api/prisma/migrations/20261011110000_native_release_availability/migration.sql",
+      "sha256": "edd55c2256cef056453ebd4955ad948b256ae7b80dddb755bc2f8c5550a56750"
+    },
+    {
+      "file": "cloud/api/prisma/migrations/20261011111000_device_update_report/migration.sql",
+      "sha256": "6b4907d55de3562c154bacc0571c7bebbf3178a90aee1b0632946a7507daca87"
+    },
+    {
+      "file": "cloud/super-admin-web/src/api/types.ts",
+      "sha256": "599204f16a16302d2a2fba5fe4f3a3464561b4685984a7bf3afd3e4e66ce299a"
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Applications/ApplicationsPage.tsx",
+      "sha256": "1f5a40994e057fd880f0fa109ee7f284b04f4336f4c59bfaa275183edb1283b9"
+    },
+    {
+      "file": "packages/ui/src/native_update.ts",
+      "sha256": "bdfff015b60775c1629ba3e24c9cd51168d8fd16f4114a93a66a2ef4397e36c5"
+    },
+    {
+      "file": "packages/ui/src/NativeUpdateButton.tsx",
+      "sha256": "abcb19e11df7f6c083f8fafee3de1f2943526849edccc0cc34514b002ba8ba68"
+    },
+    {
+      "file": "packages/ui/src/PlatformNoticeBanner.tsx",
+      "sha256": "12f9181763a8635a236be2682ec51b8d3def15ab9a0b9182344b5e533d5d3ba7"
+    },
+    {
+      "file": "packages/ui/src/DeviceGateOverlay.tsx",
+      "sha256": "be00c97e505caa5c704c6c4f489eee1d612acbb0f95242f3d16039f53046f1c8"
+    },
+    {
+      "file": "packages/ui/src/index.ts",
+      "sha256": "497092e6343090cc13f0972cdf82e57b47f517291ce90a91c25db01290b7f38f"
+    },
+    {
+      "file": "packages/sync/src/update_report.ts",
+      "sha256": "3df59c733797798fe3a5fd9af544725da434e5b92edaaf214d59a895b9838b55"
+    },
+    {
+      "file": "packages/sync/src/heartbeat.ts",
+      "sha256": "5b8a3ebc4c4bdca3e3ef6242e8bacab605c1c608dec6c1a6bded0acd56209adf"
+    },
+    {
+      "file": "packages/sync/src/index.ts",
+      "sha256": "cb91a15a8c0a1f970c47960334abfebad873fe75960bf6da3389be9ebfc629e6"
+    },
+    {
+      "file": "packages/tauri-plugin-apk-updater/build.rs",
+      "sha256": "b88e049ef40fa22a2fc8590523c8660415bedfa00814a9359544861599b3376a"
+    },
+    {
+      "file": "packages/tauri-plugin-apk-updater/src/lib.rs",
+      "sha256": "14be9d031acb62613c9ebae7e0a65f5ddc41be15b3468fbf489eeb22cbd551de"
+    },
+    {
+      "file": "packages/tauri-plugin-apk-updater/permissions/default.toml",
+      "sha256": "65ef7981daeaef5c06b011c7182e613466b35a55f279bffc1d922f6946ade4be"
+    },
+    {
+      "file": "packages/tauri-plugin-apk-updater/guest-js/index.ts",
+      "sha256": "74cf6041bfb51cc11eaf072a68c6f2069ec02765f1b09d601af11304ef0ed30f"
+    },
+    {
+      "file": "packages/tauri-plugin-apk-updater/android/src/main/java/com/jamanvaar/apkupdater/ApkUpdaterPlugin.kt",
+      "sha256": "e9495759ee5f177189b495573e423c77c95fbf587eb4f97bb4b9fba0d1ac05b3"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/desktopUpdater.ts",
+      "sha256": "a0adb65c8541364fa7fa4d8663e93fe85802365479d846cef4b14bff001c3326"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/main.tsx",
+      "sha256": "b01f80fa27378d1f41ad0d83ad1de0232358298a73255ca2c79e4557fdfbb932"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src-tauri/build.rs",
+      "sha256": "4c39568d13629adae21c3fb64014f51ae239bbfcb719c5a3d4836ab8022adff8"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src-tauri/Cargo.toml",
+      "sha256": "2561c84a8df6dc77c001f8c2768eee9eee5147581fa5bd470b8a25b975ea9809"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src-tauri/Cargo.lock",
+      "sha256": "6dd184638dbeb43cd9cde05f74b11449490773a4e498928ef9c120a1546a0786"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/main.tsx",
+      "sha256": "a518d85c470763601a70ccff7751a306ce9c16bfd1053fe90dd5f68d479854f0"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src-tauri/build.rs",
+      "sha256": "4c39568d13629adae21c3fb64014f51ae239bbfcb719c5a3d4836ab8022adff8"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src-tauri/Cargo.toml",
+      "sha256": "b0ef9d3248435fb8153054db1784999a172bb91c624f9b4058ae59f33f8d8a3b"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src-tauri/Cargo.lock",
+      "sha256": "817039a5ce373e2094f0b0ebea929cb0c80aa77bd1e10479eb770d30f1e9940b"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/main.tsx",
+      "sha256": "e04d557b8832568e2bc8c53ab25f8f598fc99ff1db2ac06fce30f19e16801e24"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src-tauri/build.rs",
+      "sha256": "4c39568d13629adae21c3fb64014f51ae239bbfcb719c5a3d4836ab8022adff8"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src-tauri/Cargo.toml",
+      "sha256": "d5fa22ed8a20cecded8ceb106ae4a1b6bc97eafc01496beb4713e177101e1be4"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src-tauri/Cargo.lock",
+      "sha256": "aa0c856cb984c5e01f54b579e3611233d4e6b5376491030f490de67198b7bce8"
+    },
+    {
+      "file": "apps/restaurant-system/kds/src/main.tsx",
+      "sha256": "87670fee4ce735929546f22a27ed438eaf0ff420c491f9a2a9a622e9c457cda4"
+    },
+    {
+      "file": "apps/restaurant-system/kds/src-tauri/build.rs",
+      "sha256": "4c39568d13629adae21c3fb64014f51ae239bbfcb719c5a3d4836ab8022adff8"
+    },
+    {
+      "file": "apps/restaurant-system/kds/src-tauri/Cargo.toml",
+      "sha256": "1773f57af3cb62a0e2bd3573cc53e1446482a3344ca5bf7e85141a6f0e209476"
+    },
+    {
+      "file": "apps/restaurant-system/kds/src-tauri/Cargo.lock",
+      "sha256": "d594f357b71cbbe9495e719a5fe07b06025ccd25258b5c82c41c80767d20c0ca"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/main.tsx",
+      "sha256": "2ec2cf7cfdeb33066965d41dffe347f41c8b4b521dc7b95d8a8606e8149d84d9"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src-tauri/build.rs",
+      "sha256": "4c39568d13629adae21c3fb64014f51ae239bbfcb719c5a3d4836ab8022adff8"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src-tauri/Cargo.toml",
+      "sha256": "092c38fc73774cecf6df97e898f1d109b97dcf1d98b45a1fac162f8d82cad2f4"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src-tauri/Cargo.lock",
+      "sha256": "ab9aa9cacf7abcc81dcd0cd7ed941073812d120783ba1e76f784f1a90c71402a"
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/App.tsx",
+      "sha256": "d09a87a031cdee6a1cc3d97f79c0f829b729661cfaec2fc3706fb407c076352b"
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/App.tsx",
+      "sha256": "007b94165d76209464ea125944c05114b9d3ba57686fbe5997848488961eab24"
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "sha256": "f4a6101de711c1313b217cecbfe3d842954de74811e091663c374c378cabd15a"
+    },
+    {
+      "file": "tests/native_update_lifecycle.test.ts",
+      "sha256": "04c0089ee043276f9e74697ebce40b991533ab8ac4e17910225c705b75f6ffe4"
+    },
+    {
+      "file": "tests/android_release_configuration.test.ts",
+      "sha256": "6dd70276bf4d80fb4745ae25447336cf5699705a9f605fb7b3a87e076e8a1572"
+    },
+    {
+      "file": "cloud/api/test/native-release-verification.unit.spec.ts",
+      "sha256": "84570f6ac70ef782b3020b62c6c883d3d9018b2cb92c9385682ef9799060807d"
+    },
+    {
+      "file": "cloud/api/test/device-updates.e2e.spec.ts",
+      "sha256": "33b3b36a2a993ebdaaf39408a802837b370750ebde8b46b5d3fb93f21eeee0e1"
+    },
+    {
+      "file": "cloud/api/test/release-provenance.unit.spec.ts",
+      "sha256": "234e14bc84720cef614dc3482e22c650812503a087e2eb81a2d57757987637c9"
+    },
+    {
+      "file": "cloud/api/test/billing-applications-support.e2e.spec.ts",
+      "sha256": "7f8bc211a6342de4f632193cbe3baa14a3c29441104a5b9d010ade716b68c597"
+    }
+  ]
+}

@@ -20,4 +20,5 @@ fingerprint="$(printf '%s\n' "$verification" | sed -n 's/^Signer #1 certificate 
 expected="$(printf '%s' "$ANDROID_SIGNING_CERT_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
 [[ "$fingerprint" == "$expected" ]] || { echo 'Unexpected Android signing certificate' >&2; exit 1; }
 if "$tools/aapt" dump badging "$root/verified-release/jamanvaar-release.apk" | grep -q 'application-debuggable'; then echo 'Debuggable APK rejected' >&2; exit 1; fi
+node .github/scripts/verify-android-identity.mjs "$root/verified-release/jamanvaar-release.apk" "$root" "$tools/aapt"
 rm -f -- "$root/verified-release/aligned.apk"

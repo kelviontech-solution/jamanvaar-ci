@@ -50,8 +50,7 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
   // An optional "new version available" bar (a mandatory update is a lock screen, not a bar). The
   // maintenance notice, when there is one, takes the top of the screen.
   // A guest-facing self-order Kiosk screen never shows this -- a customer has no way to act on a
-  // software update, and the app already updates itself silently in the background (see each
-  // app's main.tsx checkForDesktopUpdate). Staff see it via Staff Mode instead (StaffUpdatePanel).
+  // software update. Staff perform updates during maintenance from Staff Mode.
   if (!notice && update && !update.mandatory && audience !== 'guest') {
     return (
       <div

@@ -1,0 +1,48 @@
+{
+  "apps": [
+    {
+      "app": "JAMANVAAR Captain",
+      "identifier": "com.jamanvaar.captain",
+      "version": "1.0.4",
+      "updaterKeyId": "9C7A14F226BFB760",
+      "windowsInstallMode": "currentUser"
+    },
+    {
+      "app": "JAMANVAAR Kitchen Display",
+      "identifier": "com.jamanvaar.kds",
+      "version": "1.0.4",
+      "updaterKeyId": "9C7A14F226BFB760",
+      "windowsInstallMode": "currentUser"
+    },
+    {
+      "app": "JAMANVAAR POS",
+      "identifier": "com.jamanvaar.pos",
+      "version": "1.0.4",
+      "updaterKeyId": "9C7A14F226BFB760",
+      "windowsInstallMode": "currentUser"
+    },
+    {
+      "app": "JAMANVAAR POS Admin",
+      "identifier": "com.jamanvaar.posadmin",
+      "version": "1.0.7",
+      "updaterKeyId": "9C7A14F226BFB760",
+      "windowsInstallMode": "currentUser"
+    },
+    {
+      "app": "JAMANVAAR Kiosk",
+      "identifier": "com.jamanvaar.kiosk",
+      "version": "1.0.7",
+      "updaterKeyId": "9C7A14F226BFB760",
+      "windowsInstallMode": "currentUser"
+    }
+  ],
+  "localPublicCompanionMatchesConfiguredKey": true,
+  "privateKeyNotReadOrUsed": true,
+  "androidSDKFound": false,
+  "androidJdkFound": false,
+  "releaseSigningConfigurationPresent": {
+    "TAURI_SIGNING_PRIVATE_KEY": false,
+    "WINDOWS_SIGNING_PFX_BASE64": false,
+    "ANDROID_KEYSTORE_BASE64": false
+  }
+}

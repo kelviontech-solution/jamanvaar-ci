@@ -1,3 +1,5 @@
+// Archived wrapper builder; migration reference only.
+throw new Error("Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.");
 /**
  * JAMANVAAR - Master Production Desktop Architecture Builder & Deployer
  * 

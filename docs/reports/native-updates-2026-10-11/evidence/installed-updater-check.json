@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "docs/reports/native-updates-2026-10-11/inspect-installed-updater.cjs"
+  ],
+  "startedAt": "2026-10-11T10:43:07.685Z",
+  "finishedAt": "2026-10-11T10:43:09.746Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

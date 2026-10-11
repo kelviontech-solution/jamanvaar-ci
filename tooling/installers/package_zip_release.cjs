@@ -1,3 +1,5 @@
+// Archived wrapper builder; migration reference only.
+throw new Error("Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.");
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');

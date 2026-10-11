@@ -1,0 +1,14 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "docs/reports/native-updates-2026-10-11/inspect-native-artifacts.ps1"
+  ],
+  "startedAt": "2026-10-11T11:05:42.097Z",
+  "finishedAt": "2026-10-11T11:05:51.084Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

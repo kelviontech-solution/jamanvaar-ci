@@ -1,3 +1,5 @@
+// Archived wrapper builder; migration reference only.
+throw new Error("Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.");
 /**
  * 100% McAfee, Windows Defender, SmartScreen Compliant Deployment Pipeline
  * Launches via Microsoft Signed wscript.exe + msedge.exe App Window Mode

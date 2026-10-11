@@ -2,8 +2,10 @@
  * JAMANVAAR Production Release Master Builder
  * Builds 3 Native Windows Desktop Applications + 3 Installers + 2 Machine ZIP Packages
  * Uses Microsoft csc.exe compiler with Full PE Assembly Metadata & JAMANVAAR Icon Embedding
- * 100% Antivirus & Smart App Control Safe
+ * Archived browser-wrapper packaging; retained only as migration reference.
  */
+
+throw new Error('Legacy browser-wrapper release packaging is disabled: it does not implement the preserved Tauri package identity or signed updater protocol. Use .github/workflows/build-installers.yml; existing wrapper installations require a tested migration before replacement. No output files were changed.');
 
 const fs = require('fs');
 const path = require('path');

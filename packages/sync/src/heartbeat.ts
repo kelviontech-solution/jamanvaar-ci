@@ -9,6 +9,7 @@ import { InventoryLedgerSync } from './inventory_ledger_sync';
 import { syncMenuCatalog } from './menu_sync';
 import { tokenKey, verifyCommand } from './command_signing';
 import { EntitySyncEngine } from './entity_sync';
+import { readNativeUpdateReport } from './update_report';
 
 /** A readable OS name for the fleet list ("Windows", "Android", ...). Never throws. */
 export function detectOsPlatform(): string | undefined {
@@ -32,6 +33,7 @@ export function buildHeartbeatBody(appVersion: string) {
   return {
     syncStatus: problems.length > 0 ? 'error' : stats.pendingCount > 0 ? 'pending' : 'ok',
     appVersion,
+    ...(readNativeUpdateReport() ? { updateReport: readNativeUpdateReport() } : {}),
     osPlatform: detectOsPlatform(),
     pendingSyncCount: stats.pendingCount,
     menuVersion: MenuVersionTracker.applied(),

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "run",
+    "build",
+    "--workspace",
+    "apps/kiosk-system/kiosk-user"
+  ],
+  "startedAt": "2026-10-11T10:07:33.821Z",
+  "finishedAt": "2026-10-11T10:09:10.896Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

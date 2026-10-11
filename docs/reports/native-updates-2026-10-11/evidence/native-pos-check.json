@@ -1,0 +1,14 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "apps/restaurant-system/pos/src-tauri/Cargo.toml"
+  ],
+  "startedAt": "2026-10-11T09:48:08.749Z",
+  "finishedAt": "2026-10-11T09:48:20.022Z",
+  "exitCode": 0,
+  "signal": null
+}

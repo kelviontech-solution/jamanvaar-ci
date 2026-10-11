@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/native_update_lifecycle.test.ts",
+    "tests/android_release_configuration.test.ts",
+    "tests/app_update_and_extension.test.ts",
+    "tests/pos_full_offline_sqlite.test.ts",
+    "tests/outbox_reliability.test.ts",
+    "tests/branch_core_authorization.test.ts",
+    "tests/branch_core_operations.test.ts",
+    "tests/branch_core_secret_seal.test.ts",
+    "tests/sync_online_offline.test.ts"
+  ],
+  "startedAt": "2026-10-11T09:32:18.753Z",
+  "finishedAt": "2026-10-11T09:32:51.582Z",
+  "exitCode": 0,
+  "signal": null
+}

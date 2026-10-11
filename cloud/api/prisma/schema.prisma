@@ -514,6 +514,7 @@ model Device {
   type            DeviceType
   publicKey       String? // populated once the keypair activation flow (later phase) ships
   appVersion      String?
+  updateReport    Json? // Latest device-reported installer handoff / native restart verification; not remote attestation.
   status          DeviceStatus @default(PENDING)
   lastSeenAt      DateTime?
   lastSyncAt      DateTime? // last time this device's local runtime successfully synced

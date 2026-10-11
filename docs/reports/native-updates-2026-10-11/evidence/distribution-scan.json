@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "docs/reports/native-updates-2026-10-11/check-distribution.cjs"
+  ],
+  "startedAt": "2026-10-11T10:10:59.812Z",
+  "finishedAt": "2026-10-11T10:11:00.932Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

@@ -1,4 +1,6 @@
-# JAMANVAAR — Master Production Windows Desktop Release Pipeline
+﻿# Archived browser-wrapper release pipeline — retained only as migration reference
+throw 'Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.'
+<# Archived source below is intentionally non-executable migration reference.
 # Compiles 3 Native Windows Executables + Standalone Installers + Machine Packages
 # 100% Clean, Fast Startup, Virus-Free, Anti-Malware Compliant (No Smart App Control warnings)
 
@@ -633,3 +635,4 @@ Remove-Item -Recurse -Force $tempSrc
 Write-Host "`n=================================================================="
 Write-Host "  ✓ BUILD COMPLETE — ALL PRODUCTION ARTIFACTS CREATED"
 Write-Host "=================================================================="
+#>

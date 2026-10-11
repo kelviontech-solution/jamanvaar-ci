@@ -1,0 +1,16 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\docs\\reports\\native-updates-2026-10-11\\android-gradle-validation.ps1",
+    "-App",
+    "captain"
+  ],
+  "startedAt": "2026-10-11T10:46:29.852Z",
+  "finishedAt": "2026-10-11T10:49:21.019Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

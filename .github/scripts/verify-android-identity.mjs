@@ -1,0 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+const [apk, project, aapt] = process.argv.slice(2);
+const config = JSON.parse(readFileSync(resolve(project, '../../tauri.conf.json'), 'utf8'));
+const output = execFileSync(aapt, ['dump', 'badging', apk], { encoding: 'utf8' });
+const header = /^package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'/m.exec(output);
+if (!header || header[1] !== config.identifier || header[3] !== config.version || Number(header[2]) <= 0) throw Error('APK package/version does not match the preserved Tauri application identity');
+if (!/^native-code:.*'arm64-v8a'/m.test(output)) throw Error('Release APK does not support the published arm64 architecture');
+console.log(`APK identity verified: ${header[1]}, version ${header[3]}, versionCode ${header[2]}, arm64. Existing-device upgrade still requires a predecessor test.`);

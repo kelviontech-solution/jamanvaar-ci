@@ -1,0 +1,13 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "docs/reports/native-updates-2026-10-11/android-gradle-validation.ps1"
+  ],
+  "startedAt": "2026-10-11T10:18:19.165Z",
+  "status": "INCOMPLETE",
+  "exitCode": null,
+  "note": "Wrapper did not capture completion. Retained Gradle log records BUILD FAILED with lint/metaspace failure; no true process exit code is asserted. Superseded by android-kds-gradle-retry.json and android-kds-gradle-final.json, both exit 0."
+}

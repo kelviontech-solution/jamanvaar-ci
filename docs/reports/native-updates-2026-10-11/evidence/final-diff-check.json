@@ -1,0 +1,14 @@
+{
+  "command": [
+    "git",
+    "-c",
+    "core.whitespace=cr-at-eol",
+    "diff",
+    "--check"
+  ],
+  "startedAt": "2026-10-11T11:06:40.666Z",
+  "finishedAt": "2026-10-11T11:06:40.861Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

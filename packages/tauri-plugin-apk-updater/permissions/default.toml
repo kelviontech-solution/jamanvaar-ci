@@ -2,7 +2,7 @@
 
 [[permission]]
 identifier = "allow-download-and-install"
-description = "Enables the download_and_install command, which downloads a given .apk URL through Android's own DownloadManager and hands the finished file to the system install prompt."
+description = "Downloads and verifies an APK through Android's DownloadManager; a separate foreground command opens the system installer."
 commands.allow = ["download_and_install"]
 
 [[permission]]
@@ -13,4 +13,14 @@ commands.deny = ["download_and_install"]
 [[set]]
 identifier = "default"
 description = "Allows downloading and installing an Android app update through the system's own download manager and install prompt."
-permissions = ["allow-download-and-install"]
+permissions = ["allow-download-and-install", "allow-get-update-status", "allow-install-downloaded"]
+
+[[permission]]
+identifier = "allow-get-update-status"
+description = "Read this application's own APK download and installation status."
+commands.allow = ["get_update_status"]
+
+[[permission]]
+identifier = "allow-install-downloaded"
+description = "Explicitly hand the verified APK to Android's installer after saving local data."
+commands.allow = ["install_downloaded"]

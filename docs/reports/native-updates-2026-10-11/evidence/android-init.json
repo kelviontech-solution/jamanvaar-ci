@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\node_modules\\@tauri-apps\\cli\\tauri.js",
+    "android",
+    "init",
+    "--ci"
+  ],
+  "startedAt": "2026-10-11T09:35:02.661Z",
+  "finishedAt": "2026-10-11T09:35:04.801Z",
+  "exitCode": 1,
+  "signal": null
+}

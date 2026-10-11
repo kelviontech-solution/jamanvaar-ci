@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "apps/kiosk-system/kiosk-user/src-tauri/Cargo.toml"
+  ],
+  "startedAt": "2026-10-11T10:10:42.883Z",
+  "status": "INCOMPLETE",
+  "exitCode": null,
+  "note": "Interrupted/superseded development-context compile attempt; wrapper did not record a true completion exit code. Use native-kiosk-production.json for the completed production-context compile result. This attempt is not passing release evidence."
+}

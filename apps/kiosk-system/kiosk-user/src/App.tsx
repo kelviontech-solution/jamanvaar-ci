@@ -1,5 +1,5 @@
 import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
-import { KioskWelcomeScreen } from '@jamanvaar/ui';
+import { KioskWelcomeScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
 import { welcomePresentation, welcomeBackgroundUrl, welcomeLandscapeUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
 import { kioskActivationError } from './activationErrors';
@@ -521,6 +521,8 @@ export default function KioskUserApp() {
 
   // Cart State
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  useEffect(() => registerNativeUpdateGuard(() => cartItems.length
+    ? 'Finish the customer order before updating this kiosk.' : null), [cartItems]);
   const cartRef = useRef<CartItem[]>([]);
   // Opening or emptying the cart changes the whole layout, so that one change is wrapped in a
   // View Transition: the browser animates it from CSS instead of re-laying out every frame.
@@ -4166,7 +4168,7 @@ export default function KioskUserApp() {
       <Modal
         isOpen={isUpdatePanelOpen}
         onClose={() => {
-          if (updateProgress?.phase === 'downloading' || updateProgress?.phase === 'installing') return;
+          if (updateProgress?.phase === 'checking' || updateProgress?.phase === 'downloading' || updateProgress?.phase === 'installing') return;
           setIsUpdatePanelOpen(false);
         }}
         title="Software Update"

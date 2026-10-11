@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--features",
+    "tauri/custom-protocol",
+    "--manifest-path",
+    "apps/restaurant-system/pos/src-tauri/Cargo.toml"
+  ],
+  "startedAt": "2026-10-11T10:19:59.285Z",
+  "finishedAt": "2026-10-11T10:25:50.064Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

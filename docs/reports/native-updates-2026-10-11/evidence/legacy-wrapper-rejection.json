@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "tooling/installers/build_release.cjs"
+  ],
+  "startedAt": "2026-10-11T10:24:56.333Z",
+  "finishedAt": "2026-10-11T10:24:57.375Z",
+  "status": "FAILED",
+  "exitCode": 1,
+  "signal": null
+}

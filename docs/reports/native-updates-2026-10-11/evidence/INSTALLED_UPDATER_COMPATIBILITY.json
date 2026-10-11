@@ -1,0 +1,63 @@
+{
+  "expectedPublicKeyId": "9C7A14F226BFB760",
+  "results": [
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk\\node.exe",
+      "registeredName": "JAMANVAAR Kiosk",
+      "registeredVersion": "1.0.0",
+      "productName": "Node.js",
+      "currentPublicKeyFound": false,
+      "observedPublicKeyIds": [],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk Admin\\node.exe",
+      "registeredName": "JAMANVAAR Kiosk Admin",
+      "registeredVersion": "1.0.0",
+      "productName": "Node.js",
+      "currentPublicKeyFound": false,
+      "observedPublicKeyIds": [],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS\\node.exe",
+      "registeredName": "JAMANVAAR POS",
+      "registeredVersion": "1.0.0",
+      "productName": "Node.js",
+      "currentPublicKeyFound": false,
+      "observedPublicKeyIds": [],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS Admin\\node.exe",
+      "registeredName": "JAMANVAAR POS Admin",
+      "registeredVersion": "1.0.0",
+      "productName": "Node.js",
+      "currentPublicKeyFound": false,
+      "observedPublicKeyIds": [],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR Kiosk\\jamanvaar-kiosk-user.exe",
+      "registeredName": "JAMANVAAR Kiosk",
+      "registeredVersion": "1.0.6",
+      "productName": "JAMANVAAR Kiosk",
+      "currentPublicKeyFound": true,
+      "observedPublicKeyIds": [
+        "9C7A14F226BFB760"
+      ],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    },
+    {
+      "file": "C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR POS Admin\\jamanvaar-pos-admin.exe",
+      "registeredName": "JAMANVAAR POS Admin",
+      "registeredVersion": "1.0.0",
+      "productName": "JAMANVAAR POS Admin",
+      "currentPublicKeyFound": true,
+      "observedPublicKeyIds": [
+        "9C7A14F226BFB760"
+      ],
+      "scope": "Read-only scan for public key identifiers; no executable run and no user database/credential read."
+    }
+  ]
+}

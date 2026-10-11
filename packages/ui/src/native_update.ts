@@ -1,13 +1,18 @@
 import { db } from '@jamanvaar/database';
-import { AppUpdate } from '@jamanvaar/sync';
+import { AppUpdate, NATIVE_UPDATE_ATTEMPT_KEY } from '@jamanvaar/sync';
 
 export interface NativeUpdateProgress {
   phase: 'checking' | 'downloading' | 'installing' | 'done' | 'up-to-date' | 'error' | 'not-supported';
   message: string;
   percent?: number;
 }
-const ATTEMPT_KEY = 'jamanvaar_native_update_attempt_v1';
+const ATTEMPT_KEY = NATIVE_UPDATE_ATTEMPT_KEY;
 let running = false;
+const operationalGuards = new Set<() => string | null>();
+export function registerNativeUpdateGuard(guard: () => string | null): () => void {
+  operationalGuards.add(guard);
+  return () => { operationalGuards.delete(guard); };
+}
 
 export function recordUpdateAttempt(version: string): void {
   // Must persist before the Windows installer exits the current process.
@@ -22,6 +27,14 @@ export async function verifyInstalledUpdate(): Promise<void> {
     if (!raw) return;
     const attempt = JSON.parse(raw);
     if (attempt.status !== 'AWAITING_RESTART') return;
+    if (/android/i.test(navigator.userAgent)) {
+      const { getUpdateStatus } = await import('@jamanvaar/tauri-plugin-apk-updater');
+      const status = await getUpdateStatus();
+      if (['DOWNLOADING', 'READY_TO_INSTALL'].includes(status.phase)) return;
+      if (['DOWNLOAD_FAILED', 'VERIFICATION_FAILED', 'INSTALL_FAILED'].includes(status.phase)) {
+        localStorage.setItem(ATTEMPT_KEY, JSON.stringify({ ...attempt, status: 'FAILED', message: 'Android could not complete the update. Please retry.' })); return;
+      }
+    }
     const { getVersion } = await import('@tauri-apps/api/app');
     const installedVersion = await getVersion();
     localStorage.setItem(ATTEMPT_KEY, JSON.stringify({ ...attempt, installedVersion, status: installedVersion === attempt.version ? 'VERIFIED' : 'NOT_INSTALLED', checkedAt: new Date().toISOString() }));
@@ -30,6 +43,10 @@ export async function verifyInstalledUpdate(): Promise<void> {
 }
 
 async function persistBeforeInstall(): Promise<void> {
+  for (const guard of operationalGuards) {
+    const reason = guard();
+    if (reason) throw new Error(reason);
+  }
   const storage = (window as unknown as { __jamanvaarStorage?: { flush(): Promise<void> } }).__jamanvaarStorage;
   await storage?.flush();
   const health = db.getPersistenceHealth();
@@ -52,11 +69,22 @@ export async function installNativeUpdate(onProgress: (p: NativeUpdateProgress) 
     await persistBeforeInstall();
     if (/android/i.test(navigator.userAgent)) {
       if (!offer?.downloadUrl || !offer.downloadSha256) throw new Error('This Android release is missing its APK URL or checksum.');
-      const { downloadAndInstall } = await import('@jamanvaar/tauri-plugin-apk-updater');
+      const { downloadAndInstall, getUpdateStatus, installDownloaded } = await import('@jamanvaar/tauri-plugin-apk-updater');
       onProgress({ phase: 'downloading', message: 'Starting the verified APK download…' });
       await downloadAndInstall(offer.downloadUrl, offer.downloadSha256);
       recordUpdateAttempt(offer.latestVersion);
-      onProgress({ phase: 'done', message: 'Download requested. Confirm installation in Android, then reopen the app to verify the version.' });
+      const deadline = Date.now() + 600_000;
+      while (true) {
+        const status = await getUpdateStatus();
+        if (status.phase === 'READY_TO_INSTALL') break;
+        if (status.phase !== 'DOWNLOADING') throw new Error('Android could not download or verify the APK. Please retry.');
+        if (Date.now() >= deadline) throw new Error('The APK download is taking too long. Retry when the connection improves; it will not install in the background.');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      await persistBeforeInstall();
+      onProgress({ phase: 'installing', message: 'Opening the Android installer. Confirm the update to keep this app and its data.' });
+      await installDownloaded();
+      onProgress({ phase: 'done', message: 'Android installer opened. Confirm installation, then reopen the app to verify the version.' });
       return;
     }
     onProgress({ phase: 'checking', message: 'Checking the signed update manifest…' });
@@ -65,8 +93,16 @@ export async function installNativeUpdate(onProgress: (p: NativeUpdateProgress) 
     if (!update) { onProgress({ phase: 'up-to-date', message: 'No newer compatible update is available.' }); return; }
     try {
       if (offer && offer.latestVersion !== update.version) throw new Error('The release offer and signed updater manifest disagree. Refresh the update check.');
+      const { getName } = await import('@tauri-apps/api/app');
+      const product = await getName();
+      const platforms = update.rawJson.platforms as Record<string, { signature?: string }> | undefined;
+      const encoded = platforms?.['windows-x86_64']?.signature ?? update.rawJson.signature;
+      const lines = typeof encoded === 'string' ? atob(encoded).split(/\r?\n/) : [];
+      const signedFile = /(?:\t| )file:([^\t\r\n]+)/.exec(lines[2] ?? '')?.[1];
+      if (signedFile !== `${product}_${update.version}_x64-setup.exe`) throw new Error('The signed updater metadata does not match this application, version and Windows target.');
       let total = 0, downloaded = 0;
       onProgress({ phase: 'downloading', message: `Downloading version ${update.version}…`, percent: 0 });
+      // The plugin cryptographically verifies the artifact AND trusted comment on download.
       await update.download(event => {
         if (event.event === 'Started') total = event.data.contentLength ?? 0;
         if (event.event === 'Progress') downloaded += event.data.chunkLength;
@@ -80,6 +116,9 @@ export async function installNativeUpdate(onProgress: (p: NativeUpdateProgress) 
       onProgress({ phase: 'done', message: 'Installer started. Reopen the app to verify the installed version.' });
     } finally { await update.close().catch(() => undefined); }
   } catch (error) {
+    if (offer) {
+      try { localStorage.setItem(ATTEMPT_KEY, JSON.stringify({ version: offer.latestVersion, status: 'FAILED', message: 'Update could not complete; retry from this device.', at: new Date().toISOString() })); } catch { /* error remains visible even if storage failed */ }
+    }
     onProgress({ phase: 'error', message: error instanceof Error ? error.message : 'Update failed. The existing application remains usable.' });
     throw error;
   } finally { running = false; }

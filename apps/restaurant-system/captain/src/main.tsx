@@ -22,6 +22,7 @@ DeviceGate.onIdentityInvalid(() => {
 void bootDurableStorage({ appId: 'captain', restaurantId: localStorage.getItem('jamanvaar_captain_restaurant_id') }).then(() => {
   DeviceGate.reload();
   void verifyInstalledUpdate();
+  window.addEventListener('focus', () => void verifyInstalledUpdate());
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
       <App />

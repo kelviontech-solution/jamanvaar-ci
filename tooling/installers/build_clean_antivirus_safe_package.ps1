@@ -1,3 +1,6 @@
+﻿# Archived wrapper builder; migration reference only.
+throw 'Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.'
+<#
 $workspaceRoot = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
 $distDir = Join-Path $workspaceRoot "JAMANVAAR_DESKTOP_PACKAGE"
 $iconPath = Join-Path $distDir "icons\icon.ico"
@@ -114,3 +117,5 @@ Compress-Archive -Path (Join-Path $distDir "*") -DestinationPath $zipPath -Compr
 Write-Host "==============================================================="
 Write-Host "SUCCESS: Antivirus-Safe Package and Shortcuts Ready!"
 Write-Host "==============================================================="
+
+#>

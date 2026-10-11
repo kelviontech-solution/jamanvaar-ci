@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+    "run",
+    "build",
+    "--workspace",
+    "apps/restaurant-system/captain"
+  ],
+  "startedAt": "2026-10-11T10:06:27.348Z",
+  "finishedAt": "2026-10-11T10:07:00.001Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

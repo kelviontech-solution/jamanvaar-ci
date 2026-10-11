@@ -100,7 +100,7 @@ export class ApplicationsService {
       });
 
       const allDevices = await tx.device.findMany({
-        select: { type: true, status: true, lastSeenAt: true, appVersion: true }
+        select: { type: true, status: true, lastSeenAt: true, appVersion: true, updateReport: true }
       });
 
       // Real per-app entitlement counts — previously this endpoint reported
@@ -122,6 +122,12 @@ export class ApplicationsService {
           ? allDevices.filter((d) => d.type === meta.deviceType)
           : [];
 
+        const updateReports = matchingDevices.map(d => ({ deviceVersion: d.appVersion, report: d.updateReport as { status?: string; version?: string; installedVersion?: string } | null }));
+        const updateTelemetry = {
+          reportedVerified: updateReports.filter(d => d.report?.status === 'VERIFIED' && d.report.version === d.report.installedVersion && d.deviceVersion === d.report.version).length,
+          reportedFailed: updateReports.filter(d => ['FAILED', 'NOT_INSTALLED'].includes(d.report?.status ?? '')).length,
+          awaitingVerification: updateReports.filter(d => d.report?.status === 'AWAITING_RESTART').length
+        };
         const activeDevices = matchingDevices.filter((d) => d.status === 'ACTIVE').length;
         // The same health rule as the fleet page (common/device-health.ts).
         const health = matchingDevices.map((d) => deviceHealth(d, now));
@@ -140,6 +146,7 @@ export class ApplicationsService {
 
         return {
           ...meta,
+          updateTelemetry,
           // null when nothing has been published: never an invented version number.
           currentVersion: latestRelease?.version ?? null,
           channel: latestRelease?.channel || 'STABLE',
@@ -181,7 +188,7 @@ export class ApplicationsService {
 
       return APP_CATALOG.map((meta) => {
         const releases = allReleases.filter((r) => r.appCode === meta.code);
-        const latestRelease = releases.filter((r) => r.channel === 'STABLE').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
+        const latestRelease = releases.filter((r) => r.channel === 'STABLE' && r.status === 'PUBLISHED').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
 
         return {
           code: meta.code,

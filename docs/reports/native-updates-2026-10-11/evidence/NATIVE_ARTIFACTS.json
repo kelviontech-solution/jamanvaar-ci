@@ -1,0 +1,145 @@
+﻿{
+    "results":  [
+                    {
+                        "app":  "pos-admin",
+                        "android":  {
+                                        "size":  100010938,
+                                        "version":  "1.0.7",
+                                        "sourceMapsAndR8DiagnosticsPackaged":  false,
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\pos-admin\\src-tauri\\gen\\android\\app\\build\\outputs\\apk\\arm64\\release\\app-arm64-release-unsigned.apk",
+                                        "r8MappingPresent":  true,
+                                        "abi":  "arm64-v8a",
+                                        "distributionReady":  false,
+                                        "allowBackup":  false,
+                                        "debuggable":  false,
+                                        "nativeDebugSections":  false,
+                                        "signed":  false,
+                                        "signatureVerificationExitCode":  1,
+                                        "package":  "com.jamanvaar.posadmin",
+                                        "inspectedNativeLibrary":  "packaged APK library",
+                                        "sha256":  "3B5E5B99F672A01D081FBCCA557186104DD49684FF87058B7BE3B4CE75AE16EC"
+                                    },
+                        "windows":  {
+                                        "size":  105056768,
+                                        "fileVersion":  "1.0.7",
+                                        "sha256":  "3051BA907AF5EDBBFA2C30C325AA0F51E08A6DE760705A0818DD337B6EFEFE24",
+                                        "distributionReady":  false,
+                                        "authenticode":  "NotSigned",
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\target\\release\\jamanvaar-pos-admin.exe"
+                                    }
+                    },
+                    {
+                        "app":  "pos",
+                        "android":  {
+                                        "size":  92732436,
+                                        "version":  "1.0.4",
+                                        "sourceMapsAndR8DiagnosticsPackaged":  false,
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\pos\\src-tauri\\gen\\android\\app\\build\\outputs\\apk\\arm64\\release\\app-arm64-release-unsigned.apk",
+                                        "r8MappingPresent":  true,
+                                        "abi":  "arm64-v8a",
+                                        "distributionReady":  false,
+                                        "allowBackup":  false,
+                                        "debuggable":  false,
+                                        "nativeDebugSections":  false,
+                                        "signed":  false,
+                                        "signatureVerificationExitCode":  1,
+                                        "package":  "com.jamanvaar.pos",
+                                        "inspectedNativeLibrary":  "packaged APK library",
+                                        "sha256":  "21C94308515D5B57F20F240FA26DEC39219DF3F1E80ED0A27077A2C0DDB23287"
+                                    },
+                        "windows":  {
+                                        "size":  97780224,
+                                        "fileVersion":  "1.0.4",
+                                        "sha256":  "9A232850BF32D317DB18E7714A6CCB2443C9B8F5EB50A0D1AA0C1CB1F2E4D61F",
+                                        "distributionReady":  false,
+                                        "authenticode":  "NotSigned",
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\target\\release\\jamanvaar-pos.exe"
+                                    }
+                    },
+                    {
+                        "app":  "captain",
+                        "android":  {
+                                        "size":  92529208,
+                                        "version":  "1.0.4",
+                                        "sourceMapsAndR8DiagnosticsPackaged":  false,
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\captain\\src-tauri\\gen\\android\\app\\build\\outputs\\apk\\arm64\\release\\app-arm64-release-unsigned.apk",
+                                        "r8MappingPresent":  true,
+                                        "abi":  "arm64-v8a",
+                                        "distributionReady":  false,
+                                        "allowBackup":  false,
+                                        "debuggable":  false,
+                                        "nativeDebugSections":  false,
+                                        "signed":  false,
+                                        "signatureVerificationExitCode":  1,
+                                        "package":  "com.jamanvaar.captain",
+                                        "inspectedNativeLibrary":  "packaged APK library",
+                                        "sha256":  "4B1B6DC7888B91EB47932640D1F08D453A09C326D0C65498D918689BD3B78495"
+                                    },
+                        "windows":  {
+                                        "size":  97474560,
+                                        "fileVersion":  "1.0.4",
+                                        "sha256":  "04874E11BD04B951C256CB6E6D5E6122212C559B39E4DE590A3D490366B79F6D",
+                                        "distributionReady":  false,
+                                        "authenticode":  "NotSigned",
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\target\\release\\jamanvaar-captain.exe"
+                                    }
+                    },
+                    {
+                        "app":  "kds",
+                        "android":  {
+                                        "size":  92529828,
+                                        "version":  "1.0.4",
+                                        "sourceMapsAndR8DiagnosticsPackaged":  false,
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\gen\\android\\app\\build\\outputs\\apk\\arm64\\release\\app-arm64-release-unsigned.apk",
+                                        "r8MappingPresent":  true,
+                                        "abi":  "arm64-v8a",
+                                        "distributionReady":  false,
+                                        "allowBackup":  false,
+                                        "debuggable":  false,
+                                        "nativeDebugSections":  false,
+                                        "signed":  false,
+                                        "signatureVerificationExitCode":  1,
+                                        "package":  "com.jamanvaar.kds",
+                                        "inspectedNativeLibrary":  "packaged APK library",
+                                        "sha256":  "7405556B0B56305A6BEEFD216775963AE9786A988F00CEA637A3CE7FFFF94379"
+                                    },
+                        "windows":  {
+                                        "size":  97477120,
+                                        "fileVersion":  "1.0.4",
+                                        "sha256":  "2A6739FEBEE24E25B48085428F5C136D956D50B0445EC5F209AF94D96C265830",
+                                        "distributionReady":  false,
+                                        "authenticode":  "NotSigned",
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\target\\release\\jamanvaar-kds.exe"
+                                    }
+                    },
+                    {
+                        "app":  "kiosk",
+                        "android":  {
+                                        "size":  106069903,
+                                        "version":  "1.0.7",
+                                        "sourceMapsAndR8DiagnosticsPackaged":  false,
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\kiosk-system\\kiosk-user\\src-tauri\\gen\\android\\app\\build\\outputs\\apk\\arm64\\release\\app-arm64-release-unsigned.apk",
+                                        "r8MappingPresent":  true,
+                                        "abi":  "arm64-v8a",
+                                        "distributionReady":  false,
+                                        "allowBackup":  false,
+                                        "debuggable":  false,
+                                        "nativeDebugSections":  false,
+                                        "signed":  false,
+                                        "signatureVerificationExitCode":  1,
+                                        "package":  "com.jamanvaar.kiosk",
+                                        "inspectedNativeLibrary":  "packaged APK library",
+                                        "sha256":  "DD6C84F85B02D1437B36FD0F148CE470D437F9AEEB6445E724C55F5BC7F7DA73"
+                                    },
+                        "windows":  {
+                                        "size":  111110144,
+                                        "fileVersion":  "1.0.7",
+                                        "sha256":  "3D8105EE5A6AF12EA1B3C8198BC6E85F23B80810FE6C9214DE85707F587E740A",
+                                        "distributionReady":  false,
+                                        "authenticode":  "NotSigned",
+                                        "file":  "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\apps\\restaurant-system\\kds\\src-tauri\\target\\release\\jamanvaar-kiosk-user.exe"
+                                    }
+                    }
+                ],
+    "scope":  "Unsigned local production-context validation artifacts only; installer/signature/predecessor acceptance pending"
+}

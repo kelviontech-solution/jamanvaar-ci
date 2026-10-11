@@ -1,0 +1,56 @@
+﻿[
+    {
+        "registeredName":  "JAMANVAAR Kiosk",
+        "registeredVersion":  "1.0.0",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk\\node.exe",
+        "size":  92825416,
+        "fileVersion":  "24.19.0",
+        "productName":  "Node.js",
+        "signer":  "Valid"
+    },
+    {
+        "registeredName":  "JAMANVAAR Kiosk Admin",
+        "registeredVersion":  "1.0.0",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk Admin\\node.exe",
+        "size":  92825416,
+        "fileVersion":  "24.19.0",
+        "productName":  "Node.js",
+        "signer":  "Valid"
+    },
+    {
+        "registeredName":  "JAMANVAAR POS",
+        "registeredVersion":  "1.0.0",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS\\node.exe",
+        "size":  92825416,
+        "fileVersion":  "24.19.0",
+        "productName":  "Node.js",
+        "signer":  "Valid"
+    },
+    {
+        "registeredName":  "JAMANVAAR POS Admin",
+        "registeredVersion":  "1.0.0",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS Admin\\node.exe",
+        "size":  92825416,
+        "fileVersion":  "24.19.0",
+        "productName":  "Node.js",
+        "signer":  "Valid"
+    },
+    {
+        "registeredName":  "JAMANVAAR Kiosk",
+        "registeredVersion":  "1.0.6",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR Kiosk\\jamanvaar-kiosk-user.exe",
+        "size":  111967744,
+        "fileVersion":  "1.0.6",
+        "productName":  "JAMANVAAR Kiosk",
+        "signer":  "NotSigned"
+    },
+    {
+        "registeredName":  "JAMANVAAR POS Admin",
+        "registeredVersion":  "1.0.0",
+        "file":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR POS Admin\\jamanvaar-pos-admin.exe",
+        "size":  105388032,
+        "fileVersion":  "1.0.0",
+        "productName":  "JAMANVAAR POS Admin",
+        "signer":  "NotSigned"
+    }
+]

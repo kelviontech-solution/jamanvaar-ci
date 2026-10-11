@@ -1,0 +1,16 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "docs/reports/native-updates-2026-10-11/android-gradle-validation.ps1",
+    "-App",
+    "kds"
+  ],
+  "startedAt": "2026-10-11T10:54:58.096Z",
+  "finishedAt": "2026-10-11T10:56:31.683Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

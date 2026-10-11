@@ -1,3 +1,6 @@
+﻿# Archived wrapper builder; migration reference only.
+throw 'Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.'
+<#
 $ErrorActionPreference = "Stop"
 
 $workspaceRoot = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
@@ -287,3 +290,5 @@ Write-Host "SUCCESS: Desktop Applications & ZIP Package Ready!"
 Write-Host "Folder:  $distDir"
 Write-Host "ZIP:     $zipPath"
 Write-Host "==============================================================="
+
+#>

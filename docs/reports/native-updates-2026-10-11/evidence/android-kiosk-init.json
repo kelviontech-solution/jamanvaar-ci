@@ -1,0 +1,18 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\OM Sanjhira\\OneDrive\\Desktop\\k2\\docs\\reports\\native-updates-2026-10-11\\android-validation.ps1",
+    "-Stage",
+    "init",
+    "-App",
+    "kiosk"
+  ],
+  "startedAt": "2026-10-11T10:49:21.811Z",
+  "finishedAt": "2026-10-11T10:49:24.966Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "docs/reports/native-updates-2026-10-11/android-validation.ps1",
+    "-Stage",
+    "build",
+    "-App",
+    "kds"
+  ],
+  "startedAt": "2026-10-11T10:10:30.536Z",
+  "finishedAt": "2026-10-11T10:17:43.566Z",
+  "status": "FAILED",
+  "exitCode": 1,
+  "signal": null
+}

@@ -1,0 +1,55 @@
+{
+  "scannedAt": "2026-10-11T10:11:00.913Z",
+  "scope": "Private-key markers and unintended source maps only; not a complete secret scan or reverse-engineering barrier.",
+  "results": [
+    {
+      "app": "cloud/super-admin-web",
+      "files": 949,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/restaurant-system/pos-admin",
+      "files": 971,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/restaurant-system/pos",
+      "files": 899,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/restaurant-system/captain",
+      "files": 898,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/restaurant-system/kds",
+      "files": 898,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/kiosk-system/kiosk-user",
+      "files": 973,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    },
+    {
+      "app": "apps/qr-guest",
+      "files": 886,
+      "sourceMapFiles": 0,
+      "sourceMapDirectives": 0,
+      "privateKeyMarkers": 0
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+﻿{
+    "HistoricalArtifacts":  [
+                                {
+                                    "File":  "JAMANVAAR-Kiosk-Admin-Setup.exe",
+                                    "Status":  "UnknownError",
+                                    "SignerSha256":  "ECF91FB431FAB431824FC43C9D4C0E52CFF4BDB19BD83C8963BDD876F2C5C3DA"
+                                },
+                                {
+                                    "File":  "JAMANVAAR-Kiosk-Setup.exe",
+                                    "Status":  "UnknownError",
+                                    "SignerSha256":  "ECF91FB431FAB431824FC43C9D4C0E52CFF4BDB19BD83C8963BDD876F2C5C3DA"
+                                },
+                                {
+                                    "File":  "JAMANVAAR-POS-Admin-Setup.exe",
+                                    "Status":  "UnknownError",
+                                    "SignerSha256":  "ECF91FB431FAB431824FC43C9D4C0E52CFF4BDB19BD83C8963BDD876F2C5C3DA"
+                                },
+                                {
+                                    "File":  "JAMANVAAR-POS-Setup.exe",
+                                    "Status":  "UnknownError",
+                                    "SignerSha256":  "ECF91FB431FAB431824FC43C9D4C0E52CFF4BDB19BD83C8963BDD876F2C5C3DA"
+                                }
+                            ],
+    "LocalCertificates":  [
+                              {
+                                  "Subject":  "CN=JAMANVAAR by Kelviontech Systems, O=Kelviontech Systems, C=IN",
+                                  "Issuer":  "CN=JAMANVAAR by Kelviontech Systems, O=Kelviontech Systems, C=IN",
+                                  "SelfIssued":  true,
+                                  "HasPrivateKey":  true,
+                                  "CertificateSha256":  "ECF91FB431FAB431824FC43C9D4C0E52CFF4BDB19BD83C8963BDD876F2C5C3DA",
+                                  "NotAfter":  "2036-08-31T20:21:01.0000000Z"
+                              },
+                              {
+                                  "Subject":  "CN=KELVIONTECH INC., O=JAMANVAAR, C=IN",
+                                  "Issuer":  "CN=KELVIONTECH INC., O=JAMANVAAR, C=IN",
+                                  "SelfIssued":  true,
+                                  "HasPrivateKey":  true,
+                                  "CertificateSha256":  "3C74DBEB59F888D69C7903BABB373C56954D20221BBA593951BD439E13EF819A",
+                                  "NotAfter":  "2036-09-01T05:20:29.0000000Z"
+                              }
+                          ]
+}

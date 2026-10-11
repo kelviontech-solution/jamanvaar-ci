@@ -1,0 +1,48 @@
+﻿{
+    "scope":  "Read-only Windows uninstall registration; no installed app or data changed.",
+    "installedApps":  [
+                          {
+                              "DisplayName":  "JAMANVAAR Kiosk",
+                              "DisplayVersion":  "1.0.0",
+                              "InstallLocation":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk",
+                              "Publisher":  "JAMANVAAR by KELVIONTECH"
+                          },
+                          {
+                              "DisplayName":  "JAMANVAAR Kiosk Admin",
+                              "DisplayVersion":  "1.0.0",
+                              "InstallLocation":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR Kiosk Admin",
+                              "Publisher":  "JAMANVAAR by KELVIONTECH"
+                          },
+                          {
+                              "DisplayName":  "JAMANVAAR POS",
+                              "DisplayVersion":  "1.0.0",
+                              "InstallLocation":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS",
+                              "Publisher":  "JAMANVAAR by KELVIONTECH"
+                          },
+                          {
+                              "DisplayName":  "JAMANVAAR POS Admin",
+                              "DisplayVersion":  "1.0.0",
+                              "InstallLocation":  "C:\\Users\\OM Sanjhira\\AppData\\Local\\Programs\\JAMANVAAR\\JAMANVAAR POS Admin",
+                              "Publisher":  "JAMANVAAR by KELVIONTECH"
+                          },
+                          {
+                              "DisplayName":  "JAMANVAAR Kiosk",
+                              "DisplayVersion":  "1.0.6",
+                              "InstallLocation":  "\"C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR Kiosk\"",
+                              "Publisher":  "JAMANVAAR by Kelviontech Systems"
+                          },
+                          {
+                              "DisplayName":  "Jamanvaar POS",
+                              "DisplayVersion":  "0.1.0",
+                              "InstallLocation":  "\"C:\\Users\\OM Sanjhira\\AppData\\Local\\Jamanvaar POS\"",
+                              "Publisher":  "jamanvaar"
+                          },
+                          {
+                              "DisplayName":  "JAMANVAAR POS Admin",
+                              "DisplayVersion":  "1.0.0",
+                              "InstallLocation":  "\"C:\\Users\\OM Sanjhira\\AppData\\Local\\JAMANVAAR POS Admin\"",
+                              "Publisher":  "JAMANVAAR by Kelviontech Systems"
+                          }
+                      ],
+    "inspectedAt":  "2026-10-11T10:42:14.5927217Z"
+}

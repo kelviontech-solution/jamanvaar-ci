@@ -1,3 +1,6 @@
+﻿# Archived wrapper builder; migration reference only.
+throw 'Legacy browser-wrapper release packaging is disabled: use .github/workflows/build-installers.yml with preserved Tauri identities and signed updater artifacts. Existing wrapper installations require a tested migration. No output files were changed.'
+<#
 Add-Type -AssemblyName System.Drawing
 
 $workspaceRoot = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
@@ -321,3 +324,5 @@ public class ShellRefreshFinal {
 Write-Host "==============================================================="
 Write-Host "SUCCESS: Desktop apps compiled with brand logo and ZIP updated!"
 Write-Host "==============================================================="
+
+#>

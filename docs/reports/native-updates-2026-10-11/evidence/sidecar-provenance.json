@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    ".github/scripts/validate-sidecar-provenance.mjs",
+    "apps/restaurant-system/pos"
+  ],
+  "startedAt": "2026-10-11T09:46:07.064Z",
+  "finishedAt": "2026-10-11T09:46:09.117Z",
+  "exitCode": 1,
+  "signal": null
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/android_release_configuration.test.ts"
+  ],
+  "startedAt": "2026-10-11T10:34:21.564Z",
+  "finishedAt": "2026-10-11T10:34:28.424Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

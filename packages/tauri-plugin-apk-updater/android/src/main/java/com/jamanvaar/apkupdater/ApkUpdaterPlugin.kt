@@ -20,6 +20,7 @@ import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
 import java.io.File
 import java.security.MessageDigest
+import java.util.zip.ZipFile
 import android.widget.Toast
 
 @InvokeArg
@@ -30,10 +31,9 @@ class DownloadAndInstallArgs {
 
 /**
  * Downloads an app update .apk through Android's own DownloadManager (so the download itself is
- * a real, visible system download, not a silent background mystery) and, the moment it finishes,
- * hands the file straight to the system's install prompt. One tap to confirm -- Android gives no
- * ordinary app silent-install permission, so this is the most automatic an update can be without
- * enrolling the device as Device Owner (a separate, bigger piece of work).
+ * a visible system download). Completion verifies the APK and records READY_TO_INSTALL;
+ * the foreground operator then explicitly calls installDownloaded after saving local data.
+ * Android's system installer still requires confirmation. Downloads never interrupt billing.
  */
 @TauriPlugin
 class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
@@ -41,6 +41,64 @@ class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
     private var receiver: BroadcastReceiver? = null
     @Volatile private var verifying = false
     private val fileName = "jamanvaar-update.apk"
+    private val preferences get() = activity.getSharedPreferences("jamanvaar_apk_update", Context.MODE_PRIVATE)
+    private fun state(value: String) { preferences.edit().putString("phase", value).apply() }
+
+    @Command
+    fun getUpdateStatus(invoke: Invoke) {
+        val context = activity.applicationContext
+        var phase = preferences.getString("phase", "IDLE") ?: "IDLE"
+        val id = preferences.getLong("downloadId", -1)
+        if (id >= 0 && phase == "DOWNLOADING") {
+            val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val status = manager.query(DownloadManager.Query().setFilterById(id)).use { cursor ->
+                if (!cursor.moveToFirst()) DownloadManager.STATUS_FAILED else cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+            }
+            if (status == DownloadManager.STATUS_FAILED) { state("DOWNLOAD_FAILED"); phase = "DOWNLOAD_FAILED" }
+            else if (receiver == null && !verifying) {
+                downloadId = id
+                registerCompletionReceiver(context, manager, preferences.getString("sha256", "") ?: "")
+                // Recover completion after the WebView/process was closed during the download.
+                if (status == DownloadManager.STATUS_SUCCESSFUL) receiver?.onReceive(context, Intent(DownloadManager.ACTION_DOWNLOAD_COMPLETE).putExtra(DownloadManager.EXTRA_DOWNLOAD_ID, id))
+            }
+        }
+        if (phase == "INSTALLER_OPENED") {
+            @Suppress("DEPRECATION")
+            val installed = context.packageManager.getPackageInfo(context.packageName, 0)
+            val version = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) installed.longVersionCode else installed.versionCode.toLong()
+            phase = if (version >= preferences.getLong("targetVersionCode", Long.MAX_VALUE)) "VERIFIED" else "NOT_INSTALLED"
+        }
+        val result = JSObject()
+        result.put("phase", phase)
+        result.put("downloadId", id)
+        invoke.resolve(result)
+    }
+
+    @Command
+    fun installDownloaded(invoke: Invoke) {
+        if (verifying || preferences.getString("phase", "") != "READY_TO_INSTALL") { invoke.reject("The APK is not ready to install"); return }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !activity.packageManager.canRequestPackageInstalls()) { invoke.reject("Allow updates from this app in Android settings, then retry"); return }
+        val context = activity.applicationContext
+        val apk = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
+        verifying = true
+        Thread {
+            try {
+                val digest = MessageDigest.getInstance("SHA-256")
+                apk.inputStream().use { input -> val buffer = ByteArray(8192); var length = input.read(buffer); while (length >= 0) { if (length > 0) digest.update(buffer, 0, length); length = input.read(buffer) } }
+                val actual = digest.digest().joinToString("") { "%02x".format(it) }
+                if (actual != preferences.getString("sha256", "") || !isTrustedUpdate(context, apk)) {
+                    state("VERIFICATION_FAILED"); apk.delete(); invoke.reject("APK verification failed; download the signed release again"); return@Thread
+                }
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.jamanvaar.fileprovider", apk)
+                val intent = Intent(Intent.ACTION_VIEW).apply { setDataAndType(uri, "application/vnd.android.package-archive"); addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+                activity.runOnUiThread {
+                    try { context.startActivity(intent); state("INSTALLER_OPENED"); invoke.resolve(JSObject()) }
+                    catch (_: Exception) { state("INSTALL_FAILED"); invoke.reject("Unable to open the Android installer") }
+                }
+            } catch (_: Exception) { state("VERIFICATION_FAILED"); invoke.reject("APK verification failed; please retry") }
+            finally { verifying = false }
+        }.start()
+    }
 
     @Command
     fun downloadAndInstall(invoke: Invoke) {
@@ -81,6 +139,7 @@ class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
 
         try {
             downloadId = downloadManager.enqueue(request)
+            preferences.edit().putLong("downloadId", downloadId).putString("sha256", args.sha256.lowercase()).putString("phase", "DOWNLOADING").apply()
             registerCompletionReceiver(context, downloadManager, args.sha256.lowercase())
         } catch (_: Exception) {
             if (downloadId >= 0) downloadManager.remove(downloadId)
@@ -114,10 +173,10 @@ class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
                     val statusIdx = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
                     statusIdx >= 0 && cursor.getInt(statusIdx) == DownloadManager.STATUS_SUCCESSFUL
                 }
-                if (!succeeded) { Toast.makeText(context, "Update download failed. Please try again.", Toast.LENGTH_LONG).show(); return }
+                if (!succeeded) { state("DOWNLOAD_FAILED"); Toast.makeText(context, "Update download failed. Please try again.", Toast.LENGTH_LONG).show(); return }
 
                 val apk = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
-                if (!apk.exists()) return
+                if (!apk.exists()) { state("DOWNLOAD_FAILED"); return }
                 // Hashing a full APK must not block Android's broadcast/UI thread.
                 verifying = true
                 Thread {
@@ -126,26 +185,17 @@ class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
                 apk.inputStream().use { input -> val buffer = ByteArray(8192); var length = input.read(buffer); while (length >= 0) { if (length > 0) digest.update(buffer, 0, length); length = input.read(buffer) } }
                 val actualSha256 = digest.digest().joinToString("") { "%02x".format(it) }
                 if (actualSha256 != expectedSha256 || !isTrustedUpdate(context, apk)) {
+                    state("VERIFICATION_FAILED")
                     apk.delete()
                     activity.runOnUiThread { Toast.makeText(context, "Update rejected: package, version or signing certificate does not match this app.", Toast.LENGTH_LONG).show() }
                     return@Thread
                 }
 
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.jamanvaar.fileprovider",
-                    apk
-                )
-                val installIntent = Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "application/vnd.android.package-archive")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                activity.runOnUiThread {
-                    try { context.startActivity(installIntent) }
-                    catch (_: Exception) { Toast.makeText(context, "Unable to open the Android installer.", Toast.LENGTH_LONG).show() }
-                }
+                // Frontend flushes local SQLite before explicit installer handoff.
+                // A recovered background download must never interrupt a new customer order.
+                state("READY_TO_INSTALL")
                 } catch (_: Exception) {
+                    state("VERIFICATION_FAILED")
                     apk.delete()
                     activity.runOnUiThread { Toast.makeText(context, "Update verification failed. Please try again.", Toast.LENGTH_LONG).show() }
                 } finally { verifying = false }
@@ -172,12 +222,14 @@ class ApkUpdaterPlugin(private val activity: Activity) : Plugin(activity) {
         else {
             val installedVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) installed.longVersionCode else installed.versionCode.toLong()
             val candidateVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) candidate.longVersionCode else candidate.versionCode.toLong()
+            preferences.edit().putLong("targetVersionCode", candidateVersion).apply()
             fun certificates(info: android.content.pm.PackageInfo): Set<String> {
                 val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.signingInfo?.apkContentsSigners else info.signatures
                 return signatures?.map { signature -> MessageDigest.getInstance("SHA-256").digest(signature.toByteArray()).joinToString("") { "%02x".format(it) } }?.toSet() ?: emptySet()
             }
             val trusted = certificates(installed)
-            candidateVersion > installedVersion && trusted.isNotEmpty() && certificates(candidate) == trusted
+            val compatibleAbi = ZipFile(apk).use { zip -> Build.SUPPORTED_ABIS.any { abi -> zip.entries().asSequence().any { entry -> entry.name.startsWith("lib/$abi/") && entry.name.endsWith(".so") } } }
+            candidateVersion > installedVersion && compatibleAbi && trusted.isNotEmpty() && certificates(candidate) == trusted
         }
     } catch (_: Exception) { false }
 }

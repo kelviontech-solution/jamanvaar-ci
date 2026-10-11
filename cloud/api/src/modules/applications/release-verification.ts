@@ -7,6 +7,18 @@ import type { PublishReleaseDto } from './dto/application.dto';
 
 // Public key only. Must continue matching the public key embedded in distributed apps.
 export const UPDATER_PUBLIC_KEY = 'dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlDN0ExNEYyMjZCRkI3NjAKUldSZ3Q3OG04aFI2bk1pd3l1QjNLQjdSdmlqK3RZQXVic0tFNUdKNzJYMEo4ZU9Oc3dUVE5hbFIK';
+const PRODUCTS: Record<string, string> = { POS: 'JAMANVAAR POS', RESTAURANT_ADMIN: 'JAMANVAAR POS Admin', CAPTAIN: 'JAMANVAAR Captain', KDS: 'JAMANVAAR Kitchen Display', KIOSK: 'JAMANVAAR Kiosk' };
+
+/** Only use after cryptographic verification: minisign's file comment is signed metadata. */
+export function matchesSignedInstallerIdentity(encodedSignature: string, appCode: string, version: string): boolean {
+  try {
+    const comment = Buffer.from(encodedSignature.trim(), 'base64').toString('utf8').split(/\r?\n/)[2] ?? '';
+    const file = /(?:\t| )file:([^\t\r\n]+)/.exec(comment)?.[1];
+    const product = PRODUCTS[appCode];
+    // The pipeline produces only x86_64 NSIS. Preserve the product's exact case/name.
+    return !!product && file === `${product}_${version}_x64-setup.exe`;
+  } catch { return false; }
+}
 
 /** Same Ed25519/Blake2b minisign format used by Tauri. No private key needed. */
 export function verifyUpdaterArtifact(bytes: Buffer, encodedSignature: string, encodedKey = UPDATER_PUBLIC_KEY): boolean {
@@ -59,5 +71,6 @@ export async function validateReleaseArtifacts(dto: PublishReleaseDto): Promise<
     const magic = bytes.subarray(0, 2).toString('ascii');
     if ((platform === 'windows' && magic !== 'MZ') || (platform === 'android' && magic !== 'PK')) throw new BadRequestException(`${platform}: wrong artifact format`);
     if (platform === 'windows' && !verifyUpdaterArtifact(bytes, dto.signatures!.windows)) throw new BadRequestException('Windows: invalid Tauri updater signature');
+    if (platform === 'windows' && !matchesSignedInstallerIdentity(dto.signatures!.windows, dto.appCode, dto.version)) throw new BadRequestException('Windows: signed installer name does not match the application, version and x64 target. Use the unrenamed Tauri NSIS artifact when signing.');
   }
 }

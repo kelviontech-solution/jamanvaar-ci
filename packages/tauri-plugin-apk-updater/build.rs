@@ -1,4 +1,4 @@
-const COMMANDS: &[&str] = &["download_and_install"];
+const COMMANDS: &[&str] = &["download_and_install", "get_update_status", "install_downloaded"];
 
 fn main() {
     let result = tauri_plugin::Builder::new(COMMANDS)

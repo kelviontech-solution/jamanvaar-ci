@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "docs/reports/native-updates-2026-10-11/inspect-ci-signing.cjs"
+  ],
+  "startedAt": "2026-10-11T11:05:05.621Z",
+  "finishedAt": "2026-10-11T11:05:11.204Z",
+  "status": "PASSED",
+  "exitCode": 0,
+  "signal": null
+}

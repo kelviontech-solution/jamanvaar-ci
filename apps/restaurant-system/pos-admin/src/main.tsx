@@ -28,6 +28,7 @@ void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !stored
   const branch=storedAdminBranch();if(branch&&branch!=='all')KioskConfigurationRepository.bindBranch(branch);
   DeviceGate.reload();
   void verifyInstalledUpdate();
+  window.addEventListener('focus', () => void verifyInstalledUpdate());
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />

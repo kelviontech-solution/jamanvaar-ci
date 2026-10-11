@@ -824,6 +824,7 @@ export interface AppRelease {
 }
 
 export interface ApplicationSummary {
+  updateTelemetry?: { reportedVerified: number; reportedFailed: number; awaitingVerification: number };
   code: string;
   name: string;
   category: string;

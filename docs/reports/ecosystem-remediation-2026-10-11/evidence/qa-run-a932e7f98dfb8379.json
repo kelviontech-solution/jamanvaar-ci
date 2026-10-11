@@ -1,0 +1,16 @@
+{
+  "arguments": [
+    "test/native-release-verification.unit.spec.ts",
+    "test/release-provenance.unit.spec.ts",
+    "test/device-updates.e2e.spec.ts",
+    "test/billing-applications-support.e2e.spec.ts",
+    "test/licensing.e2e.spec.ts",
+    "test/activation-redeem.e2e.spec.ts",
+    "test/tenant-isolation.spec.ts",
+    "test/tenant-my-applications.e2e.spec.ts",
+    "test/plans-dynamic-entitlements.e2e.spec.ts"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "runnerError": null
+}

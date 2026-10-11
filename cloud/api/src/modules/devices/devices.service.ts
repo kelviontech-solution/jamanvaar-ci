@@ -14,6 +14,7 @@ export interface HeartbeatDto {
   lastBackupAt?: Date;
   syncStatus?: string;
   appVersion?: string;
+  updateReport?: { version: string; status: string; installedVersion?: string; message?: string };
   osPlatform?: string;
   pendingSyncCount?: number;
   syncError?: string | null;
@@ -408,6 +409,7 @@ export class DevicesService {
           ...(dto.lastBackupAt ? { lastBackupAt: dto.lastBackupAt } : {}),
           ...(dto.syncStatus ? { syncStatus: dto.syncStatus } : {}),
           ...(dto.appVersion ? { appVersion: dto.appVersion } : {}),
+          ...(dto.updateReport ? { updateReport: dto.updateReport } : {}),
           ...(dto.osPlatform ? { osPlatform: dto.osPlatform } : {}),
           ...(dto.ipAddress ? { ipAddress: dto.ipAddress } : {}),
           ...(dto.pendingSyncCount !== undefined ? { pendingSyncCount: dto.pendingSyncCount } : {}),

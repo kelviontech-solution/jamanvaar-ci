@@ -14,6 +14,7 @@ export class UpdaterManifestController {
   @Get(':appCode/latest.json')
   @HttpCode(HttpStatus.OK)
   async latest(@Param('appCode') appCode: string, @Res({ passthrough: true }) res: Response) {
+    res.setHeader('Cache-Control', 'no-store');
     const manifest = await this.applications.getUpdaterManifest(appCode);
     if (!manifest) {
       res.status(HttpStatus.NO_CONTENT);
