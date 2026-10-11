@@ -197,7 +197,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(11, 37, 58, 0.45);
+  background: var(--jv-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,8 +280,8 @@
   margin: 0;
 }
 .form-error {
-  background: #fef2f2;
-  color: var(--jv-error);
+  background: var(--jv-error-soft);
+  color: var(--jv-error-text);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 13px;
@@ -392,7 +392,7 @@
   flex-shrink: 0;
 }
 .user-avatar-owner {
-  background: #fff4eb;
+  background: var(--jv-accent-soft);
   color: var(--jv-accent-text);
 }
 .user-card-name {

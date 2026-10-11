@@ -98,7 +98,7 @@ export function ChangePlanModal({
         </div>
 
         {chosenPlan && chosenPlan.id !== currentPlan.id && (
-          <div style={{ background: '#fffaf5', border: '1px solid #fed7aa', padding: '12px 16px', borderRadius: 8 }}>
+          <div style={{ background: 'var(--jv-accent-soft)', border: '1px solid var(--jv-accent-line)', padding: '12px 16px', borderRadius: 8 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-accent-text)', textTransform: 'uppercase' }}>
               Plan Transition Summary
             </div>

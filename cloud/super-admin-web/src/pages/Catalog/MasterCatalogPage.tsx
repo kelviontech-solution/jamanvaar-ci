@@ -32,8 +32,10 @@ import {
 } from 'lucide-react';
 import '../../components/shared.css';
 import './master-catalog.css';
+import { useAdminConfirm } from '../../components/ui';
 
 export function MasterCatalogPage() {
+  const { confirm, confirmDialog } = useAdminConfirm();
   const [categories, setCategories] = useState<MasterMenuCategory[]>([]);
   const [items, setItems] = useState<MasterMenuItem[]>([]);
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
@@ -300,7 +302,7 @@ export function MasterCatalogPage() {
 
   // Delete Category
   const handleDeleteCategory = async (cat: MasterMenuCategory) => {
-    if (!confirm(`Delete category "${cat.name}"?`)) return;
+    if (!(await confirm({ title: 'Delete category?', message: `Category "${cat.name}" will be deleted from the master catalog.`, confirmLabel: 'Delete category', danger: true }))) return;
     try {
       await api.delete(`/api/v1/master-catalog/categories/${cat.id}`);
       showToast(`Category "${cat.name}" deleted`);
@@ -354,6 +356,7 @@ export function MasterCatalogPage() {
   };
 
   return (
+    <>
     <div className="catalog-wrapper">
       {/* ── Page Header ── */}
       <div className="page-header">
@@ -575,7 +578,7 @@ export function MasterCatalogPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      style={{ color: '#BE123C', minWidth: 36, padding: '0 8px' }}
+                      style={{ color: 'var(--jv-error-text)', minWidth: 36, padding: '0 8px' }}
                       onClick={() => setDeleteTarget(dish)}
                       title="Delete dish"
                     >
@@ -636,7 +639,7 @@ export function MasterCatalogPage() {
                         <span className={`dish-diet-pill ${diet.class}`}>● {diet.label}</span>
                       </td>
                       <td style={{ padding: '14px' }}>
-                        <span style={{ fontWeight: 900, color: '#047857', fontSize: 14 }}>
+                        <span style={{ fontWeight: 900, color: 'var(--jv-success-text)', fontSize: 14 }}>
                           ₹{(dish.basePrice / 100).toFixed(0)}
                         </span>
                         <span style={{ color: 'var(--jv-text-light)', fontSize: 11, marginLeft: 4 }}>+ {dish.taxRate / 100}% GST</span>
@@ -926,7 +929,7 @@ export function MasterCatalogPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        style={{ color: '#BE123C' }}
+                        style={{ color: 'var(--jv-error-text)' }}
                         onClick={() => handleDeleteCategory(cat)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -964,7 +967,7 @@ export function MasterCatalogPage() {
       {syndicateTarget && (
         <Modal title={`Syndicate Dish: ${syndicateTarget.name}`} onClose={() => setSyndicateTarget(null)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 13, color: '#166534' }}>
+            <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--jv-success-text)' }}>
               <strong>Conflict-Safe Franchising:</strong> Pushing this master dish creates or updates restaurant menu entries without overwriting custom restaurant pricing or localized descriptions.
             </div>
 
@@ -1030,5 +1033,7 @@ export function MasterCatalogPage() {
         </Modal>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

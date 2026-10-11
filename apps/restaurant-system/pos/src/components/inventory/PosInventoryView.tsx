@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo } from 'react';
 import { db, MenuRepository } from '@jamanvaar/database';
 import { MenuItem } from '@jamanvaar/types';
@@ -561,7 +562,7 @@ export const PosInventoryView: React.FC = () => {
 
       {/* SINGLE ITEM CONFIRMATION DIALOG */}
       {pendingItemAction && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+        <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
           <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
@@ -644,12 +645,12 @@ export const PosInventoryView: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* BULK ACTION CONFIRMATION DIALOG */}
       {isBulkModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+        <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
           <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-black text-jaman-navy">
@@ -693,7 +694,7 @@ export const PosInventoryView: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
     </div>
   );

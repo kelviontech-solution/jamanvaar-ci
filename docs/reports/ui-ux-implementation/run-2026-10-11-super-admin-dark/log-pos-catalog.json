@@ -1,0 +1,218 @@
+[
+ {
+  "id": "POS-CATALOG",
+  "app": "pos",
+  "url": "http://localhost:5302/?view=catalog",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"imgInCards\":0,\"cards\":12}"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"name\":\"Hara Bhara Kebab (6 Pcs)\",\"price\":\"₹220\"}"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-CATALOG-after-add-1366x768.png",
+    "metrics": {
+     "overflowX": true,
+     "scrollW": 1446,
+     "scrollH": 768,
+     "interactive": 51,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 48,
+     "h1": [],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pcs) | ₹220 | Crispy Corn Salt & Pepper | ₹240 | Cheese Corn Cigar Rolls (5 Pcs) | ₹210 | Paneer Tikka (Tandoori Angaar) | ₹260 | Dal Makhani (Slow Cooked) | ₹195 | Menu | 1 | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | 1 | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260"
+    }
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"rupees\":[\"₹220\",\"₹240\",\"₹210\",\"₹260\",\"₹195\",\"₹220\",\"₹240\",\"₹210\",\"₹260\",\"₹195\",\"₹250\",\"₹60\",\"₹75\",\"₹240\"]}"
+   }
+  ],
+  "metrics": {
+   "overflowX": true,
+   "scrollW": 1446,
+   "scrollH": 768,
+   "interactive": 43,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 40,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pcs) | ₹220 | Crispy Corn Salt & Pepper | ₹240 | Cheese Corn Cigar Rolls (5 Pcs) | ₹210 | Paneer Tikka (Tandoori Angaar) | ₹260 | Dal Makhani (Slow Cooked) | ₹195 | Menu | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD |"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-CATALOG-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-CATALOG",
+  "app": "pos",
+  "url": "http://localhost:5302/?view=catalog",
+  "viewport": "768x1024",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"imgInCards\":0,\"cards\":12}"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"name\":\"Hara Bhara Kebab (6 Pcs)\",\"price\":\"₹220\"}"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-CATALOG-after-add-768x1024.png",
+    "metrics": {
+     "overflowX": true,
+     "scrollW": 816,
+     "scrollH": 1024,
+     "interactive": 51,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 48,
+     "h1": [],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pcs) | ₹220 | Crispy Corn Salt & Pepper | ₹240 | Cheese Corn Cigar Rolls (5 Pcs) | ₹210 | Paneer Tikka (Tandoori Angaar) | ₹260 | Dal Makhani (Slow Cooked) | ₹195 | Menu | 1 | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | 1 | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260"
+    }
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"rupees\":[\"₹220\",\"₹240\",\"₹210\",\"₹260\",\"₹195\",\"₹220\",\"₹240\",\"₹210\",\"₹260\",\"₹195\",\"₹250\",\"₹60\",\"₹75\",\"₹240\"]}"
+   }
+  ],
+  "metrics": {
+   "overflowX": true,
+   "scrollW": 816,
+   "scrollH": 1024,
+   "interactive": 43,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 40,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pcs) | ₹220 | Crispy Corn Salt & Pepper | ₹240 | Cheese Corn Cigar Rolls (5 Pcs) | ₹210 | Paneer Tikka (Tandoori Angaar) | ₹260 | Dal Makhani (Slow Cooked) | ₹195 | Menu | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD |"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-CATALOG-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-CATALOG",
+  "app": "pos",
+  "url": "http://localhost:5302/?view=catalog",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"imgInCards\":0,\"cards\":12}"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"name\":\"Hara Bhara Kebab (6 Pcs)\",\"price\":\"₹220\"}"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-CATALOG-after-add-390x844.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 406,
+     "scrollH": 879,
+     "interactive": 46,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 43,
+     "h1": [],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | 1 | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | 1 | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | Curry Station · DM-05 | ₹195 | MOD | Paneer Butter Masala | Curry Station · PBM-06 | ₹250 | MOD | Butter Naan (Tandoori) | Tandoor · BN-07 | ₹60 | Garlic Butter Naa"
+    }
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"rupees\":[\"₹220\",\"₹240\",\"₹210\",\"₹260\",\"₹195\",\"₹250\",\"₹60\",\"₹75\",\"₹240\",\"₹120\",\"₹80\",\"₹280\",\"₹220\",\"₹220\"]}"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 406,
+   "scrollH": 879,
+   "interactive": 38,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 35,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "All Menu | 12 dishes | All | Veg | Jain | Non-Veg | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | Curry Station · DM-05 | ₹195 | MOD | Paneer Butter Masala | Curry Station · PBM-06 | ₹250 | MOD | Butter Naan (Tandoori) | Tandoor · BN-07 | ₹60 | Garlic Butter Naan | Tand"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-CATALOG-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

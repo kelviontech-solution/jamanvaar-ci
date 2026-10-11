@@ -126,6 +126,12 @@ export const gu = {
   idleWarningText: 'તમારી સુરક્ષા માટે આ સ્ક્રીન રીસેટ થશે',
   seconds: 'સેકન્ડમાં',
   keepOrdering: 'ઓર્ડર ચાલુ રાખો',
+  validationPhoneInvalid: 'કૃપા કરીને 10 અંકનો સાચો મોબાઇલ નંબર દાખલ કરો.',
+  otpExpired: 'આ કોડની મુદત પૂરી થઈ ગઈ છે. નવો કોડ મેળવવા Send OTP દબાવો.',
+  otpTooManyAttempts: 'ઘણા ખોટા પ્રયાસો. નવો કોડ મેળવવા Send OTP દબાવો.',
+  otpIncorrectLeft: 'ખોટો કોડ. {{count}} પ્રયાસ બાકી છે.',
+  otpIncorrectNone: 'ખોટો કોડ. કોઈ પ્રયાસ બાકી નથી — ફરીથી Send OTP દબાવો.',
+  fixCustomization: 'કૃપા કરીને જરૂરી પસંદગીઓ પૂર્ણ કરો:',
 
   // Accessibility & System
   highContrast: 'હાઈ કોન્ટ્રાસ્ટ',

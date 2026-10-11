@@ -62,7 +62,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
               {hasModifiers && <span className="text-xs font-semibold text-[#4A5568] ml-1">+</span>}
             </div>
             {hasModifiers && (
-              <span className="block mt-1 text-[11px] font-medium text-[#8C9BAE]">
+              <span className={`block mt-1 text-xs ${hasRequiredModifiers ? 'font-bold text-[#0B253A]' : 'font-semibold text-[#52677A]'}`}>
                 {hasRequiredModifiers ? 'Customization required' : 'Customizable'}
               </span>
             )}

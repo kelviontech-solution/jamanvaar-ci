@@ -238,7 +238,7 @@ export function TeamPage() {
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)', textTransform: 'uppercase' }}>
             Active Admins
           </div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: '#059669', marginTop: 4 }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--jv-success-text)', marginTop: 4 }}>
             {stats.active}
           </div>
           <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>Enabled accounts</div>
@@ -248,7 +248,7 @@ export function TeamPage() {
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-secondary)', textTransform: 'uppercase' }}>
             Pending Activation
           </div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: '#d97706', marginTop: 4 }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--jv-warning-text)', marginTop: 4 }}>
             {stats.pending}
           </div>
           <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>Awaiting first login</div>

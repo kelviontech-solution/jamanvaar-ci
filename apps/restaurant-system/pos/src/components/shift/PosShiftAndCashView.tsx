@@ -6,7 +6,7 @@ import { CentralReportingService } from '@jamanvaar/business';
 import { PosPrinterService } from '../../services/printerService';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
 import { formatINR } from '@jamanvaar/utils';
-import { EmptyState } from '@jamanvaar/ui';
+import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
 import {
   Clock,
   CircleDollarSign,
@@ -780,7 +780,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
 
       {/* MODAL 1: OPEN SHIFT MODAL */}
       {openShiftModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -872,12 +872,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* MODAL 2: RECORD CASH MOVEMENT MODAL */}
       {cashMovementModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -990,12 +990,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* MODAL 3: CLOSE SHIFT WITH DENOMINATIONS MODAL */}
       {closeShiftModalOpen && activeShift && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
@@ -1134,12 +1134,12 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* MODAL 4: HISTORICAL SHIFT DETAIL INSPECTOR */}
       {selectedHistoricalShift && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
@@ -1234,7 +1234,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
               </div>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
     </div>
   );

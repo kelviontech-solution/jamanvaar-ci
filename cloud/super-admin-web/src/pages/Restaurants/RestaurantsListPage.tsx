@@ -5,7 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import '../../components/shared.css';
 import { api, ApiError } from '../../api/client';
 import type { RestaurantListItem } from '../../api/types';
-import { Badge, BulkActionsBar, Button, Card, EmptyState, statusTone } from '../../components/ui';
+import { Badge, BulkActionsBar, Button, Card, EmptyState, statusTone, ModalShell } from '../../components/ui';
 import {
   Plus,
   Store,
@@ -849,8 +849,7 @@ export function RestaurantsListPage() {
 
       {/* Dangerous Action (Suspend / Reactivate) Confirmation Modal */}
       {confirmingStatusRestaurant && (
-        <div className="modal-backdrop" onClick={() => setConfirmingStatusRestaurant(null)}>
-          <div className="modal confirmation-dialog" onClick={(e) => e.stopPropagation()}>
+        <ModalShell onClose={() => setConfirmingStatusRestaurant(null)} label={confirmingStatusRestaurant.status === 'ACTIVE' ? `Suspend ${confirmingStatusRestaurant.name}` : `Reactivate ${confirmingStatusRestaurant.name}`} className="modal confirmation-dialog">
             <div className="confirmation-body">
               <div
                 className={`confirmation-icon-wrap ${
@@ -916,8 +915,7 @@ export function RestaurantsListPage() {
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
+        </ModalShell>
       )}
     </div>
   );

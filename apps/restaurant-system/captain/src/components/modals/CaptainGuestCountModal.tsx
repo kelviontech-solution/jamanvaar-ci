@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { guestCountOptions } from '../../store/captainStore';
@@ -31,12 +32,12 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
   const presets = [1, 2, 4, 6, 8].filter((p) => p < maxGuests).concat(maxGuests);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-5 animate-in fade-in zoom-in-95 duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-jaman-border space-y-5 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-jaman-navy">Open Table {table.tableNumber}</span>
+              <span className="text-xl font-bold text-jaman-navy">Open Table {table.tableNumber}</span>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                 Seating
               </span>
@@ -48,6 +49,7 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -64,17 +66,17 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
             <button
               type="button"
               onClick={() => setGuests((g) => Math.max(1, g - 1))}
-              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
+              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-bold text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
             >
               <Minus className="w-5 h-5" />
             </button>
             <div className="w-20 py-2 rounded-2xl bg-white border border-jaman-border shadow-xs">
-              <span className="text-3xl font-black font-mono text-jaman-navy">{guests}</span>
+              <span className="text-3xl font-bold font-mono text-jaman-navy">{guests}</span>
             </div>
             <button
               type="button"
               onClick={() => setGuests((g) => Math.min(maxGuests, g + 1))}
-              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-black text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
+              className="w-12 h-12 rounded-2xl bg-white border border-jaman-border text-jaman-navy font-bold text-lg flex items-center justify-center shadow-xs active:scale-95 transition-all hover:bg-slate-50 cursor-pointer"
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -104,20 +106,20 @@ export const CaptainGuestCountModal: React.FC<CaptainGuestCountModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs transition-colors cursor-pointer"
+            className="py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={() => onConfirm(table.tableNumber, guests)}
-            className="py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+            className="py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>Seat & Take Order</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

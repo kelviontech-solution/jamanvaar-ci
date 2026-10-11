@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useDialogFocus } from './useDialogFocus';
 import { X } from 'lucide-react';
 
 export interface ModalProps {
@@ -30,15 +31,8 @@ export const Modal: React.FC<ModalProps> = ({
   bodyClassName = '',
   footer
 }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  const { cardRef, dialogId } = useDialogFocus<HTMLDivElement>(isOpen, onClose);
+  const titleId = `${dialogId}-title`;
 
   if (!isOpen) return null;
 
@@ -58,28 +52,34 @@ export const Modal: React.FC<ModalProps> = ({
     // same to a user but costs the GPU almost nothing.
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-fadeIn">
       {/* Backdrop */}
-      <div className="fixed inset-0" onClick={onClose} />
+      <div className="fixed inset-0" aria-hidden="true" onClick={onClose} />
 
       {/* Modal Container — capped to the viewport with an internal
           scrolling body, so long content (e.g. several modifier groups)
           scrolls within the card instead of pushing the primary action
           off-screen or forcing the whole backdrop to scroll. */}
       <div
-        role="dialog" aria-modal="true" aria-label={title || 'Dialog'}
-        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col ${className}`}
+        ref={cardRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': 'Dialog' })}
+        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col focus:outline-none ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-[#F3EFE6] bg-[#FBF9F5] shrink-0">
-            <h2 className="text-xl font-bold text-[#0B253A]">{title}</h2>
+            <h2 id={titleId} className="text-xl font-bold text-[#0B253A]">{title}</h2>
             {showCloseButton && (
               <button
                 type="button"
+                data-modal-close
                 onClick={onClose}
-                className="w-9 h-9 rounded-full bg-white border border-[#EBE6DD] text-[#4A5568] hover:text-[#0B253A] hover:bg-[#F8F6F0] flex items-center justify-center transition-colors"
+                aria-label={title ? `Close ${title}` : 'Close dialog'}
+                className="w-9 h-9 rounded-full bg-white border border-[#EBE6DD] text-[#4A5568] hover:text-[#0B253A] hover:bg-[#F8F6F0] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B253A]/60"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             )}
           </div>

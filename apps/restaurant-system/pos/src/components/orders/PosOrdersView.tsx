@@ -1,4 +1,4 @@
-import {QrServiceInbox} from '@jamanvaar/ui';
+import { QrServiceInbox, ModalBackdrop } from '@jamanvaar/ui';
 import {deviceFetch} from '../../cloud/cloudClient';
 const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok)throw new Error(d.message||'Request unavailable');return d;};
 import React, { useState, useMemo } from 'react';
@@ -27,8 +27,10 @@ import {
   Flame,
   Undo2,
   Ban, QrCode, Smartphone, Monitor } from 'lucide-react';
+import { useConfirm } from '@jamanvaar/ui';
 
 export const PosOrdersView: React.FC = () => {
+  const { notify, confirmDialog } = useConfirm();
   const {
     setSelectedTable,
     loadOrderFromTable,
@@ -101,11 +103,11 @@ export const PosOrdersView: React.FC = () => {
   // opens that same full payment modal, instead of a one-click cash-only shortcut.
   const handleSettleOrder = async (order: Order) => {
     if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED') {
-      alert('This order is cancelled or refunded and cannot be settled.');
+      await notify({ title: 'Order cannot be settled', message: 'This order is cancelled or refunded and cannot be settled.' });
       return;
     }
     if (order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT') {
-      alert('This QR order is awaiting online payment verification. Ask the guest to continue payment on their phone.');
+      await notify({ title: 'Waiting for online payment', message: 'This QR order is awaiting online payment verification. Ask the guest to continue payment on their phone.' });
       return;
     }
     const isUnconfirmedKioskUpi = order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
@@ -125,7 +127,7 @@ export const PosOrdersView: React.FC = () => {
             setLastCompletedOrder(updated);
             setIsReceiptOpen(true);
           }
-          alert('This order was already paid via UPI — do not collect payment again. The receipt reflects the online payment.');
+          await notify({ title: 'Already paid via UPI', message: 'Do not collect payment again. The receipt reflects the online payment.', confirmLabel: 'Got it' });
           return;
         }
       } catch {
@@ -137,7 +139,7 @@ export const PosOrdersView: React.FC = () => {
     }
 
     if (!usePosStore.getState().loadOrderForSettlement(order.id)) {
-      alert('This order has not fully synced to this terminal yet. Try again in a moment.');
+      await notify({ title: 'Order still syncing', message: 'This order has not fully synced to this terminal yet. Try again in a moment.' });
       return;
     }
     setIsPaymentOpen(true);
@@ -749,7 +751,7 @@ export const PosOrdersView: React.FC = () => {
     </div>
 
     {refundVoidMode && selectedOrder && (
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+      <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
         <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
           <div className="flex items-center gap-2.5">
             {refundVoidMode === 'REFUND' ? (
@@ -811,8 +813,9 @@ export const PosOrdersView: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </ModalBackdrop>
     )}
+    {confirmDialog}
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, HeldOrderRepository } from '@jamanvaar/database';
@@ -11,7 +12,7 @@ export const PosHoldModal: React.FC = () => {
   const heldOrders = HeldOrderRepository.getAllHeld();
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
@@ -91,6 +92,6 @@ export const PosHoldModal: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

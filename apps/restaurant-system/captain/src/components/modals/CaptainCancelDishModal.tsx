@@ -49,10 +49,10 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label={`Cancel ${dish.name}`}>
-      <div className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-jaman-border space-y-4 max-h-[92dvh] overflow-y-auto">
+      <div className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 shadow-md border border-jaman-border space-y-4 max-h-[92dvh] overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-lg font-black text-jaman-navy flex items-center gap-2">
+            <h3 className="text-lg font-bold text-jaman-navy flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               Cancel this dish?
             </h3>
@@ -109,14 +109,14 @@ export const CaptainCancelDishModal: React.FC<Props> = ({ dish, onClose, onCance
         {error && <p role="alert" className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</p>}
 
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={onClose} className="py-3 rounded-2xl bg-jaman-cream border border-jaman-border text-slate-700 font-black text-sm cursor-pointer">
+          <button type="button" onClick={onClose} className="py-3 rounded-2xl bg-jaman-cream border border-jaman-border text-slate-700 font-bold text-sm cursor-pointer">
             Keep dish
           </button>
           <button
             type="button"
             onClick={submit}
             disabled={busy || finalReason.length < 3}
-            className="py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-black text-sm cursor-pointer"
+            className="py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-sm cursor-pointer"
           >
             {busy ? 'Cancelling…' : 'Cancel dish'}
           </button>

@@ -20,7 +20,7 @@ import {
   type RestaurantQrDetail,
   type RestaurantQrStatusItem
 } from '../../api/types';
-import { Badge, Button, EmptyState, SkeletonLine } from '../../components/ui';
+import { Badge, Button, EmptyState, SkeletonLine, ModalShell } from '../../components/ui';
 import { QrEntitlementEditor, type QrEntitlementDraft } from './QrEntitlementEditor';
 import {
   DOT,
@@ -378,8 +378,7 @@ export function QrRestaurantDetailPanel({
   const planEntitlements = detail.kind === 'ready' ? detail.data.planEntitlements : null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose} label="Dialog" className="modal modal-wide">
         {/* Header */}
         <div className="modal-header" style={{ alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
@@ -715,7 +714,6 @@ export function QrRestaurantDetailPanel({
             </PanelSection>
           )}
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

@@ -4,6 +4,7 @@ import { db, KeyValueStore } from '@jamanvaar/database';
 import { QrOrderDesk } from '@jamanvaar/sync';
 import { formatINR } from '@jamanvaar/utils';
 import { PosPrinterService } from '../../services/printerService';
+import { useConfirm } from '@jamanvaar/ui';
 
 /**
  * Orders that guests placed from their table's QR code and nobody has accepted yet. A QR order is an ordinary order
@@ -14,6 +15,7 @@ import { PosPrinterService } from '../../services/printerService';
 const DEVICE_ID_KEY = 'jamanvaar_pos_device_id';
 
 export function QrOrdersInbox({ actor }: { actor: string }) {
+  const { prompt, confirmDialog } = useConfirm();
   const [, tick] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -30,7 +32,15 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
     setBusy(null);
   };
   const decline = async (id: string) => {
-    const reason = window.prompt('Why is this order being declined? (shown to the team, not the guest)') ?? '';
+    // Cancelling the dialog now cancels the decline (the native prompt used to decline anyway on Cancel).
+    const reason = await prompt({
+      title: 'Decline this order?',
+      message: 'The kitchen and counter team will see the reason. The guest does not.',
+      inputLabel: 'Reason (optional)',
+      confirmLabel: 'Decline order',
+      tone: 'danger'
+    });
+    if (reason === null) return;
     setBusy(id);
     const result = await QrOrderDesk.reject(id, { deviceId, actor, reason: reason.trim() || undefined });
     setMessage(result.status === 'REJECTED' ? 'Cancellation confirmed.' : result.status === 'PENDING_SYNC' ? 'Cancellation awaiting approval and sync. Tell the kitchen directly until it is confirmed.' : 'This order can no longer be declined.');
@@ -38,6 +48,7 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
   };
 
   return (
+    <>
     <div className="mb-4 rounded-2xl border-2 border-jaman-saffron bg-white p-3 shrink-0" data-testid="qr-inbox">
       <div className="flex items-center gap-2 text-sm font-black text-jaman-navy mb-2"><QrCode className="w-4 h-4 text-jaman-saffron" /> New QR orders ({pending.length})</div>
       {message && <div className="text-xs text-slate-600 mb-2">{message}</div>}
@@ -55,5 +66,7 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
         ))}
       </div>
     </div>
+    {confirmDialog}
+    </>
   );
 }

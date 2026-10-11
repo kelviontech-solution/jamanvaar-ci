@@ -41,8 +41,8 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <ChefHat className="w-5 h-5 text-jaman-saffron" />
-            <h2 className="text-xl font-black text-jaman-navy">Live KOT Monitor</h2>
-            <span className="bg-jaman-cream text-slate-600 text-xs font-black px-2.5 py-0.5 rounded-full border border-jaman-border">
+            <h2 className="text-xl font-bold text-jaman-navy">Live KOT Monitor</h2>
+            <span className="bg-jaman-cream text-slate-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-jaman-border">
               {kots.length} Tickets
             </span>
           </div>
@@ -64,7 +64,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
               key={flt.id}
               type="button"
               onClick={() => setFilter(flt.id as any)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                 filter === flt.id
                   ? 'bg-jaman-navy text-white shadow-xs'
                   : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'
@@ -91,7 +91,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
               <div
                 key={kot.id}
                 data-testid="captain-kot"
-                className={`bg-white rounded-3xl border-2 p-5 space-y-4 shadow-sm flex flex-col justify-between ${
+                className={`bg-white rounded-2xl border-2 p-5 space-y-4 shadow-sm flex flex-col justify-between ${
                   isDelayed
                     ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/10'
                     : kot.status === 'SERVED'
@@ -103,10 +103,10 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xl font-black text-jaman-navy">
+                        <span className="text-xl font-bold text-jaman-navy">
                           {kot.kotNumber || 'KOT'}
                         </span>
-                        <span className="bg-jaman-navy text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+                        <span className="bg-jaman-navy text-white text-[11px] font-bold px-2 py-0.5 rounded-md">
                           TABLE {kot.tableNumber}
                         </span>
                       </div>
@@ -119,7 +119,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                     <div
                       className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-xl ${
                         isDelayed
-                          ? 'bg-rose-100 text-rose-800 font-black animate-pulse'
+                          ? 'bg-rose-100 text-rose-800 font-bold animate-pulse'
                           : 'bg-slate-100 text-slate-700'
                       }`}
                     >
@@ -136,7 +136,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                         className={`p-2.5 rounded-xl border text-xs font-semibold ${kot.status === 'CANCELLED' || it.status === 'CANCELLED' ? 'bg-rose-50 border-rose-200' : 'bg-jaman-cream border-jaman-border'}`}
                       >
                         <div className="flex items-start gap-2">
-                          <span className="font-mono font-black text-jaman-navy">{it.quantity}×</span>
+                          <span className="font-mono font-bold text-jaman-navy">{it.quantity}×</span>
                           <span className="min-w-0 break-words text-slate-800">{it.name}</span>
                         </div>
                         <div className="mt-1 flex flex-wrap gap-x-2 text-[10px] font-bold text-slate-500"><span>{it.kitchenStation || 'Kitchen'}</span><span>{kot.status === 'CANCELLED' ? 'CANCELLED' : it.status || kot.status}</span>{it.course && <span>{it.course.replace('_', ' ')}</span>}{it.seat && <span>Seat {it.seat}</span>}</div>
@@ -157,7 +157,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenSendMessage(kot.tableNumber || '')}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-black text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-[#FFF4ED] hover:bg-[#FFE8D6] border border-[#FDBA74] text-jaman-saffron font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Message Kitchen</span>
@@ -167,7 +167,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
                     <button
                       type="button"
                       onClick={() => markEntireKotServed(kot.id)}
-                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Mark Served</span>
@@ -181,7 +181,7 @@ export const CaptainLiveKotsView: React.FC<CaptainLiveKotsViewProps> = ({
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
           <ChefHat className="w-12 h-12 text-slate-400 mx-auto" />
-          <h3 className="text-lg font-black text-jaman-navy">No KOT Tickets Match</h3>
+          <h3 className="text-lg font-bold text-jaman-navy">No KOT Tickets Match</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             Try switching filters to view all kitchen tickets.
           </p>

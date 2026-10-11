@@ -169,7 +169,7 @@ export function SandboxesPage() {
       {modalOpen && (
         <Modal title="1-Click Staging Sandbox Clone" onClose={() => setModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 13, color: '#166534' }}>
+            <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--jv-success-text)' }}>
               <strong>Zero Leakage Guarantee:</strong> Sandboxes clone menu architecture, floor tables, and configuration. Password hashes, live payment credentials, and real customer order history are never cloned.
             </div>
 

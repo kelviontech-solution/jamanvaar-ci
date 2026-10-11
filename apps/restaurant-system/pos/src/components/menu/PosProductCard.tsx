@@ -1,4 +1,3 @@
-import { CachedImg } from '@jamanvaar/ui';
 import React, { useRef } from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { usePosStore } from '../../store/posStore';
@@ -78,55 +77,43 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
         </div>
       )}
 
-      <div className="flex gap-3 items-stretch">
-        {/* Image with dietary / spice badges overlaid */}
-        <div className="w-[44%] aspect-square max-h-28 rounded-2xl overflow-hidden bg-jaman-cream border border-jaman-border shrink-0 relative">
-          <CachedImg
-            src={item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
-            alt={item.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg';
-            }}
-          />
-          <div className="absolute top-1.5 left-1.5 flex items-center gap-1">
-            {/* Indian Veg / Non-Veg Indicator Symbol */}
-            <div
-              className={`w-5 h-5 bg-white border flex items-center justify-center rounded-md shadow-2xs ${
-                isPureVeg ? 'border-emerald-600' : 'border-rose-600'
-              }`}
-            >
-              <div className={`w-2.5 h-2.5 rounded-full ${isPureVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
-            </div>
-            {item.spiceLevel && item.spiceLevel !== 'NONE' && (
-              <div className="w-5 h-5 bg-white rounded-md flex items-center justify-center shadow-2xs">
-                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              </div>
-            )}
+      {/* Name-first header: dietary mark, name, station. No photo or description in the counter grid. */}
+      <div className="flex gap-2.5 items-start">
+        <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">
+          {/* Indian Veg / Non-Veg Indicator Symbol */}
+          <div
+            className={`w-5 h-5 bg-white border flex items-center justify-center rounded-md ${
+              isPureVeg ? 'border-emerald-600' : 'border-rose-600'
+            }`}
+            role="img"
+            aria-label={isPureVeg ? 'Vegetarian' : 'Non-vegetarian'}
+          >
+            <div className={`w-2.5 h-2.5 rounded-full ${isPureVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
           </div>
+          {item.spiceLevel && item.spiceLevel !== 'NONE' && (
+            <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" aria-label="Spicy" role="img" />
+          )}
         </div>
 
-        {/* Station badge, name, SKU */}
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex items-center justify-end gap-1.5 mb-1.5">
+          <h3 className="font-semibold text-[15px] text-jaman-navy leading-snug line-clamp-3 break-words" title={item.name}>
+            {item.name}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-1 min-w-0">
             {item.dietaryType === 'JAIN' && (
-              <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-md">
+              <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-md shrink-0">
                 JAIN
               </span>
             )}
-            <span className="text-[11px] font-bold text-slate-500 bg-jaman-cream px-2 py-0.5 rounded-full border border-jaman-border truncate max-w-[110px]">
-              {item.kitchenStation || 'Kitchen'}
+            <span className="text-[11px] font-semibold text-slate-500 truncate">
+              {item.kitchenStation || 'Kitchen'} · {item.sku}
             </span>
           </div>
-          <h3 className="font-semibold text-sm text-jaman-navy leading-snug line-clamp-3">
-            {item.name}
-          </h3>
-          <span className="text-[11px] text-slate-400 font-semibold block mt-auto pt-1 truncate">SKU: {item.sku}</span>
         </div>
       </div>
 
       {/* Bottom row: Price & Quick Action */}
-      <div className="flex items-center justify-between mt-auto">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 mt-auto">
         <div className="flex flex-col">
           <span className="text-lg font-bold text-jaman-navy leading-tight tabular-nums">
             ₹{item.price}

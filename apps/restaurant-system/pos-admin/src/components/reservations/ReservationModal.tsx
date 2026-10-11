@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DiningTable } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { ReservationRepository, AuditRepository } from '@jamanvaar/database';
 
 interface ReservationModalProps {
@@ -98,22 +98,22 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Guest Name *</label>
-            <input
+            <FormInput
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="e.g. Rohan Mehta"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
-            <input
+            <FormInput
               type="tel"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               placeholder="e.g. 98765 43210"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
         </div>
@@ -121,30 +121,30 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Date *</label>
-            <input
+            <FormInput
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Time *</label>
-            <input
+            <FormInput
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Guests *</label>
-            <input
+            <FormInput
               type="number"
               min="1"
               value={guestCount}
               onChange={(e) => setGuestCount(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>
@@ -152,25 +152,25 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Preferred Table (optional)</label>
-            <select
+            <FormSelect
               value={tableId}
               onChange={(e) => setTableId(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="">No preference — assign at arrival</option>
               {tables.map((t) => (
                 <option key={t.id} value={t.id}>Table {t.tableNumber} ({t.capacity} seats, {t.zone})</option>
               ))}
-            </select>
+            </FormSelect>
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Deposit Collected (₹)</label>
-            <input
+            <FormInput
               type="number"
               min="0"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>

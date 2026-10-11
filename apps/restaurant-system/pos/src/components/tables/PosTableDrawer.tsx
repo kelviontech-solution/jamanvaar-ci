@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, TableRepository } from '@jamanvaar/database';
@@ -90,7 +91,7 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-150 select-none">
+    <ModalBackdrop className="flex justify-end animate-in fade-in duration-150 select-none">
       <div className="bg-jaman-cream border-l border-jaman-border w-full max-w-md h-full flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
         <div className="bg-jaman-navy text-white p-5 flex items-center justify-between shrink-0">
@@ -308,6 +309,6 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
           </div>
         )}
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

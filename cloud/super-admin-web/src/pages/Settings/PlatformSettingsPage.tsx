@@ -324,8 +324,8 @@ export function PlatformSettingsPage() {
         </div>
       </div>
 
-      {error && <div className="page-error">{error}</div>}
-      {successToast && <div className="page-success">{successToast}</div>}
+      {error && <div className="page-error" role="alert">{error}</div>}
+      {successToast && <div className="page-success" role="status">{successToast}</div>}
 
       {loading ? (
         <div className="page-loading">Loading platform configuration…</div>

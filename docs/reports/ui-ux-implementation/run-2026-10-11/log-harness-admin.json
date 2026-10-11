@@ -1,0 +1,1052 @@
+[
+ {
+  "id": "ADMIN-SET",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=settings",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 6,
+    "focus": [
+     {
+      "tag": "BUTTON",
+      "type": "submit",
+      "text": "Save changes",
+      "name": null,
+      "outline": "2px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(191, 84, 15) 0px 0px",
+      "w": 115,
+      "h": 40
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Refresh assistant access",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 133,
+      "h": 16
+     },
+     {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "text": "on",
+      "name": "Show JAMAN AI Assistant",
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 1,
+      "h": 1
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JAMANVAAR RESTAURANT",
+      "name": null,
+      "outline": "2px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "none",
+      "w": 479,
+      "h": 38
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JAMANVAAR FOODS & HOSPITALITY PRIVATE LI",
+      "name": null,
+      "outline": "2px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "none",
+      "w": 479,
+      "h": 38
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "Authentic Indian Cuisine & Seamless Dini",
+      "name": null,
+      "outline": "2px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "none",
+      "w": 479,
+      "h": 38
+     }
+    ],
+    "shot": "evidence/restaurant-admin/ADMIN-SET-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 32,
+   "unnamed": 0,
+   "under24": 9,
+   "under44": 31,
+   "h1": [
+    "Restaurant settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Restaurant settings | Screen size, channels and the identity printed on reports and bills. | Terminal screen size | The size POS, KDS, Captain and Kiosk screens open at. Someone at a terminal can still pick a different size for that screen. | This device is not connected to JAMANVAAR Cloud yet. Connect it with an activation key in Settings, Subscription Plan. You need it to set a screen size for all your terminals. | Report branding & legal profile | Restaurant identity used on End of Day (EOD) "
+  },
+  "inputs": [
+   {
+    "type": "checkbox",
+    "label": "Show JAMAN AI Assistant",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR RESTAURANT",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR RESTAURANT"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR FOODS & HO"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. Authentic Indian Cuisine & Seamless Dining by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Authentic Indian Cui"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "/jamanvaar.png.png",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "/assets/branding/jam"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "24ABCDE1234F1Z5",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "24ABCDE1234F1Z5"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "10722001000452",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "10722001000452"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "UDYAM-GJ-01-0012345",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "UDYAM-GJ-01-0012345"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Sindhu Bhavan Road, Bodakdev",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Sindhu Bhavan Road, "
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ahmedabad",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Ahmedabad"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Gujarat",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Gujarat"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "380054",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "380054"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "+91 79 4890 1234",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "+91 79 4890 1234"
+   },
+   {
+    "type": "email",
+    "label": "",
+    "ph": "hello@jamanvaar.com",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "hello@jamanvaar.com"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "https://jamanvaar.com",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "https://jamanvaar.co"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ramesh Patel",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Ramesh Patel"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Pooja Shah",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Pooja Shah"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Official Daily Closi"
+   },
+   {
+    "type": "checkbox",
+    "label": "English",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "हिन्दी (Hindi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ગુજરાતી (Gujarati)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "मराठी (Marathi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "தமிழ் (Tamil)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "తెలుగు (Telugu)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ಕನ್ನಡ (Kannada)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "en"
+   },
+   {
+    "type": "number",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "45"
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-SET-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-SET",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=settings",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 32,
+   "unnamed": 0,
+   "under24": 9,
+   "under44": 31,
+   "h1": [
+    "Restaurant settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Restaurant settings | Screen size, channels and the identity printed on reports and bills. | Terminal screen size | The size POS, KDS, Captain and Kiosk screens open at. Someone at a terminal can still pick a different size for that screen. | This device is not connected to JAMANVAAR Cloud yet. Connect it with an activation key in Settings, Subscription Plan. You need it to set a screen size for all your terminals. | Report branding & legal profile | Restaurant identity used on End of Day (EOD) "
+  },
+  "inputs": [
+   {
+    "type": "checkbox",
+    "label": "Show JAMAN AI Assistant",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR RESTAURANT",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR RESTAURANT"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR FOODS & HO"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. Authentic Indian Cuisine & Seamless Dining by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Authentic Indian Cui"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "/jamanvaar.png.png",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "/assets/branding/jam"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "24ABCDE1234F1Z5",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "24ABCDE1234F1Z5"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "10722001000452",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "10722001000452"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "UDYAM-GJ-01-0012345",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "UDYAM-GJ-01-0012345"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Sindhu Bhavan Road, Bodakdev",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Sindhu Bhavan Road, "
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ahmedabad",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Ahmedabad"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Gujarat",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Gujarat"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "380054",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "380054"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "+91 79 4890 1234",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "+91 79 4890 1234"
+   },
+   {
+    "type": "email",
+    "label": "",
+    "ph": "hello@jamanvaar.com",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "hello@jamanvaar.com"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "https://jamanvaar.com",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "https://jamanvaar.co"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ramesh Patel",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Ramesh Patel"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Pooja Shah",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Pooja Shah"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Official Daily Closi"
+   },
+   {
+    "type": "checkbox",
+    "label": "English",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "हिन्दी (Hindi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ગુજરાતી (Gujarati)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "मराठी (Marathi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "தமிழ் (Tamil)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "తెలుగు (Telugu)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ಕನ್ನಡ (Kannada)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "en"
+   },
+   {
+    "type": "number",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "45"
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-SET-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-SET",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=settings",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 32,
+   "unnamed": 0,
+   "under24": 9,
+   "under44": 31,
+   "h1": [
+    "Restaurant settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Restaurant settings | Screen size, channels and the identity printed on reports and bills. | Terminal screen size | The size POS, KDS, Captain and Kiosk screens open at. Someone at a terminal can still pick a different size for that screen. | This device is not connected to JAMANVAAR Cloud yet. Connect it with an activation key in Settings, Subscription Plan. You need it to set a screen size for all your terminals. | Report branding & legal profile | Restaurant identity used on End of Day (EOD) "
+  },
+  "inputs": [
+   {
+    "type": "checkbox",
+    "label": "Show JAMAN AI Assistant",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR RESTAURANT",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR RESTAURANT"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. JAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "JAMANVAAR FOODS & HO"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "e.g. Authentic Indian Cuisine & Seamless Dining by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Authentic Indian Cui"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "/jamanvaar.png.png",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "/assets/branding/jam"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "24ABCDE1234F1Z5",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "24ABCDE1234F1Z5"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "10722001000452",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "10722001000452"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "UDYAM-GJ-01-0012345",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "UDYAM-GJ-01-0012345"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Sindhu Bhavan Road, Bodakdev",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Sindhu Bhavan Road, "
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ahmedabad",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Ahmedabad"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Gujarat",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "Gujarat"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "380054",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "380054"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "+91 79 4890 1234",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "+91 79 4890 1234"
+   },
+   {
+    "type": "email",
+    "label": "",
+    "ph": "hello@jamanvaar.com",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "hello@jamanvaar.com"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "https://jamanvaar.com",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "https://jamanvaar.co"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Ramesh Patel",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Ramesh Patel"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Pooja Shah",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Pooja Shah"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "Official Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Official Daily Closi"
+   },
+   {
+    "type": "checkbox",
+    "label": "English",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "हिन्दी (Hindi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ગુજરાતી (Gujarati)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "मराठी (Marathi)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "தமிழ் (Tamil)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "తెలుగు (Telugu)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "checkbox",
+    "label": "ಕನ್ನಡ (Kannada)",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "en"
+   },
+   {
+    "type": "number",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "45"
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-SET-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-MODAL",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=modal",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"role\":\"true\",\"label\":\"Close Edit dish\",\"focus\":\"n\"}"
+   },
+   {
+    "do": "key",
+    "arg": null,
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 1,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 1,
+     "h1": [],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Open dialog"
+    },
+    "shot": "evidence/restaurant-admin/ADMIN-MODAL-after-escape-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"dialogOpen\":false,\"focus\":\"Open dialog\\n\"}"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 3,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Open dialog | Edit dish | Name | Press Escape to close."
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Name",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-MODAL-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-CONFIRM",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=confirm",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"focus\":\"Cancel\",\"buttons\":[\"\",\"Cancel\",\"Delete dish\"]}"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 4,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 2,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Open dialog | Delete dish? | \"Paneer Tikka\" will be archived and removed from the menu. | Cancel | Delete dish"
+  },
+  "inputs": [],
+  "shot": "evidence/restaurant-admin/ADMIN-CONFIRM-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-CONFIRM",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=confirm",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"focus\":\"Cancel\",\"buttons\":[\"\",\"Cancel\",\"Delete dish\"]}"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 4,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 2,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Open dialog | Delete dish? | \"Paneer Tikka\" will be archived and removed from the menu. | Cancel | Delete dish"
+  },
+  "inputs": [],
+  "shot": "evidence/restaurant-admin/ADMIN-CONFIRM-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "ADMIN-PROMPT",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5301/?view=prompt",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 2,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Open dialog | Void unpaid bill A-1042? | It will be removed from open bills and the kitchen. This cannot be undone. | Reason for voiding | Cancel | Void bill"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Reason for voiding",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Abandoned by guest"
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-PROMPT-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

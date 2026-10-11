@@ -15,6 +15,7 @@ import { PosFooterKpiStrip } from './components/layout/PosFooterKpiStrip';
 import { PosCatalog } from './components/menu/PosCatalog';
 import { PosCart } from './components/cart/PosCart';
 import { PosFloorPlan } from './components/tables/PosFloorPlan';
+import { PosTableSelectionScreen } from './components/tables/PosTableSelectionScreen';
 import { PosOrdersView } from './components/orders/PosOrdersView';
 import { PosBillsView } from './components/bills/PosBillsView';
 import { PosKotView } from './components/kitchen/PosKotView';
@@ -58,7 +59,7 @@ export const App: React.FC = () => {
       setIsDeviceActivated(true);
       setShowActivationWelcome(true);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+      setActivationError(err instanceof CloudApiError ? err.message : "Could not complete activation. Check this device's internet connection and try again.");
     } finally {
       setIsActivating(false);
     }
@@ -79,6 +80,8 @@ export const App: React.FC = () => {
     setIsChatbotOpen,
     restoreSession,
     cart,
+    orderType,
+    selectedTable,
     isDiscountModalOpen,
     setIsDiscountModalOpen
   } = usePosStore();
@@ -310,6 +313,9 @@ export const App: React.FC = () => {
           appIdentity="POS"
           appTitle="POS Counter"
           appSubtitle="One-time setup — activate this terminal to start billing."
+          isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={db.isLocalCoreConnected()}
+          healthCheckUrl={db.localCoreHealthUrl()}
           heroHeadline="Smart Billing."
           heroHighlightWord="Better Dining."
           heroDescription="Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants."
@@ -414,10 +420,16 @@ export const App: React.FC = () => {
         {/* Dynamic Center Stage */}
         <main className={`flex-1 flex overflow-hidden relative min-w-0 ${activeTab === 'MENU' ? '' : 'rounded-2xl border border-jaman-border bg-white'}`}>
           {activeTab === 'MENU' && (
-            <div className="flex-1 flex gap-2.5 overflow-hidden min-w-0">
-              <PosCatalog />
-              <PosCart />
-            </div>
+            // Dine-in starts with the table: a full-width picker until a table is chosen (or the order
+            // type is switched, or dishes are already in the cart from a recalled/held order).
+            orderType === 'DINE_IN' && !selectedTable && (cart?.items?.length ?? 0) === 0 ? (
+              <PosTableSelectionScreen />
+            ) : (
+              <div className="flex-1 flex gap-2.5 overflow-hidden min-w-0">
+                <PosCatalog />
+                <PosCart />
+              </div>
+            )
           )}
 
           {activeTab === 'TABLES' && <PosFloorPlan />}

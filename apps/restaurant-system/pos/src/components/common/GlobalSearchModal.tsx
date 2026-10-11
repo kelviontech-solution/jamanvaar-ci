@@ -1,4 +1,4 @@
-import { CachedImg } from '@jamanvaar/ui';
+import { CachedImg, ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
@@ -273,8 +273,8 @@ export const GlobalSearchModal: React.FC = () => {
   const recentInvoices = db.orders.filter((o) => o.orderStatus === 'COMPLETED').slice(-3).reverse();
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-16 select-none animate-in fade-in duration-150"
+    <ModalBackdrop
+      className="flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-16 select-none animate-in fade-in duration-150"
       onClick={() => setIsGlobalSearchOpen(false)}
     >
       <div
@@ -648,6 +648,6 @@ export const GlobalSearchModal: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

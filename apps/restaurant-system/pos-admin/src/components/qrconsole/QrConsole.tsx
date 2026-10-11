@@ -60,6 +60,7 @@ import {
   QrAnalyticsView,
   QrMenuAvailability,
 } from "./QrAdvanced";
+import { useConfirm } from '@jamanvaar/ui';
 
 type Tab = QrTab;
 
@@ -553,6 +554,7 @@ function Overview() {
 }
 
 function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
+  const { confirm, confirmDialog } = useConfirm();
   const tables = useLoad<QrTableRow[]>(QrAdminApi.tables, 20000);
   const branches = useLoad<QrBranch[]>(QrAdminApi.branches);
   const [branchId, setBranchId] = useState<string>("");
@@ -699,6 +701,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
     return <div className="text-sm text-rose-700">{tables.error}</div>;
   const rows = tables.data ?? [];
   return (
+    <>
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         {activeBranches.length > 1 && (
@@ -939,11 +942,14 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
                         <Printer className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (
-                            window.confirm(
-                              "Regenerate this code? The printed one will stop working immediately.",
-                            )
+                            await confirm({
+                              title: "Regenerate this code?",
+                              message: "The printed code will stop working immediately.",
+                              confirmLabel: "Regenerate",
+                              tone: "danger",
+                            })
                           )
                             void run(
                               row.tableId,
@@ -1005,8 +1011,15 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
                   </button>
                   {q && q.status !== "REVOKED" && (
                     <button
-                      onClick={() => {
-                        if (window.confirm("Revoke this code permanently?"))
+                      onClick={async () => {
+                        if (
+                          await confirm({
+                            title: "Revoke this code?",
+                            message: "The code is revoked permanently and cannot be used again.",
+                            confirmLabel: "Revoke code",
+                            tone: "danger",
+                          })
+                        )
                           void run(
                             row.tableId,
                             () => QrAdminApi.revoke(q.id),
@@ -1033,6 +1046,8 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
         />
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }
 

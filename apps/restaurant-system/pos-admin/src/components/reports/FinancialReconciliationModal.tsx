@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { CentralReportingService, PeriodReconciliationResult, CentralDatePreset } from '@jamanvaar/business';
@@ -58,7 +59,7 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+    <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
       <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         {/* Header */}
         <div className="p-5 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
@@ -287,6 +288,6 @@ export const FinancialReconciliationModal: React.FC<FinancialReconciliationModal
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -6,7 +6,7 @@ import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { priceOrderLines } from '@jamanvaar/business';
 import { captainDb, isBillWaiting } from '@jamanvaar/database';
-import { CachedImg, EmptyState } from '@jamanvaar/ui';
+import { CachedImg, EmptyState, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import { CaptainCancelDishModal } from '../modals/CaptainCancelDishModal';
 import { CaptainCustomerModal } from '../customers/CaptainCustomerModal';
@@ -48,6 +48,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   onOpenSendMessage,
   onOpenTransferMerge
 }) => {
+  const { confirm, confirmDialog } = useConfirm();
   useEscapeToClose(isOpen, onClose);
   const {
     currentCaptain,
@@ -186,7 +187,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               key={g.id}
               type="button"
               onClick={() => handleFireKot([g.id])}
-              className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-black cursor-pointer min-h-[36px]"
+              className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-bold cursor-pointer min-h-[36px]"
             >
               Send {g.label} ({g.items.length})
             </button>
@@ -197,7 +198,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
         type="button"
         onClick={() => handleFireKot()}
         disabled={unFiredCartItems.length === 0}
-        className="w-full min-h-[48px] py-3 px-4 rounded-2xl bg-gradient-to-r from-jaman-saffron to-[#EA580C] disabled:opacity-50 hover:brightness-105 text-white font-black text-sm shadow-md shadow-jaman-saffron/25 active:scale-98 transition-all cursor-pointer flex items-center justify-between"
+        className="w-full min-h-[48px] py-3 px-4 rounded-2xl bg-gradient-to-r from-jaman-saffron to-[#EA580C] disabled:opacity-50 hover:brightness-105 text-white font-bold text-sm shadow-md shadow-jaman-saffron/25 active:scale-98 transition-all cursor-pointer flex items-center justify-between"
       >
         <span className="flex items-center gap-2">
           <Flame className="w-4 h-4 fill-white" />
@@ -210,28 +211,29 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
 
   const stateChip = (s: DishState) =>
     s === 'SERVED' ? (
-      <span className="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">Served</span>
+      <span className="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">Served</span>
     ) : s === 'READY' ? (
-      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.5 rounded">Ready to serve</span>
+      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.5 rounded">Ready to serve</span>
     ) : s === 'CANCELLED' ? (
-      <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-300 px-1.5 py-0.5 rounded">Cancelled</span>
+      <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-300 px-1.5 py-0.5 rounded">Cancelled</span>
     ) : (
-      <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">In kitchen</span>
+      <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">In kitchen</span>
     );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-stretch sm:items-center justify-center sm:p-4">
-      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92vh] bg-white sm:rounded-3xl shadow-2xl sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <>
+    <ModalBackdrop className="flex items-stretch sm:items-center justify-center sm:p-4">
+      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92vh] bg-white sm:rounded-3xl shadow-md sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-jaman-navy text-white px-3 py-2.5 sm:p-4 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-jaman-saffron text-white flex items-center justify-center font-black text-base sm:text-lg shadow-sm shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-jaman-saffron text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
               {table.tableNumber}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-xl font-black truncate">TABLE {table.tableNumber}</h2>
-                <span className="bg-white/10 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">{table.status.replace('_', ' ')}</span>
+                <h2 className="text-base sm:text-xl font-bold truncate">TABLE {table.tableNumber}</h2>
+                <span className="bg-white/10 text-emerald-300 text-[11px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">{table.status.replace('_', ' ')}</span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">
                 {(table as any).section || table.zone || 'Main Dining'} • {table.currentGuests || 2} guests<span className="hidden sm:inline"> • Captain {currentCaptain?.name}</span>
@@ -264,7 +266,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <button
               type="button"
               onClick={() => sendBill(false)}
-              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
               title={billWaiting ? 'Bill already with the counter. Send it again after adding dishes.' : 'Send the bill to the counter POS'}
               aria-label={billWaiting ? 'Re-send the bill' : 'Request the bill'}
             >
@@ -288,8 +290,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               return (
                 <React.Fragment key={label}>
                   {i > 0 && <span className="text-slate-300">➔</span>}
-                  <span className={`flex items-center gap-1 ${done ? (i === 5 ? 'text-purple-700 font-black' : 'text-emerald-700 font-black') : ''}`}>
-                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] ${done ? (i === 5 ? 'bg-purple-600 text-white' : 'bg-emerald-600 text-white') : 'bg-slate-200 text-slate-600'}`}>{i + 1}</span>
+                  <span className={`flex items-center gap-1 ${done ? (i === 5 ? 'text-purple-700 font-bold' : 'text-emerald-700 font-bold') : ''}`}>
+                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[11px] ${done ? (i === 5 ? 'bg-purple-600 text-white' : 'bg-emerald-600 text-white') : 'bg-slate-200 text-slate-600'}`}>{i + 1}</span>
                     {label}
                   </span>
                 </React.Fragment>
@@ -303,7 +305,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
           <button
             type="button"
             onClick={() => setActiveWorkspaceTab('ORDER')}
-            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${activeWorkspaceTab === 'ORDER' ? 'bg-jaman-navy text-white shadow-xs' : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'}`}
+            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${activeWorkspaceTab === 'ORDER' ? 'bg-jaman-navy text-white shadow-xs' : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'}`}
           >
             <span className="sm:hidden">Order & Bill ({billable.length})</span>
             <span className="hidden sm:inline">Current Order & Bill ({billable.length})</span>
@@ -311,7 +313,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
           <button
             type="button"
             onClick={() => setActiveWorkspaceTab('MENU')}
-            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeWorkspaceTab === 'MENU' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-[#FFF4ED] text-jaman-saffron hover:bg-[#FFE8D6]'}`}
+            className={`flex-1 sm:flex-none min-h-[44px] px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${activeWorkspaceTab === 'MENU' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-[#FFF4ED] text-jaman-saffron hover:bg-[#FFE8D6]'}`}
           >
             <Plus className="w-4 h-4" />
             <span className="sm:hidden">Menu</span>
@@ -366,7 +368,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                             setTimeout(() => setRepeatOrderError(''), 3000);
                           }
                         }}
-                        className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-jaman-navy border border-jaman-border font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 min-h-[44px]"
+                        className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-jaman-navy border border-jaman-border font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 min-h-[44px]"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                         <span>Repeat Previous Order</span>
@@ -379,13 +381,13 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     {/* Not sent yet, grouped by course so a course can be held back and sent when the table is ready */}
                     {unFiredCartItems.length > 0 && (
                       <section aria-label="Not sent to the kitchen yet" className="space-y-2">
-                        <h3 className="text-[11px] font-black uppercase tracking-wider text-amber-700">Not sent yet</h3>
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Not sent yet</h3>
                         {unfiredByCourse.map((g) => (
                           <div key={g.id} className="rounded-2xl border border-[#FDBA74] bg-[#FFFBF7] p-2.5 space-y-2">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-xs font-black text-jaman-navy">{g.short} course: {g.label}</span>
+                              <span className="text-xs font-bold text-jaman-navy">{g.short} course: {g.label}</span>
                               {multiCourse && (
-                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-black cursor-pointer min-h-[36px]">
+                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-bold cursor-pointer min-h-[36px]">
                                   Send now
                                 </button>
                               )}
@@ -399,7 +401,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                     {item.specialNotes && <p className="text-[11px] text-amber-700 italic">Note: {item.specialNotes}</p>}
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="font-black font-mono text-sm text-jaman-navy">{formatINR(item.totalPrice)}</span>
+                                    <span className="font-bold font-mono text-sm text-jaman-navy">{formatINR(item.totalPrice)}</span>
                                     <button type="button" onClick={() => removeCartItem(item.id)} aria-label={`Remove ${item.menuItem.name}`} className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-600 cursor-pointer">
                                       <Trash2 className="w-4 h-4" />
                                     </button>
@@ -407,10 +409,10 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                 </div>
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <div className="flex items-center gap-1">
-                                    <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">−</button>
-                                    <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-black cursor-pointer">+</button>
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">−</button>
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">+</button>
                                   </div>
-                                  <span className="text-[10px] font-black uppercase text-slate-400 ml-1">Seat</span>
+                                  <span className="text-[11px] font-bold uppercase text-slate-400 ml-1">Seat</span>
                                   {Array.from({ length: seatCount }, (_, n) => n + 1).map((n) => (
                                     <button
                                       key={n}
@@ -418,19 +420,19 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                       onClick={() => setCartItemSeat(item.id, item.seat === n ? undefined : n)}
                                       aria-pressed={item.seat === n}
                                       aria-label={`Seat ${n}`}
-                                      className={`w-9 h-9 rounded-lg text-[11px] font-black cursor-pointer ${item.seat === n ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                                      className={`w-9 h-9 rounded-lg text-[11px] font-bold cursor-pointer ${item.seat === n ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
                                     >
                                       {n}
                                     </button>
                                   ))}
-                                  <span className="text-[10px] font-black uppercase text-slate-400 ml-1">Course</span>
+                                  <span className="text-[11px] font-bold uppercase text-slate-400 ml-1">Course</span>
                                   {COURSES.map((c) => (
                                     <button
                                       key={c.id}
                                       type="button"
                                       onClick={() => setCartItemCourse(item.id, c.id)}
                                       aria-pressed={(item.course ?? 'COURSE_1') === c.id}
-                                      className={`px-2.5 h-9 rounded-lg text-[11px] font-black cursor-pointer ${(item.course ?? 'COURSE_1') === c.id ? 'bg-jaman-navy text-white' : 'bg-slate-100 text-slate-600'}`}
+                                      className={`px-2.5 h-9 rounded-lg text-[11px] font-bold cursor-pointer ${(item.course ?? 'COURSE_1') === c.id ? 'bg-jaman-navy text-white' : 'bg-slate-100 text-slate-600'}`}
                                     >
                                       {c.short}
                                     </button>
@@ -446,7 +448,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     {/* In the kitchen or done */}
                     {firedCartItems.length > 0 && (
                       <section aria-label="Sent to the kitchen" className="space-y-2">
-                        <h3 className="text-[11px] font-black uppercase tracking-wider text-slate-500">Sent to the kitchen</h3>
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Sent to the kitchen</h3>
                         {firedCartItems.map((item) => {
                           const state = dishState(item);
                           const serveId = state === 'READY' ? foodReadyIdFor(item) : undefined;
@@ -456,15 +458,15 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className={`font-extrabold text-sm break-words ${state === 'CANCELLED' ? 'line-through text-rose-700' : 'text-jaman-navy'}`}>{item.quantity}× {item.menuItem.name}</span>
                                   {stateChip(state)}
-                                  {item.course && <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">{COURSES.find((c) => c.id === item.course)?.label}</span>}
-                                  {item.seat && <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Seat {item.seat}</span>}
+                                  {item.course && <span className="text-[11px] font-bold uppercase text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">{COURSES.find((c) => c.id === item.course)?.label}</span>}
+                                  {item.seat && <span className="text-[11px] font-bold uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Seat {item.seat}</span>}
                                 </div>
                                 {item.selectedModifiers && item.selectedModifiers.length > 0 && <p className="text-[11px] text-slate-500 font-medium">{item.selectedModifiers.map((m) => m.optionName).join(', ')}</p>}
                                 {item.specialNotes && <p className="text-[11px] text-amber-700 italic">Note: {item.specialNotes}</p>}
                                 {state === 'CANCELLED' && item.cancelReason && <p className="text-[11px] font-bold text-rose-700">Cancelled: {item.cancelReason}</p>}
                                 <div className="flex items-center gap-2 pt-0.5 flex-wrap">
                                   {serveId && (
-                                    <button type="button" onClick={() => markItemServed(serveId)} className="min-h-[40px] px-3 rounded-xl text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer" title="Mark this dish as delivered to the table">
+                                    <button type="button" onClick={() => markItemServed(serveId)} className="min-h-[40px] px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer" title="Mark this dish as delivered to the table">
                                       Mark served
                                     </button>
                                   )}
@@ -479,7 +481,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                   )}
                                 </div>
                               </div>
-                              <span className={`font-black font-mono text-sm shrink-0 ${state === 'CANCELLED' ? 'text-rose-400' : 'text-jaman-navy'}`}>{formatINR(item.totalPrice)}</span>
+                              <span className={`font-bold font-mono text-sm shrink-0 ${state === 'CANCELLED' ? 'text-rose-400' : 'text-jaman-navy'}`}>{formatINR(item.totalPrice)}</span>
                             </div>
                           );
                         })}
@@ -492,7 +494,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               {/* Bill and actions: a compact strip at the bottom on a phone, a side column on a tablet */}
               <div className="w-full md:w-80 bg-jaman-cream border-t md:border-t-0 md:border-l border-jaman-border p-3 md:p-5 flex flex-col gap-2.5 md:gap-4 shrink-0 max-h-[42dvh] md:max-h-none overflow-y-auto">
                 <div className="hidden md:block space-y-3">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">Table Financial Summary</h3>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Table Financial Summary</h3>
                   {attachedCustomer && (
                     <button
                       type="button"
@@ -515,10 +517,10 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     {roundOff !== 0 && (
                       <div className="flex justify-between"><span>Round Off</span><span className="font-mono text-jaman-navy">{roundOff > 0 ? '+' : ''}{formatINR(roundOff)}</span></div>
                     )}
-                    <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-black text-jaman-navy"><span>Total Payable</span><span className="font-mono text-base">{formatINR(total)}</span></div>
+                    <div className="pt-2 border-t border-slate-100 flex justify-between text-sm font-bold text-jaman-navy"><span>Total Payable</span><span className="font-mono text-base">{formatINR(total)}</span></div>
                   </div>
                 </div>
-                <div className="md:hidden flex items-center justify-between text-sm font-black text-jaman-navy">
+                <div className="md:hidden flex items-center justify-between text-sm font-bold text-jaman-navy">
                   <span>Total (incl. GST)</span>
                   <span className="font-mono text-base">{formatINR(total)}</span>
                 </div>
@@ -526,7 +528,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 {unFiredCartItems.length > 0 && <div className="space-y-2">{fireButtons}</div>}
 
                 <div className="grid grid-cols-2 md:grid-cols-1 gap-2">
-                  <button type="button" onClick={() => setActiveWorkspaceTab('MENU')} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                  <button type="button" onClick={() => setActiveWorkspaceTab('MENU')} className="min-h-[44px] py-2.5 px-3 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5">
                     <Plus className="w-4 h-4" />
                     <span>Add dishes</span>
                   </button>
@@ -546,8 +548,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 {firedCartItems.length === 0 && unFiredCartItems.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.confirm('Discard this unsent order and start over? Nothing has been sent to the kitchen yet.')) clearCart();
+                    onClick={async () => {
+                      if (await confirm({ title: 'Discard this order?', message: 'Nothing has been sent to the kitchen yet. The unsent items will be removed.', confirmLabel: 'Discard order', cancelLabel: 'Keep order', tone: 'danger' })) clearCart();
                     }}
                     className="min-h-[40px] py-2 px-4 rounded-2xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                   >
@@ -562,11 +564,11 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 {currentCaptain?.permissions.CAN_TRANSFER_TABLE && (
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       const warn = total > 0
                         ? `Free Table ${table!.tableNumber}? It still shows ${formatINR(total)} owed — this will mark that bill as paid/completed without collecting it. Only do this if the guest already paid another way or left without paying.`
                         : `Free Table ${table!.tableNumber}? It will show as available for the next guest.`;
-                      if (window.confirm(warn)) {
+                      if (await confirm({ title: `Free Table ${table!.tableNumber}?`, message: warn, confirmLabel: 'Free table', cancelLabel: 'Cancel', tone: total > 0 ? 'danger' : 'default' })) {
                         closeTable(table!.tableNumber);
                         onClose();
                       }
@@ -614,7 +616,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                   <button
                     type="button"
                     onClick={() => setSelectedCategory('ALL')}
-                    className={`px-3 min-h-[40px] rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 ${selectedCategory === 'ALL' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-white text-slate-600 border border-jaman-border'}`}
+                    className={`px-3 min-h-[40px] rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${selectedCategory === 'ALL' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-white text-slate-600 border border-jaman-border'}`}
                   >
                     All Dishes ({sellableDishCount})
                   </button>
@@ -656,19 +658,19 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg'; }}
                           />
                           <span className={`absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500 ring-2 ring-white' : 'bg-rose-500 ring-2 ring-white'}`} />
-                          {soldOut && <span className="absolute inset-x-0 bottom-0 bg-rose-600 text-white text-[10px] font-black text-center py-0.5 uppercase">Sold out</span>}
+                          {soldOut && <span className="absolute inset-x-0 bottom-0 bg-rose-600 text-white text-[11px] font-bold text-center py-0.5 uppercase">Sold out</span>}
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-extrabold text-xs sm:text-sm text-jaman-navy line-clamp-2 leading-tight">{item.name}</h4>
-                          <span className="text-[10px] text-slate-400 font-bold block mt-0.5 truncate">{item.kitchenStation || 'Kitchen'}</span>
+                          <span className="text-[11px] text-slate-400 font-bold block mt-0.5 truncate">{item.kitchenStation || 'Kitchen'}</span>
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                          <span className="font-black font-mono text-xs sm:text-sm text-jaman-navy">{formatINR(item.price)}</span>
+                          <span className="font-bold font-mono text-xs sm:text-sm text-jaman-navy">{formatINR(item.price)}</span>
                           {/* Adds with the default options; tapping the card opens Customize for a real change. */}
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); addItemToCart(item, [], '', 'COURSE_1', 1); }}
-                            className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-black text-base hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90 disabled:opacity-40"
+                            className="w-10 h-10 rounded-xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center font-bold text-base hover:bg-jaman-saffron hover:text-white transition-colors cursor-pointer active:scale-90 disabled:opacity-40"
                             title={soldOut ? 'Sold out' : 'Quick Add'}
                             aria-label={soldOut ? `${item.name} is sold out` : `Add ${item.name}`}
                             disabled={soldOut}
@@ -688,13 +690,13 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                   type="button"
                   onClick={() => setCartOpen((o) => !o)}
                   aria-expanded={cartOpen}
-                  className="md:hidden min-h-[44px] px-3 flex items-center justify-between text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer"
+                  className="md:hidden min-h-[44px] px-3 flex items-center justify-between text-xs font-bold text-slate-600 uppercase tracking-wider cursor-pointer"
                 >
                   <span className="flex items-center gap-1.5">{cartOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />} Cart ({billable.length})</span>
                   <span className="font-mono text-sm text-jaman-navy normal-case">{formatINR(total)}</span>
                 </button>
                 <div className="hidden md:flex items-center justify-between px-4 pt-4">
-                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Live Cart ({billable.length})</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Live Cart ({billable.length})</span>
                   <button type="button" onClick={() => setActiveWorkspaceTab('ORDER')} className="text-xs font-bold text-jaman-saffron hover:underline cursor-pointer">View Full Order</button>
                 </div>
                 <div className={`${cartOpen ? 'block' : 'hidden'} md:block px-3 md:px-4 py-2 space-y-2 overflow-y-auto max-h-[38dvh] md:max-h-none md:flex-1 min-h-0`}>
@@ -703,7 +705,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     <div key={ci.id} className="p-2.5 rounded-xl bg-white border border-jaman-border flex items-center justify-between text-xs gap-2">
                       <div className="min-w-0">
                         <span className="font-bold text-jaman-navy block truncate">{ci.menuItem.name}</span>
-                        <span className="text-[10px] font-mono text-slate-400">{formatINR(ci.unitPrice)} × {ci.quantity}{ci.isFired ? ' · sent' : ''}</span>
+                        <span className="text-[11px] font-mono text-slate-400">{formatINR(ci.unitPrice)} × {ci.quantity}{ci.isFired ? ' · sent' : ''}</span>
                       </div>
                       {!ci.isFired && (
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -718,7 +720,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 <div className="p-3 md:p-4 md:border-t border-jaman-border space-y-2">
                   <div className="hidden md:flex justify-between text-xs font-bold text-slate-600">
                     <span>Total:</span>
-                    <span className="font-mono text-sm font-black text-jaman-navy">{formatINR(total)}</span>
+                    <span className="font-mono text-sm font-bold text-jaman-navy">{formatINR(total)}</span>
                   </div>
                   {fireButtons}
                 </div>
@@ -740,6 +742,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
 
       <CaptainCancelDishModal dish={cancelling} onClose={() => setCancelling(null)} onCancelled={() => setCancelling(null)} />
       <CaptainCustomerModal />
-    </div>
+    </ModalBackdrop>
+    {confirmDialog}
+    </>
   );
 };

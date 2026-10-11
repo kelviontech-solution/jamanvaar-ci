@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
-import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage, FormInput, FormSelect } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
 import { Upload, Sparkles, Image as ImageIcon, Sliders, Plus } from 'lucide-react';
 import { GroupEditor } from './menu/MenuOptionsModule';
@@ -296,19 +296,19 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Dish Name *</label>
-            <input
+            <FormInput
               type="text"
               required
               maxLength={MAX_NAME_LENGTH}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Paneer Butter Masala"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Price (₹) *</label>
-            <input
+            <FormInput
               type="number"
               required
               min="1"
@@ -316,7 +316,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="e.g. 260"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>
@@ -325,25 +325,25 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">SKU / Item Code</label>
-            <input
+            <FormInput
               type="text"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               placeholder="e.g. PBM-01"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Menu Category</label>
-            <select
+            <FormSelect
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
-            </select>
+            </FormSelect>
           </div>
         </div>
 
@@ -353,13 +353,13 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Kitchen Station</label>
             {/* Any station name works; the ones already on the menu are suggested. The KDS screens list exactly these. */}
-            <input
+            <FormInput
               list="kitchen-station-options"
               value={kitchenStation}
               onChange={(e) => setKitchenStation(e.target.value)}
               placeholder="e.g. Main Kitchen, Tandoor, Bar"
               maxLength={40}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
             <datalist id="kitchen-station-options">
               {Array.from(new Set(['Main Kitchen', ...db.menuItems.map((m) => (m.kitchenStation || '').trim()).filter(Boolean)])).map((n) => (
@@ -369,30 +369,30 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Dietary Type</label>
-            <select
+            <FormSelect
               value={dietaryType}
               onChange={(e) => setDietaryType(e.target.value as DietaryType)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="VEG">Veg</option>
               <option value="JAIN">Jain</option>
               <option value="VEGAN">Vegan</option>
               <option value="NON_VEG">Non-Veg</option><option value="EGG">Egg</option>
-            </select>
+            </FormSelect>
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Spice Level</label>
-            <select
+            <FormSelect
               value={spiceLevel}
               onChange={(e) => setSpiceLevel(e.target.value as SpiceLevel)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="NONE">Mild / Non-Spicy</option>
               <option value="MILD">Mild</option>
               <option value="MEDIUM">Medium Spice</option>
               <option value="SPICY">Spicy </option>
               <option value="EXTRA_SPICY">Extra Spicy </option>
-            </select>
+            </FormSelect>
           </div>
         </div>
 

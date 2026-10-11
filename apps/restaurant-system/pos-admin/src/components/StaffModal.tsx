@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User as UserType } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { StaffRepository, StaffScheduleRepository } from '@jamanvaar/database';
 import { copyText } from '@jamanvaar/utils';
 import { Check, Copy, KeyRound } from 'lucide-react';
@@ -177,70 +177,70 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4 py-1">
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Full Employee Name *</label>
-          <input
+          <FormInput
             type="text"
             required
             value={fullName}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="Employee's full name"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Username / Login ID *</label>
-            <input
+            <FormInput
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. amitdave"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Assigned Role</label>
-            <select
+            <FormSelect
               value={roleId}
               onChange={(e) => setRoleId(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
               ))}
-            </select>
+            </FormSelect>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Contact Phone</label>
-            <input
+            <FormInput
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. +91 98250 12345"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Email Address (optional)</label>
-            <input
+            <FormInput
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="staff@example.com"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Pay per hour, in rupees (optional)</label>
-          <input
+          <FormInput
             type="number"
             min="0"
             step="1"
@@ -248,7 +248,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             value={hourlyPay}
             onChange={(e) => setHourlyPay(e.target.value)}
             placeholder="e.g. 120"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           />
           <p className="text-[11px] text-slate-500 mt-1">Used only for the labour cost report. Kept on this computer; it is never sent to POS, Captain or KDS.</p>
         </div>

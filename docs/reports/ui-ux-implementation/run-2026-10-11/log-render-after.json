@@ -1,0 +1,915 @@
+[
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JMV-AAAA-BBBB-CCCC",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Activate Terminal",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 3,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 0,
+     "h1": [
+      "Smart Billing.\nBetter Dining."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Network: Online | Sun, 11 Oct 2026 | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to con"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Activation Key *",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": true,
+      "ac": "",
+      "mode": "",
+      "val": "JMV-AAAA-BBBB-CCCC"
+     }
+    ],
+    "shot": "evidence/pos/POS-001-bad-key-submit-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Could not complete activation. Check this device's internet connection and try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Unreachable | Network: Online | Sun, 11 Oct 2026 | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to con"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JMV-AAAA-BBBB-CCCC",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Activate Terminal",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 3,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 0,
+     "h1": [
+      "Smart Billing.\nBetter Dining."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Network: Online | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to connect this terminal "
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Activation Key *",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": true,
+      "ac": "",
+      "mode": "",
+      "val": "JMV-AAAA-BBBB-CCCC"
+     }
+    ],
+    "shot": "evidence/pos/POS-001-bad-key-submit-390x844.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Could not complete activation. Check this device's internet connection and try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Unreachable | Network: Online | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to connect this terminal "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "KDS-001",
+  "app": "kds",
+  "url": "http://localhost:5179/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JMV-AAAA-BBBB-CCCC",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Activate Terminal",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 3,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 0,
+     "h1": [
+      "Real-Time Kitchen Production Command\nLive KOTs"
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Network: Online | Sun, 11 Oct 2026 | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the acti"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Activation Key *",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": true,
+      "ac": "",
+      "mode": "",
+      "val": "JMV-AAAA-BBBB-CCCC"
+     }
+    ],
+    "shot": "evidence/kds/KDS-001-bad-key-submit-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Could not complete activation. Check this device's internet connection and try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Real-Time Kitchen Production Command\nLive KOTs"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Unreachable | Network: Online | Sun, 11 Oct 2026 | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the acti"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kds/KDS-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JM0000000000",
+    "result": "ok"
+   },
+   {
+    "do": "fill",
+    "arg": "wrongpass",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Sign In",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 9,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 1,
+     "h1": [
+      "Restaurant Control.\nLive Intelligence."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaur"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Restaurant ID *",
+      "ph": "e.g. JM9876543210",
+      "req": false,
+      "ac": "off",
+      "mode": "",
+      "val": "JM0000000000"
+     },
+     {
+      "type": "password",
+      "label": "Owner Password *",
+      "ph": "Enter owner password",
+      "req": false,
+      "ac": "current-password",
+      "mode": "",
+      "val": "***"
+     },
+     {
+      "type": "text",
+      "label": "Admin activation key (optional)",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": ""
+     }
+    ],
+    "shot": "evidence/restaurant-admin/ADMIN-001-bad-creds-submit-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Unreachable\",\"Unable to reach the server to verify credentials. Please check your connection and try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaur"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-1366x768.png",
+  "console": [
+   "warning: [admin sign-in] request failed before a server response: TypeError: Failed to fetch"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JM0000000000",
+    "result": "ok"
+   },
+   {
+    "do": "fill",
+    "arg": "wrongpass",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Sign In",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 9,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 1,
+     "h1": [
+      "Restaurant Control.\nLive Intelligence."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Pair | Network: Online | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID "
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Restaurant ID *",
+      "ph": "e.g. JM9876543210",
+      "req": false,
+      "ac": "off",
+      "mode": "",
+      "val": "JM0000000000"
+     },
+     {
+      "type": "password",
+      "label": "Owner Password *",
+      "ph": "Enter owner password",
+      "req": false,
+      "ac": "current-password",
+      "mode": "",
+      "val": "***"
+     },
+     {
+      "type": "text",
+      "label": "Admin activation key (optional)",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": ""
+     }
+    ],
+    "shot": "evidence/restaurant-admin/ADMIN-001-bad-creds-submit-390x844.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Unreachable\",\"Unable to reach the server to verify credentials. Please check your connection and try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-390x844.png",
+  "console": [
+   "warning: [admin sign-in] request failed before a server response: TypeError: Failed to fetch"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "CAPTAIN-001",
+  "app": "captain",
+  "url": "http://localhost:5177/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JMV-AAAA-BBBB-CCCC",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Activate Tablet",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 4,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 1,
+     "h1": [
+      "Touch-First Restaurant Floor Command\nInstant KOT"
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Touch-First Restaurant Floor Command | Instant KOT | Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency. | Fast Billing | Instant KOT | Table Management | Offline First | Full-Course Thali | Main Course | Table Beverages | WELCOME TO | CAPTAIN APP | Floor Captain & Service | High-Speed Table Orders & Service | Activate this Tablet | One-time setup — enter the activation key "
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Activation Key *",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": true,
+      "ac": "",
+      "mode": "",
+      "val": "JMV-AAAA-BBBB-CCCC"
+     }
+    ],
+    "shot": "evidence/captain/CAPTAIN-001-bad-key-submit-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Could not complete activation. Check this device's internet connection and that the key is correct, then try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 4,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 1,
+   "h1": [
+    "Touch-First Restaurant Floor Command\nInstant KOT"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Tablet"
+   ],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Touch-First Restaurant Floor Command | Instant KOT | Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency. | Fast Billing | Instant KOT | Table Management | Offline First | Full-Course Thali | Main Course | Table Beverages | WELCOME TO | CAPTAIN APP | Floor Captain & Service | High-Speed Table Orders & Service | Activate this Tablet | One-time setup — enter the activation key "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/captain/CAPTAIN-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "CAPTAIN-001",
+  "app": "captain",
+  "url": "http://localhost:5177/",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "JMV-AAAA-BBBB-CCCC",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "Activate Tablet",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 4,
+     "unnamed": 0,
+     "under24": 0,
+     "under44": 1,
+     "h1": [
+      "Touch-First Restaurant Floor Command\nInstant KOT"
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Local Core: Unreachable | Pair | Network: Online | Touch-First Restaurant Floor Command | Instant KOT | Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency. | Fast Billing | Instant KOT | Table Management | Offline First | Full-Course Thali | Main Course | Table Beverages | WELCOME TO | CAPTAIN APP | Floor Captain & Service | High-Speed Table Orders & Service | Activate this Tablet | One-time setup — enter the activation key from your Super Adm"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "Activation Key *",
+      "ph": "JMV-XXXX-XXXX-XXXX",
+      "req": true,
+      "ac": "",
+      "mode": "",
+      "val": "JMV-AAAA-BBBB-CCCC"
+     }
+    ],
+    "shot": "evidence/captain/CAPTAIN-001-bad-key-submit-390x844.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[\"Could not complete activation. Check this device's internet connection and that the key is correct, then try again.\"]"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 4,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 1,
+   "h1": [
+    "Touch-First Restaurant Floor Command\nInstant KOT"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Tablet"
+   ],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Touch-First Restaurant Floor Command | Instant KOT | Real-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency. | Fast Billing | Instant KOT | Table Management | Offline First | Full-Course Thali | Main Course | Table Beverages | WELCOME TO | CAPTAIN APP | Floor Captain & Service | High-Speed Table Orders & Service | Activate this Tablet | One-time setup — enter the activation key from your Super Adm"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/captain/CAPTAIN-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "KIOSK-001",
+  "app": "kiosk",
+  "url": "http://localhost:5174/",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 1052,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Guests order.\nKitchen fires\ninstantly."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Kiosk"
+   ],
+   "body": "KIOSK | SELF ORDERING | 🍲 Delicious Food | ⚡ Faster Service | 👥 Happier Customers | Device: | Activation required | Network: | Connected | Sun, 11 Oct 2026 · 19:21 | Need Help? | Crave. Tap. Enjoy! :) | Guests order. | Kitchen fires | instantly. | A modern self-ordering kiosk for a smoother and happier dining experience. | Touch to Order | Instant Kitchen Orders | Smart Suggestions | Happier Customers | Good Food, Better Moments | Let's Serve Happiness ♥ | Crave | Tap | Enjoy! | WELCOME TO | J"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "JM9876543210",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   },
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kiosk/KIOSK-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admin Email * | Passwor"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "QR-001",
+  "app": "qr-guest",
+  "url": "http://localhost:5190/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 0,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "This QR code is not valid"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "This QR code is not valid | Please scan the code on your table again, or ask a team member."
+  },
+  "inputs": [],
+  "shot": "evidence/qr-guest/QR-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

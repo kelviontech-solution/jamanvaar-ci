@@ -1,6 +1,8 @@
 import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
 import { CachedImg } from '@jamanvaar/ui';
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { PosTablePickerModal } from '../tables/PosTablePickerModal';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
 import { db, InventoryRepository, CustomerRepository } from '@jamanvaar/database';
@@ -43,6 +45,7 @@ import {
   ShoppingBag as TakeawayBag, Gift, X } from 'lucide-react';
 
 export const PosCart: React.FC = () => {
+  const [tablePickerOpen, setTablePickerOpen] = useState(false);
   const {
     cart,
     orderType,
@@ -204,7 +207,7 @@ export const PosCart: React.FC = () => {
             <div className="flex items-center justify-between gap-1 bg-white border border-jaman-border pl-2.5 pr-1.5 h-9 rounded-xl text-xs min-w-0">
               <button
                 type="button"
-                onClick={() => setActiveTab('TABLES')}
+                onClick={() => setTablePickerOpen(true)}
                 className="flex items-center gap-1.5 text-jaman-deepNavy font-bold hover:text-jaman-saffron transition-colors truncate cursor-pointer min-w-0 flex-1 h-full"
               >
                 <Utensils className="w-3.5 h-3.5 text-jaman-saffron shrink-0" />
@@ -664,6 +667,8 @@ export const PosCart: React.FC = () => {
         isOpen={repeatModalOpen}
         onClose={() => setRepeatModalOpen(false)}
       />
+      {/* Portalled to <body>: the cart root is its own stacking context, which would paint the sidebar over the picker. */}
+      {createPortal(<PosTablePickerModal isOpen={tablePickerOpen} onClose={() => setTablePickerOpen(false)} />, document.body)}
     </div>
   );
 };

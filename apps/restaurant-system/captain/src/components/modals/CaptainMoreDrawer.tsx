@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
-import { useAiAccess } from '@jamanvaar/ui';
+import { useAiAccess, ModalBackdrop } from '@jamanvaar/ui';
 import { useCaptainStore } from '../../store/captainStore';
 import { captainDb } from '@jamanvaar/database';
 import {
@@ -75,12 +75,12 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
+    <ModalBackdrop className="flex justify-end">
+      <div className="w-full max-w-sm bg-white h-full shadow-md flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
         {/* Header */}
         <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-jaman-saffron flex items-center justify-center font-black text-sm">
+            <div className="w-9 h-9 rounded-xl bg-jaman-saffron flex items-center justify-center font-bold text-sm">
               {currentCaptain?.name?.charAt(0) || 'R'}
             </div>
             <div>
@@ -91,6 +91,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -114,15 +115,15 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <span className="font-black text-xs text-jaman-navy block">JAMAN AI Intelligence</span>
-                <span className="text-[10px] text-slate-500 font-medium">Ask floor, kitchen & bill questions</span>
+                <span className="font-bold text-xs text-jaman-navy block">JAMAN AI Intelligence</span>
+                <span className="text-[11px] text-slate-500 font-medium">Ask floor, kitchen & bill questions</span>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-jaman-saffron" />
           </button>
           )}
 
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1 pt-2">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block px-1 pt-2">
             Floor Operations:
           </span>
 
@@ -148,7 +149,7 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
                         {item.label}
                       </span>
                       {item.count !== null && item.count > 0 && (
-                        <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono ${item.badgeColor}`}>
+                        <span className={`text-[11px] font-bold px-1.5 py-0.2 rounded-full font-mono ${item.badgeColor}`}>
                           {item.count}
                         </span>
                       )}
@@ -172,13 +173,13 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
               onClose();
               logout();
             }}
-            className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>End Shift Session & Sign Out</span>
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

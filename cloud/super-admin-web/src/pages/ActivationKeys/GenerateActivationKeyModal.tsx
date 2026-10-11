@@ -3,7 +3,7 @@ import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { ApplicationEntitlement, Branch, RestaurantDetail, RestaurantListItem } from '../../api/types';
-import { Button } from '../../components/ui';
+import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 
 export function GenerateActivationKeyModal({
@@ -97,8 +97,7 @@ export function GenerateActivationKeyModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose} label="Generate activation key">
         <div className="modal-header">
           <h2>Generate activation key</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close">
@@ -214,7 +213,6 @@ export function GenerateActivationKeyModal({
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </ModalShell>
   );
 }

@@ -42,6 +42,7 @@ import { Pager } from '../../components/Pager';
 import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
 import './billing.css';
+import { useAdminConfirm } from '../../components/ui';
 
 type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID';
 
@@ -83,6 +84,7 @@ function SellerHeader({ seller, withPan }: { seller?: SellerInfo; withPan: boole
 }
 
 export function BillingPage() {
+  const { confirm, confirmDialog } = useAdminConfirm();
   const [summary, setSummary] = useState<BillingSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -293,7 +295,7 @@ export function BillingPage() {
   async function handleUpdateInvoiceStatus(invoice: Invoice, status: 'VOID' | 'REFUNDED') {
     setActionMenuInvoiceId(null);
     const verb = status === 'VOID' ? 'void' : 'mark as refunded';
-    if (!window.confirm(`Are you sure you want to ${verb} invoice ${invoice.invoiceNumber}? This action cannot be undone.`)) {
+    if (!(await confirm({ title: `${status === 'VOID' ? 'Void' : 'Mark as refunded'}: invoice ${invoice.invoiceNumber}?`, message: `You are about to ${verb} this invoice. This action cannot be undone.`, confirmLabel: status === 'VOID' ? 'Void invoice' : 'Mark refunded', danger: true }))) {
       return;
     }
     setUpdatingStatusId(invoice.id);
@@ -361,6 +363,7 @@ export function BillingPage() {
   const overdueCount = summary?.overdueInvoices ?? summary?.pastDueInvoices;
 
   return (
+    <>
     <div className="billing-container">
       {/* Toast Notification */}
       {toast && (
@@ -390,10 +393,10 @@ export function BillingPage() {
       {/* Page Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 className="page-title" style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#0f172a' }}>
+          <h1 className="page-title" style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--jv-ink)' }}>
             Invoices & Billing
           </h1>
-          <p className="page-subtitle" style={{ margin: '4px 0 0', color: '#64748b', fontSize: 14 }}>
+          <p className="page-subtitle" style={{ margin: '4px 0 0', color: 'var(--jv-slate-500)', fontSize: 14 }}>
             Commercial SaaS receivables, statutory GST 18% tax invoices, and verified payment reconciliations.
           </p>
         </div>
@@ -421,8 +424,8 @@ export function BillingPage() {
       {/* Payment Gateway Status Banner */}
       <div
         style={{
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
+          background: 'var(--jv-paper-soft)',
+          border: '1px solid var(--jv-line)',
           borderRadius: 8,
           padding: '10px 16px',
           display: 'flex',
@@ -431,7 +434,7 @@ export function BillingPage() {
           flexWrap: 'wrap',
           gap: 8,
           fontSize: 13,
-          color: '#475569'
+          color: 'var(--jv-slate-600)'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0, flex: '1 1 260px' }}>
@@ -462,7 +465,7 @@ export function BillingPage() {
           <div className="billing-metric-card">
             <div className="billing-metric-header">
               <span className="billing-metric-title">Reconciled Collections</span>
-              <div className="billing-metric-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+              <div className="billing-metric-icon" style={{ background: 'var(--jv-success-soft)', color: 'var(--jv-success-text)' }}>
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
@@ -470,7 +473,7 @@ export function BillingPage() {
               <div className="billing-metric-value">
                 ₹{summary.totalCollected.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="billing-metric-subtext" style={{ color: '#059669' }}>
+              <div className="billing-metric-subtext" style={{ color: 'var(--jv-success-text)' }}>
                 <Check className="w-3.5 h-3.5" />
                 <span>{summary.collectionRatePercent ?? 0}% of billed amount collected</span>
               </div>
@@ -480,7 +483,7 @@ export function BillingPage() {
           <div className="billing-metric-card">
             <div className="billing-metric-header">
               <span className="billing-metric-title">Invoiced Receivables</span>
-              <div className="billing-metric-icon" style={{ background: '#fffbeb', color: '#d97706' }}>
+              <div className="billing-metric-icon" style={{ background: 'var(--jv-warning-soft)', color: 'var(--jv-warning-text)' }}>
                 <Clock className="w-5 h-5" />
               </div>
             </div>
@@ -488,7 +491,7 @@ export function BillingPage() {
               <div className="billing-metric-value" style={{ color: summary.pendingAmount > 0 ? '#b45309' : '#0f172a' }}>
                 ₹{summary.pendingAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="billing-metric-subtext" style={{ color: '#64748b' }}>
+              <div className="billing-metric-subtext" style={{ color: 'var(--jv-slate-500)' }}>
                 <span>{summary.pendingInvoices} Awaiting Tenant Payment</span>
               </div>
             </div>
@@ -497,15 +500,15 @@ export function BillingPage() {
           <div className="billing-metric-card">
             <div className="billing-metric-header">
               <span className="billing-metric-title">Settled Invoices</span>
-              <div className="billing-metric-icon" style={{ background: '#eff6ff', color: '#2563eb' }}>
+              <div className="billing-metric-icon" style={{ background: '#eff6ff', color: 'var(--jv-info-text)' }}>
                 <TrendingUp className="w-5 h-5" />
               </div>
             </div>
             <div>
               <div className="billing-metric-value">
-                {summary.paidInvoices} <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600 }}>/ {summary.totalInvoices} Total</span>
+                {summary.paidInvoices} <span style={{ fontSize: '1rem', color: 'var(--jv-slate-500)', fontWeight: 600 }}>/ {summary.totalInvoices} Total</span>
               </div>
-              <div className="billing-metric-subtext" style={{ color: '#2563eb' }}>
+              <div className="billing-metric-subtext" style={{ color: 'var(--jv-info-text)' }}>
                 <span>{summary.collectionRatePercent ?? (summary.totalInvoices > 0 ? Math.round((summary.paidInvoices / summary.totalInvoices) * 100) : 0)}% Collection Rate</span>
               </div>
             </div>
@@ -723,7 +726,7 @@ export function BillingPage() {
                             border: 'none',
                             padding: 0,
                             cursor: 'pointer',
-                            color: '#2563eb'
+                            color: 'var(--jv-info-text)'
                           }}
                           onClick={() => setViewInvoice(inv)}
                           title="View statutory GST invoice"
@@ -732,7 +735,7 @@ export function BillingPage() {
                         </button>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600, color: '#0f172a' }}>
+                        <div style={{ fontWeight: 600, color: 'var(--jv-ink)' }}>
                           {inv.restaurant?.name || 'Unknown Restaurant'}
                         </div>
                         <div className="muted" style={{ fontSize: 11 }}>
@@ -741,7 +744,7 @@ export function BillingPage() {
                         </div>
                       </td>
                       <td>
-                        <span style={{ fontWeight: 600, color: '#334155' }}>
+                        <span style={{ fontWeight: 600, color: 'var(--jv-slate-700)' }}>
                           {inv.plan?.name || 'Custom Fee'}
                         </span>
                         {inv.plan?.tier && (
@@ -751,7 +754,7 @@ export function BillingPage() {
                         )}
                       </td>
                       <td>
-                        <strong style={{ fontFamily: 'monospace', fontSize: 14, color: '#0f172a' }}>
+                        <strong style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--jv-ink)' }}>
                           ₹{(inv.totalAmount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </strong>
                         <div className="muted" style={{ fontSize: 11 }}>
@@ -759,11 +762,11 @@ export function BillingPage() {
                         </div>
                       </td>
                       <td>
-                        <div style={{ fontSize: 13, color: '#334155' }}>
+                        <div style={{ fontSize: 13, color: 'var(--jv-slate-700)' }}>
                           {new Date(inv.dueDate).toLocaleDateString('en-IN')}
                         </div>
                         {inv.status === 'ISSUED' && new Date(inv.dueDate) < new Date() && (
-                          <div style={{ fontSize: 11, color: '#dc2626', fontWeight: 600 }}>OVERDUE</div>
+                          <div style={{ fontSize: 11, color: 'var(--jv-error-text)', fontWeight: 600 }}>OVERDUE</div>
                         )}
                       </td>
                       <td>
@@ -789,7 +792,7 @@ export function BillingPage() {
                               onClick={() => handleViewReceipt(inv.id)}
                               disabled={loadingReceipt}
                               title="View Official Payment Receipt"
-                              style={{ color: '#059669', borderColor: '#a7f3d0' }}
+                              style={{ color: 'var(--jv-success-text)', borderColor: 'var(--jv-ok-line)' }}
                             >
                               <Receipt className="w-3.5 h-3.5" />
                               <span>Receipt</span>
@@ -818,8 +821,8 @@ export function BillingPage() {
                                     right: 0,
                                     top: '100%',
                                     marginTop: 4,
-                                    background: '#ffffff',
-                                    border: '1px solid #cbd5e1',
+                                    background: 'var(--jv-paper)',
+                                    border: '1px solid var(--jv-line-strong)',
                                     borderRadius: 8,
                                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                                     zIndex: 30,
@@ -839,7 +842,7 @@ export function BillingPage() {
                                       background: 'none',
                                       border: 'none',
                                       cursor: 'pointer',
-                                      color: '#475569'
+                                      color: 'var(--jv-slate-600)'
                                     }}
                                   >
                                     Void Invoice
@@ -858,8 +861,8 @@ export function BillingPage() {
                                         background: 'none',
                                         border: 'none',
                                         cursor: 'pointer',
-                                        color: '#dc2626',
-                                        borderTop: '1px solid #f1f5f9'
+                                        color: 'var(--jv-error-text)',
+                                        borderTop: '1px solid var(--jv-line)'
                                       }}
                                     >
                                       Mark as Refunded
@@ -945,13 +948,13 @@ export function BillingPage() {
                 <div style={{ marginTop: 6 }}>
                   <Badge tone={getStatusTone(viewInvoice.status)}>{viewInvoice.status}</Badge>
                 </div>
-                <div style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: '#0f172a' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: 'var(--jv-ink)' }}>
                   {viewInvoice.invoiceNumber}
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: 2 }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--jv-slate-500)', marginTop: 2 }}>
                   <strong>Date:</strong> {new Date(viewInvoice.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: '#64748b' }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--jv-slate-500)' }}>
                   <strong>Due:</strong> {new Date(viewInvoice.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </div>
               </div>
@@ -1011,7 +1014,7 @@ export function BillingPage() {
                 <tr>
                   <td>
                     <strong>{viewInvoice.plan?.name || 'JAMANVAAR Subscription'}</strong>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--jv-slate-500)', marginTop: 2 }}>
                       Multi-outlet cloud license, menu syndication, device MDM, offline sync & analytics
                     </div>
                   </td>
@@ -1079,7 +1082,7 @@ export function BillingPage() {
 
             {/* Bank Details & Payment Remittance */}
             <div className="doc-bank-box">
-              <div style={{ fontWeight: 700, marginBottom: 4, color: '#0f172a' }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: 'var(--jv-ink)' }}>
                 Bank Remittance & UPI Payment Instructions:
               </div>
               {viewInvoice.seller && (
@@ -1099,16 +1102,16 @@ export function BillingPage() {
 
             {/* Payment History if exists */}
             {viewInvoice.payments && viewInvoice.payments.length > 0 && (
-              <div style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 6, border: '1px solid #e2e8f0' }}>
-                <div style={{ fontWeight: 700, fontSize: '0.8125rem', marginBottom: 6, color: '#0f172a' }}>
+              <div style={{ marginBottom: '1.5rem', background: 'var(--jv-paper-soft)', padding: '1rem', borderRadius: 6, border: '1px solid var(--jv-line)' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.8125rem', marginBottom: 6, color: 'var(--jv-ink)' }}>
                   Recorded Transactions
                 </div>
                 {viewInvoice.payments.map((p) => (
-                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', color: '#475569', padding: '4px 0' }}>
+                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', color: 'var(--jv-slate-600)', padding: '4px 0' }}>
                     <span>
                       {p.method} • Ref: {p.referenceNumber || 'N/A'} {p.receiptNumber ? `• Receipt: ${p.receiptNumber}` : ''} ({new Date(p.createdAt).toLocaleDateString('en-IN')})
                     </span>
-                    <strong style={{ fontFamily: 'monospace', color: '#059669' }}>₹{(p.amount / 100).toFixed(2)}</strong>
+                    <strong style={{ fontFamily: 'monospace', color: 'var(--jv-success-text)' }}>₹{(p.amount / 100).toFixed(2)}</strong>
                   </div>
                 ))}
               </div>
@@ -1146,14 +1149,14 @@ export function BillingPage() {
             <div className="doc-brand-header">
               <SellerHeader seller={receiptData.seller} withPan />
               <div className="doc-type-badge">
-                <div className="doc-type-title" style={{ color: '#059669' }}>PAYMENT RECEIPT</div>
+                <div className="doc-type-title" style={{ color: 'var(--jv-success-text)' }}>PAYMENT RECEIPT</div>
                 <div style={{ marginTop: 6 }}>
                   <Badge tone="success">PAYMENT RECONCILED</Badge>
                 </div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: '#0f172a' }}>
+                <div style={{ fontSize: '1.125rem', fontWeight: 800, fontFamily: 'monospace', marginTop: 8, color: 'var(--jv-ink)' }}>
                   {receiptData.receiptNumber}
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: 2 }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--jv-slate-500)', marginTop: 2 }}>
                   <strong>Date:</strong> {new Date(receiptData.paymentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
@@ -1211,13 +1214,13 @@ export function BillingPage() {
                 <tr>
                   <td>
                     <strong>Subscription License Settlement</strong>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--jv-slate-500)' }}>
                       Invoice #{receiptData.invoiceNumber} • {receiptData.planName}
                     </div>
                   </td>
                   <td>{receiptData.paymentMethod}</td>
                   <td className="num" style={{ fontFamily: 'monospace' }}>{receiptData.transactionId}</td>
-                  <td className="num" style={{ fontFamily: 'monospace', fontWeight: 700, color: '#059669', fontSize: 15 }}>
+                  <td className="num" style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--jv-success-text)', fontSize: 15 }}>
                     ₹{receiptData.amountPaidRupees}
                   </td>
                 </tr>
@@ -1234,27 +1237,27 @@ export function BillingPage() {
                   <span>Total Paid to Date:</span>
                   <span style={{ fontFamily: 'monospace' }}>₹{(receiptData.totalPaid / 100).toFixed(2)}</span>
                 </div>
-                <div className="doc-summary-row total" style={{ color: '#059669' }}>
+                <div className="doc-summary-row total" style={{ color: 'var(--jv-success-text)' }}>
                   <span>BALANCE OUTSTANDING:</span>
                   <span style={{ fontFamily: 'monospace' }}>₹{(receiptData.balanceDue / 100).toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid #cbd5e1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--jv-line-strong)' }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#059669', fontWeight: 700, fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--jv-success-text)', fontWeight: 700, fontSize: '0.9rem' }}>
                   <ShieldCheck className="w-5 h-5" />
                   <span>OFFICIALLY RECONCILED & SETTLED</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4 }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--jv-slate-500)', marginTop: 4 }}>
                   Transaction logged into JAMANVAAR Central Accounting Ledger
                 </div>
               </div>
               <div style={{ textAlign: 'center', minWidth: 200 }}>
                 <div style={{ height: 36, borderBottom: '1px solid #94a3b8', marginBottom: 6 }} />
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>Authorized Accounts Officer</div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>{receiptData.seller?.legalName}</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--jv-slate-700)' }}>Authorized Accounts Officer</div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--jv-slate-500)' }}>{receiptData.seller?.legalName}</div>
               </div>
             </div>
 
@@ -1284,9 +1287,9 @@ export function BillingPage() {
           }
         >
           <form onSubmit={handleRecordPayment} className="modal-form">
-            <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, marginBottom: 16, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: 12, color: '#64748b' }}>Target Account</div>
-              <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 15 }}>{paymentModalInvoice.restaurant?.name}</div>
+            <div style={{ background: 'var(--jv-paper-soft)', padding: 12, borderRadius: 8, marginBottom: 16, border: '1px solid var(--jv-line)' }}>
+              <div style={{ fontSize: 12, color: 'var(--jv-slate-500)' }}>Target Account</div>
+              <div style={{ fontWeight: 700, color: 'var(--jv-ink)', fontSize: 15 }}>{paymentModalInvoice.restaurant?.name}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 13 }}>
                 <span>Invoice Total: <strong>₹{(paymentModalInvoice.totalAmount / 100).toFixed(2)}</strong></span>
                 <span>Already Paid: <strong>₹{((paymentModalInvoice.payments?.reduce((s, p) => s + p.amount, 0) || 0) / 100).toFixed(2)}</strong></span>
@@ -1309,7 +1312,7 @@ export function BillingPage() {
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                  style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
+                  style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid var(--jv-line-strong)', padding: '0 10px' }}
                   required
                 >
                   <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
@@ -1366,7 +1369,7 @@ export function BillingPage() {
               <select
                 value={issueRestaurantId}
                 onChange={(e) => setIssueRestaurantId(e.target.value)}
-                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
+                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid var(--jv-line-strong)', padding: '0 10px' }}
                 required
               >
                 <option value="">Select a restaurant…</option>
@@ -1392,7 +1395,7 @@ export function BillingPage() {
                     setIssueTax(String(Math.round(amt * 0.18)));
                   }
                 }}
-                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid #cbd5e1', padding: '0 10px' }}
+                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid var(--jv-line-strong)', padding: '0 10px' }}
               >
                 {plans.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -1447,5 +1450,7 @@ export function BillingPage() {
         </Modal>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

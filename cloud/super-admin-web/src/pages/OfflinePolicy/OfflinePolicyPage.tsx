@@ -165,14 +165,14 @@ export function OfflinePolicyPage() {
 
       {/* Approaching Expiry Warning Section */}
       {approachingExpiry.length > 0 && (
-        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid #fde68a', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
+        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid var(--jv-warn-line)', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <strong style={{ color: '#92400e', fontSize: 14 }}>
+            <strong style={{ color: 'var(--jv-warning-text)', fontSize: 14 }}>
               {approachingExpiry.length} terminal(s) approaching the {policy.offlineGraceDays}-day offline limit
             </strong>
           </div>
-          <p style={{ margin: '0 0 12px', color: '#b45309', fontSize: 13 }}>
+          <p style={{ margin: '0 0 12px', color: 'var(--jv-warning-text)', fontSize: 13 }}>
             A terminal locks itself after {policy.offlineGraceDays} days without reaching JAMANVAAR. These have been silent for {policy.warnAfterDays} days or more. Once the terminal reconnects it resets; if the outage will continue, grant an emergency extension now (it is delivered when the terminal next checks in, or entered as a code).
           </p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -181,7 +181,7 @@ export function OfflinePolicyPage() {
                 key={d.id}
                 style={{
                   background: 'var(--jv-surface-card)',
-                  border: '1px solid #fed7aa',
+                  border: '1px solid var(--jv-accent-line)',
                   borderRadius: 8,
                   padding: '8px 12px',
                   fontSize: 12,
@@ -246,7 +246,7 @@ export function OfflinePolicyPage() {
                         Asked by {ext.requestedBy}{ext.ticketRef ? ` · ${ext.ticketRef}` : ''}
                       </div>
                     </td>
-                    <td style={{ padding: '14px', fontWeight: 800, color: '#0369a1' }}>
+                    <td style={{ padding: '14px', fontWeight: 800, color: 'var(--jv-info-text)' }}>
                       +{ext.extensionDays} Days
                     </td>
                     <td style={{ padding: '14px', color: 'var(--jv-text-secondary)', maxWidth: 280 }}>
@@ -284,7 +284,7 @@ export function OfflinePolicyPage() {
       {modalOpen && (
         <Modal title="Issue Signed Emergency Offline Extension" onClose={() => setModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, fontSize: 13, color: '#166534' }}>
+            <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--jv-success-text)' }}>
               <strong>Cryptographic Protection:</strong> This issues an authentic ECDSA P-256 signed certificate. The local POS and Captain runtimes verify this certificate mathematically even when 100% disconnected from the internet.
             </div>
 
@@ -321,7 +321,7 @@ export function OfflinePolicyPage() {
             </div>
 
             {extensions.some((e) => e.restaurantId === targetRestaurantId && e.status === 'ACTIVE') && (
-              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: 10, fontSize: 12, color: '#92400e' }}>
+              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid var(--jv-warn-line)', borderRadius: 8, padding: 10, fontSize: 12, color: 'var(--jv-warning-text)' }}>
                 This restaurant already has an active extension. Issuing another does not replace it: revoke the earlier one if it should no longer apply.
               </div>
             )}

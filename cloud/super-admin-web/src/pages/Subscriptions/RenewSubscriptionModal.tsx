@@ -106,8 +106,8 @@ export function RenewSubscriptionModal({
           />
         </div>
 
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '12px 16px', borderRadius: 8 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>
+        <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', padding: '12px 16px', borderRadius: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-success-text)', textTransform: 'uppercase' }}>
             New Expiry Date After Extension
           </div>
           <div style={{ fontSize: 16, fontWeight: 800, color: '#14532d', marginTop: 2 }}>

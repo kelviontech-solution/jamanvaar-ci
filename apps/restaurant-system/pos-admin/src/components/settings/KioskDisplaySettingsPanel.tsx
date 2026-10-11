@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@jamanvaar/ui';
+import { Button, SettingsSection } from '@jamanvaar/ui';
 import { KioskDisplaySettingsRepository, OrderRepository, TokenSequenceRepository } from '@jamanvaar/database';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
@@ -25,11 +25,10 @@ export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => v
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
-        <div>
-          <h4 className="font-bold text-jaman-navy">Customer Kiosk Language & Idle Timeout</h4>
-          <p className="text-xs text-[#4A5568]">Which languages the self-order kiosk offers, and how long it waits before resetting an idle session.</p>
-        </div>
+      <SettingsSection
+        title="Customer kiosk language & idle timeout"
+        description="Which languages the self-order kiosk offers, and how long it waits before resetting an idle session."
+      >
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-jaman-ivory rounded-xl border border-jaman-border">
           {(Object.keys(KIOSK_LANGUAGE_LABELS) as Array<keyof typeof KIOSK_LANGUAGE_LABELS>).map((code) => {
@@ -94,15 +93,12 @@ export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => v
             />
           </div>
         </div>
-      </div>
+      </SettingsSection>
 
-      <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
-        <div>
-          <h4 className="font-bold text-jaman-navy">Kiosk Order Token Counter</h4>
-          <p className="text-xs text-[#4A5568]">
-            The kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.
-          </p>
-        </div>
+      <SettingsSection
+        title="Kiosk order token counter"
+        description="The kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day."
+      >
 
         <div className="flex items-center justify-between gap-3 bg-jaman-ivory rounded-xl p-4 border border-jaman-border">
           <div>
@@ -147,7 +143,7 @@ export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => v
             </Button>
           )}
         </div>
-      </div>
+      </SettingsSection>
     </>
   );
 };

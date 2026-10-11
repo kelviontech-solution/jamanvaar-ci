@@ -703,7 +703,7 @@ export function OnboardRestaurantPage() {
             className="modal-form"
           >
             <div className="form-section-title">
-              <Store className="w-4 h-4 text-[#e66817]" />
+              <Store className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Restaurant & Legal Business Identity</span>
             </div>
             <p className="form-subtext">
@@ -830,7 +830,7 @@ export function OnboardRestaurantPage() {
             className="modal-form"
           >
             <div className="form-section-title">
-              <Users className="w-4 h-4 text-[#e66817]" />
+              <Users className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Restaurant Owner & Master Administrator Credentials</span>
             </div>
             <p className="form-subtext">
@@ -872,11 +872,11 @@ export function OnboardRestaurantPage() {
                 marginTop: 20,
                 padding: '16px 20px',
                 borderRadius: 12,
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0'
+                backgroundColor: 'var(--jv-paper-soft)',
+                border: '1px solid var(--jv-line)'
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--jv-ink)', marginBottom: 8 }}>
                 Initial Account Access Setup
               </div>
               <div style={{ display: 'flex', gap: 24, marginBottom: 14 }}>
@@ -945,7 +945,7 @@ export function OnboardRestaurantPage() {
             className="modal-form"
           >
             <div className="form-section-title">
-              <Sparkles className="w-4 h-4 text-[#e66817]" />
+              <Sparkles className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Select Subscription Plan Tier & Commercial Terms</span>
             </div>
             <p className="form-subtext">
@@ -996,7 +996,7 @@ export function OnboardRestaurantPage() {
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Captain Wireless Waiter App
                         </span>
                       </li>
@@ -1006,7 +1006,7 @@ export function OnboardRestaurantPage() {
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           QR Table Ordering & Standees
                         </span>
                       </li>
@@ -1022,7 +1022,7 @@ export function OnboardRestaurantPage() {
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Self-Order Kiosk App
                         </span>
                       </li>
@@ -1032,7 +1032,7 @@ export function OnboardRestaurantPage() {
                         ) : (
                           <span className="text-slate-400 font-bold">✕</span>
                         )}
-                        <span className={isPro ? 'font-bold text-[#0b253a]' : 'text-slate-400 line-through'}>
+                        <span className={isPro ? 'font-bold text-[var(--jv-ink)]' : 'text-slate-400 line-through'}>
                           Kiosk Admin Dashboard
                         </span>
                       </li>
@@ -1120,7 +1120,7 @@ export function OnboardRestaurantPage() {
             className="modal-form"
           >
             <div className="form-section-title">
-              <Building2 className="w-4 h-4 text-[#e66817]" />
+              <Building2 className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Initial Branch & Hardware Quotas</span>
             </div>
             <p className="form-subtext">
@@ -1185,14 +1185,14 @@ export function OnboardRestaurantPage() {
                 marginTop: 20,
                 padding: '16px',
                 borderRadius: 12,
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0'
+                backgroundColor: 'var(--jv-paper-soft)',
+                border: '1px solid var(--jv-line)'
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 4, textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-slate-600)', marginBottom: 4, textTransform: 'uppercase' }}>
                 Applications to Provision
               </div>
-              <p style={{ fontSize: 11, color: '#64748b', marginTop: 0, marginBottom: 10 }}>
+              <p style={{ fontSize: 11, color: 'var(--jv-slate-500)', marginTop: 0, marginBottom: 10 }}>
                 Pre-selected from {selectedPlan?.name || 'the selected plan'}'s tier — uncheck anything this
                 restaurant shouldn't have, or enable one the plan doesn't normally include.
               </p>
@@ -1255,11 +1255,11 @@ export function OnboardRestaurantPage() {
                 marginTop: 12,
                 padding: '16px',
                 borderRadius: 12,
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0'
+                backgroundColor: 'var(--jv-paper-soft)',
+                border: '1px solid var(--jv-line)'
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', marginBottom: 8, textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-slate-600)', marginBottom: 8, textTransform: 'uppercase' }}>
                 Plan Feature Entitlements ({selectedPlan?.name || 'Selected Plan'}):
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -1274,9 +1274,9 @@ export function OnboardRestaurantPage() {
                           fontWeight: 600,
                           padding: '3px 8px',
                           borderRadius: 6,
-                          backgroundColor: '#ecfdf5',
+                          backgroundColor: 'var(--jv-success-soft)',
                           color: '#065f46',
-                          border: '1px solid #a7f3d0',
+                          border: '1px solid var(--jv-ok-line)',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: 4
@@ -1310,7 +1310,7 @@ export function OnboardRestaurantPage() {
             className="modal-form"
           >
             <div className="form-section-title">
-              <Laptop2 className="w-4 h-4 text-[#e66817]" />
+              <Laptop2 className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Pre-Generate Hardware Activation Keys</span>
             </div>
             <p className="form-subtext">
@@ -1330,7 +1330,7 @@ export function OnboardRestaurantPage() {
                   onChange={() => handleDeviceTypeToggle('POS_ADMIN')}
                 />
                 <div>
-                  <div className="device-key-option-label" style={{ fontWeight: 800, color: '#0b253a' }}>
+                  <div className="device-key-option-label" style={{ fontWeight: 800, color: 'var(--jv-ink)' }}>
                     Restaurant Admin Console (POS_ADMIN) ★
                   </div>
                   <div className="device-key-option-desc">Manager PC / Browser Management Suite ({RESTAURANT_ADMIN_URL})</div>
@@ -1448,7 +1448,7 @@ export function OnboardRestaurantPage() {
         {step === 'review' && (
           <div className="modal-form">
             <div className="form-section-title">
-              <ShieldCheck className="w-4 h-4 text-[#e66817]" />
+              <ShieldCheck className="w-4 h-4 text-[var(--jv-accent-text)]" />
               <span>Review Commercial Contract & Onboarding Details</span>
             </div>
             <p className="form-subtext">
@@ -1487,7 +1487,7 @@ export function OnboardRestaurantPage() {
                 </div>
                 <div className="credential-item">
                   <span className="credential-label">Assigned Plan Tier</span>
-                  <span className="credential-value" style={{ color: '#059669' }}>
+                  <span className="credential-value" style={{ color: 'var(--jv-success-text)' }}>
                     {selectedPlan?.name} (₹{((selectedPlan?.priceMonthly || 0) / 100).toLocaleString('en-IN')}/mo)
                   </span>
                 </div>
@@ -1560,9 +1560,9 @@ export function OnboardRestaurantPage() {
                   margin: '16px 0',
                   padding: '14px 16px',
                   borderRadius: 12,
-                  background: '#fef2f2',
-                  border: '1px solid #fecaca',
-                  color: '#991b1b'
+                  background: 'var(--jv-error-soft)',
+                  border: '1px solid var(--jv-err-line)',
+                  color: 'var(--jv-error-text)'
                 }}
               >
                 <div style={{ fontWeight: 800, fontSize: 12.5, marginBottom: 6 }}>
@@ -1578,7 +1578,7 @@ export function OnboardRestaurantPage() {
 
             {/* Owner Credentials Card */}
             <div className="credentials-box">
-              <div style={{ fontSize: 13, fontWeight: 800, color: '#0b253a', marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--jv-ink)', marginBottom: 12 }}>
                 1. Restaurant Admin Console Credentials
               </div>
               <div className="credentials-grid">
@@ -1589,10 +1589,10 @@ export function OnboardRestaurantPage() {
                     <button
                       type="button"
                       onClick={() => handleCopy(restaurantCode ?? restaurantId ?? '', 'Restaurant ID')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                       title="Copy"
                     >
-                      {isCopied('Restaurant ID') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                      {isCopied('Restaurant ID') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1604,10 +1604,10 @@ export function OnboardRestaurantPage() {
                     <button
                       type="button"
                       onClick={() => handleCopy(RESTAURANT_ADMIN_URL, 'Restaurant Admin Portal URL')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                       title="Copy"
                     >
-                      {isCopied('Restaurant Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                      {isCopied('Restaurant Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1624,10 +1624,10 @@ export function OnboardRestaurantPage() {
                       <button
                         type="button"
                         onClick={() => handleCopy(KIOSK_ADMIN_URL, 'Kiosk Admin Portal URL')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                         title="Copy"
                       >
-                        {isCopied('Kiosk Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                        {isCopied('Kiosk Admin Portal URL') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                   </div>
@@ -1640,10 +1640,10 @@ export function OnboardRestaurantPage() {
                     <button
                       type="button"
                       onClick={() => handleCopy(owner.ownerEmail, 'Login Email')}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                       title="Copy"
                     >
-                      {isCopied('Login Email') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                      {isCopied('Login Email') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -1656,10 +1656,10 @@ export function OnboardRestaurantPage() {
                       <button
                         type="button"
                         onClick={() => handleCopy(owner.initialPassword, 'Password')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                         title="Copy"
                       >
-                        {isCopied('Password') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                        {isCopied('Password') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     )}
                   </div>
@@ -1679,10 +1679,10 @@ export function OnboardRestaurantPage() {
                         <button
                           type="button"
                           onClick={() => handleCopy(ownerActivationToken, 'Invitation token')}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--jv-slate-500)' }}
                           title="Copy"
                         >
-                          {isCopied('Invitation token') ? <Check className="w-3.5 h-3.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5" />}
+                          {isCopied('Invitation token') ? <Check className="w-3.5 h-3.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       )}
                     </div>
@@ -1692,16 +1692,16 @@ export function OnboardRestaurantPage() {
             </div>
 
             {/* Hardware Activation Codes & QR Stamps */}
-            <div style={{ marginTop: 24, padding: '18px 20px', borderRadius: 14, border: '1.5px solid #fed7aa', background: 'linear-gradient(180deg, #fffaf5 0%, #ffffff 100%)' }}>
+            <div style={{ marginTop: 24, padding: '18px 20px', borderRadius: 14, border: '1.5px solid var(--jv-accent-line)', background: 'linear-gradient(180deg, #fffaf5 0%, #ffffff 100%)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <KeyRound className="w-5 h-5 text-orange-600" />
-                    <span style={{ fontSize: 16, fontWeight: 900, color: '#0b253a' }}>
+                    <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--jv-ink)' }}>
                       2. Pre-Generated Device Activation Keys ({provisionedKeys.length})
                     </span>
                   </div>
-                  <p style={{ margin: '6px 0 0 0', fontSize: 13, color: '#64748b' }}>
+                  <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--jv-slate-500)' }}>
                     Provide these keys to the restaurant owner. On first login, entering the matching key registers and
                     binds the device — <strong>POS_ADMIN / POS / CAPTAIN / KDS</strong> keys at{' '}
                     <strong>{RESTAURANT_ADMIN_URL}</strong>
@@ -1724,20 +1724,20 @@ export function OnboardRestaurantPage() {
                     }}
                     style={{ fontWeight: 700, color: 'var(--jv-accent-text)' }}
                   >
-                    {isCopied('All Activation Keys') ? <Check className="w-3.5 h-3.5 mr-1.5" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
+                    {isCopied('All Activation Keys') ? <Check className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
                     {isCopied('All Activation Keys') ? 'Copied' : 'Copy All Keys'}
                   </Button>
                 )}
               </div>
 
-              <div style={{ padding: '10px 14px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #a7f3d0', color: '#065f46', fontSize: 12.5, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ padding: '10px 14px', background: 'var(--jv-success-soft)', borderRadius: 8, border: '1px solid var(--jv-ok-line)', color: '#065f46', fontSize: 12.5, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>These keys are permanently saved and accessible anytime in <strong>Restaurant Details → Overview</strong> and <strong>Devices &amp; Keys</strong> tab.</span>
               </div>
 
               {provisionedKeys.length === 0 ? (
-                <div style={{ padding: '24px', textAlign: 'center', background: '#fff', borderRadius: 10, border: '1px dashed #cbd5e1' }}>
-                  <p style={{ margin: '0 0 12px 0', fontSize: 13, color: '#64748b' }}>
+                <div style={{ padding: '24px', textAlign: 'center', background: 'var(--jv-paper)', borderRadius: 10, border: '1px dashed var(--jv-line-strong)' }}>
+                  <p style={{ margin: '0 0 12px 0', fontSize: 13, color: 'var(--jv-slate-500)' }}>
                     No keys were provisioned yet for this restaurant.
                   </p>
                   <Button variant="accent" onClick={handleGenerateKeysOnDone} disabled={processing}>
@@ -1748,7 +1748,7 @@ export function OnboardRestaurantPage() {
               ) : (
                 <div className="device-keys-grid">
                   {provisionedKeys.map((k) => (
-                    <div key={k.id} className="device-key-card" style={{ border: '1.5px solid #fed7aa', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
+                    <div key={k.id} className="device-key-card" style={{ border: '1.5px solid var(--jv-accent-line)', boxShadow: '0 2px 8px rgba(234, 88, 12, 0.08)' }}>
                       <div className="device-key-type-tag" style={{ background: 'var(--jv-accent)', color: '#fff', fontWeight: 800 }}>
                         {k.requestedType === 'QR_ORDERING'
                           ? 'QR ORDERING CONSOLE'
@@ -1763,7 +1763,7 @@ export function OnboardRestaurantPage() {
                         dangerouslySetInnerHTML={{ __html: k.qrSvg }}
                         title={`Scan QR to activate ${k.deviceType}`}
                       />
-                      <div className="device-code-pill" style={{ fontWeight: 900, color: '#0b253a', fontSize: 14 }}>
+                      <div className="device-code-pill" style={{ fontWeight: 900, color: 'var(--jv-ink)', fontSize: 14 }}>
                         {k.code}
                       </div>
                       <Button
@@ -1771,7 +1771,7 @@ export function OnboardRestaurantPage() {
                         style={{ fontSize: 11, padding: '4px 10px', color: 'var(--jv-accent-text)', fontWeight: 700 }}
                         onClick={() => handleCopy(k.code, `${k.deviceType} Key`)}
                       >
-                        {isCopied(`${k.deviceType} Key`) ? <Check className="w-3 h-3 mr-1" style={{ color: '#047857' }} /> : <Copy className="w-3 h-3 mr-1" />}
+                        {isCopied(`${k.deviceType} Key`) ? <Check className="w-3 h-3 mr-1" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3 h-3 mr-1" />}
                         {isCopied(`${k.deviceType} Key`) ? 'Copied' : 'Copy Code'}
                       </Button>
                     </div>
@@ -1791,7 +1791,7 @@ export function OnboardRestaurantPage() {
                   variant="ghost"
                   onClick={() => handleCopy(getHandoverWhatsAppText(), 'WhatsApp Handover Message')}
                 >
-                  {isCopied('WhatsApp Handover Message') ? <Check className="w-4 h-4 mr-1.5" style={{ color: '#047857' }} /> : <Copy className="w-4 h-4 mr-1.5" />}
+                  {isCopied('WhatsApp Handover Message') ? <Check className="w-4 h-4 mr-1.5" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-4 h-4 mr-1.5" />}
                   {isCopied('WhatsApp Handover Message') ? 'Copied' : 'Copy WhatsApp / Email Greeting'}
                 </Button>
               </div>

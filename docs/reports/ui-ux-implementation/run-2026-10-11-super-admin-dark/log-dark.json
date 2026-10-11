@@ -1,0 +1,154 @@
+[
+ {
+  "id": "SA-HARNESS-LIGHT",
+  "app": "super-admin",
+  "url": "http://localhost:5303/?theme=light&modal=1",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 8,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 8,
+   "h1": [
+    "Platform overview"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Platform overview | Hard-coded inline colours now follow the theme. | 1 | Restaurants | 128 | 1 | Active | 121 | 7 | Trials | 7 | 4 | Devices | 412 | 3 | Alerts | 3 | Primary | Accent | Ghost | Danger | ACTIVE | TRIAL | SUSPENDED | DRAFT | All | 12 | Trials | 3 | Success note using migrated inline tokens | Error note using migrated inline tokens | Neutral panel: strong text | RESTAURANT\tPLAN\tSTATUS | Spice Route\tPro\t | ACTIVE | Tandoor House\tCore\t | TRIAL | Edit restaurant | × | Dialog body text"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Spice Route"
+   }
+  ],
+  "shot": "evidence/super-admin/SA-HARNESS-LIGHT-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "SA-HARNESS-LIGHT",
+  "app": "super-admin",
+  "url": "http://localhost:5303/?theme=light&modal=1",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 8,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 8,
+   "h1": [
+    "Platform overview"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Platform overview | Hard-coded inline colours now follow the theme. | 1 | Restaurants | 128 | 1 | Active | 121 | 7 | Trials | 7 | 4 | Devices | 412 | 3 | Alerts | 3 | Primary | Accent | Ghost | Danger | ACTIVE | TRIAL | SUSPENDED | DRAFT | All | 12 | Trials | 3 | Success note using migrated inline tokens | Error note using migrated inline tokens | Neutral panel: strong text | RESTAURANT\tPLAN\tSTATUS | Spice Route\tPro\t | ACTIVE | Tandoor House\tCore\t | TRIAL | Edit restaurant | × | Dialog body text"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Spice Route"
+   }
+  ],
+  "shot": "evidence/super-admin/SA-HARNESS-LIGHT-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "SA-HARNESS-DARK",
+  "app": "super-admin",
+  "url": "http://localhost:5303/?theme=dark&modal=1",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 8,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 8,
+   "h1": [
+    "Platform overview"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Platform overview | Hard-coded inline colours now follow the theme. | 1 | Restaurants | 128 | 1 | Active | 121 | 7 | Trials | 7 | 4 | Devices | 412 | 3 | Alerts | 3 | Primary | Accent | Ghost | Danger | ACTIVE | TRIAL | SUSPENDED | DRAFT | All | 12 | Trials | 3 | Success note using migrated inline tokens | Error note using migrated inline tokens | Neutral panel: strong text | RESTAURANT\tPLAN\tSTATUS | Spice Route\tPro\t | ACTIVE | Tandoor House\tCore\t | TRIAL | Edit restaurant | × | Dialog body text"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Spice Route"
+   }
+  ],
+  "shot": "evidence/super-admin/SA-HARNESS-DARK-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "SA-HARNESS-DARK",
+  "app": "super-admin",
+  "url": "http://localhost:5303/?theme=dark&modal=1",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 8,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 8,
+   "h1": [
+    "Platform overview"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Platform overview | Hard-coded inline colours now follow the theme. | 1 | Restaurants | 128 | 1 | Active | 121 | 7 | Trials | 7 | 4 | Devices | 412 | 3 | Alerts | 3 | Primary | Accent | Ghost | Danger | ACTIVE | TRIAL | SUSPENDED | DRAFT | All | 12 | Trials | 3 | Success note using migrated inline tokens | Error note using migrated inline tokens | Neutral panel: strong text | RESTAURANT\tPLAN\tSTATUS | Spice Route\tPro\t | ACTIVE | Tandoor House\tCore\t | TRIAL | Edit restaurant | × | Dialog body text"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "Spice Route"
+   }
+  ],
+  "shot": "evidence/super-admin/SA-HARNESS-DARK-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

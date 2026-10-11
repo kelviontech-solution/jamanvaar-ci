@@ -64,7 +64,7 @@ export const CaptainMessagesView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-jaman-saffron" />
-              <h2 className="text-xl font-black text-jaman-navy">Floor & Kitchen Communications</h2>
+              <h2 className="text-xl font-bold text-jaman-navy">Floor & Kitchen Communications</h2>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
               Live operational messaging between Captain, Kitchen, Cashier, and Manager.
@@ -82,7 +82,7 @@ export const CaptainMessagesView: React.FC = () => {
                 key={flt.id}
                 type="button"
                 onClick={() => setFilter(flt.id as any)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filter === flt.id
                     ? 'bg-jaman-navy text-white shadow-xs'
                     : 'bg-jaman-cream text-slate-600 hover:bg-slate-100'
@@ -106,22 +106,22 @@ export const CaptainMessagesView: React.FC = () => {
               return (
                 <div
                   key={msg.id}
-                  className={`bg-white rounded-3xl border p-4 sm:p-5 space-y-3 shadow-2xs transition-all ${
+                  className={`bg-white rounded-2xl border p-4 sm:p-5 space-y-3 shadow-2xs transition-all ${
                     msg.status === 'RESOLVED' ? 'border-jaman-border opacity-75' : 'border-[#FDBA74] bg-[#FFFBF7]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-jaman-navy bg-slate-100 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-bold text-jaman-navy bg-slate-100 px-2 py-0.5 rounded-md">
                           From: {msg.senderName}
                         </span>
                         <span className="text-xs font-bold text-slate-400">➔</span>
-                        <span className="text-xs font-black text-jaman-saffron bg-[#FFF4ED] px-2 py-0.5 rounded-md border border-[#FDBA74]">
+                        <span className="text-xs font-bold text-jaman-saffron bg-[#FFF4ED] px-2 py-0.5 rounded-md border border-[#FDBA74]">
                           {getRecipientBadge(msg.recipient)}
                         </span>
                         {msg.tableNumber && (
-                          <span className="text-xs font-black bg-jaman-navy text-white px-2 py-0.5 rounded-md">
+                          <span className="text-xs font-bold bg-jaman-navy text-white px-2 py-0.5 rounded-md">
                             TABLE {msg.tableNumber}
                           </span>
                         )}
@@ -149,7 +149,7 @@ export const CaptainMessagesView: React.FC = () => {
                   {/* Status & Actions */}
                   <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                     <span
-                      className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full uppercase ${
                         msg.status === 'RESOLVED'
                           ? 'bg-emerald-100 text-emerald-800'
                           : msg.status === 'ACKNOWLEDGED'
@@ -175,7 +175,7 @@ export const CaptainMessagesView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => resolveMessage(msg.id)}
-                          className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1"
+                          className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1"
                         >
                           <Check className="w-3.5 h-3.5" />
                           <span>Resolve</span>
@@ -190,7 +190,7 @@ export const CaptainMessagesView: React.FC = () => {
         ) : (
           <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
             <MessageSquare className="w-12 h-12 text-slate-400 mx-auto" />
-            <h3 className="text-lg font-black text-jaman-navy">No Active Messages</h3>
+            <h3 className="text-lg font-bold text-jaman-navy">No Active Messages</h3>
             <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
               All communications have been resolved. Use the composer on the right to send an operational note.
             </p>
@@ -202,7 +202,7 @@ export const CaptainMessagesView: React.FC = () => {
       <div className="bg-white rounded-3xl border border-jaman-border p-5 space-y-4 shadow-2xs self-start sticky top-24">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
           <Send className="w-4 h-4 text-jaman-saffron" />
-          <h3 className="text-base font-black text-jaman-navy">Quick Message Composer</h3>
+          <h3 className="text-base font-bold text-jaman-navy">Quick Message Composer</h3>
         </div>
 
         <form onSubmit={handleSend} className="space-y-3.5">
@@ -287,7 +287,7 @@ export const CaptainMessagesView: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Send className="w-4 h-4" />
             <span>Send Message Broadcast</span>

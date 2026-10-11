@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InventoryItem, StockMovement } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { InventoryRepository } from '@jamanvaar/database';
 
 interface StockAdjustModalProps {
@@ -66,7 +66,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Adjustment Type</label>
-          <select
+          <FormSelect
             value={movementType}
             onChange={(e) => {
               const val = e.target.value as StockMovement['type'];
@@ -76,27 +76,27 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               else if (val === 'SPOILAGE') setReason('Ingredient expired / spoiled');
               else if (val === 'ADJUSTMENT') setReason('Physical stock audit reconciliation');
             }}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           >
             <option value="RESTOCK">Restock / Purchase Received (+)</option>
             <option value="WASTE">Kitchen Wastage (-)</option>
             <option value="SPOILAGE">Spoilage / Expired (-)</option>
             <option value="ADJUSTMENT">Physical Count Reconciliation</option>
-          </select>
+          </FormSelect>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">
             {movementType === 'ADJUSTMENT' ? `Exact Count Found (${item.unit})` : `Quantity (${item.unit})`}
           </label>
-          <input
+          <FormInput
             type="number"
             step="0.1"
             min="0"
             required
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+            mono
           />
         </div>
 

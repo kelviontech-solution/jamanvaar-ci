@@ -165,7 +165,7 @@ export const App: React.FC = () => {
       setIsDeviceActivated(true);
       setShowActivationWelcome(true);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed');
+      setActivationError(err instanceof CloudApiError ? err.message : "Could not complete activation. Check this device's internet connection and try again.");
     } finally {
       setIsActivating(false);
     }
@@ -646,6 +646,9 @@ export const App: React.FC = () => {
           appIdentity="KDS"
           appTitle="Kitchen Display System"
           appSubtitle="One-time setup — activate this display to start receiving tickets."
+          isLocalCoreUnauthorized={kdsDb.isLocalCoreUnauthorized()}
+          isLocalCoreConnected={kdsDb.isLocalCoreConnected()}
+          healthCheckUrl={kdsDb.localCoreHealthUrl()}
           heroHeadline="Real-Time Kitchen Production Command"
           heroHighlightWord="Live KOTs"
           heroDescription="Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff."

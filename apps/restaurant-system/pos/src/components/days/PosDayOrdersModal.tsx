@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect} from 'react';
 import { BusinessDay, Order, OrderStatus, OrderType, PaymentMethod } from '@jamanvaar/types';
 import { BusinessDayRepository } from '@jamanvaar/database';
 import { formatINR, formatSplitTax } from '@jamanvaar/utils';
-import { EmptyState } from '@jamanvaar/ui';
+import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
 import {
   X,
   Search,
@@ -85,7 +85,7 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
+    <ModalBackdrop className="flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
       <div className="bg-jaman-cream border border-jaman-border w-full max-w-6xl h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Header */}
@@ -355,6 +355,6 @@ export const PosDayOrdersModal: React.FC<PosDayOrdersModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

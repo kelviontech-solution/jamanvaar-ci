@@ -2,6 +2,7 @@ import { LocalCorePairing } from './LocalCorePairing';
 import React, { useEffect, useState } from 'react';
 import { collectDiagnostics, connectionStatus, saveCoreUrl, syncNow, EndpointResolver, type StatusTone } from '@jamanvaar/sync';
 import { db, TenantIsolation } from '@jamanvaar/database';
+import { useConfirm } from './ConfirmDialog';
 
 const TONE: Record<StatusTone, string> = {
   ok: 'bg-emerald-50 text-emerald-800 border-emerald-200',
@@ -45,6 +46,7 @@ export const ConnectionBadge: React.FC<{ className?: string }> = ({ className = 
 
 /** Full connectivity and diagnostics screen: status, Branch Core address, sync backlog, storage health, versions. */
 export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: string) => void }> = ({ appVersion, showToast }) => {
+  const { confirm, confirmDialog } = useConfirm();
   const d = useLive(() => collectDiagnostics(appVersion));
   const [address, setAddress] = useState(d.coreUrl ?? '');
   const [message, setMessage] = useState<string | null>(null);
@@ -56,6 +58,7 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
   );
 
   return (
+    <>
     <div className="space-y-5" data-testid="connection-panel">
       <div className={`rounded-2xl border p-4 ${TONE[d.status.tone]}`}>
         <div className="text-lg font-extrabold">{d.status.label}</div>
@@ -103,8 +106,13 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         <p className="text-xs text-slate-500 mt-1">Removes the staff list, orders and other data stored on this device and downloads this restaurant's own data again. Use it if you see staff, orders or items that are not yours. Orders not yet sent are set aside, not deleted.</p>
         <button
           type="button"
-          onClick={() => {
-            if (!window.confirm('Remove the data stored on this device and download it again from your restaurant account?')) return;
+          onClick={async () => {
+            if (!(await confirm({
+              title: 'Start this device fresh?',
+              message: 'The data stored on this device will be removed and downloaded again from your restaurant account. Orders not yet sent are set aside, not deleted.',
+              confirmLabel: 'Clear and re-download',
+              tone: 'danger'
+            }))) return;
             const r = TenantIsolation.reset(db.restaurant.id);
             say(r.quarantined > 0 ? `Device cleared. ${r.quarantined} unsent order(s) were set aside.` : 'Device cleared. Your restaurant data will download again.');
             void syncNow();
@@ -115,5 +123,7 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         </button>
       </div>
     </div>
+    {confirmDialog}
+    </>
   );
 };

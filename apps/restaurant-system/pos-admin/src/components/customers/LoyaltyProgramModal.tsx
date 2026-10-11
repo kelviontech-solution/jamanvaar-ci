@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LoyaltyTier, LoyaltyReward } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, useConfirm } from '@jamanvaar/ui';
 import { syncLoyaltyProgramSettings, syncLoyaltyRewards, syncLoyaltyTiers } from '@jamanvaar/sync';
 import { db, CustomerRepository } from '@jamanvaar/database';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
@@ -17,6 +17,7 @@ interface LoyaltyProgramModalProps {
  * redeem points against (just an implicit "1 pt = ₹1" assumption).
  */
 export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen, onClose, showToast }) => {
+  const { confirm, confirmDialog } = useConfirm();
   const [tiers, setTiers] = useState<LoyaltyTier[]>(() => CustomerRepository.getTiers());
   const [rewards, setRewards] = useState<LoyaltyReward[]>(() => CustomerRepository.getRewards());
   const [rate, setRate] = useState(() => CustomerRepository.getProgramSettings());
@@ -61,8 +62,8 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
     showToast('Tier updated');
   };
 
-  const removeTier = (tier: LoyaltyTier) => {
-    if (!window.confirm(`Delete tier "${tier.name}"? Customers at this tier will fall back to the next one below.`)) return;
+  const removeTier = async (tier: LoyaltyTier) => {
+    if (!(await confirm({ title: 'Delete tier?', message: `Tier "${tier.name}" will be deleted. Customers at this tier will fall back to the next one below.`, confirmLabel: 'Delete tier', tone: 'danger' }))) return;
     CustomerRepository.deleteTier(tier.id);
     refresh();
     showToast(`Deleted tier: ${tier.name}`);
@@ -88,8 +89,8 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
     refresh(); syncProgram();
   };
 
-  const removeReward = (reward: LoyaltyReward) => {
-    if (!window.confirm(`Remove reward "${reward.name}" from the catalog?`)) return;
+  const removeReward = async (reward: LoyaltyReward) => {
+    if (!(await confirm({ title: 'Remove reward?', message: `"${reward.name}" will be removed from the rewards catalog.`, confirmLabel: 'Remove reward', tone: 'danger' }))) return;
     CustomerRepository.deleteReward(reward.id);
     refresh();
     showToast(`Removed reward: ${reward.name}`);
@@ -109,6 +110,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
   };
 
   return (
+    <>
     <Modal isOpen={isOpen} onClose={onClose} title="Loyalty Program Settings" maxWidth="lg">
       <div className="space-y-6 py-1">
         <button type="button" onClick={() => { CustomerRepository.updateProgramSettings({ ...CustomerRepository.getProgramSettings(), enabled: rate.enabled === false }); refresh(); syncProgram(); }} className="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-3 font-bold text-emerald-800">
@@ -279,5 +281,7 @@ export const LoyaltyProgramModal: React.FC<LoyaltyProgramModalProps> = ({ isOpen
         </div>
       </div>
     </Modal>
+    {confirmDialog}
+    </>
   );
 };

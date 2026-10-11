@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { KioskLocalPrinterRepository, type KioskLocalPrinterConfig } from '@jamanvaar/database';
 import { detectPrinters, describeDiscovered, PrinterService, type DetectionResult, type DiscoveredPrinter } from '@jamanvaar/api';
 import { RefreshCw, Usb, Wifi, Cable, CheckCircle2, Trash2 } from 'lucide-react';
@@ -215,61 +215,61 @@ export const KioskPrinterSettingsModal: React.FC<KioskPrinterSettingsModalProps>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Printer Name *</label>
-          <input
+          <FormInput
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Kiosk Counter Thermal 80mm"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Interface Connection</label>
-            <select
+            <FormSelect
               value={interfaceType}
               onChange={(e) => setInterfaceType(e.target.value as KioskLocalPrinterConfig['interfaceType'])}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="USB">USB Cable</option>
               <option value="NETWORK_LAN">Ethernet / Network LAN</option>
               <option value="SERIAL">Serial / COM Port</option>
               <option value="WINDOWS_DRIVER">Windows System Spooler</option>
-            </select>
+            </FormSelect>
           </div>
 
           {interfaceType === 'NETWORK_LAN' ? (
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">Printer IP Address *</label>
-              <input
+              <FormInput
                 type="text"
                 value={ipAddress}
                 onChange={(e) => setIpAddress(e.target.value)}
                 placeholder="192.168.1.200"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+                mono
               />
             </div>
           ) : interfaceType === 'SERIAL' ? (
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">COM Port</label>
-              <input
+              <FormInput
                 type="text"
                 value={port}
                 onChange={(e) => setPort(e.target.value)}
                 placeholder="COM3"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+                mono
               />
             </div>
           ) : (
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">Windows Printer Name *</label>
-              <input
+              <FormInput
                 type="text"
                 value={systemPrinterName}
                 onChange={(e) => setSystemPrinterName(e.target.value)}
                 placeholder="Exact Windows printer name"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
               />
             </div>
           )}

@@ -185,9 +185,9 @@ export function InviteTeammateModal({ onClose, onSuccess }: InviteTeammateModalP
               style={{
                 padding: '10px 14px',
                 borderRadius: 6,
-                background: '#fef2f2',
-                border: '1px solid #fecaca',
-                color: '#b91c1c',
+                background: 'var(--jv-error-soft)',
+                border: '1px solid var(--jv-err-line)',
+                color: 'var(--jv-error-text)',
                 fontSize: 13
               }}
             >

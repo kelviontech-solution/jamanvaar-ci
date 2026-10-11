@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShiftRecord } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput } from '@jamanvaar/ui';
 import { ShiftRepository } from '@jamanvaar/database';
 
 interface CashDropModalProps {
@@ -79,13 +79,13 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Amount (₹) *</label>
-          <input
+          <FormInput
             type="number"
             min="1"
             required
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+            mono
           />
         </div>
 

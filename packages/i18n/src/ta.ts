@@ -126,6 +126,12 @@ export const ta = {
   idleWarningText: 'உங்கள் பாதுகாப்பிற்காக, இந்த அமர்வு தானாக மீட்டமைக்கப்படும்',
   seconds: 'வினாடிகளில்',
   keepOrdering: 'ஆர்டர் செய்வதைத் தொடரவும்',
+  validationPhoneInvalid: 'சரியான 10 இலக்க மொபைல் எண்ணை உள்ளிடவும்.',
+  otpExpired: 'இந்த குறியீடு காலாவதியாகிவிட்டது. புதிய குறியீட்டிற்கு Send OTP ஐ அழுத்தவும்.',
+  otpTooManyAttempts: 'பல தவறான முயற்சிகள். புதிய குறியீட்டிற்கு Send OTP ஐ அழுத்தவும்.',
+  otpIncorrectLeft: 'தவறான குறியீடு. {{count}} முயற்சி(கள்) மீதமுள்ளன.',
+  otpIncorrectNone: 'தவறான குறியீடு. முயற்சிகள் இல்லை — மீண்டும் Send OTP ஐ அழுத்தவும்.',
+  fixCustomization: 'தேவையான தேர்வுகளை முடிக்கவும்:',
 
   // Accessibility & System
   highContrast: 'அதிக காண்ட்ராஸ்ட்',

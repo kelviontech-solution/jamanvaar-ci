@@ -125,7 +125,7 @@ export function SystemHealthPage() {
             </div>
             <dl className="detail-list">
               <dt>Service Status</dt>
-              <dd style={{ fontWeight: 700, color: '#16a34a' }}>OPERATIONAL</dd>
+              <dd style={{ fontWeight: 700, color: 'var(--jv-success-text)' }}>OPERATIONAL</dd>
               <dt>Runtime Uptime</dt>
               <dd style={{ fontWeight: 600 }}>
                 {uptimeHours > 0 ? `${uptimeHours}h ` : ''}{remainingMinutes}m {health.uptimeSeconds % 60}s

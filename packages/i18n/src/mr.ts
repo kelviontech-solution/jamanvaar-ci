@@ -126,6 +126,12 @@ export const mr = {
   idleWarningText: 'तुमच्या सुरक्षेसाठी, हे सत्र आपोआप रीसेट होईल',
   seconds: 'सेकंदात',
   keepOrdering: 'ऑर्डर सुरू ठेवा',
+  validationPhoneInvalid: 'कृपया 10 अंकी वैध मोबाइल नंबर टाका.',
+  otpExpired: 'हा कोड कालबाह्य झाला आहे. नवीन कोडसाठी Send OTP दाबा.',
+  otpTooManyAttempts: 'खूप चुकीचे प्रयत्न. नवीन कोडसाठी Send OTP दाबा.',
+  otpIncorrectLeft: 'चुकीचा कोड. {{count}} प्रयत्न शिल्लक.',
+  otpIncorrectNone: 'चुकीचा कोड. प्रयत्न शिल्लक नाहीत — पुन्हा Send OTP दाबा.',
+  fixCustomization: 'कृपया आवश्यक पर्याय निवडा:',
 
   // Accessibility & System
   highContrast: 'हाय कॉन्ट्रास्ट',

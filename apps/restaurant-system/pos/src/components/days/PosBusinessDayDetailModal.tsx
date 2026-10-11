@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useEffect} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
 import { db, BusinessDayRepository, PrintQueueRepository } from '@jamanvaar/database';
@@ -198,7 +199,7 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
   const isClosed = businessDay.status === 'CLOSED';
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
+    <ModalBackdrop className="flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
       <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Action Header */}
@@ -510,6 +511,6 @@ VARIANCE: Rs. ${businessDay.cashVariance || 0}
           </div>
         </div>
       )}
-    </div>
+    </ModalBackdrop>
   );
 };

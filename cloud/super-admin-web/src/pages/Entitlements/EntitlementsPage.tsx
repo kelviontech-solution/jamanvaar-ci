@@ -164,7 +164,7 @@ export function EntitlementsPage() {
                               ₹{(p.priceMonthly / 100).toLocaleString('en-IN')}
                               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--jv-text-muted)' }}>/mo</span>
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: '#166534', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '2px 8px', borderRadius: 12 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-success-text)', background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', padding: '2px 8px', borderRadius: 12 }}>
                               {dynamicFeatCount} Capabilities Active
                             </span>
                           </div>
@@ -208,7 +208,7 @@ export function EntitlementsPage() {
                                   <span>{category.isProExclusive ? '⭐' : '📦'}</span>
                                   <span>{category.name}</span>
                                   {category.isProExclusive && (
-                                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff4ed', border: '1px solid #fed7aa', padding: '1px 6px', borderRadius: 10 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: 'var(--jv-accent-soft)', border: '1px solid var(--jv-accent-line)', padding: '1px 6px', borderRadius: 10 }}>
                                       PRO EXCLUSIVE
                                     </span>
                                   )}
@@ -247,7 +247,7 @@ export function EntitlementsPage() {
                                       }}
                                     >
                                       {isEnabled ? (
-                                        <span style={{ color: '#16a34a', fontWeight: 900, fontSize: 15 }}>
+                                        <span style={{ color: 'var(--jv-success-text)', fontWeight: 900, fontSize: 15 }}>
                                           ✓ <span style={{ fontSize: 11, fontWeight: 700 }}>Included</span>
                                         </span>
                                       ) : (
@@ -292,7 +292,7 @@ export function EntitlementsPage() {
                           return (
                             <td key={p.id} style={{ padding: '10px 20px', textAlign: 'center', borderLeft: '1px solid var(--jv-border)' }}>
                               {included ? (
-                                <span style={{ color: '#16a34a', fontWeight: 900, fontSize: 15 }}>
+                                <span style={{ color: 'var(--jv-success-text)', fontWeight: 900, fontSize: 15 }}>
                                   ✓ <span style={{ fontSize: 11, fontWeight: 700 }}>Included</span>
                                 </span>
                               ) : (

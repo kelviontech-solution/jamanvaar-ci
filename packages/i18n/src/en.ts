@@ -136,6 +136,12 @@ export const en = {
   idleWarningText: 'For your security, this session will reset automatically in',
   seconds: 'seconds',
   keepOrdering: 'Continue Ordering',
+  validationPhoneInvalid: 'Please enter a valid 10-digit mobile number.',
+  otpExpired: 'That code has expired. Tap Send OTP for a new one.',
+  otpTooManyAttempts: 'Too many wrong attempts. Tap Send OTP for a new code.',
+  otpIncorrectLeft: 'Incorrect code. {{count}} attempt(s) left.',
+  otpIncorrectNone: 'Incorrect code. No attempts left — tap Send OTP again.',
+  fixCustomization: 'Please complete the required choices:',
 
   // Accessibility & System
   highContrast: 'High Contrast',

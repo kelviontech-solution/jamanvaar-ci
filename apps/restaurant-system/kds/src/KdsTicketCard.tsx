@@ -79,7 +79,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="kds-token font-black font-mono break-words text-jaman-navy leading-none">#{kot.tokenNumber}</span>
-              <span className="text-[10px] break-all font-black bg-jaman-saffron text-white px-2 py-0.5 rounded-md font-mono">{kot.kotNumber}</span>
+              <span className="text-[11px] break-all font-black bg-[#BF540F] text-white px-2 py-0.5 rounded-md font-mono">{kot.kotNumber}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold mt-1 flex-wrap">
               <span>{kot.tableNumber ? `Table ${kot.tableNumber}` : 'No table'}</span>
@@ -96,12 +96,12 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         <div className="flex items-center justify-between gap-2">
           <select aria-label={`Priority for token ${kot.tokenNumber}`} value={priority} disabled={cancelled || isServed}
             onChange={e => onPriority(kot, e.target.value as 'NORMAL' | 'URGENT')}
-            className={`min-h-[40px] min-w-0 rounded-xl border px-2 text-xs font-bold ${priority === 'URGENT' ? 'bg-rose-50 text-rose-800 border-rose-300' : 'bg-jaman-cream text-jaman-navy border-jaman-border'}`}>
+            className={`min-h-[44px] min-w-0 rounded-xl border px-2 text-xs font-bold ${priority === 'URGENT' ? 'bg-rose-50 text-rose-800 border-rose-300' : 'bg-jaman-cream text-jaman-navy border-jaman-border'}`}>
             <option value="NORMAL">Normal priority</option><option value="URGENT">Urgent · cook first</option>
           </select>
           {!isServed && !cancelled && (
             <span
-              className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-black font-mono border ${
+              className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs sm:text-[13px] font-black font-mono border ${
                 age.level === 'late'
                   ? 'bg-rose-50 text-rose-700 border-rose-300 animate-pulse'
                   : age.level === 'warn'
@@ -115,7 +115,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
             </span>
           )}
           <button type="button" onClick={() => onReprint(kot)} aria-label={`Reprint KOT ${kot.kotNumber}`} title="Reprint this ticket without creating another order"
-            className="min-h-[40px] min-w-[40px] rounded-xl border border-jaman-border flex items-center justify-center text-jaman-navy bg-white hover:bg-jaman-cream"><Printer className="w-4 h-4" /></button>
+            className="min-h-[44px] min-w-[44px] rounded-xl border border-jaman-border flex items-center justify-center text-jaman-navy bg-white hover:bg-jaman-cream"><Printer className="w-4 h-4" /></button>
         </div>
         {progress.tickets > 0 && progress.total > 0 && !cancelled && (progress.tickets > 1 || progress.ready > 0) && (
           <div className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">

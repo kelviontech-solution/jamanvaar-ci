@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
@@ -46,12 +47,12 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <GitMerge className="w-5 h-5 text-jaman-saffron" />
-            <h3 className="text-lg font-black text-jaman-navy">
+            <h3 className="text-lg font-bold text-jaman-navy">
               {mode === 'TRANSFER' ? 'Transfer Table' : 'Merge Tables'}
             </h3>
           </div>
@@ -74,7 +75,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
               setTargetTableNumber('');
               setError('');
             }}
-            className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               mode === 'TRANSFER' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
             }`}
           >
@@ -87,7 +88,7 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
               setTargetTableNumber('');
               setError('');
             }}
-            className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               mode === 'MERGE' ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:text-jaman-navy'
             }`}
           >
@@ -124,8 +125,8 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
                       : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
                   }`}
                 >
-                  <span className="text-xs font-black block">T-{t.tableNumber}</span>
-                  <span className={`text-[9px] font-bold block ${isSelected ? 'text-white' : 'text-slate-400'}`}>
+                  <span className="text-xs font-bold block">T-{t.tableNumber}</span>
+                  <span className={`text-[11px] font-bold block ${isSelected ? 'text-white' : 'text-slate-400'}`}>
                     {t.status}
                   </span>
                 </button>
@@ -154,13 +155,13 @@ export const CaptainTransferMergeModal: React.FC<CaptainTransferMergeModalProps>
             type="button"
             onClick={handleAction}
             disabled={!targetTableNumber}
-            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] disabled:opacity-50 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
           >
             <span>Confirm {mode === 'TRANSFER' ? 'Transfer' : 'Merge'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

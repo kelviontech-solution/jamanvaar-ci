@@ -61,8 +61,8 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
         <div>
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
-            <h2 className="text-xl font-black text-jaman-navy">Active Dining Orders</h2>
-            <span className="bg-[#FFF4ED] text-jaman-saffron text-xs font-black px-2.5 py-0.5 rounded-full border border-[#FDBA74]">
+            <h2 className="text-xl font-bold text-jaman-navy">Active Dining Orders</h2>
+            <span className="bg-[#FFF4ED] text-jaman-saffron text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#FDBA74]">
               {activeDiningTables.length} Active Tables
             </span>
           </div>
@@ -95,21 +95,21 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
             return (
               <div
                 key={table.id}
-                className={`bg-white rounded-3xl border-2 p-5 space-y-4 shadow-sm flex flex-col justify-between ${
+                className={`bg-white rounded-2xl border-2 p-5 space-y-4 shadow-sm flex flex-col justify-between ${
                   isBillReq ? 'border-purple-500 bg-purple-50/15' : 'border-jaman-border'
                 }`}
               >
                 <div>
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-2xl font-black text-jaman-navy">TABLE {table.tableNumber}</span>
+                      <span className="text-2xl font-bold text-jaman-navy">TABLE {table.tableNumber}</span>
                       <span className="text-xs text-slate-500 font-bold block mt-0.5">
                         {(table as any).section || table.zone || 'Main Dining'} • {table.currentGuests || 2} Guests
                       </span>
                     </div>
 
                     <span
-                      className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase ${
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase ${
                         isBillReq
                           ? 'bg-purple-100 text-purple-800 border border-purple-300'
                           : 'bg-[#FFF4ED] text-jaman-saffron border border-[#FDBA74]'
@@ -145,7 +145,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
                   <button
                     type="button"
                     onClick={() => onOpenTableWorkspace(table.tableNumber)}
-                    className="w-full py-3 px-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-between"
+                    className="w-full py-3 px-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex items-center justify-between"
                   >
                     <span>Open Table Workspace</span>
                     <ArrowRight className="w-4 h-4 text-jaman-saffron" />
@@ -169,7 +169,7 @@ export const CaptainActiveOrdersView: React.FC<CaptainActiveOrdersViewProps> = (
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
           <ShoppingBag className="w-12 h-12 text-slate-400 mx-auto" />
-          <h3 className="text-lg font-black text-jaman-navy">No Active Table Orders</h3>
+          <h3 className="text-lg font-bold text-jaman-navy">No Active Table Orders</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             All floor tables are currently clear. When you seat guests and send a KOT, active orders will show here.
           </p>

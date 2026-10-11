@@ -1,5 +1,6 @@
+import { useDialogFocus } from '../../../../packages/ui/src/useDialogFocus';
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import './ui.css';
 
@@ -105,10 +106,10 @@ export function ErrorState({
 }) {
   return (
     <div className="empty-state" style={{ borderColor: 'rgba(239, 68, 68, 0.2)', background: '#fffcfc' }}>
-      <div className="empty-state-icon-box" style={{ background: '#fef2f2', color: '#dc2626' }}>
+      <div className="empty-state-icon-box" style={{ background: 'var(--jv-error-soft)', color: 'var(--jv-error-text)' }}>
         <AlertCircle className="w-6 h-6" />
       </div>
-      <h3 style={{ color: '#991b1b' }}>Unable to load data</h3>
+      <h3 style={{ color: 'var(--jv-error-text)' }}>Unable to load data</h3>
       <p style={{ color: '#7f1d1d' }}>{message}</p>
       {onRetry && (
         <div className="empty-state-action">
@@ -132,22 +133,26 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
 }) {
-  // The Escape key closes this dialog like any other on the platform, not just its own Close button.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // Shared dialog behaviour (packages/ui): focus moves in, Tab stays inside, Escape closes only the
+  // top-most dialog, focus returns to the control that opened it.
+  const { cardRef, dialogId } = useDialogFocus<HTMLDivElement>(true, onClose);
+  const titleId = `${dialogId}-title`;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={cardRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          <h2>{title}</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-            ×
+          <h2 id={titleId}>{title}</h2>
+          <button type="button" data-modal-close className="modal-close" onClick={onClose} aria-label={`Close ${title}`}>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div className="modal-body">{children}</div>
@@ -156,6 +161,129 @@ export function Modal({
     </div>
   );
 }
+
+/** Backdrop + dialog card for pages that lay out their own header/body/footer markup. Same behaviour as <Modal>. */
+export function ModalShell({
+  onClose,
+  label,
+  className = 'modal',
+  style,
+  children
+}: {
+  onClose: () => void;
+  label: string;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
+}) {
+  const { cardRef } = useDialogFocus<HTMLDivElement>(true, onClose);
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div
+        ref={cardRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        className={className}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ── Confirmations: in-app replacement for window.confirm / window.prompt ── */
+
+interface AdminDialogRequest {
+  kind: 'confirm' | 'prompt';
+  title: string;
+  message: ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  danger?: boolean;
+  inputLabel?: string;
+  inputType?: 'text' | 'password';
+  required?: boolean;
+}
+
+/**
+ * Same promise API as the shared `useConfirm` in packages/ui, rendered with the console's own
+ * `confirmation-*` styles so dark-theme pages keep their look.
+ *   if (!(await confirm({ title, message, danger: true, confirmLabel: 'Delete' }))) return;
+ *   const password = await prompt({ title, message, inputLabel: 'Password', inputType: 'password', required: true });
+ */
+export function useAdminConfirm() {
+  const [request, setRequest] = useState<AdminDialogRequest | null>(null);
+  const [value, setValue] = useState('');
+  const pending = useRef<((v: string | null) => void) | null>(null);
+  useEffect(() => () => { pending.current?.(null); pending.current = null; }, []);
+
+  const open = useCallback((req: AdminDialogRequest) => new Promise<string | null>((resolve) => {
+    pending.current?.(null);
+    pending.current = resolve;
+    setValue('');
+    setRequest(req);
+  }), []);
+  const settle = (v: string | null) => {
+    const resolve = pending.current;
+    pending.current = null;
+    setRequest(null);
+    resolve?.(v);
+  };
+
+  const confirm = useCallback(
+    async (o: Omit<AdminDialogRequest, 'kind' | 'inputLabel' | 'inputType' | 'required'>) => (await open({ ...o, kind: 'confirm' })) !== null,
+    [open]
+  );
+  const prompt = useCallback(
+    (o: Omit<AdminDialogRequest, 'kind'> & { inputLabel: string }) => open({ ...o, kind: 'prompt' }),
+    [open]
+  );
+
+  const missing = !!request?.required && value.trim().length === 0;
+  const confirmDialog = request ? (
+    <ModalShell onClose={() => settle(null)} label={request.title} className="modal confirmation-dialog">
+      <form
+        className="confirmation-body"
+        onSubmit={(e) => { e.preventDefault(); if (!missing) settle(request.kind === 'prompt' ? value.trim() : ''); }}
+      >
+        <h2 className="confirmation-title">{request.title}</h2>
+        <div className="confirmation-desc">{request.message}</div>
+        {request.kind === 'prompt' && (
+          <label style={{ display: 'block', textAlign: 'left', marginTop: 12 }}>
+            <span style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{request.inputLabel}</span>
+            <input
+              className="input"
+              data-autofocus=""
+              type={request.inputType ?? 'text'}
+              autoComplete={request.inputType === 'password' ? 'current-password' : 'off'}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
+          </label>
+        )}
+        <div className="confirmation-actions">
+          <Button type="button" variant="ghost" data-autofocus={request.kind === 'confirm' && request.danger ? '' : undefined} onClick={() => settle(null)}>
+            {request.cancelLabel ?? 'Cancel'}
+          </Button>
+          <Button
+            type="submit"
+            variant={request.danger ? 'danger' : 'primary'}
+            data-autofocus={request.kind === 'confirm' && !request.danger ? '' : undefined}
+            disabled={missing}
+          >
+            {request.confirmLabel ?? 'Confirm'}
+          </Button>
+        </div>
+      </form>
+    </ModalShell>
+  ) : null;
+
+  return { confirm, prompt, confirmDialog };
+}
+
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`input ${props.className || ''}`} {...props} />;

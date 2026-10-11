@@ -5,7 +5,7 @@ import { formatINR, formatDate, formatTime, getOrderSource, getBillingTender, OR
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { db, AuditRepository, OrderRepository, ReceiptRepository, isUnpaidOpenOrder, billsWaiting, billLinesOf } from '@jamanvaar/database';
 import { DayOrdersService, CentralReportingService } from '@jamanvaar/business';
-import { printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
+import { printThermalReceipt, EmptyState, printElement, ModalBackdrop } from '@jamanvaar/ui';
 import { exportBillingCsv, formatBillingMoney, isPendingCollection, isSubmittedBillingOrder, summarizeBillingLedger } from './billingLedger';
 import { BillingStatementDocument } from './BillingStatementDocument';
 import {
@@ -1178,7 +1178,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       {/* 7. DETAILED ORDER & INVOICE INSPECTOR MODAL */}
       {/* ========================================================================= */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
             
             {/* Modal Header */}
@@ -1393,12 +1393,12 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             </div>
 
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* 8. REFUND CONFIRMATION MODAL */}
       {isRefundModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3 text-amber-600">
               <AlertTriangle className="w-6 h-6" />
@@ -1431,12 +1431,12 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* 9. VOID / CANCEL CONFIRMATION MODAL */}
       {isCancelModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3 text-rose-600">
               <Ban className="w-6 h-6" />
@@ -1469,7 +1469,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* ========================================================================= */}

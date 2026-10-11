@@ -128,7 +128,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
               {title || KEYBOARD_TITLES[language]}
             </h4>
             {language !== 'en' && (
-              <p className="text-[11px] text-[#8C9BAE]">
+              <p className="text-[11px] text-[#52677A]">
                 Type sounds in Roman letters (e.g. "paneer tikka") — native script appears live. Review the field before saving.
               </p>
             )}

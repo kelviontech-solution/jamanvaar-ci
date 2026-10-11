@@ -451,7 +451,7 @@ export function RestaurantDetailPage() {
       message: isActivating ? (
         'Reactivating this restaurant will re-enable console logins, license certificates, and POS/Captain order syncing.'
       ) : (
-        <span style={{ color: '#dc2626' }}>
+        <span style={{ color: 'var(--jv-error-text)' }}>
           Suspending will immediately block all terminal logins, cloud backups, and order routing across all branches.
         </span>
       ),
@@ -883,7 +883,7 @@ export function RestaurantDetailPage() {
           </div>
 
           {/* HARDWARE & DEVICE ACTIVATION KEYS CARD */}
-          <Card style={{ padding: 22, border: '1px solid #fed7aa', background: 'linear-gradient(180deg, #fffaf5 0%, #ffffff 100%)' }}>
+          <Card style={{ padding: 22, border: '1px solid var(--jv-accent-line)', background: 'linear-gradient(180deg, #fffaf5 0%, #ffffff 100%)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -975,7 +975,7 @@ export function RestaurantDetailPage() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--jv-text-muted)' }}>
                         <span>Expires: {new Date(k.expiresAt).toLocaleDateString('en-IN')}</span>
                         {k.redeemedAt && (
-                          <span style={{ color: '#16A34A', fontWeight: 600 }}>
+                          <span style={{ color: 'var(--jv-success-text)', fontWeight: 600 }}>
                             ✓ Redeemed {new Date(k.redeemedAt).toLocaleDateString('en-IN')}
                           </span>
                         )}
@@ -1171,7 +1171,7 @@ export function RestaurantDetailPage() {
             </div>
 
             {activeSub ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, background: '#FFFDF9', border: '1px solid var(--jv-border)', borderRadius: 10, padding: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, background: 'var(--jv-accent-soft)', border: '1px solid var(--jv-border)', borderRadius: 10, padding: 18 }}>
                 <div>
                   <span className="muted" style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Plan Name</span>
                   <div style={{ fontSize: 16, fontWeight: 800, marginTop: 4 }}>{activeSub.plan.name}</div>
@@ -1371,7 +1371,7 @@ export function RestaurantDetailPage() {
             <div style={{ padding: 18, background: 'var(--jv-surface-subtle)', borderRadius: 12, border: '1px solid var(--jv-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Staff &amp; Terminal Users</span>
-                <span style={{ fontWeight: 800, color: '#16a34a' }}>
+                <span style={{ fontWeight: 800, color: 'var(--jv-success-text)' }}>
                   {restaurant.users.length} / {activeSub?.plan.maxUsers || 10}
                 </span>
               </div>
@@ -1499,7 +1499,7 @@ export function RestaurantDetailPage() {
                       <td>{new Date(k.expiresAt).toLocaleDateString('en-IN')}</td>
                       <td>
                         {k.status === 'REDEEMED' && (
-                          <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 600, marginBottom: 4 }}>
+                          <div style={{ fontSize: 11, color: 'var(--jv-success-text)', fontWeight: 600, marginBottom: 4 }}>
                             ✓ Redeemed {k.redeemedAt ? new Date(k.redeemedAt).toLocaleDateString('en-IN') : ''}
                           </div>
                         )}
@@ -1669,7 +1669,7 @@ export function RestaurantDetailPage() {
               </div>
               <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Successful Amount</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-success-text)', marginTop: 4 }}>
                   ₹{(payments.rows.filter((p) => p.status === 'SUCCESS').reduce((sum, p) => sum + p.amount, 0) / 100).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -1827,7 +1827,7 @@ export function RestaurantDetailPage() {
                   <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-text)', marginTop: 4 }}>
                     ₹{reportsData.metrics.totalBilled.toLocaleString('en-IN')}
                   </div>
-                  <div style={{ fontSize: 11.5, color: '#16a34a', marginTop: 2, fontWeight: 600 }}>
+                  <div style={{ fontSize: 11.5, color: 'var(--jv-success-text)', marginTop: 2, fontWeight: 600 }}>
                     ₹{reportsData.metrics.collectedRevenue.toLocaleString('en-IN')} collected
                   </div>
                 </div>
@@ -1844,7 +1844,7 @@ export function RestaurantDetailPage() {
 
                 <div style={{ padding: 16, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Terminal Fleet Health</div>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--jv-success-text)', marginTop: 4 }}>
                     {reportsData.metrics.activeDevices} / {reportsData.metrics.devicesCount} Online
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 2 }}>
@@ -1991,7 +1991,7 @@ export function RestaurantDetailPage() {
                 </div>
                 <div style={{ padding: 14, background: 'var(--jv-surface-subtle)', borderRadius: 10, border: '1px solid var(--jv-border)' }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Online Terminals</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: '#16a34a', marginTop: 4 }}>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--jv-success-text)', marginTop: 4 }}>
                     {diagnostics.onlineDevicesCount} / {diagnostics.devices.length} Online
                   </div>
                 </div>

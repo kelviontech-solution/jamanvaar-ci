@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CustomerAccount } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput } from '@jamanvaar/ui';
 import { CustomerRepository, db } from '@jamanvaar/database';
 import { formatINR, formatDate, formatTime, isValidIndianPhone, normalizeIndianPhone } from '@jamanvaar/utils';
 import {
@@ -157,13 +157,13 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               <User className="w-3.5 h-3.5 text-jaman-navy" />
               <span>Customer Full Name *</span>
             </label>
-            <input
+            <FormInput
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Ramesh Patel"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
 
@@ -191,12 +191,12 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               <Mail className="w-3.5 h-3.5 text-jaman-navy" />
               <span>Email Address</span>
             </label>
-            <input
+            <FormInput
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. ramesh.patel@gmail.com"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
 
@@ -205,12 +205,12 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               <MapPin className="w-3.5 h-3.5 text-jaman-navy" />
               <span>Delivery / Home Address</span>
             </label>
-            <input
+            <FormInput
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="e.g. Satellite Towers, Bodakdev"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
         </div>
@@ -222,11 +222,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               <Calendar className="w-3.5 h-3.5 text-slate-500" />
               <span>Date of Birth (Birthday)</span>
             </label>
-            <input
+            <FormInput
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
 
@@ -235,11 +235,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-rose-500" />
               <span>Wedding Anniversary</span>
             </label>
-            <input
+            <FormInput
               type="date"
               value={anniversary}
               onChange={(e) => setAnniversary(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
 

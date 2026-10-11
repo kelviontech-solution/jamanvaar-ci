@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
@@ -41,8 +42,8 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
+    <ModalBackdrop className="flex justify-end">
+      <div className="w-full max-w-sm bg-white h-full shadow-md flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200">
         {/* Header */}
         <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -52,6 +53,7 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1 hover:bg-white/10 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -78,10 +80,10 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-black text-xs text-jaman-navy leading-tight">
+                    <span className="font-bold text-xs text-jaman-navy leading-tight">
                       {notif.title}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-bold shrink-0">
+                    <span className="text-[11px] text-slate-400 font-bold shrink-0">
                       {elapsedMins}m ago
                     </span>
                   </div>
@@ -128,6 +130,6 @@ export const CaptainNotificationsModal: React.FC<CaptainNotificationsModalProps>
           </div>
         )}
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

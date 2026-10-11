@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, ShiftRepository } from '@jamanvaar/database';
@@ -65,7 +66,7 @@ export const PosShiftModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-5 flex items-center justify-between shrink-0">
@@ -303,6 +304,6 @@ export const PosShiftModal: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

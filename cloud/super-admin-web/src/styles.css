@@ -72,6 +72,23 @@
   --jv-radius-xl: 18px;
   --jv-radius-full: 9999px;
 
+  /* Neutral text/line/paper roles for page-level inline styles (light values equal the hex they replaced) */
+  --jv-ink: #0b253a;
+  --jv-slate-700: #334155;
+  --jv-slate-600: #475569;
+  --jv-slate-500: #64748b;
+  --jv-line: #e2e8f0;
+  --jv-line-strong: #cbd5e1;
+  --jv-paper: #ffffff;
+  --jv-paper-soft: #f8fafc;
+  --jv-ok-line: #bbf7d0;
+  --jv-warn-line: #fde68a;
+  --jv-err-line: #fecaca;
+  --jv-accent-line: #fed7aa;
+  --jv-info-text: #0369a1;
+  --jv-surface-alt: rgba(11, 37, 58, 0.03);
+  --jv-overlay: rgba(11, 37, 58, 0.45);
+
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light;
 }
@@ -136,6 +153,22 @@
     --jv-shadow-saffron: 0 4px 16px 0 rgba(249, 115, 22, 0.35);
     --jv-shadow-saffron-hover: 0 8px 24px 0 rgba(249, 115, 22, 0.5);
 
+
+    --jv-ink: #e8eef6;
+    --jv-slate-700: #cbd5e1;
+    --jv-slate-600: #b4c0d0;
+    --jv-slate-500: #97a9bf;
+    --jv-line: #263b52;
+    --jv-line-strong: #3a5878;
+    --jv-paper: #14202e;
+    --jv-paper-soft: #172637;
+    --jv-ok-line: rgba(52, 211, 153, 0.35);
+    --jv-warn-line: rgba(251, 191, 36, 0.35);
+    --jv-err-line: rgba(248, 113, 113, 0.35);
+    --jv-accent-line: rgba(251, 146, 60, 0.35);
+    --jv-info-text: #7dd3fc;
+    --jv-surface-alt: rgba(255, 255, 255, 0.05);
+    --jv-overlay: rgba(2, 6, 12, 0.72);
     color-scheme: dark;
   }
 }
@@ -198,6 +231,21 @@
   --jv-shadow-saffron: 0 4px 16px 0 rgba(249, 115, 22, 0.35);
   --jv-shadow-saffron-hover: 0 8px 24px 0 rgba(249, 115, 22, 0.5);
 
+  --jv-ink: #e8eef6;
+  --jv-slate-700: #cbd5e1;
+  --jv-slate-600: #b4c0d0;
+  --jv-slate-500: #97a9bf;
+  --jv-line: #263b52;
+  --jv-line-strong: #3a5878;
+  --jv-paper: #14202e;
+  --jv-paper-soft: #172637;
+  --jv-ok-line: rgba(52, 211, 153, 0.35);
+  --jv-warn-line: rgba(251, 191, 36, 0.35);
+  --jv-err-line: rgba(248, 113, 113, 0.35);
+  --jv-accent-line: rgba(251, 146, 60, 0.35);
+  --jv-info-text: #7dd3fc;
+  --jv-surface-alt: rgba(255, 255, 255, 0.05);
+  --jv-overlay: rgba(2, 6, 12, 0.72);
   color-scheme: dark;
 }
 
@@ -421,3 +469,34 @@ input[type='range']:focus-visible,
     transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, fill 0.25s ease !important;
   }
 }
+
+/* Dark refinements: pastel light-theme tints that have no token get a calm dark counterpart.
+   Same rules under both ways of selecting the dark theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .stat-tile-icon-blue { background: rgba(96, 165, 250, 0.14); color: #93c5fd; }
+  :root:not([data-theme='light']) .stat-tile-icon-green { background: rgba(52, 211, 153, 0.14); color: #34d399; }
+  :root:not([data-theme='light']) .stat-tile-icon-orange { background: rgba(251, 146, 60, 0.14); color: #fb923c; }
+  :root:not([data-theme='light']) .stat-tile-icon-purple { background: rgba(167, 139, 250, 0.14); color: #c4b5fd; }
+  :root:not([data-theme='light']) .stat-tile-icon-amber { background: rgba(251, 191, 36, 0.14); color: #fbbf24; }
+  :root:not([data-theme='light']) .detail-page-avatar { box-shadow: inset 0 0 0 1px var(--jv-border-hover); }
+  :root:not([data-theme='light']) .notif-item.unread,
+  :root:not([data-theme='light']) .notif-page-item.unread { background: rgba(251, 146, 60, 0.1); }
+}
+:root[data-theme='dark'] .stat-tile-icon-blue { background: rgba(96, 165, 250, 0.14); color: #93c5fd; }
+:root[data-theme='dark'] .stat-tile-icon-green { background: rgba(52, 211, 153, 0.14); color: #34d399; }
+:root[data-theme='dark'] .stat-tile-icon-orange { background: rgba(251, 146, 60, 0.14); color: #fb923c; }
+:root[data-theme='dark'] .stat-tile-icon-purple { background: rgba(167, 139, 250, 0.14); color: #c4b5fd; }
+:root[data-theme='dark'] .stat-tile-icon-amber { background: rgba(251, 191, 36, 0.14); color: #fbbf24; }
+:root[data-theme='dark'] .detail-page-avatar { box-shadow: inset 0 0 0 1px var(--jv-border-hover); }
+:root[data-theme='dark'] .notif-item.unread,
+:root[data-theme='dark'] .notif-page-item.unread { background: rgba(251, 146, 60, 0.1); }
+
+/* Dark: a pure-white primary fill glares on the deep navy surfaces; use a cool, slightly dimmed light slate. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .btn-primary,
+  :root:not([data-theme='light']) .ui-filter-pill.active { background: #d9e2ec; border-color: transparent; }
+  :root:not([data-theme='light']) .btn-primary:hover:not(:disabled) { background: #e8eef6; }
+}
+:root[data-theme='dark'] .btn-primary,
+:root[data-theme='dark'] .ui-filter-pill.active { background: #d9e2ec; border-color: transparent; }
+:root[data-theme='dark'] .btn-primary:hover:not(:disabled) { background: #e8eef6; }

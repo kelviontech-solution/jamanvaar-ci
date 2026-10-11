@@ -211,7 +211,7 @@ export function LoginPage() {
                 />
                 <span>Remember session</span>
               </label>
-              <span className="text-[var(--jv-text-light)] text-[11px] font-mono">Port 4000 • Live Cloud API</span>
+              <span className="text-[var(--jv-text-light)] text-[11px] font-mono">Live cloud API</span>
             </div>
 
             <button

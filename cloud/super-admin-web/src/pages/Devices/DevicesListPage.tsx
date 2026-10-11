@@ -401,7 +401,7 @@ export function DevicesListPage() {
                         {d.health === 'online' ? <Wifi className="w-3 h-3 inline mr-1" /> : d.health === 'offline' || d.health === 'degraded' ? <WifiOff className="w-3 h-3 inline mr-1" /> : null}
                         {HEALTH_LABEL[d.health]}
                       </Badge>
-                      {d.syncError && <div style={{ color: '#dc2626', fontSize: 11, marginTop: 2 }} title={d.syncError}>Sync problem</div>}
+                      {d.syncError && <div style={{ color: 'var(--jv-error-text)', fontSize: 11, marginTop: 2 }} title={d.syncError}>Sync problem</div>}
                     </td>
                     <td style={{ padding: '14px' }}>
                       {d.isLocked ? <Badge tone="warning"><Lock className="w-3 h-3 inline mr-1" /> LOCKED</Badge> : <span className="muted">—</span>}

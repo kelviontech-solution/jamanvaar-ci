@@ -5,7 +5,7 @@ import { PLAN_DEFINITIONS, EntitlementService, applyLicenseCertificate } from '@
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
 import { PosPrinterService } from '../../services/printerService';
 import { formatINR, slipHeader } from '@jamanvaar/utils';
-import { sound, ConnectionPanel, type SoundVolume } from '@jamanvaar/ui';
+import { sound, ConnectionPanel, type SoundVolume, SettingsPageHeader, SettingsTabs, SettingsFeedback } from '@jamanvaar/ui';
 import { DisplaySizeCard } from './DisplaySizeCard';
 import { DetectedPrintersPanel } from './DetectedPrintersPanel';
 import {
@@ -212,111 +212,38 @@ ESC/POS Command Engine Verified OK
 
   return (
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-5">
-      {/* Top Header & Settings Navigation Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
-            <Settings className="w-6 h-6 text-jaman-saffron" />
-            <span>POS System & License Settings</span>
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses.
-          </p>
-        </div>
-
-        {/* Settings View Switcher */}
-        <div className="bg-white border border-jaman-border p-1 rounded-2xl flex items-center gap-1 shadow-2xs">
-          <button
-            onClick={() => setActiveSettingsTab('HARDWARE')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeSettingsTab === 'HARDWARE'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
-            }`}
-          >
-            Hardware & Printers
-          </button>
-          <button
-            onClick={() => setActiveSettingsTab('REPORTS')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-              activeSettingsTab === 'REPORTS'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Reports & Design</span>
-          </button>
-          <button
-            onClick={() => setActiveSettingsTab('INSTANT_BILL')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-              activeSettingsTab === 'INSTANT_BILL'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5" />
-            <span>Instant Bill</span>
-          </button>
-          <button
-            onClick={() => setActiveSettingsTab('DATABASE')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeSettingsTab === 'DATABASE'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
-            }`}
-          >
-            Local DB & Sync
-          </button>
-          <button
-            onClick={() => setActiveSettingsTab('LICENSE')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
-              activeSettingsTab === 'LICENSE'
-                ? 'bg-jaman-saffron text-white shadow-xs'
-                : 'text-slate-600 hover:text-jaman-navy hover:bg-jaman-cream'
-            }`}
-          >
-            <Award className="w-3.5 h-3.5" />
-            <span>Subscription & License</span>
-          </button>
-        </div>
+      {/* Page header + section tabs (shared Settings primitives) */}
+      <div className="space-y-3 shrink-0">
+        <SettingsPageHeader
+          title="POS System & License Settings"
+          description="Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses."
+          icon={<Settings className="w-6 h-6 text-jaman-saffron" aria-hidden="true" />}
+        />
+        <SettingsTabs
+          ariaLabel="POS settings sections"
+          active={activeSettingsTab}
+          onChange={setActiveSettingsTab}
+          tabs={[
+            { id: 'HARDWARE', label: 'Hardware & Printers' },
+            { id: 'REPORTS', label: 'Reports & Design', icon: <FileText className="w-3.5 h-3.5" aria-hidden="true" /> },
+            { id: 'INSTANT_BILL', label: 'Instant Bill', icon: <Zap className="w-3.5 h-3.5" aria-hidden="true" /> },
+            { id: 'DATABASE', label: 'Local DB & Sync' },
+            { id: 'LICENSE', label: 'Subscription & License', icon: <Award className="w-3.5 h-3.5" aria-hidden="true" /> }
+          ]}
+        />
       </div>
 
-      {/* Global Feedback Toasts */}
-      {reportFeedback && (
-        <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          {reportFeedback}
-        </div>
-      )}
-      {instantBillFeedback && (
-        <div className="p-3 bg-amber-50 text-amber-900 text-xs font-bold rounded-2xl border border-amber-200 animate-in fade-in">
-          {instantBillFeedback}
-        </div>
-      )}
-      {testPrintFeedback && (
-        <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          {testPrintFeedback}
-        </div>
-      )}
-      {syncFeedback && (
-        <div className="p-3 bg-blue-50 text-blue-800 text-xs font-bold rounded-2xl border border-blue-200 animate-in fade-in">
-          {syncFeedback}
-        </div>
-      )}
-      {licenseFeedback && (
-        <div className="p-3 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-2xl border border-emerald-200 animate-in fade-in">
-          {licenseFeedback}
-        </div>
-      )}
-      {licenseError && (
-        <div className="p-3 bg-rose-50 text-rose-800 text-xs font-bold rounded-2xl border border-rose-200 animate-in fade-in">
-          {licenseError}
-        </div>
-      )}
+      {/* Outcomes of settings actions: one banner style, announced by assistive tech */}
+      {reportFeedback && <SettingsFeedback kind="success">{reportFeedback}</SettingsFeedback>}
+      {instantBillFeedback && <SettingsFeedback kind="warning">{instantBillFeedback}</SettingsFeedback>}
+      {testPrintFeedback && <SettingsFeedback kind="success">{testPrintFeedback}</SettingsFeedback>}
+      {syncFeedback && <SettingsFeedback kind="info">{syncFeedback}</SettingsFeedback>}
+      {licenseFeedback && <SettingsFeedback kind="success">{licenseFeedback}</SettingsFeedback>}
+      {licenseError && <SettingsFeedback kind="error">{licenseError}</SettingsFeedback>}
 
       {activeSettingsTab === 'HARDWARE' && (
-        <div className="bg-white border border-jaman-border rounded-3xl p-5 shrink-0">
-          <h2 className="text-base font-extrabold text-jaman-navy mb-3">Connection &amp; Diagnostics</h2>
+        <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs shrink-0">
+          <h2 className="text-sm font-bold text-jaman-navy mb-3">Connection &amp; diagnostics</h2>
           <ConnectionPanel appVersion={typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0'} />
         </div>
       )}

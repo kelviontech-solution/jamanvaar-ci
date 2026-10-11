@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
@@ -138,7 +139,7 @@ export const PosCustomersView: React.FC = () => {
 
       {/* Quick Customer Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-jaman-navy">Register New Customer</h3>
@@ -198,7 +199,7 @@ export const PosCustomersView: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
     </div>
   );

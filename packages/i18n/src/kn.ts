@@ -126,6 +126,12 @@ export const kn = {
   idleWarningText: 'ನಿಮ್ಮ ಸುರಕ್ಷತೆಗಾಗಿ, ಈ ಸೆಷನ್ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಮರುಹೊಂದಿಸಲ್ಪಡುತ್ತದೆ',
   seconds: 'ಸೆಕೆಂಡುಗಳಲ್ಲಿ',
   keepOrdering: 'ಆರ್ಡರ್ ಮುಂದುವರಿಸಿ',
+  validationPhoneInvalid: 'ದಯವಿಟ್ಟು ಸರಿಯಾದ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.',
+  otpExpired: 'ಈ ಕೋಡ್ ಅವಧಿ ಮುಗಿದಿದೆ. ಹೊಸ ಕೋಡ್‌ಗಾಗಿ Send OTP ಒತ್ತಿ.',
+  otpTooManyAttempts: 'ಹಲವು ತಪ್ಪು ಪ್ರಯತ್ನಗಳು. ಹೊಸ ಕೋಡ್‌ಗಾಗಿ Send OTP ಒತ್ತಿ.',
+  otpIncorrectLeft: 'ತಪ್ಪಾದ ಕೋಡ್. {{count}} ಪ್ರಯತ್ನ(ಗಳು) ಉಳಿದಿವೆ.',
+  otpIncorrectNone: 'ತಪ್ಪಾದ ಕೋಡ್. ಪ್ರಯತ್ನಗಳು ಉಳಿದಿಲ್ಲ — ಮತ್ತೆ Send OTP ಒತ್ತಿ.',
+  fixCustomization: 'ಅಗತ್ಯ ಆಯ್ಕೆಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ:',
 
   // Accessibility & System
   highContrast: 'ಹೈ ಕಾಂಟ್ರಾಸ್ಟ್',

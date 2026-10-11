@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MenuItem } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput } from '@jamanvaar/ui';
 import { ComboRepository, AuditRepository, KioskComboAuthoring, MenuRepository } from '@jamanvaar/database';
 import type { ComboDeal } from '@jamanvaar/types';
 
@@ -157,22 +157,22 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Combo Name *</label>
-            <input
+            <FormInput
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Family Feast Combo"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Description</label>
-            <input
+            <FormInput
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. 2 mains, a side, and a drink"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
         </div>
@@ -180,24 +180,24 @@ export const ComboModal: React.FC<ComboModalProps> = ({ isOpen, onClose, comboTo
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Combo Price (₹) *</label>
-            <input
+            <FormInput
               type="number"
               min="1"
               value={basePrice}
               onChange={(e) => setBasePrice(e.target.value)}
               placeholder="e.g. 449"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">À La Carte Price (₹) *</label>
-            <input
+            <FormInput
               type="number"
               min="1"
               value={componentTotal}
               readOnly
               placeholder="e.g. 550"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>

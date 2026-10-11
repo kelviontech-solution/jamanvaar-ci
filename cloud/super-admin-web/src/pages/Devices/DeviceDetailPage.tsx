@@ -180,7 +180,7 @@ export function DeviceDetailPage() {
               <Unlock className="w-4 h-4 mr-1.5" /> Unlock Device
             </Button>
           ) : (
-            <Button variant="ghost" style={{ color: '#d97706', borderColor: '#fde68a' }} onClick={() => { setSelectedCommand('LOCK'); setCommandModalOpen(true); }}>
+            <Button variant="ghost" style={{ color: 'var(--jv-warning-text)', borderColor: 'var(--jv-warn-line)' }} onClick={() => { setSelectedCommand('LOCK'); setCommandModalOpen(true); }}>
               <Lock className="w-4 h-4 mr-1.5" /> Lock Device
             </Button>
           )}
@@ -195,11 +195,11 @@ export function DeviceDetailPage() {
 
       {/* Lock Notice Banner */}
       {device.isLocked && (
-        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid #fde68a', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: 'var(--jv-warning-soft)', border: '1.5px solid var(--jv-warn-line)', borderRadius: 12, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
           <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <div style={{ flex: 1 }}>
-            <strong style={{ color: '#92400e', fontSize: 14 }}>Device Locked via Super Admin MDM</strong>
-            <p style={{ margin: '2px 0 0', color: '#b45309', fontSize: 12 }}>
+            <strong style={{ color: 'var(--jv-warning-text)', fontSize: 14 }}>Device Locked via Super Admin MDM</strong>
+            <p style={{ margin: '2px 0 0', color: 'var(--jv-warning-text)', fontSize: 12 }}>
               Reason: {device.lockReason || 'Administrative lock applied'}. Device operations and order processing are blocked until unlocked.
             </p>
           </div>
@@ -217,7 +217,7 @@ export function DeviceDetailPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
               <span style={{ color: 'var(--jv-text-muted)' }}>App Version</span>
-              <strong style={{ color: '#0369a1' }}>{device.appVersion || 'v1.0.0 (Stable)'}</strong>
+              <strong style={{ color: 'var(--jv-info-text)' }}>{device.appVersion || 'v1.0.0 (Stable)'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
               <span style={{ color: 'var(--jv-text-muted)' }}>IP Address</span>
@@ -310,7 +310,7 @@ export function DeviceDetailPage() {
                         {cmd.status}
                       </Badge>
                       {(cmd.status === 'PENDING' || cmd.status === 'SENT') && (cmd.commandType === 'LOCK' || cmd.commandType === 'UNLOCK') && (
-                        <div style={{ fontSize: 11, color: '#16a34a', marginTop: 3, fontWeight: 700 }}>Applied already — awaiting device confirmation</div>
+                        <div style={{ fontSize: 11, color: 'var(--jv-success-text)', marginTop: 3, fontWeight: 700 }}>Applied already — awaiting device confirmation</div>
                       )}
                       {(cmd.status === 'PENDING' || cmd.status === 'SENT') && cmd.commandType !== 'LOCK' && cmd.commandType !== 'UNLOCK' && !isOnline && (
                         <div style={{ fontSize: 11, color: 'var(--jv-text-light)', marginTop: 3 }}>Waiting for terminal to check in</div>
@@ -324,7 +324,7 @@ export function DeviceDetailPage() {
                     </td>
                     <td style={{ padding: '12px 14px', color: 'var(--jv-text-muted)' }}>
                       {cmd.errorMessage ? (
-                        <span style={{ color: '#dc2626' }}>{cmd.errorMessage}</span>
+                        <span style={{ color: 'var(--jv-error-text)' }}>{cmd.errorMessage}</span>
                       ) : cmd.payload?.reason ? (
                         <span>Reason: {String(cmd.payload.reason)}</span>
                       ) : (
@@ -363,7 +363,7 @@ export function DeviceDetailPage() {
             </div>
 
             {!isOnline && selectedCommand !== 'LOCK' && selectedCommand !== 'UNLOCK' && (
-              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 12px', fontSize: 12.5, color: '#92400e' }}>
+              <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid var(--jv-warn-line)', borderRadius: 8, padding: '10px 12px', fontSize: 12.5, color: 'var(--jv-warning-text)' }}>
                 This terminal is offline. {selectedCommand === 'FORCE_LOGOUT' ? 'The logout' : 'This command'} will stay queued and only run once the terminal checks in again — it will not take effect immediately.
               </div>
             )}
@@ -395,13 +395,13 @@ export function DeviceDetailPage() {
       {wipeModalOpen && (
         <Modal title="⚠️ Controlled Remote Device Wipe" onClose={() => setWipeModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: 12, color: '#991b1b', fontSize: 13 }}>
+            <div style={{ background: 'var(--jv-error-soft)', border: '1px solid var(--jv-err-line)', borderRadius: 8, padding: 12, color: 'var(--jv-error-text)', fontSize: 13 }}>
               <strong>Extreme Caution:</strong> This will deauthorize the terminal, revoke active hardware tokens, and clear all cached client-side records on next check-in. Terminal will require a new activation key to reconnect.
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
-                Type <code style={{ color: '#dc2626' }}>WIPE DEVICE DATA</code> to confirm:
+                Type <code style={{ color: 'var(--jv-error-text)' }}>WIPE DEVICE DATA</code> to confirm:
               </label>
               <input
                 type="text"

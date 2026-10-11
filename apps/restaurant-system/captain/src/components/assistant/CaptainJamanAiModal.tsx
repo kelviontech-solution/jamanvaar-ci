@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { AiConfig, refreshConfiguredAi } from '@jamanvaar/business';
-import { JamanAiAccessNotice } from '@jamanvaar/ui';
+import { JamanAiAccessNotice, ModalBackdrop } from '@jamanvaar/ui';
 import { reportAiQueryNow } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
 import {
@@ -140,8 +140,8 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
   };
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="JAMAN AI Floor Intelligence" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-4">
-      <div className="w-full sm:max-w-md h-[85vh] sm:h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-jaman-border flex flex-col justify-between overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
+    <ModalBackdrop role="dialog" aria-modal="true" aria-label="JAMAN AI Floor Intelligence" className="flex items-end sm:items-center justify-center sm:justify-end p-0 sm:p-4">
+      <div className="w-full sm:max-w-md h-[85vh] sm:h-[90vh] bg-white rounded-t-3xl sm:rounded-3xl shadow-md border border-jaman-border flex flex-col justify-between overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-right duration-200">
         {/* Header */}
         <div className="p-4 bg-jaman-navy text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
             </div>
             <div>
               <span className="font-extrabold text-sm block">JAMAN AI Floor Intelligence</span>
-              <span className="text-[10px] text-emerald-300 font-bold">● OFFLINE DB LINKED</span>
+              <span className="text-[11px] text-emerald-300 font-bold">● OFFLINE DB LINKED</span>
             </div>
           </div>
           <button
@@ -191,7 +191,7 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
 
         {/* Preloaded Captain Query Chips Footer */}
         <div className="p-4 bg-white border-t border-jaman-border space-y-2.5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             Preloaded Captain Floor Inquiries:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -219,6 +219,6 @@ export const CaptainJamanAiModal: React.FC<CaptainJamanAiModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

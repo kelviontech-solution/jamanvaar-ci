@@ -54,7 +54,7 @@ export function LicenseCertificatePanel({ restaurantId }: { restaurantId: string
       </Button>
 
       {error && (
-        <p style={{ color: '#B91C1C', fontSize: 13, marginTop: 10 }}>{error}</p>
+        <p style={{ color: 'var(--jv-error-text)', fontSize: 13, marginTop: 10 }}>{error}</p>
       )}
 
       {certificate && (

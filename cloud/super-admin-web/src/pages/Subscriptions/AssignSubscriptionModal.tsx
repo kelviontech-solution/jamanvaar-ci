@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { Plan, RestaurantListItem } from '../../api/types';
-import { Button } from '../../components/ui';
+import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 
 export function AssignSubscriptionModal({
@@ -48,8 +48,7 @@ export function AssignSubscriptionModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose} label="Assign subscription">
         <div className="modal-header">
           <h2>Assign subscription</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close">
@@ -112,7 +111,6 @@ export function AssignSubscriptionModal({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

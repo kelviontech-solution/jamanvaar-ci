@@ -64,7 +64,7 @@ export function CopyButton({
         onResult?.(await copy(text));
       }}
     >
-      {state === 'copied' ? <Check className="w-3.5 h-3.5 mr-1" style={{ color: '#047857' }} /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+      {state === 'copied' ? <Check className="w-3.5 h-3.5 mr-1" style={{ color: 'var(--jv-success-text)' }} /> : <Copy className="w-3.5 h-3.5 mr-1" />}
       <span aria-live="polite">{state === 'copied' ? 'Copied' : state === 'failed' ? 'Copy failed' : label}</span>
     </Button>
   );

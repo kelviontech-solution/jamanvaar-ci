@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, PRESET_MESSAGES } from '../../store/captainStore';
@@ -35,19 +36,20 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <ModalBackdrop className="flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-jaman-saffron" />
-            <h3 className="text-lg font-black text-jaman-navy">Send Staff Message</h3>
+            <h3 className="text-lg font-bold text-jaman-navy">Send Staff Message</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -144,13 +146,13 @@ export const CaptainQuickMessageModal: React.FC<CaptainQuickMessageModalProps> =
           </button>
           <button
             type="submit"
-            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5"
+            className="py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Send Broadcast</span>
           </button>
         </div>
       </form>
-    </div>
+    </ModalBackdrop>
   );
 };

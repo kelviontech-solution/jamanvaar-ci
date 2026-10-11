@@ -1,0 +1,40 @@
+[
+ {
+  "id": "POS-WORKSPACE",
+  "app": "pos",
+  "url": "http://127.0.0.1:5302/workspace.html",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 64,
+   "unnamed": 0,
+   "under24": 4,
+   "under44": 61,
+   "h1": [],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-WORKSPACE-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

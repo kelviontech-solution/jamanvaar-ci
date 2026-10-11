@@ -28,7 +28,7 @@ export const EmptyState: React.FC<{
   className = ''
 }) => (
   <div className={`flex flex-col items-center justify-center p-12 text-center bg-white rounded-2xl border border-[#EBE6DD] ${className}`}>
-    <div className="w-16 h-16 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#8C9BAE] mb-4">
+    <div className="w-16 h-16 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#52677A] mb-4">
       {icon || <UtensilsCrossed className="w-8 h-8 text-[#E66817]" />}
     </div>
     <h3 className="text-lg font-bold text-[#0B253A]">{title}</h3>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAiAccess } from '@jamanvaar/ui';
+import { useAiAccess, SettingsSaveBar, type SettingsSaveState } from '@jamanvaar/ui';
 import { refreshConfiguredAi } from '@jamanvaar/business';
 import { db } from '@jamanvaar/database';
 import { isValidGstinFormat, isValidFssaiFormat, isValidIndianPincode, isValidIndianPhone } from '@jamanvaar/utils';
@@ -63,7 +63,10 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   // enforces server-side (BUG-054) — this screen never went through that API at all.
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const handleSave = (e: React.FormEvent) => {
+  const [saveState, setSaveState] = useState<SettingsSaveState>('idle');
+  const [saveMessage, setSaveMessage] = useState<string | undefined>(undefined);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const errors: Record<string, string> = {};
@@ -80,7 +83,13 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       errors.phone = 'Enter a valid 10-digit Indian phone number.';
     }
     setFieldErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0) {
+      setSaveState('error');
+      setSaveMessage('Some details need attention. Check the highlighted fields and save again.');
+      return;
+    }
+    setSaveState('saving');
+    setSaveMessage(undefined);
 
     // Update restaurant
     db.restaurant.name = name;
@@ -128,32 +137,37 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     // stay on this one device forever — POS, Captain, KDS and both kiosk apps never learned of an
     // edit made here, and it was lost entirely on a fresh device or a reinstall. Best-effort: a
     // failed push is simply retried by every terminal's own periodic pull once this one succeeds.
-    void saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI }).catch(() => showToast('Saved locally. Could not sync restaurant settings; check the connection and save again.'));
+    // The device copy is saved; only report "saved" for what actually persisted where.
+    let synced = true;
+    try {
+      await saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI });
+    } catch {
+      synced = false;
+    }
     onUpdated();
-    showToast('Restaurant Branding & Accounting Profile Saved!');
+    if (synced) {
+      setSaveState('saved');
+      setSaveMessage('Saved and synced to your restaurant account.');
+      showToast('Restaurant Branding & Accounting Profile Saved!');
+    } else {
+      setSaveState('error');
+      setSaveMessage('Saved on this device only. Could not sync to your restaurant account — check the connection and save again.');
+      showToast('Saved locally. Could not sync restaurant settings; check the connection and save again.');
+    }
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6 max-w-5xl mx-auto">
+    <form onSubmit={handleSave} onChange={() => { setSaveState((current) => (current === 'saving' ? current : 'dirty')); setSaveMessage(undefined); }} className="space-y-6">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Section header (the page title lives in the Settings page header) */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">
-            Report Branding & Legal Profile
-          </h1>
+          <h2 className="text-base font-bold text-jaman-navy">Report branding & legal profile</h2>
           <p className="text-xs text-[#4A5568] mt-0.5">
-            Configure restaurant identity used on End of Day (EOD) Z-Reports, GST tax invoices, and thermal bills.
+            Restaurant identity used on End of Day (EOD) Z-Reports, GST tax invoices, and thermal bills. Applies to this restaurant on every terminal.
           </p>
         </div>
-
-        <button
-          type="submit"
-          className="px-6 py-2.5 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 min-h-[44px]"
-        >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
+        <SettingsSaveBar state={saveState} message={saveMessage} saveType="submit" saveLabel="Save changes" />
       </div>
 
       {/* App Preferences — layered on top of the platform-wide JAMAN AI

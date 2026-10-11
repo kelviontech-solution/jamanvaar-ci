@@ -1,0 +1,845 @@
+[
+ {
+  "id": "POS-SET",
+  "app": "pos",
+  "url": "http://localhost:5302/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 4,
+    "focus": [
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Hardware & Printers",
+      "name": null,
+      "outline": "2px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(11, 37, 58, 0.6) 0p",
+      "w": 144,
+      "h": 36
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Sync now",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 96,
+      "h": 38
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "http://localhost:5178",
+      "name": "Local Core address",
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 1232,
+      "h": 34
+     },
+     {
+      "tag": "INPUT",
+      "type": "password",
+      "text": "Local Core pairing PIN",
+      "name": "Local Core pairing PIN",
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 1232,
+      "h": 34
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-tab-order-1366x768.png"
+   },
+   {
+    "do": "key",
+    "arg": null,
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 41,
+     "unnamed": 3,
+     "under24": 2,
+     "under44": 41,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Use the restaurant default"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+    },
+    "shot": "evidence/pos/POS-SET-arrow-right-1366x768.png"
+   },
+   {
+    "do": "click",
+    "arg": "Reports & Design",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 15,
+     "unnamed": 4,
+     "under24": 4,
+     "under44": 10,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Default Report Template & Layout | 5 TEMPLATES | Selected Report Design Theme: | Classic Accounting | Standard audit tables & borders | Modern Dashboard | Colored KPI badges & progress mix | Compact A4 | Dense single-sheet printable layout | Financial Statement | Formal"
+    },
+    "inputs": [
+     {
+      "type": "select-one",
+      "label": "",
+      "ph": "",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": "05:00 AM"
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-reports-tab-1366x768.png"
+   },
+   {
+    "do": "click",
+    "arg": "Subscription & License",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 26,
+     "unnamed": 0,
+     "under24": 2,
+     "under44": 20,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Verify & Apply Certificate"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | JAMANVAAR PRO | ACTIVE | Restaurant: JAMANVAAR Traditional Dining • Branch: Ahmedabad Flagship Store | ACTIVE PRICE TIER | ₹7000 | LICENSE KEY | JAMAN-PRO-2026-AHM-8842-X | TERMINAL ID | POS-01 | ALLOWED TERMINALS | 2 / 5 Active | VALID UNTIL | 1 Jan 2028 | Available So"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "",
+      "ph": "Paste the License Certificate from Super Admin...",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": ""
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-license-tab-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 41,
+   "unnamed": 3,
+   "under24": 2,
+   "under44": 41,
+   "h1": [
+    "POS System & License Settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Use the restaurant default"
+   ],
+   "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Local Core address",
+    "ph": "http://localhost:5178",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "http://localhost:517"
+   },
+   {
+    "type": "password",
+    "label": "Pairing PIN",
+    "ph": "",
+    "req": true,
+    "ac": "off",
+    "mode": "numeric",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "192.168.1.10:5178",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "range",
+    "label": "Screen size",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "100"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "RECEIPT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "KITCHEN"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "TANDOOR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "BAR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "DESSERT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "REPORT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "GENERAL"
+   }
+  ],
+  "shot": "evidence/pos/POS-SET-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-SET",
+  "app": "pos",
+  "url": "http://localhost:5302/",
+  "viewport": "768x1024",
+  "steps": [
+   {
+    "do": "key",
+    "arg": null,
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 768,
+     "scrollH": 1024,
+     "interactive": 41,
+     "unnamed": 3,
+     "under24": 2,
+     "under44": 41,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Use the restaurant default"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+    },
+    "shot": "evidence/pos/POS-SET-arrow-right-768x1024.png"
+   },
+   {
+    "do": "click",
+    "arg": "Reports & Design",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 768,
+     "scrollH": 1024,
+     "interactive": 15,
+     "unnamed": 4,
+     "under24": 4,
+     "under44": 10,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Default Report Template & Layout | 5 TEMPLATES | Selected Report Design Theme: | Classic Accounting | Standard audit tables & borders | Modern Dashboard | Colored KPI badges & progress mix | Compact A4 | Dense single-sheet printable layout | Financial Statement | Formal"
+    },
+    "inputs": [
+     {
+      "type": "select-one",
+      "label": "",
+      "ph": "",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": "05:00 AM"
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-reports-tab-768x1024.png"
+   },
+   {
+    "do": "click",
+    "arg": "Subscription & License",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 768,
+     "scrollH": 1024,
+     "interactive": 26,
+     "unnamed": 0,
+     "under24": 2,
+     "under44": 20,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Verify & Apply Certificate"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | JAMANVAAR PRO | ACTIVE | Restaurant: JAMANVAAR Traditional Dining • Branch: Ahmedabad Flagship Store | ACTIVE PRICE TIER | ₹7000 | LICENSE KEY | JAMAN-PRO-2026-AHM-8842-X | TERMINAL ID | POS-01 | ALLOWED TERMINALS | 2 / 5 Active | VALID UNTIL | 1 Jan 2028 | Available So"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "",
+      "ph": "Paste the License Certificate from Super Admin...",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": ""
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-license-tab-768x1024.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 41,
+   "unnamed": 3,
+   "under24": 2,
+   "under44": 41,
+   "h1": [
+    "POS System & License Settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Use the restaurant default"
+   ],
+   "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Local Core address",
+    "ph": "http://localhost:5178",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "http://localhost:517"
+   },
+   {
+    "type": "password",
+    "label": "Pairing PIN",
+    "ph": "",
+    "req": true,
+    "ac": "off",
+    "mode": "numeric",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "192.168.1.10:5178",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "range",
+    "label": "Screen size",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "100"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "RECEIPT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "KITCHEN"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "TANDOOR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "BAR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "DESSERT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "REPORT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "GENERAL"
+   }
+  ],
+  "shot": "evidence/pos/POS-SET-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-SET",
+  "app": "pos",
+  "url": "http://localhost:5302/",
+  "viewport": "1920x1080",
+  "steps": [
+   {
+    "do": "key",
+    "arg": null,
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1920,
+     "scrollH": 1080,
+     "interactive": 41,
+     "unnamed": 3,
+     "under24": 2,
+     "under44": 41,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Use the restaurant default"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+    },
+    "shot": "evidence/pos/POS-SET-arrow-right-1920x1080.png"
+   },
+   {
+    "do": "click",
+    "arg": "Reports & Design",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1920,
+     "scrollH": 1080,
+     "interactive": 15,
+     "unnamed": 4,
+     "under24": 4,
+     "under44": 10,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Default Report Template & Layout | 5 TEMPLATES | Selected Report Design Theme: | Classic Accounting | Standard audit tables & borders | Modern Dashboard | Colored KPI badges & progress mix | Compact A4 | Dense single-sheet printable layout | Financial Statement | Formal"
+    },
+    "inputs": [
+     {
+      "type": "select-one",
+      "label": "",
+      "ph": "",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": "05:00 AM"
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-reports-tab-1920x1080.png"
+   },
+   {
+    "do": "click",
+    "arg": "Subscription & License",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1920,
+     "scrollH": 1080,
+     "interactive": 26,
+     "unnamed": 0,
+     "under24": 2,
+     "under44": 20,
+     "h1": [
+      "POS System & License Settings"
+     ],
+     "main": false,
+     "lang": "en",
+     "disabledBtns": [
+      "Verify & Apply Certificate"
+     ],
+     "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | JAMANVAAR PRO | ACTIVE | Restaurant: JAMANVAAR Traditional Dining • Branch: Ahmedabad Flagship Store | ACTIVE PRICE TIER | ₹7000 | LICENSE KEY | JAMAN-PRO-2026-AHM-8842-X | TERMINAL ID | POS-01 | ALLOWED TERMINALS | 2 / 5 Active | VALID UNTIL | 1 Jan 2028 | Available So"
+    },
+    "inputs": [
+     {
+      "type": "text",
+      "label": "",
+      "ph": "Paste the License Certificate from Super Admin...",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": ""
+     }
+    ],
+    "shot": "evidence/pos/POS-SET-license-tab-1920x1080.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 41,
+   "unnamed": 3,
+   "under24": 2,
+   "under44": 41,
+   "h1": [
+    "POS System & License Settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Use the restaurant default"
+   ],
+   "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Local Core address",
+    "ph": "http://localhost:5178",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "http://localhost:517"
+   },
+   {
+    "type": "password",
+    "label": "Pairing PIN",
+    "ph": "",
+    "req": true,
+    "ac": "off",
+    "mode": "numeric",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "192.168.1.10:5178",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "range",
+    "label": "Screen size",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "100"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "RECEIPT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "KITCHEN"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "TANDOOR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "BAR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "DESSERT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "REPORT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "GENERAL"
+   }
+  ],
+  "shot": "evidence/pos/POS-SET-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-SET",
+  "app": "pos",
+  "url": "http://localhost:5302/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 41,
+   "unnamed": 3,
+   "under24": 2,
+   "under44": 41,
+   "h1": [
+    "POS System & License Settings"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [
+    "Use the restaurant default"
+   ],
+   "body": "POS System & License Settings | Configure hardware stations, thermal receipt print queues, and restaurant subscription licenses. | Hardware & Printers | Reports & Design | Instant Bill | Local DB & Sync | Subscription & License | Connection & diagnostics | ONLINE ● Connected | Connected to the cloud. Everything is up to date. | Sync now | Local Core setup | Activate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant a"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Local Core address",
+    "ph": "http://localhost:5178",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": "http://localhost:517"
+   },
+   {
+    "type": "password",
+    "label": "Pairing PIN",
+    "ph": "",
+    "req": true,
+    "ac": "off",
+    "mode": "numeric",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "",
+    "ph": "192.168.1.10:5178",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "range",
+    "label": "Screen size",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "100"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "RECEIPT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "KITCHEN"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "TANDOOR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "BAR"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "DESSERT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "REPORT"
+   },
+   {
+    "type": "select-one",
+    "label": "",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "GENERAL"
+   }
+  ],
+  "shot": "evidence/pos/POS-SET-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

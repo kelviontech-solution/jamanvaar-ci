@@ -1,4 +1,4 @@
-import {QrServiceInbox} from '@jamanvaar/ui';
+import { QrServiceInbox, ModalBackdrop } from '@jamanvaar/ui';
 import {deviceFetch} from '../../cloud/cloudClient';
 const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json();if(!r.ok)throw new Error(data.message||'Service request unavailable');return data;};
 import React, { useState } from 'react';
@@ -65,14 +65,14 @@ export const CaptainGuestRequestsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5"><QrServiceInbox api={qrRequestsApi}/>
+    <div className="space-y-5 pb-16 md:pb-6"><QrServiceInbox api={qrRequestsApi}/>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-3xl border border-jaman-border shadow-2xs">
         <div>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-amber-600" />
-            <h2 className="text-xl font-black text-jaman-navy">Guest Service Requests</h2>
-            <span className="bg-amber-100 text-amber-900 text-xs font-black px-2.5 py-0.5 rounded-full">
+            <h2 className="text-xl font-bold text-jaman-navy">Guest Service Requests</h2>
+            <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {pendingRequests.length} Pending
             </span>
           </div>
@@ -84,7 +84,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>+ Log Guest Request</span>
@@ -103,7 +103,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
             return (
               <div
                 key={req.id}
-                className="bg-white rounded-3xl border-2 border-amber-400 p-5 space-y-4 shadow-sm flex flex-col justify-between"
+                className="bg-white rounded-2xl border-2 border-amber-400 p-5 space-y-4 shadow-sm flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between">
@@ -112,8 +112,8 @@ export const CaptainGuestRequestsView: React.FC = () => {
                         {getRequestIcon(req.type)}
                       </div>
                       <div>
-                        <span className="text-xl font-black text-jaman-navy">TABLE {req.tableNumber}</span>
-                        <span className="text-xs font-black text-amber-800 uppercase block tracking-wider">
+                        <span className="text-xl font-bold text-jaman-navy">TABLE {req.tableNumber}</span>
+                        <span className="text-xs font-bold text-amber-800 uppercase block tracking-wider">
                           {req.type.replace('_', ' ')}
                         </span>
                       </div>
@@ -139,7 +139,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => acknowledgeCustomerRequest(req.id)}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs transition-colors cursor-pointer"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                     >
                       Accept
                     </button>
@@ -148,7 +148,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => resolveCustomerRequest(req.id)}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Mark Done</span>
@@ -161,7 +161,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
           <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-          <h3 className="text-lg font-black text-jaman-navy">All Guest Requests Completed!</h3>
+          <h3 className="text-lg font-bold text-jaman-navy">All Guest Requests Completed!</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             No pending diner requests on your floor right now.
           </p>
@@ -170,13 +170,13 @@ export const CaptainGuestRequestsView: React.FC = () => {
 
       {/* Add Request Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <form
             onSubmit={handleCreateRequest}
-            className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-md bg-white rounded-3xl p-6 shadow-md border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-black text-jaman-navy">Log Guest Request</h3>
+              <h3 className="text-lg font-bold text-jaman-navy">Log Guest Request</h3>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
@@ -252,13 +252,13 @@ export const CaptainGuestRequestsView: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs shadow-md"
+                className="flex-1 py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs shadow-md"
               >
                 Submit Request
               </button>
             </div>
           </form>
-        </div>
+        </ModalBackdrop>
       )}
     </div>
   );

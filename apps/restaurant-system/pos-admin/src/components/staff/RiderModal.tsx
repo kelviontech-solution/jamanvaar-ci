@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DeliveryRider } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput } from '@jamanvaar/ui';
 import { RiderRepository } from '@jamanvaar/database';
 
 interface RiderModalProps {
@@ -58,11 +58,11 @@ export const RiderModal: React.FC<RiderModalProps> = ({ isOpen, onClose, riderTo
         )}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Rider Name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand" />
+          <FormInput value={name} onChange={(e) => setName(e.target.value)}/>
         </div>
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Phone *</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand" />
+          <FormInput value={phone} onChange={(e) => setPhone(e.target.value)}/>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>

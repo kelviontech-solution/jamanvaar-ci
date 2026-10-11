@@ -23,9 +23,10 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary: 'bg-[#0B253A] text-white hover:bg-[#133E5E] focus:ring-[#0B253A] shadow-sm',
-    accent: 'bg-[#E66817] text-white hover:bg-[#F27A2B] active:bg-[#D1560D] focus:ring-[#E66817] shadow-md shadow-[#E66817]/20',
+    // Darker than the decorative saffron (#E66817, 3.3:1 with white text): white on #BF540F is 4.7:1, the same brand orange Restaurant Admin already uses for actions.
+    accent: 'bg-[#BF540F] text-white hover:bg-[#A9480C] active:bg-[#933E0A] focus:ring-[#BF540F] shadow-md shadow-[#BF540F]/20',
     secondary: 'bg-white text-[#0B253A] border border-[#EBE6DD] hover:bg-[#F8F6F0] focus:ring-[#0B253A] shadow-sm',
-    outline: 'bg-transparent text-[#0B253A] border-2 border-[#0B253A] hover:bg-[#0B253A]/5',
+    outline: 'bg-transparent text-[#0B253A] border-2 border-[#0B253A] hover:bg-[#0B253A]/5 focus:ring-[#0B253A]',
     danger: 'bg-[#DC2626] text-white hover:bg-[#B91C1C] focus:ring-[#DC2626]',
     ghost: 'bg-transparent text-[#4A5568] hover:bg-black/5 hover:text-[#0B253A]'
   };

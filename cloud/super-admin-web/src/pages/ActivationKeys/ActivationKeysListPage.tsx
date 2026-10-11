@@ -21,6 +21,7 @@ import { useDebounced, usePagedList } from '../../hooks/usePagedList';
 import { Pager } from '../../components/Pager';
 import '../../components/shared.css';
 import { GenerateActivationKeyModal } from './GenerateActivationKeyModal';
+import { useAdminConfirm } from '../../components/ui';
 
 type Lifecycle = 'ALL' | 'AVAILABLE' | 'REDEEMED' | 'REVOKED' | 'EXPIRED';
 type View = 'RESTAURANTS' | 'KEYS';
@@ -44,6 +45,7 @@ const LIFECYCLE_TONE = { AVAILABLE: 'success', REDEEMED: 'accent', REVOKED: 'err
  * stays fast with thousands of keys (BUG-060). A key's code is shown only while it can still be used.
  */
 export function ActivationKeysListPage() {
+  const { confirm, confirmDialog } = useAdminConfirm();
   const [view, setView] = useState<View>('RESTAURANTS');
   const [toast, setToast] = useState<string | null>(null);
   const [showGenerate, setShowGenerate] = useState(false);
@@ -142,7 +144,7 @@ export function ActivationKeysListPage() {
     }
     const redeemed = keys.items.filter((k) => ids.includes(k.id) && k.lifecycle === 'REDEEMED').length;
     const extra = redeemed ? ` ${redeemed} of them are already in use: revoking those also revokes their terminals.` : '';
-    if (!window.confirm(`Revoke ${ids.length} activation key(s)?${extra} A revoked key can be brought back with Activate again.`)) return;
+    if (!(await confirm({ title: `Revoke ${ids.length} activation key(s)?`, message: `${extra ? extra.trim() + ' ' : ''}A revoked key can be brought back with Activate again.`, confirmLabel: 'Revoke', danger: true }))) return;
     setBulkPending(true);
     try {
       // One request for the whole selection.
@@ -188,7 +190,7 @@ export function ActivationKeysListPage() {
       showToast('None of the selected keys can be deleted (keys in use must be revoked first)');
       return;
     }
-    if (!window.confirm(`Delete ${ids.length} activation key(s)? Their codes can never be redeemed again. This is recorded in the audit log and cannot be undone.`)) return;
+    if (!(await confirm({ title: `Delete ${ids.length} activation key(s)?`, message: 'Their codes can never be redeemed again. This is recorded in the audit log and cannot be undone.', confirmLabel: 'Delete', danger: true }))) return;
     setBulkPending(true);
     try {
       const res = await api.post<{ deleted: number; skipped: number }>('/api/v1/activation-keys/bulk-delete', { ids });
@@ -234,6 +236,7 @@ export function ActivationKeysListPage() {
   const active = view === 'KEYS' ? keys : restaurants;
 
   return (
+    <>
     <div>
       <div className="page-header">
         <div>
@@ -510,5 +513,7 @@ export function ActivationKeysListPage() {
         />
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

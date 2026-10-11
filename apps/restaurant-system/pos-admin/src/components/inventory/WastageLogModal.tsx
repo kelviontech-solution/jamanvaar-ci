@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InventoryItem, WastageReasonCode } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { InventoryRepository } from '@jamanvaar/database';
 import { Camera, X } from 'lucide-react';
 
@@ -163,27 +163,27 @@ export const WastageLogModal: React.FC<WastageLogModalProps> = ({
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Reason *</label>
-          <select
+          <FormSelect
             value={reasonCode}
             onChange={(e) => setReasonCode(e.target.value as WastageReasonCode)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           >
             {WASTAGE_REASONS.map((r) => (
               <option key={r.code} value={r.code}>{r.label}</option>
             ))}
-          </select>
+          </FormSelect>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Quantity Wasted ({item.unit}) *</label>
-          <input
+          <FormInput
             type="number"
             step="0.1"
             min="0"
             required
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+            mono
           />
         </div>
 

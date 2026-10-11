@@ -1,0 +1,1689 @@
+[
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 8,
+    "focus": [
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Show Password",
+      "name": null,
+      "outline": "2px solid rgb(251, 146, 60)",
+      "boxShadow": "none",
+      "w": 96,
+      "h": 44
+     },
+     {
+      "tag": "INPUT",
+      "type": "password",
+      "text": "Enter your password",
+      "name": null,
+      "outline": "1px auto rgb(238, 238, 238)",
+      "boxShadow": "rgba(251, 146, 60, 0.28) 0px 0px 0px 2.77443px",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "text": "on",
+      "name": null,
+      "outline": "2px solid rgb(251, 146, 60)",
+      "boxShadow": "rgba(251, 146, 60, 0.263) 0px 0px 0px 2.6214px",
+      "w": 13,
+      "h": 13
+     },
+     {
+      "tag": "BUTTON",
+      "type": "submit",
+      "text": "CONTINUE",
+      "name": null,
+      "outline": "2px solid rgb(251, 155, 75)",
+      "boxShadow": "rgba(191, 84, 15, 0.25) 0px 4px 14px 0px",
+      "w": 478,
+      "h": 48
+     },
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "2px solid rgb(251, 146, 60)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "email",
+      "text": "e.g. superadmin@jamanvaar.app",
+      "name": null,
+      "outline": "1px auto rgb(238, 238, 238)",
+      "boxShadow": "rgba(251, 146, 60, 0.28) 0px 0px 0px 2.77443px",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Show Password",
+      "name": null,
+      "outline": "2px solid rgb(251, 146, 60)",
+      "boxShadow": "none",
+      "w": 96,
+      "h": 44
+     }
+    ],
+    "shot": "evidence/super-admin/SUPER-001-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-1366x768.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-768x1024.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admin Email * | Passwor"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-390x844.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "1920x1080",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-1920x1080.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-002",
+  "app": "super-admin",
+  "url": "http://localhost:5180/activate",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 1,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "This invitation link is not valid"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "ACTIVATE ACCOUNT | This invitation link is not valid | The link is incomplete or was replaced by a newer invitation. Use the most recent email, or ask a Platform Owner to resend it. | Go to sign in"
+  },
+  "inputs": [],
+  "shot": "evidence/super-admin/SUPER-002-initial-1366x768.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-002",
+  "app": "super-admin",
+  "url": "http://localhost:5180/activate",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 1,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "This invitation link is not valid"
+   ],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "ACTIVATE ACCOUNT | This invitation link is not valid | The link is incomplete or was replaced by a newer invitation. Use the most recent email, or ask a Platform Owner to resend it. | Go to sign in"
+  },
+  "inputs": [],
+  "shot": "evidence/super-admin/SUPER-002-initial-390x844.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-003",
+  "app": "super-admin",
+  "url": "http://localhost:5180/restaurants",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "/login"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-003-initial-1366x768.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 10,
+    "focus": [
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Pair",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 22,
+      "h": 16
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "e.g. JM9876543210",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Show Password",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 100,
+      "h": 44
+     },
+     {
+      "tag": "INPUT",
+      "type": "password",
+      "text": "Enter owner password",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Forgot password?",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 112,
+      "h": 44
+     },
+     {
+      "tag": "SUMMARY",
+      "type": null,
+      "text": "Connecting a new device? Add your admin ",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 478,
+      "h": 20
+     },
+     {
+      "tag": "BUTTON",
+      "type": "submit",
+      "text": "Sign In",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0",
+      "w": 478,
+      "h": 48
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Set your password from the welcome email",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 260,
+      "h": 44
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Pair",
+      "name": null,
+      "outline": "2px solid rgba(191, 84, 15, 0.55)",
+      "boxShadow": "none",
+      "w": 22,
+      "h": 16
+     }
+    ],
+    "shot": "evidence/restaurant-admin/ADMIN-001-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaur"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaur"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "ADMIN-001",
+  "app": "restaurant-admin",
+  "url": "http://localhost:5176/",
+  "viewport": "1920x1080",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 9,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Restaurant Control.\nLive Intelligence."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Local Core: Unreachable | Pair | Network: Online | Sun, 11 Oct 2026 | Restaurant Control. | Live Intelligence. | Sign in once. Open the apps included in your plan, with a separate workspace for each. | Restaurant Management | Reports & Analytics | Menu Management | Inventory & Staff | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | OWNER SIGN-IN | JAMANVAAR | One account for your restaurant and kiosk apps | Restaurant ID * | Find it in Super Admin: Restaurants, open the restaur"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "e.g. JM9876543210",
+    "req": false,
+    "ac": "off",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Owner Password *",
+    "ph": "Enter owner password",
+    "req": false,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "text",
+    "label": "Admin activation key (optional)",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/restaurant-admin/ADMIN-001-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 6,
+    "focus": [
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 478,
+      "h": 46
+     }
+    ],
+    "shot": "evidence/pos/POS-001-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to conne"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to conne"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to connect this terminal to"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-001",
+  "app": "pos",
+  "url": "http://localhost:5175/",
+  "viewport": "1920x1080",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Smart Billing.\nBetter Dining."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Smart Billing. | Better Dining. | Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | POS TERMINAL | POS Counter | One-time setup — activate this terminal to start billing. | Activate This Terminal | Enter the activation key from your Super Admin Welcome Kit to conne"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/pos/POS-001-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KDS-001",
+  "app": "kds",
+  "url": "http://localhost:5179/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 6,
+    "focus": [
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(230, 104, 23, 0.2) ",
+      "w": 478,
+      "h": 46
+     },
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Network: Online",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 146,
+      "h": 46
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(230, 104, 23, 0.2) ",
+      "w": 478,
+      "h": 46
+     }
+    ],
+    "shot": "evidence/kds/KDS-001-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Real-Time Kitchen Production Command\nLive KOTs"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the activa"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kds/KDS-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KDS-001",
+  "app": "kds",
+  "url": "http://localhost:5179/",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1024,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Real-Time Kitchen Production Command\nLive KOTs"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the activa"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kds/KDS-001-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KDS-001",
+  "app": "kds",
+  "url": "http://localhost:5179/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Real-Time Kitchen Production Command\nLive KOTs"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the activation key from your "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kds/KDS-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KDS-001",
+  "app": "kds",
+  "url": "http://localhost:5179/",
+  "viewport": "1920x1080",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 3,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Real-Time Kitchen Production Command\nLive KOTs"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Terminal"
+   ],
+   "body": "Local Core: Connected | Network: Online | Sun, 11 Oct 2026 | Real-Time Kitchen Production Command | Live KOTs | Instant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff. | Fast Billing | Instant KOT | Table Management | Offline First | Tandoor Station | Wok Station | Dosa Station | WELCOME TO | KITCHEN DISPLAY (KDS) | Kitchen Display System | One-time setup — activate this display to start receiving tickets. | Activate This Terminal | Enter the activa"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kds/KDS-001-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KIOSK-001",
+  "app": "kiosk",
+  "url": "http://localhost:5174/",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "tab",
+    "arg": 8,
+    "focus": [
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Where can I find this?",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 141,
+      "h": 44
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 17, 17)",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0",
+      "w": 558,
+      "h": 62
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Need Help?",
+      "name": "Need help?",
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 108,
+      "h": 44
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JM9876543210",
+      "name": null,
+      "outline": "1px auto rgb(16, 18, 19)",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0",
+      "w": 558,
+      "h": 62
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Where can I find this?",
+      "name": null,
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 141,
+      "h": 44
+     },
+     {
+      "tag": "INPUT",
+      "type": "text",
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "name": null,
+      "outline": "1px auto rgb(16, 18, 19)",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0",
+      "w": 558,
+      "h": 62
+     },
+     {
+      "tag": "BODY"
+     },
+     {
+      "tag": "BUTTON",
+      "type": "button",
+      "text": "Need Help?",
+      "name": "Need help?",
+      "outline": "1px auto rgb(16, 16, 16)",
+      "boxShadow": "none",
+      "w": 108,
+      "h": 44
+     }
+    ],
+    "shot": "evidence/kiosk/KIOSK-001-tab-order-1366x768.png"
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 1052,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Guests order.\nKitchen fires\ninstantly."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Kiosk"
+   ],
+   "body": "KIOSK | SELF ORDERING | 🍲 Delicious Food | ⚡ Faster Service | 👥 Happier Customers | Device: | Activation required | Network: | Connected | Sun, 11 Oct 2026 · 18:26 | Need Help? | Crave. Tap. Enjoy! :) | Guests order. | Kitchen fires | instantly. | A modern self-ordering kiosk for a smoother and happier dining experience. | Touch to Order | Instant Kitchen Orders | Smart Suggestions | Happier Customers | Good Food, Better Moments | Let's Serve Happiness ♥ | Crave | Tap | Enjoy! | WELCOME TO | J"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "JM9876543210",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   },
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kiosk/KIOSK-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KIOSK-001",
+  "app": "kiosk",
+  "url": "http://localhost:5174/",
+  "viewport": "768x1024",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 768,
+   "scrollH": 1781,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Guests order.\nKitchen fires\ninstantly."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Kiosk"
+   ],
+   "body": "KIOSK | SELF ORDERING | Device: | Activation required | Network: | Connected | Need Help? | Crave. Tap. Enjoy! :) | Guests order. | Kitchen fires | instantly. | A modern self-ordering kiosk for a smoother and happier dining experience. | Touch to Order | Instant Kitchen Orders | Smart Suggestions | Happier Customers | Good Food, Better Moments | Let's Serve Happiness ♥ | Crave | Tap | Enjoy! | WELCOME TO | JAMANVAAR KIOSK | SELF ORDERING · SMART DINING · BETTER EXPERIENCE | Activate Your Kiosk |"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "JM9876543210",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   },
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kiosk/KIOSK-001-initial-768x1024.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KIOSK-001",
+  "app": "kiosk",
+  "url": "http://localhost:5174/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 1873,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Guests order.\nKitchen fires\ninstantly."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Kiosk"
+   ],
+   "body": "Crave. Tap. Enjoy! :) | Guests order. | Kitchen fires | instantly. | A modern self-ordering kiosk for a smoother and happier dining experience. | Touch to Order | Instant Kitchen Orders | Smart Suggestions | Happier Customers | Good Food, Better Moments | Let's Serve Happiness ♥ | WELCOME TO | JAMANVAAR KIOSK | SELF ORDERING · SMART DINING · BETTER EXPERIENCE | Activate Your Kiosk | Enter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant. | Restaurant "
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "JM9876543210",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   },
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kiosk/KIOSK-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "KIOSK-001",
+  "app": "kiosk",
+  "url": "http://localhost:5174/",
+  "viewport": "1920x1080",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 5,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "Guests order.\nKitchen fires\ninstantly."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Activate Kiosk"
+   ],
+   "body": "KIOSK | SELF ORDERING | 🍲 Delicious Food | ⚡ Faster Service | 👥 Happier Customers | Device: | Activation required | Network: | Connected | Sun, 11 Oct 2026 · 18:27 | Need Help? | Crave. Tap. Enjoy! :) | Guests order. | Kitchen fires | instantly. | A modern self-ordering kiosk for a smoother and happier dining experience. | Touch to Order | Instant Kitchen Orders | Smart Suggestions | Happier Customers | Good Food, Better Moments | Let's Serve Happiness ♥ | Crave | Tap | Enjoy! | WELCOME TO | J"
+  },
+  "inputs": [
+   {
+    "type": "text",
+    "label": "Restaurant ID *",
+    "ph": "JM9876543210",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   },
+   {
+    "type": "text",
+    "label": "Activation Key *",
+    "ph": "JMV-XXXX-XXXX-XXXX",
+    "req": true,
+    "ac": "",
+    "mode": "text",
+    "val": ""
+   }
+  ],
+  "shot": "evidence/kiosk/KIOSK-001-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "QR-001",
+  "app": "qr-guest",
+  "url": "http://localhost:5190/",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 0,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "This QR code is not valid"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "This QR code is not valid | Please scan the code on your table again, or ask a team member."
+  },
+  "inputs": [],
+  "shot": "evidence/qr-guest/QR-001-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "QR-001",
+  "app": "qr-guest",
+  "url": "http://localhost:5190/",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 0,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "This QR code is not valid"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "This QR code is not valid | Please scan the code on your table again, or ask a team member."
+  },
+  "inputs": [],
+  "shot": "evidence/qr-guest/QR-001-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "QR-002",
+  "app": "qr-guest",
+  "url": "http://localhost:5190/q/AuditFakeToken0123456789",
+  "viewport": "390x844",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 1,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "No connection"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "No connection | No connection. Please check your internet and try again. | Try again"
+  },
+  "inputs": [],
+  "shot": "evidence/qr-guest/QR-002-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "QR-002",
+  "app": "qr-guest",
+  "url": "http://localhost:5190/q/AuditFakeToken0123456789",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 1,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [
+    "No connection"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "No connection | No connection. Please check your internet and try again. | Try again"
+  },
+  "inputs": [],
+  "shot": "evidence/qr-guest/QR-002-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "CAPTAIN-001",
+  "app": "captain",
+  "url": "http://localhost:5177/",
+  "viewport": "1366x768",
+  "steps": [],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 0,
+   "unnamed": 0,
+   "under24": 0,
+   "under44": 0,
+   "h1": [],
+   "main": false,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": ""
+  },
+  "inputs": [],
+  "shot": "evidence/captain/CAPTAIN-001-initial-1366x768.png",
+  "console": [
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\food-ready\\CaptainFoodReadyView.tsx: Unexpected token (183:1)\n\n  181 |             <CheckCircle2 className=",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\kots\\CaptainLiveKotsView.tsx: Unexpected token (93:0)\n\n  91 |               <div\n  92 |                 key",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\requests\\CaptainGuestRequestsView.tsx: Unexpected token (68:1)\n\n  66 |\n  67 |   return (\n> 68 | <<<<<<< Upd",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\tables\\CaptainTableWorkspaceModal.tsx: Unexpected token (256:0)\n\n  254 |             <button\n  255 |       ",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\assistant\\CaptainJamanAiModal.tsx: Unexpected token (38:1)\n\n  36 |     return () => window.removeEventListe",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\tables\\CaptainTableCard.tsx: Unexpected token (60:0)\n\n  58 |   return (\n  59 |     <div\n> 60 | <<<<<<< Upda",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\food-ready\\CaptainFoodReadyView.tsx: Unexpected token (183:1)\n\n  181 |             <CheckCircle2 className=",
+   "error: [vite] Internal Server Error\nD:\\jamanvar\\kiosk\\apps\\restaurant-system\\captain\\src\\components\\kots\\CaptainLiveKotsView.tsx: Unexpected token (93:0)\n\n  91 |               <div\n  92 |                 key"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED",
+   "net::ERR_ABORTED"
+  ]
+ }
+]

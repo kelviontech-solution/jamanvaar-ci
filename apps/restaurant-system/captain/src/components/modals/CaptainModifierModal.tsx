@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { MenuItem, SelectedModifier } from '@jamanvaar/types';
@@ -71,14 +72,14 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-jaman-border space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-jaman-border space-y-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-              <h3 className="text-lg font-black text-jaman-navy">{item.name}</h3>
+              <h3 className="text-lg font-bold text-jaman-navy">{item.name}</h3>
             </div>
             <span className="text-xs text-jaman-saffron font-bold font-mono block mt-0.5">
               Base Price: {formatINR(item.price)}
@@ -87,6 +88,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -101,7 +103,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <div key={g.id} className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                 <span>{g.name}{g.isRequired ? ' *' : ''}</span>
-                {max > 1 && <span className="text-[10px] normal-case font-semibold text-slate-400">choose up to {max}</span>}
+                {max > 1 && <span className="text-[11px] normal-case font-semibold text-slate-400">choose up to {max}</span>}
               </label>
               <div className="space-y-1.5">
                 {g.options.map((o) => {
@@ -172,15 +174,15 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-black flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-8 text-center text-lg font-black font-mono text-jaman-navy">{quantity}</span>
+            <span className="w-8 text-center text-lg font-bold font-mono text-jaman-navy">{quantity}</span>
             <button
               type="button"
               onClick={() => setQuantity((q) => q + 1)}
-              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-black flex items-center justify-center cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -191,13 +193,13 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             onClick={handleAdd}
             disabled={missing.length > 0}
             title={missing.length > 0 ? `Choose: ${missing.join(', ')}` : undefined}
-            className="flex-1 disabled:opacity-50 py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-black text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
+            className="flex-1 disabled:opacity-50 py-3 px-4 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs sm:text-sm shadow-md shadow-jaman-saffron/20 transition-all active:scale-98 cursor-pointer flex items-center justify-between"
           >
             <span>Add to Order</span>
             <span className="font-mono">{formatINR(totalPrice)}</span>
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -419,8 +419,8 @@
   color: inherit;
 }
 .ui-filter-pill.active .ui-filter-pill-count {
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--jv-on-primary) 25%, transparent);
+  color: var(--jv-on-primary);
 }
 
 

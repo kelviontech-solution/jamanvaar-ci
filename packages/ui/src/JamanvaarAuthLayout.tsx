@@ -290,7 +290,10 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
 
   const apiBadgeConnected = healthCheckUrl ? apiReachable !== false : true;
   // Restaurant Admin is an owner/manager console: pairing plumbing is noise there unless the server is actually unreachable.
-  const showCoreBadge = !!onPairLocalCore || appIdentity !== 'ADMIN' || !apiBadgeConnected;
+  // A badge is a claim. With no health URL and no connection state from the caller there is nothing
+  // to base "Connected" on, so say nothing rather than show a green pill that was never checked.
+  const hasConnectionSignal = !!healthCheckUrl || isLocalCoreConnected !== undefined || isLocalCoreUnauthorized;
+  const showCoreBadge = hasConnectionSignal && (!!onPairLocalCore || appIdentity !== 'ADMIN' || !apiBadgeConnected);
   const [pairingOpen, setPairingOpen] = useState(false);
 
   const defaultCapabilities: JamanvaarCapabilityItem[] = [
@@ -369,11 +372,11 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 <strong className="text-amber-700 font-extrabold">Connecting (cloud sync in use)</strong>
               ) : (
                 <strong className={dark ? 'text-emerald-400 font-extrabold' : 'text-emerald-700 font-extrabold'}>
-                  {appIdentity === 'SUPER_ADMIN' ? 'Connected (Port 4000)' : 'Connected'}
+                  Connected
                 </strong>
               )}
             </span>
-            {onPairLocalCore && <button type="button" onClick={() => setPairingOpen(true)} className="text-xs font-bold underline">{isLocalCoreUnauthorized ? 'Pair' : 'Setup'}</button>}
+            {onPairLocalCore && <button type="button" onClick={() => setPairingOpen(true)} className="text-xs font-bold underline px-1.5 py-1 -my-1 min-h-[24px] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current">{isLocalCoreUnauthorized ? 'Pair' : 'Setup'}</button>}
           </div>
           )}
           {pairingOpen && onPairLocalCore && localCoreUrl && <div role="dialog" aria-modal="true" aria-label="Local Core setup" className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">

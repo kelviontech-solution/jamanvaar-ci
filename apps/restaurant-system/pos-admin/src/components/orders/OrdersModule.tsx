@@ -36,7 +36,7 @@ import {
   Layers,
   Sparkles, X } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
-import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement } from '@jamanvaar/ui';
+import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
 
 interface OrdersModuleProps {
   orders: Order[];
@@ -49,6 +49,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   onOrderUpdated,
   showToast
 }) => {
+  const { prompt, confirmDialog } = useConfirm();
   // Navigation & View Level: 'DAYS_LIST' | 'DAY_DRILLDOWN'
   // Default preset is TODAY (below), and the single most common lookup is
   // checking/reprinting a recent order — so if today already has orders,
@@ -279,6 +280,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   };
 
   return (
+    <>
     <div className="space-y-6 max-w-7xl mx-auto select-none">
       <div className="flex items-center gap-3 text-xs font-bold text-jaman-navy">
         <label htmlFor="history-order-source">Order source</label>
@@ -893,9 +895,16 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
                           {isUnpaidOpenOrder(ord) && (
                             <button
                               type="button"
-                              onClick={() => {
-                                if (!window.confirm(`Void unpaid bill ${ord.orderNumber}? It will be removed from open bills and the kitchen.`)) return;
-                                const reason = window.prompt('Reason for voiding this bill', 'Abandoned by guest')?.trim();
+                              onClick={async () => {
+                                const reason = await prompt({
+                                  title: `Void unpaid bill ${ord.orderNumber}?`,
+                                  message: 'It will be removed from open bills and the kitchen. This cannot be undone.',
+                                  inputLabel: 'Reason for voiding',
+                                  defaultValue: 'Abandoned by guest',
+                                  required: true,
+                                  confirmLabel: 'Void bill',
+                                  tone: 'danger'
+                                });
                                 if (!reason) return;
                                 try {
                                   OrderRepository.voidOrder(ord.id, reason, 'Restaurant Admin');
@@ -996,7 +1005,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
       {/* THERMAL BILL PRINT MODAL */}
       {/* ========================================================================= */}
       {isReceiptModalOpen && receiptOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-bold text-sm text-jaman-navy">Print Thermal Bill</h3>
@@ -1027,9 +1036,11 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               </button>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
     </div>
+    {confirmDialog}
+    </>
   );
 };

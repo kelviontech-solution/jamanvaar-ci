@@ -41,8 +41,10 @@ import {
   RotateCcw,
   Check
 } from 'lucide-react';
+import { useConfirm } from '@jamanvaar/ui';
 
 export const PosHeader: React.FC = () => {
+  const { confirm, confirmDialog } = useConfirm();
   const ai = useAiAccess();
   const {
     currentUser,
@@ -169,12 +171,18 @@ export const PosHeader: React.FC = () => {
   ).length;
   const aiAlertCount = delayedKotCount + lowStockCount;
 
-  const handleStartNewOrder = (type: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY') => {
+  const handleStartNewOrder = async (type: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY') => {
     setNewOrderDropdownOpen(false);
     // An in-progress cart used to be discarded with zero confirmation here,
     // in direct contrast to the cart's own "Clear Cart" button, which
     // correctly asks first.
-    if (cart.items.length > 0 && !window.confirm(`Discard the ${cart.items.length} item(s) in the current cart and start a new order?`)) {
+    if (cart.items.length > 0 && !(await confirm({
+      title: 'Start a new order?',
+      message: `The ${cart.items.length} item(s) in the current cart will be discarded.`,
+      confirmLabel: 'Discard & start new',
+      cancelLabel: 'Keep cart',
+      tone: 'danger'
+    }))) {
       return;
     }
     clearCart();
@@ -186,8 +194,14 @@ export const PosHeader: React.FC = () => {
     }
   };
 
-  const handleStartNewBusinessDay = () => {
-    if (cart.items.length > 0 && !window.confirm(`Discard the ${cart.items.length} item(s) in the current cart and start a new business day?`)) {
+  const handleStartNewBusinessDay = async () => {
+    if (cart.items.length > 0 && !(await confirm({
+      title: 'Start a new business day?',
+      message: `The ${cart.items.length} item(s) in the current cart will be discarded.`,
+      confirmLabel: 'Discard & start day',
+      cancelLabel: 'Keep cart',
+      tone: 'danger'
+    }))) {
       return;
     }
     BusinessDayRepository.openNewBusinessDay(currentUser?.fullName || 'Cashier', 2000);
@@ -197,6 +211,7 @@ export const PosHeader: React.FC = () => {
   };
 
   return (
+    <>
     <header className="w-full h-14 bg-white border border-jaman-border rounded-2xl px-3 sm:px-4 flex items-center justify-between text-jaman-navy select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
       {/* Left: Brand Header & New Order */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -759,5 +774,7 @@ export const PosHeader: React.FC = () => {
         />
       )}
     </header>
+    {confirmDialog}
+    </>
   );
 };

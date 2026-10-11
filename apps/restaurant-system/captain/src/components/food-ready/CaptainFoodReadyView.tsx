@@ -54,8 +54,8 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <Flame className="w-5 h-5 text-emerald-600 fill-emerald-600" />
-            <h2 className="text-xl font-black text-jaman-navy">Food Ready for Delivery</h2>
-            <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full">
+            <h2 className="text-xl font-bold text-jaman-navy">Food Ready for Delivery</h2>
+            <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {activeFoodReady.length} Dishes Ready
             </span>
           </div>
@@ -90,15 +90,15 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
             return (
               <div
                 key={tableNum}
-                className="bg-white rounded-3xl border-2 border-emerald-500 ring-2 ring-emerald-500/20 p-5 space-y-4 shadow-sm flex flex-col justify-between"
+                className="bg-white rounded-2xl border-2 border-emerald-500 ring-2 ring-emerald-500/20 p-5 space-y-4 shadow-sm flex flex-col justify-between"
               >
                 {/* Table Header */}
                 <div>
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-jaman-navy">TABLE {tableNum}</span>
-                        <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                        <span className="text-2xl font-bold text-jaman-navy">TABLE {tableNum}</span>
+                        <span className="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
                           <Flame className="w-3 h-3 fill-white" />
                           <span>READY</span>
                         </span>
@@ -122,14 +122,14 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                         className="p-3 rounded-2xl bg-jaman-cream border border-jaman-border flex items-center justify-between gap-3"
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-xs font-mono shrink-0">
+                          <div className="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs font-mono shrink-0">
                             {it.quantity}×
                           </div>
                           <div>
                             <span className="font-extrabold text-xs text-jaman-navy block">
                               {it.dishName}
                             </span>
-                            <span className="text-[10px] font-bold text-slate-400">
+                            <span className="text-[11px] font-bold text-slate-400">
                               {it.station || 'Kitchen'} • {it.kotNumber || 'KOT'}
                             </span>
                           </div>
@@ -138,7 +138,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                         <button
                           type="button"
                           onClick={() => markItemServed(it.id)}
-                          className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-black text-xs shadow-2xs transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
+                          className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
                           title="Mark this single dish as delivered"
                         >
                           <Check className="w-3.5 h-3.5" />
@@ -156,7 +156,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
                     onClick={() => {
                       items.forEach((it) => markItemServed(it.id));
                     }}
-                    className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>{search.trim() ? 'DELIVER SHOWN READY ITEMS' : 'DELIVER ALL READY ITEMS'} ({items.length})</span>
@@ -180,7 +180,7 @@ export const CaptainFoodReadyView: React.FC<CaptainFoodReadyViewProps> = ({
           <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-black text-jaman-navy">{search.trim() ? 'No ready food matches your search' : 'All Food Delivered & Served!'}</h3>
+          <h3 className="text-lg font-bold text-jaman-navy">{search.trim() ? 'No ready food matches your search' : 'All Food Delivered & Served!'}</h3>
           <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
             The kitchen stations have no pending ready dishes. New food ready notifications will pop up automatically.
           </p>

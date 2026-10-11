@@ -126,6 +126,12 @@ export const hi = {
   idleWarningText: 'आपकी सुरक्षा के लिए यह स्क्रीन रीसेट हो जाएगी',
   seconds: 'सेकंड में',
   keepOrdering: 'ऑर्डर जारी रखें',
+  validationPhoneInvalid: 'कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें।',
+  otpExpired: 'यह कोड समाप्त हो गया है। नया कोड पाने के लिए Send OTP दबाएँ।',
+  otpTooManyAttempts: 'बहुत ज़्यादा गलत प्रयास। नया कोड पाने के लिए Send OTP दबाएँ।',
+  otpIncorrectLeft: 'गलत कोड। {{count}} प्रयास बाकी हैं।',
+  otpIncorrectNone: 'गलत कोड। कोई प्रयास बाकी नहीं — फिर से Send OTP दबाएँ।',
+  fixCustomization: 'कृपया ज़रूरी विकल्प चुनें:',
 
   // Accessibility & System
   highContrast: 'हाई कंट्रास्ट',

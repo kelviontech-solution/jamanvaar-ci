@@ -1,3 +1,4 @@
+import { SettingsSection } from '@jamanvaar/ui';
 import { copyText } from '@jamanvaar/utils';
 import React, { useEffect, useState } from 'react';
 import {
@@ -130,42 +131,42 @@ export const WhatsAppChannelPanel: React.FC<{ showToast: (msg: string) => void }
   const locked = entitlement !== null && !entitlement.enabled;
 
   return (
-    <div className="bg-white rounded-2xl p-5 border border-jaman-border shadow-2xs space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-slate-500" />
-          <h3 className="text-sm font-bold text-jaman-navy">WhatsApp Ordering</h3>
-          {locked ? (
-            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-              <Lock className="w-2.5 h-2.5" />
-              Locked
+    <SettingsSection
+      icon={<MessageCircle className="w-4 h-4" />}
+      title="WhatsApp ordering"
+      badge={
+        locked ? (
+          <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            <Lock className="w-2.5 h-2.5" aria-hidden="true" />
+            Locked
+          </span>
+        ) : (
+          status && (
+            <span
+              className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                isConnected ? 'bg-emerald-50 text-emerald-800' : status.status === 'PENDING' ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-700'
+              }`}
+            >
+              {isConnected ? 'Connected' : status.status === 'PENDING' ? 'Waiting to connect' : 'Not connected'}
             </span>
-          ) : (
-            status && (
-              <span
-                className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                  isConnected ? 'bg-emerald-50 text-emerald-700' : status.status === 'PENDING' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {isConnected ? 'Connected' : status.status === 'PENDING' ? 'Waiting to connect' : 'Not connected'}
-              </span>
-            )
-          )}
-        </div>
-        {!hasKey && (
+          )
+        )
+      }
+      actions={
+        !hasKey ? (
           <button
             type="button"
             onClick={handleGenerate}
             disabled={busy || locked}
             title={locked ? entitlement?.lockedMessage ?? undefined : undefined}
-            className="px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="min-h-[40px] px-3.5 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <KeyRound className="w-3.5 h-3.5" />
-            <span>{busy ? 'Generating…' : 'Generate Key'}</span>
+            <span>{busy ? 'Generating…' : 'Generate key'}</span>
           </button>
-        )}
-      </div>
-
+        ) : undefined
+      }
+    >
       {locked && (
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-2 text-[11px] text-slate-600">
           <Lock className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
@@ -266,6 +267,6 @@ export const WhatsAppChannelPanel: React.FC<{ showToast: (msg: string) => void }
           </div>
         </div>
       )}
-    </div>
+    </SettingsSection>
   );
 };

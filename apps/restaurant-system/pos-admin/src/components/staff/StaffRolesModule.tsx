@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { ScheduleShiftModal } from './ScheduleShiftModal';
 import { RiderModal } from './RiderModal';
+import { useConfirm } from '@jamanvaar/ui';
 
 interface StaffRolesModuleProps {
   users: User[];
@@ -41,6 +42,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   showToast,
   onRequestConfirm
 }) => {
+  const { confirm, confirmDialog } = useConfirm();
   // B2-013: was `new Date().toISOString().slice(0, 10)` — the UTC calendar date, a day behind
   // for a restaurant in India from midnight until 05:30 IST, exactly when a late-night restaurant
   // opens the next day's roster. Same Asia/Kolkata-via-Intl approach already used for business days.
@@ -67,8 +69,8 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   const attendanceForDay = StaffScheduleRepository.getAttendanceForDate(selectedDate);
   const riders = RiderRepository.getAllRiders();
 
-  const handleDeleteRider = (rider: DeliveryRider) => {
-    if (!window.confirm(`Remove rider "${rider.name}" from the roster?`)) return;
+  const handleDeleteRider = async (rider: DeliveryRider) => {
+    if (!(await confirm({ title: 'Remove rider?', message: `"${rider.name}" will be removed from the delivery roster.`, confirmLabel: 'Remove', tone: 'danger' }))) return;
     RiderRepository.deleteRider(rider.id);
     refresh();
     showToast(`Removed rider: ${rider.name}`);
@@ -84,8 +86,8 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
     return rec?.status || null;
   };
 
-  const handleDeleteShift = (shift: StaffShiftSchedule) => {
-    if (!window.confirm(`Remove ${shift.userName}'s shift on ${shift.date}?`)) return;
+  const handleDeleteShift = async (shift: StaffShiftSchedule) => {
+    if (!(await confirm({ title: 'Remove shift?', message: `${shift.userName}'s shift on ${shift.date} will be removed.`, confirmLabel: 'Remove shift', tone: 'danger' }))) return;
     StaffScheduleRepository.deleteSchedule(shift.id);
     refresh();
     showToast('Shift removed');
@@ -127,6 +129,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
   };
 
   return (
+    <>
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -429,5 +432,7 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
         onSaved={() => { refresh(); showToast(riderToEdit ? 'Rider updated' : 'Rider added'); }}
       />
     </div>
+    {confirmDialog}
+    </>
   );
 };

@@ -1,0 +1,23 @@
+5:57:29 pm [vite] (client) Pre-transform error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+5:57:37 pm [vite] (client) Pre-transform error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+5:57:37 pm [vite] (client) Pre-transform error: Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+5:57:38 pm [vite] Internal server error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+5:57:39 pm [vite] (client) Pre-transform error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+5:57:39 pm [vite] (client) Pre-transform error: Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+5:58:34 pm [vite] Internal server error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+5:58:38 pm [vite] Internal server error: Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+== captain
+Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+== kds
+Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+== kiosk-user
+Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+== pos-admin
+Failed to resolve import "@jamanvaar/tauri-plugin-apk-updater" from "../../../packages/ui/src/native_update.ts". Does the file exist?
+Failed to resolve import "qrcode" from "../../../packages/utils/src/qrcode.ts". Does the file exist?
+== super-admin-web
+Failed to resolve import "qrcode" from "../../packages/utils/src/qrcode.ts". Does the file exist?
+== qr-guest

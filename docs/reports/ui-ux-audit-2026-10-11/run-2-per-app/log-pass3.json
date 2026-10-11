@@ -1,0 +1,266 @@
+[
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "audit@example.test",
+    "result": "ok"
+   },
+   {
+    "do": "fill",
+    "arg": "wrongpassword1",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "CONTINUE",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 6,
+     "unnamed": 0,
+     "under24": 1,
+     "under44": 1,
+     "h1": [
+      "Platform Control.\nUnified Cloud Engine."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+    },
+    "inputs": [
+     {
+      "type": "email",
+      "label": "Super Admin Email *",
+      "ph": "e.g. superadmin@jamanvaar.app",
+      "req": true,
+      "ac": "username",
+      "mode": "",
+      "val": "audit@example.test"
+     },
+     {
+      "type": "password",
+      "label": "Password *",
+      "ph": "Enter your password",
+      "req": true,
+      "ac": "current-password",
+      "mode": "",
+      "val": "***"
+     },
+     {
+      "type": "checkbox",
+      "label": "Remember session",
+      "ph": "",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": "on"
+     }
+    ],
+    "shot": "evidence/super-admin/SUPER-001-network-failure-submit-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Sun, 11 Oct 2026 | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admi"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-1366x768.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ },
+ {
+  "id": "SUPER-001",
+  "app": "super-admin",
+  "url": "http://localhost:5180/login",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "fill",
+    "arg": "audit@example.test",
+    "result": "ok"
+   },
+   {
+    "do": "fill",
+    "arg": "wrongpassword1",
+    "result": "ok"
+   },
+   {
+    "do": "click",
+    "arg": "CONTINUE",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 6,
+     "unnamed": 0,
+     "under24": 1,
+     "under44": 1,
+     "h1": [
+      "Platform Control.\nUnified Cloud Engine."
+     ],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "Cloud API: Unreachable | Network: Online | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admin Email * | Passwor"
+    },
+    "inputs": [
+     {
+      "type": "email",
+      "label": "Super Admin Email *",
+      "ph": "e.g. superadmin@jamanvaar.app",
+      "req": true,
+      "ac": "username",
+      "mode": "",
+      "val": "audit@example.test"
+     },
+     {
+      "type": "password",
+      "label": "Password *",
+      "ph": "Enter your password",
+      "req": true,
+      "ac": "current-password",
+      "mode": "",
+      "val": "***"
+     },
+     {
+      "type": "checkbox",
+      "label": "Remember session",
+      "ph": "",
+      "req": false,
+      "ac": "",
+      "mode": "",
+      "val": "on"
+     }
+    ],
+    "shot": "evidence/super-admin/SUPER-001-network-failure-submit-390x844.png"
+   },
+   {
+    "do": "eval",
+    "arg": null
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 6,
+   "unnamed": 0,
+   "under24": 1,
+   "under44": 1,
+   "h1": [
+    "Platform Control.\nUnified Cloud Engine."
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "Cloud API: Unreachable | Network: Online | Platform Control. | Unified Cloud Engine. | Centralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics. | Tenant Fleet Control | License Provisioning | Enterprise Analytics | Role-Based Security | Tandoori Breads | Royal Curries | Tandoor Starters | WELCOME TO | SUPER ADMIN | JAMANVAAR | Enterprise Platform Control & SaaS Management | Super Admin Email * | Passwor"
+  },
+  "inputs": [
+   {
+    "type": "email",
+    "label": "Super Admin Email *",
+    "ph": "e.g. superadmin@jamanvaar.app",
+    "req": true,
+    "ac": "username",
+    "mode": "",
+    "val": ""
+   },
+   {
+    "type": "password",
+    "label": "Password *",
+    "ph": "Enter your password",
+    "req": true,
+    "ac": "current-password",
+    "mode": "",
+    "val": "***"
+   },
+   {
+    "type": "checkbox",
+    "label": "Remember session",
+    "ph": "",
+    "req": false,
+    "ac": "",
+    "mode": "",
+    "val": "on"
+   }
+  ],
+  "shot": "evidence/super-admin/SUPER-001-initial-390x844.png",
+  "console": [
+   "warning: ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more informa",
+   "warning: ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see http"
+  ],
+  "exceptions": [],
+  "failedRequests": [
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED",
+   "net::ERR_CONNECTION_REFUSED"
+  ]
+ }
+]

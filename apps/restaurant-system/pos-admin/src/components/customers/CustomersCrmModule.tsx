@@ -4,7 +4,7 @@ import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
 import { LoyaltyProgramModal } from './LoyaltyProgramModal';
 import { MarketingCampaignsModal } from './MarketingCampaignsModal';
 import { formatINR, formatDate, formatTime, toCsvRow } from '@jamanvaar/utils';
-import { EmptyState } from '@jamanvaar/ui';
+import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
 import {
   Users,
   Search,
@@ -738,7 +738,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       {/* 6. CUSTOMER 360 COMPREHENSIVE DRILLDOWN MODAL */}
       {/* ========================================================================= */}
       {detailCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalBackdrop className="flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95">
             
             {/* Header */}
@@ -1010,7 +1010,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
             </div>
 
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       <LoyaltyProgramModal

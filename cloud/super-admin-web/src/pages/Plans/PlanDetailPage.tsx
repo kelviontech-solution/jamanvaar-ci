@@ -116,7 +116,7 @@ export function PlanDetailPage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: 13, color: 'var(--jv-text)' }}>
-                      <span style={{ color: '#16a34a' }}>✓</span>
+                      <span style={{ color: 'var(--jv-success-text)' }}>✓</span>
                       <span>{cat.name}</span>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--jv-text-muted)' }}>

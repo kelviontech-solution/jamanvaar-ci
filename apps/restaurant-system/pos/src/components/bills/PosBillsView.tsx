@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo } from 'react';
 import { createRefund, CloudApiError } from '../../cloud/cloudClient';
 import { usePosStore } from '../../store/posStore';
@@ -947,7 +948,7 @@ export const PosBillsView: React.FC = () => {
 
       {/* MODAL 1: VIEW INVOICE DETAIL MODAL */}
       {detailModalBill && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             {/* Modal Header */}
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between shrink-0">
@@ -1095,12 +1096,12 @@ export const PosBillsView: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* MODAL 2: PROTECTED REFUND MODAL */}
       {refundModalBill && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -1182,12 +1183,12 @@ export const PosBillsView: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
       {/* MODAL 3: REOPEN BILL MODAL */}
       {reopenModalBill && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+        <ModalBackdrop className="flex items-center justify-center p-4 animate-in fade-in select-none">
           <div className="bg-jaman-cream border border-jaman-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95">
             <div className="p-4 bg-white border-b border-jaman-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -1247,7 +1248,7 @@ export const PosBillsView: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </ModalBackdrop>
       )}
 
     </div>

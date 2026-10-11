@@ -1,0 +1,1172 @@
+[
+ {
+  "name": "kiosk-user-root",
+  "url": "http://localhost:5174/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kiosk-user-root-1366x768.png",
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 1052,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Guests order.\nKitchen fires\ninstantly.",
+   "H2:JAMANVAAR KIOSK",
+   "H2:Activate This Kiosk"
+  ],
+  "counts": {
+   "interactive": 5,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 23
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "KIOSK\nSELF ORDERING\n🍲 Delicious Food\n⚡ Faster Service\n👥 Happier Customers\nDevice:\nOnline\nNetwork:\nConnected\nSun, 11 Oct 2026 · 18:08\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 11
+ },
+ {
+  "name": "kiosk-user-root",
+  "url": "http://localhost:5174/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kiosk-user-root-768x1024.png",
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1832,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Guests order.\nKitchen fires\ninstantly.",
+   "H2:JAMANVAAR KIOSK",
+   "H2:Activate This Kiosk"
+  ],
+  "counts": {
+   "interactive": 5,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 19
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "KIOSK\nSELF ORDERING\nDevice:\nOnline\nNetwork:\nConnected\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nCrave\nTap\nEnjoy!\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART D",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 11
+ },
+ {
+  "name": "kiosk-user-root",
+  "url": "http://localhost:5174/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kiosk-user-root-390x844.png",
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 1937,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Guests order.\nKitchen fires\ninstantly.",
+   "H2:JAMANVAAR KIOSK",
+   "H2:Activate This Kiosk"
+  ],
+  "counts": {
+   "interactive": 5,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 13
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Crave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART DINING · BETTER EXPERIENCE\n\nActivate This Kiosk\n\nEnter the activation key from your ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 11
+ },
+ {
+  "name": "kiosk-user-root",
+  "url": "http://localhost:5174/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kiosk-user-root-1920x1080.png",
+  "title": "JAMANVAAR Kiosk — Customer Self-Order Terminal",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Guests order.\nKitchen fires\ninstantly.",
+   "H2:JAMANVAAR KIOSK",
+   "H2:Activate This Kiosk"
+  ],
+  "counts": {
+   "interactive": 5,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 23
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "KIOSK\nSELF ORDERING\n🍲 Delicious Food\n⚡ Faster Service\n👥 Happier Customers\nDevice:\nOnline\nNetwork:\nConnected\nSun, 11 Oct 2026 · 18:08\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 11
+ },
+ {
+  "name": "pos-root",
+  "url": "http://localhost:5175/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none",
+  "shot": "pos-root-1366x768.png",
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Smart Billing.\nBetter Dining.",
+   "H2:POS Counter",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "pos-root",
+  "url": "http://localhost:5175/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none",
+  "shot": "pos-root-768x1024.png",
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Smart Billing.\nBetter Dining.",
+   "H2:POS Counter",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "pos-root",
+  "url": "http://localhost:5175/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none",
+  "shot": "pos-root-390x844.png",
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Smart Billing.\nBetter Dining.",
+   "H2:POS Counter",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "pos-root",
+  "url": "http://localhost:5175/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none",
+  "shot": "pos-root-1920x1080.png",
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Smart Billing.\nBetter Dining.",
+   "H2:POS Counter",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "pos-admin-root",
+  "url": "http://localhost:5176/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "pos-admin-root-1366x768.png",
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Restaurant Control.\nLive Intelligence.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 9,
+   "unnamed": 0,
+   "small24": 2,
+   "small44": 2,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 11
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>",
+   "<input type=\"checkbox\" class=\"rounded accent-brand\" checked=\"\">"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nCentralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nRESTAURANT ADMIN\nJAMANVAAR\n\nRestaurant Operations SaaS\n\nR",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 3
+ },
+ {
+  "name": "pos-admin-root",
+  "url": "http://localhost:5176/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "pos-admin-root-768x1024.png",
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Restaurant Control.\nLive Intelligence.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 9,
+   "unnamed": 0,
+   "small24": 2,
+   "small44": 2,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 11
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>",
+   "<input type=\"checkbox\" class=\"rounded accent-brand\" checked=\"\">"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nCentralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nRESTAURANT ADMIN\nJAMANVAAR\n\nRestaurant Operations SaaS\n\nR",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 3
+ },
+ {
+  "name": "pos-admin-root",
+  "url": "http://localhost:5176/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "pos-admin-root-390x844.png",
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Restaurant Control.\nLive Intelligence.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 9,
+   "unnamed": 0,
+   "small24": 2,
+   "small44": 2,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 11
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>",
+   "<input type=\"checkbox\" class=\"rounded accent-brand\" checked=\"\">"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nRestaurant Control.\nLive Intelligence.\n\nCentralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nRESTAURANT ADMIN\nJAMANVAAR\n\nRestaurant Operations SaaS\n\nRestaurant ID *\n\nF",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 3
+ },
+ {
+  "name": "pos-admin-root",
+  "url": "http://localhost:5176/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "pos-admin-root-1920x1080.png",
+  "title": "JAMANVAAR Admin — Restaurant Operations & Intelligence",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Restaurant Control.\nLive Intelligence.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 9,
+   "unnamed": 0,
+   "small24": 2,
+   "small44": 2,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 11
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>",
+   "<input type=\"checkbox\" class=\"rounded accent-brand\" checked=\"\">"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nCentralized management suite for sales analytics, live KOT dispatch, recipe costing and team permissions.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nRESTAURANT ADMIN\nJAMANVAAR\n\nRestaurant Operations SaaS\n\nR",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 3
+ },
+ {
+  "name": "captain-root",
+  "url": "http://localhost:5177/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "captain-root-1366x768.png",
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Touch-First Restaurant Floor Command\nIns",
+   "H2:Floor Captain & Service",
+   "H2:Activate this Tablet"
+  ],
+  "counts": {
+   "interactive": 4,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Servic",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ },
+ {
+  "name": "captain-root",
+  "url": "http://localhost:5177/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "captain-root-768x1024.png",
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Touch-First Restaurant Floor Command\nIns",
+   "H2:Floor Captain & Service",
+   "H2:Activate this Tablet"
+  ],
+  "counts": {
+   "interactive": 4,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Servic",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ },
+ {
+  "name": "captain-root",
+  "url": "http://localhost:5177/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "captain-root-390x844.png",
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Touch-First Restaurant Floor Command\nIns",
+   "H2:Floor Captain & Service",
+   "H2:Activate this Tablet"
+  ],
+  "counts": {
+   "interactive": 4,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nActivate this ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ },
+ {
+  "name": "captain-root",
+  "url": "http://localhost:5177/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "captain-root-1920x1080.png",
+  "title": "JAMANVAAR Captain — Floor Service & Table Ordering",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Touch-First Restaurant Floor Command\nIns",
+   "H2:Floor Captain & Service",
+   "H2:Activate this Tablet"
+  ],
+  "counts": {
+   "interactive": 4,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<button type=\"button\" class=\"text-xs font-bold underline\">Pair</button>"
+  ],
+  "bodyText": "Local Core: Unreachable\nPair\nNetwork: Online\nSun, 11 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Servic",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ },
+ {
+  "name": "kds-root",
+  "url": "http://localhost:5179/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kds-root-1366x768.png",
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Real-Time Kitchen Production Command\nLiv",
+   "H2:Kitchen Display System",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "kds-root",
+  "url": "http://localhost:5179/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kds-root-768x1024.png",
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Real-Time Kitchen Production Command\nLiv",
+   "H2:Kitchen Display System",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "kds-root",
+  "url": "http://localhost:5179/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kds-root-390x844.png",
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Real-Time Kitchen Production Command\nLiv",
+   "H2:Kitchen Display System",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display to start receivin",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "kds-root",
+  "url": "http://localhost:5179/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+  "shot": "kds-root-1920x1080.png",
+  "title": "JAMANVAAR KDS — Kitchen Display System",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Real-Time Kitchen Production Command\nLiv",
+   "H2:Kitchen Display System",
+   "H2:Activate This Terminal"
+  ],
+  "counts": {
+   "interactive": 3,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 15
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "Local Core: Connected\nNetwork: Online\nSun, 11 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display ",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "qr-guest-root",
+  "url": "http://localhost:5190/",
+  "viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+  "shot": "qr-guest-root-1366x768.png",
+  "title": "Order",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": false
+  },
+  "headings": [
+   "H1:This QR code is not valid"
+  ],
+  "counts": {
+   "interactive": 0,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 0
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "This QR code is not valid\n\nPlease scan the code on your table again, or ask a team member.",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "qr-guest-root",
+  "url": "http://localhost:5190/",
+  "viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+  "shot": "qr-guest-root-768x1024.png",
+  "title": "Order",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": false
+  },
+  "headings": [
+   "H1:This QR code is not valid"
+  ],
+  "counts": {
+   "interactive": 0,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 0
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "This QR code is not valid\n\nPlease scan the code on your table again, or ask a team member.",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "qr-guest-root",
+  "url": "http://localhost:5190/",
+  "viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+  "shot": "qr-guest-root-390x844.png",
+  "title": "Order",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": false
+  },
+  "headings": [
+   "H1:This QR code is not valid"
+  ],
+  "counts": {
+   "interactive": 0,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 0
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "This QR code is not valid\n\nPlease scan the code on your table again, or ask a team member.",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 0
+ },
+ {
+  "name": "super-admin-login",
+  "url": "http://localhost:5180/login",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-login-1366x768.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Platform Control.\nUnified Cloud Engine.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 6,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 12
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<input type=\"checkbox\" class=\"rounded accent-[var(--jv-accent)]\" checked=\"\">"
+  ],
+  "bodyText": "Cloud API: Unreachable\nNetwork: Online\nSun, 11 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMI",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 2
+ },
+ {
+  "name": "super-admin-login",
+  "url": "http://localhost:5180/login",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-login-768x1024.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 768,
+  "vh": 1024,
+  "scrollW": 768,
+  "scrollH": 1024,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Platform Control.\nUnified Cloud Engine.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 6,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 12
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<input type=\"checkbox\" class=\"rounded accent-[var(--jv-accent)]\" checked=\"\">"
+  ],
+  "bodyText": "Cloud API: Unreachable\nNetwork: Online\nSun, 11 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMI",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 2
+ },
+ {
+  "name": "super-admin-login",
+  "url": "http://localhost:5180/login",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-login-390x844.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Platform Control.\nUnified Cloud Engine.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 6,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 12
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<input type=\"checkbox\" class=\"rounded accent-[var(--jv-accent)]\" checked=\"\">"
+  ],
+  "bodyText": "Cloud API: Unreachable\nNetwork: Online\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnte",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 2
+ },
+ {
+  "name": "super-admin-login",
+  "url": "http://localhost:5180/login",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-login-1920x1080.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 1920,
+  "vh": 1080,
+  "scrollW": 1920,
+  "scrollH": 1080,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": true,
+   "nav": false,
+   "header": true
+  },
+  "headings": [
+   "H1:Platform Control.\nUnified Cloud Engine.",
+   "H2:JAMANVAAR"
+  ],
+  "counts": {
+   "interactive": 6,
+   "unnamed": 0,
+   "small24": 1,
+   "small44": 1,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 12
+  },
+  "unnamedSamples": [],
+  "smallSamples": [
+   "<input type=\"checkbox\" class=\"rounded accent-[var(--jv-accent)]\" checked=\"\">"
+  ],
+  "bodyText": "Cloud API: Unreachable\nNetwork: Online\nSun, 11 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMI",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 2
+ },
+ {
+  "name": "super-admin-activate",
+  "url": "http://localhost:5180/activate",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-activate-1366x768.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 1366,
+  "vh": 768,
+  "scrollW": 1366,
+  "scrollH": 768,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": false,
+   "nav": false,
+   "header": false
+  },
+  "headings": [
+   "H1:This invitation link is not valid"
+  ],
+  "counts": {
+   "interactive": 1,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 1
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "ACTIVATE ACCOUNT\nThis invitation link is not valid\n\nThe link is incomplete or was replaced by a newer invitation. Use the most recent email, or ask a Platform Owner to resend it.\n\nGo to sign in",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ },
+ {
+  "name": "super-admin-activate",
+  "url": "http://localhost:5180/activate",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "shot": "super-admin-activate-390x844.png",
+  "title": "JAMANVAAR — Platform Control Center",
+  "lang": "en",
+  "vw": 390,
+  "vh": 844,
+  "scrollW": 390,
+  "scrollH": 844,
+  "overflowX": false,
+  "wide": [],
+  "landmarks": {
+   "main": false,
+   "nav": false,
+   "header": false
+  },
+  "headings": [
+   "H1:This invitation link is not valid"
+  ],
+  "counts": {
+   "interactive": 1,
+   "unnamed": 0,
+   "small24": 0,
+   "small44": 0,
+   "imgsNoAlt": 0,
+   "brokenImgs": 0,
+   "inputsNoLabel": 0,
+   "tinyTextNodes": 1
+  },
+  "unnamedSamples": [],
+  "smallSamples": [],
+  "bodyText": "ACTIVATE ACCOUNT\nThis invitation link is not valid\n\nThe link is incomplete or was replaced by a newer invitation. Use the most recent email, or ask a Platform Owner to resend it.\n\nGo to sign in",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": 1
+ }
+]

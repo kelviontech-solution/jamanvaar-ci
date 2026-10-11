@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DiningTable, TableStatus } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { TableRepository, planBulkTables } from '@jamanvaar/database';
 
 interface TableModalProps {
@@ -125,25 +125,25 @@ export const TableModal: React.FC<TableModalProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">{bulk && !tableToEdit ? 'First Table Number *' : 'Table Number *'}</label>
-            <input
+            <FormInput
               type="text"
               required
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
               placeholder="e.g. 15"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Seating Capacity (Guests)</label>
-            <input
+            <FormInput
               type="number"
               min="1"
               max="30"
               required
               value={capacity}
               onChange={(e) => setCapacity(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>
@@ -176,15 +176,15 @@ export const TableModal: React.FC<TableModalProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Dining Zone / Section</label>
             {addingZone ? (
-              <input
+              <FormInput
                 type="text"
                 value={zone}
                 onChange={(e) => setZone(e.target.value)}
                 placeholder="e.g. Garden Terrace"
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
               />
             ) : (
-              <select
+              <FormSelect
                 value={zones.includes(zone) ? zone : '__new__'}
                 onChange={(e) => {
                   if (e.target.value === '__new__') {
@@ -194,41 +194,41 @@ export const TableModal: React.FC<TableModalProps> = ({
                     setZone(e.target.value);
                   }
                 }}
-                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
               >
                 {zones.map((z) => (
                   <option key={z} value={z}>{z}</option>
                 ))}
                 <option value="__new__">＋ New zone…</option>
-              </select>
+              </FormSelect>
             )}
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Floor Level</label>
-            <select
+            <FormSelect
               value={floor}
               onChange={(e) => setFloor(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="1">Floor 1 (Ground)</option>
               <option value="2">Floor 2 (First)</option>
               <option value="3">Rooftop</option>
-            </select>
+            </FormSelect>
           </div>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Initial Status</label>
-          <select
+          <FormSelect
             value={status}
             onChange={(e) => setStatus(e.target.value as TableStatus)}
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           >
             <option value="AVAILABLE">AVAILABLE (Vacant)</option>
             <option value="OCCUPIED">OCCUPIED (Seated)</option>
             <option value="RESERVED">RESERVED</option>
             <option value="CLEANING">CLEANING / RESET</option>
-          </select>
+          </FormSelect>
         </div>
 
         {formError && (

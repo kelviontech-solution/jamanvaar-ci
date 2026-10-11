@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { InventoryItem } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { InventoryRepository } from '@jamanvaar/database';
 
 const MAX_STOCK_QUANTITY = 1_000_000;
@@ -157,23 +157,23 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Item Name *</label>
-            <input
+            <FormInput
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Fresh Malai Paneer"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Raw SKU Code</label>
-            <input
+            <FormInput
               type="text"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               placeholder="e.g. RAW-PAN-01"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>
@@ -181,10 +181,10 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Category</label>
-            <select
+            <FormSelect
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="Dairy">Dairy & Cheese</option>
               <option value="Grains & Pulses">Grains & Pulses</option>
@@ -192,14 +192,14 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               <option value="Spices & Oils">Spices & Cooking Oils</option>
               <option value="Beverage Raw">Beverage Raw Materials</option>
               <option value="Packaging">Packaging & Disposables</option>
-            </select>
+            </FormSelect>
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Stock Unit of Measurement</label>
-            <select
+            <FormSelect
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               <option value="kg">kg (Kilograms)</option>
               <option value="g">g (Grams)</option>
@@ -207,14 +207,14 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               <option value="ml">ml (Millilitres)</option>
               <option value="pcs">pcs (Pieces / Units)</option>
               <option value="packets">packets (Packets)</option>
-            </select>
+            </FormSelect>
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Current Stock ({unit})</label>
-            <input
+            <FormInput
               type="number"
               step="0.1"
               min="0"
@@ -222,19 +222,19 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
               required
               value={currentStock}
               onChange={(e) => setCurrentStock(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Min Threshold ({unit})</label>
-            <input
+            <FormInput
               type="number"
               step="0.1"
               min="0"
               required
               value={minStockLevel}
               onChange={(e) => setMinStockLevel(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
@@ -243,38 +243,38 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                 so "5" meant 5kg of rice and 5 saffron threads alike, and Purchasing's "Reorder &
                 expiry" tab (which reads this field) was silently wrong for almost every item. */}
             <label className="block text-xs font-bold text-slate-600 mb-1">Reorder Level ({unit})</label>
-            <input
+            <FormInput
               type="number"
               step="0.1"
               min="0"
               required
               value={reorderLevel}
               onChange={(e) => setReorderLevel(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Cost / Unit (₹)</label>
-            <input
+            <FormInput
               type="number"
               step="0.1"
               min="0"
               required
               value={costPerUnit}
               onChange={(e) => setCostPerUnit(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Supplier Name / Vendor (Optional)</label>
-          <input
+          <FormInput
             type="text"
             value={supplierName}
             onChange={(e) => setSupplierName(e.target.value)}
             placeholder="e.g. Amul Dairy Direct / Metro Wholesale"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           />
         </div>
 

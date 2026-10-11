@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
 import { X, MessageSquare, Plus, Check } from 'lucide-react';
@@ -55,7 +56,7 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 flex items-center justify-between">
@@ -128,6 +129,6 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -493,7 +493,7 @@ export function SupportPage() {
                 </div>
               </div>
               <div>
-                <div className="stat-value" style={{ color: '#059669', fontSize: 20 }}>Cluster Active</div>
+                <div className="stat-value" style={{ color: 'var(--jv-success-text)', fontSize: 20 }}>Cluster Active</div>
                 <div className="stat-sub">Port 4000 Backend Serving Real-Time Metrics</div>
               </div>
             </Card>

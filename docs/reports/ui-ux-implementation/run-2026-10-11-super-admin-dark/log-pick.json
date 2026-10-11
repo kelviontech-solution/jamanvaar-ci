@@ -1,0 +1,296 @@
+[
+ {
+  "id": "POS-TABLEPICK",
+  "app": "pos",
+  "url": "http://127.0.0.1:5302/workspace.html",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "click",
+    "arg": "Select Table",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 82,
+     "unnamed": 0,
+     "under24": 4,
+     "under44": 67,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+    },
+    "inputs": [],
+    "shot": "evidence/pos/POS-TABLEPICK-picker-open-1366x768.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"tiles\":12,\"zones\":[\"All zones\",\"AC Balcony\",\"Family Section\",\"Main Hall\"],\"first\":[\"Table 9, AC Balcony, 4 seats, Free\",\"Table 10, AC Balcony, 4 seats, Free\",\"Table 11, AC Balcony, 4 seats, Free\",\"Table 12, AC Balcony, 4 seats, Free\"]}"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "created"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"tiles\":13,\"zones\":[\"All zones\",\"AC Balcony\",\"Family Section\",\"Main Hall\",\"Rooftop\"],\"first\":[\"Table 9, AC Balcony, 4 seats, Free\",\"Table 10, AC Balcony, 4 seats, Free\",\"Table 11, AC Balcony, 4 seats, Free\",\"Table 12, AC Balcony, 4 seats, Free\"]}"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-TABLEPICK-after-admin-adds-table-1366x768.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 84,
+     "unnamed": 0,
+     "under24": 4,
+     "under44": 68,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+    }
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "picked"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"dialogOpen\":false,\"cartTableText\":[\"Table #NEW-77\"]}"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-TABLEPICK-after-pick-1366x768.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 65,
+     "unnamed": 0,
+     "under24": 4,
+     "under44": 62,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+    }
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 64,
+   "unnamed": 0,
+   "under24": 4,
+   "under44": 61,
+   "h1": [],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-TABLEPICK-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "POS-TABLEPICK",
+  "app": "pos",
+  "url": "http://127.0.0.1:5302/workspace.html",
+  "viewport": "390x844",
+  "steps": [
+   {
+    "do": "click",
+    "arg": "Select Table",
+    "result": "clicked",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 73,
+     "unnamed": 1,
+     "under24": 2,
+     "under44": 58,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | Search dishes, SKU, tables, bills, customers... | 2 | ? | STA | TAN | MAI | NAA | BIR | BEV | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | "
+    },
+    "inputs": [],
+    "shot": "evidence/pos/POS-TABLEPICK-picker-open-390x844.png"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"tiles\":12,\"zones\":[\"All zones\",\"AC Balcony\",\"Family Section\",\"Main Hall\"],\"first\":[\"Table 9, AC Balcony, 4 seats, Free\",\"Table 10, AC Balcony, 4 seats, Free\",\"Table 11, AC Balcony, 4 seats, Free\",\"Table 12, AC Balcony, 4 seats, Free\"]}"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "created"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"tiles\":13,\"zones\":[\"All zones\",\"AC Balcony\",\"Family Section\",\"Main Hall\",\"Rooftop\"],\"first\":[\"Table 9, AC Balcony, 4 seats, Free\",\"Table 10, AC Balcony, 4 seats, Free\",\"Table 11, AC Balcony, 4 seats, Free\",\"Table 12, AC Balcony, 4 seats, Free\"]}"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-TABLEPICK-after-admin-adds-table-390x844.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 75,
+     "unnamed": 1,
+     "under24": 2,
+     "under44": 59,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | Search dishes, SKU, tables, bills, customers... | 2 | ? | STA | TAN | MAI | NAA | BIR | BEV | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | "
+    }
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "picked"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "{\"dialogOpen\":false,\"cartTableText\":[\"Table #NEW-77\"]}"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/POS-TABLEPICK-after-pick-390x844.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 390,
+     "scrollH": 844,
+     "interactive": 56,
+     "unnamed": 1,
+     "under24": 2,
+     "under44": 53,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [
+      "Discount",
+      "Hold Order",
+      "Clear All",
+      "PAY ₹0",
+      "SEND KOT",
+      "INSTANT BILL\nCash • Auto Print"
+     ],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | Search dishes, SKU, tables, bills, customers... | 2 | ? | STA | TAN | MAI | NAA | BIR | BEV | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | "
+    }
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 390,
+   "scrollH": 844,
+   "interactive": 55,
+   "unnamed": 1,
+   "under24": 2,
+   "under44": 52,
+   "h1": [],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [
+    "Discount",
+    "Hold Order",
+    "Clear All",
+    "PAY ₹0",
+    "SEND KOT",
+    "INSTANT BILL\nCash • Auto Print"
+   ],
+   "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | Search dishes, SKU, tables, bills, customers... | 2 | ? | STA | TAN | MAI | NAA | BIR | BEV | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | Hara Bhara Kebab (6 Pcs) | Kitchen · HBK-01 | ₹220 | MOD | Crispy Corn Salt & Pepper | Kitchen · CC-02 | ₹240 | MOD | Cheese Corn Cigar Rolls (5 Pcs) | Kitchen · CCR-03 | ₹210 | MOD | Paneer Tikka (Tandoori Angaar) | Tandoor · PT-04 | ₹260 | MOD | Dal Makhani (Slow Cooked) | "
+  },
+  "inputs": [],
+  "shot": "evidence/pos/POS-TABLEPICK-initial-390x844.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]

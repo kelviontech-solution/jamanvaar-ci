@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { PaymentConnection } from '../../api/types';
-import { Badge, Button, Card, ConfirmModal, EmptyState, FilterTabs, SearchBar, SkeletonTable, statusTone } from '../../components/ui';
+import { Badge, Button, Card, ConfirmModal, EmptyState, FilterTabs, SearchBar, SkeletonTable, statusTone, useAdminConfirm } from '../../components/ui';
 import { CreditCard } from 'lucide-react';
 import '../../components/shared.css';
 
@@ -17,6 +17,7 @@ function bankStatusTone(status: PaymentConnection['bankVerificationStatus']): 's
 }
 
 export function PaymentConnectionsListPage() {
+  const { prompt, confirmDialog } = useAdminConfirm();
   const [connections, setConnections] = useState<PaymentConnection[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +66,7 @@ export function PaymentConnectionsListPage() {
       showToast('Enter a percentage between 0 and 100');
       return;
     }
-    const password = window.prompt('Confirm your password to change the platform default commission') ?? '';
+    const password = await prompt({ title: 'Confirm your password', message: 'Changing the platform default commission needs your password.', inputLabel: 'Password', inputType: 'password', required: true, confirmLabel: 'Save commission' });
     if (!password) return;
     setSavingDefault(true);
     try {
@@ -86,7 +87,7 @@ export function PaymentConnectionsListPage() {
       showToast('Enter a percentage between 0 and 100, or leave blank to use the platform default');
       return;
     }
-    const password = window.prompt(`Confirm your password to change ${c.restaurant.name}'s commission`) ?? '';
+    const password = await prompt({ title: 'Confirm your password', message: `Changing ${c.restaurant.name}'s commission needs your password.`, inputLabel: 'Password', inputType: 'password', required: true, confirmLabel: 'Save commission' });
     if (!password) return;
     setSavingOverrideId(c.id);
     try {
@@ -144,6 +145,7 @@ export function PaymentConnectionsListPage() {
   }
 
   return (
+    <>
     <div>
       <div className="page-header">
         <div>
@@ -344,5 +346,7 @@ export function PaymentConnectionsListPage() {
         />
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

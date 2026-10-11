@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category } from '@jamanvaar/types';
-import { CachedImg, Modal, Button, MenuCategoryIcon } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, MenuCategoryIcon, FormInput, FormSelect } from '@jamanvaar/ui';
 import { CATEGORY_ICON_OPTIONS, isMenuPlaceholder, menuCategoryImage } from '@jamanvaar/utils';
 import { MenuRepository, AuditRepository } from '@jamanvaar/database';
 
@@ -135,37 +135,37 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-4 py-1">
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Category Name *</label>
-          <input
+          <FormInput
             type="text"
             required
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. Starters & Appetizers"
-            className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">URL / Code Slug</label>
-            <input
+            <FormInput
               type="text"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="e.g. starters-appetizers"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none focus:border-brand"
+              mono
             />
           </div>
           <div>
             <label htmlFor="category-icon-style" className="block text-xs font-bold text-slate-600 mb-1">Icon Style</label>
-            <select
+            <FormSelect
               id="category-icon-style"
               value={iconName}
               onChange={(e) => setIconName(e.target.value)}
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             >
               {CATEGORY_ICON_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
+            </FormSelect>
           </div>
         </div>
 

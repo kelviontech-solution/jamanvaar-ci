@@ -12,7 +12,7 @@ import {
   countFeatures,
   type PlanFeatureGroup
 } from '@jamanvaar/types';
-import { Button } from '../../components/ui';
+import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 import './plans.css';
 
@@ -207,8 +207,7 @@ export function PlanFormModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal modal-wide plan-modal-container" onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose} label="Dialog" className="modal modal-wide plan-modal-container">
         {/* MODAL HEADER */}
         <div className="modal-header">
           <div>
@@ -299,8 +298,8 @@ export function PlanFormModal({
 
               {/* Automatic Core Inheritance Notification */}
               {form.tier === 'PRO' && (
-                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#166534', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 12, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-success-text)', display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span>✓</span>
                     <span>Automatic Core Inheritance Active: All 10 Core base modules (183 features) are included.</span>
                   </div>
@@ -456,7 +455,7 @@ export function PlanFormModal({
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                       <span>{ENTITLEMENT_LABELS[key as keyof Entitlements] || key}</span>
                                       {isProExclusive && (
-                                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
+                                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: 'var(--jv-accent-soft)', padding: '1px 5px', borderRadius: 4 }}>
                                           PRO
                                         </span>
                                       )}
@@ -479,7 +478,7 @@ export function PlanFormModal({
                                 </span>
                               ))}
                               {totalGranularCount > 16 && (
-                                <span className="feature-pill" style={{ background: '#fff4ed', color: 'var(--jv-accent-text)', fontWeight: 700 }}>
+                                <span className="feature-pill" style={{ background: 'var(--jv-accent-soft)', color: 'var(--jv-accent-text)', fontWeight: 700 }}>
                                   +{totalGranularCount - 16} more capabilities
                                 </span>
                               )}
@@ -674,10 +673,10 @@ export function PlanFormModal({
 
                     return (
                       <div key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, color: 'var(--jv-text)' }}>
-                        <span style={{ color: '#16a34a', fontWeight: 900 }}>✓</span>
+                        <span style={{ color: 'var(--jv-success-text)', fontWeight: 900 }}>✓</span>
                         <span>{cat.name}</span>
                         {cat.isProExclusive && (
-                          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: '#fff7ed', padding: '1px 5px', borderRadius: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--jv-accent-text)', background: 'var(--jv-accent-soft)', padding: '1px 5px', borderRadius: 4 }}>
                             PRO
                           </span>
                         )}
@@ -709,7 +708,6 @@ export function PlanFormModal({
             </div>
           </div>
         </form>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

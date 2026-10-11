@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, PrintQueueRepository } from '@jamanvaar/database';
 import { PrintJob, PrintJobStatus } from '@jamanvaar/types';
-import { sound } from '@jamanvaar/ui';
+import { sound, ModalBackdrop } from '@jamanvaar/ui';
 import { PosPrinterService } from '../../services/printerService';
 import {
   Printer,
@@ -84,7 +84,7 @@ export const PosPrintQueueModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
@@ -221,6 +221,6 @@ export const PosPrintQueueModal: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

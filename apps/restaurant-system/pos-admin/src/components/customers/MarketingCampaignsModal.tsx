@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MarketingCampaign, CustomerSegmentFilter, LoyaltyTier } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
+import { Modal, Button, useConfirm, FormInput } from '@jamanvaar/ui';
 import { MarketingRepository, CustomerRepository } from '@jamanvaar/database';
 import { Plus, Send, Trash2, Users as UsersIcon } from 'lucide-react';
 
@@ -13,6 +13,7 @@ interface MarketingCampaignsModalProps {
 const EMPTY_FILTER: CustomerSegmentFilter = {};
 
 export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = ({ isOpen, onClose, showToast }) => {
+  const { confirm, confirmDialog } = useConfirm();
   const [campaigns, setCampaigns] = useState<MarketingCampaign[]>(() => MarketingRepository.getCampaigns());
   const [tiers] = useState<LoyaltyTier[]>(() => CustomerRepository.getTiers());
   const [creating, setCreating] = useState(false);
@@ -40,8 +41,8 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
     showToast('Campaign created');
   };
 
-  const handleDelete = (campaign: MarketingCampaign) => {
-    if (!window.confirm(`Delete campaign "${campaign.name}"?`)) return;
+  const handleDelete = async (campaign: MarketingCampaign) => {
+    if (!(await confirm({ title: 'Delete campaign?', message: `Campaign "${campaign.name}" will be deleted.`, confirmLabel: 'Delete campaign', tone: 'danger' }))) return;
     MarketingRepository.deleteCampaign(campaign.id);
     refresh();
     showToast('Campaign deleted');
@@ -78,6 +79,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
   };
 
   return (
+    <>
     <Modal isOpen={isOpen} onClose={onClose} title="Marketing Campaigns" maxWidth="lg">
       {sendQueue ? (
         <div className="space-y-4 py-1">
@@ -102,11 +104,11 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
         <div className="space-y-4 py-1">
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1">Campaign Name *</label>
-            <input
+            <FormInput
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Diwali VIP Offer"
-              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-brand"
+
             />
           </div>
           <div>
@@ -221,5 +223,7 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
         </div>
       )}
     </Modal>
+    {confirmDialog}
+    </>
   );
 };

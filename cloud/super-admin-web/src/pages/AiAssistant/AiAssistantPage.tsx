@@ -41,8 +41,10 @@ import '../../components/shared.css';
 import './ai-assistant.css';
 import { AiRestaurantAccess } from './AiRestaurantAccess';
 import type { Plan } from '../../api/types';
+import { useAdminConfirm } from '../../components/ui';
 
 export function AiAssistantPage() {
+  const { confirm, confirmDialog } = useAdminConfirm();
   const [categories, setCategories] = useState<AiCategory[]>([]);
   const [questions, setQuestions] = useState<AiQuestionItem[]>([]);
   const [settings, setSettings] = useState<AiGlobalSettings | null>(null);
@@ -245,7 +247,7 @@ export function AiAssistantPage() {
   }
 
   async function handleDeleteQuestion(id: string) {
-    if (!window.confirm('Are you sure you want to remove this custom question?')) return;
+    if (!(await confirm({ title: 'Remove this custom question?', message: 'The question is removed from the assistant for every restaurant.', confirmLabel: 'Remove', danger: true }))) return;
     try {
       await api.delete(`/api/v1/ai-assistant/questions/${id}`);
       setQuestions((prev) => prev.filter((q) => q.id !== id));
@@ -289,6 +291,7 @@ export function AiAssistantPage() {
   }, [questions, selectedCategory, search]);
 
   return (
+    <>
     <div className="ai-engine-container">
       {/* Toast Notification */}
       {toast && (
@@ -351,7 +354,7 @@ export function AiAssistantPage() {
           <div className="ai-metric-card">
             <div className="ai-metric-header">
               <span className="ai-metric-title">AI-Enabled Tenants</span>
-              <div className="ai-metric-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+              <div className="ai-metric-icon" style={{ background: 'var(--jv-success-soft)', color: 'var(--jv-success-text)' }}>
                 <Building2 className="w-5 h-5" />
               </div>
             </div>
@@ -359,7 +362,7 @@ export function AiAssistantPage() {
               <div className="ai-metric-value">
                 {telemetry.activeProTenants} <span style={{ fontSize: '1rem', color: 'var(--jv-text-muted)', fontWeight: 600 }}>/ {telemetry.totalActiveTenants}</span>
               </div>
-              <div className="ai-metric-subtext" style={{ color: '#059669' }}>
+              <div className="ai-metric-subtext" style={{ color: 'var(--jv-success-text)' }}>
                 <Check className="w-3.5 h-3.5" />
                 <span>{telemetry.adoptionRatePercent}% on JAMANVAAR PRO ({priceOf('PRO')})</span>
               </div>
@@ -369,7 +372,7 @@ export function AiAssistantPage() {
           <div className="ai-metric-card">
             <div className="ai-metric-header">
               <span className="ai-metric-title">Total Queries Handled</span>
-              <div className="ai-metric-icon" style={{ background: '#eff6ff', color: '#2563eb' }}>
+              <div className="ai-metric-icon" style={{ background: '#eff6ff', color: 'var(--jv-info-text)' }}>
                 <Bot className="w-5 h-5" />
               </div>
             </div>
@@ -377,7 +380,7 @@ export function AiAssistantPage() {
               <div className="ai-metric-value">
                 {telemetry.totalQueries.toLocaleString('en-IN')}
               </div>
-              <div className="ai-metric-subtext" style={{ color: '#2563eb' }}>
+              <div className="ai-metric-subtext" style={{ color: 'var(--jv-info-text)' }}>
                 <span>+{telemetry.todayQueries} queries processed today</span>
               </div>
             </div>
@@ -386,7 +389,7 @@ export function AiAssistantPage() {
           <div className="ai-metric-card">
             <div className="ai-metric-header">
               <span className="ai-metric-title">Top Inquired Intent</span>
-              <div className="ai-metric-icon" style={{ background: 'var(--jv-warning-soft)', color: '#d97706' }}>
+              <div className="ai-metric-icon" style={{ background: 'var(--jv-warning-soft)', color: 'var(--jv-warning-text)' }}>
                 <TrendingUp className="w-5 h-5" />
               </div>
             </div>
@@ -411,7 +414,7 @@ export function AiAssistantPage() {
               <div className="ai-metric-value">
                 {telemetry.latencyMs != null ? `${telemetry.latencyMs} ms` : 'No data yet'}
               </div>
-              <div className="ai-metric-subtext" style={{ color: '#059669' }}>
+              <div className="ai-metric-subtext" style={{ color: 'var(--jv-success-text)' }}>
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Average per answer, measured on the terminals</span>
               </div>
@@ -470,10 +473,10 @@ export function AiAssistantPage() {
             <div>
               <div className="ai-tier-header">
                 <div>
-                  <div className="ai-tier-title" style={{ color: '#b45309' }}>JAMANVAAR PRO</div>
-                  <div style={{ fontSize: 13, color: '#b45309', fontWeight: 700 }}>{priceOf('PRO')} / month (Growth Edition)</div>
+                  <div className="ai-tier-title" style={{ color: 'var(--jv-warning-text)' }}>JAMANVAAR PRO</div>
+                  <div style={{ fontSize: 13, color: 'var(--jv-warning-text)', fontWeight: 700 }}>{priceOf('PRO')} / month (Growth Edition)</div>
                 </div>
-                <span className="ai-tier-badge" style={{ background: 'var(--jv-warning-soft)', color: '#b45309' }}>
+                <span className="ai-tier-badge" style={{ background: 'var(--jv-warning-soft)', color: 'var(--jv-warning-text)' }}>
                   <Unlock className="w-3 h-3 inline mr-1" />
                   100% UNLOCKED
                 </span>
@@ -497,7 +500,7 @@ export function AiAssistantPage() {
                 </li>
               </ul>
             </div>
-            <div style={{ background: 'var(--jv-warning-soft)', padding: 10, borderRadius: 8, fontSize: 12, color: '#b45309', fontWeight: 600 }}>
+            <div style={{ background: 'var(--jv-warning-soft)', padding: 10, borderRadius: 8, fontSize: 12, color: 'var(--jv-warning-text)', fontWeight: 600 }}>
               Included alongside Captain App & Table QR Standee Ordering.
             </div>
           </div>
@@ -692,7 +695,7 @@ export function AiAssistantPage() {
                           <Edit2 className="w-3.5 h-3.5" />
                         </Button>
                         {q.isCustom && (
-                          <Button size="sm" variant="ghost" onClick={() => handleDeleteQuestion(q.id)} title="Delete Custom Query" style={{ color: '#dc2626' }}>
+                          <Button size="sm" variant="ghost" onClick={() => handleDeleteQuestion(q.id)} title="Delete Custom Query" style={{ color: 'var(--jv-error-text)' }}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         )}
@@ -957,5 +960,7 @@ export function AiAssistantPage() {
         </Modal>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

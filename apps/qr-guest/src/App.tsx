@@ -74,14 +74,15 @@ export default function App() {
   return <Ordering token={token} />;
 }
 
-function Message({ title, text, action }: { title: string; text?: string; action?: { label: string; run: () => void } }) {
+function Message({ title, text, action, busy, note }: { title: string; text?: string; action?: { label: string; run: () => void }; busy?: boolean; note?: string }) {
   return (
     <main className="center">
       <img className="message-logo" src={imageSrc('/assets/branding/jamanvaar-logo.png')} alt="Jamanvaar by Kelviontech" />
       <Icon name="plate" className="message-icon" />
       <h1>{title}</h1>
       {text && <p className="muted">{text}</p>}
-      {action && <button className="primary" onClick={action.run}>{action.label}</button>}
+      {note && !busy && <p className="warn" role="status">{note}</p>}
+      {action && <button className="primary" onClick={action.run} disabled={busy} aria-busy={busy || undefined}>{busy ? 'Trying again…' : action.label}</button>}
     </main>
   );
 }
@@ -99,6 +100,9 @@ function Ordering({ token }: { token: string }) {
   const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
   const [restoreError,setRestoreError]=useState<string|null>(null);
   const [restoreAttempt,setRestoreAttempt]=useState(0);
+  // A manual retry must visibly do something: busy label while it runs, and an explicit note if it fails again.
+  const [retrying, setRetrying] = useState(false);
+  const [retryFailed, setRetryFailed] = useState(false);
   const etag = useRef<string | null>(null);
   useEffect(() => {
     const resume = (event: PageTransitionEvent) => {
@@ -174,7 +178,7 @@ function Ordering({ token }: { token: string }) {
 
   if (openingPayment) return <Message title="Opening secure payment" text="Choose your preferred method in secure Razorpay checkout. Your order is confirmed only after payment is verified." action={openingPayment === 'STANDARD' ? undefined : { label: 'Continue to Razorpay', run: () => location.assign(openingPayment) }} />;
   if (problem && placed && screen === 'STATUS') return <StatusScreen placed={placed} setPlaced={setPlaced} showStatus onMore={()=>void load().then(()=>navigate('MENU'))} />;
-  if (problem) return <Message title={problem.title} text={problem.text} action={problem.retry ? { label: 'Try again', run: () => { setRestoreAttempt(a=>a+1);void load(); } } : undefined} />;
+  if (problem) return <Message title={problem.title} text={problem.text} busy={retrying} note={retryFailed ? 'Still not connected. Check your internet connection, then try again.' : undefined} action={problem.retry ? { label: 'Try again', run: () => { setRetryFailed(false); setRetrying(true); setRestoreAttempt(a=>a+1); void load().finally(() => { setRetrying(false); setRetryFailed(true); }); } } : undefined} />;
   if (!info || !menu) return <Message title="Setting your table" text="Your restaurant’s fresh menu is on its way…" />;
 
   const gone = unavailableLines(cart, new Set(menu.items.map((i) => i.id)));
@@ -492,7 +496,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
         <fieldset><legend>How would you like it?</legend>
           {(s.orderingModes ?? ['DINE_IN','TAKEAWAY']).includes('DINE_IN') && <label className="opt"><input type="radio" name="ot" checked={orderType === 'DINE_IN'} onChange={() => setOrderType('DINE_IN')} /> <span>Dine-in</span></label>}
           {(s.orderingModes ?? ['DINE_IN','TAKEAWAY']).includes('TAKEAWAY') && <label className="opt"><input type="radio" name="ot" checked={orderType === 'TAKEAWAY'} onChange={() => setOrderType('TAKEAWAY')} /> <span>Takeaway</span></label>}
-          {orderType === 'DINE_IN' && <input placeholder="Your table number" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} maxLength={20} />}
+          {orderType === 'DINE_IN' && <label>Table number<input placeholder="Your table number" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} maxLength={20} /></label>}
         </fieldset>
       )}
       {menuOnly&&orderType==='TAKEAWAY'&&<PickupSelector token={token} session={sessionId} onChange={s=>{setPickupAt(s);setCart({...cart,attemptKey:null});}} onOptions={s=>setAsap(s.asapEnabled)}/>}<div className="guest-details"><label>Your name {s.requireCustomerName ? '*' : <small>(optional)</small>}<input placeholder="How should we call you?" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} autoComplete="name" /></label>

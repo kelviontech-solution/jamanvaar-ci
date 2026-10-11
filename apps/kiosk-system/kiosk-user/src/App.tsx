@@ -495,6 +495,9 @@ export default function KioskUserApp() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [phoneInput, setPhoneInput] = useState('');
   const [otpInput, setOtpInput] = useState('');
+  // Inline, in-flow validation feedback (replaces blocking window.alert on the guest terminal).
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [customizationError, setCustomizationError] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   // B2-001: the generated OTP itself, its expiry and a wrong-attempt counter — none of this
   // existed before, which is how "any 4-character input" and a fixed, reused '1234' passed.
@@ -1084,6 +1087,7 @@ export default function KioskUserApp() {
   const handleOpenCustomize = (item: MenuItem) => {
     SoundService.playTap();
     resetIdleTimer();
+    setCustomizationError(null);
     setCustomizingItem(item);
     setActiveItemQuantity(1);
     setSpecialInstructions('');
@@ -1207,11 +1211,12 @@ export default function KioskUserApp() {
     if (customizingItem.modifierGroups) {
       const validation = validateModifiers(customizingItem.modifierGroups, selectedModifiers);
       if (!validation.isValid) {
-        alert(validation.errors.join('\n'));
+        setCustomizationError(validation.errors.join(' '));
         return;
       }
     }
 
+    setCustomizationError(null);
     addToCartDirect(customizingItem, activeItemQuantity, selectedModifiers, specialInstructions);
     setCustomizingItem(null);
   };
@@ -1870,9 +1875,10 @@ export default function KioskUserApp() {
   // OTP Login Handler
   const handleSendOtp = () => {
     if (!phoneInput || phoneInput.length < 10) {
-      alert('Please enter a valid 10-digit mobile number');
+      setAuthError(t('validationPhoneInvalid'));
       return;
     }
+    setAuthError(null);
     const code = generateSecureNumericCode(4);
     setOtpGenerated(code);
     setOtpExpiresAt(Date.now() + OTP_VALID_MS);
@@ -1885,13 +1891,13 @@ export default function KioskUserApp() {
 
   const handleVerifyOtp = () => {
     if (Date.now() > otpExpiresAt) {
-      alert('That code has expired. Tap Send OTP again for a new one.');
+      setAuthError(t('otpExpired'));
       setOtpSent(false);
       setOtpInput('');
       return;
     }
     if (otpAttempts >= OTP_MAX_ATTEMPTS) {
-      alert('Too many wrong attempts. Tap Send OTP again for a new code.');
+      setAuthError(t('otpTooManyAttempts'));
       setOtpSent(false);
       setOtpInput('');
       return;
@@ -1899,6 +1905,7 @@ export default function KioskUserApp() {
     if (otpInput.length === 4 && otpInput === otpGenerated) {
       const account = CustomerRepository.getOrCreateAccount(phoneInput);
       setLoggedInAccount(account);
+      setAuthError(null);
       setIsAuthModalOpen(false);
       setOtpSent(false);
       setPhoneInput('');
@@ -1910,7 +1917,7 @@ export default function KioskUserApp() {
       const attempts = otpAttempts + 1;
       setOtpAttempts(attempts);
       setOtpInput('');
-      alert(attempts >= OTP_MAX_ATTEMPTS ? 'Incorrect code. No attempts left — tap Send OTP again.' : `Incorrect code. ${OTP_MAX_ATTEMPTS - attempts} attempt(s) left.`);
+      setAuthError(attempts >= OTP_MAX_ATTEMPTS ? t('otpIncorrectNone') : t('otpIncorrectLeft').replace('{{count}}', String(OTP_MAX_ATTEMPTS - attempts)));
     }
   };
 
@@ -1933,7 +1940,7 @@ export default function KioskUserApp() {
               {activationSuccess.mismatchNote}
             </p>
           )}
-          <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#8C9BAE] font-medium">
+          <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#52677A] font-medium">
             Terminal ID: {activationSuccess.deviceId.slice(0, 8)}
           </div>
           <button
@@ -2069,7 +2076,7 @@ export default function KioskUserApp() {
           <p className="text-sm text-[#4A5568] mt-3 leading-relaxed">
             Our self-ordering kiosk is currently undergoing scheduled updates. Please place your order at the main counter.
           </p>
-          <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#8C9BAE] font-medium">
+          <div className="mt-6 pt-4 border-t border-[#F3EFE6] text-xs text-[#52677A] font-medium">
             JAMANVAAR • Terminal {kioskId}
           </div>
         </div>
@@ -2355,7 +2362,7 @@ export default function KioskUserApp() {
                         showToast(`Network switched to: ${nextState}`);
                       }}
                       title="Simulate online/offline (staff diagnostic)"
-                      className="ml-auto text-[10px] text-[#8C9BAE] underline"
+                      className="ml-auto text-[10px] text-[#52677A] underline"
                     >{kioskCopy("screen_simulate_b9efe3", "simulate")}</button>
                   </div>
 
@@ -2484,12 +2491,12 @@ export default function KioskUserApp() {
                 <span className="text-3xl font-black text-jaman-navy group-hover:text-jaman-saffron transition-colors">
                   {l.native}
                 </span>
-                <span className="text-xs font-bold text-[#8C9BAE] uppercase tracking-wider">{l.label}</span>
+                <span className="text-xs font-bold text-[#52677A] uppercase tracking-wider">{l.label}</span>
               </button>
             ))}
           </div>
 
-          <p className="relative z-10 text-xs font-semibold text-[#8C9BAE] tracking-wide uppercase">{kioskCopy("screen_you_can_change_this_anytime_from_the_header_d8f222", "You can change this anytime from the header")}</p>
+          <p className="relative z-10 text-xs font-semibold text-[#52677A] tracking-wide uppercase">{kioskCopy("screen_you_can_change_this_anytime_from_the_header_d8f222", "You can change this anytime from the header")}</p>
         </div>
       )}
 
@@ -2720,7 +2727,7 @@ export default function KioskUserApp() {
             {/* Filter Bar */}
             <div className="bg-white border-b border-jaman-border px-4 sm:px-6 py-3 flex items-center gap-3 shadow-sm shrink-0 min-w-0">
               <div className="relative flex-1 min-w-0">
-                <Search className="w-4 h-4 text-[#8C9BAE] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#52677A] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -2903,7 +2910,7 @@ export default function KioskUserApp() {
                               <div className="min-w-0">
                                 <div className="text-xl font-black text-jaman-saffron leading-none">
                                   ₹{combo.basePrice}
-                                  <span className="text-sm line-through text-[#8C9BAE] font-medium ml-1">₹{combo.originalPrice}</span>
+                                  <span className="text-sm line-through text-[#52677A] font-medium ml-1">₹{combo.originalPrice}</span>
                                 </div>
                                 <span className="block mt-1 text-[11px] font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
                               </div>
@@ -2976,7 +2983,7 @@ export default function KioskUserApp() {
                               {formatINR(ci.itemTotal)}
                             </span>
                             {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                              <div className="text-[10px] text-[#8C9BAE] mt-1 leading-tight">
+                              <div className="text-[10px] text-[#52677A] mt-1 leading-tight">
                                 {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
                               </div>
                             )}
@@ -2989,7 +2996,7 @@ export default function KioskUserApp() {
                           
                           <button
                             onClick={() => updateCartItemQuantity(ci.cartItemId, -ci.quantity)}
-                            className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center text-[#8C9BAE] hover:text-jaman-navy hover:bg-gray-50 active:bg-gray-100 transition-colors" aria-label="Remove item"
+                            className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center text-[#52677A] hover:text-jaman-navy hover:bg-gray-50 active:bg-gray-100 transition-colors" aria-label="Remove item"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -3134,11 +3141,11 @@ export default function KioskUserApp() {
                       </div>
                     )}
                     {/* B2-036: derived via formatSplitTax so the two halves always sum to the displayed Total Payable. */}
-                    <div className="flex justify-between text-xs text-[#8C9BAE]">
+                    <div className="flex justify-between text-xs text-[#52677A]">
                       <span>{t('cgst')}</span>
                       <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span>
                     </div>
-                    <div className="flex justify-between text-xs text-[#8C9BAE]">
+                    <div className="flex justify-between text-xs text-[#52677A]">
                       <span>{t('sgst')}</span>
                       <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span>
                     </div>
@@ -3281,7 +3288,7 @@ export default function KioskUserApp() {
                     <div className="mx-auto w-[min(88vw,520px)] h-[min(88vw,520px)] bg-white p-3 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
                       <img src={qrImageSrc} alt="UPI payment QR code" className="w-full h-full object-contain" />
                     </div>
-                    <div className="text-xs text-[#8C9BAE] font-medium flex items-center justify-center gap-1.5">
+                    <div className="text-xs text-[#52677A] font-medium flex items-center justify-center gap-1.5">
                       <Clock className="w-4 h-4 text-jaman-saffron" />
                       <span>{t('paymentExpiresIn')}: <strong className="text-jaman-navy font-mono">{Math.floor(qrSecondsLeft / 60)}:{String(qrSecondsLeft % 60).padStart(2, '0')}</strong></span>
                     </div>
@@ -3385,7 +3392,7 @@ export default function KioskUserApp() {
             {/* TOKEN + WAIT: the number the guest keeps until the order is called */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <section className="rounded-[28px] bg-white border-2 border-jaman-border shadow-xl p-6 sm:p-8 text-center flex flex-col items-center justify-center gap-2">
-                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#8C9BAE]">{t('token')}</span>
+                <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#52677A]">{t('token')}</span>
                 <div className="text-7xl sm:text-8xl font-black text-jaman-saffron font-mono tracking-tight leading-none">#{placedOrder.tokenNumber}</div>
               </section>
               <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-6 sm:p-8 flex flex-col justify-center gap-4">
@@ -3578,10 +3585,16 @@ export default function KioskUserApp() {
       {customizingItem && (
         <Modal
           isOpen={true}
-          onClose={() => setCustomizingItem(null)}
+          onClose={() => { setCustomizationError(null); setCustomizingItem(null); }}
           title={localizedName(customizingItem, lang)}
           maxWidth="2xl"
           footer={
+            <div className="space-y-3">
+            {customizationError && (
+              <p role="alert" className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+                {t('fixCustomization')} {customizationError}
+              </p>
+            )}
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 bg-jaman-ivory border border-jaman-border px-3 py-2 rounded-xl">
                 <button
@@ -3590,9 +3603,9 @@ export default function KioskUserApp() {
                     SoundService.playTap();
                     setActiveItemQuantity((q) => Math.max(1, q - 1));
                   }}
-                  className="w-8 h-8 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
+                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-5 h-5" aria-label="Decrease quantity" />
                 </button>
                 <span className="font-black text-lg w-6 text-center">{activeItemQuantity}</span>
                 <button
@@ -3601,14 +3614,15 @@ export default function KioskUserApp() {
                     SoundService.playTap();
                     setActiveItemQuantity((q) => q + 1);
                   }}
-                  className="w-8 h-8 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
+                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" aria-label="Increase quantity" />
                 </button>
               </div>
 
               <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>{kioskCopy("screen_add_to_cart__7aa3dd", "Add to Cart •")}{formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
               </Button>
+            </div>
             </div>
           }
         >
@@ -3644,7 +3658,7 @@ export default function KioskUserApp() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-bold text-base text-jaman-navy">{group.name}</h4>
-                    <p className="text-xs text-[#8C9BAE]">{group.description}</p>
+                    <p className="text-xs text-[#52677A]">{group.description}</p>
                   </div>
                   <span className="text-xs font-semibold text-jaman-saffron bg-jaman-saffron/10 px-2 py-0.5 rounded">
                     {group.isRequired ? t('required') : t('optional')}
@@ -3896,7 +3910,7 @@ export default function KioskUserApp() {
                             <p className="text-[10px] text-[#4A5568] line-clamp-1 mt-0.5">{localizedDescription(combo, lang)}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs font-black text-jaman-saffron">{formatINR(combo.basePrice)}</span>
-                              <span className="text-[10px] text-[#8C9BAE] line-through">{formatINR(combo.originalPrice)}</span>
+                              <span className="text-[10px] text-[#52677A] line-through">{formatINR(combo.originalPrice)}</span>
                             </div>
                           </div>
 
@@ -3968,7 +3982,7 @@ export default function KioskUserApp() {
             {/* Preloaded Touch Options Deck (Zero Typing Required for Kiosk) */}
             <div className="p-3.5 sm:p-4 border-t border-jaman-border bg-white space-y-2 select-none">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase text-[#8C9BAE] tracking-wider flex items-center gap-1.5">
+                <span className="text-[11px] font-black uppercase text-[#52677A] tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-jaman-saffron" />{kioskCopy("screen_tap_any_preloaded_option_below__a407c3", "Tap Any Preloaded Option Below:")}</span>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">{kioskCopy("screen_1_tap_instant_response_55bf08", "1-Tap Instant Response")}</span>
               </div>
@@ -4062,7 +4076,7 @@ export default function KioskUserApp() {
           <div className="w-48 h-48 mx-auto bg-white p-4 rounded-2xl border-2 border-slate-900 shadow-md flex items-center justify-center">
             <QrCode className="w-40 h-40 text-jaman-navy" />
           </div>
-          <p className="text-xs font-mono font-bold text-[#8C9BAE]">{kioskCopy("screen_https_kiosk_jamanvaar_com_m__ef0f32", "https://kiosk.jamanvaar.com/m/")}{sessionId.substring(0, 8)}
+          <p className="text-xs font-mono font-bold text-[#52677A]">{kioskCopy("screen_https_kiosk_jamanvaar_com_m__ef0f32", "https://kiosk.jamanvaar.com/m/")}{sessionId.substring(0, 8)}
           </p>
           <Button variant="primary" size="md" className="w-full" onClick={() => setIsHandoffModalOpen(false)}>{kioskCopy("screen_close_7d9eb7", "Close")}</Button>
         </div>
@@ -4074,6 +4088,7 @@ export default function KioskUserApp() {
         onClose={() => {
           setIsAuthModalOpen(false);
           setOtpSent(false);
+          setAuthError(null);
         }}
         title="Loyalty Rewards & Account Login"
       >
@@ -4082,19 +4097,25 @@ export default function KioskUserApp() {
             <>
               <p className="text-xs text-[#4A5568]">{kioskCopy("screen_enter_your_mobile_number_to_check_loyalty_points_re_ord_08e4ca", "Enter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards.")}</p>
               <div>
-                <label className="block text-xs font-bold text-jaman-navy mb-1">{kioskCopy("screen_mobile_number_34975e", "Mobile Number")}</label>
+                <label htmlFor="kiosk-auth-phone" className="block text-xs font-bold text-jaman-navy mb-1">{kioskCopy("screen_mobile_number_34975e", "Mobile Number")}</label>
                 <div className="flex gap-2">
                   <span className="bg-jaman-ivory border border-jaman-border px-3 py-2 rounded-xl text-xs font-bold flex items-center">+91</span>
                   <input
+                    id="kiosk-auth-phone"
                     type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel-national"
                     maxLength={10}
                     value={phoneInput}
-                    onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, ''))}
+                    aria-invalid={authError ? true : undefined}
+                    aria-describedby={authError ? 'kiosk-auth-error' : undefined}
+                    onChange={(e) => { setAuthError(null); setPhoneInput(e.target.value.replace(/\D/g, '')); }}
                     placeholder="Enter 10-digit number"
                     className="flex-1 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-jaman-navy"
                   />
                 </div>
               </div>
+              {authError && <p id="kiosk-auth-error" role="alert" className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{authError}</p>}
               <Button variant="accent" size="md" className="w-full" onClick={handleSendOtp}>{kioskCopy("screen_send_otp_9c4566", "Send OTP")}</Button>
             </>
           ) : (
@@ -4105,10 +4126,14 @@ export default function KioskUserApp() {
                 inputMode="numeric"
                 maxLength={4}
                 value={otpInput}
-                onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                aria-label="4-digit code"
+                aria-invalid={authError ? true : undefined}
+                aria-describedby={authError ? 'kiosk-auth-error' : undefined}
+                onChange={(e) => { setAuthError(null); setOtpInput(e.target.value.replace(/\D/g, '')); }}
                 placeholder="••••"
                 className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
+              {authError && <p id="kiosk-auth-error" role="alert" className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{authError}</p>}
               <Button variant="accent" size="md" className="w-full" onClick={handleVerifyOtp}>{kioskCopy("screen_verify_login_91ef55", "Verify & Login")}</Button>
             </>
           )}
@@ -4292,7 +4317,7 @@ export default function KioskUserApp() {
               </Button>
               <button
                 onClick={handleFullSessionReset}
-                className="text-xs font-bold text-[#8C9BAE] hover:text-jaman-navy"
+                className="text-xs font-bold text-[#52677A] hover:text-jaman-navy"
               >{kioskCopy("screen_cancel_reset_screen_a5c397", "Cancel & Reset Screen")}</button>
             </div>
           </div>

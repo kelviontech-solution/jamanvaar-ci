@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
@@ -40,7 +41,7 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in">
       <div className="bg-white border-2 border-jaman-border rounded-3xl max-w-sm w-full p-5 shadow-2xl space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -120,6 +121,6 @@ export const PosInstantBillConfirmationModal: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -30,6 +30,7 @@ import {
   printCards,
   withLogo,
 } from "./qrPrint";
+import { useConfirm } from '@jamanvaar/ui';
 
 const scopedBranch = () =>
   /^\/qr\//.test(location.pathname) &&
@@ -379,6 +380,7 @@ export function QrOrderingRules({
   showToast,
   payments = false,
 }: Props & { payments?: boolean }) {
+  const { confirm, prompt, confirmDialog } = useConfirm();
   const branches = useData("branches", QrAdminApi.branches);
   const [branch, setBranch] = useState(scopedBranch);
   const settings = useData(branch, () => QrAdminApi.settings(branch)),
@@ -435,12 +437,22 @@ export function QrOrderingRules({
         ["menuOnlyEnabled", "Allow menu / counter codes"],
       ];
   return (
+    <>
     <div className="max-w-3xl space-y-5">
       <div className={box}>
         <BranchSelect
           value={branch}
-          onChange={(v) => {
-            if (!dirty || confirm("Discard unsaved ordering rules?"))
+          onChange={async (v) => {
+            if (
+              !dirty ||
+              (await confirm({
+                title: "Discard unsaved ordering rules?",
+                message: "Switching branch will lose the changes you have not saved.",
+                confirmLabel: "Discard changes",
+                cancelLabel: "Keep editing",
+                tone: "danger",
+              }))
+            )
               setBranch(v);
           }}
           branches={branches.data}
@@ -456,9 +468,11 @@ export function QrOrderingRules({
             className="text-sm text-brand font-bold mt-3"
             onClick={async () => {
               if (
-                confirm(
-                  "Remove this branch’s QR overrides and use restaurant defaults?",
-                )
+                await confirm({
+                  title: "Use restaurant defaults?",
+                  message: "This branch’s QR overrides will be removed and restaurant defaults will apply.",
+                  confirmLabel: "Use defaults",
+                })
               )
                 try {
                   await QrAdminApi.inheritSettings(branch);
@@ -736,10 +750,13 @@ export function QrOrderingRules({
         </div>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }
 
 export function QrOperationalOrders({ showToast }: Props) {
+  const { confirm, prompt, confirmDialog } = useConfirm();
   const [branch, setBranch] = useState(scopedBranch),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState("ALL"),
@@ -780,12 +797,25 @@ export function QrOperationalOrders({ showToast }: Props) {
   const action = async (o: QrOrderRow, type: string) => {
     let reason: string | undefined;
     if (type === "CANCELLED") {
-      reason = prompt("Reason for cancellation (required)")?.trim();
+      const entered = await prompt({
+        title: "Cancel this order?",
+        message: "The reason is recorded with the cancellation.",
+        inputLabel: "Reason for cancellation",
+        required: true,
+        confirmLabel: "Cancel order",
+        cancelLabel: "Keep order",
+        tone: "danger",
+      });
+      reason = entered?.trim();
       if (!reason) return;
     }
     if (
       type === "COLLECT" &&
-      !confirm(`Confirm ${money(o.total)} was collected at the counter?`)
+      !(await confirm({
+        title: "Payment collected?",
+        message: `Confirm ${money(o.total)} was collected at the counter.`,
+        confirmLabel: "Yes, collected",
+      }))
     )
       return;
     setBusy(true);
@@ -804,6 +834,7 @@ export function QrOperationalOrders({ showToast }: Props) {
     }
   };
   return (
+    <>
     <div className="space-y-4">
       <div className={box + " flex flex-wrap gap-4 items-end"}>
         <BranchSelect
@@ -1004,6 +1035,8 @@ export function QrOperationalOrders({ showToast }: Props) {
         </div>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }
 

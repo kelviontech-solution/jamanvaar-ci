@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { RestaurantListItem } from '../../api/types';
-import { Button } from '../../components/ui';
+import { Button, ModalShell } from '../../components/ui';
 import { X, Building, MapPin, FileText } from 'lucide-react';
 
 interface EditRestaurantModalProps {
@@ -62,8 +62,7 @@ export function EditRestaurantModal({ restaurant, onClose, onUpdated, onSaved }:
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 580 }}>
+    <ModalShell onClose={onClose} label="Edit Restaurant Profile" style={{ maxWidth: 580 }}>
         <div className="modal-header">
           <div>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--jv-text)' }}>Edit Restaurant Profile</h2>
@@ -186,7 +185,6 @@ export function EditRestaurantModal({ restaurant, onClose, onUpdated, onSaved }:
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

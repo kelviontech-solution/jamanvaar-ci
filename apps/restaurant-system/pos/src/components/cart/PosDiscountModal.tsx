@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePosStore, isManagerOrAboveRole, isHighDiscount } from '../../store/posStore';
 import { formatINR } from '@jamanvaar/utils';
-import { sound } from '@jamanvaar/ui';
+import { sound, ModalBackdrop } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import { calculateCart } from '@jamanvaar/business';
 import {
@@ -221,7 +221,7 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
   const hasDiscountApplied = cart.discountAmount > 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150 font-sans">
+    <ModalBackdrop className="flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150 font-sans">
       <div className="bg-white border border-jaman-border rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-cream border-b border-jaman-border p-4 sm:p-5 flex items-center justify-between shrink-0">
@@ -506,6 +506,6 @@ export const PosDiscountModal: React.FC<PosDiscountModalProps> = ({ isOpen, onCl
           </div>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

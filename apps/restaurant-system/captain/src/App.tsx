@@ -119,7 +119,7 @@ export const App: React.FC = () => {
       setDeviceConnected(true);
       setShowActivationWelcome(true);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the key.');
+      setActivationError(err instanceof CloudApiError ? err.message : "Could not complete activation. Check this device's internet connection and that the key is correct, then try again.");
     } finally {
       setActivationBusy(false);
     }

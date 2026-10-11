@@ -6,7 +6,7 @@ import { generateSecurePassword } from '../../../../../packages/utils/src/uuid';
 import { useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { CreateRestaurantInput, RestaurantDetail, ActivationKey, Plan } from '../../api/types';
-import { Button } from '../../components/ui';
+import { Button, ModalShell } from '../../components/ui';
 import { Copy, Check, Eye, EyeOff, RefreshCw, KeyRound } from 'lucide-react';
 import './restaurants.css';
 
@@ -128,8 +128,7 @@ export function CreateRestaurantModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 580 }} onClick={(e) => e.stopPropagation()}>
+    <ModalShell onClose={onClose} label="Quick Create Restaurant" style={{ maxWidth: 580 }}>
         <div className="modal-header">
           <h2>Quick Create Restaurant</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close">
@@ -139,7 +138,7 @@ export function CreateRestaurantModal({
 
         {createdResult ? (
           <div className="modal-form">
-            <div style={{ padding: '12px 16px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, color: '#166534', fontSize: 14, fontWeight: 600 }}>
+            <div style={{ padding: '12px 16px', background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 8, color: 'var(--jv-success-text)', fontSize: 14, fontWeight: 600 }}>
               ✓ Restaurant & Owner Account Successfully Created!
             </div>
 
@@ -147,7 +146,7 @@ export function CreateRestaurantModal({
               The owner account is activated and ready to log into Restaurant Admin immediately. Relay these credentials to the restaurant manager:
             </p>
 
-            <div style={{ background: '#FFFDF9', border: '1px solid var(--jv-border)', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ background: 'var(--jv-accent-soft)', border: '1px solid var(--jv-border)', borderRadius: 10, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <span style={{ fontSize: 11, color: 'var(--jv-text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Restaurant</span>
@@ -324,7 +323,6 @@ export function CreateRestaurantModal({
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </ModalShell>
   );
 }

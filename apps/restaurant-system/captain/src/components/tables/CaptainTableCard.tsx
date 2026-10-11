@@ -59,7 +59,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
     <div
       role="group"
       aria-label={`Dining table ${table.tableNumber}`}
-      className={`rounded-3xl border-2 p-4 sm:p-5 bg-white transition-all shadow-xs flex flex-col justify-between space-y-3.5 hover:shadow-md ${
+      className={`rounded-2xl border-2 p-4 sm:p-5 bg-white transition-all shadow-xs flex flex-col justify-between space-y-3.5 hover:shadow-md ${
         isFoodReady
           ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/15'
           : isBillReq
@@ -73,11 +73,11 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">
+            <span className="text-xl sm:text-2xl font-bold text-jaman-navy tracking-tight">
               TABLE {table.tableNumber}
             </span>
             {isFoodReady && (
-              <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse shadow-xs shrink-0">
+              <span className="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse shadow-xs shrink-0">
                 <Flame className="w-3 h-3 fill-white" />
                 <span>{foodReadyCount} READY</span>
               </span>
@@ -92,7 +92,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
 
         {/* Status Pill */}
         <span
-          className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0 ${
+          className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0 ${
             isBillReq
               ? 'bg-purple-100 text-purple-800 border border-purple-300'
               : isFoodReady
@@ -114,8 +114,8 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <span>{table.currentGuests || 2} Guests</span>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 uppercase block font-bold">Order Value</span>
-            <span className="text-sm font-black font-mono text-jaman-navy">
+            <span className="text-[11px] text-slate-400 uppercase block font-bold">Order Value</span>
+            <span className="text-sm font-bold font-mono text-jaman-navy">
               {activeOrder ? formatINR(activeOrder.totalAmount) : '—'}
             </span>
           </div>
@@ -135,7 +135,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             </div>
           </div>
         ) : hold ? (
-          <div className="pt-1.5 border-t border-slate-100 text-[11px] text-purple-700 font-black flex items-center gap-1" data-testid="table-hold">
+          <div className="pt-1.5 border-t border-slate-100 text-[11px] text-purple-700 font-bold flex items-center gap-1" data-testid="table-hold">
             <Clock className="w-3.5 h-3.5" />
             <span>{holdLabel(hold)}</span>
           </div>
@@ -161,7 +161,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenTableModal(table)}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>OPEN TABLE</span>
@@ -173,7 +173,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             // B2-020: animate-bounce (Tailwind's infinite bounce) never stopped, making the
             // button's own tap target visually move on a real tablet — the emerald color, shadow
             // and flame icon already signal urgency without a moving target.
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Flame className="w-4 h-4 fill-white" />
             <span>DELIVER FOOD ({foodReadyCount})</span>
@@ -182,7 +182,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
           <button
             type="button"
             onClick={() => onOpenWorkspace(table)}
-            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-black text-xs sm:text-sm shadow-md shadow-purple-700/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[46px] py-2.5 px-4 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-purple-700/25 transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
           >
             <Receipt className="w-4 h-4" />
             <span>VIEW BILL STATUS</span>
@@ -192,7 +192,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenWorkspace(table)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-black text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
+              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] text-white font-bold text-xs shadow-sm transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
             >
               <UtensilsCrossed className="w-3.5 h-3.5 text-jaman-saffron" />
               <span>{activeOrder ? 'VIEW ORDER' : 'TAKE ORDER'}</span>
@@ -200,7 +200,7 @@ export const CaptainTableCard: React.FC<CaptainTableCardProps> = ({
             <button
               type="button"
               onClick={() => onRequestBill(table.tableNumber)}
-              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-black text-xs shadow-2xs transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
+              className="min-h-[44px] py-2 px-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 hover:border-purple-400 font-bold text-xs shadow-2xs transition-all active:scale-98 cursor-pointer flex flex-col xl:flex-row items-center justify-center gap-1 text-center leading-tight"
             >
               <Receipt className="w-3.5 h-3.5" />
               <span>REQUEST BILL</span>

@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
 import { captainDb, CustomerRepository } from '@jamanvaar/database';
@@ -42,7 +43,7 @@ export const CaptainCustomerModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
+    <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
@@ -172,6 +173,6 @@ export const CaptainCustomerModal: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

@@ -9,6 +9,7 @@ import {
 import { pushEntitySync, qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi } from "../../cloud/qrAdminClient";
 import { downloadMenuFile } from "../menu/MenuImportModals";
+import { useConfirm } from '@jamanvaar/ui';
 const input =
   "w-full mt-1 rounded-xl border border-jaman-border px-3 py-2 text-sm";
 const button =
@@ -49,6 +50,7 @@ async function writeMany(type: string, rows: any[]) {
   }
 }
 export function QrCatalog() {
+  const { confirm, confirmDialog } = useConfirm();
   const [items, setItems] = useState<any[]>([]),
     [categories, setCategories] = useState<any[]>([]),
     [groups, setGroups] = useState<any[]>([]),
@@ -237,6 +239,7 @@ export function QrCatalog() {
       );
     }, "");
   return (
+    <>
     <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-4">
       <h2 className="text-xl font-bold">Shared menu editor</h2>
       <p className="text-sm text-slate-600">
@@ -317,14 +320,21 @@ export function QrCatalog() {
                 </button>
                 <button
                   disabled={busy}
-                  onClick={() => {
+                  onClick={async () => {
                     if (items.some((i) => i.categoryId === c.id)) {
                       setError(
                         "Move dishes to another category before deleting this category.",
                       );
                       return;
                     }
-                    if (window.confirm(`Delete empty category ${c.name}?`))
+                    if (
+                      await confirm({
+                        title: "Delete category?",
+                        message: `Empty category "${c.name}" will be removed from the menu draft.`,
+                        confirmLabel: "Delete category",
+                        tone: "danger",
+                      })
+                    )
                       void run(
                         () =>
                           write("MENU_CATEGORY", c.id, { ...c, deleted: true }),
@@ -645,9 +655,14 @@ export function QrCatalog() {
                   <button
                     disabled={busy}
                     className="font-bold text-rose-700"
-                    onClick={() => {
+                    onClick={async () => {
                       if (
-                        window.confirm(`Delete ${i.name} from the menu draft?`)
+                        await confirm({
+                          title: "Delete dish?",
+                          message: `"${i.name}" will be removed from the menu draft.`,
+                          confirmLabel: "Delete dish",
+                          tone: "danger",
+                        })
                       )
                         void run(
                           () =>
@@ -695,5 +710,7 @@ export function QrCatalog() {
         </div>
       )}
     </section>
+    {confirmDialog}
+    </>
   );
 }

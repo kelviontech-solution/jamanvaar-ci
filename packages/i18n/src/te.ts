@@ -126,6 +126,12 @@ export const te = {
   idleWarningText: 'మీ భద్రత కోసం, ఈ సెషన్ స్వయంచాలకంగా రీసెట్ అవుతుంది',
   seconds: 'సెకన్లలో',
   keepOrdering: 'ఆర్డర్ చేయడం కొనసాగించండి',
+  validationPhoneInvalid: 'దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్‌ను నమోదు చేయండి.',
+  otpExpired: 'ఈ కోడ్ గడువు ముగిసింది. కొత్త కోడ్ కోసం Send OTP నొక్కండి.',
+  otpTooManyAttempts: 'చాలా తప్పు ప్రయత్నాలు. కొత్త కోడ్ కోసం Send OTP నొక్కండి.',
+  otpIncorrectLeft: 'తప్పు కోడ్. {{count}} ప్రయత్నం(లు) మిగిలి ఉన్నాయి.',
+  otpIncorrectNone: 'తప్పు కోడ్. ప్రయత్నాలు లేవు — మళ్లీ Send OTP నొక్కండి.',
+  fixCustomization: 'అవసరమైన ఎంపికలను పూర్తి చేయండి:',
 
   // Accessibility & System
   highContrast: 'హై కాంట్రాస్ట్',

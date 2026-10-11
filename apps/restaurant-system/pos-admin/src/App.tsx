@@ -44,7 +44,8 @@ import {
   JamanAiAssistantModal,
   JamanAiFloatingButton,
   JAMANVAARStartup,
-  JamanvaarAuthLayout,
+  JamanvaarAuthLayout,
+  SettingsPageHeader,
   APP_HERO_IMAGES,
   Modal,
   NotificationDrawerModal,
@@ -392,11 +393,15 @@ export default function PosAdminApp() {
       // The generic branch below used to show one fixed sentence regardless of
       // WHY the request failed (CORS block, DNS failure, timeout, TLS error...),
       // which made every non-HTTP failure look identical and undiagnosable from
-      // the UI alone. It now includes the real error's name/message too.
+      // the UI alone. The real error's name/message now goes to the console for
+      // support; the owner sees a plain sentence with no exception text in it.
+      if (!(err instanceof CloudApiError)) {
+        console.warn('[admin sign-in] request failed before a server response:', err instanceof Error ? `${err.name}: ${err.message}` : err);
+      }
       setAuthError(
         err instanceof CloudApiError
           ? err.message
-          : `Unable to reach the server to verify credentials. Please check your connection and try again. (${err instanceof Error ? `${err.name}: ${err.message}` : String(err)})`
+          : 'Unable to reach the server to verify credentials. Please check your connection and try again.'
       );
     } finally {
       setLoginBusy(false);
@@ -417,7 +422,7 @@ export default function PosAdminApp() {
       setActivationKeyInput('');
       completeLogin(res.user, res.restaurant);
     } catch (err) {
-      setActivationError(err instanceof CloudApiError ? err.message : 'Activation failed. Please verify the code.');
+      setActivationError(err instanceof CloudApiError ? err.message : "Could not complete activation. Check this device's internet connection and that the code is correct, then try again.");
     } finally {
       setActivationBusy(false);
     }
@@ -1585,7 +1590,14 @@ export default function PosAdminApp() {
 
             {/* TAB 15: SETTINGS & BRANDING */}
             {activeTab === 'SETTINGS' && (
-              <>
+              <div className="space-y-6 max-w-5xl mx-auto">
+                <SettingsPageHeader
+                  title={isKioskAdmin ? 'Kiosk settings' : 'Restaurant settings'}
+                  description={isKioskAdmin
+                    ? 'Screen size, restaurant identity and customer-kiosk behaviour.'
+                    : 'Screen size, channels and the identity printed on reports and bills.'}
+                  icon={<Settings className="w-6 h-6 text-slate-500" aria-hidden="true" />}
+                />
                 <TerminalDisplaySettings showToast={showToast} />
                 {!isKioskAdmin && hasApp('WHATSAPP_ORDERING') && <WhatsAppChannelPanel showToast={showToast} />}
                 <ReportBrandingSettings
@@ -1593,7 +1605,7 @@ export default function PosAdminApp() {
                   onUpdated={() => setDbTick((t) => t + 1)}
                 />
                 {isKioskAdmin && <KioskDisplaySettingsPanel showToast={showToast} />}
-              </>
+              </div>
             )}
 
             {/* TAB 16: SUBSCRIPTION PLANS */}

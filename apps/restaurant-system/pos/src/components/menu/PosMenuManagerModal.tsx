@@ -1,4 +1,4 @@
-import { CachedImg } from '@jamanvaar/ui';
+import { CachedImg, ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { EmptyState } from '@jamanvaar/ui';
@@ -57,11 +57,13 @@ import {
   ChevronsRight,
   Info
 } from 'lucide-react';
+import { useConfirm } from '@jamanvaar/ui';
 
 export const PosMenuManagerModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
 }> = ({ isOpen, onClose }) => {
+  const { confirm, confirmDialog } = useConfirm();
   const { setSelectedCategory } = usePosStore();
 
   const [activeTab, setActiveTab] = useState<'ITEMS' | 'CATEGORIES' | 'PRESETS' | 'BULK'>('ITEMS');
@@ -396,8 +398,8 @@ export const PosMenuManagerModal: React.FC<{
     setTimeout(() => setFeedback(''), 3000);
   };
 
-  const handleDeleteItem = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to archive "${name}"?`)) {
+  const handleDeleteItem = async (id: string, name: string) => {
+    if (await confirm({ title: 'Archive dish?', message: `"${name}" will be archived and removed from the menu.`, confirmLabel: 'Archive', tone: 'danger' })) {
       MenuRepository.deleteMenuItem(id);
       setFeedback(`Archived dish "${name}".`);
       setTimeout(() => setFeedback(''), 3000);
@@ -431,7 +433,7 @@ export const PosMenuManagerModal: React.FC<{
     setTimeout(() => setFeedback(''), 3000);
   };
 
-  const handleDeleteCategory = (id: string, name: string) => {
+  const handleDeleteCategory = async (id: string, name: string) => {
     const itemsInCat = db.menuItems.filter((i) => i.categoryId === id).length;
     if (itemsInCat > 0) {
       setErrorMsg(`Cannot delete "${name}" because it contains ${itemsInCat} dishes. Reassign or delete the dishes first.`);
@@ -439,7 +441,7 @@ export const PosMenuManagerModal: React.FC<{
       return;
     }
 
-    if (confirm(`Delete category "${name}"?`)) {
+    if (await confirm({ title: 'Delete category?', message: `Category "${name}" will be deleted.`, confirmLabel: 'Delete', tone: 'danger' })) {
       MenuRepository.deleteCategory(id);
       setFeedback(`Deleted category "${name}".`);
       setTimeout(() => setFeedback(''), 3000);
@@ -500,7 +502,8 @@ export const PosMenuManagerModal: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-150">
+    <>
+    <ModalBackdrop className="flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* MODAL HEADER */}
         <div className="bg-white border-b border-jaman-border px-6 py-4 flex items-center justify-between shrink-0">
@@ -2205,6 +2208,8 @@ export const PosMenuManagerModal: React.FC<{
           </div>
         </div>
       )}
-    </div>
+    </ModalBackdrop>
+    {confirmDialog}
+    </>
   );
 };

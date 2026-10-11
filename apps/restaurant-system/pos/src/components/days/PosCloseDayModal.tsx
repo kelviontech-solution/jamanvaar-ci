@@ -1,3 +1,4 @@
+import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useEffect} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
 import { db, BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
@@ -124,7 +125,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
+    <ModalBackdrop className="flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
       <div className="bg-jaman-cream border border-jaman-border w-full max-w-xl rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         {/* Top Header */}
         <div className="p-4 sm:p-5 bg-white border-b border-jaman-border flex items-center justify-between gap-3 shrink-0">
@@ -622,6 +623,6 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   );
 };

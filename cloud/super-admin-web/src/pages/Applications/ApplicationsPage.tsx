@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { ApplicationSummary } from '../../api/types';
-import { Button, Card, Badge, Modal, Input, EmptyState } from '../../components/ui';
+import { Button, Card, Badge, Modal, Input, EmptyState, useAdminConfirm } from '../../components/ui';
 import {
   Layers,
   Laptop2,
@@ -38,6 +38,7 @@ import '../../components/shared.css';
 import './applications.css';
 
 export function ApplicationsPage() {
+  const { confirm, confirmDialog } = useAdminConfirm();
   const [apps, setApps] = useState<ApplicationSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,6 +162,7 @@ export function ApplicationsPage() {
   const fleetSyncRate = totalFleetDevices > 0 ? Math.round((totalOnlineDevices / totalFleetDevices) * 100) : null;
 
   return (
+    <>
     <div>
       <div className="page-header">
         <div>
@@ -343,7 +345,7 @@ export function ApplicationsPage() {
                           <span>{new Date(rel.releasedAt).toLocaleDateString()}</span>
                           <span>{rel.status ?? 'PUBLISHED'} · {rel.artifactVerifiedAt ? 'Artifact verified' : 'Legacy metadata'}</span>
                           {rel.status !== 'PAUSED' && <button type="button" className="btn btn-ghost btn-sm" onClick={async () => {
-                            if (!window.confirm(`Pause version ${rel.version}? Installed apps will stop receiving this release.`)) return;
+                            if (!(await confirm({ title: `Pause version ${rel.version}?`, message: 'Installed apps will stop receiving this release.', confirmLabel: 'Pause release', danger: true }))) return;
                             try { await api.post(`/api/v1/applications/releases/${rel.id}/pause`, {}); loadApplications(); }
                             catch (err) { setError(err instanceof ApiError ? err.message : 'Could not pause release'); }
                           }}>Pause release</button>}
@@ -492,5 +494,7 @@ export function ApplicationsPage() {
         </Modal>
       )}
     </div>
+    {confirmDialog}
+    </>
   );
 }

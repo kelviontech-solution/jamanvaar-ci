@@ -100,8 +100,8 @@ export function SyncMonitorPage() {
           </div>
         </div>
 
-        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid #bbf7d0', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase' }}>Replication Success Rate</span>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-ok-line)', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-success-text)', textTransform: 'uppercase' }}>Replication Success Rate</span>
           <div style={{ fontSize: 24, fontWeight: 900, color: '#15803d', marginTop: 4 }}>
             {metrics?.successRatePercent !== undefined ? `${metrics.successRatePercent}%` : '—'}
           </div>
@@ -116,14 +116,14 @@ export function SyncMonitorPage() {
               like the sibling "24h Sync Events" tile right next to it, which already says its own
               window in its own label. */}
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-text-muted)', textTransform: 'uppercase' }}>Terminals Reporting (24h)</span>
-          <div style={{ fontSize: 24, fontWeight: 900, color: '#0369a1', marginTop: 4 }}>
+          <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--jv-info-text)', marginTop: 4 }}>
             {metrics?.activeSyncingDevices ?? '—'}
           </div>
         </div>
 
-        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid #fecaca', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', textTransform: 'uppercase' }}>Pending Conflicts</span>
-          <div style={{ fontSize: 24, fontWeight: 900, color: '#b91c1c', marginTop: 4 }}>
+        <div style={{ background: 'var(--jv-surface-card)', border: '1px solid var(--jv-err-line)', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-error-text)', textTransform: 'uppercase' }}>Pending Conflicts</span>
+          <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--jv-error-text)', marginTop: 4 }}>
             {metrics?.pendingConflicts ?? 0}
           </div>
         </div>
@@ -264,14 +264,14 @@ export function SyncMonitorPage() {
       {selectedConflict && (
         <Modal title={`Resolve Sync Conflict: ${selectedConflict.entityType}`} onClose={() => setSelectedConflict(null)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid #fde68a', borderRadius: 8, padding: 12, fontSize: 13, color: '#92400e' }}>
+            <div style={{ background: 'var(--jv-warning-soft)', border: '1px solid var(--jv-warn-line)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--jv-warning-text)' }}>
               <strong>Conflict Cause:</strong> {selectedConflict.reason}
             </div>
 
             {/* Side by side JSON Diff Preview */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 12 }}>
-                <strong style={{ display: 'block', fontSize: 13, color: '#0369a1', marginBottom: 6 }}>
+                <strong style={{ display: 'block', fontSize: 13, color: 'var(--jv-info-text)', marginBottom: 6 }}>
                   📱 Local Edge Terminal Version
                 </strong>
                 <pre style={{ fontSize: 12, background: 'var(--jv-surface-card)', padding: 10, borderRadius: 6, border: '1px solid var(--jv-border-hover)', overflowX: 'auto' }}>

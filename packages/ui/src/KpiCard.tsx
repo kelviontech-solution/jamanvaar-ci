@@ -20,7 +20,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   return (
     <div className={`bg-white rounded-2xl p-4 sm:p-5 border border-[#EBE6DD] shadow-sm flex items-center justify-between ${className}`}>
       <div>
-        <p className="text-xs font-semibold text-[#8C9BAE] uppercase tracking-wider">
+        <p className="text-xs font-semibold text-[#52677A] uppercase tracking-wider">
           {title}
         </p>
         <div className="text-2xl sm:text-3xl font-black text-[#0B253A] mt-1">
