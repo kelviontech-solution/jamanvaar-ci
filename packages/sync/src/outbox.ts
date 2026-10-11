@@ -7,6 +7,7 @@ import { NetworkStatusService } from '@jamanvaar/api';
 import { nextAttemptState } from './sync_protocol';
 import { EndpointResolver } from './endpoint_resolver';
 import { jsonBatches } from './batches';
+import { requiresCloudOrderAuthorization } from './sync_authorization';
 
 /** Money crosses the wire in paise (integers), matching cloud/api's schema. */
 const toPaise = (rupees: number | undefined | null): number => Math.round((Number(rupees) || 0) * 100);
@@ -694,7 +695,11 @@ export class SyncOutboxEngine {
         }
       } else {
         const events = new Map(pendingOrders.map((order) => [order.id, toPushEvent(order)]));
-        for (const payload of jsonBatches([...events.values()], 100, 1_500_000)) {
+        // Never let an offline cancellation/refund hold ordinary branch sales in the same network request.
+        const allEvents = [...events.values()];
+        const batches = [allEvents.filter(e => !requiresCloudOrderAuthorization(e)), allEvents.filter(requiresCloudOrderAuthorization)]
+          .flatMap(group => [...jsonBatches(group, 100, 1_500_000)]);
+        for (const payload of batches) {
         if (transport !== this.transport) break;
         const ids = new Set(payload.map((event) => event.externalOrderId));
         const batch = pendingOrders.filter((order) => ids.has(order.id));

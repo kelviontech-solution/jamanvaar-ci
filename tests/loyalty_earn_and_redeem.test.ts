@@ -95,7 +95,7 @@ describe("the admin's loyalty program configuration reaches the counter, not jus
   });
 
   it('a tier created in Restaurant Admin applies on a device (POS) that only ever pulls it', () => {
-    db.loyaltyTiers.push({ id: 'tier-vip-test', name: 'VIP', minLifetimeSpend: 0, pointsMultiplier: 2, perks: ['Priority seating'] });
+    db.loyaltyTiers.push({ id: 'tier-vip-test', name: 'VIP', minLifetimeSpend: 0, pointsMultiplier: 2, perks: ['Priority seating'], colorHex: '#B5651D' });
     // Every tier on this device is a pending record, seeded ones included — find the one just added.
     const record = LoyaltyTierSync.collectSyncRecords().find((r) => r.externalId === 'tier-vip-test')!;
     expect(record.payload).toMatchObject({ name: 'VIP', pointsMultiplier: 2 });

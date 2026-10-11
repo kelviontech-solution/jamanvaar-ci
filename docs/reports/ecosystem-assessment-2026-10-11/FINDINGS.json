@@ -1,0 +1,379 @@
+[
+  {
+    "id": "SEC-01",
+    "severity": "HIGH",
+    "title": "A POS device can mint manager authority through staff synchronization",
+    "status": "CONFIRMED / OPEN",
+    "references": [
+      "cloud/api/src/modules/entity-sync/entity-authority.ts:31",
+      "cloud/api/src/modules/entity-sync/entity-sync.controller.ts:34",
+      "cloud/api/src/modules/entity-sync/entity-sync.service.ts:72",
+      "cloud/api/src/modules/entity-sync/staff-approval.service.ts:42"
+    ],
+    "affected": "POS, Restaurant Admin staff/RBAC, Cloud API and manager-approved operations",
+    "conditions": "Valid activated POS bearer credential. No owner login, existing manager PIN or signed staff approval is needed. This is an intra-restaurant privilege escalation, not a demonstrated platform-admin or cross-tenant takeover.",
+    "evidence": "Probe creates a synthetic STAFF_USER with role-manager and attacker-chosen PIN hash using only POS authorization, then receives a genuine signed manager approval token. KDS creation is rejected as a negative control.",
+    "impact": "Device-type permission substitutes for human administrative authority. A cashier-level terminal credential can establish its own approving manager.",
+    "remediation": "Require owner or authorized human administrator evidence for staff creation and role/PIN/active-state changes. Give offline staff changes an explicit bounded authorization envelope; a device identity alone must not authorize security-sensitive account administration.",
+    "regression": "POS-only manager creation/role upgrade/PIN reset/deletion denied; authorized owner/manager allowed; role revocation and offline retry replay tests. Re-run the probe expecting rejection.",
+    "estimatedEffort": "2\u20134 days including offline compatibility"
+  },
+  {
+    "id": "SEC-02",
+    "severity": "MEDIUM",
+    "title": "Three tenant tables lack the established database RLS boundary",
+    "status": "CONFIRMED / OPEN",
+    "references": [
+      "cloud/api/prisma/migrations/20260929192800_whatsapp_channel_connection/migration.sql:1",
+      "cloud/api/prisma/migrations/20260930125247_outbound_webhook_delivery/migration.sql:1",
+      "cloud/api/prisma/migrations/20261005090000_manual_payouts/migration.sql:1"
+    ],
+    "affected": "WhatsApp channel connections, outbound webhook payloads, restaurant payouts",
+    "conditions": "An application query omits tenant scoping, or uses a foreign identifier within a tenant transaction. The probe uses a non-superuser without BYPASSRLS. A direct HTTP cross-tenant exploit was NOT demonstrated.",
+    "evidence": "Unscoped reads return synthetic rows in all three tables; tenant B can read tenant A payout. The same unscoped query against protected Restaurant returns null.",
+    "impact": "The database cannot contain an application scoping mistake for these tenant records, despite the intended runAsTenant contract.",
+    "remediation": "Add additive ENABLE/FORCE RLS migrations and policies matching established transaction context. Preserve authorized platform jobs. Add a schema invariant test for every restaurant-owned table with documented platform exceptions.",
+    "regression": "Unscoped and foreign-tenant reads/writes denied; owning tenant and explicit platform jobs succeed; migrations tested on existing data.",
+    "estimatedEffort": "1\u20132 days plus migration rehearsal"
+  },
+  {
+    "id": "SEC-03",
+    "severity": "MEDIUM",
+    "title": "Unknown order states bypass terminal-state restrictions",
+    "status": "CONFIRMED / OPEN",
+    "references": [
+      "cloud/api/src/modules/order-sync/order-rules.ts:48",
+      "cloud/api/src/modules/order-sync/dto/push-order-sync.dto.ts:98",
+      "cloud/api/src/modules/order-sync/order-sync.service.ts:263"
+    ],
+    "affected": "Cloud order sync, KDS and all interfaces consuming canonical order status",
+    "conditions": "Valid branch KDS credential and a cancelled synthetic order. Unknown status strings are accepted by the request schema.",
+    "evidence": "Pure rule and actual API/DB probes persist CANCELLED \u2192 AUDIT_UNKNOWN \u2192 NEW. Direct CANCELLED \u2192 NEW is rejected by the ordinary rule.",
+    "impact": "A sentinel intermediate status bypasses the lifecycle guard, allowing a cancelled ticket to reopen. No gateway payment forgery or actual refund transfer was proved.",
+    "remediation": "Validate canonical statuses and a finite versioned legacy alias map before applying transitions. Reject unknown values with a retry-safe conflict. Apply equivalent validation to item kitchen/payment states.",
+    "regression": "Unknown-state and mixed-case/legacy-alias probes; every terminal-state transition by device type; old offline client compatibility.",
+    "estimatedEffort": "1\u20132 days"
+  },
+  {
+    "id": "SEC-04",
+    "severity": "MEDIUM",
+    "title": "Missing staff proof defaults to accepting sensitive sync actions",
+    "status": "CONFIRMED DEFAULT POLICY / OPEN; deployed setting NOT TESTED",
+    "references": [
+      "cloud/api/src/config/env.validation.ts:59",
+      "cloud/api/src/modules/order-sync/order-sync.service.ts:368",
+      "cloud/api/src/modules/order-sync/order-sync.service.ts:403"
+    ],
+    "affected": "POS void/cancel/refund/correction sync and operational auditability",
+    "conditions": "Device bearer with no signed human evidence and REQUIRE_STAFF_SESSION unset/false. Production environment value was deliberately not read.",
+    "evidence": "Probe successfully cancels a synthetic order without staff proof; stored actorVerified is false and the conflict is recorded. Source documents the offline fallback intentionally.",
+    "impact": "Flagging does not enforce manager approval. A request with a cashier proof is refused while omitting the proof can be accepted under this policy.",
+    "remediation": "Define an explicit production policy. For sensitive operations, accept verifiable bounded offline authorization or quarantine for approval; retain ordinary offline sales. Do not simply disable offline operation. Address SEC-01 before treating manager evidence as trustworthy.",
+    "regression": "No-proof, cashier-proof, owner/manager-proof, expired/revoked proof, backdated offline events, reconnect and retry cases under both policy values.",
+    "estimatedEffort": "2\u20134 days"
+  },
+  {
+    "id": "SEC-05",
+    "severity": "HIGH",
+    "title": "The publish workflow produces debug-signed Android APKs",
+    "status": "CONFIRMED RELEASE CONFIGURATION / OPEN; installed production APK NOT TESTED",
+    "references": [
+      ".github/workflows/build-installers.yml:160",
+      ".github/workflows/build-installers.yml:170",
+      ".github/workflows/build-installers.yml:183"
+    ],
+    "affected": "Five native app release variants and Android upgrade compatibility",
+    "conditions": "Running the repository installer publishing workflow. No APK was available in the inspected artifact locations to independently verify its signing certificate.",
+    "evidence": "Android build is explicitly --debug and the resulting APKs are uploaded into the release pipeline. Stripping dev symbols does not make this a release-signing policy.",
+    "impact": "Production release provenance, stable signing identity, upgrade compatibility and debug-hardening are not established. This is not evidence of silent remote APK installation.",
+    "remediation": "Use release builds and a protected stable Android signing identity, fail closed on missing signing material, and verify package/version/signer before publish. Separate test builds from customer releases.",
+    "regression": "Clean CI release build, APK signer/debuggable inspection and upgrade-over-previous-release on an isolated device.",
+    "estimatedEffort": "2\u20133 days plus device verification"
+  },
+  {
+    "id": "SEC-06",
+    "severity": "MEDIUM",
+    "title": "Cloud API runner defaults to root and retains development dependencies",
+    "status": "CONFIRMED CONTAINER CONFIGURATION / OPEN; deployed runtime identity NOT TESTED",
+    "references": [
+      "cloud/api/Dockerfile:40",
+      "cloud/api/Dockerfile:53"
+    ],
+    "affected": "Cloud API container, migrations and deployment",
+    "conditions": "Building the supplied Dockerfile without a runtime user override.",
+    "evidence": "Runner has no USER directive and copies complete workspace node_modules including development tooling. Retention is explicitly intentional for Prisma/seed tooling.",
+    "impact": "Any application compromise has greater container privileges and a larger installed attack surface. Container breakout or a production exploit was NOT tested.",
+    "remediation": "Run the application as a dedicated non-root user. Separate migration/seed tooling or maintain a justified minimal runtime allowlist. Keep required native engines and writable paths working.",
+    "regression": "Container UID, health/startup/migration smoke tests, read-only filesystem compatibility and production dependency/SBOM checks.",
+    "estimatedEffort": "1\u20132 days"
+  },
+  {
+    "id": "SEC-07",
+    "severity": "MEDIUM",
+    "title": "Android native update command does not validate update provenance",
+    "status": "CONFIRMED SOURCE / OPEN",
+    "references": [
+      "packages/tauri-plugin-apk-updater/android/src/main/java/com/jamanvaar/apkupdater/ApkUpdaterPlugin.kt:39",
+      "packages/tauri-plugin-apk-updater/android/src/main/java/com/jamanvaar/apkupdater/ApkUpdaterPlugin.kt:54",
+      "packages/tauri-plugin-apk-updater/android/src/main/java/com/jamanvaar/apkupdater/ApkUpdaterPlugin.kt:100"
+    ],
+    "affected": "Native Android updater shared by applications",
+    "conditions": "An untrusted URL reaches the native command, for example through compromised renderer/update metadata. Actual native exploit path and installed package behavior NOT TESTED.",
+    "evidence": "Only blank URL is rejected; download success/file presence triggers install intent. No HTTPS/host policy, expected digest, package name or expected certificate check is performed in this native boundary.",
+    "impact": "An untrusted download can be presented to the user. Android still requires consent and enforces signer matching for updates to an existing package; do not infer silent arbitrary code execution.",
+    "remediation": "Validate transport and an authorized download host/redirect policy, authenticated release metadata, expected hash, package/version and signer natively before presenting installation.",
+    "regression": "HTTP/untrusted-host/redirect/digest/package/signer mismatch rejected; authorized update accepted on device.",
+    "estimatedEffort": "2\u20133 days"
+  },
+  {
+    "id": "SEC-08",
+    "severity": "LOW",
+    "title": "Client credentials remain readable within their application context",
+    "status": "CONFIRMED DESIGN / CONDITIONAL RISK",
+    "references": [
+      "apps/restaurant-system/pos-admin/src/cloud/cloudClient.ts:115",
+      "apps/restaurant-system/pos-admin/src/cloud/cloudClient.ts:121",
+      "packages/branch-core/src/secret-seal.ts:13"
+    ],
+    "affected": "Admin browser device registration and branch-core local credential storage",
+    "conditions": "Same-origin script execution or access to the logged-in device/data directory. No XSS or local physical takeover was demonstrated.",
+    "evidence": "Admin device bearer is stored in localStorage. Branch-core seal uses AES-GCM but its key is an adjacent file; its comment explicitly limits protection to copying the DB alone.",
+    "impact": "A browser/native client is inspectable; local encrypted bytes do not establish a server authorization boundary. An XSS/device compromise amplifies SEC-01. Windows chmod semantics and disk/customer-data ACLs were NOT tested.",
+    "remediation": "Maintain least-privilege revocable device credentials and strong server authorization; use native OS credential storage where available. Keep offline continuity and document the supported physical-access threat model.",
+    "regression": "Revocation on next request, logout/profile cleanup, native keystore recovery and synthetic disk-copy test.",
+    "estimatedEffort": "2\u20134 days"
+  },
+  {
+    "id": "DEP-01",
+    "severity": "HIGH",
+    "title": "Locked dependencies contain production vulnerability alerts",
+    "status": "SCANNER ALERT / REACHABILITY PARTLY REVIEWED; exploit NOT CONFIRMED",
+    "references": [
+      "package-lock.json:1",
+      "cloud/api/src/modules/platform-settings/welcome-designs.service.ts:60",
+      "cloud/api/src/main.ts:1"
+    ],
+    "affected": "Cloud API and client/build dependencies; exact reachability differs by package",
+    "conditions": "Affected locked package and the vulnerable code path must be reachable. Package counts are not independent vulnerabilities or exploit counts.",
+    "evidence": "npm audit all: 45 packages (5 critical/20 high/16 moderate/4 low). --omit=dev: 13 packages (1 critical/4 high/7 moderate/1 low). These two counts overlap. Raw advisory details are retained.",
+    "impact": "Patch backlog exists, but proxy-addr critical subnet assumptions do not match the inspected numeric trust-proxy setting; client React Router does not use SSR here; no direct FileInterceptor usage was found. The sharp uploader intends WebP-only but inspects metadata before checking the detected format, so SVG decoder reachability remains unresolved. These observations do not eliminate every advisory.",
+    "remediation": "Triage each advisory by installed version/call path; update in small compatible groups and retain justification for inapplicable paths. Prune unnecessary runtime tooling and generate an SBOM. Do not blindly apply npm audit fix --force.",
+    "regression": "Auth/proxy throttling, upload parsing, route redirects, API/root regressions and repeat lock-based audit.",
+    "estimatedEffort": "2\u20135 days initial triage"
+  },
+  {
+    "id": "ART-01",
+    "severity": "MEDIUM",
+    "title": "Available Windows artifacts lack verified distribution signatures",
+    "status": "CONFIRMED ARTIFACT OBSERVATION / revision association UNKNOWN",
+    "references": [
+      "docs/reports/ecosystem-assessment-2026-10-11/evidence/ARTIFACT_SIGNATURES.json:1",
+      ".github/workflows/build-installers.yml:64"
+    ],
+    "affected": "Local Windows installers/executables, including older separate Kiosk Admin binaries",
+    "conditions": "Local artifact files discovered in named release and Tauri bundle directories. They were not launched and cannot be attributed to the source commit.",
+    "evidence": "23 assets inventoried: 18 EXE/MSI and 5 ICNS. Authenticode reports 14 NotSigned and 4 UnknownError; none returned Valid. Hashes retained. UnknownError is inconclusive, not proof of missing signature.",
+    "impact": "Users cannot rely on a verified Windows publisher for these observed artifacts. Tauri updater .sig verification is a different mechanism from Windows Authenticode.",
+    "remediation": "Produce revision-linked release manifests/SBOM and enforce Windows publisher signing plus updater signatures. Investigate UnknownError on a trusted signing-verification host.",
+    "regression": "Authenticode verification, manifest hash linkage, valid/tampered updater signature and installation/rollback on isolated Windows VM.",
+    "estimatedEffort": "1\u20133 days plus certificate setup"
+  },
+  {
+    "id": "QUAL-01",
+    "severity": "MEDIUM",
+    "title": "Baseline type checks fail in both projects",
+    "status": "CONFIRMED / OPEN",
+    "references": [
+      "cloud/api/src/modules/menu-publications/menu-publications.service.spec.ts:21",
+      "tests/crm_loyalty_checkout.test.ts:21",
+      "tests/kitchen_controls_and_captain.test.ts:86",
+      "tests/loyalty_earn_and_redeem.test.ts:98"
+    ],
+    "affected": "Cloud API test compilation and root cross-app fixtures",
+    "conditions": "Frozen commit, installed lock-compatible dependencies, TypeScript --noEmit checks.",
+    "evidence": "API has one baseline diagnostic: stale constructor call expects four arguments. Root has four TS diagnostic headers across three fixture files (missing deliveryCharge, Order shape, modifiers and colorHex). An audit-harness typing error was corrected and excluded from baseline counts.",
+    "impact": "Transpile-only test execution can be green while typed contracts drift. This is not proof the deployed production build currently fails; application-only build checks were not all run.",
+    "remediation": "Update fixtures to the current domain/constructor contracts and require separate API/root type checks in CI; do not silence with blanket any or unknown casts.",
+    "regression": "Both type checks pass from a clean install, with compile-time tests for API/local money and order contracts.",
+    "estimatedEffort": "0.5\u20131 day"
+  },
+  {
+    "id": "QUAL-02",
+    "severity": "MEDIUM",
+    "title": "The checked-in regression suite remains red after build preparation",
+    "status": "CONFIRMED TEST FAILURES / product causality MIXED",
+    "references": [
+      "tests/bill_on_order.test.ts:1",
+      "tests/pos_fast_cashier_workflow.test.ts:1",
+      "tests/pwa_alerts_and_small_screens.test.ts:1",
+      "docs/reports/ecosystem-assessment-2026-10-11/evidence/root-failure-recheck.log:1"
+    ],
+    "affected": "POS/Captain bill requests and customer display; assistant, printing, PWA and UI assertions",
+    "conditions": "Root Vitest suite at frozen commit. A second run of all failed files includes the repository pretest asset preparation.",
+    "evidence": "Initial: 1,758 pass/13 fail in 238 files. After preparation, recheck: 150 pass/11 fail in 11 selected files. Missing copied photo and image-path cases clear. Some remaining failures compare exact text, regex layouts or literal filesystem paths including URL query strings; these are not demonstrated UI/payment security defects.",
+    "impact": "The release regression contract is not trustworthy while behavior defects and stale assertions are mixed. Bill-request notification/customer-display failures need runtime triage; every individual failure is retained, not hidden by rerun counts.",
+    "remediation": "Classify each failure; repair implementation where behavior is wrong, update tests where the intended contract changed, and use semantic/browser assertions instead of source regex or filesystem checks on URL strings.",
+    "regression": "Named failing files pass, then one clean complete suite using the documented preparation. Browser persistence/notification and actual offline-service-worker tests.",
+    "estimatedEffort": "2\u20134 days"
+  },
+  {
+    "id": "QUAL-03",
+    "severity": "MEDIUM",
+    "title": "Multi-source integration test selects an unrelated earlier QR fixture",
+    "status": "CONFIRMED TEST DEFECT / production sync failure NOT PROVEN",
+    "references": [
+      "cloud/api/test/multi-branch-dashboard.e2e.spec.ts:131",
+      "cloud/api/test/multi-branch-dashboard.e2e.spec.ts:178"
+    ],
+    "affected": "Multi-branch/dashboard verification and confidence in order routing",
+    "conditions": "Running the full file, which first inserts an older source=QR finance fixture with no replay sequence.",
+    "evidence": "The original selected suite fails the cross-app scenario. Diagnostic copy shows missing finance-4 while all four newly created source orders are returned. Restricting the audit-copy lookup to qr.body.publicOrderId makes all 34 scenarios pass, including ready/served to POS/Captain/Kiosk/QR.",
+    "impact": "The test gives a false sync alarm and never reaches its final lifecycle assertions in the ordinary run.",
+    "remediation": "In a future implementation change, select the created order by its returned identity and add isolation of seeded finance fixtures. Audit changed only a separate diagnostic test copy, not the original test.",
+    "regression": "Full file and corrected identity selection pass; malicious cross-branch requests remain denied.",
+    "estimatedEffort": "Under half a day"
+  },
+  {
+    "id": "QUAL-04",
+    "severity": "MEDIUM",
+    "title": "Several core components and repositories concentrate too many responsibilities",
+    "status": "CONFIRMED SOURCE / MAINTAINABILITY RISK",
+    "references": [
+      "packages/database/src/repositories.ts:1",
+      "apps/kiosk-system/kiosk-user/src/App.tsx:1",
+      "apps/restaurant-system/pos-admin/src/App.tsx:1",
+      "apps/restaurant-system/pos/src/store/posStore.ts:1",
+      "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx:1"
+    ],
+    "affected": "Shared local persistence, kiosk/admin application state and onboarding",
+    "conditions": "Changing one workflow in large mixed-responsibility modules. Line count alone is not a functional defect.",
+    "evidence": "Repository file 4,854 lines; kiosk App 4,214; admin App 2,074; POS store 1,842; onboarding 1,810. Shared TS/runtime validation exists, but critical request DTOs and local/cloud representations still differ.",
+    "impact": "UI/session/pricing/sync changes require broad context and increase accidental cross-workflow coupling.",
+    "remediation": "Extract one coherent boundary at a time: account-authorized staff administration, order transition validation, kiosk receipt state, typed sync mapping, then onboarding orchestration. Reuse existing packages rather than replace all architecture.",
+    "regression": "Behavior characterization at each boundary and targeted cross-app contracts; preserve offline functionality.",
+    "estimatedEffort": "1\u20132 weeks incrementally"
+  },
+  {
+    "id": "QUAL-05",
+    "severity": "LOW",
+    "title": "Super Admin violates its shared-package import boundary",
+    "status": "CONFIRMED SOURCE AND TEST / bundle impact UNMEASURED",
+    "references": [
+      "cloud/super-admin-web/src/pages/Settings/KioskWelcomeDesignsCard.tsx:3",
+      "tests/super_admin_css_classes.test.ts:95"
+    ],
+    "affected": "Super Admin settings and shared package layering",
+    "conditions": "Building the platform app through shared utils barrel exports.",
+    "evidence": "Settings component imports optimizeWelcomeUpload/resolveMenuImage from @jamanvaar/utils; the dedicated dependency-boundary test reports this file as an offender.",
+    "impact": "A platform browser app can gain unintended local-device dependencies or heavier bundles. Actual bundle size, circular graph and runtime failure were NOT measured.",
+    "remediation": "Use a leaf visual/upload module with a documented browser-safe dependency contract; retain the boundary check.",
+    "regression": "Boundary test and production bundle import graph; confirm setting behavior in a browser.",
+    "estimatedEffort": "0.5\u20131 day"
+  },
+  {
+    "id": "QUAL-06",
+    "severity": "LOW",
+    "title": "Generated Rust target artifacts are committed with source",
+    "status": "CONFIRMED INVENTORY / REPRODUCIBILITY RISK",
+    "references": [
+      "apps/restaurant-system/pos/src-tauri/target/debug/JamanvaarLocalCore.exe:1",
+      "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps:1",
+      "docs/reports/ecosystem-assessment-2026-10-11/evidence/INVENTORY.json:1"
+    ],
+    "affected": "Repository hygiene, source review and native build reproducibility",
+    "conditions": "A clean source checkout includes debug executables and procedural macro DLLs.",
+    "evidence": "git ls-files inventories 41 EXE/DLL artifact paths, many inside target/debug. They are not runtime entrypoints merely because they are tracked.",
+    "impact": "Review/delivery noise and stale opaque binaries complicate reproducibility and provenance. Malware or credentials inside these artifacts were NOT demonstrated.",
+    "remediation": "Separate intentional signed sidecars from generated target output; ignore build output after a reviewed packaging migration. Do not delete required sidecars blindly.",
+    "regression": "Clean checkout/build without tracked target dependencies; sidecar hash/signature/revision verification.",
+    "estimatedEffort": "0.5\u20131 day"
+  },
+  {
+    "id": "QUAL-07",
+    "severity": "MEDIUM",
+    "title": "A webhook test can pass against an older audit row and fails on a fresh database",
+    "status": "CONFIRMED TEST DEFECT / payment processing failure NOT PROVEN",
+    "references": [
+      "cloud/api/test/payments-webhook.e2e.spec.ts:167",
+      "cloud/api/test/payments-webhook.e2e.spec.ts:171",
+      "cloud/api/src/modules/payments/payments.service.ts:921"
+    ],
+    "affected": "Payment webhook test reliability and fresh-environment release validation",
+    "conditions": "A reused QA database can contain historical FAILED callback rows whose messages include the old payment reference.",
+    "evidence": "The reused-DB suite passes this assertion, but the fresh 83-migration database fails its contains(pay_unknown_ref) query. Direct platform-context verification finds the signed synthetic callback recorded FAILED with No matching payment transaction found, exactly as current source writes.",
+    "impact": "An uncorrelated historical row can mask stale assertions. This is not evidence that the unknown callback was lost or a payment was approved incorrectly.",
+    "remediation": "Correlate each assertion to the exact event identity created by that test and assert the current stable failure classification. Exercise both empty and populated QA databases without deleting real audit history.",
+    "regression": "Fresh DB plus seeded unrelated older failed event; only the current provider event may satisfy the assertion.",
+    "estimatedEffort": "Under half a day"
+  },
+  {
+    "id": "SAAS-01",
+    "severity": "MEDIUM",
+    "title": "Concurrent outbound webhook attempts can send the same pending row twice",
+    "status": "CONFIRMED / OPEN",
+    "references": [
+      "cloud/api/src/modules/whatsapp-outbound/whatsapp-outbound-webhook.service.ts:77",
+      "cloud/api/src/modules/whatsapp-outbound/whatsapp-outbound-webhook.service.ts:94",
+      "cloud/api/src/modules/whatsapp-outbound/whatsapp-outbound-webhook.service.ts:135"
+    ],
+    "affected": "WhatsApp connector integration and multi-instance/background delivery",
+    "conditions": "Two attempt calls overlap before delivery status update, e.g. immediate dispatch + sweep or two replicas.",
+    "evidence": "Audit probe uses a real synthetic pending DB row with HTTP mocked; Promise.all of two attempt calls invokes fetch twice. Source uses read-then-send without atomic claim. No real message was sent.",
+    "impact": "Duplicate callbacks may cause duplicate downstream notifications unless receiver deduplicates. Receiver behavior was NOT tested. Fetch also has no explicit deadline in the inspected path.",
+    "remediation": "Atomically acquire a bounded delivery lease/claim, add a stable delivery id to the signed contract, require receiver deduplication, and use bounded timeout/backoff. At-least-once semantics must be documented.",
+    "regression": "Concurrent attempts, lease expiry/crash recovery, same-id retries, duplicate receiver callbacks, timeout, multi-replica processing.",
+    "estimatedEffort": "2\u20133 days"
+  },
+  {
+    "id": "SAAS-02",
+    "severity": "MEDIUM",
+    "title": "Sync batches serialize on a restaurant-wide database lock",
+    "status": "CONFIRMED SOURCE / CAPACITY RISK, not a measured overload",
+    "references": [
+      "cloud/api/src/modules/entity-sync/entity-sync.service.ts:100",
+      "cloud/api/src/modules/order-sync/order-sync.service.ts:726"
+    ],
+    "affected": "All branches/devices within one restaurant during synchronization",
+    "conditions": "Concurrent large sync batches from multiple branches sharing restaurant sequencing.",
+    "evidence": "Entity mutations hold an entity:restaurant advisory transaction lock while iterating events. Server-order ingestion takes the same restaurant-wide sequencing lock. Sequence ordering/idempotency benefit is intentional.",
+    "impact": "A busy branch can add waiting time to other branches of the same tenant. The 10,000-row synthetic dashboard fixture is a correctness check, not a throughput or concurrency certification.",
+    "remediation": "Measure lock wait and transaction duration; shorten work under locks, bound batch work and separate unnecessary locks while retaining monotonic replay order. Adopt branch sequencing only with a compatibility/migration design if measurements justify it.",
+    "regression": "Concurrent multi-branch bursts and offline catch-up with no dropped/duplicate events; record p95 lock wait and latency.",
+    "estimatedEffort": "2\u20134 days measurement, optimization contingent"
+  },
+  {
+    "id": "SAAS-03",
+    "severity": "MEDIUM",
+    "title": "Release assurance is not enforced across backend and all client products",
+    "status": "CONFIRMED WORKFLOW GAP / operations NOT FULLY VERIFIED",
+    "references": [
+      ".github/workflows/tauri-build.yml:1",
+      ".github/workflows/build-installers.yml:1"
+    ],
+    "affected": "Cloud API, native releases, shared packages and independently licensed products",
+    "conditions": "Using the two checked-in workflows as the repository release assurance mechanism. External branch protections/checks NOT TESTED.",
+    "evidence": "Tauri build checks and installer smoke process exist, but no checked-in workflow gates releases on the API/root security regression suites or both type checks. Installer workflow uses mutable action tags; the other workflow pins actions. Signing and manual update publication remain separate steps.",
+    "impact": "A release can build while critical authorization regressions remain. Deployment rollback, actual cloud alerts and clean-install reproducibility are not certified by these workflows.",
+    "remediation": "Add required source/type/test/security gates, protected release environment and pinned actions; publish source revision, dependency/artifact manifests, rollback instructions and compatible client/server versions.",
+    "regression": "Protected PR and release dry run, failing security probe blocks release, rollback/restore rehearsal, no production credentials in test jobs.",
+    "estimatedEffort": "2\u20134 days"
+  },
+  {
+    "id": "CFG-01",
+    "severity": "LOW",
+    "title": "Release environment hosts are fixed in CI while tenant configuration is dynamic",
+    "status": "CONFIRMED CONFIGURATION / portability limitation",
+    "references": [
+      ".github/workflows/build-installers.yml:36",
+      "packages/config/src/constants.ts:9",
+      "cloud/api/src/config/env.validation.ts:1"
+    ],
+    "affected": "Installer staging/alternate environment builds; shared regional defaults",
+    "conditions": "Building a staging/alternate-host release through the installer workflow.",
+    "evidence": "VITE cloud and QR URLs are assigned a fixed production host at job scope. Tenant IDs in APP_CONSTANTS are definitions with no discovered consumer; they are not proven hardcoded production ownership. INR/GST defaults fit the current Indian market.",
+    "impact": "Environment portability depends on editing workflow configuration, while onboarding another restaurant on the same host is database/entitlement driven. Do not mislabel every stable brand/tax default as a SaaS defect.",
+    "remediation": "Use validated GitHub environment configuration for URLs; keep secrets out of client builds. Preserve intentional brand/domain constants and per-restaurant overrides.",
+    "regression": "Separate staging and production builds, scan bundles for unintended localhost and configure a new synthetic tenant without source edits.",
+    "estimatedEffort": "0.5\u20131 day"
+  }
+]

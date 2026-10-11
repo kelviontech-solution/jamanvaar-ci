@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { PublishReleaseDto } from './dto/application.dto';
+import { validateReleaseArtifacts } from './release-verification';
 
 export interface AppMetadata {
   code: string;
@@ -115,7 +116,7 @@ export class ApplicationsService {
       return APP_CATALOG.map((meta) => {
         const releases = allReleases.filter((r) => r.appCode === meta.code);
         // The newest STABLE release by version number (2.10.0 is newer than 2.9.0), not by publish time.
-        const latestRelease = releases.filter((r) => r.channel === 'STABLE').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
+        const latestRelease = releases.filter((r) => r.channel === 'STABLE' && r.status === 'PUBLISHED').sort((a, b) => compareVersions(b.version, a.version))[0] || null;
 
         const matchingDevices = meta.deviceType
           ? allDevices.filter((d) => d.type === meta.deviceType)
@@ -221,8 +222,9 @@ export class ApplicationsService {
    */
   async getUpdaterManifest(appCode: string) {
     return this.prisma.runAsPlatform(async (tx) => {
-      const releases = await tx.appRelease.findMany({ where: { appCode, channel: 'STABLE' } });
-      const latest = releases.sort((a, b) => compareVersions(b.version, a.version))[0];
+      const releases = await tx.appRelease.findMany({ where: { appCode, channel: 'STABLE', status: 'PUBLISHED' } });
+      const compatible = releases.filter(r => Array.isArray(r.supportedPlatforms) && r.supportedPlatforms.includes('windows') && (r.downloadUrls as Record<string, string> | null)?.windows && (r.signatures as Record<string, string> | null)?.windows);
+      const latest = compatible.sort((a, b) => compareVersions(b.version, a.version))[0];
       if (!latest) return null;
       const downloadUrls = latest.downloadUrls as Record<string, string> | null;
       const signatures = latest.signatures as Record<string, string> | null;
@@ -241,6 +243,8 @@ export class ApplicationsService {
   }
 
   async publishRelease(dto: PublishReleaseDto, actor: PlatformUser) {
+    // Network/cryptographic validation happens before opening a database transaction.
+    await validateReleaseArtifacts(dto);
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.appRelease.findUnique({
         where: { appCode_version: { appCode: dto.appCode, version: dto.version } }
@@ -259,7 +263,9 @@ export class ApplicationsService {
           releaseNotes: dto.releaseNotes,
           downloadUrls: dto.downloadUrls,
           signatures: dto.signatures,
-          isMandatory: dto.isMandatory
+          artifactHashes: dto.artifactHashes,
+          isMandatory: dto.isMandatory,
+          status: 'PUBLISHED', artifactVerifiedAt: new Date()
         }
       });
 
@@ -274,6 +280,14 @@ export class ApplicationsService {
         tx
       );
 
+      return release;
+    });
+  }
+
+  async pauseRelease(id: string, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async tx => {
+      const release = await tx.appRelease.update({ where: { id }, data: { status: 'PAUSED' } });
+      await this.audit.log({ actorType: 'PLATFORM', actorId: actor.id, action: 'APP_RELEASE_PAUSED', category: 'APPLICATIONS', details: { appCode: release.appCode, version: release.version } }, tx);
       return release;
     });
   }

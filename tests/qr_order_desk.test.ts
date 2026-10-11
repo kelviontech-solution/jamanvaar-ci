@@ -199,11 +199,12 @@ describe('a QR order at the counter', () => {
     expect(db.orders.find((o) => o.id === 'qr-b4')!.syncStatus).not.toBe('SYNCED');
   });
 
-  it('declining cancels the order for everyone and prints nothing', async () => {
+  it('declining without reachable cloud authorization reports pending sync and leaves the kitchen ticket active', async () => {
     arrive('qr-b5');
     await pull();
     const r = await QrOrderDesk.reject('qr-b5', { deviceId: 'pos-1', actor: 'Asha', reason: 'Kitchen closed' });
-    expect(r.status).toBe('REJECTED');
-    expect(core.store.get<{ status: string }>('SELECT status FROM orders WHERE external_order_id = ?', 'qr-b5')!.status).toBe('CANCELLED');
+    expect(r.status).toBe('PENDING_SYNC');
+    expect(db.orders.find(o => o.id === 'qr-b5')).toMatchObject({ orderStatus: 'CANCELLED', syncStatus: 'FAILED' });
+    expect(core.store.get<{ status: string }>('SELECT status FROM orders WHERE external_order_id = ?', 'qr-b5')!.status).toBe('NEW');
   });
 });

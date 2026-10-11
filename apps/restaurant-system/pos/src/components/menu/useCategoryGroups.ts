@@ -35,9 +35,11 @@ export function useCategoryGroups(): CategoryGroup[] {
         if (!existing.categoryIds.includes(cat.id)) {
           existing.categoryIds.push(cat.id);
         }
-        existing.totalDishCount = db.menuItems.filter((i) => existing.categoryIds.includes(i.categoryId)).length;
+        // BUG: counted archived (deleted-from-admin) dishes too -- a restaurant admin's "7 dishes in
+        // Sides" and the POS sidebar's own "SIDES 9" disagreed because this never excluded archivedAt.
+        existing.totalDishCount = db.menuItems.filter((i) => !i.archivedAt && existing.categoryIds.includes(i.categoryId)).length;
       } else {
-        const matchingDishesCount = db.menuItems.filter((i) => i.categoryId === cat.id).length;
+        const matchingDishesCount = db.menuItems.filter((i) => !i.archivedAt && i.categoryId === cat.id).length;
         groupMap.set(canonicalKey, {
           canonicalKey,
           displayLabel: label,

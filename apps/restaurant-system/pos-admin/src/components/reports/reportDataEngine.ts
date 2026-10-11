@@ -1,5 +1,5 @@
 import { db, isUnpaidOpenOrder } from '@jamanvaar/database';
-import { Order, MenuItem, Category, DiningTable, User } from '@jamanvaar/types';
+import { Order, MenuItem, Category, DiningTable, User, CustomerAccount, InventoryItem, StockMovement } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
 
 export type ReportPeriodPreset =
@@ -163,25 +163,43 @@ export interface StationPerformanceRow {
 
 export interface CustomerReportRow {
   phone: string;
-  name: string;
-  visitsCount: number;
-  totalSpent: number;
-  avgSpend: number;
-  lastVisitDate: string;
-  loyaltyPoints: number;
+  name?: string;
+  ordersInRange: number;
+  spendInRange: number;
+  lastVisitAt?: string;
+  tags?: string[];
+}
+
+export interface CustomerReportResult {
+  matchedOrders: number;
+  unmatchedOrders: number;
+  newCustomers: number;
+  repeatCustomers: number;
+  topSpenders: CustomerReportRow[];
+  avgSpendPerVisit: MetricWithVariance;
 }
 
 export interface InventoryReportRow {
-  id: string;
+  itemId: string;
   name: string;
   sku: string;
-  unit: string;
   currentStock: number;
-  minThreshold: number;
-  unitCost: number;
-  totalStockValue: number;
-  usageCount: number;
-  status: 'OPTIMAL' | 'LOW' | 'CRITICAL';
+  unit: string;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  costImpactInRange?: number;
+}
+
+export interface InventoryMovementSummary {
+  type: 'PURCHASE' | 'RESTOCK' | 'SALE' | 'SALE_REVERSAL' | 'WASTE' | 'SPOILAGE' | 'ADJUSTMENT';
+  count: number;
+  quantityTotal: number;
+  costImpactTotal: number;
+}
+
+export interface InventoryReportResult {
+  lowStock: InventoryReportRow[];
+  movementsInRange: InventoryMovementSummary[];
+  topWastageByCost: InventoryReportRow[];
 }
 
 export interface GstTaxBreakdownRow {
@@ -878,6 +896,94 @@ export class ReportDataEngine {
         delayedKotCount: delayed
       };
     });
+  }
+
+  /** Customer report: new vs. repeat, top spenders, and average spend per matched visit, from
+   * already-fetched orders joined against db.customerAccounts by phone. `range` is required to
+   * classify new vs. repeat (an account's createdAt is compared against range.startDate); when
+   * omitted, every matched customer is counted as repeat since there is nothing to compare against. */
+  public static getCustomerReport(orders: Order[], range?: ReportDateRange): CustomerReportResult {
+    const byPhone = new Map<string, { ordersInRange: number; spendInRange: number; lastVisitAt?: string }>();
+    let matchedOrders = 0;
+    let unmatchedOrders = 0;
+
+    for (const order of orders) {
+      const phone = order.customerPhone;
+      const account = phone ? db.customerAccounts.find((c) => c.phone === phone) : undefined;
+      if (!phone || !account) {
+        unmatchedOrders++;
+        continue;
+      }
+      matchedOrders++;
+      const entry = byPhone.get(phone) ?? { ordersInRange: 0, spendInRange: 0, lastVisitAt: undefined };
+      entry.ordersInRange++;
+      entry.spendInRange += order.totalAmount;
+      if (!entry.lastVisitAt || order.createdAt > entry.lastVisitAt) entry.lastVisitAt = order.createdAt;
+      byPhone.set(phone, entry);
+    }
+
+    const rangeStart = range?.startDate;
+    let newCustomers = 0;
+    let repeatCustomers = 0;
+    for (const phone of byPhone.keys()) {
+      const account = db.customerAccounts.find((c) => c.phone === phone);
+      if (!account) continue;
+      const createdInRange = rangeStart && account.createdAt ? new Date(account.createdAt) >= rangeStart : false;
+      if (createdInRange) newCustomers++; else repeatCustomers++;
+    }
+
+    const topSpenders: CustomerReportRow[] = [...byPhone.entries()]
+      .map(([phone, v]) => {
+        const account = db.customerAccounts.find((c) => c.phone === phone);
+        return { phone, name: account?.name, ordersInRange: v.ordersInRange, spendInRange: v.spendInRange, lastVisitAt: v.lastVisitAt, tags: account?.tags };
+      })
+      .sort((a, b) => b.spendInRange - a.spendInRange)
+      .slice(0, 10);
+
+    const totalSpend = [...byPhone.values()].reduce((sum, v) => sum + v.spendInRange, 0);
+    const avgSpendPerVisit: MetricWithVariance = { current: matchedOrders > 0 ? Math.round((totalSpend / matchedOrders) * 100) / 100 : 0 };
+
+    return { matchedOrders, unmatchedOrders, newCustomers, repeatCustomers, topSpenders, avgSpendPerVisit };
+  }
+
+  /** Inventory report: a live low-stock snapshot (NOT period-scoped — db.inventoryItems.status is
+   * the current truth regardless of the selected date range), plus stock movements and wastage
+   * actually recorded inside `range`. Takes `range` alone, not `orders`: inventory has nothing to
+   * do with the order list, only stock state and movement records. */
+  public static getInventoryReport(range: ReportDateRange): InventoryReportResult {
+    const lowStock: InventoryReportRow[] = (db.inventoryItems ?? [])
+      .filter((item) => item.status !== 'IN_STOCK')
+      .map((item) => ({ itemId: item.id, name: item.name, sku: item.sku, currentStock: item.currentStock, unit: item.unit, status: item.status }))
+      .sort((a, b) => a.currentStock - b.currentStock);
+
+    const inRange = (db.stockMovements ?? []).filter((m) => {
+      const t = new Date(m.timestamp).getTime();
+      return t >= range.startDate.getTime() && t <= range.endDate.getTime();
+    });
+
+    const movementsByType = new Map<string, InventoryMovementSummary>();
+    for (const m of inRange) {
+      const entry = movementsByType.get(m.type) ?? { type: m.type, count: 0, quantityTotal: 0, costImpactTotal: 0 };
+      entry.count++;
+      entry.quantityTotal += m.quantityDelta;
+      entry.costImpactTotal += m.costImpact ?? 0;
+      movementsByType.set(m.type, entry);
+    }
+
+    const wastageByItem = new Map<string, number>();
+    for (const m of inRange) {
+      if (m.type !== 'WASTE' && m.type !== 'SPOILAGE') continue;
+      wastageByItem.set(m.itemId, (wastageByItem.get(m.itemId) ?? 0) + (m.costImpact ?? 0));
+    }
+    const topWastageByCost: InventoryReportRow[] = [...wastageByItem.entries()]
+      .map(([itemId, costImpactInRange]) => {
+        const item = (db.inventoryItems ?? []).find((i) => i.id === itemId);
+        return { itemId, name: item?.name ?? 'Unknown item', sku: item?.sku ?? '', currentStock: item?.currentStock ?? 0, unit: item?.unit ?? '', status: item?.status ?? 'IN_STOCK', costImpactInRange };
+      })
+      .sort((a, b) => (b.costImpactInRange ?? 0) - (a.costImpactInRange ?? 0))
+      .slice(0, 10);
+
+    return { lowStock, movementsInRange: [...movementsByType.values()], topWastageByCost };
   }
 
   /**

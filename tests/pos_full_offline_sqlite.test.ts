@@ -179,7 +179,11 @@ describe('POS: every counter function works with no network, on SQLite', () => {
     await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
     await SyncOutboxEngine.processOutbox({ ignoreBackoff: true }); // a second pass must add nothing
     const inCore = core.store.all<{ external_order_id: string }>('SELECT external_order_id FROM orders').map((r) => r.external_order_id).sort();
-    expect(inCore).toEqual(expect.arrayContaining(['dine-1', 'take-1', 'refund-1']));
+    // Ordinary sales reach the LAN while the cloud is down. A protected refund remains
+    // durable and pending; a terminal bearer alone cannot apply it to the shared core.
+    expect(inCore).toEqual(expect.arrayContaining(['dine-1', 'take-1']));
+    expect(inCore).not.toContain('refund-1');
+    expect(db.orders.find(o => o.id === 'refund-1')?.syncStatus).toBe('FAILED');
     expect(new Set(inCore).size).toBe(inCore.length);
     expect(core.store.get<{ payment_status: string }>('SELECT payment_status FROM orders WHERE external_order_id = ?', 'dine-1')!.payment_status).toBe('SUCCESS');
 

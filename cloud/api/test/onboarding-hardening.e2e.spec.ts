@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -84,7 +84,7 @@ describe('onboarding and multi-app hardening', () => {
       await push(F.pos, order('h-correct', 'COMPLETED'));
       await push(F.kds1, order('h-correct', 'PREPARING', undefined, { meta: { statusCorrection: true } }));
       expect((await row('h-correct')).status).toBe('COMPLETED');
-      await push(F.pos, order('h-correct', 'PREPARING', undefined, { meta: { statusCorrection: true } }));
+      await push(F.pos, order('h-correct', 'PREPARING', undefined, { meta: { statusCorrection: true, staffSession: await refundManagerSession(app, prisma, F.pos) } }));
       expect((await row('h-correct')).status).toBe('PREPARING');
       expect(JSON.stringify((await row('h-correct')).meta)).not.toContain('statusCorrection');
     });
@@ -200,10 +200,10 @@ describe('onboarding and multi-app hardening', () => {
       const stored = await prisma.runAsPlatform((tx) => tx.syncedEntity.findFirstOrThrow({ where: { restaurantId: F.rid, entityType: 'DINING_TABLE', externalId: 'tA1' } }));
       expect((stored.payload as any).branchId).toBe(F.brA);
       const seenB = (await as('get', '/api/v1/entity-sync/DINING_TABLE', F.posB)).body.entities.map((e: any) => e.externalId);
-      expect(seenB).toEqual(expect.arrayContaining(['tB1', 'tShared']));
+      expect(seenB).toContain('tB1'); expect(seenB).not.toContain('tShared');
       expect(seenB).not.toContain('tA1');
       const seenA = (await as('get', '/api/v1/entity-sync/DINING_TABLE', F.captain)).body.entities.map((e: any) => e.externalId);
-      expect(seenA).toEqual(expect.arrayContaining(['tA1', 'tShared']));
+      expect(seenA).toContain('tA1'); expect(seenA).not.toContain('tShared');
       expect(seenA).not.toContain('tB1');
     });
   });

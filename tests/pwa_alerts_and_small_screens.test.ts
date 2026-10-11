@@ -19,7 +19,7 @@ describe('the Captain and KDS install like apps and open without signal', () => 
         expect(manifest.start_url).toBeTruthy();
         const sizes = manifest.icons.map((i: { sizes: string; purpose: string }) => `${i.sizes}:${i.purpose}`);
         expect(sizes).toEqual(expect.arrayContaining(['192x192:any', '512x512:any', '512x512:maskable']));
-        for (const icon of manifest.icons) expect(existsSync(join(SYSTEM, app, 'public', icon.src)), icon.src).toBe(true);
+        for (const icon of manifest.icons) expect(existsSync(join(SYSTEM, app, 'public', new URL(icon.src, 'https://example.invalid/').pathname)), icon.src).toBe(true);
       });
 
       it('links the manifest, the theme colour and the home-screen icon from the page', () => {
@@ -80,7 +80,7 @@ describe('POS and Restaurant Admin open with no signal too, not just Captain and
       it('builds the shell from the Vite plugin that fills in the real asset list, not a hand-maintained one', () => {
         const config = read(`${app}/vite.config.ts`);
         expect(config).toContain("import { appShellCache } from '../../../tooling/vite/app_shell_cache'");
-        expect(config).toMatch(/plugins:\s*\[react\(\),\s*appShellCache\(\)\]/);
+        expect(config).toMatch(/plugins:\s*\[react\(\),\s*appShellCache\(\)(?:,|\])/);
       });
     });
   }

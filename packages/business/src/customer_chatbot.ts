@@ -22,7 +22,7 @@ export class CustomerChatbotEngine {
     const inCategory = (item: MenuItem, pattern: RegExp) => pattern.test(db.categories.find(c => c.id === item.categoryId)?.name ?? '') || pattern.test(item.name);
     // Dietary restrictions apply before every category, budget and combo branch.
     if (allItems.length === 0 && !/pay|coupon|offer|time|wait/.test(q)) return { id, sender: 'ASSISTANT', timestamp,
-      text: "No available dishes match that request in this restaurant's menu. Ask staff about ingredients or special preparation.", suggestions: ['Call Staff for Special Prep'] };
+      text: jainOnly ? 'No available dishes are currently marked Jain. Ask staff about ingredients or special preparation.' : "No available dishes match that request in this restaurant's menu. Ask staff about ingredients or special preparation.", suggestions: ['Call Staff for Special Prep'] };
     if (/allerg|gluten|nut.free|dairy.free/.test(q)) return { id, sender: 'ASSISTANT', timestamp,
       text: 'Please check dish allergen details and speak with staff. This menu guide cannot verify preparation or cross-contact safety.', suggestions: ['Call Staff for Special Prep'] };
     if (jainOnly && !/starter|main|curry|bread|combo|budget|under|below/.test(q)) return { id, sender: 'ASSISTANT', timestamp,

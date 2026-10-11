@@ -9,7 +9,8 @@ import { WelcomePolicy, WELCOME_POLICY_KEY } from './welcome-policy';
 
 const SETTING_CATEGORY: Record<string, { category: string; description: string }> = {
   'platform.kioskWelcome': { category: 'CATALOG', description: 'Kiosk welcome design access and restaurant limits' },
-  'platform.billing': { category: 'BILLING', description: 'Seller details printed on invoices and receipts' }
+  'platform.billing': { category: 'BILLING', description: 'Seller details printed on invoices and receipts' },
+  'platform.announcement': { category: 'SYSTEM', description: 'Targeted announcement shown on POS, Kiosk, and Restaurant Admin only' }
 };
 
 @Injectable()

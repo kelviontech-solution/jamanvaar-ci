@@ -209,7 +209,9 @@ export const PosMenuManagerModal: React.FC<{
   if (!isOpen) return null;
 
   const categories = db.categories;
-  const menuItems = db.menuItems;
+  // Same archived-dish gap as PosCatalog.tsx's main grid -- this modal's own dish list and category
+  // counts must not show a dish the restaurant already archived either.
+  const menuItems = db.menuItems.filter((i) => !i.archivedAt);
   const isDraftMode = MenuBuilderService.isDraft();
   const importHistory = MenuBuilderService.getImportHistory();
 

@@ -11,6 +11,7 @@ export interface DownloadAndInstallResponse {
  * allows any ordinary app to do; there is no silent-install path without Device Owner
  * enrollment. No-ops (rejects) outside Android -- callers should only invoke this on Android.
  */
-export async function downloadAndInstall(url: string): Promise<DownloadAndInstallResponse> {
-  return invoke('plugin:apk-updater|download_and_install', { payload: { url } });
+export async function downloadAndInstall(url: string, sha256: string): Promise<DownloadAndInstallResponse> {
+  if (!/^[a-f0-9]{64}$/i.test(sha256)) throw new Error('This update has no verified checksum. Ask the administrator to republish its signed APK.');
+  return invoke('plugin:apk-updater|download_and_install', { payload: { url, sha256 } });
 }

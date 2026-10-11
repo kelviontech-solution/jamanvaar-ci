@@ -6,7 +6,7 @@ import { db, CustomerRepository, NotificationRepository, StaffRepository, BILL_R
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import type { MenuItem, Category } from '@jamanvaar/types';
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, onAppResume } from '@jamanvaar/sync';
+import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, syncKioskConfiguration, onAppResume } from '@jamanvaar/sync';
 import { sound } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
@@ -184,6 +184,11 @@ export const App: React.FC = () => {
     void syncReservations({ push: true });
     void reportHeartbeat();
     void syncRestaurantIdentity();
+    // BUG: despite its name this also carries ReceiptConfig (thank-you message, footer, logo, and
+    // the UPI "scan to pay" QR settings) -- Restaurant Admin pushes it, but POS never pulled it at
+    // all, so a UPI QR enabled in Settings showed correctly in Admin's own receipt preview and on
+    // Kiosk (which does call this), yet never reached the actual bill printed at the counter.
+    void syncKioskConfiguration().catch(() => {});
 
     // Orders, kitchen tickets and table states are time-critical: every few seconds. The
     // heavier snapshots (CRM, menu) and the heartbeat keep the slower cadence.
@@ -206,6 +211,7 @@ export const App: React.FC = () => {
       void syncReservations({ push: true });
       void reportHeartbeat();
       void syncRestaurantIdentity();
+      void syncKioskConfiguration().catch(() => {});
     }, 15000);
 
     // Waking the terminal (screen unlocked, network back, tab visible again) catches up at once: no refresh needed.

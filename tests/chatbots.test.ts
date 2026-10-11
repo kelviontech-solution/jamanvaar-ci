@@ -19,7 +19,10 @@ describe('CustomerChatbotEngine', () => {
 
   it('should explain payment options offline', () => {
     const res = CustomerChatbotEngine.processQuery('How do I pay with UPI or Card?');
-    expect(res.text).toContain('UPI Dynamic QR');
+    expect(res.text).toContain('checkout screen');
+    const configured = CustomerChatbotEngine.processQuery('How do I pay?', { paymentMethods: ['UPI Dynamic QR', 'Cash at counter'] });
+    expect(configured.text).toContain('UPI Dynamic QR');
+    expect(configured.text).toContain('Cash at counter');
   });
 });
 

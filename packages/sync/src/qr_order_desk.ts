@@ -64,8 +64,8 @@ export class QrOrderDesk {
     return { status: 'ACCEPTED', printed };
   }
 
-  /** Declines a pending QR order (nothing is printed; the guest sees it cancelled). */
-  static async reject(orderId: string, opts: { deviceId: string; actor: string; reason?: string }): Promise<AcceptResult | { status: 'REJECTED' }> {
+  /** A decline becomes authoritative only after the protected cloud mutation is acknowledged. */
+  static async reject(orderId: string, opts: { deviceId: string; actor: string; reason?: string }): Promise<AcceptResult | { status: 'REJECTED' | 'PENDING_SYNC' }> {
     const order = db.orders.find((o) => o.id === orderId && o.source_type === 'QR_TABLE');
     if (!order) return { status: 'NOT_FOUND' };
     if (order.orderStatus !== 'NEW') return order.acceptedByDeviceId ? { status: 'ALREADY_ACCEPTED', by: order.acceptedByDeviceId } : { status: 'NOT_PENDING' };
@@ -77,6 +77,6 @@ export class QrOrderDesk {
     } catch {
       // offline: pushed later
     }
-    return { status: 'REJECTED' };
+    return { status: order.syncStatus === 'SYNCED' ? 'REJECTED' : 'PENDING_SYNC' };
   }
 }

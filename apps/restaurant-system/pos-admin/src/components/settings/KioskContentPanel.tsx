@@ -2,6 +2,43 @@ import React, { useState } from 'react';
 import { db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { getTranslation, KIOSK_CONTENT_CATALOG, type SupportedLanguage } from '@jamanvaar/i18n';
+import { ImageIcon, Clock, Languages, Info, Save, Search as SearchIcon, Pencil } from 'lucide-react';
+
+const LANGUAGE_LABEL: Record<string, string> = {
+  en: 'English', hi: 'Hindi', gu: 'Gujarati', mr: 'Marathi', ta: 'Tamil', te: 'Telugu', kn: 'Kannada'
+};
+
+/** A bounded-integer text field that lets the box go empty while typing instead of collapsing to 0.
+ * BUG: binding a number input's value straight to a number state (value={n}, onChange={Number(e.target.value)})
+ * means Number('') === 0, so clearing the box to retype wrote 0 into the real setting immediately,
+ * and the field then looked permanently stuck at "0" no matter what was typed next. This keeps its
+ * own string buffer while focused and only commits (or reverts) a real number on blur. */
+function BoundedNumberField({
+  label, hint, value, min, max, onCommit
+}: { label: string; hint: string; value: number; min: number; max: number; onCommit: (n: number) => void }) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const shown = draft ?? String(value);
+  return (
+    <div>
+      <label className="block text-xs font-bold text-jaman-navy mb-1">{label}</label>
+      <input
+        aria-label={label}
+        type="number"
+        min={min}
+        max={max}
+        className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+        value={shown}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          const n = Math.trunc(Number(draft));
+          if (draft !== null && draft.trim() !== '' && Number.isFinite(n) && n >= min && n <= max) onCommit(n);
+          setDraft(null);
+        }}
+      />
+      <p className="text-[11px] text-slate-500 mt-1">{hint}</p>
+    </div>
+  );
+}
 
 export function KioskContentPanel({ showToast }: { showToast: (message: string) => void }) {
   const [display, setDisplay] = useState(() => structuredClone(db.kioskDisplaySettings));
@@ -9,39 +46,247 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  const catalog: Record<string, string> = { ...Object.fromEntries(Object.entries(getTranslation(language)).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), ...KIOSK_CONTENT_CATALOG };
-  const inputClass = 'w-full rounded-xl border border-slate-300 p-2 text-sm';
-  return <div className="space-y-5" data-testid="kiosk-content-panel">
-    <div className="rounded-2xl border bg-white p-6 space-y-4">
-      <h2 className="text-xl font-bold">Kiosk Appearance & Content</h2>
-      <p className="text-sm text-slate-600">Customize this branch's customer kiosk. Menu images, prices, availability and modifiers are managed in Menu & Categories and Customisations & Tax. Receipt content and layout are managed in Receipt & E-Bill.</p>
-      <label className="block text-sm font-semibold">Restaurant logo URL<input aria-label="Kiosk logo URL" className={inputClass} value={display.logoUrl || ''} onChange={e => setDisplay({ ...display, logoUrl: e.target.value })} placeholder="https://… or /assets/…" /></label>
-      <label className="block text-sm font-semibold">Upload kiosk logo (PNG, JPEG or WebP, under 2MB)<input aria-label="Upload kiosk logo" type="file" accept="image/png,image/jpeg,image/webp" onChange={e => {
-        const file = e.target.files?.[0]; if (!file) return;
-        if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) { setMessage('Choose a PNG, JPEG or WebP image under 2MB.'); return; }
-        const reader = new FileReader(); reader.onload = () => setDisplay(current => ({ ...current, logoUrl: String(reader.result) })); reader.readAsDataURL(file);
-      }} /></label>
-      <label className="block text-sm font-semibold">Kiosk accent color<input aria-label="Kiosk accent color" type="color" value={display.accentColor || '#EF6A0B'} onChange={e => setDisplay({ ...display, accentColor: e.target.value })} /></label>
-      {display.logoUrl && <img src={display.logoUrl} alt="Kiosk logo preview" className="h-20 max-w-full object-contain" />}
-      <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">Choose backgrounds, preview the welcome screen and edit its message in <a href="/kiosk-admin/welcome-screen" className="font-bold underline">Kiosk Welcome Screen</a>.</div>
-      <label className="block text-sm font-semibold">Idle warning after (seconds)<input aria-label="Kiosk idle warning" type="number" min={5} max={3600} className={inputClass} value={display.idleWarningAfterSeconds} onChange={e => setDisplay({ ...display, idleWarningAfterSeconds: Number(e.target.value) })} /></label>
-      <label className="block text-sm font-semibold">Idle reset countdown (seconds)<input aria-label="Kiosk idle countdown" type="number" min={3} max={120} className={inputClass} value={display.idleResetCountdownSeconds} onChange={e => setDisplay({ ...display, idleResetCountdownSeconds: Number(e.target.value) })} /></label>
+  const catalog: Record<string, string> = {
+    ...Object.fromEntries(Object.entries(getTranslation(language)).filter((entry): entry is [string, string] => typeof entry[1] === 'string')),
+    ...KIOSK_CONTENT_CATALOG
+  };
+  const entries = Object.entries(catalog).filter(([key, value]) => `${key} ${value}`.toLowerCase().includes(query.toLowerCase()));
+  const overriddenCount = Object.keys(display.texts?.[language] ?? {}).filter((k) => (display.texts?.[language]?.[k] ?? '').trim() !== '').length;
+
+  const save = async () => {
+    setBusy(true); setMessage('');
+    try {
+      // Defensive, not redundant: BoundedNumberField only ever commits a validated value for an
+      // edit made *this session* -- a value already sitting in storage from before this fix existed
+      // (e.g. a prior save that landed on 0) would otherwise publish unchanged.
+      if (
+        !Number.isInteger(display.idleWarningAfterSeconds) || display.idleWarningAfterSeconds < 5 || display.idleWarningAfterSeconds > 3600 ||
+        !Number.isInteger(display.idleResetCountdownSeconds) || display.idleResetCountdownSeconds < 3 || display.idleResetCountdownSeconds > 120
+      ) {
+        throw new Error('Use an idle warning of 5–3600 seconds and countdown of 3–120 seconds.');
+      }
+      KioskDisplaySettingsRepository.updateSettings(display);
+      await syncKioskConfiguration({ push: true });
+      setMessage('Kiosk settings published. Connected kiosks receive them automatically.');
+      showToast('Kiosk settings published.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Could not publish kiosk settings.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6" data-testid="kiosk-content-panel">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Appearance & Content</h1>
+        <p className="text-sm text-[#4A5568] mt-1">
+          Customize this branch's customer kiosk. Menu images, prices, availability and modifiers are managed in
+          Menu & Categories and Customisations & Tax. Receipt content and layout are managed in Receipt & E-Bill.
+        </p>
+      </div>
+
+      {/* 1. Branding */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-jaman-navy flex items-center justify-center shrink-0">
+            <ImageIcon className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base text-jaman-navy">Branding</h3>
+            <p className="text-xs text-slate-500 mt-0.5">The logo and accent color shown on this kiosk's screens.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-start">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant logo URL</label>
+              <input
+                aria-label="Kiosk logo URL"
+                className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                value={display.logoUrl || ''}
+                onChange={(e) => setDisplay({ ...display, logoUrl: e.target.value })}
+                placeholder="https://… or /assets/…"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-jaman-navy mb-1">Upload kiosk logo</label>
+                <input
+                  aria-label="Upload kiosk logo"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-2 file:rounded-xl file:border-0 file:bg-jaman-navy file:text-white file:text-xs file:font-bold file:cursor-pointer"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+                      setMessage('Choose a PNG, JPEG or WebP image under 2MB.');
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () => setDisplay((current) => ({ ...current, logoUrl: String(reader.result) }));
+                    reader.readAsDataURL(file);
+                  }}
+                />
+                <p className="text-[11px] text-slate-500 mt-1">PNG, JPEG or WebP, under 2MB.</p>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-jaman-navy mb-1">Accent color</label>
+                <input
+                  aria-label="Kiosk accent color"
+                  type="color"
+                  className="w-full h-10 rounded-xl border border-jaman-border cursor-pointer"
+                  value={display.accentColor || '#EF6A0B'}
+                  onChange={(e) => setDisplay({ ...display, accentColor: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-40 shrink-0">
+            <span className="block text-xs font-bold text-jaman-navy mb-1">Preview</span>
+            <div className="h-28 w-full lg:w-40 rounded-xl border border-jaman-border bg-jaman-ivory flex items-center justify-center overflow-hidden">
+              {display.logoUrl ? (
+                <img src={display.logoUrl} alt="Kiosk logo preview" className="h-20 max-w-full object-contain" />
+              ) : (
+                <span className="text-[11px] text-slate-400 text-center px-2">No logo set</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Idle & Session Timing */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-jaman-navy flex items-center justify-center shrink-0">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base text-jaman-navy">Idle & Session Timing</h3>
+            <p className="text-xs text-slate-500 mt-0.5">When an untouched kiosk warns the guest, and how long before it resets to the welcome screen.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <BoundedNumberField
+            label="Idle warning after (seconds)"
+            hint="5–3600 seconds of no touch before the warning appears."
+            value={display.idleWarningAfterSeconds}
+            min={5}
+            max={3600}
+            onCommit={(n) => setDisplay((d) => ({ ...d, idleWarningAfterSeconds: n }))}
+          />
+          <BoundedNumberField
+            label="Idle reset countdown (seconds)"
+            hint="3–120 seconds the warning counts down before the session resets."
+            value={display.idleResetCountdownSeconds}
+            min={3}
+            max={120}
+            onCommit={(n) => setDisplay((d) => ({ ...d, idleResetCountdownSeconds: n }))}
+          />
+        </div>
+      </div>
+
+      {/* 3. Welcome Screen cross-link */}
+      <div className="bg-amber-50 rounded-2xl p-5 border border-amber-200 flex items-start gap-3">
+        <Info className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+        <p className="text-sm text-amber-900">
+          Choose backgrounds, preview the welcome screen and edit its message in{' '}
+          <a href="/kiosk-admin/welcome-screen" className="font-bold underline">Kiosk Welcome Screen</a>.
+        </p>
+      </div>
+
+      {/* 4. Customer screen wording by language */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-jaman-border shadow-2xs space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-jaman-navy flex items-center justify-center shrink-0">
+            <Languages className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base text-jaman-navy">Customer Screen Wording by Language</h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Edit welcome, menu, cart, checkout, payment, confirmation and help labels. Empty values use the default
+              wording. Values containing placeholders should retain those placeholders.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <select
+            aria-label="Kiosk content language"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
+            className="sm:w-48 bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+          >
+            {['en', 'hi', 'gu', 'mr', 'ta', 'te', 'kn'].map((l) => (
+              <option key={l} value={l}>{LANGUAGE_LABEL[l] ?? l.toUpperCase()}</option>
+            ))}
+          </select>
+          <div className="relative flex-1">
+            <SearchIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              aria-label="Search kiosk wording"
+              placeholder="Search text or screen label"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full bg-jaman-ivory border border-jaman-border rounded-xl pl-9 pr-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
+          <span>Showing {entries.length} of {Object.keys(catalog).length} labels</span>
+          <span>{overriddenCount} customized in {LANGUAGE_LABEL[language] ?? language}</span>
+        </div>
+
+        <div className="max-h-[420px] overflow-auto rounded-xl border border-jaman-border divide-y divide-jaman-border">
+          {entries.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500">No wording matches "{query}".</div>
+          ) : (
+            entries.map(([key, defaultValue]) => {
+              const overrideValue = display.texts?.[language]?.[key] || '';
+              const isOverridden = overrideValue.trim() !== '';
+              return (
+                <div key={key} className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 hover:bg-jaman-cream/60">
+                  <div className="sm:w-[42%] min-w-0">
+                    <div className="text-sm text-jaman-navy font-semibold leading-snug">{defaultValue}</div>
+                    <div className="text-[10px] text-slate-400 font-mono mt-0.5 truncate" title={key}>{key}</div>
+                  </div>
+                  <div className="flex-1 relative">
+                    {isOverridden && (
+                      <Pencil className="w-3 h-3 text-jaman-saffron absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    )}
+                    <input
+                      aria-label={`Kiosk wording ${key}`}
+                      maxLength={2000}
+                      className={`w-full bg-white border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy ${isOverridden ? 'border-jaman-saffron/60 pl-7' : 'border-jaman-border'}`}
+                      placeholder={defaultValue}
+                      value={overrideValue}
+                      onChange={(e) =>
+                        setDisplay({ ...display, texts: { ...display.texts, [language]: { ...display.texts?.[language], [key]: e.target.value } } })
+                      }
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          disabled={busy}
+          className="px-5 py-2.5 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder disabled:opacity-50 text-white font-bold text-sm flex items-center gap-2 shadow-2xs transition-colors"
+          onClick={() => void save()}
+        >
+          <Save className="w-4 h-4" />
+          <span>{busy ? 'Publishing…' : 'Save & Publish Kiosk Settings'}</span>
+        </button>
+        {message && <p role="status" className="text-sm text-slate-600">{message}</p>}
+      </div>
     </div>
-    <div className="rounded-2xl border bg-white p-6 space-y-4">
-      <h3 className="font-bold">Customer screen wording by language</h3>
-      <p className="text-sm text-slate-600">Edit welcome, menu, cart, checkout, payment, confirmation and help labels. Empty values use the default wording. Values containing placeholders should retain those placeholders.</p>
-      <div className="flex gap-3"><select aria-label="Kiosk content language" value={language} onChange={e => setLanguage(e.target.value as SupportedLanguage)} className={inputClass}>{['en', 'hi', 'gu', 'mr', 'ta', 'te', 'kn'].map(l => <option key={l} value={l}>{l.toUpperCase()}</option>)}</select><input aria-label="Search kiosk wording" placeholder="Search text or screen label" value={query} onChange={e => setQuery(e.target.value)} className={inputClass} /></div>
-      <div className="max-h-[480px] overflow-auto space-y-3">{Object.entries(catalog).filter(([key, value]) => typeof value === 'string' && `${key} ${value}`.toLowerCase().includes(query.toLowerCase())).map(([key, value]) => <label className="block text-xs text-slate-600" key={key}>{key}<input aria-label={`Kiosk wording ${key}`} maxLength={2000} className={inputClass} placeholder={value} value={display.texts?.[language]?.[key] || ''} onChange={e => setDisplay({ ...display, texts: { ...display.texts, [language]: { ...display.texts?.[language], [key]: e.target.value } } })} /></label>)}</div>
-    </div>
-    <button disabled={busy} className="rounded-xl bg-orange-600 px-5 py-3 font-bold text-white disabled:opacity-50" onClick={async () => {
-      setBusy(true); setMessage('');
-      try {
-        if (!Number.isInteger(display.idleWarningAfterSeconds) || display.idleWarningAfterSeconds < 5 || display.idleWarningAfterSeconds > 3600 || !Number.isInteger(display.idleResetCountdownSeconds) || display.idleResetCountdownSeconds < 3 || display.idleResetCountdownSeconds > 120) throw new Error('Use an idle warning of 5–3600 seconds and countdown of 3–120 seconds.');
-        KioskDisplaySettingsRepository.updateSettings(display);
-        await syncKioskConfiguration({ push: true }); setMessage('Kiosk settings published. Connected kiosks receive them automatically.'); showToast('Kiosk settings published.');
-      } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not publish kiosk settings.'); }
-      finally { setBusy(false); }
-    }}>{busy ? 'Publishing…' : 'Save & Publish Kiosk Settings'}</button>
-    {message && <p role="status" className="text-sm">{message}</p>}
-  </div>;
+  );
 }

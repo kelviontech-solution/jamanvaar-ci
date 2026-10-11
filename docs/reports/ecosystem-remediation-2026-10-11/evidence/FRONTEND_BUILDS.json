@@ -1,0 +1,30 @@
+[
+  {
+    "app": "super-admin-web",
+    "exitCode": 0
+  },
+  {
+    "app": "pos-admin",
+    "exitCode": 0
+  },
+  {
+    "app": "pos",
+    "exitCode": 0
+  },
+  {
+    "app": "captain",
+    "exitCode": 0
+  },
+  {
+    "app": "kds",
+    "exitCode": 0
+  },
+  {
+    "app": "kiosk-user",
+    "exitCode": 0
+  },
+  {
+    "app": "qr-guest",
+    "exitCode": 0
+  }
+]

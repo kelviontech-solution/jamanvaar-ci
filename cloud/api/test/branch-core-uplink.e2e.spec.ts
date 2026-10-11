@@ -235,7 +235,9 @@ describe('Branch Core <-> Cloud', () => {
       // A new POS activated in the cloud while this core is up.
       const newPos = await activate2();
       let ready = false;
-      for (let i = 0; i < 40 && !ready; i++) {
+      // The service's healthy fleet refresh interval is 10 seconds. Allow two cycles plus
+      // startup/DB work; a ten-second assertion races the documented refresh boundary.
+      for (let i = 0; i < 100 && !ready; i++) {
         const r = await fetch(`http://127.0.0.1:${port}/api/v1/orders/sync?afterSeq=0`, { headers: { Authorization: `Bearer ${newPos}` } });
         ready = r.status === 200;
         if (!ready) await new Promise((r2) => setTimeout(r2, 250));

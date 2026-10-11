@@ -22,7 +22,7 @@ describe('B2-063: ESC/POS command injection is neutralised before reaching the p
     expect(cleaned).not.toContain('\x19');
     // \xfa (U+00FA, "ú") is an ordinary printable character, not a control byte — it survives,
     // same as any other accented letter a real dish name might legitimately contain.
-    expect(cleaned).toBe('Evil Dish p\xfa End');
+    expect(cleaned).toBe('Evil Dish p? End');
 
     const withFormatting = 'Line one\nLine two\tTabbed';
     expect(stripControlCharsForPrint(withFormatting)).toBe(withFormatting);

@@ -1,0 +1,47 @@
+[
+  {
+    "app": "pos",
+    "vulnerabilities": 0,
+    "warnings": {
+      "unmaintained": 6,
+      "unsound": 1
+    },
+    "evidence": "rust-pos-audit.json"
+  },
+  {
+    "app": "pos-admin",
+    "vulnerabilities": 0,
+    "warnings": {
+      "unmaintained": 1,
+      "unsound": 1
+    },
+    "evidence": "rust-pos-admin-audit.json"
+  },
+  {
+    "app": "kiosk-user",
+    "vulnerabilities": 0,
+    "warnings": {
+      "unmaintained": 1,
+      "unsound": 1
+    },
+    "evidence": "rust-kiosk-user-audit.json"
+  },
+  {
+    "app": "kds",
+    "vulnerabilities": 0,
+    "warnings": {
+      "unmaintained": 1,
+      "unsound": 1
+    },
+    "evidence": "rust-audit-kds.json"
+  },
+  {
+    "app": "captain",
+    "vulnerabilities": 0,
+    "warnings": {
+      "unmaintained": 1,
+      "unsound": 1
+    },
+    "evidence": "rust-audit-captain.json"
+  }
+]

@@ -175,7 +175,7 @@ it('POS, Captain, Kiosk and a real QR checkout converge in one branch and KDS co
   const token=code.body.url.split('/q/')[1],start=performance.now();
   const qr=await http().post(`/api/v1/public/qr/${token}/orders`).send({items:[{itemId:'tea',quantity:1,optionIds:[]}],idempotencyKey:`four-source-QR-${stamp}`,paymentMethod:'CASH_AT_COUNTER'});
   expect(qr.status,JSON.stringify(qr.body)).toBe(201);
-  const record=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.findFirstOrThrow({where:{restaurantId:rid,source:'QR',branchId:branches[4].id}}));created.push(record.externalOrderId);
+  const record=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.findFirstOrThrow({where:{restaurantId:rid,publicOrderId:qr.body.publicOrderId,source:'QR',branchId:branches[4].id}}));created.push(record.externalOrderId);
   fullFlowTimings.push({source:'QR',commitMs:Math.round(performance.now()-start)});
   for(const d of members){const pull=await as('get','/api/v1/orders/sync?afterSeq=0',d.token);for(const id of created)expect(pull.body.orders.some((o:any)=>o.externalOrderId===id)).toBe(true);}
   const foreign=await as('get','/api/v1/orders/sync?afterSeq=0',devices[0][0].token);for(const id of created)expect(foreign.body.orders.some((o:any)=>o.externalOrderId===id)).toBe(false);
@@ -224,7 +224,7 @@ it('partial refunds retain their exact amount and null payment states still coun
 it('new branch staff are assigned to the selected workspace and omission cannot remove that membership',async()=>{
   const path='/api/v1/entity-sync/STAFF_USER',payload={id:'scoped-staff',fullName:'Branch cashier',roleId:'role-cashier',isActive:true,pinHash:'test-only-hash',updatedAt:new Date().toISOString()};
   const create=await as('post',path).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt).send({events:[{externalId:payload.id,payload}]});expect(create.body.results[0].status).toBe('ok');
-  const update=await as('post',path).send({events:[{externalId:payload.id,payload:{...payload,fullName:'Renamed'}}]});expect(update.body.results[0].status).toBe('ok');
+  const update=await as('post',path).set('x-owner-authorization',ownerJwt).send({events:[{externalId:payload.id,payload:{...payload,fullName:'Renamed'}}]});expect(update.body.results[0].status).toBe('ok');
   const row=await prisma.runAsTenant(rid,tx=>tx.syncedEntity.findFirstOrThrow({where:{restaurantId:rid,entityType:'STAFF_USER',externalId:payload.id}}));expect((row.payload as any).branchId).toBe(branches[0].id);
   expect((await as('get',path+'?afterSeq=0',devices[1][0].token)).body.entities.some((e:any)=>e.externalId===payload.id)).toBe(false);
 });

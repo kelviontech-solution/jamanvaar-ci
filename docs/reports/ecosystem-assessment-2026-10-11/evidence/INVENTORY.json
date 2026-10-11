@@ -1,0 +1,1924 @@
+{
+  "revision": "a6e13aaf01f19088bc3c2c89b59cf0badd763120",
+  "trackedFiles": 10959,
+  "lockSha256": "57a80ec97fb3ccdca33dd0404fd71894b59f06d77b30a87dffa523094e04e2f0",
+  "manifests": [
+    {
+      "path": "apps/kiosk-system/kiosk-user/package.json",
+      "name": "@jamanvaar/kiosk-user",
+      "scripts": {
+        "dev": "vite --port 5174",
+        "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
+      },
+      "dependencies": [
+        "@jamanvaar/api",
+        "@jamanvaar/business",
+        "@jamanvaar/config",
+        "@jamanvaar/database",
+        "@jamanvaar/i18n",
+        "@jamanvaar/sync",
+        "@jamanvaar/tauri-plugin-apk-updater",
+        "@jamanvaar/types",
+        "@jamanvaar/ui",
+        "@jamanvaar/utils",
+        "@jamanvaar/validation",
+        "@tauri-apps/api",
+        "@tauri-apps/plugin-process",
+        "@tauri-apps/plugin-shell",
+        "@tauri-apps/plugin-updater",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "zustand"
+      ]
+    },
+    {
+      "path": "apps/kiosk-system/shared/package.json",
+      "name": "@jamanvaar/kiosk-shared",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "apps/qr-guest/package.json",
+      "name": "@jamanvaar/qr-guest",
+      "scripts": {
+        "predev": "node ../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5190",
+        "build": "tsc --noEmit && vite build",
+        "preview": "vite preview"
+      },
+      "dependencies": [
+        "react",
+        "react-dom"
+      ]
+    },
+    {
+      "path": "apps/restaurant-system/captain/package.json",
+      "name": "@jamanvaar/captain",
+      "scripts": {
+        "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5177",
+        "build": "vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
+      },
+      "dependencies": [
+        "@jamanvaar/api",
+        "@jamanvaar/business",
+        "@jamanvaar/config",
+        "@jamanvaar/database",
+        "@jamanvaar/i18n",
+        "@jamanvaar/sync",
+        "@jamanvaar/tauri-plugin-apk-updater",
+        "@jamanvaar/types",
+        "@jamanvaar/ui",
+        "@jamanvaar/utils",
+        "@jamanvaar/validation",
+        "@tauri-apps/api",
+        "@tauri-apps/plugin-process",
+        "@tauri-apps/plugin-shell",
+        "@tauri-apps/plugin-updater",
+        "clsx",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "tailwind-merge",
+        "zustand"
+      ]
+    },
+    {
+      "path": "apps/restaurant-system/kds/package.json",
+      "name": "@jamanvaar/kds",
+      "scripts": {
+        "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5179",
+        "build": "vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
+      },
+      "dependencies": [
+        "@jamanvaar/api",
+        "@jamanvaar/business",
+        "@jamanvaar/config",
+        "@jamanvaar/database",
+        "@jamanvaar/i18n",
+        "@jamanvaar/sync",
+        "@jamanvaar/tauri-plugin-apk-updater",
+        "@jamanvaar/types",
+        "@jamanvaar/ui",
+        "@jamanvaar/utils",
+        "@jamanvaar/validation",
+        "@tauri-apps/api",
+        "@tauri-apps/plugin-process",
+        "@tauri-apps/plugin-shell",
+        "@tauri-apps/plugin-updater",
+        "clsx",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "tailwind-merge",
+        "zustand"
+      ]
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/package.json",
+      "name": "@jamanvaar/pos-admin",
+      "scripts": {
+        "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5176",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
+      },
+      "dependencies": [
+        "@jamanvaar/api",
+        "@jamanvaar/business",
+        "@jamanvaar/config",
+        "@jamanvaar/database",
+        "@jamanvaar/i18n",
+        "@jamanvaar/sync",
+        "@jamanvaar/tauri-plugin-apk-updater",
+        "@jamanvaar/types",
+        "@jamanvaar/ui",
+        "@jamanvaar/utils",
+        "@jamanvaar/validation",
+        "@tauri-apps/api",
+        "@tauri-apps/plugin-process",
+        "@tauri-apps/plugin-shell",
+        "@tauri-apps/plugin-updater",
+        "clsx",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "tailwind-merge",
+        "zustand"
+      ]
+    },
+    {
+      "path": "apps/restaurant-system/pos/package.json",
+      "name": "@jamanvaar/pos",
+      "scripts": {
+        "predev": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5175",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
+      },
+      "dependencies": [
+        "@jamanvaar/api",
+        "@jamanvaar/business",
+        "@jamanvaar/config",
+        "@jamanvaar/database",
+        "@jamanvaar/i18n",
+        "@jamanvaar/sync",
+        "@jamanvaar/tauri-plugin-apk-updater",
+        "@jamanvaar/types",
+        "@jamanvaar/ui",
+        "@jamanvaar/utils",
+        "@jamanvaar/validation",
+        "@tauri-apps/api",
+        "@tauri-apps/plugin-process",
+        "@tauri-apps/plugin-shell",
+        "@tauri-apps/plugin-updater",
+        "clsx",
+        "lucide-react",
+        "react",
+        "react-dom",
+        "tailwind-merge",
+        "zustand"
+      ]
+    },
+    {
+      "path": "cloud/api/package.json",
+      "name": "@jamanvaar/cloud-api",
+      "scripts": {
+        "postinstall": "prisma generate",
+        "build": "nest build",
+        "start": "nest start",
+        "start:dev": "nest start --watch",
+        "start:prod": "NODE_ENV=production node dist/src/main.js",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "prisma:generate": "prisma generate",
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:deploy": "prisma migrate deploy",
+        "seed": "ts-node prisma/seed.ts",
+        "backfill-restaurant-codes": "ts-node prisma/backfill-restaurant-codes.ts"
+      },
+      "dependencies": [
+        "@aws-sdk/client-s3",
+        "@aws-sdk/s3-request-presigner",
+        "@nestjs/common",
+        "@nestjs/config",
+        "@nestjs/core",
+        "@nestjs/jwt",
+        "@nestjs/platform-express",
+        "@nestjs/throttler",
+        "@prisma/client",
+        "bcryptjs",
+        "cookie-parser",
+        "helmet",
+        "nodemailer",
+        "pdfkit",
+        "pg",
+        "reflect-metadata",
+        "rxjs",
+        "sharp",
+        "zod"
+      ]
+    },
+    {
+      "path": "cloud/super-admin-web/package.json",
+      "name": "@jamanvaar/super-admin-web",
+      "scripts": {
+        "predev": "node ../../tooling/dev/sync_description_photos.mjs",
+        "prebuild": "node ../../tooling/dev/sync_description_photos.mjs",
+        "dev": "vite --port 5180",
+        "build": "tsc --noEmit && vite build",
+        "preview": "vite preview",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+      },
+      "dependencies": [
+        "lucide-react",
+        "react",
+        "react-dom",
+        "react-router-dom"
+      ]
+    },
+    {
+      "path": "package.json",
+      "name": "jamanvaar-kiosk-system",
+      "scripts": {
+        "dev:sync": "node tooling/local-runtime/sync_server.cjs",
+        "predev:cloud-api": "node tooling/dev/free_ports.cjs 4000",
+        "dev:cloud-api": "npm run start:dev --workspace=@jamanvaar/cloud-api",
+        "predev:super-admin": "node tooling/dev/free_ports.cjs 5180",
+        "dev:super-admin": "npm run dev --workspace=@jamanvaar/super-admin-web",
+        "dev:cloud": "concurrently -n \"API,SUPER-ADMIN\" -c \"blue,magenta\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\"",
+        "test:cloud-api": "npm run test --workspace=@jamanvaar/cloud-api",
+        "dev:kiosk": "npm run dev --workspace=@jamanvaar/kiosk-user",
+        "dev:pos": "npm run dev --workspace=@jamanvaar/pos",
+        "dev:pos-admin": "npm run dev --workspace=@jamanvaar/pos-admin",
+        "dev:captain": "npm run dev --workspace=@jamanvaar/captain",
+        "dev:kds": "npm run dev --workspace=@jamanvaar/kds",
+        "dev:qr-guest": "npm run dev --workspace=@jamanvaar/qr-guest",
+        "build:qr-guest": "npm run build --workspace=@jamanvaar/qr-guest",
+        "dev": "concurrently \"npm run dev:sync\" \"npm run dev:kiosk\" \"npm run dev:pos\" \"npm run dev:pos-admin\" \"npm run dev:captain\" \"npm run dev:kds\"",
+        "dev:all": "concurrently -n \"API,SUPER,POS-ADM,POS,CAPT,KDS,KIOSK,SYNC,QR\" -c \"blue,magenta,cyan,green,yellow,red,blueBright,gray,cyanBright\" \"npm run dev:cloud-api\" \"npm run dev:super-admin\" \"npm run dev:pos-admin\" \"npm run dev:pos\" \"npm run dev:captain\" \"npm run dev:kds\" \"npm run dev:kiosk\" \"npm run dev:sync\" \"npm run dev:qr-guest\"",
+        "stop": "node tooling/dev/stop_servers.cjs",
+        "validate:menu": "node tooling/dev/validate_menu_assets.mjs",
+        "validate:menu-assets": "node tooling/dev/validate_menu_assets.mjs",
+        "prepare:images": "node tooling/dev/prepare_brand_assets.mjs && node tooling/dev/package_core_menu_images.mjs && node tooling/dev/download_real_food_images.mjs && node tooling/dev/prepare_menu_images.mjs && node tooling/dev/build_canonical_menu_catalog.mjs",
+        "build:kiosk": "npm run build --workspace=@jamanvaar/kiosk-user",
+        "build:pos": "npm run build --workspace=@jamanvaar/pos",
+        "build:pos-admin": "npm run build --workspace=@jamanvaar/pos-admin",
+        "build:captain": "npm run build --workspace=@jamanvaar/captain",
+        "build:kds": "npm run build --workspace=@jamanvaar/kds",
+        "build": "npm run prepare:images && npm run validate:menu-assets && npm run build --workspace=@jamanvaar/kiosk-user && npm run build --workspace=@jamanvaar/pos && npm run build --workspace=@jamanvaar/pos-admin && npm run build --workspace=@jamanvaar/captain && npm run build --workspace=@jamanvaar/kds",
+        "typecheck": "tsc -b",
+        "pretest": "node tooling/dev/sync_description_photos.mjs",
+        "test": "vitest run"
+      },
+      "dependencies": [
+        "@sqlite.org/sqlite-wasm",
+        "clsx",
+        "lucide-react",
+        "qrcode",
+        "react",
+        "react-dom",
+        "react-hook-form",
+        "tailwind-merge",
+        "zod",
+        "zustand"
+      ]
+    },
+    {
+      "path": "packages/api/package.json",
+      "name": "@jamanvaar/api",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/business/package.json",
+      "name": "@jamanvaar/business",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/config/package.json",
+      "name": "@jamanvaar/config",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/database/package.json",
+      "name": "@jamanvaar/database",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/i18n/package.json",
+      "name": "@jamanvaar/i18n",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/sync/package.json",
+      "name": "@jamanvaar/sync",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/tauri-plugin-apk-updater/package.json",
+      "name": "@jamanvaar/tauri-plugin-apk-updater",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/types/package.json",
+      "name": "@jamanvaar/types",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/ui/package.json",
+      "name": "@jamanvaar/ui",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/utils/package.json",
+      "name": "@jamanvaar/utils",
+      "scripts": {},
+      "dependencies": []
+    },
+    {
+      "path": "packages/validation/package.json",
+      "name": "@jamanvaar/validation",
+      "scripts": {},
+      "dependencies": []
+    }
+  ],
+  "sourceFileCount": 1480,
+  "sourceLines": 254448,
+  "largestModules": [
+    {
+      "path": "packages/database/src/repositories.ts",
+      "lines": 4854,
+      "anyCount": 13,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "lines": 4214,
+      "anyCount": 7,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "lines": 2382,
+      "anyCount": 5,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "lines": 2208,
+      "anyCount": 6,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "lines": 2074,
+      "anyCount": 9,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "lines": 2065,
+      "anyCount": 5,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/store/posStore.ts",
+      "lines": 1842,
+      "anyCount": 3,
+      "todoCount": 0
+    },
+    {
+      "path": "packages/types/src/domain.ts",
+      "lines": 1836,
+      "anyCount": 13,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "lines": 1810,
+      "anyCount": 5,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/cloud/cloudClient.ts",
+      "lines": 1632,
+      "anyCount": 11,
+      "todoCount": 0
+    },
+    {
+      "path": "packages/database/src/db.ts",
+      "lines": 1623,
+      "anyCount": 6,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/settings/SubscriptionPlansView.tsx",
+      "lines": 1486,
+      "anyCount": 5,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/billing/BillingInvoicesModule.tsx",
+      "lines": 1482,
+      "anyCount": 4,
+      "todoCount": 0
+    },
+    {
+      "path": "packages/business/src/pos_assistant.ts",
+      "lines": 1481,
+      "anyCount": 3,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/captain/src/store/captainStore.ts",
+      "lines": 1477,
+      "anyCount": 1,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrConsole.tsx",
+      "lines": 1454,
+      "anyCount": 1,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "lines": 1451,
+      "anyCount": 0,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/components/bills/PosBillsView.tsx",
+      "lines": 1378,
+      "anyCount": 3,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrAdvanced.tsx",
+      "lines": 1312,
+      "anyCount": 0,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx",
+      "lines": 1248,
+      "anyCount": 4,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos/src/components/shift/PosShiftAndCashView.tsx",
+      "lines": 1241,
+      "anyCount": 1,
+      "todoCount": 0
+    },
+    {
+      "path": "packages/database/src/menu_templates_data.ts",
+      "lines": 1229,
+      "anyCount": 1,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/api/src/modules/payments/payments.service.ts",
+      "lines": 1215,
+      "anyCount": 7,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/super-admin-web/src/api/types.ts",
+      "lines": 1194,
+      "anyCount": 7,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/api/src/modules/qr/qr-operations.service.ts",
+      "lines": 1161,
+      "anyCount": 26,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/api/src/modules/tenant-auth/tenant-auth.service.ts",
+      "lines": 1150,
+      "anyCount": 7,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrOperations.tsx",
+      "lines": 1118,
+      "anyCount": 39,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/orders/OrdersModule.tsx",
+      "lines": 1035,
+      "anyCount": 2,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "lines": 1034,
+      "anyCount": 1,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/customers/CustomersCrmModule.tsx",
+      "lines": 1030,
+      "anyCount": 9,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "lines": 1027,
+      "anyCount": 0,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/kds/src/App.tsx",
+      "lines": 1024,
+      "anyCount": 7,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/reports/reportDataEngine.ts",
+      "lines": 990,
+      "anyCount": 9,
+      "todoCount": 0
+    },
+    {
+      "path": "cloud/api/src/modules/billing/invoices.service.ts",
+      "lines": 970,
+      "anyCount": 10,
+      "todoCount": 0
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCapabilities.tsx",
+      "lines": 965,
+      "anyCount": 11,
+      "todoCount": 0
+    }
+  ],
+  "anyCountsByArea": {
+    "cloud/api/src": 284,
+    "cloud/super-admin-web/src": 39,
+    "apps/restaurant-system/pos/": 56,
+    "apps/restaurant-system/pos-admin/": 156,
+    "apps/restaurant-system/captain/": 31,
+    "apps/restaurant-system/kds/": 8,
+    "apps/kiosk-system/": 11,
+    "apps/qr-guest/": 4,
+    "packages/": 200
+  },
+  "controllers": [
+    {
+      "path": "cloud/api/src/common/realtime/realtime.controller.ts",
+      "routes": 0,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/activation-keys/activation-keys.controller.ts",
+      "routes": 10,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/activation-keys/activation-redeem.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/ai-assistant/ai-assistant.controller.ts",
+      "routes": 7,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/ai-assistant/device-ai-assistant.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/ai-assistant/tenant-ai-assistant.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/application-entitlements/application-entitlements.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/applications/applications.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/applications/tenant-applications.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/applications/updater-manifest.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": false,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/audit-query/audit-query.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/backups/device-backups.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/backups/platform-backups.controller.ts",
+      "routes": 10,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/backups/tenant-backups.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/billing/invoices.controller.ts",
+      "routes": 9,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/billing/tenant-billing.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/branches/branches.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/branches/tenant-branches.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/dashboard/dashboard.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/dashboard/tenant-dashboard.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/device-commands/device-commands.controller.ts",
+      "routes": 11,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/devices/device-heartbeat.controller.ts",
+      "routes": 7,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/devices/devices.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/entity-sync/entity-sync.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/entity-sync/staff-approval.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/features/feature-categories.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/features/features.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/inventory-ledger/inventory-ledger.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/jobs/jobs.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/licensing/licensing.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/master-catalog/master-catalog.controller.ts",
+      "routes": 13,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/menu-publications/menu-publications.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/notifications/receipts.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/notifications/whatsapp-bill-settings.tenant.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/offline-policy/offline-policy.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/order-sync/number-leases.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/order-sync/order-sync.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/owners/owners.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/kiosk-payment-connection.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/menu-sync.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/payment-orders.controller.ts",
+      "routes": 11,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/platform-payment-connections.controller.ts",
+      "routes": 7,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/platform-payments.controller.ts",
+      "routes": 9,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/payments/razorpay-webhook.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": false,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/payments/restaurant-payouts.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/plans/plans.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/platform-auth/platform-auth.controller.ts",
+      "routes": 7,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/platform-notifications/platform-notifications.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/platform-settings/platform-settings.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/platform-settings/welcome-designs.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/platform-users/platform-users.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/qr-ordering/qr-ordering.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/qr-ordering/qr-ordering.tenant.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/qr/qr-advanced.controller.ts",
+      "routes": 18,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/qr/qr-group.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": false,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/qr/qr-legacy.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": false,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/qr/qr-operations.controller.ts",
+      "routes": 10,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/reports/reports.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/restaurants/restaurant-lookup.controller.ts",
+      "routes": 1,
+      "hasGuardDecorator": false,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/restaurants/restaurants.controller.ts",
+      "routes": 9,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/sandboxes/sandboxes.controller.ts",
+      "routes": 4,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/sessions/sessions.controller.ts",
+      "routes": 3,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/subscriptions/subscriptions.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/support-tickets/support-tickets.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/support-tickets/tenant-support-tickets.controller.ts",
+      "routes": 6,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/support/support.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/sync-observability/sync-observability.controller.ts",
+      "routes": 8,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/system-health/system-health.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    },
+    {
+      "path": "cloud/api/src/modules/tenant-auth/tenant-auth.controller.ts",
+      "routes": 21,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/whatsapp-channel/whatsapp-channel.service.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/whatsapp-channel/whatsapp-channel.tenant.controller.ts",
+      "routes": 5,
+      "hasGuardDecorator": true,
+      "hasZod": true
+    },
+    {
+      "path": "cloud/api/src/modules/whatsapp-ordering-admin/whatsapp-ordering-admin.controller.ts",
+      "routes": 2,
+      "hasGuardDecorator": true,
+      "hasZod": false
+    }
+  ],
+  "testFiles": [
+    "cloud/api/prisma/backfill-restaurant-codes.spec.ts",
+    "cloud/api/src/common/cors.spec.ts",
+    "cloud/api/src/common/device-health.spec.ts",
+    "cloud/api/src/common/paging.spec.ts",
+    "cloud/api/src/common/rbac/access.spec.ts",
+    "cloud/api/src/common/security/admin-product-access.spec.ts",
+    "cloud/api/src/common/security/credential-encryption.util.spec.ts",
+    "cloud/api/src/common/security/geo.spec.ts",
+    "cloud/api/src/common/security/step-up.util.spec.ts",
+    "cloud/api/src/common/validation/gstin.spec.ts",
+    "cloud/api/src/common/validation/password.spec.ts",
+    "cloud/api/src/common/validation/phone.spec.ts",
+    "cloud/api/src/common/version.spec.ts",
+    "cloud/api/src/config/env.validation.spec.ts",
+    "cloud/api/src/config/seed-options.spec.ts",
+    "cloud/api/src/modules/menu-publications/menu-publications.service.spec.ts",
+    "cloud/api/src/modules/menu-publications/menu-snapshot.spec.ts",
+    "cloud/api/src/modules/offline-policy/signing-status.spec.ts",
+    "cloud/api/src/modules/payments/commission.util.spec.ts",
+    "cloud/api/src/modules/payments/kitchen-admission.util.spec.ts",
+    "cloud/api/src/modules/payments/menu-sync.service.spec.ts",
+    "cloud/api/src/modules/payments/pricing.util.spec.ts",
+    "cloud/api/src/modules/payments/razorpay-gateway.service.spec.ts",
+    "cloud/api/src/modules/payments/refund-authorization.guard.spec.ts",
+    "cloud/api/src/modules/qr/qr-operations.spec.ts",
+    "cloud/api/src/modules/qr/qr-rules.spec.ts",
+    "cloud/api/src/modules/restaurants/restaurant-code.util.spec.ts",
+    "cloud/api/src/prisma/rls-role.spec.ts",
+    "cloud/api/test/_live_fixture.e2e.spec.ts",
+    "cloud/api/test/activation-redeem.e2e.spec.ts",
+    "cloud/api/test/admin-product-access.e2e.spec.ts",
+    "cloud/api/test/ai-assistant.e2e.spec.ts",
+    "cloud/api/test/annual-billing-cadence.e2e.spec.ts",
+    "cloud/api/test/application-entitlements-db-catalog.e2e.spec.ts",
+    "cloud/api/test/audit-probes.e2e.spec.ts",
+    "cloud/api/test/backups-local.e2e.spec.ts",
+    "cloud/api/test/backups.e2e.spec.ts",
+    "cloud/api/test/billing-applications-support.e2e.spec.ts",
+    "cloud/api/test/branch-core-uplink.e2e.spec.ts",
+    "cloud/api/test/branch-devices-config.e2e.spec.ts",
+    "cloud/api/test/branch-roster.e2e.spec.ts",
+    "cloud/api/test/branches-paging.e2e.spec.ts",
+    "cloud/api/test/catalog-endpoints-security.e2e.spec.ts",
+    "cloud/api/test/device-command-fleet.e2e.spec.ts",
+    "cloud/api/test/device-enforcement.e2e.spec.ts",
+    "cloud/api/test/device-limit.e2e.spec.ts",
+    "cloud/api/test/device-sync-throttle.e2e.spec.ts",
+    "cloud/api/test/device-updates.e2e.spec.ts",
+    "cloud/api/test/display-scale.e2e.spec.ts",
+    "cloud/api/test/ecosystem.e2e.spec.ts",
+    "cloud/api/test/entity-sync.e2e.spec.ts",
+    "cloud/api/test/feature-catalog-model.e2e.spec.ts",
+    "cloud/api/test/feature-catalog.e2e.spec.ts",
+    "cloud/api/test/feature-disable-impact-and-quotas.e2e.spec.ts",
+    "cloud/api/test/fleet-and-keys.e2e.spec.ts",
+    "cloud/api/test/inventory-ledger.e2e.spec.ts",
+    "cloud/api/test/invoice-integrity.e2e.spec.ts",
+    "cloud/api/test/invoices-and-jobs.e2e.spec.ts",
+    "cloud/api/test/kiosk-management.e2e.spec.ts",
+    "cloud/api/test/kiosk-pro-remote-management.e2e.spec.ts",
+    "cloud/api/test/licensing.e2e.spec.ts",
+    "cloud/api/test/master-catalog-upload.e2e.spec.ts",
+    "cloud/api/test/menu-versioning.e2e.spec.ts",
+    "cloud/api/test/merged-admin-access.e2e.spec.ts",
+    "cloud/api/test/multi-branch-dashboard.e2e.spec.ts",
+    "cloud/api/test/multi-family-subscriptions.e2e.spec.ts",
+    "cloud/api/test/number-leases.e2e.spec.ts",
+    "cloud/api/test/offline-policy.e2e.spec.ts",
+    "cloud/api/test/onboarding-hardening.e2e.spec.ts",
+    "cloud/api/test/order-handoff.e2e.spec.ts",
+    "cloud/api/test/order-merge.unit.spec.ts",
+    "cloud/api/test/order-rules.unit.spec.ts",
+    "cloud/api/test/order-sync-and-suspension.e2e.spec.ts",
+    "cloud/api/test/order-sync-payload.e2e.spec.ts",
+    "cloud/api/test/owner-activation.e2e.spec.ts",
+    "cloud/api/test/owner-login.e2e.spec.ts",
+    "cloud/api/test/owner-welcome-email.e2e.spec.ts",
+    "cloud/api/test/password-reset.e2e.spec.ts",
+    "cloud/api/test/payment-connections.e2e.spec.ts",
+    "cloud/api/test/payments-device-signature.e2e.spec.ts",
+    "cloud/api/test/payments-kiosk-flow.e2e.spec.ts",
+    "cloud/api/test/payments-menu-sync.e2e.spec.ts",
+    "cloud/api/test/payments-orders.e2e.spec.ts",
+    "cloud/api/test/payments-pentest.e2e.spec.ts",
+    "cloud/api/test/payments-refund-webhook.e2e.spec.ts",
+    "cloud/api/test/payments-refund.e2e.spec.ts",
+    "cloud/api/test/payments-webhook.e2e.spec.ts",
+    "cloud/api/test/plans-dynamic-entitlements.e2e.spec.ts",
+    "cloud/api/test/plans-product-family.e2e.spec.ts",
+    "cloud/api/test/platform-activation.e2e.spec.ts",
+    "cloud/api/test/platform-auth.e2e.spec.ts",
+    "cloud/api/test/platform-branding.e2e.spec.ts",
+    "cloud/api/test/platform-notice.e2e.spec.ts",
+    "cloud/api/test/platform-notifications-area-scope.e2e.spec.ts",
+    "cloud/api/test/platform-notifications.e2e.spec.ts",
+    "cloud/api/test/platform-payments.e2e.spec.ts",
+    "cloud/api/test/platform-sessions.e2e.spec.ts",
+    "cloud/api/test/qr-legacy-compat.e2e.spec.ts",
+    "cloud/api/test/qr-live-availability.e2e.spec.ts",
+    "cloud/api/test/qr-menu-control.e2e.spec.ts",
+    "cloud/api/test/qr-mobile-payments.e2e.spec.ts",
+    "cloud/api/test/qr-module.e2e.spec.ts",
+    "cloud/api/test/qr-operations.e2e.spec.ts",
+    "cloud/api/test/qr-ordering-saas.e2e.spec.ts",
+    "cloud/api/test/qr-ordering.e2e.spec.ts",
+    "cloud/api/test/qr-scale.e2e.spec.ts",
+    "cloud/api/test/razorpay-payment-link.test.ts",
+    "cloud/api/test/rbac.e2e.spec.ts",
+    "cloud/api/test/realtime-stream.e2e.spec.ts",
+    "cloud/api/test/receipts.e2e.spec.ts",
+    "cloud/api/test/restaurant-gstin-fssai.e2e.spec.ts",
+    "cloud/api/test/restaurant-identity-sync.e2e.spec.ts",
+    "cloud/api/test/restaurant-lookup.e2e.spec.ts",
+    "cloud/api/test/restaurant-menu.e2e.spec.ts",
+    "cloud/api/test/restaurant-payouts.e2e.spec.ts",
+    "cloud/api/test/restaurant-sales.e2e.spec.ts",
+    "cloud/api/test/restaurant-tickets.e2e.spec.ts",
+    "cloud/api/test/restaurants.e2e.spec.ts",
+    "cloud/api/test/rls-platform-reads.e2e.spec.ts",
+    "cloud/api/test/saas-modules.e2e.spec.ts",
+    "cloud/api/test/security-audit-regressions.e2e.spec.ts",
+    "cloud/api/test/security-hardening.e2e.spec.ts",
+    "cloud/api/test/security-hardening.unit.spec.ts",
+    "cloud/api/test/spec-58-user-journey.e2e.spec.ts",
+    "cloud/api/test/status-sync.e2e.spec.ts",
+    "cloud/api/test/subscription-extend.e2e.spec.ts",
+    "cloud/api/test/support-tickets.e2e.spec.ts",
+    "cloud/api/test/sustained-load.e2e.spec.ts",
+    "cloud/api/test/sync-chaos.e2e.spec.ts",
+    "cloud/api/test/sync-events-and-sequence.e2e.spec.ts",
+    "cloud/api/test/sync-reconciliation.e2e.spec.ts",
+    "cloud/api/test/tenant-auth-kiosk-admin-retirement.e2e.spec.ts",
+    "cloud/api/test/tenant-auth.e2e.spec.ts",
+    "cloud/api/test/tenant-billing.e2e.spec.ts",
+    "cloud/api/test/tenant-isolation.spec.ts",
+    "cloud/api/test/tenant-my-applications.e2e.spec.ts",
+    "cloud/api/test/tenant-session-enforcement.e2e.spec.ts",
+    "cloud/api/test/welcome-design-access.e2e.spec.ts",
+    "cloud/api/test/whatsapp-bill-settings.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel-entitlement.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel-menu.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel-outbound-hooks.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel-payments.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel-security.e2e.spec.ts",
+    "cloud/api/test/whatsapp-channel.e2e.spec.ts",
+    "cloud/api/test/whatsapp-ordering-admin.e2e.spec.ts",
+    "cloud/api/test/whatsapp-outbound-webhook.e2e.spec.ts",
+    "cloud/super-admin-web/src/__tests__/access-parity.test.ts",
+    "packages/business/src/__tests__/discount_pricing.test.ts",
+    "packages/database/src/__tests__/menu_integrity.test.ts",
+    "tests/activation_notice_banner.test.ts",
+    "tests/admin_crud_and_reports.test.ts",
+    "tests/admin_product_branch_core.test.ts",
+    "tests/admin_product_context.test.ts",
+    "tests/admin_void_unpaid_bill.test.ts",
+    "tests/app_update_and_extension.test.ts",
+    "tests/authoritative_business_day_consistency.test.ts",
+    "tests/bill_on_order.test.ts",
+    "tests/bill_request_handoff.test.ts",
+    "tests/billing_collection_and_exports.test.ts",
+    "tests/branch_core.test.ts",
+    "tests/branch_core_chaos.test.ts",
+    "tests/branch_core_discovery.test.ts",
+    "tests/branch_core_operations.test.ts",
+    "tests/branch_core_outage_matrix.test.ts",
+    "tests/branch_core_secret_seal.test.ts",
+    "tests/browser_audit_fix_regressions.test.ts",
+    "tests/browser_branch_boot.test.ts",
+    "tests/business_day_cross_device_consistency.test.ts",
+    "tests/captain_app_workflows.test.ts",
+    "tests/captain_courses_and_cancel.test.ts",
+    "tests/captain_menu_sync.test.ts",
+    "tests/captain_order_pricing.test.ts",
+    "tests/captain_session_restore.test.ts",
+    "tests/captain_store_service.test.ts",
+    "tests/captain_ui_guards.test.ts",
+    "tests/cash_watermark.test.ts",
+    "tests/central_reporting_consistency.test.ts",
+    "tests/chatbots.test.ts",
+    "tests/clipboard.test.ts",
+    "tests/connection_diagnostics.test.ts",
+    "tests/connection_panel_render.test.ts",
+    "tests/coupon_redemption.test.ts",
+    "tests/coupons.test.ts",
+    "tests/crm_loyalty_checkout.test.ts",
+    "tests/cross_app_sync_cluster.test.ts",
+    "tests/csv_export_safety.test.ts",
+    "tests/database_notification_scope.test.ts",
+    "tests/db_persistence_batching.test.ts",
+    "tests/description_matched_menu_photos.test.ts",
+    "tests/device_cloud_client.test.ts",
+    "tests/device_command_runner.test.ts",
+    "tests/device_gate.test.ts",
+    "tests/device_gate_disconnect.test.ts",
+    "tests/device_gate_overlay.test.ts",
+    "tests/display_scale.test.ts",
+    "tests/durable_cluster.test.ts",
+    "tests/durable_db_integration.test.ts",
+    "tests/durable_store.test.ts",
+    "tests/ebill.test.ts",
+    "tests/ebill_sync_retry.test.ts",
+    "tests/endpoint_resolver.test.ts",
+    "tests/eod_new_business_day_lifecycle.test.ts",
+    "tests/escpos_command_injection.test.ts",
+    "tests/floor_sync_tick.test.ts",
+    "tests/fresh_activation_menu.test.ts",
+    "tests/fresh_restaurant_operations.test.ts",
+    "tests/gap_reports_and_split.test.ts",
+    "tests/gst_default_tax_group.test.ts",
+    "tests/heartbeat_health.test.ts",
+    "tests/i18n_key_parity.test.ts",
+    "tests/image_cache.test.ts",
+    "tests/india_compliance_validation.test.ts",
+    "tests/inventory_control.test.ts",
+    "tests/inventory_integrity.test.ts",
+    "tests/inventory_ledger_sync.test.ts",
+    "tests/item_modal_edit_persists.test.tsx",
+    "tests/jaman_ai_access_and_menu.test.ts",
+    "tests/jaman_ai_cloud_config.test.ts",
+    "tests/jaman_ai_restaurant_intelligence.test.ts",
+    "tests/jamanvaar_startup_experience.test.ts",
+    "tests/kds_logic.test.ts",
+    "tests/kds_ticket_served_gate.test.tsx",
+    "tests/key_value_store.test.ts",
+    "tests/kiosk_cloud_commands_with_core.test.ts",
+    "tests/kiosk_combo_authoring.test.ts",
+    "tests/kiosk_configuration.test.ts",
+    "tests/kiosk_connection_fixes.test.ts",
+    "tests/kiosk_dining_table_sync.test.ts",
+    "tests/kiosk_display_settings.test.ts",
+    "tests/kiosk_kot_once.test.ts",
+    "tests/kiosk_kot_routing.test.ts",
+    "tests/kiosk_order_lifecycle.test.ts",
+    "tests/kiosk_payments_product_scope.test.ts",
+    "tests/kiosk_receipt_touch.test.tsx",
+    "tests/kiosk_upi_retry.test.ts",
+    "tests/kiosk_welcome.test.ts",
+    "tests/kitchen_controls_and_captain.test.ts",
+    "tests/kitchen_item_status.test.ts",
+    "tests/kot_status_from_orders.test.ts",
+    "tests/lan_mesh_sync_suite.test.ts",
+    "tests/lan_sync_bridge.test.ts",
+    "tests/license_certificate.test.ts",
+    "tests/license_entitlements.test.ts",
+    "tests/license_qr_tier_offline.test.ts",
+    "tests/lifecycle.test.ts",
+    "tests/local_core_health_scope.test.ts",
+    "tests/local_relay_pairing.test.ts",
+    "tests/local_relay_service.test.ts",
+    "tests/loyalty_earn_and_redeem.test.ts",
+    "tests/menu_archive_delete_sync.test.ts",
+    "tests/menu_authoring.test.ts",
+    "tests/menu_build_preserves_restaurant.test.ts",
+    "tests/menu_builder.test.ts",
+    "tests/menu_completeness_recovery.test.ts",
+    "tests/menu_csv_import.test.ts",
+    "tests/menu_dedupe.test.ts",
+    "tests/menu_edit_delete_sync.test.ts",
+    "tests/menu_image_routes.test.ts",
+    "tests/menu_images.test.ts",
+    "tests/menu_load_integrity.test.ts",
+    "tests/menu_starter_library_and_merge.test.ts",
+    "tests/menu_sync_cross_window.test.ts",
+    "tests/menu_version_tracker.test.ts",
+    "tests/modifier_selection.test.ts",
+    "tests/modifiers.test.ts",
+    "tests/multi_app_client_hardening.test.ts",
+    "tests/no_demo_identity_fallbacks.test.ts",
+    "tests/notice_banner_layout.test.ts",
+    "tests/number_allocator.test.ts",
+    "tests/numbering_integration.test.ts",
+    "tests/offline_menu_image_cache.test.ts",
+    "tests/offline_routing_integration.test.ts",
+    "tests/order_creation_integrity.test.ts",
+    "tests/order_reaches_kitchen_fast.test.ts",
+    "tests/order_sync_fidelity.test.ts",
+    "tests/order_sync_flagging.test.ts",
+    "tests/outbox_reliability.test.ts",
+    "tests/outlet_identity_adoption.test.ts",
+    "tests/paged_query.test.ts",
+    "tests/payment_policy.test.ts",
+    "tests/pdf_report_identity.test.ts",
+    "tests/pdf_structure.test.ts",
+    "tests/persistence_atomicity.test.ts",
+    "tests/pin_scope_verification.test.ts",
+    "tests/platform_notice.test.ts",
+    "tests/platform_ports.test.ts",
+    "tests/pos_admin_active_tab_persistence.test.ts",
+    "tests/pos_admin_billing_invoices.test.ts",
+    "tests/pos_admin_cloud_logout.test.ts",
+    "tests/pos_admin_crm.test.ts",
+    "tests/pos_admin_day_wise_orders.test.ts",
+    "tests/pos_admin_entitlements.test.ts",
+    "tests/pos_admin_eod_z_report.test.ts",
+    "tests/pos_admin_item_modal_kiosk_fields.test.ts",
+    "tests/pos_admin_kiosk_fleet_client.test.ts",
+    "tests/pos_admin_nav_gating_real_data.test.ts",
+    "tests/pos_admin_payment_connection_client.test.ts",
+    "tests/pos_admin_report_data_engine.test.ts",
+    "tests/pos_assistant.test.ts",
+    "tests/pos_business_day_archive.test.ts",
+    "tests/pos_cart_and_billing.test.ts",
+    "tests/pos_cashier_ux_overhaul.test.ts",
+    "tests/pos_crash_recovery.test.ts",
+    "tests/pos_day_close_and_live_orders_reset.test.ts",
+    "tests/pos_discount_dialog.test.tsx",
+    "tests/pos_discount_manager_approval.test.ts",
+    "tests/pos_fast_cashier_workflow.test.ts",
+    "tests/pos_fast_ordering_and_receipt.test.ts",
+    "tests/pos_full_offline_sqlite.test.ts",
+    "tests/pos_global_search_and_touch.test.ts",
+    "tests/pos_instant_bill.test.ts",
+    "tests/pos_inventory_and_availability.test.ts",
+    "tests/pos_kiosk_integration.test.ts",
+    "tests/pos_kot_and_stations.test.ts",
+    "tests/pos_menu_crud_and_presets.test.ts",
+    "tests/pos_print_queue.test.ts",
+    "tests/pos_reports_and_pdf_export.test.ts",
+    "tests/pos_running_order_flow.test.ts",
+    "tests/pos_shift_and_drawer.test.ts",
+    "tests/pos_terminal_lock_persistence.test.ts",
+    "tests/pos_to_admin_order_sync.test.ts",
+    "tests/pos_touch_and_printer_system.test.ts",
+    "tests/pos_touch_first_no_shortcuts_ui.test.ts",
+    "tests/pricing.test.ts",
+    "tests/print_isolation.test.ts",
+    "tests/print_layout_css.test.ts",
+    "tests/print_transport.test.ts",
+    "tests/printer_network_transport.test.ts",
+    "tests/printer_queue.test.ts",
+    "tests/probe_core_restaurant.test.ts",
+    "tests/production_sync_regressions.test.ts",
+    "tests/pwa_alerts_and_small_screens.test.ts",
+    "tests/qr_checkout_sdk.test.ts",
+    "tests/qr_code_generation.test.ts",
+    "tests/qr_design_studio.test.ts",
+    "tests/qr_guest_cart.test.ts",
+    "tests/qr_order_desk.test.ts",
+    "tests/qr_order_propagation.test.ts",
+    "tests/qr_table_lifecycle.test.ts",
+    "tests/reactivation_keeps_cloud_data.test.ts",
+    "tests/realtime_client.test.ts",
+    "tests/receipt_identity.test.ts",
+    "tests/recommendations.test.ts",
+    "tests/relative_time.test.ts",
+    "tests/reports.test.ts",
+    "tests/reservation_release.test.ts",
+    "tests/restaurant_id_visibility.test.ts",
+    "tests/restaurant_menu_templates.test.ts",
+    "tests/restaurant_profile_adoption.test.ts",
+    "tests/restaurant_scenarios.test.ts",
+    "tests/role_specific_dbs.test.ts",
+    "tests/saas_plan_entitlements_architecture.test.ts",
+    "tests/secure_random_utils.test.ts",
+    "tests/security_audit_remediation.test.ts",
+    "tests/service_messages.test.ts",
+    "tests/shift_sync.test.ts",
+    "tests/split_payment_matrix.test.ts",
+    "tests/split_payment_tenders.test.ts",
+    "tests/staff_cross_device_sync.test.ts",
+    "tests/staff_login_and_pins.test.ts",
+    "tests/staff_login_selected_user.test.ts",
+    "tests/staff_pin.test.ts",
+    "tests/staff_pin_login_sync_race.test.ts",
+    "tests/staff_session.test.ts",
+    "tests/staff_sync_coalescing.test.ts",
+    "tests/suite_architecture_and_kds.test.ts",
+    "tests/super_admin_app_urls.test.ts",
+    "tests/super_admin_css_classes.test.ts",
+    "tests/sync_online_offline.test.ts",
+    "tests/sync_outbox_persistence.test.ts",
+    "tests/sync_protocol.test.ts",
+    "tests/table_bulk.test.ts",
+    "tests/table_cross_device_sync.test.ts",
+    "tests/table_state.test.ts",
+    "tests/tax_labels_configured.test.ts",
+    "tests/tax_split_consistency.test.ts",
+    "tests/tax_split_display.test.ts",
+    "tests/template_photo_coverage.test.ts",
+    "tests/tenant_isolation.test.ts",
+    "tests/terminal_role_access.test.ts",
+    "tests/transliteration.test.ts",
+    "tests/unified_local_core_ecosystem.test.ts",
+    "tests/unpaid_orders_not_sales.test.ts",
+    "tests/voice.test.ts",
+    "tests/whatsapp_bill_number_panel.test.tsx"
+  ],
+  "models": [
+    {
+      "name": "PlatformUser",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "PlatformRefreshToken",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Restaurant",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Branch",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "User",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "TenantRefreshToken",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "FeatureCategory",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Feature",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Plan",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Subscription",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "ApplicationEntitlement",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "ActivationKey",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "Device",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "AuditLog",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "SupportTicket",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "TicketComment",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "TicketEvent",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "TicketAttachment",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Invoice",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "InvoiceCounter",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Payment",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "AppRelease",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "PlatformSetting",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "Backup",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "DeviceCommand",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "MasterMenuCategory",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "MasterMenuItem",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "RestaurantMenuSyndication",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "SyncEventLog",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "SyncConflict",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "OfflineExtension",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "RestaurantSandbox",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "BackupRestoreJob",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "MenuSnapshotItem",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "Order",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "PaymentTransaction",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "RestaurantPaymentConnection",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "WhatsAppChannelConnection",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "OutboundWebhookDelivery",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "Refund",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "WebhookEvent",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "RestaurantPayout",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "SyncedOrder",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "OrderPaymentEntry",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "QrCode",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "QrSettings",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "QrEvent",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "SyncedEntity",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "AiQuestion",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "RestaurantAiAccess",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "AiUsageDaily",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "PlatformNotification",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "PlatformNotificationRead",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "ProcessedSyncEvent",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "SyncSequence",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "RateCounter",
+      "restaurantOwned": false,
+      "branchField": false
+    },
+    {
+      "name": "NumberSequence",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "InventoryMovement",
+      "restaurantOwned": true,
+      "branchField": true
+    },
+    {
+      "name": "MenuPublication",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "QrBranding",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "MenuImage",
+      "restaurantOwned": true,
+      "branchField": false
+    },
+    {
+      "name": "MenuSnapshot",
+      "restaurantOwned": true,
+      "branchField": false
+    }
+  ],
+  "rlsDeclaredEnabled": [
+    "ActivationKey",
+    "AiUsageDaily",
+    "ApplicationEntitlement",
+    "Backup",
+    "BackupRestoreJob",
+    "Branch",
+    "Device",
+    "DeviceCommand",
+    "InventoryMovement",
+    "Invoice",
+    "MenuImage",
+    "MenuPublication",
+    "MenuSnapshot",
+    "MenuSnapshotItem",
+    "NumberSequence",
+    "OfflineExtension",
+    "Order",
+    "OrderPaymentEntry",
+    "Payment",
+    "PaymentTransaction",
+    "ProcessedSyncEvent",
+    "QrBranding",
+    "QrCode",
+    "QrEvent",
+    "QrSettings",
+    "ReconciliationException",
+    "Refund",
+    "Restaurant",
+    "RestaurantAiAccess",
+    "RestaurantMenuSyndication",
+    "RestaurantPaymentConnection",
+    "Subscription",
+    "SupportTicket",
+    "SyncConflict",
+    "SyncEventLog",
+    "SyncSequence",
+    "SyncedEntity",
+    "SyncedOrder",
+    "TenantRefreshToken",
+    "TicketAttachment",
+    "TicketComment",
+    "TicketEvent",
+    "User",
+    "WebhookEvent"
+  ],
+  "rlsDeclaredForced": [
+    "ActivationKey",
+    "AiUsageDaily",
+    "ApplicationEntitlement",
+    "Backup",
+    "BackupRestoreJob",
+    "Branch",
+    "Device",
+    "DeviceCommand",
+    "InventoryMovement",
+    "Invoice",
+    "MenuImage",
+    "MenuPublication",
+    "MenuSnapshot",
+    "MenuSnapshotItem",
+    "NumberSequence",
+    "OfflineExtension",
+    "Order",
+    "OrderPaymentEntry",
+    "Payment",
+    "PaymentTransaction",
+    "ProcessedSyncEvent",
+    "QrBranding",
+    "QrCode",
+    "QrEvent",
+    "QrSettings",
+    "ReconciliationException",
+    "Refund",
+    "Restaurant",
+    "RestaurantAiAccess",
+    "RestaurantMenuSyndication",
+    "RestaurantPaymentConnection",
+    "Subscription",
+    "SupportTicket",
+    "SyncConflict",
+    "SyncEventLog",
+    "SyncSequence",
+    "SyncedEntity",
+    "SyncedOrder",
+    "TenantRefreshToken",
+    "TicketAttachment",
+    "TicketComment",
+    "TicketEvent",
+    "User",
+    "WebhookEvent"
+  ],
+  "tenantModelsWithoutDeclaredRls": [
+    "AuditLog",
+    "WhatsAppChannelConnection",
+    "OutboundWebhookDelivery",
+    "RestaurantPayout",
+    "PlatformNotification"
+  ],
+  "secretCandidates": [
+    {
+      "path": "cloud/api/test/qr-scale.e2e.spec.ts",
+      "line": 164,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docker-compose.yml",
+      "line": 57,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/reports/QA_AUDIT_REPORT.md",
+      "line": 76,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-25-jamanvaar-phase10-generic-feature-model.md",
+      "line": 307,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-25-jamanvaar-phase10-generic-feature-model.md",
+      "line": 441,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-25-jamanvaar-phase11-migrate-consumers.md",
+      "line": 375,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-25-jamanvaar-phase2-multi-subscription-entitlements.md",
+      "line": 122,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-25-jamanvaar-phase5-commercial-catalog.md",
+      "line": 183,
+      "kind": "credentialed-database-url",
+      "status": "candidate, requires classification; value redacted"
+    }
+  ],
+  "artifactPaths": [
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/cssparser_macros-b54ee368cc3b67db.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/ctor_proc_macro-ab36408018bc55de.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/darling_macro-7fa73bb85d1fa567.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/derive_more_impl-091a9e8075538be1.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/displaydoc-8f2c797fdb026488.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/phf_macros-6568bdd800537b5e.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/schemars_derive-1e51152ab784b454.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/serde_derive-97bc3fd83597d074.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/serde_with_macros-cf85c3b6432a7268.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/thiserror_impl-96b596cdd5ed1893.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/thiserror_impl-a32a9b5bd66b94c4.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/time_macros-2690dda601e85c9a.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/webview2_com_macros-8e3437922eeed0df.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/windows_implement-3992c680c98582e3.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/windows_interface-e3cfc84f62536c53.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/yoke_derive-6b9b307905cc969f.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/zerofrom_derive-01714b8e56e09e7c.dll",
+    "apps/restaurant-system/pos-admin/src-tauri/target/debug/deps/zerovec_derive-19c0b03fd2c5a40e.dll",
+    "apps/restaurant-system/pos/src-tauri/binaries/JamanvaarLocalCore-x86_64-pc-windows-msvc.exe",
+    "apps/restaurant-system/pos/src-tauri/target/debug/JamanvaarLocalCore.exe",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/cssparser_macros-b54ee368cc3b67db.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/ctor_proc_macro-ab36408018bc55de.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/darling_macro-7fa73bb85d1fa567.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/derive_more_impl-091a9e8075538be1.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/displaydoc-8f2c797fdb026488.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/phf_macros-6568bdd800537b5e.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/schemars_derive-1e51152ab784b454.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/serde_derive-97bc3fd83597d074.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/serde_repr-92d7beef8ab41887.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/serde_with_macros-cf85c3b6432a7268.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/serialize_to_javascript_impl-7ca920b06076568d.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/tauri_macros-226d3d86f2375f77.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/thiserror_impl-96b596cdd5ed1893.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/thiserror_impl-a32a9b5bd66b94c4.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/time_macros-2690dda601e85c9a.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/webview2_com_macros-8e3437922eeed0df.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/windows_implement-3992c680c98582e3.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/windows_interface-e3cfc84f62536c53.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/yoke_derive-6b9b307905cc969f.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/zerofrom_derive-01714b8e56e09e7c.dll",
+    "apps/restaurant-system/pos/src-tauri/target/debug/deps/zerovec_derive-19c0b03fd2c5a40e.dll"
+  ]
+}

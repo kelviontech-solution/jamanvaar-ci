@@ -109,11 +109,22 @@
 
 .app-card-actions {
   display: flex;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  row-gap: 0.5rem;
   align-items: center;
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid var(--jv-border);
+}
+
+/* Three download pills (web/android/windows) plus Publish Version plus the history chevron no
+   longer fit on one row at the card's min-width (360px) -- they overflowed the card border
+   instead of wrapping. Letting the row wrap, and letting the chevron wrap onto its own line
+   rather than fight for space via margin-left: auto, keeps every button inside the card. */
+.app-card-actions > a,
+.app-card-actions > button:not(:last-child) {
+  flex-shrink: 0;
 }
 
 .release-history-box {

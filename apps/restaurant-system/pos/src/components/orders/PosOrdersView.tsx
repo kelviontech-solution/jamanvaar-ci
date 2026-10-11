@@ -94,7 +94,12 @@ export const PosOrdersView: React.FC = () => {
     return { total, completed, active, totalSales };
   }, [scopedOrders]);
 
-  const handleSettleCounterCash = async (order: Order) => {
+  // BUG: this always called OrderRepository.settleOrder(order.id, 'CASH', ...) directly -- Live
+  // Orders offered no way to settle a bill with UPI, card, split payment, or anything but cash,
+  // unlike the normal Billing/Menu checkout flow (PosPaymentModal) which offers all of them. Now
+  // loads the order into the cart (same mechanism a bill-request notification already uses) and
+  // opens that same full payment modal, instead of a one-click cash-only shortcut.
+  const handleSettleOrder = async (order: Order) => {
     if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED') {
       alert('This order is cancelled or refunded and cannot be settled.');
       return;
@@ -106,8 +111,8 @@ export const PosOrdersView: React.FC = () => {
     const isUnconfirmedKioskUpi = order.paymentMethod === 'UPI' && order.paymentStatus === 'PENDING';
     // A UPI attempt may have landed at Razorpay moments after the kiosk gave
     // up waiting — check the real cloud status before trusting the customer's
-    // word, so cash is never collected on top of a payment that already went
-    // through.
+    // word, so the counter is never asked to collect a payment method on top
+    // of one that already went through.
     if (isUnconfirmedKioskUpi && order.paymentTransactionId) {
       setCheckingOrderId(order.id);
       try {
@@ -120,25 +125,22 @@ export const PosOrdersView: React.FC = () => {
             setLastCompletedOrder(updated);
             setIsReceiptOpen(true);
           }
-          alert('This order was already paid via UPI — do not collect cash. The receipt reflects the online payment.');
+          alert('This order was already paid via UPI — do not collect payment again. The receipt reflects the online payment.');
           return;
         }
       } catch {
-        // Network/device-auth failure — fall through to manual cash
-        // settlement; staff already saw the on-screen warning and can ask
-        // the customer directly.
+        // Network/device-auth failure — fall through to manual settlement;
+        // staff already saw the on-screen warning and can ask the customer directly.
       } finally {
         setCheckingOrderId(null);
       }
     }
 
-    OrderRepository.settleOrder(order.id, 'CASH', order.totalAmount, undefined, 'Cashier Counter');
-    void SyncOutboxEngine.flush();
-    const updated = OrderRepository.getOrderById(order.id);
-    if (updated) {
-      setLastCompletedOrder(updated);
-      setIsReceiptOpen(true);
+    if (!usePosStore.getState().loadOrderForSettlement(order.id)) {
+      alert('This order has not fully synced to this terminal yet. Try again in a moment.');
+      return;
     }
+    setIsPaymentOpen(true);
   };
 
   const handleAdvanceStatus = (orderId: string, nextStatus: OrderStatus) => {
@@ -402,12 +404,12 @@ export const PosOrdersView: React.FC = () => {
                     </div>
 
                     {isPendingOnlineQr && <p className="text-xs font-bold text-amber-700">Online payment pending — awaiting verification</p>}
-                    {/* Fast Cash at Counter Settle Action */}
+                    {/* Settle Action — opens the same Payment & Settlement modal (cash/UPI/card/split/etc.) the normal checkout flow uses */}
                     {isCounterCashPending && (
                       <div className="flex flex-col items-end gap-1">
                         {isUnconfirmedKioskUpi && (
                           <p className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded max-w-[220px] text-right">
-                            Attempted UPI first — confirm with the customer they haven't already paid online before accepting cash.
+                            Attempted UPI first — confirm with the customer they haven't already paid online before settling another way.
                           </p>
                         )}
                         <button
@@ -415,13 +417,13 @@ export const PosOrdersView: React.FC = () => {
                           disabled={checkingOrderId === order.id}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSettleCounterCash(order);
+                            void handleSettleOrder(order);
                           }}
                           className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
-                          title={isUnconfirmedKioskUpi ? 'Checks the real UPI payment status before collecting cash' : 'Collect cash & print thermal receipt'}
+                          title={isUnconfirmedKioskUpi ? 'Checks the real UPI payment status, then opens Cash / UPI / Card / Split settlement' : 'Opens Cash / UPI / Card / Split settlement'}
                         >
                           <CreditCard className="w-3.5 h-3.5" />
-                          <span>{checkingOrderId === order.id ? 'Checking…' : 'Settle Cash'}</span>
+                          <span>{checkingOrderId === order.id ? 'Checking…' : 'Settle'}</span>
                         </button>
                       </div>
                     )}

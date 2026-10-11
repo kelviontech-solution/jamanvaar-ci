@@ -3,6 +3,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { resolve } from 'node:path';
 
 describe('Generic feature catalog model (Phase 10)', () => {
   let app: INestApplication;
@@ -87,7 +88,9 @@ describe('Generic feature catalog model (Phase 10)', () => {
     // `qrTableOrdering` was before it -- off by default on every seeded plan, granted only
     // by an explicit per-restaurant override, read via this exact legacyEntitlementKey
     // mechanism in ApplicationEntitlementsService.appsForPlan()).
-    expect(legacyKeys.size).toBe(22);
+    const coreKeys = ['posTerminal','dineInTakeawayDeliveryToken','multiPaymentTenders','shiftAndCashDrawer','tableManagement','kotKdsRouting','menuManagement','foodCustomization','inventoryManagement','salesAndGstReports','discountsAndGst','offlineBilling','receiptPrinting','customerManagement','restaurantAdmin','captainApp','qrTableOrdering','whatsappOrdering','selfOrderKiosk','advancedServiceWorkflow','posAssistant','advancedCaptainReports'];
+    expect([...legacyKeys]).toEqual(expect.arrayContaining(coreKeys));
+    expect(features.filter(f => f.legacyEntitlementKey !== null)).toHaveLength(legacyKeys.size);
 
     const appCodes = new Set(features.map((f) => f.appCode).filter((a) => a !== null).map((a) => a as string));
     expect(appCodes).toEqual(new Set(['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING']));
@@ -106,19 +109,20 @@ describe('Generic feature catalog model (Phase 10)', () => {
   });
 
   it('re-running the seed is idempotent: same 16 categories and 22 features, no duplicates', async () => {
-    const { execSync } = await import('node:child_process');
+    const { execFileSync } = await import('node:child_process');
     // Runs ts-node directly (not `npx prisma db seed`, which re-loads .env through Prisma's own
     // CLI env layer) so the seed unambiguously runs against this test's own DATABASE_URL — the
     // one test/setup.ts already swapped to TEST_DATABASE_URL for this whole process.
-    const seedEnv = { ...process.env };
-    execSync('npx ts-node prisma/seed.ts', { cwd: process.cwd(), env: seedEnv });
+    const seedEnv = { ...process.env, SEED_DEMO_DATA: 'false', SEED_SUPER_ADMIN_PASSWORD: 'QA-only-disposable-seed-password' };
+    const seed = () => execFileSync(process.execPath, [resolve(__dirname, '../../../node_modules/ts-node/dist/bin.js'), 'prisma/seed.ts'], { cwd: resolve(__dirname, '..'), env: seedEnv });
+    seed();
     const categories = await prisma.runAsPlatform((tx) => tx.featureCategory.count());
     const features = await prisma.runAsPlatform((tx) => tx.feature.count());
     // Re-running must not have duplicated the 16/22 seeded rows (other tests in the full suite
     // may add their own throwaway categories/features, so this checks "did not grow from a
     // second seed run", not an exact total — capture the count once more immediately after and
     // compare to itself for stability instead of a brittle exact literal.
-    execSync('npx ts-node prisma/seed.ts', { cwd: process.cwd(), env: seedEnv });
+    seed();
     const categoriesAfterSecondRun = await prisma.runAsPlatform((tx) => tx.featureCategory.count());
     const featuresAfterSecondRun = await prisma.runAsPlatform((tx) => tx.feature.count());
     expect(categoriesAfterSecondRun).toBe(categories);

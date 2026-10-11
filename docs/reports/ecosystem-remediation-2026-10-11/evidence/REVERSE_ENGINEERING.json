@@ -1,0 +1,233 @@
+{
+  "scope": "local historical artifacts and available frontend dist folders; not a mobile device penetration test",
+  "windows": [
+    {
+      "path": "release/JAMANVAAR-Kiosk-Admin-Setup.exe",
+      "bytes": 190744080,
+      "sha256": "c5bc152283176999dd1835752773c8e880bcc151714a4c8971460a8e1daf4cce",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 52508,
+      "recoverableUtf16Strings": 73,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/JAMANVAAR-Kiosk-Setup.exe",
+      "bytes": 190702096,
+      "sha256": "64e857a2dafe171124f78ad3214710f6bed28042d2ee5252ddb312a9df3f4a44",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 52474,
+      "recoverableUtf16Strings": 73,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/JAMANVAAR-POS-Admin-Setup.exe",
+      "bytes": 187358224,
+      "sha256": "caf75785b5f2bb84475d52f49a78972a16786761d042db4fbba200f04450771f",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 51650,
+      "recoverableUtf16Strings": 73,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/JAMANVAAR-POS-Setup.exe",
+      "bytes": 187356688,
+      "sha256": "86bf8ce6e91e23ba682c453bff4e2125e97a9477b0dc8859f2decef1ebb51a2b",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 51605,
+      "recoverableUtf16Strings": 73,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/kiosk/JAMANVAAR-Kiosk-Setup.exe",
+      "bytes": 58368,
+      "sha256": "73e347269c20d7e7fef831ee3062223653a13eb6ac21071efb928d767a07b78e",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 187,
+      "recoverableUtf16Strings": 59,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/kiosk/JamanvaarKiosk.exe",
+      "bytes": 53248,
+      "sha256": "d0e8e508301721bbeacee06b76c84eaf6a1ca4ce1dff461344a093dcaeb59bad",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 100,
+      "recoverableUtf16Strings": 40,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/kiosk-admin/JAMANVAAR-Kiosk-Admin-Setup.exe",
+      "bytes": 58368,
+      "sha256": "496e2da84f9e951d4ac7d25852c0a1cdab097348589b7b3267a30d46f8dd4e2d",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 187,
+      "recoverableUtf16Strings": 60,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/kiosk-admin/JamanvaarKioskAdmin.exe",
+      "bytes": 53248,
+      "sha256": "1464a4aa09b60ecfe1705c806e8cc4c8fafc5c09bd614a048a84a7c83e809190",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 100,
+      "recoverableUtf16Strings": 42,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos/JAMANVAAR-POS-Setup.exe",
+      "bytes": 58368,
+      "sha256": "adcbc72f2d554d8b0932e6c0a02cfafd518920e6df930592fd778f17f6c4fb98",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 187,
+      "recoverableUtf16Strings": 59,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos/JamanvaarLocalCore.exe",
+      "bytes": 92957184,
+      "sha256": "7ff3d2c26fb1cbe457ec07f949341f720a40691216684a2127437be5220ce377",
+      "managedClrMetadata": false,
+      "pdbDebugMarkers": 7,
+      "recoverableAsciiStrings": 308713,
+      "recoverableUtf16Strings": 185865,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos/JamanvaarPOS.exe",
+      "bytes": 53248,
+      "sha256": "24a059d08772cf5b2e0526c13654562d1aa0b02f1546e21f04969d2c6d8b56e4",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 100,
+      "recoverableUtf16Strings": 41,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos-admin/JAMANVAAR-POS-Admin-Setup.exe",
+      "bytes": 58368,
+      "sha256": "6b148842c3f70ffce69f87b62096a70110c640ac034a4e2b95802a2c402e4057",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 187,
+      "recoverableUtf16Strings": 60,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos-admin/JamanvaarLocalCore.exe",
+      "bytes": 92957184,
+      "sha256": "7ff3d2c26fb1cbe457ec07f949341f720a40691216684a2127437be5220ce377",
+      "managedClrMetadata": false,
+      "pdbDebugMarkers": 7,
+      "recoverableAsciiStrings": 308713,
+      "recoverableUtf16Strings": 185865,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "release/windows/pos-admin/JamanvaarPOSAdmin.exe",
+      "bytes": 53248,
+      "sha256": "37296225f53ff095bd17feea7225b3a3b0b41b313ae5dfcb1714407d167a4104",
+      "managedClrMetadata": true,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 100,
+      "recoverableUtf16Strings": 42,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "apps/restaurant-system/pos/src-tauri/target/release/bundle/nsis/JAMANVAAR POS_1.0.0_x64-setup.exe",
+      "bytes": 110651668,
+      "sha256": "22420b70d1b9f96968040e5c2f3eadf865bcc5f610b7f8498d06de1ec98ed924",
+      "managedClrMetadata": false,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 25156,
+      "recoverableUtf16Strings": 44,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src-tauri/target/release/bundle/nsis/JAMANVAAR POS Admin_1.0.0_x64-setup.exe",
+      "bytes": 94498820,
+      "sha256": "a6afc867381f90ee1f7e77d23471391023445422a6829bf6bd34b4f0cd3a0ae5",
+      "managedClrMetadata": false,
+      "pdbDebugMarkers": 0,
+      "recoverableAsciiStrings": 21371,
+      "recoverableUtf16Strings": 44,
+      "privateKeyPemMarkers": 0,
+      "sourceCommitVerified": false
+    }
+  ],
+  "bundles": [
+    {
+      "path": "apps/kiosk-system/kiosk-user/dist",
+      "javascriptFiles": 6,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "apps/restaurant-system/captain/dist",
+      "javascriptFiles": 10,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "apps/restaurant-system/kds/dist",
+      "javascriptFiles": 11,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "apps/restaurant-system/pos/dist",
+      "javascriptFiles": 11,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/dist",
+      "javascriptFiles": 14,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "apps/qr-guest/dist",
+      "javascriptFiles": 2,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    },
+    {
+      "path": "cloud/super-admin-web/dist",
+      "javascriptFiles": 4,
+      "sourceMaps": 0,
+      "privateKeyPemMarkers": 0,
+      "javascriptInspectable": true
+    }
+  ],
+  "availableApks": []
+}

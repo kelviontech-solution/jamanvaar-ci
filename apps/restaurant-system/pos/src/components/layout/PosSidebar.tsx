@@ -61,7 +61,9 @@ export const PosSidebar: React.FC = () => {
   const activeKotsCount = db.kots.filter((k) => k.status === 'PREPARING' || k.status === 'PENDING').length;
   const heldCartsCount = db.heldOrders.length;
   const occupiedTablesCount = db.tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILLING').length;
-  const outOfStockCount = db.menuItems.filter((i) => !i.isAvailable).length;
+  // Archiving a dish also sets isAvailable: false (see repositories.ts), so without excluding
+  // archivedAt here every discontinued dish inflated this as if it were merely out of stock.
+  const outOfStockCount = db.menuItems.filter((i) => !i.archivedAt && !i.isAvailable).length;
   const failedPrintsCount = db.printJobs.filter((j) => j.status === 'FAILED').length;
 
   const navItems: NavItem[] = [
@@ -117,7 +119,7 @@ export const PosSidebar: React.FC = () => {
                 selectedCategory === 'ALL' ? 'bg-white text-jaman-saffron border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
               }`}
             >
-              {db.menuItems.length}
+              {db.menuItems.filter((i) => !i.archivedAt).length}
             </span>
           </button>
 

@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { describe, it, expect, beforeAll, beforeEach, afterAll, vi, type MockInstance } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach, vi, type MockInstance } from 'vitest';
 import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { NotificationGatewayService } from '../src/modules/notifications/notification-gateway.service';
@@ -18,7 +18,7 @@ describe('Receipt e-bill delivery', () => {
   let kdsToken: string;
   let sendWhatsAppMock: ReturnType<typeof vi.fn>;
   let sendSmsMock: ReturnType<typeof vi.fn>;
-  let emailSendMock: ReturnType<typeof vi.fn>;
+  let emailSendMock: ReturnType<typeof vi.fn<EmailService['send']>>;
   let emailConfiguredSpy: ReturnType<typeof vi.spyOn>;
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
@@ -44,7 +44,7 @@ describe('Receipt e-bill delivery', () => {
     // against, same convention as owner-welcome-email.e2e.spec.ts. This test environment has no
     // real SMTP configured, so `configured` is also forced true (the one test that wants it false
     // uses mockReturnValueOnce on this same spy).
-    emailSendMock = vi.fn().mockResolvedValue(true);
+    emailSendMock = vi.fn<EmailService['send']>().mockResolvedValue(true);
     vi.spyOn(app.get(EmailService), 'send').mockImplementation(emailSendMock);
     emailConfiguredSpy = vi.spyOn(app.get(EmailService), 'configured', 'get').mockReturnValue(true);
 
@@ -230,11 +230,11 @@ describe('Receipt e-bill delivery', () => {
       expect(subject).toContain('Order');
       expect(html).toContain('TEST Receipts Restaurant');
       expect(attachments).toHaveLength(1);
-      expect(attachments[0].contentType).toBe('application/pdf');
-      expect(attachments[0].content).toBeInstanceOf(Buffer);
-      expect(attachments[0].content.length).toBeGreaterThan(500);
+      expect(attachments![0].contentType).toBe('application/pdf');
+      expect(attachments![0].content).toBeInstanceOf(Buffer);
+      expect(attachments![0].content.length).toBeGreaterThan(500);
       // a real PDF file signature, not just any buffer
-      expect(attachments[0].content.subarray(0, 4).toString()).toBe('%PDF');
+      expect(attachments![0].content.subarray(0, 4).toString()).toBe('%PDF');
     });
 
     it('the email body itself is a real message with the bill in it — what was ordered and what it came to — not just "see attached"', async () => {
@@ -263,7 +263,7 @@ describe('Receipt e-bill delivery', () => {
 
       expect(emailSendMock).toHaveBeenCalledTimes(1);
       const [, , , attachments] = emailSendMock.mock.calls[0];
-      expect(attachments[0].content.subarray(0, 4).toString()).toBe('%PDF');
+      expect(attachments![0].content.subarray(0, 4).toString()).toBe('%PDF');
     });
 
     it('rejects a malformed email address before building anything', async () => {
@@ -324,7 +324,7 @@ describe('Receipt e-bill delivery', () => {
       fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ success: true, via: 'text' }), { status: 200 }));
     });
 
-    afterAll(() => fetchSpy?.mockRestore());
+    afterEach(() => fetchSpy?.mockRestore());
 
     const send = (token: string, orderId: string, phone: string) => authed('post', '/api/v1/receipts/whatsapp', token).send({ orderId, phone });
 

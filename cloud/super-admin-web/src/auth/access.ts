@@ -15,6 +15,7 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/owners', area: 'restaurants' },
   { prefix: '/branches', area: 'restaurants' },
   { prefix: '/subscriptions', area: 'subscriptions' },
+  { prefix: '/saas-management', area: 'subscriptions' },
   { prefix: '/plans', area: 'subscriptions' },
   { prefix: '/entitlements', area: 'subscriptions' },
   { prefix: '/feature-catalog', area: 'subscriptions' },

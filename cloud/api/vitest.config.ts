@@ -14,7 +14,8 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./test/setup.ts'],
     testTimeout: 20000,
-    fileParallelism: false
+    fileParallelism: false,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/target/**']
   },
   resolve: {
     alias: {

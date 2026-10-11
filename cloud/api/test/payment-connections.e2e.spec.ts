@@ -403,7 +403,7 @@ describe('Payment connection onboarding', () => {
     const wrong = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: 'totally-wrong' });
     expect(wrong.status).toBe(403);
     const missing = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken);
-    expect(missing.status).toBe(403);
+    expect(missing.status).toBe(403); // The step-up policy rejects missing evidence as well as wrong evidence.
     const right = await authed('patch', `/api/v1/restaurants/${rid}/payment-connection/approve`, platformToken).send({ password: adminPassword });
     expect(right.status).toBe(200);
     expect(right.body.status).toBe('ACTIVE');

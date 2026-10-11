@@ -18,7 +18,7 @@ function fixture() {
     },
     menuImage: { upsert: vi.fn() }
   };
-  const service = new MenuPublicationsService({runAsTenant: async (_: string, run: any) => run(tx)} as any, {log: vi.fn()} as any, {publish: vi.fn()} as any);
+  const service = new MenuPublicationsService({runAsTenant: async (_: string, run: any) => run(tx)} as any, {log: vi.fn()} as any, {publish: vi.fn()} as any, { effectiveForRestaurant: vi.fn(async () => ({})) } as any);
   const category = {entityType:'MENU_CATEGORY',payload:{id:'mains',name:'Mains',isActive:true}};
   const dish = {entityType:'MENU_ITEM',payload:{id:'dish',name:'New dish',categoryId:'mains',price:100,isAvailable:true}};
   return {service,rows,tx,category,dish,snapshots};

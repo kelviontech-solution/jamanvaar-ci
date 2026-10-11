@@ -3,14 +3,14 @@
  * applies them, the tests exercise them directly.
  */
 
-/** Position of each order status in the order's life. Statuses not listed are unknown to the server and are never blocked. */
+/** Finite lifecycle including the aliases used by existing offline terminals. */
 const RANK: Record<string, number> = {
-  DRAFT: -1,
-  NEW: 0, PENDING: 0, CONFIRMED: 0, ACCEPTED: 0,
+  DRAFT: -1, HELD: -1,
+  NEW: 0, CREATED: 0, PENDING: 0, CONFIRMED: 0, ACCEPTED: 0, ACKNOWLEDGED: 0, KITCHEN_ACCEPTED: 0,
   PREPARING: 1, COOKING: 1,
   READY: 2,
-  SERVED: 3, DELIVERED: 3,
-  COMPLETED: 4,
+  SERVED: 3, DELIVERED: 3, COLLECTED: 3,
+  COMPLETED: 4, BILLED: 4,
   CANCELLED: 5, VOID: 5, VOIDED: 5,
   REFUNDED: 6
 };
@@ -23,6 +23,9 @@ const KIOSK_TYPES = new Set(['KIOSK', 'KIOSK_ADMIN']);
 const KIOSK_FORBIDDEN = new Set(['READY', 'SERVED', 'DELIVERED', 'COMPLETED', 'REFUNDED']);
 
 export const statusRank = (s: string | null | undefined): number | undefined => (s ? RANK[s.toUpperCase()] : undefined);
+export const ORDER_STATUSES = Object.keys(RANK) as [string, ...string[]];
+export const KITCHEN_STATUSES = ['PENDING', 'NEW', 'QUEUED', 'PREPARING', 'COOKING', 'READY', 'SERVED', 'COMPLETED', 'DELIVERED', 'CANCELLED', 'VOID', 'VOIDED'] as const;
+export const PAYMENT_STATUSES = ['CREATED', 'PENDING', 'WAITING_FOR_USER', 'PROCESSING', 'PARTIALLY_PAID', 'PARTIALLY_REFUNDED', 'SUCCESS', 'FAILED', 'CANCELLED', 'EXPIRED', 'REFUNDED'] as const;
 
 /** Explicit operator actions share one definition; sync still accepts the established offline aliases. */
 export function validateQrOrderAction(current: string, action: string, paid: boolean, reason?: string): string | null {
@@ -36,7 +39,7 @@ export function validateQrOrderAction(current: string, action: string, paid: boo
 
 export type StatusDecision =
   | { apply: true; status: string }
-  | { apply: false; status: string; reason: 'STATUS_REGRESSION' | 'STATUS_TERMINAL' | 'STATUS_NOT_PERMITTED'; message: string };
+  | { apply: false; status: string; reason: 'STATUS_UNKNOWN' | 'STATUS_REGRESSION' | 'STATUS_TERMINAL' | 'STATUS_NOT_PERMITTED'; message: string };
 
 /**
  * The status an order ends up with after a push. A push that would move it backwards, out of a terminal state, or that its
@@ -44,19 +47,21 @@ export type StatusDecision =
  * push (items, meta) is still merged, so nothing else is lost.
  */
 export function decideStatus(current: string | null | undefined, incoming: string, deviceType: string, meta?: { statusCorrection?: unknown } | null): StatusDecision {
-  if (!current || current === incoming) return { apply: true, status: incoming };
+  incoming = incoming.toUpperCase();
   const from = statusRank(current);
   const to = statusRank(incoming);
-  if (from === undefined || to === undefined) return { apply: true, status: incoming };
+  if (to === undefined || (current && from === undefined)) return { apply: false, status: current || 'DRAFT', reason: 'STATUS_UNKNOWN', message: 'Unknown order status; refresh this order before changing it' };
+  if (!current) return { apply: true, status: incoming };
 
   if (KIOSK_TYPES.has(deviceType) && KIOSK_FORBIDDEN.has(incoming.toUpperCase())) {
     return { apply: false, status: current, reason: 'STATUS_NOT_PERMITTED', message: `A ${deviceType} device cannot set an existing order to ${incoming}` };
   }
+  if (current.toUpperCase() === incoming) return { apply: true, status: incoming };
   const correction = meta?.statusCorrection === true && CORRECTION_AUTHORITY.has(deviceType);
   if (TERMINAL.has(current.toUpperCase()) && !(current.toUpperCase() === 'CANCELLED' && correction) && incoming.toUpperCase() !== 'REFUNDED') {
     return { apply: false, status: current, reason: 'STATUS_TERMINAL', message: `The order is ${current}; it cannot become ${incoming}` };
   }
-  if (to < from && !correction) {
+  if (to < from! && !correction) {
     return { apply: false, status: current, reason: 'STATUS_REGRESSION', message: `The order is already ${current}; a push from ${deviceType} tried to set ${incoming}` };
   }
   return { apply: true, status: incoming };

@@ -29,4 +29,9 @@ export class ApplicationsController {
   ) {
     return this.applications.publishRelease(body, actor);
   }
+
+  @Post('releases/:id/pause')
+  pause(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.applications.pauseRelease(id, actor);
+  }
 }

@@ -79,7 +79,7 @@ export class PlatformAuthService {
       secret: this.config.get<string>('JWT_ACCESS_SECRET'),
       issuer: PLATFORM_JWT_ISSUER,
       audience: PLATFORM_JWT_AUDIENCE,
-      expiresIn: this.config.get<string>('JWT_ACCESS_TTL') ?? '15m'
+      expiresIn: (this.config.get<string>('JWT_ACCESS_TTL') ?? '15m') as import('@nestjs/jwt').JwtSignOptions['expiresIn']
     });
   }
 

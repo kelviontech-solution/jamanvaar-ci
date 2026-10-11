@@ -2,7 +2,7 @@
  * Proof of WHO is at this terminal. After a staff member signs in with their PIN, the server hands back a signed session (and, for a
  * manager override, a short approval). The terminal keeps them here and stamps them onto the orders it syncs, so the server can read
  * the person's role from the proof instead of trusting a name typed on the terminal. Everything here is best effort: with no
- * connection the terminal still works from its local sign-in, and the server records those actions as "not proven".
+ * connection the terminal still takes ordinary sales from its local sign-in. Sensitive changes require valid manager proof when synchronized.
  */
 const KEY = 'jamanvaar_staff_session';
 export interface RefundApprovalScope { action: 'REFUND'; paymentId: string; amountPaise: number; idempotencyKey: string }

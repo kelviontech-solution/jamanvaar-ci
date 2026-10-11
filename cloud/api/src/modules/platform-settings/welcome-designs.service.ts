@@ -56,6 +56,8 @@ export class WelcomeDesignsService {
     const optimize = async (data: string) => {
       const bytes = Buffer.from(data.split(',')[1], 'base64');
       if (bytes.length > 450 * 1024) throw new BadRequestException('Optimize images to 450 KB or less.');
+      // Refuse SVG/XML and other decoders before invoking libvips, irrespective of a forged data-URL MIME type.
+      if (bytes.length < 12 || bytes.toString('ascii', 0, 4) !== 'RIFF' || bytes.toString('ascii', 8, 12) !== 'WEBP' || bytes.readUInt32LE(4) !== bytes.length - 8) throw new BadRequestException('Use a valid WebP image.');
       try {
         const image = sharp(bytes, { limitInputPixels: 1920 * 1920 }); const meta = await image.metadata();
         if (meta.format !== 'webp' || !meta.width || !meta.height || meta.width < 640 || meta.height < 640 || meta.width > 1920 || meta.height > 1920 || (meta.pages || 1) !== 1) throw Error('Invalid image dimensions or format.');

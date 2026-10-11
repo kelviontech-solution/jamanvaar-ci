@@ -1,0 +1,13 @@
+{
+  "source": "fresh QA synthetic unknown-reference callback",
+  "rows": [
+    {
+      "processingStatus": "FAILED",
+      "errorMessage": "No matching payment transaction found",
+      "signatureValid": true
+    }
+  ],
+  "expectedErrorMessage": "No matching payment transaction found",
+  "legacyTestSearches": "pay_unknown_ref",
+  "conclusion": "Test uses outdated error-message substring; unknown-reference failure is persisted with current safe message"
+}

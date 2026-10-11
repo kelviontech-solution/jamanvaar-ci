@@ -1,0 +1,11 @@
+{
+  "installedApiProductionDependencies": true,
+  "prismaCli": true,
+  "nestjsCore": "11.2.7",
+  "nestCli": false,
+  "typescriptCompiler": false,
+  "testRunner": false,
+  "scope": "Windows isolated production dependency installation only; not a Docker image build",
+  "schemaEngineCopiedFromBuilder": true,
+  "generatedClientCopiedFromBuilder": true
+}

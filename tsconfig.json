@@ -43,5 +43,5 @@
   // metadata, commonjs modules) and its own independent typecheck script —
   // it must not be swept into this project's default include, which has no
   // "include" of its own and would otherwise pick up every .ts file in the repo.
-  "exclude": ["cloud/**", "node_modules"]
+  "exclude": ["cloud/**", "docs/**", "node_modules"]
 }

@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -162,7 +162,8 @@ describe('Order sync: event idempotency and sequence cursor', () => {
     await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D')] });
     const revert = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D', 'PENDING')] });
     expect(revert.body.results[0].status).toBe('error');
-    const refund = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [paid('pay-3', 'TXN-D', 'REFUNDED')] });
+    const refunded = paid('pay-3', 'TXN-D', 'REFUNDED');
+    const refund = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [{ ...refunded, meta: { ...refunded.meta, staffSession: await refundManagerSession(app, prisma, posToken) } }] });
     expect(refund.body.results[0].status).toBe('ok');
   });
 

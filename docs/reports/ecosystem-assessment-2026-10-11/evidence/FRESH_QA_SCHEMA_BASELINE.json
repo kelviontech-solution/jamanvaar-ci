@@ -1,0 +1,13 @@
+{
+  "frozenMigrationCount": 83,
+  "qaAppliedMigrationCount": 83,
+  "missing": [],
+  "extra": [],
+  "checksumMismatches": [],
+  "role": [
+    {
+      "rolsuper": false,
+      "rolbypassrls": false
+    }
+  ]
+}

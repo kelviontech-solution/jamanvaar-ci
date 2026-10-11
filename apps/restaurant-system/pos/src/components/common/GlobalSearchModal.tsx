@@ -61,6 +61,9 @@ export const GlobalSearchModal: React.FC = () => {
     // 1. Menu & Dishes
     const items = db.menuItems
       .filter((i) => {
+        // Same archived-dish gap as the main catalog grid: search must not surface (and let staff
+        // add) a dish the restaurant already discontinued.
+        if (i.archivedAt) return false;
         const cat = db.categories.find((c) => c.id === i.categoryId);
         return (
           i.name.toLowerCase().includes(q) ||

@@ -20,7 +20,9 @@ export class ZodValidationPipe implements PipeTransform {
     if (metadata.type !== 'body') {
       return value;
     }
-    const result = this.schema.safeParse(value);
+    // Express 5 leaves a body-less request undefined. Cookie refresh/logout schemas accept an empty object.
+    // Required body fields still fail validation normally.
+    const result = this.schema.safeParse(value ?? {});
     if (!result.success) {
       throw new BadRequestException({
         message: 'Validation failed',

@@ -7,6 +7,8 @@ import { kioskConfigurationSchema } from '../../../cloud/api/src/modules/entity-
 import { requiredConsoleApps } from '../../../cloud/api/src/common/security/admin-product-access';
 import { BRANCH_ENTITY_TYPES } from '../../../cloud/api/src/modules/entity-sync/branch-entity-scope';
 import { mayWrite, mayRead, staffVisibleTo } from '../../../cloud/api/src/modules/entity-sync/entity-authority';
+import { ORDER_STATUSES, KITCHEN_STATUSES, PAYMENT_STATUSES, decideStatus } from '../../../cloud/api/src/modules/order-sync/order-rules';
+import { requiresCloudOrderAuthorization } from '../../sync/src/sync_authorization';
 
 /** Version of the shared sync protocol this core speaks (bump on any wire-format change). */
 export const SYNC_PROTOCOL_VERSION = 1;
@@ -64,7 +66,9 @@ const itemSchema = z.object({
   modifiers: z.array(z.string()).default([]),
   modifierDetails: z.array(z.object({ optionName: z.string(), priceDelta: z.number().int(), optionId: z.string().max(128).optional(), groupId: z.string().max(128).optional(), groupName: z.string().max(200).optional() })).optional(),
   snapshot: z.object({ menuVersion: z.number().int().optional(), basePrice: z.number().int().optional(), taxGroupId: z.string().max(128).optional(), taxRateBp: z.number().int().optional(), taxInclusive: z.boolean().optional(), lineTax: z.number().int().optional() }).optional(),
-  kitchenStatus: z.string().optional(),
+  kitchenStatus: z.string().transform(s => s.toUpperCase()).pipe(z.enum(KITCHEN_STATUSES)).optional(),
+  statusRev: z.number().int().min(0).max(1_000_000).optional(),
+  readyAt: z.string().max(40).optional(),
   originDeviceId: z.string().optional(),
   kitchenStation: z.string().max(64).optional(),
   specialInstructions: z.string().max(500).optional(),
@@ -75,7 +79,7 @@ const orderEventSchema = z.object({
   traceId: z.string().min(1).max(128).optional(),
   externalOrderId: z.string().min(1).max(64),
   orderType: z.string().min(1).max(32),
-  status: z.string().min(1).max(32),
+  status: z.string().min(1).max(32).transform(s => s.toUpperCase()).pipe(z.enum(ORDER_STATUSES)),
   tableId: z.string().optional(),
   tableLabel: z.string().optional(),
   items: z.array(itemSchema),
@@ -84,7 +88,7 @@ const orderEventSchema = z.object({
   discountAmount: z.number().int().default(0),
   totalAmount: z.number().int(),
   notes: z.string().optional(),
-  paymentStatus: z.string().max(32).optional(),
+  paymentStatus: z.string().transform(s => s.toUpperCase()).pipe(z.enum(PAYMENT_STATUSES)).optional(),
   paymentMethod: z.string().max(32).optional(),
   meta: z.record(z.unknown()).optional(),
   updatedAt: z.string().min(1)
@@ -273,6 +277,7 @@ export class BranchCore {
   }
 
   private applyOrderEvent(device: { id: string; type: string }, evt: OrderEvent, origin: 'device' | 'cloud', now: number) {
+    if (origin === 'device' && requiresCloudOrderAuthorization(evt)) throw new CoreError(403, 'CLOUD_AUTHORIZATION_REQUIRED', 'Cancellation, refunds and corrections require current manager authorization on the cloud');
     if (evt.eventId) {
       const prior = this.store.get<{ result: string }>('SELECT result FROM processed_events WHERE event_id = ?', evt.eventId);
       if (prior) {
@@ -283,6 +288,8 @@ export class BranchCore {
 
     const existingRow = this.store.get<Record<string, any>>('SELECT * FROM orders WHERE external_order_id = ?', evt.externalOrderId);
     const existing = existingRow ? this.orderFromRow(existingRow) : undefined;
+    const decision = origin === 'cloud' ? { apply: true as const, status: evt.status } : decideStatus(existing?.status, evt.status, device.type, evt.meta);
+    if (!decision.apply) throw new CoreError(409, decision.reason, decision.message);
 
     if (existing) {
       const violation = paymentViolation(existing, { paymentStatus: evt.paymentStatus, meta: evt.meta }, device);
@@ -427,6 +434,7 @@ export class BranchCore {
   // ------------------------------------------------------------------ generic entities (menu, staff, tables ...)
 
   pushEntities(device: { id: string; type?: string }, type: string, events: Array<{ externalId: string; payload: Record<string, any> }>, origin: 'device' | 'cloud' = 'device') {
+    if (type === 'STAFF_USER' && origin === 'device') throw new CoreError(403, 'STAFF_ADMINISTRATION_REQUIRED', 'Staff changes require an authorized cloud manager session');
     if (origin === 'device' && device.type && !mayWrite(type as never,device.type as never)) throw new CoreError(403,'FORBIDDEN',`This device may not write ${type}`);
     if (type === 'KIOSK_CONFIGURATION') {
       if (origin === 'device' && device.type !== 'POS_ADMIN' && device.type !== 'KIOSK_ADMIN') throw new CoreError(403, 'FORBIDDEN', 'Only a restaurant console can edit kiosk configuration');
@@ -434,6 +442,14 @@ export class BranchCore {
         if (event.payload.branchId !== this.cfg.branchId) throw new CoreError(403, 'WRONG_BRANCH', 'Kiosk configuration belongs to another branch');
         if (!kioskConfigurationSchema.safeParse(event.payload).success) throw new CoreError(400, 'BAD_REQUEST', 'Invalid kiosk configuration');
         if (event.externalId !== `kiosk-config-${this.cfg.branchId}`) throw new CoreError(400, 'BAD_REQUEST', 'Invalid kiosk configuration scope');
+        if (origin === 'device') {
+          const prior = this.store.get<{ payload: string }>('SELECT payload FROM entities WHERE entity_type = ? AND external_id = ?', type, event.externalId);
+          const priorReceipt = prior ? JSON.parse(prior.payload).receipt : null;
+          const receipt = event.payload.receipt;
+          if ((receipt.upiId ?? '') !== (priorReceipt?.upiId ?? '') || (receipt.upiPayeeName ?? '') !== (priorReceipt?.upiPayeeName ?? '')) {
+            throw new CoreError(403, 'CLOUD_AUTHORIZATION_REQUIRED', 'Changing the receipt UPI destination requires cloud owner authorization');
+          }
+        }
         if (origin === 'device') for (const id of Object.keys(event.payload.welcome?.deviceOverrides || {})) {
           const target = this.store.get<{ type: string }>('SELECT type FROM devices WHERE id = ?', id);
           if (target?.type !== 'KIOSK') throw new CoreError(403, 'FORBIDDEN', 'Welcome override must target a kiosk registered to this branch');

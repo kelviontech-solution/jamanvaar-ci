@@ -8,7 +8,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
-  JWT_ACCESS_TTL: z.string().default('15m'),
+  JWT_ACCESS_TTL: z.string().regex(/^\d+(ms|s|m|h|d)$/).default('15m'),
   JWT_REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(30),
   /** Owners and super admins stay signed in for a shorter time than everyone else. */
   PRIVILEGED_REFRESH_TTL_DAYS: z.coerce.number().int().positive().default(7),
@@ -49,9 +49,8 @@ const envSchema = z.object({
   PAYMENT_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),
   // Number of reverse proxies in front of the API (1 behind one load balancer). Unset means the API sees the connecting address
   // itself. Never set it to `true`: that lets any caller choose their own address for rate limiting.
-  // 'true' makes the server refuse voids/refunds/corrections that arrive with no signed proof of who did them (default: accept and flag, so a
-  // terminal that signed in offline can still sync).
-  REQUIRE_STAFF_SESSION: z.enum(['true', 'false']).optional(),
+  // Sensitive offline changes remain pending until a manager can authorize them. Ordinary sales still synchronize.
+  REQUIRE_STAFF_SESSION: z.enum(['true', 'false']).default('true'),
   TRUST_PROXY: z.coerce.number().int().min(0).max(5).optional(),
   // Separate secret for QR guest session signatures; falls back to JWT_ACCESS_SECRET when unset.
   QR_SESSION_SECRET: z.string().min(32).optional(),
@@ -86,6 +85,7 @@ export function isStrongSecret(value: string | undefined): boolean {
 /** What must be true before the API may start in production. Returned as plain sentences so the boot error is readable. */
 export function productionConfigProblems(config: Record<string, unknown>): string[] {
   const problems: string[] = [];
+  if (config.REQUIRE_STAFF_SESSION === 'false') problems.push('REQUIRE_STAFF_SESSION cannot be disabled in production.');
   if (!isStrongSecret(config.JWT_ACCESS_SECRET as string | undefined)) problems.push('JWT_ACCESS_SECRET must be a random secret of 32+ characters (not a placeholder).');
   // `!== undefined` isn't enough to mean "actually configured": found on the real deploy,
   // not assumed -- this project's own docker-compose.yml passes every optional secret

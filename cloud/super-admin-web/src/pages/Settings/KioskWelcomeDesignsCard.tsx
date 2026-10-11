@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ImagePlus, Save } from 'lucide-react';
-import { optimizeWelcomeUpload, resolveMenuImage } from '@jamanvaar/utils';
+import { optimizeWelcomeUpload } from '@jamanvaar/utils/kiosk_welcome';
+import { resolveMenuImage } from '@jamanvaar/utils/menu_image';
 import { api } from '../../api/client';
 import { useAuth } from '../../auth/AuthContext';
 import type { RestaurantListItem } from '../../api/types';

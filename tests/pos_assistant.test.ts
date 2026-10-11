@@ -87,6 +87,6 @@ describe('JAMANVAAR POS Smart Assistant Engine Tests', () => {
     db.orders = [];
     const res = PosAssistantService.executeQuery('TODAY_SALES');
     expect(res.card?.highlightNumber).toBe('₹0');
-    expect(res.card?.metrics[0].value).toBe('0 bills');
+    expect(res.card?.metrics.find(m => m.label === 'Completed Orders')?.value).toBe('0 bills');
   });
 });

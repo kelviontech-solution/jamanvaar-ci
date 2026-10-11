@@ -1,0 +1,25 @@
+{
+  "credentialValueMatches": 0,
+  "filesWithMatches": [],
+  "invalidFindingReferences": [],
+  "trackedApplicationCodeChangesInDetachedCheckout": [],
+  "scores": {
+    "security": 5.1,
+    "quality": 6.0,
+    "saas": 5.6
+  },
+  "freshMigrationBaseline": {
+    "frozenMigrationCount": 83,
+    "qaAppliedMigrationCount": 83,
+    "missing": [],
+    "extra": [],
+    "checksumMismatches": [],
+    "role": [
+      {
+        "rolsuper": false,
+        "rolbypassrls": false
+      }
+    ]
+  },
+  "scope": "Validation of retained assessment artifacts; not a clean git-history secret scan"
+}

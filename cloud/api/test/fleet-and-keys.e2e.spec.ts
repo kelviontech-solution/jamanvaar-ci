@@ -245,7 +245,7 @@ describe('Activation keys and fleet lists (BUG-060/067/069/048)', () => {
 
     it('"needs attention" lists offline, degraded and sync-failing devices only', async () => {
       const res = await api('get', '/api/v1/devices').query({ restaurantId, page: 1, needsAttention: 'true' });
-      expect(res.body.items.map((d: { name: string }) => d.name).sort()).toEqual(['Degraded one', 'Offline one']);
+      expect(res.body.items.map((d: { name: string }) => d.name).sort()).toEqual(['Degraded one', 'Never seen', 'Offline one']);
     });
 
     it('summarises the fleet per restaurant', async () => {

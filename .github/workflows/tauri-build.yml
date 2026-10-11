@@ -46,6 +46,12 @@ jobs:
           - workspace: '@jamanvaar/kiosk-user'
             dir: apps/kiosk-system/kiosk-user
             name: Kiosk User
+          - workspace: '@jamanvaar/captain'
+            dir: apps/restaurant-system/captain
+            name: Captain
+          - workspace: '@jamanvaar/kds'
+            dir: apps/restaurant-system/kds
+            name: KDS
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -70,5 +76,5 @@ jobs:
       # The real check this workflow exists for: does the Rust side — including
       # packages/native/printing.rs and the new printer-detection/printing IPC commands — actually
       # compile and link into a working desktop shell.
-      - run: npx tauri build --no-bundle
+      - run: npx tauri build --no-bundle -- --locked
         working-directory: ${{ matrix.dir }}

@@ -49,6 +49,16 @@ describe('SyncOutboxEngine reliability', () => {
     expect(t.calls[0][0].meta?.refundAmountPaise).toBe(3025);
     expect(t.calls[0][0].totalAmount).toBe(10500);
   });
+  it('a cancellation awaiting cloud authorization cannot block ordinary offline sales', async () => {
+    const sale = makeOrder('ordinary-sale'), cancellation = { ...makeOrder('cancelled-sale'), orderStatus: 'CANCELLED' as const };
+    db.orders.push(sale, cancellation);
+    const t = transport(events => events.some(event => event.status === 'CANCELLED') ? 'throw' : 'ok');
+    SyncOutboxEngine.configureTransport(t);
+    const result = await SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
+    expect(result).toMatchObject({ processed: 1, failed: 1 });
+    expect(sale.syncStatus).toBe('SYNCED'); expect(cancellation.syncStatus).toBe('FAILED');
+    expect(t.calls).toHaveLength(2);
+  });
 
   it('every pushed order carries a stable eventId that changes only when the order changes', async () => {
     const order = makeOrder('ord-evt-1');

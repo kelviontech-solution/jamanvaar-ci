@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-10-11T06:12:51.138392+00:00",
+  "scope": "Changed workspace; local QA only; no production deployment or public release",
+  "tests": {
+    "root-full-confirmed.log": {
+      "status": "PASS",
+      "files": "239 passed (239)",
+      "tests": "1774 passed (1774)",
+      "evidence": "root-full-confirmed.log"
+    },
+    "api-full-confirmed.log": {
+      "status": "PASS",
+      "files": "147 passed | 2 skipped (149)",
+      "tests": "1335 passed | 2 skipped (1337)",
+      "evidence": "api-full-confirmed.log"
+    },
+    "api-security-confirmed.log": {
+      "status": "PASS",
+      "files": "2 passed (2)",
+      "tests": "13 passed (13)",
+      "evidence": "api-security-confirmed.log"
+    },
+    "api-boundary-final.log": {
+      "status": "PASS",
+      "files": "3 passed (3)",
+      "tests": "29 passed (29)",
+      "evidence": "api-boundary-final.log"
+    },
+    "core-canonical-final.log": {
+      "status": "PASS",
+      "files": "4 passed (4)",
+      "tests": "39 passed (39)",
+      "evidence": "core-canonical-final.log"
+    },
+    "root-final-failures.log": {
+      "status": "PASS",
+      "files": "2 passed (2)",
+      "tests": "10 passed (10)",
+      "evidence": "root-final-failures.log"
+    },
+    "receipt-authority-final.log": {
+      "status": "PASS",
+      "files": "4 passed (4)",
+      "tests": "52 passed (52)",
+      "evidence": "receipt-authority-final.log"
+    },
+    "api-receipt-authority-final.log": {
+      "status": "PASS",
+      "files": "2 passed (2)",
+      "tests": "21 passed (21)",
+      "evidence": "api-receipt-authority-final.log"
+    }
+  },
+  "validationSequence": "Full suites passed before the final receipt-authority guard change; focused core/configuration/API checks and both typechecks/API build followed that change.",
+  "frontendBuilds": [
+    {
+      "app": "super-admin-web",
+      "exitCode": 0
+    },
+    {
+      "app": "pos-admin",
+      "exitCode": 0
+    },
+    {
+      "app": "pos",
+      "exitCode": 0
+    },
+    {
+      "app": "captain",
+      "exitCode": 0
+    },
+    {
+      "app": "kds",
+      "exitCode": 0
+    },
+    {
+      "app": "kiosk-user",
+      "exitCode": 0
+    },
+    {
+      "app": "qr-guest",
+      "exitCode": 0
+    }
+  ],
+  "productionNpmAdvisories": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "allNpmAdvisories": {
+    "info": 0,
+    "low": 0,
+    "moderate": 1,
+    "high": 8,
+    "critical": 0,
+    "total": 9
+  },
+  "rustAudits": [
+    {
+      "app": "pos",
+      "vulnerabilities": 0,
+      "warnings": {
+        "unmaintained": 6,
+        "unsound": 1
+      },
+      "evidence": "rust-pos-audit.json"
+    },
+    {
+      "app": "pos-admin",
+      "vulnerabilities": 0,
+      "warnings": {
+        "unmaintained": 1,
+        "unsound": 1
+      },
+      "evidence": "rust-pos-admin-audit.json"
+    },
+    {
+      "app": "kiosk-user",
+      "vulnerabilities": 0,
+      "warnings": {
+        "unmaintained": 1,
+        "unsound": 1
+      },
+      "evidence": "rust-kiosk-user-audit.json"
+    },
+    {
+      "app": "kds",
+      "vulnerabilities": 0,
+      "warnings": {
+        "unmaintained": 1,
+        "unsound": 1
+      },
+      "evidence": "rust-audit-kds.json"
+    },
+    {
+      "app": "captain",
+      "vulnerabilities": 0,
+      "warnings": {
+        "unmaintained": 1,
+        "unsound": 1
+      },
+      "evidence": "rust-audit-captain.json"
+    }
+  ],
+  "syncLoad": {
+    "concurrentRequests": 32,
+    "acknowledged": 32,
+    "persisted": 32,
+    "p95Ms": 1427,
+    "maxMs": 1428,
+    "scope": "local isolated QA database; not production capacity certification"
+  },
+  "reverseEngineering": {
+    "windowsExeCount": 16,
+    "managedClrMetadataCount": 12,
+    "bundles": 7,
+    "availableJamanvaarApks": 0,
+    "authenticodeValidCount": 0,
+    "signatureInspections": 23
+  },
+  "notVerified": [
+    "Production deployment and DB migrations",
+    "Docker runtime and mounted-volume permissions",
+    "GitHub quality/release workflow execution",
+    "Trusted signed release and upgrade tests",
+    "Android build/device and APK penetration test",
+    "Real payment-provider sandbox/refund acceptance",
+    "Production capacity and backup restore rehearsal"
+  ],
+  "runtimeDependencies": {
+    "installedApiProductionDependencies": true,
+    "prismaCli": true,
+    "nestjsCore": "11.2.7",
+    "nestCli": false,
+    "typescriptCompiler": false,
+    "testRunner": false,
+    "scope": "Windows isolated production dependency installation only; not a Docker image build",
+    "schemaEngineCopiedFromBuilder": true,
+    "generatedClientCopiedFromBuilder": true
+  },
+  "additionalEvidence": [
+    "root-types-final.log",
+    "api-types-final.log",
+    "api-build-final.log",
+    "build-pos-final.log",
+    "native-kds-check-final.log",
+    "TRACKED_BUILD_CLEANUP.json",
+    "SBOM.cdx.json"
+  ]
+}

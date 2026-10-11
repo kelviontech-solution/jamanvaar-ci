@@ -1,6 +1,7 @@
 import React, { useSyncExternalStore } from 'react';
-import { ArrowUpCircle, Wrench, X } from 'lucide-react';
+import { ArrowUpCircle, Megaphone, Wrench, X } from 'lucide-react';
 import { AppUpdate, PlatformNotice } from '@jamanvaar/sync';
+import { NativeUpdateButton } from './NativeUpdateButton';
 
 export interface PlatformNoticeBannerProps {
   /**
@@ -28,36 +29,6 @@ function isSafeHttpsUrl(url: string | null | undefined): url is string {
 }
 
 /**
- * A packaged Tauri app has no browser tab for `<a target="_blank">` to open into, so clicking
- * it silently did nothing (confirmed live: Super Admin publishes a version, the banner shows it,
- * "Download" is dead). Opens through the shell plugin when running as a Tauri app (desktop or
- * Android), falling back to a normal new-tab open in a real browser (the web/Docker build).
- *
- * Android has no silent-install permission for an ordinary app (see tauri-plugin-apk-updater's
- * own doc comment), so on Android this tries that plugin first -- a real, visible download
- * through the system's own DownloadManager, followed automatically by its install prompt, one
- * tap to confirm, instead of opening a browser and leaving the file to be found manually. Falls
- * back to the shell-open path on any app that hasn't wired that plugin in yet.
- */
-async function openDownloadUrl(url: string): Promise<void> {
-  if (/android/i.test(navigator.userAgent)) {
-    try {
-      const { downloadAndInstall } = await import('@jamanvaar/tauri-plugin-apk-updater');
-      await downloadAndInstall(url);
-      return;
-    } catch {
-      // Not wired into this app yet, or not actually running as Tauri on Android -- fall through.
-    }
-  }
-  try {
-    const { open } = await import('@tauri-apps/plugin-shell');
-    await open(url);
-  } catch {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-}
-
-/**
  * The platform team's announcement (maintenance etc.), shown as a thin bar at the
  * very top of a restaurant app. It says plainly that selling is not affected, and
  * can be dismissed for the session.
@@ -78,7 +49,10 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
 
   // An optional "new version available" bar (a mandatory update is a lock screen, not a bar). The
   // maintenance notice, when there is one, takes the top of the screen.
-  if (!notice && update && !update.mandatory) {
+  // A guest-facing self-order Kiosk screen never shows this -- a customer has no way to act on a
+  // software update, and the app already updates itself silently in the background (see each
+  // app's main.tsx checkForDesktopUpdate). Staff see it via Staff Mode instead (StaffUpdatePanel).
+  if (!notice && update && !update.mandatory && audience !== 'guest') {
     return (
       <div
         role="status"
@@ -89,13 +63,7 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
         <span className="min-w-0 flex-1">
           Version {update.latestVersion} is available.
           {isSafeHttpsUrl(update.downloadUrl) && (
-            <button
-              type="button"
-              onClick={() => void openDownloadUrl(update.downloadUrl as string)}
-              className="ml-2 underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-white"
-            >
-              Download
-            </button>
+            <NativeUpdateButton className="ml-2 underline bg-transparent border-0 p-0 cursor-pointer font-semibold text-white" />
           )}
         </span>
         <button
@@ -111,19 +79,29 @@ export const PlatformNoticeBanner: React.FC<PlatformNoticeBannerProps> = ({ audi
   }
   if (!notice) return null;
 
+  const isMaintenance = notice.kind === 'MAINTENANCE';
+  // A guest-facing Kiosk screen gets a neutral, pre-written line for maintenance (the real
+  // statusBanner text is written for restaurant staff), but a targeted ANNOUNCEMENT has no such
+  // staff-only framing -- its own message is exactly what guests should see too.
+  const displayMessage = audience === 'guest' && isMaintenance
+    ? 'We are currently undergoing scheduled maintenance. Thank you for your patience!'
+    : notice.message;
+
   return (
     <div
       role="status"
       aria-live="polite"
-      className="sticky inset-x-0 top-0 z-[9000] flex items-center gap-3 bg-amber-500 px-4 py-2 text-sm font-semibold text-[#0B253A] shadow-md"
+      className={`sticky inset-x-0 top-0 z-[9000] flex items-center gap-3 px-4 py-2 text-sm font-semibold shadow-md ${
+        isMaintenance ? 'bg-amber-500 text-[#0B253A]' : 'bg-sky-600 text-white'
+      }`}
     >
-      <Wrench className="h-4 w-4 shrink-0" />
+      {isMaintenance ? <Wrench className="h-4 w-4 shrink-0" /> : <Megaphone className="h-4 w-4 shrink-0" />}
       <span className="min-w-0 flex-1">
-        {audience === 'guest' ? 'We are currently undergoing scheduled maintenance. Thank you for your patience!' : notice.message}
+        {displayMessage}
         {audience === 'staff' && notice.endsAt && (
           <span className="ml-2 font-normal opacity-80">{' '}Until {new Date(notice.endsAt).toLocaleString()}.</span>
         )}
-        {audience === 'staff' && (
+        {audience === 'staff' && isMaintenance && (
           <span className="ml-2 font-normal opacity-80">{' '}Billing is not affected. Your terminals keep working.</span>
         )}
       </span>

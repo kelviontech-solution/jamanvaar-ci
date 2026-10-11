@@ -1,0 +1,117 @@
+[
+  {
+    "path": "release/JAMANVAAR-Kiosk-Admin-Setup.exe",
+    "bytes": 190744080,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-Kiosk-Setup.exe",
+    "bytes": 190702096,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-POS-Admin-Setup.exe",
+    "bytes": 187358224,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-POS-Setup.exe",
+    "bytes": 187356688,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/kiosk/JAMANVAAR-Kiosk-Setup.exe",
+    "bytes": 58368,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/kiosk/JamanvaarKiosk.exe",
+    "bytes": 53248,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/kiosk-admin/JAMANVAAR-Kiosk-Admin-Setup.exe",
+    "bytes": 58368,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/kiosk-admin/JamanvaarKioskAdmin.exe",
+    "bytes": 53248,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos/JAMANVAAR-POS-Setup.exe",
+    "bytes": 58368,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos/JamanvaarLocalCore.exe",
+    "bytes": 92957184,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos/JamanvaarPOS.exe",
+    "bytes": 53248,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos-admin/JAMANVAAR-POS-Admin-Setup.exe",
+    "bytes": 58368,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos-admin/JamanvaarLocalCore.exe",
+    "bytes": 92957184,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/windows/pos-admin/JamanvaarPOSAdmin.exe",
+    "bytes": 53248,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-product-icons-v1/restaurant-admin/platform/icon.icns",
+    "bytes": 1357686,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-product-icons-v1/pos/platform/icon.icns",
+    "bytes": 1372197,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-product-icons-v1/kiosk/platform/icon.icns",
+    "bytes": 1396471,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-product-icons-v1/kds/platform/icon.icns",
+    "bytes": 1381388,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "release/JAMANVAAR-product-icons-v1/captain/platform/icon.icns",
+    "bytes": 1381862,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "apps/restaurant-system/pos/src-tauri/target/release/bundle/msi/JAMANVAAR POS_1.0.0_x64_en-US.msi",
+    "bytes": 122318848,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "apps/restaurant-system/pos/src-tauri/target/release/bundle/nsis/JAMANVAAR POS_1.0.0_x64-setup.exe",
+    "bytes": 110651668,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "apps/restaurant-system/pos-admin/src-tauri/target/release/bundle/msi/JAMANVAAR POS Admin_1.0.0_x64_en-US.msi",
+    "bytes": 94814208,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  },
+  {
+    "path": "apps/restaurant-system/pos-admin/src-tauri/target/release/bundle/nsis/JAMANVAAR POS Admin_1.0.0_x64-setup.exe",
+    "bytes": 94498820,
+    "status": "local artifact discovered; identity/build revision/signature NOT VERIFIED"
+  }
+]

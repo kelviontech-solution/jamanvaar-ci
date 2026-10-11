@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -177,7 +177,7 @@ describe('Order sync bridge + suspension enforcement', () => {
 
     // POS (payment-authoritative) can still legitimately issue a refund transition.
     const posRefund = await authed('post', '/api/v1/orders/sync', posToken).send({
-      events: [{ ...orderEvent('settled-ord-1'), paymentStatus: 'REFUNDED' }]
+      events: [{ ...orderEvent('settled-ord-1'), paymentStatus: 'REFUNDED', meta: { staffSession: await refundManagerSession(app, prisma, posToken) } }]
     });
     expect(posRefund.body.results[0].status).toBe('ok');
   });

@@ -137,7 +137,7 @@ export class TenantAuthService {
       secret: this.config.get<string>('JWT_ACCESS_SECRET'),
       issuer: TENANT_JWT_ISSUER,
       audience: TENANT_JWT_AUDIENCE,
-      expiresIn: this.config.get<string>('JWT_ACCESS_TTL') ?? '15m'
+      expiresIn: (this.config.get<string>('JWT_ACCESS_TTL') ?? '15m') as import('@nestjs/jwt').JwtSignOptions['expiresIn']
     });
   }
 

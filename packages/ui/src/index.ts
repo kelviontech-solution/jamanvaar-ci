@@ -29,6 +29,7 @@ export * from './DeviceGateOverlay';
 export * from './ActivationNoticeBanner';
 export * from './ActivationHelpNote';
 export * from './PlatformNoticeBanner';
+export * from './CommandActivityToast';
 export * from './useAiAccess';
 export * from './printElement';
 export * from './ScreenErrorBoundary';
@@ -40,3 +41,5 @@ export * from './LocalCorePairing';
 export * from './JamanAiAccessNotice';
 
 export {QrServiceInbox,type QrServiceRequest} from './QrServiceInbox';
+export * from './native_update';
+export * from './NativeUpdateButton';

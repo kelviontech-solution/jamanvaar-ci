@@ -7,7 +7,8 @@ import { KeyValueStore } from '@jamanvaar/database';
  * session. It never blocks selling: the apps are offline-first.
  */
 export interface PlatformNoticeData {
-  kind: 'MAINTENANCE';
+  /** ANNOUNCEMENT is a lighter-weight notice scoped to POS / Kiosk / Restaurant Admin only. */
+  kind: 'MAINTENANCE' | 'ANNOUNCEMENT';
   message: string;
   startsAt: string | null;
   endsAt: string | null;

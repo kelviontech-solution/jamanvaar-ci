@@ -126,6 +126,12 @@ export const PosCatalog: React.FC = () => {
 
   const filteredMenuItems = useMemo(() => {
     return db.menuItems.filter((item) => {
+      // BUG: a dish archived (deleted) from Restaurant Admin stayed fully visible and orderable at
+      // the POS counter forever -- Restaurant Admin's own menu list already excludes archivedAt
+      // (see MenuCategoriesModule.tsx), this grid never did, so the two disagreed on dish counts and
+      // staff could keep selling something the restaurant explicitly discontinued.
+      if (item.archivedAt) return false;
+
       // 1. Category filter (matches against canonical category group or category ID)
       if (selectedCategory !== 'ALL') {
         const selectedGroup = displayCategoryGroups.find(

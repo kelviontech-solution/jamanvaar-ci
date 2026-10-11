@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { db, billsWaiting, isBillWaiting, projectTableBillState, announceBillRequests, refreshBillState, resetBillAnnouncementsForTests, billLinesOf, BILL_REQUEST_FRESH_MS } from '@jamanvaar/database';
 import { SyncOutboxEngine, EntitySyncEngine } from '@jamanvaar/sync';
 import type { DiningTable, Order } from '@jamanvaar/types';
@@ -168,6 +168,7 @@ describe('a bill request belongs to its order', () => {
     });
 
     it('a pulled order carrying billRequestedAt puts the table into Bill Requested and raises one notification', async () => {
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
       db.tables = [table()];
       const remote: any = {
         externalOrderId: 'ord-1',
@@ -190,7 +191,7 @@ describe('a bill request belongs to its order', () => {
         push: async () => ({ results: [], serverTime: cloudNow }),
         pull: async () => ({ orders: [remote], latestSeq: remote.seq, serverTime: cloudNow })
       });
-      await SyncOutboxEngine.catchUpFromCloud();
+      try { await SyncOutboxEngine.catchUpFromCloud(); } finally { clock.mockRestore(); }
 
       const pulled = db.orders.find((o) => o.id === 'ord-1');
       expect(pulled?.billRequestedAt).toBe(remote.meta.billRequestedAt);

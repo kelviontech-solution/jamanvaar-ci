@@ -53,6 +53,8 @@ export function ApplicationsPage() {
   // downloadUrls.windows without a matching signature (the .sig file CI produces
   // alongside the installer when the signing secrets are set).
   const [newSignatures, setNewSignatures] = useState<Record<string, string>>({});
+  const [androidHash, setAndroidHash] = useState('');
+  const [windowsHash, setWindowsHash] = useState('');
   const [isMandatory, setIsMandatory] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
@@ -104,8 +106,10 @@ export function ApplicationsPage() {
     }
     setNewPlatforms(app.supportedPlatforms || ['web']);
     setNewReleaseNotes('');
-    setNewDownloadUrls(app.downloadUrls || {});
+    setNewDownloadUrls({}); // Never accidentally republish the preceding version's artifact.
     setNewSignatures({});
+    setAndroidHash('');
+    setWindowsHash('');
     setIsMandatory(false);
     setPublishError(null);
   }
@@ -130,6 +134,7 @@ export function ApplicationsPage() {
         releaseNotes: newReleaseNotes.trim() || undefined,
         downloadUrls: Object.keys(downloadUrls).length > 0 ? downloadUrls : undefined,
         signatures: newSignatures.windows?.trim() ? { windows: newSignatures.windows.trim() } : undefined,
+        artifactHashes: { ...(androidHash.trim() ? { android: androidHash.trim() } : {}), ...(windowsHash.trim() ? { windows: windowsHash.trim() } : {}) },
         isMandatory
       });
       setPublishModalApp(null);
@@ -335,6 +340,12 @@ export function ApplicationsPage() {
                             <strong>v{rel.version}</strong> ({rel.channel})
                           </span>
                           <span>{new Date(rel.releasedAt).toLocaleDateString()}</span>
+                          <span>{rel.status ?? 'PUBLISHED'} · {rel.artifactVerifiedAt ? 'Artifact verified' : 'Legacy metadata'}</span>
+                          {rel.status !== 'PAUSED' && <button type="button" className="btn btn-ghost btn-sm" onClick={async () => {
+                            if (!window.confirm(`Pause version ${rel.version}? Installed apps will stop receiving this release.`)) return;
+                            try { await api.post(`/api/v1/applications/releases/${rel.id}/pause`, {}); loadApplications(); }
+                            catch (err) { setError(err instanceof ApiError ? err.message : 'Could not pause release'); }
+                          }}>Pause release</button>}
                         </div>
                       ))
                     )}
@@ -429,13 +440,20 @@ export function ApplicationsPage() {
               )}
             </div>
 
+            {newPlatforms.includes('android') && (
+              <div className="form-field">
+                <label>Android signed APK SHA-256</label>
+                <Input value={androidHash} onChange={e => setAndroidHash(e.target.value)} placeholder="64-character checksum from SHA256SUMS.txt" />
+              </div>
+            )}
             {newPlatforms.includes('windows') && (
               <div className="form-field">
+                <label>Windows signed installer SHA-256</label>
+                <Input value={windowsHash} onChange={e => setWindowsHash(e.target.value)} placeholder="64-character checksum from SHA256SUMS.txt" />
                 <label>Windows Updater Signature (.sig file contents)</label>
                 <p style={{ color: 'var(--jv-text-muted)', fontSize: '0.8rem', margin: '0 0 0.25rem' }}>
-                  CI writes a matching <code>.sig</code> file next to the Windows installer when the
-                  signing secrets are configured. Paste its full contents here -- without it, installed
-                  desktop apps will see this release but their auto-updater will skip it.
+                  The trusted signing workstation writes a matching <code>.sig</code> file next to the installer.
+                  Paste its complete contents. Publication verifies the hosted bytes and signature before making the release available.
                 </p>
                 <textarea
                   value={newSignatures.windows || ''}

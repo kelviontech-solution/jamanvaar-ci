@@ -17,7 +17,10 @@ import { getPaymentsSummary, type PaymentsSummary } from '../../cloud/cloudClien
 import { ReportExportService } from './reportExportService';
 import { ReportDesignSelectorModal } from './ReportDesignSelectorModal';
 import { ReportPreviewModal } from './ReportPreviewModal';
-import { LabourPanel, LossReportPanel, OwnerSummaryPanel, PrepTimePanel } from './OwnerInsightPanels';
+import { CustomerReportPanel, InventoryReportPanel, LabourPanel, LossReportPanel, OwnerSummaryPanel, PrepTimePanel } from './OwnerInsightPanels';
+import { DonutChart } from '../charts/DonutChart';
+import { SalesTrendLineChart } from '../charts/SalesTrendLineChart';
+import { ReportKpiRow } from './ReportKpiRow';
 import {
   Search,
   Calendar,
@@ -150,7 +153,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
       .then((s) => { setOnlineSummary(s); setOnlineSummaryError(false); })
       .catch(() => setOnlineSummaryError(true));
   }, []);
-  const [selectedCategory, setSelectedCategory] = useState<ReportCategoryKey>('SALES');
+  const [selectedCategory, setSelectedCategory] = useState<ReportCategoryKey | 'OVERVIEW'>('OVERVIEW');
   const [activeReportId, setActiveReportId] = useState<string>('DAILY_SALES');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -285,6 +288,26 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   const eod = useMemo(() => {
     return ReportDataEngine.getEodReconciliation(currentOrders, dateRange);
   }, [currentOrders, dateRange]);
+
+  const channelSplit = useMemo(() => {
+    const byChannel = new Map<string, number>();
+    for (const o of currentOrders) {
+      const key = o.source_type || o.orderType || 'OTHER';
+      byChannel.set(key, (byChannel.get(key) ?? 0) + o.totalAmount);
+    }
+    const palette = ['#EF6A0B', '#0B253A', '#16A34A', '#D97706', '#7C3AED', '#0891B2'];
+    return [...byChannel.entries()].map(([label, value], i) => ({ label, value, color: palette[i % palette.length] }));
+  }, [currentOrders]);
+
+  const paymentSplit = useMemo(() => [
+    { label: 'Cash', value: summary.cashCollected.current, color: '#16A34A' },
+    { label: 'UPI', value: summary.upiCollected.current, color: '#0B253A' },
+    { label: 'Card', value: summary.cardCollected.current, color: '#EF6A0B' },
+    { label: 'Split / Other', value: summary.splitCollected.current + summary.otherCollected.current, color: '#7C3AED' }
+  ], [summary]);
+
+  const customerReport = useMemo(() => ReportDataEngine.getCustomerReport(currentOrders, dateRange), [currentOrders, dateRange]);
+  const inventoryReport = useMemo(() => ReportDataEngine.getInventoryReport(dateRange), [dateRange]);
 
   // Active Report Details
   const activeReport = useMemo(() => {
@@ -605,6 +628,70 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
       </div>
 
       {/* 4. MAIN REPORT WORKSPACE (CATEGORIES + SUB-REPORTS + DATA VIEW) */}
+      {selectedCategory === 'OVERVIEW' && !searchQuery.trim() ? (
+        <div className="space-y-5">
+          <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
+              Report Categories
+            </span>
+            <div className="grid grid-cols-4 gap-1.5 text-xs">
+              {[
+                { id: 'OVERVIEW', label: 'Overview', icon: TrendingUp },
+                { id: 'SALES', label: 'Sales', icon: DollarSign },
+                { id: 'MENU', label: 'Menu', icon: Utensils },
+                { id: 'FINANCIAL', label: 'Financial', icon: BarChart3 },
+                { id: 'OPERATIONS', label: 'Operations', icon: Clock },
+                { id: 'CUSTOMERS', label: 'Customers', icon: Users },
+                { id: 'INVENTORY', label: 'Inventory', icon: Package }
+              ].filter(c => !kioskMode || !['CUSTOMERS', 'INVENTORY'].includes(c.id)).map((c) => {
+                const Icon = c.icon;
+                const isCatActive = c.id === 'OVERVIEW';
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      setSelectedCategory(c.id as ReportCategoryKey | 'OVERVIEW');
+                      setSearchQuery('');
+                      if (c.id === 'OVERVIEW') return;
+                      const firstInCat = reports.find((r) => r.category === c.id);
+                      if (firstInCat) handleSelectReport(firstInCat.id);
+                    }}
+                    className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      isCatActive
+                        ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
+                        : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{c.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <ReportKpiRow summary={summary} periodLabel={dateRange.label} hasCompare={isCompareEnabled} />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2">
+              <SalesTrendLineChart days={dayByDay} />
+            </div>
+            <DonutChart title="Payment Method Split" segments={paymentSplit} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <DonutChart title="Order Channel Split" segments={channelSplit} />
+            <DonutChart
+              title="Top Dishes by Revenue"
+              segments={dishes.slice(0, 6).map((d, i) => ({
+                label: d.name,
+                value: d.grossRevenue,
+                color: ['#EF6A0B', '#0B253A', '#16A34A', '#D97706', '#7C3AED', '#0891B2'][i % 6]
+              }))}
+            />
+          </div>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* LEFT COLUMN: REPORT CATEGORIES & REPORT LIST (lg:col-span-4) */}
         <div className="lg:col-span-4 space-y-4">
@@ -613,8 +700,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
               Report Categories
             </span>
-            <div className="grid grid-cols-3 gap-1.5 text-xs">
+            <div className="grid grid-cols-4 gap-1.5 text-xs">
               {[
+                { id: 'OVERVIEW', label: 'Overview', icon: TrendingUp },
                 { id: 'SALES', label: 'Sales', icon: DollarSign },
                 { id: 'MENU', label: 'Menu', icon: Utensils },
                 { id: 'FINANCIAL', label: 'Financial', icon: BarChart3 },
@@ -628,8 +716,9 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                   <button
                     key={c.id}
                     onClick={() => {
-                      setSelectedCategory(c.id as ReportCategoryKey);
+                      setSelectedCategory(c.id as ReportCategoryKey | 'OVERVIEW');
                       setSearchQuery('');
+                      if (c.id === 'OVERVIEW') return;
                       const firstInCat = reports.find((r) => r.category === c.id);
                       if (firstInCat) handleSelectReport(firstInCat.id);
                     }}
@@ -971,6 +1060,13 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           {activeReportId === 'LABOUR_COST' && <LabourPanel range={dateRange} sales={summary.netSales.current} />}
           {activeReportId === 'KITCHEN_PREP_TIME' && <PrepTimePanel range={dateRange} />}
 
+          {['CUSTOMER_SALES', 'NEW_CUSTOMERS', 'RETURNING_CUSTOMERS', 'REPEAT_VISIT_RATE', 'CUSTOMER_LIFETIME_VALUE', 'AVG_CUSTOMER_SPEND', 'LOYALTY_POINTS'].includes(activeReportId) && (
+            <CustomerReportPanel report={customerReport} />
+          )}
+          {['STOCK_MOVEMENT', 'LOW_STOCK', 'INGREDIENT_USAGE', 'WASTE_REPORT', 'PURCHASE_VS_CONSUMPTION', 'MENU_FOOD_COST', 'ESTIMATED_GROSS_MARGIN'].includes(activeReportId) && (
+            <InventoryReportPanel report={inventoryReport} />
+          )}
+
           {/* 6. KITCHEN / OPERATIONS */}
           {(activeReportId === 'KITCHEN_PREP_TIME' || activeReportId === 'STATION_PERFORMANCE' || activeReportId === 'KOT_PERFORMANCE') && (
             <div className="bg-white border border-jaman-border rounded-2xl p-5 shadow-xs space-y-4">
@@ -995,6 +1091,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
           )}
         </div>
       </div>
+      )}
 
       {/* MODALS */}
       {/* 1. Report Design Selector Modal */}

@@ -18,7 +18,7 @@ beforeEach(() => {
   db.resetToDefaultSeed(); db.orders = []; db.customerAccounts = [];
   CustomerSync.reset();
   pos().clearCart(); pos().closeOverrideModal();
-  usePosStore.setState({ currentUser: { id: 'cashier', fullName: 'Cashier', roleId: 'role-cashier' } as any, selectedCustomer: null, selectedTable: null, deliveryDetails: { name: '', phone: '', address: '' } });
+  usePosStore.setState({ currentUser: { id: 'cashier', fullName: 'Cashier', roleId: 'role-cashier' } as any, selectedCustomer: null, selectedTable: null, deliveryDetails: { name: '', phone: '', address: '', deliveryCharge: 0 } });
   CustomerRepository.createCustomer({ phone, name: 'Daksh', loyaltyPoints: 200 });
   CustomerRepository.updateProgramSettings({ earnPoints: 1, perRupeesSpent: 10, enabled: true });
   CustomerRepository.updateReward('reward-100off', { discountAmount: 100, pointsCost: 150, isActive: true });

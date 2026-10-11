@@ -1,8 +1,9 @@
+import { verifyInstalledUpdate } from '@jamanvaar/ui';
 import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { DeviceGateOverlay, PlatformNoticeBanner } from '@jamanvaar/ui';
+import { DeviceGateOverlay, PlatformNoticeBanner, CommandActivityToast } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
 import { resetTerminal } from './cloud/cloudClient';
 import './index.css';
@@ -14,32 +15,18 @@ DeviceGate.onIdentityInvalid(() => {
   window.location.reload();
 });
 
-// Desktop auto-update: silent by design -- these run as unattended restaurant
-// terminals, not something a person sits and watches for a prompt. Rejects (and is
-// ignored) outside the Tauri desktop shell -- dev server, Docker/web build, Android.
-async function checkForDesktopUpdate() {
-  if (!import.meta.env.PROD) return;
-  try {
-    const { check } = await import('@tauri-apps/plugin-updater');
-    const { relaunch } = await import('@tauri-apps/plugin-process');
-    const update = await check();
-    if (update) {
-      await update.downloadAndInstall();
-      await relaunch();
-    }
-  } catch {
-    // Not the Tauri desktop shell, or the updater endpoint has nothing newer -- either way, carry on.
-  }
-}
-void checkForDesktopUpdate();
+// Updates require a staff maintenance action; startup only verifies a previous handoff.
+
 
 // The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
 void bootDurableStorage({ appId: 'kds', restaurantId: localStorage.getItem('jamanvaar_kds_restaurant_id') }).then(() => {
   DeviceGate.reload();
+  void verifyInstalledUpdate();
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
       <App />
       <PlatformNoticeBanner />
+      <CommandActivityToast />
       <DeviceGateOverlay appName="Kitchen Display" />
     </React.StrictMode>
   );

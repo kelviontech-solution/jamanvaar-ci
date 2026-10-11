@@ -68,7 +68,12 @@ export async function activatePosDevice(code: string): Promise<void> {
   const res = await fetchWithDeadline(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: code.trim(), deviceType: 'POS', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
+    body: JSON.stringify({
+      code: code.trim(),
+      deviceType: 'POS',
+      appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+      ...(publicKeyJwk ? { publicKeyJwk } : {})
+    })
   });
 
   const data = await parseJsonResponse(res);

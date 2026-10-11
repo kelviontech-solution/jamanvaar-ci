@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 pub struct DownloadAndInstallRequest {
     /// Direct HTTPS URL of the .apk to download (the same one the update banner already shows).
     pub url: String,
+    /// SHA-256 supplied by the authenticated cloud release manifest.
+    pub sha256: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

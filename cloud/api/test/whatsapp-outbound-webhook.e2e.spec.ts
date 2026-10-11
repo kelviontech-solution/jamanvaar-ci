@@ -103,6 +103,7 @@ describe('WhatsAppOutboundWebhookService — kiosk calling INTO product/whatsapp
 
     const body = JSON.parse(req.rawBody);
     expect(body).toEqual({
+      deliveryId: expect.any(String),
       type: 'order.confirmed',
       restaurantId,
       data: { paymentId: 'pay-1', orderId: 'order-1', publicOrderId: 'WA-1', status: 'NEW' }

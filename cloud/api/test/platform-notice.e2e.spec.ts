@@ -117,9 +117,11 @@ describe('Platform notice / maintenance mode (BUG-091/092)', () => {
     expect(hb.body.notice).toMatchObject({ message: 'Running now', endsAt: later });
   });
 
-  it('the Restaurant Admin notice endpoint requires a sign-in', async () => {
+  it('the public platform announcement contains only the notice envelope', async () => {
     const res = await request(app.getHttpServer()).get('/api/v1/tenant/platform-notice');
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    expect(Object.keys(res.body)).toEqual(['notice']);
+    expect(JSON.stringify(res.body)).not.toMatch(/password|deviceToken|activationKey|restaurantId/i);
   });
 
   it('rejects an end time before the start, and over-long or wrongly-typed values', async () => {

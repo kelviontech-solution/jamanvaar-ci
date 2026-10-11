@@ -17,6 +17,7 @@ import { KeyValueStore } from '@jamanvaar/database';
 import { PaymentPolicy } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { fetchWithDeadline } from '@jamanvaar/api';
+import { requiresCloudOrderAuthorization } from './sync_authorization';
 
 export type Responder = 'core' | 'cloud';
 export type ConnectionMode = 'ONLINE' | 'LOCAL' | 'OFFLINE';
@@ -35,8 +36,11 @@ const OPERATIONAL_PREFIXES = [
 // They were listed here, so with a core configured they went to it and got a 404 that the resolver rightly treats as a real answer
 // (no fallback). Those are cloud facts and go to the cloud.
 
-export function isOperationalPath(path: string): boolean {
+export function isOperationalPath(path: string, method = 'GET'): boolean {
   const p = path.split('?')[0];
+  // Staff administration needs current human authorization verified by the cloud.
+  // A LAN terminal must not bootstrap its own manager/PIN authority.
+  if (['/api/v1/entity-sync/STAFF_USER', '/api/v1/entity-sync/KIOSK_CONFIGURATION'].includes(p) && method.toUpperCase() !== 'GET') return false;
   return OPERATIONAL_PREFIXES.some((prefix) => p === prefix || p.startsWith(prefix.endsWith('/') ? prefix : prefix + '/') || p === prefix.replace(/\/$/, ''));
 }
 
@@ -193,8 +197,13 @@ export class EndpointResolver {
   }
 
   static async fetch(path: string, init: RequestInit = {}, doFetch: (url: string, init?: RequestInit) => Promise<Response> = (u, i) => this.transport ? this.transport(u, i) : fetchWithDeadline(u, i)): Promise<Response> {
-    const first = this.serverKeyFor(path);
-    const order: Responder[] = this.coreUrl && isOperationalPath(path) ? (first === 'core' ? ['core', 'cloud'] : ['cloud', 'core']) : ['cloud'];
+    let sensitiveOrder = false;
+    if (path.split('?')[0] === '/api/v1/orders/sync' && init.method?.toUpperCase() === 'POST' && typeof init.body === 'string') {
+      try { const body = JSON.parse(init.body); sensitiveOrder = Array.isArray(body.events) && body.events.some(requiresCloudOrderAuthorization); } catch { /* The server rejects malformed bodies. */ }
+    }
+    const operational = !sensitiveOrder && isOperationalPath(path, init.method ?? 'GET');
+    const first = operational ? this.serverKeyFor(path) : 'cloud';
+    const order: Responder[] = this.coreUrl && operational ? (first === 'core' ? ['core', 'cloud'] : ['cloud', 'core']) : ['cloud'];
     let lastError: unknown;
     for (const r of order) {
       const base = r === 'core' ? this.coreUrl : this.cloudBase;

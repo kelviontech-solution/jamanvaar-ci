@@ -10,6 +10,7 @@ import { EndpointResolver } from './endpoint_resolver';
 import { sendHeartbeat } from './heartbeat';
 import { pullRestaurantIdentity } from './restaurant_identity';
 import { orderSyncPullQuery } from './sync_protocol';
+import { StaffSession } from './staff_session';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder } from './outbox';
 import type { EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from './entity_sync';
 
@@ -110,7 +111,7 @@ export function createDeviceCloudClient(options: DeviceCloudClientOptions) {
       request(`/api/v1/orders/sync${orderSyncPullQuery(cursor)}`, 'Order sync pull failed'),
 
     pushEntitySync: (entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> =>
-      request(`/api/v1/entity-sync/${entityType}`, 'Entity sync push failed', { method: 'POST', body: JSON.stringify({ events }) }),
+      request(`/api/v1/entity-sync/${entityType}`, 'Entity sync push failed', { method: 'POST', body: JSON.stringify({ events }), ...(entityType === 'STAFF_USER' && StaffSession.sessionToken() ? { headers: { 'x-staff-session': StaffSession.sessionToken()! } } : {}) }),
 
     pullEntitySync: (
       entityType: string,

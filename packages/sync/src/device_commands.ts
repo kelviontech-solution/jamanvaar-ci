@@ -1,6 +1,7 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { SyncOutboxEngine } from './outbox';
 import { syncMenuCatalog } from './menu_sync';
+import { CommandActivity } from './command_activity';
 
 /**
  * Executes the commands the cloud has queued for this device (Kiosk Admin / Super Admin: sync now,
@@ -106,6 +107,26 @@ export class DeviceCommandRunner {
         return { restartingInMs: 1500 };
       });
     }
+    // Was offered in every app's dispatch UI but had no handler anywhere -- every app fell through to
+    // "not supported" and the command always came back FAILED, regardless of device type. Clearing the
+    // PWA app-shell cache (the same CacheStorage every app's service-worker registration populates) and
+    // reloading is universal across apps, so it belongs here rather than in each app individually.
+    if (!this.handlers.has('CLEAR_CACHE')) {
+      this.registerHandler('CLEAR_CACHE', async () => {
+        let clearedCacheStorage = false;
+        try {
+          if (typeof caches !== 'undefined') {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+            clearedCacheStorage = true;
+          }
+        } catch {
+          // Not every runtime exposes CacheStorage (e.g. a non-PWA build); reloading still helps.
+        }
+        setTimeout(() => (globalThis as { location?: { reload(): void } }).location?.reload(), 1500);
+        return { clearedCacheStorage, restartingInMs: 1500 };
+      });
+    }
   }
 
   /** `verify` returns false for a command that must not run (e.g. a forged LAN command); it is refused and acknowledged as FAILED. */
@@ -154,6 +175,10 @@ export class DeviceCommandRunner {
         if (!alreadyDone) {
           if (outcome.status === 'SUCCEEDED') executed++;
           else failed++;
+          // A command like Request Sync/Health/Diagnostics has no visible effect on its own -- this
+          // is what lets a terminal's own UI show that something actually happened, instead of a
+          // dispatched command looking identical, from the screen, to one that never arrived at all.
+          CommandActivity.report(cmd.commandType, outcome);
         }
         try {
           await io.ack(cmd.id, outcome);

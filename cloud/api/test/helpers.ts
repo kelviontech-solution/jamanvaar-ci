@@ -10,6 +10,18 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import { EmailService } from '../src/modules/notifications/email.service';
 import { StaffSessionService } from '../src/modules/entity-sync/staff-session.service';
 import { hashOpaqueToken } from '../src/common/security/token.util';
+import { JwtService } from '@nestjs/jwt';
+import { TENANT_JWT_ISSUER, TENANT_JWT_AUDIENCE } from '../src/modules/tenant-auth/tenant-auth.service';
+
+/** Authorized test setup, not an HTTP bypass: guards still validate the active owner and exact terminal binding. */
+export async function ownerDeviceSession(prisma: PrismaService, deviceToken: string): Promise<string> {
+  const device = await prisma.runAsPlatform(tx => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(deviceToken) } }));
+  const owner = await prisma.runAsTenant(device.restaurantId, async tx => {
+    const existing = await tx.user.findFirstOrThrow({ where: { restaurantId: device.restaurantId, role: 'OWNER' } });
+    return tx.user.update({ where: { id: existing.id }, data: { status: 'ACTIVE' } });
+  });
+  return new JwtService().sign({ sub: owner.id, restaurantId: device.restaurantId, did: device.id, email: owner.email }, { secret: process.env.JWT_ACCESS_SECRET, issuer: TENANT_JWT_ISSUER, audience: TENANT_JWT_AUDIENCE, expiresIn: '15m' });
+}
 
 /** An explicitly authorized finance fixture. Real refund guards still verify scope, signature, expiry and current staff role. */
 export async function refundManagerSession(app: INestApplication, prisma: PrismaService, deviceToken: string): Promise<string> {

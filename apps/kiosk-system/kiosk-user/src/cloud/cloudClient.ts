@@ -137,7 +137,15 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
   const res = await fetchWithDeadline(`${API_BASE}/api/v1/activation/redeem`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: code.trim(), deviceType: 'KIOSK', appVersion: '1.0.0', ...(publicKeyJwk ? { publicKeyJwk } : {}) })
+    // BUG: this used to hardcode '1.0.0' regardless of the real build -- the very first thing the
+    // server ever learns about a freshly-activated terminal was a lie, visible in Super Admin's
+    // device list until the next heartbeat happened to overwrite it.
+    body: JSON.stringify({
+      code: code.trim(),
+      deviceType: 'KIOSK',
+      appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
+      ...(publicKeyJwk ? { publicKeyJwk } : {})
+    })
   });
 
   const data = await parseJsonResponse(res);

@@ -42,6 +42,7 @@ import { WhatsAppOrderingPage } from '../pages/WhatsAppOrdering/WhatsAppOrdering
 import { PaymentConnectionsListPage } from '../pages/PaymentConnections/PaymentConnectionsListPage';
 import { PlatformPaymentsDashboardPage } from '../pages/PlatformPayments/PlatformPaymentsDashboardPage';
 import { PayoutsListPage } from '../pages/Payouts/PayoutsListPage';
+import { SaaSManagementPage } from '../pages/SaaSManagement/SaaSManagementPage';
 
 /** Wraps a page element so a render crash on this one route can't blank the whole console. */
 function page(name: string, element: JSX.Element) {
@@ -53,7 +54,6 @@ export function App() {
     <ErrorBoundary boundaryName="root">
       <BrowserRouter
         basename={import.meta.env.VITE_ROUTER_BASENAME || undefined}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <AuthProvider>
           <Routes>
@@ -73,6 +73,7 @@ export function App() {
               <Route path="/owners/:id" element={page('OwnerDetail', <OwnerDetailPage />)} />
               <Route path="/branches" element={page('BranchesList', <BranchesListPage />)} />
               <Route path="/branches/:id" element={page('BranchDetail', <BranchDetailPage />)} />
+              <Route path="/saas-management" element={page('SaaSManagement', <SaaSManagementPage />)} />
               <Route path="/plans" element={page('PlansList', <PlansListPage />)} />
               <Route path="/plans/:id" element={page('PlanDetail', <PlanDetailPage />)} />
               <Route path="/qr-ordering" element={page('QrOrdering', <QrOrderingPage />)} />

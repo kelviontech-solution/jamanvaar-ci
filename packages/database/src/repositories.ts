@@ -570,9 +570,15 @@ export class OrderRepository {
     const tag = prefix ? `${prefix}-` : '';
     const resetAt = db.tokenSequenceResets[prefix];
     const resetAtMs = resetAt ? Date.parse(resetAt) : null;
+    let beforeReset = new Set<string>();
+    try {
+      const marker = JSON.parse(KeyValueStore.get(`token-reset-boundary:${prefix}`) || 'null');
+      if (marker?.at === resetAt && Array.isArray(marker.orderIds)) beforeReset = new Set(marker.orderIds);
+    } catch { /* legacy timestamp boundary */ }
     let highest = 100;
     for (const o of db.orders) {
       if (o.businessDayId !== dayId) continue;
+      if (beforeReset.has(o.id)) continue;
       if (resetAtMs !== null && new Date(o.createdAt).getTime() < resetAtMs) continue;
       const t = String(o.tokenNumber ?? '');
       if (!t.startsWith(tag)) continue;
@@ -794,7 +800,10 @@ export class OrderRepository {
 
     // Update active shift stats if payment is already successful (e.g. Counter instant bill / kiosk order)
     if (newOrder.paymentStatus === 'SUCCESS') {
-      if (newOrder.customerPhone) newOrder.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(newOrder.customerPhone, newOrder.totalAmount, newOrder.id);
+      if (newOrder.customerPhone) {
+        CustomerRepository.getOrCreateAccount(newOrder.customerPhone, newOrder.customerName);
+        newOrder.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(newOrder.customerPhone, newOrder.totalAmount, newOrder.id);
+      }
       // getActiveShift() derives the shift totals from the orders themselves, so
       // refreshing it is enough. Adding the amounts again here double-counted
       // every settlement until the next read.
@@ -925,6 +934,7 @@ export class OrderRepository {
     // retried settle — the same real-world path a flaky sync or a double-tap can produce — credited
     // the account a second time for one purchase.
     if (!order.serverQrLoyalty && order.customerPhone && order.loyaltyPointsEarned === undefined) {
+      CustomerRepository.getOrCreateAccount(order.customerPhone, order.customerName);
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
     }
 
@@ -1155,7 +1165,10 @@ export class TokenSequenceRepository {
   }
 
   public static reset(prefix: string, actor: string = 'Kiosk Admin'): void {
-    db.tokenSequenceResets = { ...db.tokenSequenceResets, [prefix]: new Date().toISOString() };
+    const at = new Date().toISOString();
+    // A timestamp alone cannot distinguish an order and reset in the same millisecond.
+    KeyValueStore.set(`token-reset-boundary:${prefix}`, JSON.stringify({ at, orderIds: db.orders.filter(o => String(o.tokenNumber ?? '').startsWith(prefix ? `${prefix}-` : '')).map(o => o.id) }));
+    db.tokenSequenceResets = { ...db.tokenSequenceResets, [prefix]: at };
     AuditRepository.log({
       action: 'SETTINGS_UPDATE',
       category: 'BUSINESS',

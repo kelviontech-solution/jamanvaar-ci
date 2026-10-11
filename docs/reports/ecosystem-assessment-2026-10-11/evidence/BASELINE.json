@@ -1,0 +1,30 @@
+{
+  "revision": "a6e13aaf01f19088bc3c2c89b59cf0badd763120",
+  "frozenLockSha256": "57a80ec97fb3ccdca33dd0404fd71894b59f06d77b30a87dffa523094e04e2f0",
+  "sharedWorkspaceLockSha256": "57a80ec97fb3ccdca33dd0404fd71894b59f06d77b30a87dffa523094e04e2f0",
+  "worktreeStatusAfterPreparation": [
+    " M apps/kiosk-system/kiosk-user/public/favicon.svg",
+    " M apps/kiosk-system/kiosk-user/public/jamanvaar-app-icon.svg",
+    " M apps/kiosk-system/kiosk-user/public/manifest.json",
+    " M apps/kiosk-system/kiosk-user/public/manifest.webmanifest",
+    " M apps/restaurant-system/captain/public/favicon.svg",
+    " M apps/restaurant-system/captain/public/jamanvaar-app-icon.svg",
+    " M apps/restaurant-system/captain/public/manifest.webmanifest",
+    " M apps/restaurant-system/kds/public/favicon.svg",
+    " M apps/restaurant-system/kds/public/jamanvaar-app-icon.svg",
+    " M apps/restaurant-system/kds/public/manifest.webmanifest",
+    " M apps/restaurant-system/pos-admin/public/favicon.svg",
+    " M apps/restaurant-system/pos-admin/public/jamanvaar-app-icon.svg",
+    " M apps/restaurant-system/pos-admin/public/manifest.json",
+    " M apps/restaurant-system/pos-admin/public/manifest.webmanifest",
+    " M apps/restaurant-system/pos/public/favicon.svg",
+    " M apps/restaurant-system/pos/public/jamanvaar-app-icon.svg",
+    " M apps/restaurant-system/pos/public/manifest.json",
+    " M apps/restaurant-system/pos/public/manifest.webmanifest",
+    " M docs/reports/multi-branch-2026-10-07/PERFORMANCE.json",
+    "?? cloud/api/test/assessment-flow-diagnostic.e2e.spec.ts",
+    "?? cloud/api/test/assessment-probes.e2e.spec.ts"
+  ],
+  "dependencyReuse": "node_modules junction; fresh installation NOT TESTED",
+  "sourcePolicy": "No tracked application code edited; generated public assets/performance artifact changed only in detached checkout by existing preparation/tests; two added audit test copies."
+}

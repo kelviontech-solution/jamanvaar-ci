@@ -334,7 +334,7 @@ export class OrderSyncService {
           // points at a settled gateway transaction of this restaurant that covers the total; otherwise the order keeps its payment
           // state (or starts unpaid) and the attempt is recorded. This is what stops a kiosk, kitchen screen or Captain from inserting
           // "paid" sales that no money stands behind.
-          let payStatus = evt.paymentStatus;
+          let payStatus: string | undefined = evt.paymentStatus;
           if (existing) {
             const allocations = await tx.orderPaymentEntry.findMany({ where: { restaurantId: device.restaurantId, orderId: existing.id } });
             if (allocations.length) {
@@ -367,8 +367,8 @@ export class OrderSyncService {
 
           // Taking an order or money back must be done by someone the server can name. The terminal stamps the signed session of the
           // person signed in (and, for an override, the manager's approval); the server reads the ROLE from that proof. A cashier's own
-          // session without a manager approval is refused; no proof at all (an offline sign-in) is accepted but flagged, or refused when
-          // the deployment sets REQUIRE_STAFF_SESSION=true. The tokens themselves are never stored.
+          // session without a manager approval is refused. Unverified sensitive actions remain pending by default;
+          // only explicit non-production legacy configurations may accept them with a review flag. Tokens are never stored.
           const staffFinalMeta = finalMeta as Record<string, unknown>;
           if (evt.meta?.refundAmountPaise !== undefined) {
             if (!PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)) {
@@ -384,25 +384,26 @@ export class OrderSyncService {
             || (payStatus === 'REFUNDED' && existing.paymentStatus !== 'REFUNDED')
               || (typeof evt.meta?.refundAmountPaise === 'number' && evt.meta.refundAmountPaise !== priorMeta.refundAmountPaise && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type))
             || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status));
-          if (takesBack && !STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type)) {
-            const at = Date.parse(evt.updatedAt) || Date.now();
+          if (takesBack && !(STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type) && (device as Device & { adminActorId?: string }).adminActorId)) {
+            // Client timestamps cannot extend a signed authorization indefinitely.
+            const at = Date.now();
             const rawSession = (evt.meta as { staffSession?: string } | undefined)?.staffSession;
             const rawApproval = (evt.meta as { approvalSession?: string } | undefined)?.approvalSession;
             const session = this.sessions.verify(rawSession, device.restaurantId, device.id, 'session', at);
             const approval = this.sessions.verify(rawApproval, device.restaurantId, device.id, 'approval', at);
-            const stillActive = async (sid: string) => {
+            const stillActive = async (sid: string, role: string) => {
               const row = await tx.syncedEntity.findFirst({ where: { restaurantId: device.restaurantId, entityType: 'STAFF_USER', externalId: sid }, select: { payload: true } });
-              const p = row?.payload as { deleted?: unknown; isActive?: unknown } | null;
-              return !p || (p.deleted !== true && p.isActive !== false);
+              const p = row?.payload as { deleted?: unknown; isActive?: unknown; roleId?: unknown; branchId?: unknown } | null;
+              return !!p && p.deleted !== true && p.isActive !== false && p.roleId === role && (!device.branchId || !p.branchId || p.branchId === device.branchId);
             };
             const managerEvidence = [approval, session].find((c) => c && MANAGER_ROLES.includes(c.role)) ?? null;
-            const evidence = managerEvidence && (await stillActive(managerEvidence.sid)) ? managerEvidence : null;
+            const evidence = managerEvidence && (await stillActive(managerEvidence.sid, managerEvidence.role)) ? managerEvidence : null;
             if (evidence) {
               staffFinalMeta.verifiedStaff = { id: evidence.sid, name: evidence.name, role: evidence.role };
             } else {
               const refusal = session
                 ? 'STAFF_NOT_AUTHORIZED: this action needs a manager; the person signed in on the terminal is not one and no manager approval came with it'
-                : this.config.get<string>('REQUIRE_STAFF_SESSION') === 'true'
+                : this.config.get<string>('REQUIRE_STAFF_SESSION') !== 'false'
                   ? 'STAFF_UNVERIFIED: this action needs a signed-in staff member and none was proven'
                   : null;
               await tx.syncConflict.create({

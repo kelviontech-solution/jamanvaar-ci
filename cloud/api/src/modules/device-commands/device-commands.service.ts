@@ -180,7 +180,12 @@ export class DeviceCommandsService {
     {
       if (device.status === 'REVOKED') throw new ConflictException('Cannot issue commands to a revoked device');
 
-      if ((device.type === 'KIOSK' || device.type === 'KIOSK_ADMIN') && KIOSK_PRO_ONLY_COMMANDS.has(dto.commandType)) {
+      // The Kiosk Pro gate protects a restaurant's OWN console from commanding its fleet beyond what
+      // it pays for (issueFromDevice, actorType TENANT). It was never meant to stop the platform's own
+      // Super Admin from running support/diagnostic commands on the fleet it operates -- found live: a
+      // Super Admin clicking "Request Diagnostic Health Check" from the MDM console was told to
+      // upgrade a restaurant's plan, on a command the restaurant itself never even issued.
+      if (issuer.actorType !== 'PLATFORM' && (device.type === 'KIOSK' || device.type === 'KIOSK_ADMIN') && KIOSK_PRO_ONLY_COMMANDS.has(dto.commandType)) {
         const proSub = await tx.subscription.findFirst({
           where: {
             restaurantId: device.restaurantId,

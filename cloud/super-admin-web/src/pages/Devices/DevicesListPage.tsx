@@ -4,13 +4,14 @@ import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Device } from '../../api/types';
 import { Badge, Button, Card, ConfirmModal, EmptyState, FilterTabs, SearchBar, SkeletonTable } from '../../components/ui';
-import { Laptop2, Download, Wifi, WifiOff, Lock, Unlock, Eye, Pencil, Check, X } from 'lucide-react';
+import { Laptop2, Download, Wifi, WifiOff, Lock, Unlock, Eye, Pencil, Check, X, ArrowRight } from 'lucide-react';
 import { exportRowsToCsv } from '../../lib/csvExport';
 import { fetchAllPages } from '../../lib/fetchAll';
 import { absoluteTime, relativeTime } from '../../lib/relativeTime';
 import { useDebounced, usePagedList } from '../../hooks/usePagedList';
 import { Pager } from '../../components/Pager';
 import '../../components/shared.css';
+import './devices.css';
 
 type Health = 'online' | 'degraded' | 'offline' | 'never_seen' | 'revoked' | 'pending';
 type View = 'ATTENTION' | 'ALL' | 'RESTAURANTS';
@@ -27,6 +28,7 @@ interface RestaurantFleetRow {
   neverSeen: number;
   revoked: number;
   needsAttention: number;
+  deviceTypes: Record<string, number>;
 }
 
 const HEALTH_LABEL: Record<Health, string> = {
@@ -36,13 +38,26 @@ const HEALTH_TONE: Record<Health, 'success' | 'warning' | 'error' | 'neutral'> =
   online: 'success', degraded: 'warning', offline: 'error', never_seen: 'neutral', revoked: 'neutral', pending: 'neutral'
 };
 
+/** Short, stable order & label for the app chips on each restaurant's fleet card. */
+const DEVICE_TYPE_CHIPS: Array<{ type: string; label: string }> = [
+  { type: 'POS', label: 'POS' },
+  { type: 'POS_ADMIN', label: 'Restaurant Admin' },
+  { type: 'CAPTAIN', label: 'Captain' },
+  { type: 'KDS', label: 'KDS' },
+  { type: 'KIOSK', label: 'Kiosk' },
+  { type: 'KIOSK_ADMIN', label: 'Kiosk Admin' }
+];
+
 /**
  * Fleet overview. Health is decided once, on the server (online / degraded / offline, with revoked,
  * pending and never-seen kept apart), and the counts, search, filters and paging all happen there too,
  * so a real outage is not buried in a thousand-row table (BUG-067/069).
  */
 export function DevicesListPage() {
-  const [view, setView] = useState<View>('ATTENTION');
+  // Grouped-by-restaurant cards is the default: a fleet of any real size turns a flat per-terminal
+  // table into an endless scroll (the exact complaint this replaces) -- a restaurant with a problem
+  // stands out as one card instead of being buried among dozens of individual rows.
+  const [view, setView] = useState<View>('RESTAURANTS');
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [health, setHealth] = useState<Health | 'ALL'>('ALL');
@@ -244,9 +259,9 @@ export function DevicesListPage() {
             if (v === 'RESTAURANTS') setRestaurant(null);
           }}
           options={[
+            { id: 'RESTAURANTS', label: 'By restaurant' },
             { id: 'ATTENTION', label: 'Needs attention' },
-            { id: 'ALL', label: 'All devices' },
-            { id: 'RESTAURANTS', label: 'By restaurant' }
+            { id: 'ALL', label: 'All devices' }
           ]}
         />
         <SearchBar value={search} onChange={setSearch} placeholder={view === 'RESTAURANTS' ? 'Search restaurants…' : 'Search terminal, ID, restaurant or branch…'} width="340px" />
@@ -292,31 +307,40 @@ export function DevicesListPage() {
             }
           />
         ) : view === 'RESTAURANTS' ? (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
-                  {['Restaurant', 'Terminals', 'Online', 'Degraded', 'Offline', 'Never seen', 'Revoked', 'Needs attention', ''].map((h) => <th key={h} style={{ padding: '12px 14px' }}>{h}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {restaurants.items.map((r) => (
-                  <tr key={r.restaurantId} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
-                    <td style={{ padding: '12px 14px' }}><Link to={`/restaurants/${r.restaurantId}`} style={{ fontWeight: 700, color: 'var(--jv-text)', textDecoration: 'none' }}>{r.restaurantName}</Link></td>
-                    <td style={{ padding: '12px 14px' }}>{r.total}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.online}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.degraded}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.offline}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.neverSeen}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.revoked}</td>
-                    <td style={{ padding: '12px 14px' }}>{r.needsAttention > 0 ? <Badge tone="warning">{r.needsAttention}</Badge> : 0}</td>
-                    <td style={{ padding: '12px 14px', textAlign: 'right' }}>
-                      <Button size="sm" variant="ghost" onClick={() => { setRestaurant({ id: r.restaurantId, name: r.restaurantName }); setView('ALL'); }}>View terminals</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="restaurant-fleet-grid">
+            {restaurants.items.map((r) => (
+              <Card key={r.restaurantId} className="restaurant-fleet-card">
+                <div className="restaurant-fleet-card-header">
+                  <Link to={`/restaurants/${r.restaurantId}`} className="restaurant-fleet-card-title">{r.restaurantName}</Link>
+                  {r.needsAttention > 0 && <Badge tone="warning">{r.needsAttention} need attention</Badge>}
+                </div>
+
+                <div className="restaurant-fleet-apps-row">
+                  {DEVICE_TYPE_CHIPS.filter((c) => r.deviceTypes[c.type] > 0).map((c) => (
+                    <span key={c.type} className="restaurant-fleet-app-chip">{c.label} ×{r.deviceTypes[c.type]}</span>
+                  ))}
+                  {DEVICE_TYPE_CHIPS.every((c) => !r.deviceTypes[c.type]) && (
+                    <span className="muted" style={{ fontSize: 12 }}>No active terminals (all revoked)</span>
+                  )}
+                </div>
+
+                <div className="restaurant-fleet-health-row">
+                  <span><span className="restaurant-fleet-health-dot" style={{ background: '#16a34a' }} />{r.online} online</span>
+                  <span><span className="restaurant-fleet-health-dot" style={{ background: '#d97706' }} />{r.degraded} degraded</span>
+                  <span><span className="restaurant-fleet-health-dot" style={{ background: '#dc2626' }} />{r.offline} offline</span>
+                  {r.neverSeen > 0 && <span><span className="restaurant-fleet-health-dot" style={{ background: '#64748b' }} />{r.neverSeen} never seen</span>}
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  style={{ justifyContent: 'center' }}
+                  onClick={() => { setRestaurant({ id: r.restaurantId, name: r.restaurantName }); setView('ALL'); }}
+                >
+                  View {r.total} terminal{r.total === 1 ? '' : 's'} <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </Card>
+            ))}
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>

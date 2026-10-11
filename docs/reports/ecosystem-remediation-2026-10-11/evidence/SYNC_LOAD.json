@@ -1,0 +1,8 @@
+{
+  "concurrentRequests": 32,
+  "acknowledged": 32,
+  "persisted": 32,
+  "p95Ms": 1427,
+  "maxMs": 1428,
+  "scope": "local isolated QA database; not production capacity certification"
+}

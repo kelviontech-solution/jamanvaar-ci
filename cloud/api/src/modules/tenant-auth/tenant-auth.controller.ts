@@ -337,6 +337,8 @@ export class PublicPlatformNoticeController {
 
   @Get('platform-notice')
   async platformNotice() {
-    return { notice: await readActivePlatformNotice(this.prisma) };
+    // Only Restaurant Admin polls this endpoint, so a targeted announcement is resolved as if for
+    // a POS_ADMIN-typed device -- matching what that same restaurant's devices get over heartbeat.
+    return { notice: await readActivePlatformNotice(this.prisma, new Date(), 'POS_ADMIN') };
   }
 }

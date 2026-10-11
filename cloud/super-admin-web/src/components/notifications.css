@@ -53,6 +53,17 @@
 }
 .notif-empty { padding: 20px 14px; font-size: 13px; color: var(--jv-text-light); text-align: center; }
 .notif-list { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow-y: auto; }
+.notif-category-group { list-style: none; }
+.notif-category-label {
+  padding: 8px 14px 4px;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--jv-text-light);
+  background: var(--jv-surface-alt, rgba(0, 0, 0, 0.02));
+}
+.notif-category-items { list-style: none; margin: 0; padding: 0; }
 .notif-item {
   display: flex;
   gap: 10px;

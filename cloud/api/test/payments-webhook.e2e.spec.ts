@@ -165,12 +165,15 @@ describe('Razorpay webhook processing', () => {
   });
 
   it('an unknown payment reference is recorded as a failed WebhookEvent without throwing', async () => {
-    const res = await signedEvent(capturedEvent(21000, 'pay_unknown_ref', `pay_unknown_${Date.now()}`));
+    const eventId = `unknown-payment-${Date.now()}`;
+    const res = await signedEventWithId(capturedEvent(21000, 'pay_unknown_ref', `pay_unknown_${Date.now()}`), eventId);
     expect(res.status).toBe(200);
     const failed = await prisma.runAsPlatform((tx) =>
-      tx.webhookEvent.findFirst({ where: { provider: 'RAZORPAY', processingStatus: 'FAILED', errorMessage: { contains: 'pay_unknown_ref' } } })
+      tx.webhookEvent.findUnique({ where: { provider_providerEventKey: { provider: 'RAZORPAY', providerEventKey: `event:${eventId}` } } })
     );
     expect(failed).not.toBeNull();
+    expect(failed?.processingStatus).toBe('FAILED');
+    expect(failed?.errorMessage).toBe('No matching payment transaction found');
   });
 
   it('a signed body that is not valid JSON is recorded as a failed WebhookEvent', async () => {

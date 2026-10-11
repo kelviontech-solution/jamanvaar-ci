@@ -25,8 +25,11 @@ describe('order status rules', () => {
     expect(decideStatus('NEW', 'COMPLETED', 'KIOSK_ADMIN')).toMatchObject({ apply: false });
     expect(decideStatus('NEW', 'PREPARING', 'KIOSK')).toEqual({ apply: true, status: 'PREPARING' });
   });
-  it('an unknown status is never blocked (the server does not guess)', () => {
-    expect(decideStatus('READY', 'SOMETHING_NEW', 'POS')).toEqual({ apply: true, status: 'SOMETHING_NEW' });
+  it('unknown states cannot reopen cancelled orders or evade device permissions', () => {
+    expect(decideStatus('READY', 'SOMETHING_NEW', 'POS')).toMatchObject({ apply: false, status: 'READY', reason: 'STATUS_UNKNOWN' });
+    expect(decideStatus('CANCELLED', 'AUDIT_UNKNOWN', 'KDS')).toMatchObject({ apply: false, status: 'CANCELLED' });
+    expect(decideStatus('AUDIT_UNKNOWN', 'NEW', 'KDS')).toMatchObject({ apply: false, reason: 'STATUS_UNKNOWN' });
+    expect(decideStatus(undefined, 'COMPLETELY_UNKNOWN', 'KIOSK')).toMatchObject({ apply: false });
     expect(statusRank('bogus')).toBeUndefined();
   });
 });

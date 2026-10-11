@@ -56,7 +56,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
-    "vitest": "^3.0.5"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "^3.53.4-build1",
@@ -72,10 +72,26 @@
   },
   "allowScripts": {
     "esbuild@0.25.12": true,
-    "@nestjs/core@10.4.22": true,
     "@prisma/client@5.22.0": true,
     "prisma@5.22.0": true,
     "@prisma/engines@5.22.0": true,
-    "@swc/core@1.16.2": true
+    "@swc/core@1.16.2": true,
+    "@nestjs/core@11.2.7": true
+  },
+  "overrides": {
+    "proxy-addr": "^2.0.8",
+    "qs": "^6.16.0",
+    "lodash": "^4.18.0",
+    "multer": "^2.3.0",
+    "body-parser": "^2.2.2",
+    "tinypool": "^2.2.0",
+    "picomatch": "^4.0.4",
+    "tmp": "^0.2.6",
+    "postcss-selector-parser": "^7.1.6",
+    "@nestjs/common": "^11.2.7",
+    "@nestjs/core": "^11.2.7",
+    "ajv@>=7": "^8.18.0",
+    "fast-xml-parser@>=4": "^5.7.0",
+    "rxjs": "^7.8.2"
   }
 }

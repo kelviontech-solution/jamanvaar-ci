@@ -1,6 +1,7 @@
+import { NativeUpdateButton } from './NativeUpdateButton';
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { Lock, WifiOff, RefreshCw, Download } from 'lucide-react';
-import { DeviceGate, type DeviceGateCode } from '@jamanvaar/sync';
+import { AppUpdate, DeviceGate, type DeviceGateCode } from '@jamanvaar/sync';
 
 export interface DeviceGateOverlayProps {
   /** Shown in the headline, e.g. "POS Terminal", "Kitchen Display". */
@@ -81,17 +82,7 @@ export const DeviceGateOverlay: React.FC<DeviceGateOverlayProps> = ({ appName, o
             Reason: {gate.reason.replace(/\s*Download:\s*https?:\/\/\S+/, '')}
           </p>
         )}
-        {gate.code === 'UPDATE_REQUIRED' && /https?:\/\/\S+/.test(gate.reason ?? '') && (
-          <a
-            href={/https?:\/\/\S+/.exec(gate.reason ?? '')![0]}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#E66817] px-4 py-2 text-sm font-bold text-white"
-          >
-            <Download className="h-4 w-4" />
-            Download the update
-          </a>
-        )}
+        {gate.code === 'UPDATE_REQUIRED' && AppUpdate.getVisible() && <NativeUpdateButton className="inline-flex items-center gap-2 rounded-xl bg-[#E66817] px-4 py-2 text-sm font-bold text-white" />}
         {gate.code === 'OFFLINE_LIMIT' && (
           <div className="space-y-2 rounded-xl border border-[#EBE6DD] bg-[#FAF7F2] p-3 text-left">
             <label htmlFor="extension-code" className="text-xs font-bold text-[#0B253A]">

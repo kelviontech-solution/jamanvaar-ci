@@ -54,7 +54,9 @@ export class StaffSessionService {
    */
   verify(token: unknown, restaurantId: string, deviceId: string, kind: StaffTokenKind, at = Date.now()): StaffClaims | null {
     if (typeof token !== 'string' || token.length > 1200) return null;
-    const [body, sig] = token.split('.');
+    const parts = token.split('.');
+    if (parts.length !== 2 || !Number.isFinite(at)) return null;
+    const [body, sig] = parts;
     if (!body || !sig) return null;
     const expected = Buffer.from(this.sign(body));
     const actual = Buffer.from(sig);
@@ -63,6 +65,7 @@ export class StaffSessionService {
       const c = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as StaffClaims;
       if (c.v !== 1 || c.kind !== kind || c.rid !== restaurantId || c.did !== deviceId) return null;
       if (typeof c.sid !== 'string' || typeof c.role !== 'string') return null;
+      if (!Number.isFinite(c.iat) || !Number.isFinite(c.exp) || c.exp <= c.iat || c.exp - c.iat > (kind === 'session' ? SESSION_TTL_MS : APPROVAL_TTL_MS)) return null;
       if (at < c.iat - SKEW_MS || at > c.exp + SKEW_MS) return null;
       return c;
     } catch {

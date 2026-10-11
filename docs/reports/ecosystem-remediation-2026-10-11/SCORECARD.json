@@ -1,0 +1,165 @@
+{
+  "date": "2026-10-11",
+  "baselineRevision": "a6e13aaf01f19088bc3c2c89b59cf0badd763120",
+  "remediationRevision": "a6e13aaf01f19088bc3c2c89b59cf0badd763120",
+  "status": "PROVISIONAL_WORKSPACE_REASSESSMENT",
+  "confidence": "High for probed local boundaries; moderate for repository-wide conclusions; production/native acceptance pending",
+  "weights": {
+    "security": [
+      [
+        "Authentication and authorization",
+        15
+      ],
+      [
+        "API security and input validation",
+        15
+      ],
+      [
+        "Tenant isolation and data protection",
+        15
+      ],
+      [
+        "Secrets and cryptographic controls",
+        10
+      ],
+      [
+        "Dependencies and supply chain",
+        10
+      ],
+      [
+        "Deployment and infrastructure security",
+        10
+      ],
+      [
+        "Session, payment and business logic security",
+        10
+      ],
+      [
+        "Desktop/mobile integrity and reverse engineering",
+        5
+      ],
+      [
+        "Logging, monitoring, backup and recovery",
+        5
+      ],
+      [
+        "Security testing and remediation evidence",
+        5
+      ]
+    ],
+    "quality": [
+      [
+        "Architecture and separation",
+        15
+      ],
+      [
+        "Maintainability and readability",
+        15
+      ],
+      [
+        "Configuration and hardcoded values",
+        10
+      ],
+      [
+        "Type safety and validation",
+        10
+      ],
+      [
+        "Domain logic and data integrity",
+        15
+      ],
+      [
+        "Testing quality",
+        10
+      ],
+      [
+        "Performance and scalability",
+        10
+      ],
+      [
+        "Errors and observability",
+        5
+      ],
+      [
+        "API and cross-app consistency",
+        5
+      ],
+      [
+        "Documentation and deployment reproducibility",
+        5
+      ]
+    ],
+    "saas": [
+      [
+        "Tenant and branch isolation",
+        25
+      ],
+      [
+        "Tenant configuration and domain integrity",
+        15
+      ],
+      [
+        "Onboarding and modular entitlements",
+        20
+      ],
+      [
+        "Integration and synchronization reliability",
+        15
+      ],
+      [
+        "Operations, recovery and observability",
+        15
+      ],
+      [
+        "Deployment and upgrade compatibility",
+        10
+      ]
+    ]
+  },
+  "ecosystem": {
+    "security": {
+      "baselineScore": 5.1,
+      "score": 7.7,
+      "dimensions": {
+        "Authentication and authorization": 8,
+        "API security and input validation": 8,
+        "Tenant isolation and data protection": 9,
+        "Secrets and cryptographic controls": 7,
+        "Dependencies and supply chain": 8,
+        "Deployment and infrastructure security": 6,
+        "Session, payment and business logic security": 8,
+        "Desktop/mobile integrity and reverse engineering": 6,
+        "Logging, monitoring, backup and recovery": 7,
+        "Security testing and remediation evidence": 8
+      }
+    },
+    "quality": {
+      "baselineScore": 6.0,
+      "score": 7.4,
+      "dimensions": {
+        "Architecture and separation": 7,
+        "Maintainability and readability": 6,
+        "Configuration and hardcoded values": 8,
+        "Type safety and validation": 9,
+        "Domain logic and data integrity": 8,
+        "Testing quality": 8,
+        "Performance and scalability": 6,
+        "Errors and observability": 7,
+        "API and cross-app consistency": 8,
+        "Documentation and deployment reproducibility": 8
+      }
+    },
+    "saas": {
+      "baselineScore": 5.6,
+      "score": 7.8,
+      "dimensions": {
+        "Tenant and branch isolation": 9,
+        "Tenant configuration and domain integrity": 8,
+        "Onboarding and modular entitlements": 8,
+        "Integration and synchronization reliability": 8,
+        "Operations, recovery and observability": 6,
+        "Deployment and upgrade compatibility": 6
+      }
+    }
+  }
+}

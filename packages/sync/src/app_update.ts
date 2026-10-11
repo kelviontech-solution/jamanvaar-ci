@@ -8,6 +8,7 @@ export interface AppUpdateOffer {
   latestVersion: string;
   mandatory: boolean;
   downloadUrl: string | null;
+  downloadSha256?: string;
   releaseNotes: string | null;
 }
 

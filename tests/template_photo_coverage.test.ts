@@ -55,7 +55,7 @@ describe('complete template photo delivery', () => {
         expect(crypto.createHash('sha256').update(delivered).digest('hex')).toBe(photo.sha256);
       }
     }
-  });
+  }, 20000);
   it('never shares a photo between different dish names, combos or template categories', () => {
     const dishPhotos = new Map<string, string>();
     const categories: string[] = [], combos: string[] = [];

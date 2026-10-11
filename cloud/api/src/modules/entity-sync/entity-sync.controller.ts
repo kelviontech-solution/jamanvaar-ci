@@ -2,7 +2,10 @@ import { BadRequestException, Body, Controller, ForbiddenException, Get, Param, 
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { EntitySyncService } from './entity-sync.service';
-import { mayRead, mayWrite } from './entity-authority';
+import { mayRead, mayWrite, MANAGER_ROLES } from './entity-authority';
+import { Headers } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { StaffSessionService } from './staff-session.service';
 import { pushEntitySyncSchema, PushEntitySyncDto, SYNCABLE_ENTITY_TYPES, SyncableEntityType } from './dto/push-entity-sync.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
@@ -30,13 +33,28 @@ function assertDeviceMayRead(entityType: SyncableEntityType, device: Device): vo
 @Controller('api/v1/entity-sync/:entityType')
 @UseGuards(DeviceAuthGuard)
 export class EntitySyncController {
-  constructor(private readonly entitySync: EntitySyncService) {}
+  constructor(private readonly entitySync: EntitySyncService, private readonly sessions: StaffSessionService, private readonly prisma: PrismaService) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(pushEntitySyncSchema))
-  push(@Param('entityType') entityType: string, @Body() body: PushEntitySyncDto, @CurrentDevice() device: Device) {
+  async push(@Param('entityType') entityType: string, @Body() body: PushEntitySyncDto, @CurrentDevice() device: Device, @Headers('x-staff-session') staffToken?: string) {
     assertSyncableEntityType(entityType);
     assertDeviceMayWrite(entityType, device);
+    // A terminal credential identifies a machine, never the person allowed to administer accounts.
+    // The console's owner proof is checked by DeviceAuthGuard; POS needs a current manager session.
+    if (entityType === 'STAFF_USER' && device.type === 'POS_ADMIN' && !(device as Device & { adminActorId?: string }).adminActorId) {
+      throw new ForbiddenException({ code: 'ADMIN_SESSION_REQUIRED', message: 'Current owner or branch-manager sign-in is required' });
+    }
+    if (entityType === 'STAFF_USER' && device.type === 'POS') {
+      const claim = this.sessions.verify(staffToken, device.restaurantId, device.id, 'session');
+      const current = claim && MANAGER_ROLES.includes(claim.role) && await this.prisma.runAsTenant(device.restaurantId, tx => tx.syncedEntity.findFirst({
+        where: { restaurantId: device.restaurantId, entityType: 'STAFF_USER', externalId: claim.sid }, select: { payload: true }
+      }));
+      const staff = current ? current.payload as Record<string, unknown> : null;
+      if (!claim || claim.exp <= Date.now() || !staff || staff.deleted === true || staff.isActive === false || staff.roleId !== claim.role || (device.branchId && staff.branchId && staff.branchId !== device.branchId)) {
+        throw new ForbiddenException({ code: 'STAFF_ADMINISTRATION_REQUIRED', message: 'Sign in as a manager before changing staff accounts.' });
+      }
+    }
     return this.entitySync.pushEvents(device, entityType, body.events);
   }
 

@@ -4,6 +4,7 @@ import { Bell } from 'lucide-react';
 import { api } from '../api/client';
 import type { NotificationExtras, PlatformNotification } from '../api/types';
 import { absoluteTime, relativeTime } from '../lib/relativeTime';
+import { groupByCategory } from '../lib/notificationCategory';
 import './notifications.css';
 
 const POLL_MS = 60_000;
@@ -113,18 +114,25 @@ export function NotificationBell() {
             <div className="notif-empty">Nothing needs your attention right now.</div>
           ) : (
             <ul className="notif-list">
-              {items.map((n) => (
-                <li key={n.id}>
-                  <button type="button" className={`notif-item${n.read ? '' : ' unread'}`} onClick={() => openItem(n)}>
-                    <span className={`notif-dot ${n.severity.toLowerCase()}`} aria-label={n.severity.toLowerCase()} />
-                    <span className="notif-item-text">
-                      <span className="notif-item-title">{n.title}</span>
-                      {n.body && <span className="notif-item-body">{n.body}</span>}
-                      <span className="notif-item-time" title={absoluteTime(n.createdAt)}>
-                        {relativeTime(n.createdAt)}
-                      </span>
-                    </span>
-                  </button>
+              {groupByCategory(items).map(({ category, items: group }) => (
+                <li key={category.id} className="notif-category-group">
+                  <div className="notif-category-label">{category.label}</div>
+                  <ul className="notif-category-items">
+                    {group.map((n) => (
+                      <li key={n.id}>
+                        <button type="button" className={`notif-item${n.read ? '' : ' unread'}`} onClick={() => openItem(n)}>
+                          <span className={`notif-dot ${n.severity.toLowerCase()}`} aria-label={n.severity.toLowerCase()} />
+                          <span className="notif-item-text">
+                            <span className="notif-item-title">{n.title}</span>
+                            {n.body && <span className="notif-item-body">{n.body}</span>}
+                            <span className="notif-item-time" title={absoluteTime(n.createdAt)}>
+                              {relativeTime(n.createdAt)}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

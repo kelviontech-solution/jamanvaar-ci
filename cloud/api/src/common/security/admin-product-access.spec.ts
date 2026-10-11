@@ -7,7 +7,7 @@ describe('shared console resource authorization', () => {
     expect(requiredConsoleApps(`/api/v1/entity-sync/${type}?afterSeq=0`)).toEqual(['POS_ADMIN']);
   });
   it.each(['MENU_ITEM','MENU_CATEGORY','MODIFIER_GROUP','TAX_GROUP','COMBO','COUPON','DINING_TABLE','STAFF_USER','CUSTOMER_FEEDBACK'])('retains shared management of %s', type => {
-    expect(requiredConsoleApps(`/api/v1/entity-sync/${type}`)).toEqual(['POS_ADMIN','KIOSK_ADMIN']);
+    expect(requiredConsoleApps(`/api/v1/entity-sync/${type}`)).toEqual(['MENU_ITEM','MENU_CATEGORY','MODIFIER_GROUP','TAX_GROUP'].includes(type) ? ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'] : ['POS_ADMIN','KIOSK_ADMIN']);
   });
   it('requires kiosk access for customer configuration and bank setup', () => {
     expect(requiredConsoleApps('/api/v1/entity-sync/KIOSK_CONFIGURATION')).toEqual(['POS_ADMIN', 'KIOSK_ADMIN']);

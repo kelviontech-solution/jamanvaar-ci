@@ -63,9 +63,14 @@ export class DevicesService {
     };
     const lockedFilter: Prisma.DeviceWhereInput[] = query.locked === 'true' ? [{ isLocked: true }] : [];
     const healthFilter = query.health ? [healthWhere(query.health as DeviceHealth, now)].filter(Boolean) : [];
+    // BUG: a freshly-activated device that has never sent its first heartbeat (lastSeenAt: null,
+    // health "never_seen") was excluded from "needs attention" entirely -- Prisma's `lt` on a null
+    // column never matches, so neither the offline nor degraded clause below ever caught it. A
+    // terminal just activated but silent since is exactly the kind of thing an operator needs to
+    // see, arguably more urgently than one that's merely degraded.
     const attention: Prisma.DeviceWhereInput[] =
       query.needsAttention === 'true'
-        ? [{ OR: [healthWhere('offline', now), healthWhere('degraded', now), { status: 'ACTIVE', syncError: { not: null } }] as Prisma.DeviceWhereInput[] }]
+        ? [{ OR: [healthWhere('offline', now), healthWhere('degraded', now), healthWhere('never_seen', now), { status: 'ACTIVE', syncError: { not: null } }] as Prisma.DeviceWhereInput[] }]
         : [];
     const where: Prisma.DeviceWhereInput = { AND: [scope, ...healthFilter, ...attention, ...lockedFilter] };
     const orderBy: Prisma.DeviceOrderByWithRelationInput[] =
@@ -111,7 +116,9 @@ export class DevicesService {
           COUNT(*) FILTER (WHERE d.status = 'ACTIVE' AND d."lastSeenAt" < ${ts(degraded)})::int AS offline,
           COUNT(*) FILTER (WHERE d.status = 'ACTIVE' AND d."lastSeenAt" IS NULL)::int AS "neverSeen",
           COUNT(*) FILTER (WHERE d.status = 'REVOKED')::int AS revoked,
-          COUNT(*) FILTER (WHERE d.status = 'ACTIVE' AND (d."lastSeenAt" < ${ts(online)} OR d."syncError" IS NOT NULL))::int AS "needsAttention"
+          -- Same "never checked in yet" gap as list()'s attention filter: lastSeenAt IS NULL must be
+          -- counted explicitly since "< online" never matches a NULL column in SQL either.
+          COUNT(*) FILTER (WHERE d.status = 'ACTIVE' AND (d."lastSeenAt" < ${ts(online)} OR d."lastSeenAt" IS NULL OR d."syncError" IS NOT NULL))::int AS "needsAttention"
         FROM "Restaurant" r
         JOIN "Device" d ON d."restaurantId" = r.id
         WHERE r."deletedAt" IS NULL AND (${like}::text IS NULL OR r.name ILIKE ${like})
@@ -119,12 +126,32 @@ export class DevicesService {
         ORDER BY "needsAttention" DESC, r.name ASC
         LIMIT ${limit} OFFSET ${offset}
       `);
-      if (!paging.paged) return rows;
+
+      // Which apps each restaurant actually has registered (not just a bare terminal count) -- a
+      // card needs to say "POS x2, Kiosk x1, KDS x1" rather than just "4 terminals", otherwise it
+      // tells the operator nothing they couldn't already see from the total.
+      const restaurantIds = rows.map((r) => r.restaurantId as string);
+      const typeCounts = restaurantIds.length
+        ? await tx.device.groupBy({
+            by: ['restaurantId', 'type'],
+            where: { restaurantId: { in: restaurantIds }, status: { not: 'REVOKED' } },
+            _count: { _all: true }
+          })
+        : [];
+      const typesByRestaurant = new Map<string, Record<string, number>>();
+      for (const row of typeCounts) {
+        const bucket = typesByRestaurant.get(row.restaurantId) ?? {};
+        bucket[row.type] = row._count._all;
+        typesByRestaurant.set(row.restaurantId, bucket);
+      }
+      const withTypes = rows.map((r) => ({ ...r, deviceTypes: typesByRestaurant.get(r.restaurantId as string) ?? {} }));
+
+      if (!paging.paged) return withTypes;
       const totalRows = await tx.$queryRaw<Array<{ n: number }>>(Prisma.sql`
         SELECT COUNT(DISTINCT r.id)::int AS n FROM "Restaurant" r JOIN "Device" d ON d."restaurantId" = r.id
         WHERE r."deletedAt" IS NULL AND (${like}::text IS NULL OR r.name ILIKE ${like})
       `);
-      return pageOf(rows, totalRows[0]?.n ?? 0, paging);
+      return pageOf(withTypes, totalRows[0]?.n ?? 0, paging);
     });
   }
 
@@ -191,10 +218,10 @@ export class DevicesService {
   /** The newest STABLE release of the terminal's own app, as an offer relative to the version it runs. */
   private async latestUpdateFor(deviceType: string, currentVersion: string | null, osPlatform: string | null) {
     const releases = await this.prisma.runAsPlatform((tx) =>
-      tx.appRelease.findMany({ where: { appCode: DevicesService.APP_CODE_FOR_DEVICE[deviceType] ?? deviceType, channel: 'STABLE' } })
+      tx.appRelease.findMany({ where: { appCode: DevicesService.APP_CODE_FOR_DEVICE[deviceType] ?? deviceType, channel: 'STABLE', status: 'PUBLISHED' } })
     );
     // Versions compare numerically, so pick the newest in code rather than trusting a database sort.
-    const newest = releases.sort((a, b) => compareVersions(b.version, a.version))[0] ?? null;
+    const newest = releases.filter(r => updateFor(currentVersion, { ...r, downloadUrls: r.downloadUrls as Record<string, string> | null }, osPlatform) !== null).sort((a, b) => compareVersions(b.version, a.version))[0] ?? null;
     return updateFor(
       currentVersion,
       newest ? { ...newest, downloadUrls: newest.downloadUrls as Record<string, string> | null } : null,
@@ -418,7 +445,8 @@ export class DevicesService {
       lockCode: updated.isLocked ? 'DEVICE_LOCKED' : branchInactive ? 'BRANCH_INACTIVE' : null,
       lockReason: updated.isLocked ? updated.lockReason ?? null : branchInactive ? `Branch "${updated.branch!.name}" has been deactivated.` : null,
       // What the platform team wants every restaurant screen to say right now (maintenance, etc.).
-      notice: await readActivePlatformNotice(this.prisma),
+      // A targeted announcement (as opposed to maintenance) only reaches POS / Kiosk / Restaurant Admin.
+      notice: await readActivePlatformNotice(this.prisma, new Date(), updated.type),
       // A newer stable release for this terminal's app, or null when it is current (BUG-065).
       update,
       // The signed emergency offline extension that applies to this terminal, if any (BUG-077).

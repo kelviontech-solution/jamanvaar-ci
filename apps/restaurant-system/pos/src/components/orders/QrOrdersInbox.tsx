@@ -19,7 +19,8 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
   const [message, setMessage] = useState<string | null>(null);
   useEffect(() => db.subscribe(() => tick((n) => n + 1)), []);
   const pending = QrOrderDesk.pending();
-  if (pending.length === 0) return null;
+  const cancellationsPending = db.orders.filter(o => o.source_type === 'QR_TABLE' && o.orderStatus === 'CANCELLED' && o.syncStatus !== 'SYNCED');
+  if (pending.length === 0 && cancellationsPending.length === 0 && !message) return null;
   const deviceId = KeyValueStore.get(DEVICE_ID_KEY) ?? 'this-pos';
 
   const accept = async (id: string) => {
@@ -31,7 +32,8 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
   const decline = async (id: string) => {
     const reason = window.prompt('Why is this order being declined? (shown to the team, not the guest)') ?? '';
     setBusy(id);
-    await QrOrderDesk.reject(id, { deviceId, actor, reason: reason.trim() || undefined });
+    const result = await QrOrderDesk.reject(id, { deviceId, actor, reason: reason.trim() || undefined });
+    setMessage(result.status === 'REJECTED' ? 'Cancellation confirmed.' : result.status === 'PENDING_SYNC' ? 'Cancellation awaiting approval and sync. Tell the kitchen directly until it is confirmed.' : 'This order can no longer be declined.');
     setBusy(null);
   };
 
@@ -39,6 +41,7 @@ export function QrOrdersInbox({ actor }: { actor: string }) {
     <div className="mb-4 rounded-2xl border-2 border-jaman-saffron bg-white p-3 shrink-0" data-testid="qr-inbox">
       <div className="flex items-center gap-2 text-sm font-black text-jaman-navy mb-2"><QrCode className="w-4 h-4 text-jaman-saffron" /> New QR orders ({pending.length})</div>
       {message && <div className="text-xs text-slate-600 mb-2">{message}</div>}
+      {cancellationsPending.length > 0 && <div role="status" className="mb-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">Cancellation awaiting approval and sync: {cancellationsPending.map(o => o.orderNumber).join(', ')}. Kitchen tickets remain active until confirmed.</div>}
       <div className="grid gap-2">
         {pending.map((o) => (
           <div key={o.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-jaman-cream p-3">

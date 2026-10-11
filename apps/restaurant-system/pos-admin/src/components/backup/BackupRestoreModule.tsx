@@ -283,27 +283,37 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
           </button>
         </div>
 
-        {/* 3. Factory Demo Reset */}
-        <div className="bg-white rounded-2xl p-5 sm:p-6 border border-rose-200/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* 3. Factory Demo Reset -- only meaningful before a restaurant has real, cloud-synced data:
+            it replaces the local menu/tables with a generic placeholder demo set, which used to look
+            like it did nothing on a live restaurant (the very next sync pulled the real cloud menu
+            straight back over it). Disabled once this console is actually connected to a restaurant's
+            cloud account, rather than offering a button that either silently no-ops or, if "fixed" to
+            push, would wipe real production data with placeholder dishes. */}
+        <div className={`bg-white rounded-2xl p-5 sm:p-6 border shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${cloudReady ? 'border-slate-200 opacity-60' : 'border-rose-200/80'}`}>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${cloudReady ? 'bg-slate-100 text-slate-500' : 'bg-rose-50 text-rose-600'}`}>
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="font-bold text-base text-rose-800">Factory Demo Seed Reset</h4>
-                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] font-bold">
-                  Danger Zone
-                </span>
+                <h4 className={`font-bold text-base ${cloudReady ? 'text-slate-600' : 'text-rose-800'}`}>Factory Demo Seed Reset</h4>
+                {!cloudReady && (
+                  <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] font-bold">
+                    Danger Zone
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                Restores standard flagship dishes, tables, and categories. All current runtime orders, custom items, and shift records will be reset.
+                {cloudReady
+                  ? "Not available once connected to JAMANVAAR Cloud — this restaurant's real menu is shared with every device; replacing it locally with placeholder demo dishes would just be overwritten by the next sync anyway."
+                  : 'Restores standard flagship dishes, tables, and categories. All current runtime orders, custom items, and shift records will be reset.'}
               </p>
             </div>
           </div>
           <button
             onClick={handleResetToSeed}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 border border-rose-300 text-rose-700 font-bold text-xs shrink-0 cursor-pointer transition-colors"
+            disabled={cloudReady}
+            className="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 disabled:hover:bg-white border border-rose-300 disabled:border-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-rose-700 font-bold text-xs shrink-0 cursor-pointer transition-colors"
           >
             Reset Seed Data
           </button>

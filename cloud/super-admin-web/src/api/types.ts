@@ -819,6 +819,8 @@ export interface AppRelease {
   isMandatory: boolean;
   releasedAt: string;
   createdAt: string;
+  status?: 'PUBLISHED' | 'PAUSED';
+  artifactVerifiedAt?: string | null;
 }
 
 export interface ApplicationSummary {

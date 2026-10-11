@@ -365,6 +365,18 @@ async function seedInPlatformContext(tx: Prisma.TransactionClient) {
         scheduledDowntime: null,
         statusBanner: ''
       }
+    },
+    {
+      key: 'platform.announcement',
+      category: 'SYSTEM',
+      description: 'Targeted announcement shown on POS, Kiosk, and Restaurant Admin only',
+      value: {
+        enabled: false,
+        message: '',
+        targetApps: ['POS', 'KIOSK', 'POS_ADMIN'],
+        startsAt: null,
+        endsAt: null
+      }
     }
   ];
 

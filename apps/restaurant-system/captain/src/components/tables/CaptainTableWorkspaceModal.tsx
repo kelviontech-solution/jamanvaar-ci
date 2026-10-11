@@ -85,6 +85,9 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
 
   const filteredMenuItems = useMemo(() => {
     return menuItems.filter((item) => {
+      // Same gap as POS's catalog grid: an archived (deleted-from-admin) dish must not stay orderable
+      // from Captain either.
+      if (item.archivedAt) return false;
       if (selectedCategory !== 'ALL' && item.categoryId !== selectedCategory) return false;
       if (!matchesCaptainDiet(item, dietaryFilter)) return false;
       if (searchQuery.trim()) {
@@ -94,6 +97,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       return true;
     });
   }, [menuItems, selectedCategory, dietaryFilter, searchQuery]);
+
+  const sellableDishCount = useMemo(() => menuItems.filter((item) => !item.archivedAt).length, [menuItems]);
 
   const billable = cartItems.filter((ci) => ci.status !== 'CANCELLED');
   const unFiredCartItems = cartItems.filter((ci) => !ci.isFired);
@@ -611,7 +616,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                     onClick={() => setSelectedCategory('ALL')}
                     className={`px-3 min-h-[40px] rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 ${selectedCategory === 'ALL' ? 'bg-jaman-saffron text-white shadow-xs' : 'bg-white text-slate-600 border border-jaman-border'}`}
                   >
-                    All Dishes ({menuItems.length})
+                    All Dishes ({sellableDishCount})
                   </button>
                   {categories.map((cat) => (
                     <button
@@ -628,7 +633,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 <div className="flex-1 p-2.5 sm:p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 content-start min-h-0">
                   {filteredMenuItems.length === 0 && (
                     <div className="col-span-full text-center py-10 text-sm font-bold text-slate-500" data-testid="captain-empty-menu">
-                      {menuItems.length === 0
+                      {sellableDishCount === 0
                         ? 'No dishes yet. The menu loads from the cloud within a few seconds; if it stays empty, add dishes in Restaurant Admin.'
                         : 'No dishes match this search or filter.'}
                     </div>

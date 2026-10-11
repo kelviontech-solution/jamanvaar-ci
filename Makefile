@@ -86,7 +86,7 @@ check:
 	@echo "Public routing lives at https://system.kelviontech.in/<admin|kiosk|pos|pos-admin|captain|kds|q>/ -- see nginx/system.kelviontech.in.conf. Reload the SHARED kelviontech-nginx-1 container after deploying this config, not this stack's own compose."
 
 seed:
-	$(COMPOSE) exec backend npm run seed
+	$(COMPOSE) exec backend npm run seed:prod
 
 migrate:
 	$(COMPOSE) exec backend npm run prisma:deploy

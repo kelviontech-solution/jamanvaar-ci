@@ -71,11 +71,13 @@ export const PosHeader: React.FC = () => {
   const [isBusinessDayPanelOpen, setIsBusinessDayPanelOpen] = useState(false);
   const [isCloseDayModalOpen, setIsCloseDayModalOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isBillRequestsOpen, setIsBillRequestsOpen] = useState(false);
 
   // Refs for click outside handling
   const profileRef = useRef<HTMLDivElement>(null);
   const businessDayRef = useRef<HTMLDivElement>(null);
   const newOrderRef = useRef<HTMLDivElement>(null);
+  const billRequestsRef = useRef<HTMLDivElement>(null);
 
   // Subscribe to db mutations
   const [tick, setTick] = useState(0);
@@ -97,6 +99,9 @@ export const PosHeader: React.FC = () => {
       if (newOrderRef.current && !newOrderRef.current.contains(target)) {
         setNewOrderDropdownOpen(false);
       }
+      if (billRequestsRef.current && !billRequestsRef.current.contains(target)) {
+        setIsBillRequestsOpen(false);
+      }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -104,6 +109,7 @@ export const PosHeader: React.FC = () => {
         setProfileDropdownOpen(false);
         setIsBusinessDayPanelOpen(false);
         setNewOrderDropdownOpen(false);
+        setIsBillRequestsOpen(false);
       }
     };
 
@@ -140,6 +146,14 @@ export const PosHeader: React.FC = () => {
   const daySummary = dayState.summary;
   const activeShift = ShiftRepository.getActiveShift();
   const unreadNotifsCount = NotificationRepository.getUnreadCount('POS');
+  // BUG: a Captain's bill request only ever reached the cashier as a transient toast/notification —
+  // missing it meant leaving Billing/Menu entirely, going to Live Orders, and hunting for it there,
+  // with no persistent on-screen trace in the meantime. This surfaces every still-unsettled request
+  // as a standing pill, visible from any tab (the header is shared across all of them), until it's
+  // actually settled.
+  const billRequestedOrders = db.orders
+    .filter((o) => o.billRequestedAt && o.paymentStatus === 'PENDING' && o.orderStatus !== 'CANCELLED' && o.orderStatus !== 'REFUNDED')
+    .sort((a, b) => new Date(a.billRequestedAt!).getTime() - new Date(b.billRequestedAt!).getTime());
   const failedJobsCount = db.printJobs.filter((j) => j.status === 'FAILED').length;
   const isPrinterOffline = !hardwareStatus.printer || failedJobsCount > 0;
   const allSystemsOk = hardwareStatus.localDb && !isPrinterOffline && isOnline;
@@ -260,6 +274,52 @@ export const PosHeader: React.FC = () => {
             Healthy printer status now lives inside the profile menu's
             System Health section instead of taking permanent header space. */}
         <ConnectionBadge className="hidden lg:inline-flex" />
+        {billRequestedOrders.length > 0 && (
+          <div ref={billRequestsRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setIsBillRequestsOpen((v) => !v)}
+              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 animate-pulse"
+              title="Bills requested by Captain / QR tables, waiting to be settled"
+            >
+              <CircleDollarSign className="w-3.5 h-3.5 text-amber-700" />
+              <span className="hidden xl:inline text-[11px] font-bold">Bill Requested</span>
+              <span className="bg-amber-600 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full">
+                {billRequestedOrders.length}
+              </span>
+            </button>
+            {isBillRequestsOpen && (
+              <div className="absolute right-0 top-[calc(100%+6px)] w-72 bg-white border border-jaman-border rounded-2xl shadow-xl z-50 overflow-hidden">
+                <div className="px-3 py-2 border-b border-jaman-border bg-amber-50 text-[11px] font-bold text-amber-800 uppercase tracking-wide">
+                  {billRequestedOrders.length} bill{billRequestedOrders.length === 1 ? '' : 's'} requested
+                </div>
+                <div className="max-h-72 overflow-y-auto">
+                  {billRequestedOrders.map((order) => (
+                    <button
+                      key={order.id}
+                      type="button"
+                      onClick={() => {
+                        setIsBillRequestsOpen(false);
+                        if (usePosStore.getState().loadOrderForSettlement(order.id)) {
+                          usePosStore.getState().setIsPaymentOpen(true);
+                        }
+                      }}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-jaman-cream transition-colors border-b border-jaman-border last:border-b-0 cursor-pointer"
+                    >
+                      <span>
+                        <span className="block text-xs font-bold text-jaman-navy">
+                          {order.tableNumber ? `Table ${order.tableNumber}` : `Token #${order.tokenNumber}`}
+                        </span>
+                        <span className="block text-[10px] text-slate-500">#{order.orderNumber} · requested {Math.max(0, Math.round((Date.now() - new Date(order.billRequestedAt!).getTime()) / 60000))} min ago</span>
+                      </span>
+                      <span className="text-xs font-extrabold text-jaman-saffron shrink-0">{formatINR(order.totalAmount)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {isPrinterOffline && (
           <button
             type="button"

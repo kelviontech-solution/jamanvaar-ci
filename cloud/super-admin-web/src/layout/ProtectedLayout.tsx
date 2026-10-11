@@ -52,7 +52,8 @@ import {
   QrCode,
   MessageCircle,
   ListChecks,
-  Wallet
+  Wallet,
+  LayoutGrid
 } from 'lucide-react';
 import './layout.css';
 
@@ -88,6 +89,7 @@ const PAGE_KEYWORDS: Record<string, string> = {
   '/branches': 'branch outlet location',
   '/subscriptions': 'subscription plan renew renewal suspend reactivate expiry',
   '/billing': 'invoice invoices receipt reciept receipts payment payments gst tax bill billing pdf',
+  '/saas-management': 'saas management overview features productized cards',
   '/plans': 'plan plans tier pricing price entitlement entitlements',
   '/feature-catalog': 'feature features module modules category',
   '/qr-ordering': 'qr code table ordering guest menu',
@@ -132,6 +134,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'SaaS Management',
     items: [
+      { to: '/saas-management', label: 'Overview', icon: LayoutGrid, end: true },
       { to: '/plans', label: 'Plans & Entitlements', icon: Package },
       { to: '/feature-catalog', label: 'Feature Catalog', icon: ListChecks },
       { to: '/qr-ordering', label: 'QR Ordering Suite', icon: QrCode },

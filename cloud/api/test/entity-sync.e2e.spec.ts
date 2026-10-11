@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { hashOpaqueToken } from '../src/common/security/token.util';
 
@@ -20,9 +20,10 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
   let planId: string;
   let posToken: string;
   let posAdminToken: string;
+  const ownerTokens = new Map<string, string>();
 
   const authed = (method: 'get' | 'post', url: string, token: string) =>
-    request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+    request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`).set(ownerTokens.has(token) ? { 'x-owner-authorization': ownerTokens.get(token)! } : {});
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -56,6 +57,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const adminKey = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const adminRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: adminKey.body.code, deviceType: 'POS_ADMIN' });
     posAdminToken = adminRedeem.body.deviceToken;
+    ownerTokens.set(posAdminToken, await ownerDeviceSession(prisma, posAdminToken));
   });
 
   afterAll(async () => {
@@ -160,7 +162,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const kdsRedeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kdsKeyRes.body.code, deviceType: 'KDS' });
     const kdsToken = kdsRedeem.body.deviceToken as string;
 
-    const pushRes = await authed('post', '/api/v1/entity-sync/STAFF_USER', posToken).send({
+    const pushRes = await authed('post', '/api/v1/entity-sync/STAFF_USER', posAdminToken).send({
       events: [{ externalId: 'usr-chef-1', payload: { id: 'usr-chef-1', username: 'amitdave', fullName: 'Amit Dave', roleId: 'role-chef', isActive: true, pinHash: 'pinv1:deadbeefcafef00d' } }]
     });
     expect(pushRes.status).toBe(201);
@@ -207,6 +209,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'POS_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'POS_ADMIN' });
     const posAdminToken = redeem.body.deviceToken as string;
+    ownerTokens.set(posAdminToken, await ownerDeviceSession(prisma, posAdminToken));
 
     const res = await authed('post', '/api/v1/entity-sync/STAFF_USER', posAdminToken).send({
       events: [{ externalId: 'usr-legit-admin', payload: { id: 'usr-legit-admin', roleId: 'role-manager', isActive: true, pinHash: 'pinv1:cafef00ddeadbeef' } }]

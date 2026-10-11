@@ -27,3 +27,10 @@ tauri-plugin-process = "2"
 # Android's own equivalent of the Windows updater above -- see packages/tauri-plugin-apk-updater.
 [target.'cfg(target_os = "android")'.dependencies]
 tauri-plugin-apk-updater = { path = "../../../../packages/tauri-plugin-apk-updater" }
+
+# Smaller release binaries without development symbols. This is not an authorization boundary.
+[profile.release]
+strip = "symbols"
+debug = 0
+lto = "thin"
+codegen-units = 1

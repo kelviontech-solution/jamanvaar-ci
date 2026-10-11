@@ -7,6 +7,7 @@ import { Pager } from '../../components/Pager';
 import { RefreshButton } from '../../components/RefreshButton';
 import { usePagedList } from '../../hooks/usePagedList';
 import { absoluteTime, relativeTime } from '../../lib/relativeTime';
+import { allCategories, categoryForType } from '../../lib/notificationCategory';
 import '../../components/shared.css';
 import '../../components/notifications.css';
 
@@ -21,6 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
   KEYS_EXPIRING: 'Activation keys',
   SYNC_FAILING: 'Sync',
   RESTAURANT_SUSPENDED: 'Suspended',
+  WHATSAPP_CONNECTION_LOCKED: 'WhatsApp connector',
   TICKET_CREATED: 'Ticket',
   TICKET_ASSIGNED: 'Ticket',
   TICKET_COMMENT: 'Ticket'
@@ -86,9 +88,17 @@ export function NotificationsPage() {
         />
         <select aria-label="Type" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">All types</option>
-          {Object.entries(TYPE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
+          {allCategories().map((cat) => {
+            const typesInCategory = Object.entries(TYPE_LABELS).filter(([value]) => categoryForType(value).id === cat.id);
+            if (typesInCategory.length === 0) return null;
+            return (
+              <optgroup key={cat.id} label={cat.label}>
+                {typesInCategory.map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </optgroup>
+            );
+          })}
         </select>
       </div>
 
@@ -109,6 +119,7 @@ export function NotificationsPage() {
                 {n.body && <span className="notif-item-body">{n.body}</span>}
               </span>
               <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                <span className="muted" style={{ fontSize: 11 }}>{categoryForType(n.type).label}</span>
                 <Badge tone={SEVERITY_TONE[n.severity]}>{TYPE_LABELS[n.type] ?? n.type}</Badge>
                 <span className="notif-item-time" title={absoluteTime(n.createdAt)}>{relativeTime(n.createdAt)}</span>
               </span>

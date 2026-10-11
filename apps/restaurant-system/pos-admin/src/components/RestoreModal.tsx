@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
-import { db, AuditRepository, TableSync } from '@jamanvaar/database';
+import { db, AuditRepository, TableSync, MenuItemSync, CategorySync } from '@jamanvaar/database';
 import { Upload, AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
 
 interface RestoreModalProps {
@@ -47,8 +47,22 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
     try {
       if (parsedData.restaurant) db.restaurant = { ...db.restaurant, ...parsedData.restaurant };
       if (parsedData.outlet) db.outlet = { ...db.outlet, ...parsedData.outlet };
-      if (Array.isArray(parsedData.menuItems)) db.menuItems = parsedData.menuItems;
-      if (Array.isArray(parsedData.categories)) db.categories = parsedData.categories;
+      // BUG: a restore that just replaced the array looked like it did nothing on a cloud-connected
+      // restaurant -- the sync engine only ever pushes content it can see changed on a record it still
+      // has, so a dish the restore meant to remove silently reappeared on the very next pull (nothing
+      // told the cloud it was deleted). Recording each dropped id's deletion first, exactly the way the
+      // table restore just below already does, is what makes the sync engine actually propagate the
+      // removal instead of only ever adding things back.
+      if (Array.isArray(parsedData.menuItems)) {
+        const kept = new Set((parsedData.menuItems as Array<{ id: string }>).map((m) => m.id));
+        db.menuItems.filter((m) => !kept.has(m.id)).forEach((m) => MenuItemSync.recordDeletion(m.id));
+        db.menuItems = parsedData.menuItems;
+      }
+      if (Array.isArray(parsedData.categories)) {
+        const kept = new Set((parsedData.categories as Array<{ id: string }>).map((c) => c.id));
+        db.categories.filter((c) => !kept.has(c.id)).forEach((c) => CategorySync.recordDeletion(c.id));
+        db.categories = parsedData.categories;
+      }
       if (Array.isArray(parsedData.tables)) {
         // A restore is a deliberate replacement of the floor: the tables it drops are deleted for every device (nothing else infers a deletion).
         const kept = new Set((parsedData.tables as Array<{ id: string }>).map((t) => t.id));
@@ -91,7 +105,7 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
         <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-900 leading-relaxed font-semibold">
-            <strong>Warning:</strong> Restoring a backup snapshot will replace your active menu, orders, inventory, and table layout with the contents of the file. Please ensure you have a current export before proceeding.
+            <strong>Warning:</strong> Restoring a backup snapshot will replace your active menu, orders, inventory, and table layout with the contents of the file. The menu, categories, and tables sync to JAMANVAAR Cloud and every other connected device (POS, Kiosk, KDS, Captain) within moments — this is not local to this screen. Please ensure you have a current export before proceeding.
           </p>
         </div>
 

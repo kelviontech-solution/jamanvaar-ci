@@ -1,0 +1,107 @@
+[
+  {
+    "id": "SEC-01",
+    "title": "A POS device can mint manager authority through staff synchronization",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "SEC-02",
+    "title": "Three tenant tables lack the established database RLS boundary",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "SEC-03",
+    "title": "Unknown order states bypass terminal-state restrictions",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "SEC-04",
+    "title": "Missing staff proof defaults to accepting sensitive sync actions",
+    "status": "VERIFIED_LOCAL_POLICY; DEPLOYMENT_PENDING"
+  },
+  {
+    "id": "SEC-05",
+    "title": "The publish workflow produces debug-signed Android APKs",
+    "status": "IMPLEMENTED; SIGNED_RELEASE_AND_DEVICE_ACCEPTANCE_PENDING"
+  },
+  {
+    "id": "SEC-06",
+    "title": "Cloud API runner defaults to root and retains development dependencies",
+    "status": "IMPLEMENTED; CONTAINER_ACCEPTANCE_PENDING"
+  },
+  {
+    "id": "SEC-07",
+    "title": "Android native update command does not validate update provenance",
+    "status": "IMPLEMENTED; ANDROID_ACCEPTANCE_PENDING"
+  },
+  {
+    "id": "SEC-08",
+    "title": "Client credentials remain readable within their application context",
+    "status": "PARTIAL; BROWSER_AND_NON_WINDOWS_STORAGE_REMAIN"
+  },
+  {
+    "id": "DEP-01",
+    "title": "Locked dependencies contain production vulnerability alerts",
+    "status": "PRODUCTION_SCAN_CLEAR; DEVELOPMENT_ALERTS_REMAIN"
+  },
+  {
+    "id": "ART-01",
+    "title": "Available Windows artifacts lack verified distribution signatures",
+    "status": "RELEASE_GATE_IMPLEMENTED; HISTORICAL_ARTIFACTS_UNCHANGED"
+  },
+  {
+    "id": "QUAL-01",
+    "title": "Baseline type checks fail in both projects",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "QUAL-02",
+    "title": "The checked-in regression suite remains red after build preparation",
+    "status": "VERIFIED_LOCAL; SEE_VALIDATION_SEQUENCE"
+  },
+  {
+    "id": "QUAL-03",
+    "title": "Multi-source integration test selects an unrelated earlier QR fixture",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "QUAL-04",
+    "title": "Several core components and repositories concentrate too many responsibilities",
+    "status": "PARTIAL; LARGE_MODULES_REMAIN"
+  },
+  {
+    "id": "QUAL-05",
+    "title": "Super Admin violates its shared-package import boundary",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "QUAL-06",
+    "title": "Generated Rust target artifacts are committed with source",
+    "status": "VERIFIED_TRACKING_CLEANUP; LOCAL_FILES_PRESERVED"
+  },
+  {
+    "id": "QUAL-07",
+    "title": "A webhook test can pass against an older audit row and fails on a fresh database",
+    "status": "VERIFIED_LOCAL"
+  },
+  {
+    "id": "SAAS-01",
+    "title": "Concurrent outbound webhook attempts can send the same pending row twice",
+    "status": "VERIFIED_LOCAL; RECEIVER_DEDUP_REQUIRED"
+  },
+  {
+    "id": "SAAS-02",
+    "title": "Sync batches serialize on a restaurant-wide database lock",
+    "status": "LOCAL_LOAD_MEASURED; LARGE_TENANT_CAPACITY_OPEN"
+  },
+  {
+    "id": "SAAS-03",
+    "title": "Release assurance is not enforced across backend and all client products",
+    "status": "GATES_IMPLEMENTED; CI_EXECUTION_PENDING"
+  },
+  {
+    "id": "CFG-01",
+    "title": "Release environment hosts are fixed in CI while tenant configuration is dynamic",
+    "status": "IMPLEMENTED; RELEASE_CONFIGURATION_PENDING"
+  }
+]

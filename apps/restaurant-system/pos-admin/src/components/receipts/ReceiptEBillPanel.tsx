@@ -55,12 +55,20 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
     e.preventDefault();
     if (publishing) return;
     setPublishing(true); setPublishMessage('');
+    // BUG: a changed UPI payout VPA -- the one field on this whole page that actually redirects real
+    // money -- was logged under the exact same generic "paper size" message as every other edit here,
+    // so even a legitimate change left no distinct trail to audit. Called out explicitly when it
+    // happens, with the before/after VPA, same as any other sensitive financial change should be.
+    const before = ReceiptRepository.getConfig();
+    const upiChanged = (before.upiId ?? '') !== (config.upiId ?? '') || (before.upiPayeeName ?? '') !== (config.upiPayeeName ?? '');
     ReceiptRepository.updateConfig(config);
     AuditRepository.log({
       username: 'admin',
-      action: 'RECEIPT_SETTINGS_UPDATED',
+      action: upiChanged ? 'RECEIPT_UPI_PAYOUT_CHANGED' : 'RECEIPT_SETTINGS_UPDATED',
       category: 'SETTINGS',
-      details: `Updated thermal receipt template and paper size to ${config.paperSize}`
+      details: upiChanged
+        ? `UPI payout VPA changed from "${before.upiId || '(none)'}" to "${config.upiId || '(none)'}" (payee name: "${config.upiPayeeName || before.restaurantName || ''}")`
+        : `Updated thermal receipt template and paper size to ${config.paperSize}`
     });
     try {
       await syncKioskConfiguration({ push: true });

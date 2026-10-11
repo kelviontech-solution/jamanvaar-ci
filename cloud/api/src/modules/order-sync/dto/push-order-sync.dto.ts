@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ORDER_STATUSES, KITCHEN_STATUSES, PAYMENT_STATUSES } from '../order-rules';
 
 // This bridge mirrors the order as POS/KDS/Captain/Restaurant Admin already
 // agreed on it locally - unlike payments' createPaymentOrderSchema, there is no
@@ -30,7 +31,7 @@ export const syncedOrderItemSchema = z.object({
       lineTax: z.number().int().optional()
     })
     .optional(),
-  kitchenStatus: z.string().optional(),
+  kitchenStatus: z.string().transform(s => s.toUpperCase()).pipe(z.enum(KITCHEN_STATUSES)).optional(),
   /** Raised by a deliberate step backwards (a recall) or a cancellation, so it beats older copies (see order-merge.ts). */
   statusRev: z.number().int().min(0).max(1_000_000).optional(),
   /** 'COURSE_1' | 'COURSE_2' | 'COURSE_3': which part of the meal the dish belongs to. */
@@ -94,7 +95,7 @@ export const orderSyncEventSchema = z.object({
   traceId: z.string().min(1).max(128).optional(),
   externalOrderId: z.string().min(1).max(64),
   orderType: z.string().min(1).max(32),
-  status: z.string().min(1).max(32),
+  status: z.string().min(1).max(32).transform(s => s.toUpperCase()).pipe(z.enum(ORDER_STATUSES)),
   tableId: z.string().max(64).optional(),
   tableLabel: z.string().max(64).optional(),
   items: z.array(syncedOrderItemSchema).min(1).max(200),
@@ -103,7 +104,7 @@ export const orderSyncEventSchema = z.object({
   discountAmount: z.number().int().min(0).default(0),
   totalAmount: z.number().int().min(0),
   notes: z.string().max(2000).optional(),
-  paymentStatus: z.string().max(32).optional(),
+  paymentStatus: z.string().transform(s => s.toUpperCase()).pipe(z.enum(PAYMENT_STATUSES)).optional(),
   paymentMethod: z.string().max(32).optional(),
   meta: orderSyncMetaSchema.optional(),
   updatedAt: z.string().datetime(),

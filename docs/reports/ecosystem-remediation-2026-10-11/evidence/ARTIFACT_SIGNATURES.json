@@ -1,0 +1,140 @@
+﻿[
+    {
+        "path":  "release/JAMANVAAR-Kiosk-Admin-Setup.exe",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "C5BC152283176999DD1835752773C8E880BCC151714A4C8971460A8E1DAF4CCE",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-Kiosk-Setup.exe",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "64E857A2DAFE171124F78AD3214710F6BED28042D2EE5252DDB312A9DF3F4A44",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-POS-Admin-Setup.exe",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "CAF75785B5F2BB84475D52F49A78972A16786761D042DB4FBBA200F04450771F",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-POS-Setup.exe",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "86BF8CE6E91E23BA682C453BFF4E2125E97A9477B0DC8859F2DECEF1EBB51A2B",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/kiosk/JAMANVAAR-Kiosk-Setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "73E347269C20D7E7FEF831EE3062223653A13EB6AC21071EFB928D767A07B78E",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/kiosk/JamanvaarKiosk.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "D0E8E508301721BBEACEE06B76C84EAF6A1CA4CE1DFF461344A093DCAEB59BAD",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/kiosk-admin/JAMANVAAR-Kiosk-Admin-Setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "496E2DA84F9E951D4AC7D25852C0A1CDAB097348589B7B3267A30D46F8DD4E2D",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/kiosk-admin/JamanvaarKioskAdmin.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "1464A4AA09B60ECFE1705C806E8CC4C8FAFC5C09BD614A048A84A7C83E809190",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos/JAMANVAAR-POS-Setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "ADCBC72F2D554D8B0932E6C0A02CFAFD518920E6DF930592FD778F17F6C4FB98",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos/JamanvaarLocalCore.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "7FF3D2C26FB1CBE457EC07F949341F720A40691216684A2127437BE5220CE377",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos/JamanvaarPOS.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "24A059D08772CF5B2E0526C13654562D1AA0B02F1546E21F04969D2C6D8B56E4",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos-admin/JAMANVAAR-POS-Admin-Setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "6B148842C3F70FFCE69F87B62096A70110C640AC034A4E2B95802A2C402E4057",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos-admin/JamanvaarLocalCore.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "7FF3D2C26FB1CBE457EC07F949341F720A40691216684A2127437BE5220CE377",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/windows/pos-admin/JamanvaarPOSAdmin.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "37296225F53FF095BD17FEEA7225B3A3B0B41B313AE5DFCB1714407D167A4104",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-product-icons-v1/restaurant-admin/platform/icon.icns",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "0CD4C308D27E593D9EEB3C42A85DA778050175AA650AC174F3E9278B2AB2A9E0",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-product-icons-v1/pos/platform/icon.icns",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "7DAA1634438DB6E4D652069CA7B0438E747E406AB71C3BF7BACF9BFDAE8C3EED",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-product-icons-v1/kiosk/platform/icon.icns",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "034206025E99A329989429EAC6C57FE4D9958F1398024106E33A71920AC4FBC2",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-product-icons-v1/kds/platform/icon.icns",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "0C320CB32E4F63418CD4A9A5531153B4331E8B4FA1B6C64297C31FBCAB2967B0",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "release/JAMANVAAR-product-icons-v1/captain/platform/icon.icns",
+        "authenticodeStatus":  "UnknownError",
+        "sha256":  "3A9DB9B073814CBEACB2228FB46467A7DA26D3CC405C11252E20576A412BA3FD",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "apps/restaurant-system/pos/src-tauri/target/release/bundle/msi/JAMANVAAR POS_1.0.0_x64_en-US.msi",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "3CA5060759326338CDA0BF3805C3A2263C176420FBD65C7AA91E4C01928468DE",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "apps/restaurant-system/pos/src-tauri/target/release/bundle/nsis/JAMANVAAR POS_1.0.0_x64-setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "22420B70D1B9F96968040E5C2F3EADF865BCC5F610B7F8498D06DE1EC98ED924",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "apps/restaurant-system/pos-admin/src-tauri/target/release/bundle/msi/JAMANVAAR POS Admin_1.0.0_x64_en-US.msi",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "BAA15FBA4206BCA3C351AC2BF4469D6CBD8C24EAA2BCC13615376CC2E0EC9F6E",
+        "revision":  "Historical artifact; source revision not verified"
+    },
+    {
+        "path":  "apps/restaurant-system/pos-admin/src-tauri/target/release/bundle/nsis/JAMANVAAR POS Admin_1.0.0_x64-setup.exe",
+        "authenticodeStatus":  "NotSigned",
+        "sha256":  "A6AFC867381F90EE1F7E77D23471391023445422A6829BF6BD34B4F0CD3A0AE5",
+        "revision":  "Historical artifact; source revision not verified"
+    }
+]

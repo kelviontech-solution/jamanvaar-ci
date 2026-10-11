@@ -39,6 +39,16 @@ describe('EndpointResolver', () => {
     expect((await res.json()).from).toBe('cloud');
     expect(EndpointResolver.mode()).toBe('ONLINE');
   });
+  it('staff reads stay available on LAN, while staff writes and take-backs cannot bypass cloud authorization', async () => {
+    EndpointResolver.configure({ cloudBase: CLOUD, coreUrl: CORE });
+    const online = fakeFetch({ core: 'up', cloud: 'up' });
+    expect((await (await EndpointResolver.fetch('/api/v1/entity-sync/STAFF_USER', {}, online.fn as never)).json()).from).toBe('core');
+    expect((await (await EndpointResolver.fetch('/api/v1/entity-sync/STAFF_USER', { method: 'POST' }, online.fn as never)).json()).from).toBe('cloud');
+    expect((await (await EndpointResolver.fetch('/api/v1/orders/sync', { method: 'POST', body: JSON.stringify({ events: [{ status: 'CANCELLED' }] }) }, online.fn as never)).json()).from).toBe('cloud');
+    const offline = fakeFetch({ core: 'up', cloud: 'down' });
+    await expect(EndpointResolver.fetch('/api/v1/entity-sync/STAFF_USER', { method: 'POST' }, offline.fn as never)).rejects.toThrow();
+    expect(offline.calls.every(url => url.startsWith(CLOUD))).toBe(true);
+  });
 
   it('prefers the Branch Core for operational traffic and the cloud for everything else', async () => {
     EndpointResolver.configure({ cloudBase: CLOUD, coreUrl: CORE });

@@ -919,12 +919,18 @@ export async function logTenantAiTelemetry(intent: string, queryText?: string): 
 }
 
 /** Same device-authed bypass pattern as createRefund() below — order-sync and entity-sync are DeviceAuthGuard endpoints, not user-session ones. */
-async function adminScopeHeaders(path:string):Promise<Record<string,string>> {
+async function adminScopeHeaders(path:string, method: string = 'GET'):Promise<Record<string,string>> {
   const branch=activeAdminBranch;
   const restaurantPayout=/^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(path);
   const qrProduct=/^\/qr\//.test(globalThis.location?.pathname??'')&&/^\/api\/v1\/(restaurant\/qr|menu)/.test(path);
   const restaurantQrScope=branch==='all'&&/^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(path);
-  if(!qrProduct&&!restaurantPayout&&!restaurantQrScope&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
+  const staffAdministration=/^\/api\/v1\/(entity-sync\/STAFF_USER|orders\/sync)(?:\?|$)/.test(path);
+  // The UPI payout VPA (where every "scan to pay" receipt QR sends customer money) rides inside this
+  // generic kiosk-config push alongside unrelated settings (welcome screen, display). The owner-proof
+  // header must always be attached here so the server can enforce its own owner-only check on the VPA
+  // specifically — this app doesn't need to know whether a given save actually touched it.
+  const kioskConfigPush = method.toUpperCase() === 'POST' && /^\/api\/v1\/entity-sync\/KIOSK_CONFIGURATION(?:\?|$)/.test(path);
+  if(!staffAdministration&&!qrProduct&&!restaurantPayout&&!restaurantQrScope&&!kioskConfigPush&&(!branch||branch==='all'||!/^\/api\/v1\/(orders\/sync|entity-sync|inventory|restaurant\/qr|menu|payments|devices\/me\/(fleet|sync-issues|kiosks|roster))/.test(path)))return {};
   let expired=true;
   try { expired=!accessToken||JSON.parse(atob(accessToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp*1000<Date.now()+30000; } catch { /* refresh malformed/absent token */ }
   if(expired&&(await refreshAccessToken())!=='ok')throw new CloudApiError('Sign in to manage this branch',401);
@@ -935,7 +941,7 @@ async function deviceFetch(path: string, init: RequestInit = {}): Promise<Respon
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
   return DeviceGate.gatedFetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...await adminScopeHeaders(path), ...(init.headers ?? {}) }
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...await adminScopeHeaders(path, init.method ?? 'GET'), ...(init.headers ?? {}) }
   });
 }
 
@@ -954,7 +960,7 @@ async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      ...await adminScopeHeaders(path),
+      ...await adminScopeHeaders(path, method),
       ...(signed ? { 'x-device-signature': signed.signature, 'x-device-timestamp': signed.timestamp } : {}),
       ...(init.headers ?? {})
     }

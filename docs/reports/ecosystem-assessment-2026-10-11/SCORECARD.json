@@ -1,0 +1,763 @@
+{
+  "revision": "a6e13aaf01f19088bc3c2c89b59cf0badd763120",
+  "date": "2026-10-11",
+  "status": "PROVISIONAL",
+  "confidence": "Moderate overall; high for six targeted probes",
+  "weights": {
+    "security": [
+      [
+        "Authentication and authorization",
+        15
+      ],
+      [
+        "API security and input validation",
+        15
+      ],
+      [
+        "Tenant isolation and data protection",
+        15
+      ],
+      [
+        "Secrets and cryptographic controls",
+        10
+      ],
+      [
+        "Dependencies and supply chain",
+        10
+      ],
+      [
+        "Deployment and infrastructure security",
+        10
+      ],
+      [
+        "Session, payment and business logic security",
+        10
+      ],
+      [
+        "Desktop/mobile integrity and reverse engineering",
+        5
+      ],
+      [
+        "Logging, monitoring, backup and recovery",
+        5
+      ],
+      [
+        "Security testing and remediation evidence",
+        5
+      ]
+    ],
+    "quality": [
+      [
+        "Architecture and separation",
+        15
+      ],
+      [
+        "Maintainability and readability",
+        15
+      ],
+      [
+        "Configuration and hardcoded values",
+        10
+      ],
+      [
+        "Type safety and validation",
+        10
+      ],
+      [
+        "Domain logic and data integrity",
+        15
+      ],
+      [
+        "Testing quality",
+        10
+      ],
+      [
+        "Performance and scalability",
+        10
+      ],
+      [
+        "Errors and observability",
+        5
+      ],
+      [
+        "API and cross-app consistency",
+        5
+      ],
+      [
+        "Documentation and deployment reproducibility",
+        5
+      ]
+    ],
+    "saas": [
+      [
+        "Tenant and branch isolation",
+        25
+      ],
+      [
+        "Tenant configuration and domain integrity",
+        15
+      ],
+      [
+        "Onboarding and modular entitlements",
+        20
+      ],
+      [
+        "Integration and synchronization reliability",
+        15
+      ],
+      [
+        "Operations, recovery and observability",
+        15
+      ],
+      [
+        "Deployment and upgrade compatibility",
+        10
+      ]
+    ]
+  },
+  "ecosystem": {
+    "security": {
+      "dimensions": {
+        "Authentication and authorization": 4,
+        "API security and input validation": 6,
+        "Tenant isolation and data protection": 5,
+        "Secrets and cryptographic controls": 7,
+        "Dependencies and supply chain": 4,
+        "Deployment and infrastructure security": 4,
+        "Session, payment and business logic security": 5,
+        "Desktop/mobile integrity and reverse engineering": 4,
+        "Logging, monitoring, backup and recovery": 7,
+        "Security testing and remediation evidence": 6
+      },
+      "score": 5.1
+    },
+    "quality": {
+      "dimensions": {
+        "Architecture and separation": 6,
+        "Maintainability and readability": 5,
+        "Configuration and hardcoded values": 7,
+        "Type safety and validation": 6,
+        "Domain logic and data integrity": 6,
+        "Testing quality": 5,
+        "Performance and scalability": 6,
+        "Errors and observability": 7,
+        "API and cross-app consistency": 6,
+        "Documentation and deployment reproducibility": 7
+      },
+      "score": 6.0
+    },
+    "saas": {
+      "dimensions": {
+        "Tenant and branch isolation": 5,
+        "Tenant configuration and domain integrity": 7,
+        "Onboarding and modular entitlements": 7,
+        "Integration and synchronization reliability": 6,
+        "Operations, recovery and observability": 4,
+        "Deployment and upgrade compatibility": 4
+      },
+      "score": 5.6
+    }
+  },
+  "applications": [
+    {
+      "application": "Cloud API",
+      "path": "cloud/api",
+      "exposure": "Public HTTPS API + platform/tenant/device identities",
+      "integrations": "PostgreSQL/Prisma, REST, SSE/PG notification, payment/backup/webhook jobs",
+      "status": "PROVISIONAL",
+      "confidence": "High for probed boundaries; medium for remaining source",
+      "mainConcern": "SEC-01/02/03/04; dependency alerts; worker race",
+      "security": {
+        "score": 5.1,
+        "dimensions": {
+          "Authentication and authorization": 4,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.0,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 5,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Super Admin",
+      "path": "cloud/super-admin-web",
+      "exposure": "Privileged browser application",
+      "integrations": "Platform auth, plans, activation, configuration, aggregate reports",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; API authorization tested, every screen NOT TESTED",
+      "mainConcern": "Shared backend controls, oversized onboarding/detail, shared barrel import",
+      "security": {
+        "score": 5.6,
+        "dimensions": {
+          "Authentication and authorization": 6,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 6,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 5.9,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 5,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 5,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "POS",
+      "path": "apps/restaurant-system/pos",
+      "exposure": "Staff browser/PWA + Tauri Windows/Android",
+      "integrations": "Local SQLite, branch core, customer/loyalty, counter collections and sync",
+      "status": "PROVISIONAL",
+      "confidence": "High for sync/authorization probes; medium for client source",
+      "mainConcern": "Device-to-manager escalation and missing-proof fallback",
+      "security": {
+        "score": 4.9,
+        "dimensions": {
+          "Authentication and authorization": 3,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 4,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 5.8,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 4,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Restaurant Admin",
+      "path": "apps/restaurant-system/pos-admin",
+      "exposure": "Owner/manager browser + Tauri",
+      "integrations": "Owner session + admin device, menu/staff/configuration/reporting",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; backend tests, UI routes NOT TESTED",
+      "mainConcern": "Staff authority boundary, shared application complexity",
+      "security": {
+        "score": 5.3,
+        "dimensions": {
+          "Authentication and authorization": 5,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 5.8,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 4,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Kiosk Admin context",
+      "path": "apps/restaurant-system/pos-admin/src/kiosk",
+      "exposure": "Product context inside the shared admin application",
+      "integrations": "Kiosk configurations, welcome assets, receipts, fleet controls",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; not a separate executable source application",
+      "mainConcern": "Shares admin backend and release controls",
+      "security": {
+        "score": 5.3,
+        "dimensions": {
+          "Authentication and authorization": 5,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 5.7,
+        "dimensions": {
+          "Architecture and separation": 5,
+          "Maintainability and readability": 4,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "QR Admin + public product site",
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole",
+      "exposure": "Separate /qr/ marketing, login and admin entrypoints",
+      "integrations": "QR configuration, menu publishing, branch tables, customer preview",
+      "status": "PROVISIONAL",
+      "confidence": "Medium/low; API tested, route-by-route browser review NOT TESTED",
+      "mainConcern": "Shared admin/backend dependencies; unverified UI workflows",
+      "security": {
+        "score": 5.3,
+        "dimensions": {
+          "Authentication and authorization": 5,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 5,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.0,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 5,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "QR Customer Ordering",
+      "path": "apps/qr-guest",
+      "exposure": "Public /q/ capability route, guest session",
+      "integrations": "Server-priced menu/order, gateway checkout, status and service requests",
+      "status": "PROVISIONAL",
+      "confidence": "High for selected API payment cases; medium for source",
+      "mainConcern": "Unknown-state sync bypass downstream; mobile gateways NOT TESTED live",
+      "security": {
+        "score": 5.7,
+        "dimensions": {
+          "Authentication and authorization": 6,
+          "API security and input validation": 7,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 6,
+          "Desktop/mobile integrity and reverse engineering": 5,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.5,
+        "dimensions": {
+          "Architecture and separation": 7,
+          "Maintainability and readability": 7,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 7,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Kiosk Customer",
+      "path": "apps/kiosk-system/kiosk-user",
+      "exposure": "Public touchscreen, device credential, Tauri/PWA",
+      "integrations": "Server checkout + local cart, own payment lookup, receipt flow",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; API payment/ownership tested, touchscreen hardware NOT TESTED",
+      "mainConcern": "4,214-line app, native update and device storage risk",
+      "security": {
+        "score": 5.5,
+        "dimensions": {
+          "Authentication and authorization": 6,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 6,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 5.8,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 4,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Captain",
+      "path": "apps/restaurant-system/captain",
+      "exposure": "Staff PIN + device identity; browser/PWA/Tauri",
+      "integrations": "Branch tables/orders/service requests and sync",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; API multi-device tests, native/device tests NOT TESTED",
+      "mainConcern": "Shared order engine and offline release verification",
+      "security": {
+        "score": 5.4,
+        "dimensions": {
+          "Authentication and authorization": 6,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.1,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 6,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "KDS",
+      "path": "apps/restaurant-system/kds",
+      "exposure": "Kitchen device + staff identity; browser/PWA/Tauri",
+      "integrations": "Branch order pull, ready/served status, stations and tickets",
+      "status": "PROVISIONAL",
+      "confidence": "High for status bypass; medium for UI source",
+      "mainConcern": "SEC-03 permits reopening a cancelled order",
+      "security": {
+        "score": 5.3,
+        "dimensions": {
+          "Authentication and authorization": 6,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 4,
+          "Desktop/mobile integrity and reverse engineering": 4,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.4,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 7,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 7,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Branch Core",
+      "path": "packages/branch-core",
+      "exposure": "Local/LAN operational service, paired branch/device",
+      "integrations": "Node SQLite/WAL, local backup, discovery and cloud uplink",
+      "status": "PROVISIONAL",
+      "confidence": "Medium; selected root tests; physical LAN penetration NOT TESTED",
+      "mainConcern": "Adjacent credential key, branch sync throughput and release sidecar provenance",
+      "security": {
+        "score": 5.3,
+        "dimensions": {
+          "Authentication and authorization": 5,
+          "API security and input validation": 6,
+          "Tenant isolation and data protection": 5,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 5,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 3,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 6
+        }
+      },
+      "quality": {
+        "score": 6.0,
+        "dimensions": {
+          "Architecture and separation": 6,
+          "Maintainability and readability": 5,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 6,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 5.6,
+        "dimensions": {
+          "Tenant and branch isolation": 5,
+          "Tenant configuration and domain integrity": 7,
+          "Onboarding and modular entitlements": 7,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 4
+        }
+      }
+    },
+    {
+      "application": "Legacy local runtime",
+      "path": "tooling/local-runtime",
+      "exposure": "Local helper/service scripts; deployment selection matters",
+      "integrations": "CJS local service, sync server, launcher/SEA packaging",
+      "status": "PROVISIONAL",
+      "confidence": "Low; secondary source inspection; actual production use NOT TESTED",
+      "mainConcern": "Multiple runtime implementations; avoid shipping unintended legacy path",
+      "security": {
+        "score": 4.7,
+        "dimensions": {
+          "Authentication and authorization": 4,
+          "API security and input validation": 5,
+          "Tenant isolation and data protection": 4,
+          "Secrets and cryptographic controls": 7,
+          "Dependencies and supply chain": 4,
+          "Deployment and infrastructure security": 4,
+          "Session, payment and business logic security": 5,
+          "Desktop/mobile integrity and reverse engineering": 3,
+          "Logging, monitoring, backup and recovery": 7,
+          "Security testing and remediation evidence": 4
+        }
+      },
+      "quality": {
+        "score": 5.3,
+        "dimensions": {
+          "Architecture and separation": 4,
+          "Maintainability and readability": 4,
+          "Configuration and hardcoded values": 7,
+          "Type safety and validation": 4,
+          "Domain logic and data integrity": 6,
+          "Testing quality": 5,
+          "Performance and scalability": 6,
+          "Errors and observability": 7,
+          "API and cross-app consistency": 6,
+          "Documentation and deployment reproducibility": 7
+        }
+      },
+      "saas": {
+        "score": 4.6,
+        "dimensions": {
+          "Tenant and branch isolation": 4,
+          "Tenant configuration and domain integrity": 5,
+          "Onboarding and modular entitlements": 5,
+          "Integration and synchronization reliability": 6,
+          "Operations, recovery and observability": 4,
+          "Deployment and upgrade compatibility": 3
+        }
+      }
+    }
+  ]
+}

@@ -248,6 +248,10 @@ interface PosState {
   closeOverrideModal: () => void;
 
   loadOrderFromTable: (table: DiningTable) => void;
+  /** Same cart-loading behaviour as loadOrderFromTable, but by order id directly — for settling a
+   * bill from Live Orders or a bill-request notification, where a table may not even apply
+   * (takeaway/delivery orders can also sit in Live Orders awaiting settlement). */
+  loadOrderForSettlement: (orderId: string) => boolean;
   openCashDrawer: () => void;
   recoverDraftSession: () => void;
   discardDraftSession: () => void;
@@ -1480,6 +1484,70 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
+    },
+
+    // Same cart-loading logic as loadOrderFromTable above, but reachable by order id alone -- used
+    // by Live Orders' "Settle" button and the persistent bill-request indicator on the Billing/Menu
+    // screen, neither of which necessarily has a DiningTable handy (a takeaway/delivery order sitting
+    // in Live Orders has none at all).
+    loadOrderForSettlement: (orderId: string) => {
+      const order = OrderRepository.getOrderById(orderId);
+      if (!order) return false;
+
+      const table = db.tables.find((t) => t.currentOrderId === orderId) ?? null;
+
+      const cartItems: CartItem[] = order.items.map((oi) => {
+        const itemObj = db.menuItems.find((m) => m.id === oi.menuItemId) || {
+          id: oi.menuItemId,
+          categoryId: 'cat-starters',
+          sku: oi.sku,
+          name: oi.name,
+          description: '',
+          price: oi.unitPrice,
+          dietaryType: 'VEG',
+          spiceLevel: 'NONE',
+          isPopular: false,
+          isNew: false,
+          isFeatured: false,
+          isAvailable: true,
+          prepTimeMinutes: 15,
+          allergens: [],
+          modifierGroupIds: [],
+          sortOrder: 0
+        };
+
+        return {
+          cartItemId: `ci-loaded-${oi.id}`,
+          menuItemId: oi.menuItemId,
+          item: itemObj as MenuItem,
+          quantity: oi.quantity,
+          unitPrice: oi.unitPrice,
+          selectedModifiers: oi.modifiers || [],
+          specialInstructions: oi.specialInstructions,
+          itemTotal: oi.totalPrice,
+          orderItemId: oi.id,
+          kotSentQty: oi.quantity,
+          ...(oi.seat ? { seat: oi.seat } : {})
+        };
+      });
+
+      const updatedCart = recomputeCart(
+        cartItems,
+        order.discountType || (order.discountAmount ? 'FIXED' : 'NONE'),
+        order.discountAmount || 0,
+        order.discountScope || 'BILL',
+        order.discountReason,
+        order.discountCode
+      );
+
+      set({
+        selectedTable: table,
+        orderType: table ? 'DINE_IN' : order.orderType,
+        cart: { ...updatedCart, loyaltyRedemption: order.loyaltyRedemption },
+        selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
+        activeTab: 'MENU'
+      });
+      return true;
     },
 
     recoverDraftSession: () => {

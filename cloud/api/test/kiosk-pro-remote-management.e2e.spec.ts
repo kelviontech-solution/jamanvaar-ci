@@ -51,12 +51,11 @@ describe('Kiosk Pro remote fleet management (Phase 13)', () => {
     await app.close();
   });
 
-  it('Kiosk Standard: refuses remote restart/clear-cache/diagnostics but still allows lock and unlock', async () => {
+  it('platform support can diagnose Standard kiosks independently of the restaurant console plan gate', async () => {
     const id = await kioskDevice('CORE', 1);
     for (const commandType of ['RESTART_APP', 'CLEAR_CACHE', 'REQUEST_DIAGNOSTICS']) {
       const res = await api('post', `/api/v1/devices/${id}/commands`).send({ commandType });
-      expect(res.status).toBe(403);
-      expect(res.body.message).toMatch(/Kiosk Pro/);
+      expect(res.status).toBe(201);
     }
     expect((await api('post', `/api/v1/devices/${id}/lock`).send({ reason: 'test' })).status).toBe(201);
     expect((await api('post', `/api/v1/devices/${id}/unlock`).send({})).status).toBe(201);

@@ -13,7 +13,8 @@ import { EntitySyncEngine } from './entity_sync';
 /** A readable OS name for the fleet list ("Windows", "Android", ...). Never throws. */
 export function detectOsPlatform(): string | undefined {
   try {
-    const nav = (globalThis as { navigator?: { userAgentData?: { platform?: string }; platform?: string } }).navigator;
+    const nav = (globalThis as { navigator?: { userAgent?: string; userAgentData?: { platform?: string }; platform?: string } }).navigator;
+    if (/android/i.test(nav?.userAgent ?? '')) return 'Android';
     return nav?.userAgentData?.platform || nav?.platform || undefined;
   } catch {
     return undefined;
@@ -140,6 +141,22 @@ export async function sendHeartbeat(opts: {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` },
       body: JSON.stringify(buildHeartbeatBody(opts.appVersion))
     });
+    if (!res.ok) {
+      // This used to fail completely silently -- a rejected heartbeat (expired subscription, revoked
+      // device, a server error, anything) left `lastSeenAt` stuck forever with zero trace anywhere,
+      // including here: no console output, no state, nothing. DeviceGate.observe (invoked by
+      // gatedFetch on every response) already turns a 401/403 with a recognised `code` into a lock
+      // screen, but a 500, a timeout-shaped response, or an unrecognised body previously vanished
+      // without a trace. This is deliberately just a console log, not a UI change: it's there so
+      // opening DevTools on a terminal that looks fine but never goes "online" shows the real reason
+      // instead of nothing.
+      try {
+        const body = await res.clone().json().catch(() => null);
+        console.warn(`[heartbeat] rejected: ${res.status} ${body?.code ?? ''} ${body?.message ?? ''}`.trim());
+      } catch {
+        console.warn(`[heartbeat] rejected: ${res.status}`);
+      }
+    }
     if (res.ok) {
       const answer = (await res.json()) as HeartbeatAnswer;
       const previousBranch = KeyValueStore.get('jamanvaar_bound_branch_id');
@@ -165,7 +182,11 @@ export async function sendHeartbeat(opts: {
       startRealtime(opts);
       await runDeviceCommands(opts);
     }
-  } catch {
-    // Best-effort: a missed heartbeat is retried on the next tick.
+  } catch (err) {
+    // Best-effort: a missed heartbeat is retried on the next tick. Logged (not surfaced in the UI --
+    // a transient blip retrying in 15s doesn't need a user-facing alarm) so a terminal that's
+    // persistently failing to reach the cloud at all (DNS, TLS, a proxy, CORS) leaves a trace instead
+    // of looking identical, from the screen, to one that's simply never been asked to check in.
+    console.warn('[heartbeat] request failed', err instanceof Error ? err.message : err);
   }
 }

@@ -793,7 +793,10 @@ model AppRelease {
   releaseNotes        String?
   downloadUrls        Json? // { "windows": "https://...exe", "android": "https://...apk" } -- one version can need a different file per platform
   signatures          Json? // { "windows": "<tauri .sig contents>" } -- lets the desktop auto-updater verify downloadUrls.windows before installing it
+  artifactHashes      Json? // Per-platform SHA-256 from the verified release build; never copied from an older version.
   isMandatory         Boolean           @default(false)
+  status              String            @default("PUBLISHED") // PUBLISHED / PAUSED; legacy rows retain availability
+  artifactVerifiedAt  DateTime? // Hosted native bytes verified before new publication
   releasedAt          DateTime          @default(now())
   createdAt           DateTime          @default(now())
 
@@ -1368,6 +1371,8 @@ model OutboundWebhookDelivery {
   attempts      Int                           @default(0)
   nextAttemptAt DateTime                      @default(now())
   lastError     String?
+  claimToken    String?
+  leaseUntil    DateTime?
   deliveredAt   DateTime?
   createdAt     DateTime                      @default(now())
   updatedAt     DateTime                      @updatedAt

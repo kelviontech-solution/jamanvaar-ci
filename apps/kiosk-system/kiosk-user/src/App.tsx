@@ -1,4 +1,4 @@
-import { DeviceCommandRunner } from '@jamanvaar/sync';
+import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
 import { KioskWelcomeScreen } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
 import { welcomePresentation, welcomeBackgroundUrl, welcomeLandscapeUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
@@ -6,6 +6,7 @@ import { kioskActivationError } from './activationErrors';
 import { resetTerminal } from './cloud/cloudClient';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers } from '@jamanvaar/sync';
+import { runStaffTriggeredUpdate, type DesktopUpdateProgress } from './desktopUpdater';
 import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { KioskProductCard } from './KioskProductCard';
@@ -602,6 +603,12 @@ export default function KioskUserApp() {
   const [isStaffActionMenuOpen, setIsStaffActionMenuOpen] = useState(false);
   const [verifiedStaffName, setVerifiedStaffName] = useState<string | null>(null);
   const [isKioskPrinterSettingsOpen, setIsKioskPrinterSettingsOpen] = useState(false);
+  // Software update: the "Version X is available" banner never shows to a guest (see
+  // PlatformNoticeBanner's guest-audience check) -- it's reached from here instead, inside Staff
+  // Mode, where it belongs (a customer has no way to act on it anyway).
+  const [isUpdatePanelOpen, setIsUpdatePanelOpen] = useState(false);
+  const [availableUpdate, setAvailableUpdate] = useState<AppUpdateOffer | null>(() => AppUpdate.getVisible());
+  const [updateProgress, setUpdateProgress] = useState<DesktopUpdateProgress | null>(null);
   // B2-059: was pre-filled at 5 with no requirement to actually choose one — a guest tapping
   // "Submit Rating" without picking a star recorded a perfect score, inflating the average.
   const [feedbackRating, setFeedbackRating] = useState<number>(0);
@@ -641,6 +648,10 @@ export default function KioskUserApp() {
     PrinterService.autoConfigureKioskPrinter();
     PrinterService.resumeCrashRecovery();
   }, []);
+
+  // Keeps the Staff Mode menu's "Update available" badge current as heartbeats arrive, without
+  // guests ever seeing it -- see PlatformNoticeBanner's guest-audience gate for the customer side.
+  useEffect(() => AppUpdate.subscribe(() => setAvailableUpdate(AppUpdate.getVisible())), []);
 
   // A self-order kiosk must not sleep while it is on the welcome screen.
   useEffect(() => {
@@ -1822,6 +1833,23 @@ export default function KioskUserApp() {
       category: 'STAFF_OVERRIDE',
       details: `Kiosk printer settings opened by ${verifiedStaffName ?? 'staff'}`
     });
+  };
+
+  const handleOpenUpdatePanel = () => {
+    setIsStaffActionMenuOpen(false);
+    setUpdateProgress(null);
+    setIsUpdatePanelOpen(true);
+    AuditRepository.log({
+      kioskId,
+      action: 'STAFF_OVERRIDE_PIN_SUCCESS',
+      category: 'STAFF_OVERRIDE',
+      details: `Software update panel opened by ${verifiedStaffName ?? 'staff'}`
+    });
+  };
+
+  const handleRunUpdate = () => {
+    if (cartItems.length > 0) { setUpdateProgress({ phase: 'error', message: 'Finish the customer order before updating this kiosk.' }); return; }
+    void runStaffTriggeredUpdate(setUpdateProgress);
   };
 
   // Feedback Submission
@@ -3588,10 +3616,13 @@ export default function KioskUserApp() {
                 with a modal whose whole point is helping a guest decide
                 what they're customizing. */}
             <div className="relative -mx-6 -mt-6">
+              {/* 4:3 made this hero image taller than the customization options below it put
+                  together on this modal's width, pushing Size/Add-ons/Instructions below the fold.
+                  16:9 keeps it a real, prominent photo without burying the actual decision. */}
               <CachedImg
                 src={customizingItem.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
                 alt={customizingItem.name}
-                className="w-full aspect-[4/3] object-cover"
+                className="w-full aspect-[16/9] object-cover"
               />
               <div className="absolute top-3 left-3">
                 <StatusBadge status={customizingItem.dietaryType} type="dietary" />
@@ -3689,25 +3720,44 @@ export default function KioskUserApp() {
                 {t('specialInstructions')}
               </label>
               <div className="flex flex-wrap gap-2 mb-2">
+                {/* BUG: used to just append the keyword on every click with no idea whether it was
+                    already there, so tapping "Less Spicy" twice wrote "Less Spicy, Less Spicy" into
+                    the kitchen note. Each chip now toggles -- tap to add, tap again to remove -- and
+                    highlights to match whatever's currently in the text box, the same selected/
+                    unselected pattern the modifier buttons above already use. */}
                 {[
                   'Less Spicy',
                   'No Onion & Garlic',
                   'Extra Gravy',
                   'Serve Separately',
-                  'Make it Crispy'
-                ].map((note) => (
-                  <button
-                    key={note}
-                    type="button"
-                    onClick={() => {
-                      SoundService.playTap();
-                      setSpecialInstructions((prev) => (prev ? `${prev}, ${note}` : note));
-                    }}
-                    className="px-3 py-1 bg-jaman-ivory border border-jaman-border rounded-lg text-xs font-semibold hover:bg-[#F4EFE6]"
-                  >
-                    + {note}
-                  </button>
-                ))}
+                  'Make it Crispy',
+                  'Jain',
+                  'Swaminarayan'
+                ].map((note) => {
+                  const tokens = specialInstructions.split(',').map((t) => t.trim()).filter(Boolean);
+                  const isActive = tokens.includes(note);
+                  return (
+                    <button
+                      key={note}
+                      type="button"
+                      onClick={() => {
+                        SoundService.playTap();
+                        setSpecialInstructions((prev) => {
+                          const list = prev.split(',').map((t) => t.trim()).filter(Boolean);
+                          const next = list.includes(note) ? list.filter((t) => t !== note) : [...list, note];
+                          return next.join(', ');
+                        });
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all active:scale-95 ${
+                        isActive
+                          ? 'bg-jaman-navy text-white border-jaman-navy shadow-sm'
+                          : 'bg-jaman-ivory border-jaman-border hover:bg-[#F4EFE6] text-jaman-navy'
+                      }`}
+                    >
+                      {isActive ? '✓' : '+'} {note}
+                    </button>
+                  );
+                })}
               </div>
               <input
                 type="text"
@@ -4100,9 +4150,70 @@ export default function KioskUserApp() {
           <Button variant="ghost" className="w-full justify-center" onClick={handleOpenPrinterSettings}>
             Configure Kiosk Printer
           </Button>
+          <Button variant="ghost" className="w-full justify-center relative" onClick={handleOpenUpdatePanel}>
+            {availableUpdate ? `Update Available (v${availableUpdate.latestVersion})` : 'Software Update'}
+            {availableUpdate && <span className="absolute top-1.5 right-3 w-2 h-2 rounded-full bg-emerald-500" />}
+          </Button>
           <Button variant="ghost" className="w-full justify-center" onClick={() => setIsStaffActionMenuOpen(false)}>
             {kioskCopy("screen_cancel_19766e", "Cancel")}
           </Button>
+        </div>
+      </Modal>
+
+      {/* MODAL: STAFF-TRIGGERED SOFTWARE UPDATE -- the real in-place Tauri updater
+          (check -> downloadAndInstall -> relaunch), with progress, instead of the guest-facing
+          banner that used to show "Version X is available" on the customer screen. */}
+      <Modal
+        isOpen={isUpdatePanelOpen}
+        onClose={() => {
+          if (updateProgress?.phase === 'downloading' || updateProgress?.phase === 'installing') return;
+          setIsUpdatePanelOpen(false);
+        }}
+        title="Software Update"
+      >
+        <div className="space-y-4 py-2">
+          {!updateProgress && availableUpdate && (
+            <>
+              <p className="text-sm text-[#4A5568]">
+                Version <strong>{availableUpdate.latestVersion}</strong> is available.
+                {availableUpdate.releaseNotes && <span> {availableUpdate.releaseNotes}</span>}
+              </p>
+              <Button variant="accent" className="w-full justify-center" onClick={handleRunUpdate}>
+                Update Now
+              </Button>
+            </>
+          )}
+          {!updateProgress && !availableUpdate && (
+            <>
+              <p className="text-sm text-[#4A5568]">No update offer has been received yet.</p>
+              <Button variant="accent" className="w-full justify-center" onClick={handleRunUpdate}>
+                Check for Updates
+              </Button>
+            </>
+          )}
+          {updateProgress && (
+            <div className="space-y-3">
+              <p className="text-sm text-[#4A5568]">{updateProgress.message}</p>
+              {(updateProgress.phase === 'downloading' || updateProgress.phase === 'installing') && (
+                <div className="w-full h-2 rounded-full bg-jaman-ivory border border-jaman-border overflow-hidden">
+                  <div
+                    className="h-full bg-jaman-saffron transition-all"
+                    style={{ width: `${updateProgress.percent ?? (updateProgress.phase === 'installing' ? 100 : 5)}%` }}
+                  />
+                </div>
+              )}
+              {(updateProgress.phase === 'up-to-date' || updateProgress.phase === 'error' || updateProgress.phase === 'not-supported') && (
+                <Button variant="ghost" className="w-full justify-center" onClick={() => setIsUpdatePanelOpen(false)}>
+                  {kioskCopy("screen_close_7d9eb7", "Close")}
+                </Button>
+              )}
+            </div>
+          )}
+          {!updateProgress && (
+            <Button variant="ghost" className="w-full justify-center" onClick={() => setIsUpdatePanelOpen(false)}>
+              {kioskCopy("screen_cancel_19766e", "Cancel")}
+            </Button>
+          )}
         </div>
       </Modal>
 

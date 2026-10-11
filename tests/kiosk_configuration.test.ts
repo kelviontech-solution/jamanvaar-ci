@@ -5,6 +5,7 @@ import { kioskConfigurationSchema } from '../cloud/api/src/modules/entity-sync/k
 import { BranchCore } from '../packages/branch-core/src/core';
 import { BranchStore } from '../packages/branch-core/src/store';
 import { CloudUplink } from '../packages/branch-core/src/uplink';
+import { isOperationalPath } from '../packages/sync/src/endpoint_resolver';
 const saved = globalThis.localStorage;
 beforeEach(() => {
   const store = new Map<string, string>();
@@ -14,6 +15,23 @@ beforeEach(() => {
   db.resetKioskConfiguration();
 });
 afterEach(() => { EntitySyncEngine.configureTransport(null); vi.restoreAllMocks(); KeyValueStore.reset(); globalThis.localStorage = saved; });
+
+it('a LAN console cannot redirect receipt payments, while cloud-confirmed config and offline welcome edits remain valid', () => {
+  const store = new BranchStore(':memory:');
+  const core = new BranchCore(store, { restaurantId: 'rest-A', branchId: 'br-A', branchCode: 'A' });
+  const payload = KioskConfigurationRepository.snapshot();
+  const event = { externalId: 'kiosk-config-br-A', payload: { ...payload, receipt: { ...payload.receipt, upiId: 'qa-merchant@upi' } } };
+  const device = { id: 'admin', type: 'POS_ADMIN' };
+  try {
+    expect(() => core.pushEntities(device, 'KIOSK_CONFIGURATION', [event])).toThrow(/cloud owner authorization/);
+    expect(core.pushEntities(device, 'KIOSK_CONFIGURATION', [event], 'cloud').results[0].status).toBe('ok');
+    const changed = { ...event, payload: { ...event.payload, receipt: { ...event.payload.receipt, upiId: 'qa-other@upi' } } };
+    expect(() => core.pushEntities({ ...device, type: 'KIOSK_ADMIN' }, 'KIOSK_CONFIGURATION', [changed])).toThrow(/cloud owner authorization/);
+    expect(core.pushEntities(device, 'KIOSK_CONFIGURATION', [{ ...event, payload: { ...event.payload, welcome: { ...event.payload.welcome, headingText: 'QA welcome' } } }]).results[0].status).toBe('ok');
+    expect(isOperationalPath('/api/v1/entity-sync/KIOSK_CONFIGURATION', 'GET')).toBe(true);
+    expect(isOperationalPath('/api/v1/entity-sync/KIOSK_CONFIGURATION', 'POST')).toBe(false);
+  } finally { store.close(); }
+});
 describe('kiosk configuration', () => {
   it('accepts existing default settings without making payment policy editable', () => {
     const config = KioskConfigurationRepository.snapshot();
@@ -91,7 +109,7 @@ describe('kiosk configuration', () => {
     const store = new BranchStore(':memory:'); const core = new BranchCore(store, { restaurantId: 'rest-A', branchId: 'br-A', branchCode: 'A' });
     const event = { externalId: 'kiosk-config-br-A', payload: KioskConfigurationRepository.snapshot() };
     try {
-      expect(() => core.pushEntities({ id: 'kiosk', type: 'KIOSK' }, 'KIOSK_CONFIGURATION', [event])).toThrow(/console/);
+      expect(() => core.pushEntities({ id: 'kiosk', type: 'KIOSK' }, 'KIOSK_CONFIGURATION', [event])).toThrow(/may not write KIOSK_CONFIGURATION/);
       expect(() => core.pushEntities({ id: 'admin', type: 'POS_ADMIN' }, 'KIOSK_CONFIGURATION', [{ ...event, payload: { ...event.payload, branchId: 'br-B' } }])).toThrow(/branch/);
       expect(core.pushEntities({ id: 'admin', type: 'POS_ADMIN' }, 'KIOSK_CONFIGURATION', [event]).results[0].status).toBe('ok');
       expect(core.pullEntities('KIOSK_CONFIGURATION').entities).toHaveLength(1);

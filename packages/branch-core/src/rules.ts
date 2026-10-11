@@ -1,62 +1,6 @@
-/**
- * The business rules that decide how concurrent writes to one order combine. These are the same rules the
- * cloud applies (cloud/api/src/modules/order-sync/order-merge.ts holds an identical copy of
- * mergeOrderItems/kitchenStatusRank; tests/branch_core_rules_parity.test.ts fails if the two ever drift),
- * so an order behaves identically whether the branch core or the cloud processed it.
- */
-
-export interface MergeableItem {
-  externalItemId: string;
-  kitchenStatus?: string;
-  originDeviceId?: string;
-  [key: string]: unknown;
-}
-
-const KITCHEN_RANK: Record<string, number> = {
-  PENDING: 0, NEW: 0, QUEUED: 0,
-  PREPARING: 1, COOKING: 1,
-  READY: 2,
-  SERVED: 3, COMPLETED: 3, DELIVERED: 3,
-  CANCELLED: 4, VOID: 4, VOIDED: 4
-};
-
-export function kitchenStatusRank(status: string | undefined): number {
-  return status ? (KITCHEN_RANK[status.toUpperCase()] ?? 0) : 0;
-}
-
-export function mergeOrderItems<T extends MergeableItem>(
-  existing: T[] | undefined,
-  incoming: T[],
-  deviceId: string
-): { items: T[]; foreignItemsKept: boolean } {
-  const prior = existing ?? [];
-  const incomingIds = new Set(incoming.map((i) => i.externalItemId));
-  const priorById = new Map(prior.map((i) => [i.externalItemId, i]));
-
-  const merged: T[] = incoming.map((inc) => {
-    const old = priorById.get(inc.externalItemId);
-    const status =
-      old && kitchenStatusRank(old.kitchenStatus) > kitchenStatusRank(inc.kitchenStatus) ? old.kitchenStatus : inc.kitchenStatus;
-    // The ordered-with configuration is written once, when the order is created, and outlives every later push.
-    const kept: Record<string, unknown> = {};
-    if (old?.snapshot && !inc.snapshot) kept.snapshot = old.snapshot;
-    if (old?.modifierDetails && !inc.modifierDetails) kept.modifierDetails = old.modifierDetails;
-    return { ...inc, ...kept, kitchenStatus: status, originDeviceId: old?.originDeviceId ?? deviceId };
-  });
-
-  let foreignItemsKept = false;
-  for (const old of prior) {
-    if (incomingIds.has(old.externalItemId)) continue;
-    // Absent from this push: only the device that added it may remove it.
-    if (old.originDeviceId && old.originDeviceId !== deviceId) {
-      merged.push(old);
-      foreignItemsKept = true;
-    } else if (!old.originDeviceId && prior.length > 0 && incoming.length === 0) {
-      merged.push(old); // legacy item with no owner: never drop everything on an empty push
-    }
-  }
-  return { items: merged, foreignItemsKept };
-}
+// Branch core and cloud use the same revision-aware kitchen merge.
+export { mergeOrderItems, kitchenStatusRank } from '../../../cloud/api/src/modules/order-sync/order-merge';
+export type { MergeableItem } from '../../../cloud/api/src/modules/order-sync/order-merge';
 
 const TERMINAL_PAID_STATUSES: ReadonlySet<string> = new Set(['SUCCESS', 'REFUNDED']);
 /** Device types with real payment/refund authority. */

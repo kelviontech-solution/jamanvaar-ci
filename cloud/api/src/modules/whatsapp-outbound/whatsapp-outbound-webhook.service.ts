@@ -1,4 +1,4 @@
-import { createHash, createHmac } from 'crypto';
+import { createHash, createHmac, randomUUID } from 'crypto';
 import { Injectable, Logger, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
@@ -9,6 +9,8 @@ const BASE_DELAY_MS = 5_000;
 const MAX_DELAY_MS = 10 * 60_000;
 const FAST_RETRY_INTERVAL_MS = 20_000;
 const ORDER_EVENT_PATH = '/api/v1/webhooks/jamanvaar/order-event';
+const HTTP_TIMEOUT_MS = 15_000;
+const DELIVERY_LEASE_MS = 60_000;
 
 function backoffMs(attempts: number): number {
   return Math.min(MAX_DELAY_MS, BASE_DELAY_MS * 2 ** attempts);
@@ -50,7 +52,7 @@ export class WhatsAppOutboundWebhookService implements OnApplicationBootstrap, O
     // Off under test, same reasoning JobsService's own scheduler gives -- deterministic
     // test runs, no background timer racing an in-memory app instance being torn down.
     if (this.config.get<string>('NODE_ENV') === 'test') return;
-    this.timer = setInterval(() => void this.retryDue(), FAST_RETRY_INTERVAL_MS);
+    this.timer = setInterval(() => void this.retryDue().catch(err => this.logger.warn(`Webhook retry failed: ${err instanceof Error ? err.message : 'unknown error'}`)), FAST_RETRY_INTERVAL_MS);
     this.timer.unref();
   }
 
@@ -63,29 +65,35 @@ export class WhatsAppOutboundWebhookService implements OnApplicationBootstrap, O
    *  push) on an external HTTP call to product/whatsapp. */
   async enqueue(restaurantId: string, eventType: WhatsAppOutboundEventType, payload: Record<string, unknown>): Promise<void> {
     const row = await this.prisma.runAsPlatform((tx) =>
-      tx.outboundWebhookDelivery.create({ data: { restaurantId, eventType, payload: payload as unknown as Prisma.InputJsonValue } })
+      tx.outboundWebhookDelivery.create({ data: { restaurantId, eventType, payload: payload as unknown as Prisma.InputJsonValue, nextAttemptAt: new Date(0) } })
     );
     void this.attempt(row.id).catch((err) =>
       this.logger.warn(`Immediate delivery attempt failed for ${row.id}, will retry: ${err instanceof Error ? err.message : String(err)}`)
     );
   }
 
-  /** One delivery attempt for one row. Safe to call more than once for the same row (e.g.
-   *  the immediate attempt and a concurrent retry-sweep tick both reaching it) -- only a
-   *  still-PENDING row is ever actually sent, so a race just means one of the two calls
-   *  is a harmless no-op. */
+  /** Atomically lease a due row. Expired leases recover after crashes; stale workers cannot overwrite a new claim.
+   * Delivery is at-least-once: receivers must deduplicate the signed deliveryId after a crash following successful HTTP. */
   async attempt(id: string): Promise<void> {
-    const row = await this.prisma.runAsPlatform((tx) => tx.outboundWebhookDelivery.findUnique({ where: { id } }));
-    if (!row || row.status !== 'PENDING') return;
+    const claimToken = randomUUID();
+    const now = new Date();
+    const row = await this.prisma.runAsPlatform(async tx => {
+      const claimed = await tx.outboundWebhookDelivery.updateMany({
+        where: { id, status: 'PENDING', nextAttemptAt: { lte: now }, OR: [{ leaseUntil: null }, { leaseUntil: { lte: now } }] },
+        data: { claimToken, leaseUntil: new Date(now.getTime() + DELIVERY_LEASE_MS) }
+      });
+      return claimed.count === 1 ? tx.outboundWebhookDelivery.findUnique({ where: { id } }) : null;
+    });
+    if (!row) return;
 
     const baseUrl = this.config.get<string>('WHATSAPP_CONNECTOR_BASE_URL');
     const secret = this.config.get<string>('JAMANVAAR_SERVICE_SECRET');
     if (!baseUrl || !secret) {
-      await this.fail(row.id, row.attempts, 'WHATSAPP_CONNECTOR_BASE_URL or JAMANVAAR_SERVICE_SECRET not configured on this server');
+      await this.fail(row.id, claimToken, row.attempts, 'WHATSAPP_CONNECTOR_BASE_URL or JAMANVAAR_SERVICE_SECRET not configured on this server');
       return;
     }
 
-    const rawBody = JSON.stringify({ type: row.eventType, restaurantId: row.restaurantId, data: row.payload });
+    const rawBody = JSON.stringify({ deliveryId: row.id, type: row.eventType, restaurantId: row.restaurantId, data: row.payload });
     const timestamp = String(Date.now());
     const bodyHash = createHash('sha256').update(rawBody).digest('hex');
     const signature = createHmac('sha256', secret).update(`POST\n${ORDER_EVENT_PATH}\n${timestamp}\n${bodyHash}`).digest('hex');
@@ -93,33 +101,36 @@ export class WhatsAppOutboundWebhookService implements OnApplicationBootstrap, O
     try {
       const res = await fetch(`${baseUrl}${ORDER_EVENT_PATH}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Signature': signature, 'X-Timestamp': timestamp },
+        headers: { 'Content-Type': 'application/json', 'X-Signature': signature, 'X-Timestamp': timestamp, 'X-Delivery-Id': row.id },
+        signal: AbortSignal.timeout(HTTP_TIMEOUT_MS),
         body: rawBody
       });
       if (res.ok) {
         await this.prisma.runAsPlatform((tx) =>
-          tx.outboundWebhookDelivery.update({
-            where: { id: row.id },
-            data: { status: 'DELIVERED', deliveredAt: new Date(), lastError: null, attempts: { increment: 1 } }
+          tx.outboundWebhookDelivery.updateMany({
+            where: { id: row.id, claimToken, status: 'PENDING' },
+            data: { status: 'DELIVERED', deliveredAt: new Date(), lastError: null, attempts: { increment: 1 }, claimToken: null, leaseUntil: null }
           })
         );
         return;
       }
       const text = await res.text().catch(() => '');
-      await this.fail(row.id, row.attempts, `HTTP ${res.status}: ${text.slice(0, 500)}`);
+      await this.fail(row.id, claimToken, row.attempts, `HTTP ${res.status}: ${text.slice(0, 500)}`);
     } catch (err) {
-      await this.fail(row.id, row.attempts, err instanceof Error ? err.message : String(err));
+      await this.fail(row.id, claimToken, row.attempts, err instanceof Error ? err.message : String(err));
     }
   }
 
-  private async fail(id: string, priorAttempts: number, message: string): Promise<void> {
+  private async fail(id: string, claimToken: string, priorAttempts: number, message: string): Promise<void> {
     const attempts = priorAttempts + 1;
     const exhausted = attempts >= MAX_ATTEMPTS;
     await this.prisma.runAsPlatform((tx) =>
-      tx.outboundWebhookDelivery.update({
-        where: { id },
+      tx.outboundWebhookDelivery.updateMany({
+        where: { id, claimToken, status: 'PENDING' },
         data: {
           attempts,
+          claimToken: null,
+          leaseUntil: null,
           lastError: message,
           status: exhausted ? 'FAILED' : 'PENDING',
           nextAttemptAt: new Date(Date.now() + backoffMs(attempts))
@@ -135,7 +146,7 @@ export class WhatsAppOutboundWebhookService implements OnApplicationBootstrap, O
   async retryDue(): Promise<{ attempted: number }> {
     const due = await this.prisma.runAsPlatform((tx) =>
       tx.outboundWebhookDelivery.findMany({
-        where: { status: 'PENDING', nextAttemptAt: { lte: new Date() } },
+        where: { status: 'PENDING', nextAttemptAt: { lte: new Date() }, OR: [{ leaseUntil: null }, { leaseUntil: { lte: new Date() } }] },
         select: { id: true },
         take: 100
       })

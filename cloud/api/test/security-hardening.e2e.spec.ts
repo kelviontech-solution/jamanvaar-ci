@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { pbkdf2Sync, randomBytes } from 'node:crypto';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /** Audit F-01/F-02/F-05: what a public kiosk may and may not do, and the server-side manager PIN check. */
@@ -16,8 +16,9 @@ describe('security hardening (kiosk authority, manager PIN, admin-code redemptio
   let planId: string;
   let posAdminToken: string;
   let kioskToken: string;
+  let ownerProof: string;
 
-  const authed = (method: 'get' | 'post', url: string, token: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`);
+  const authed = (method: 'get' | 'post', url: string, token: string) => request(app.getHttpServer())[method](url).set('Authorization', `Bearer ${token}`).set(token === posAdminToken && ownerProof ? { 'x-owner-authorization': ownerProof } : {});
   const redeem = async (type: string) => {
     const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: type, expiresAt: new Date(Date.now() + 86400000).toISOString() });
     const res = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type });
@@ -42,6 +43,7 @@ describe('security hardening (kiosk authority, manager PIN, admin-code redemptio
       applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
     });
     posAdminToken = await redeem('POS_ADMIN');
+    ownerProof = await ownerDeviceSession(prisma, posAdminToken);
     kioskToken = await redeem('KIOSK');
   });
 
@@ -132,16 +134,16 @@ describe('security hardening (kiosk authority, manager PIN, admin-code redemptio
       expect(JSON.stringify(row.meta)).not.toContain('approvalSession');
     });
 
-    it('a forged, altered or a token from another terminal count as no proof, and a proof-less take-back is accepted but flagged', async () => {
+    it('a forged or altered session cannot authorize a take-back, which remains pending for a manager', async () => {
       const cashier = (await signIn('3333')).body.sessionToken as string;
       await pushOrder(evt('sec-o2', 'PENDING'));
       const forged = cashier.slice(0, -3) + 'abc';
       const res = await pushOrder(evt('sec-o2', 'CANCELLED', { staffSession: forged }));
-      expect(res.body.results[0].status).toBe('ok'); // default deployment: offline sign-ins still sync
+      expect(res.body.results[0].status).toBe('error');
       const conflicts = await prisma.runAsPlatform((tx) => tx.syncConflict.findMany({ where: { restaurantId, entityId: 'sec-o2' } }));
       expect(conflicts.some((c) => c.reason.startsWith('STAFF_UNVERIFIED'))).toBe(true);
       const row = await prisma.runAsPlatform((tx) => tx.syncedOrder.findFirstOrThrow({ where: { restaurantId, externalOrderId: 'sec-o2' } }));
-      expect((row.meta as any).actorVerified).toBe(false);
+      expect(row.status).toBe('PENDING');
     });
 
     it('a manager who has since been deactivated no longer counts', async () => {

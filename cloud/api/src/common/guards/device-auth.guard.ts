@@ -67,6 +67,11 @@ export class DeviceAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
+    // Express decodes route parameters and accepts trailing slashes. Match that interpretation
+    // before applying resource-specific authorization, including percent-encoded entity names.
+    let authorizationPath: string;
+    try { authorizationPath = decodeURIComponent((request.originalUrl ?? request.url ?? '').split('?')[0]).replace(/\/+$/, ''); }
+    catch { throw new ForbiddenException('Invalid request path'); }
     const token = this.extractBearerToken(request);
     if (!token) {
       this.deny('unauthorized', 'INVALID_DEVICE_CREDENTIAL', 'Missing device credential');
@@ -150,7 +155,7 @@ export class DeviceAuthGuard implements CanActivate {
     const branch = verdict!.branch;
 
     if (device.type === 'POS_ADMIN' || device.type === 'KIOSK_ADMIN') {
-      const required = requiredConsoleApps(request.originalUrl ?? request.url ?? '');
+      const required = requiredConsoleApps(authorizationPath);
       if (!required.some(app => verdict!.enabledApps.includes(app))) {
         // A resource denial must not lock the whole shared console; the other product may remain enabled.
         throw new ForbiddenException({ statusCode: 403, code: 'PRODUCT_ACCESS_DENIED', message: 'Your subscription does not enable this application resource.' });
@@ -159,12 +164,12 @@ export class DeviceAuthGuard implements CanActivate {
 
     // A terminal bound to a branch stops when that branch is deactivated (BUG-048). Like an MDM lock it
     // may still check in, so it can learn why and resume as soon as the branch is active again.
-    if (branch && branch.status !== 'ACTIVE' && !ALLOWED_WHILE_LOCKED.test(request.originalUrl ?? request.url ?? '')) {
+    if (branch && branch.status !== 'ACTIVE' && !ALLOWED_WHILE_LOCKED.test(authorizationPath)) {
       this.deny('forbidden', 'BRANCH_INACTIVE', `The branch "${branch.name}" has been deactivated. Please contact your platform administrator.`);
     }
 
     // MDM lock: enforced here, immediately, whether or not the terminal ever fetched the command.
-    if (device.isLocked && !ALLOWED_WHILE_LOCKED.test(request.originalUrl ?? request.url ?? '')) {
+    if (device.isLocked && !ALLOWED_WHILE_LOCKED.test(authorizationPath)) {
       this.deny('forbidden', 'DEVICE_LOCKED', 'This terminal has been locked by your platform administrator.', device.lockReason ?? undefined);
     }
 
@@ -172,11 +177,42 @@ export class DeviceAuthGuard implements CanActivate {
     const requestedBranch = request.headers['x-admin-branch'];
     // Restaurant-wide QR management is an explicit owner-authorized request scope.
     // It never changes the terminal binding or opens cross-branch POS/entity synchronization.
-    const restaurantQrScope = requestedBranch === 'all' && /^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(request.originalUrl ?? request.url ?? '');
-    const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(request.originalUrl ?? request.url ?? '');
+    const restaurantQrScope = requestedBranch === 'all' && /^\/api\/v1\/(restaurant\/qr(?:\/|\?|$)|menu\/(preview|publish|branch-overrides)(?:\?|$))/.test(authorizationPath);
+    const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(authorizationPath);
     const requiresRestaurantOwner = payoutPath && await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } })) > 1;
-    const requiresFinancialActor = /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(request.originalUrl ?? request.url ?? '');
-    if (requestedBranch !== undefined || requiresRestaurantOwner || requiresFinancialActor) {
+    const requiresFinancialActor = /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(authorizationPath);
+    const managesStaff = request.method === 'POST' && /^\/api\/v1\/entity-sync\/STAFF_USER$/.test(authorizationPath) && device.type === 'POS_ADMIN';
+    const sensitiveOrder = Array.isArray(request.body?.events) && request.body.events.some((event: unknown) => {
+      if (!event || typeof event !== 'object') return false;
+      const value = event as { status?: unknown; paymentStatus?: unknown; meta?: { statusCorrection?: unknown; refundAmountPaise?: unknown } };
+      return (typeof value.status === 'string' && ['CANCELLED','VOID','VOIDED','REFUNDED'].includes(value.status.toUpperCase())) || value.paymentStatus === 'REFUNDED' || value.meta?.statusCorrection === true || typeof value.meta?.refundAmountPaise === 'number';
+    });
+    const managesOrders = sensitiveOrder && request.method === 'POST' && /^\/api\/v1\/orders\/sync$/.test(authorizationPath) && device.type === 'POS_ADMIN';
+    // The UPI VPA on ReceiptConfig is where every customer's "scan to pay" lands -- changing it
+    // silently redirects real money. It travels bundled inside the generic KIOSK_CONFIGURATION push
+    // (welcome screen, display settings and the receipt template all share one blob), so a MANAGER
+    // editing an unrelated field (e.g. the welcome banner) must stay frictionless; only an actual
+    // change to the payout VPA itself is gated, by diffing against what's currently stored.
+    const kioskConfigPush = request.method === 'POST' && /^\/api\/v1\/entity-sync\/KIOSK_CONFIGURATION$/.test(authorizationPath) && ['POS_ADMIN', 'KIOSK_ADMIN'].includes(device.type);
+    let managesUpiDestination = false;
+    if (kioskConfigPush) {
+      const events = (request.body as { events?: Array<{ externalId?: string; payload?: { receipt?: { upiId?: string; upiPayeeName?: string } } }> })?.events;
+      for (const event of Array.isArray(events) ? events : []) {
+        const incoming = event?.payload?.receipt;
+        if (!incoming || typeof incoming !== 'object') continue;
+        const existing = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
+          tx.syncedEntity.findFirst({
+            where: { restaurantId: device.restaurantId, entityType: 'KIOSK_CONFIGURATION', externalId: event.externalId },
+            select: { payload: true }
+          })
+        );
+        const existingReceipt = (existing?.payload as { receipt?: { upiId?: string; upiPayeeName?: string } } | null)?.receipt;
+        if ((incoming.upiId ?? '') !== (existingReceipt?.upiId ?? '') || (incoming.upiPayeeName ?? '') !== (existingReceipt?.upiPayeeName ?? '')) {
+          managesUpiDestination = true;
+        }
+      }
+    }
+    if (requestedBranch !== undefined || requiresRestaurantOwner || requiresFinancialActor || managesStaff || managesOrders || managesUpiDestination) {
       if (requestedBranch !== undefined && (device.type !== 'POS_ADMIN' || typeof requestedBranch !== 'string' || (!restaurantQrScope && !/^[0-9a-f-]{36}$/i.test(requestedBranch)))) throw new ForbiddenException('Invalid admin branch scope');
       const proof = request.headers['x-owner-authorization'];
       let claims: TenantAccessTokenPayload;
@@ -190,7 +226,11 @@ export class DeviceAuthGuard implements CanActivate {
         if (!user || !['OWNER', 'MANAGER'].includes(user.role)) return false;
         if (restaurantQrScope) return user.role === 'OWNER';
         if (requiresRestaurantOwner && user.role !== 'OWNER') return false;
-        if (requiresFinancialActor && user.role !== 'OWNER' && user.branchId !== device.branchId) return false;
+        // Stricter than the branch-manager allowance just below: changing where customer payments
+        // land is OWNER-only, full stop -- a branch's own manager is not exempt the way they are for
+        // ordinary financial-actor or staff-administration actions.
+        if (managesUpiDestination && user.role !== 'OWNER') return false;
+        if ((requiresFinancialActor || managesStaff || managesOrders) && user.role !== 'OWNER' && user.branchId !== device.branchId) return false;
         if (requestedBranch === undefined) return true;
         if (user.role !== 'OWNER' && (user.branchId ?? device.branchId) !== requestedBranch) return false;
         return Boolean(await tx.branch.findFirst({ where: { id: requestedBranch, restaurantId: device.restaurantId, status: 'ACTIVE' } }));

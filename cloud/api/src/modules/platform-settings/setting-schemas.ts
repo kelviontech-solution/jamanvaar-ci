@@ -57,6 +57,23 @@ export const SETTING_SCHEMAS: Record<string, z.ZodTypeAny> = {
     .refine((v) => !v.startsAt || !v.endsAt || Date.parse(v.endsAt) > Date.parse(v.startsAt), {
       message: 'The end time must be after the start time',
       path: ['endsAt']
+    }),
+  /**
+   * A lighter-weight announcement than platform.maintenance -- scoped to specific terminal apps
+   * (never Captain or KDS, since those have no screen real estate for a guest- or staff-facing
+   * banner the same way) rather than broadcast to all five.
+   */
+  'platform.announcement': z
+    .object({
+      enabled: z.boolean(),
+      message: z.string().trim().max(500),
+      targetApps: z.array(z.enum(['POS', 'KIOSK', 'POS_ADMIN'])).min(1, 'Select at least one app'),
+      startsAt: isoDate.nullish(),
+      endsAt: isoDate.nullish()
+    })
+    .refine((v) => !v.startsAt || !v.endsAt || Date.parse(v.endsAt) > Date.parse(v.startsAt), {
+      message: 'The end time must be after the start time',
+      path: ['endsAt']
     })
 };
 
@@ -93,5 +110,6 @@ export const SETTING_DEFAULTS: Record<string, Record<string, unknown>> = {
     billingEmail: ''
   },
   'platform.defaults': { trialDurationDays: 14, maxTrialBranches: 1, maxTrialDevices: 5, defaultCurrency: 'INR' },
-  'platform.maintenance': { maintenanceMode: false, statusBanner: '', startsAt: null, endsAt: null }
+  'platform.maintenance': { maintenanceMode: false, statusBanner: '', startsAt: null, endsAt: null },
+  'platform.announcement': { enabled: false, message: '', targetApps: ['POS', 'KIOSK', 'POS_ADMIN'], startsAt: null, endsAt: null }
 };

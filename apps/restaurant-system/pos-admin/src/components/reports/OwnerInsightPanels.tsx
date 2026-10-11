@@ -6,7 +6,7 @@ import {
 } from '@jamanvaar/business';
 import { copyText, formatINR, formatRestaurantDate } from '@jamanvaar/utils';
 import { AlertTriangle, Copy, MessageCircle } from 'lucide-react';
-import type { ReportDateRange, ReportSummaryMetrics, DishPerformanceRow } from './reportDataEngine';
+import type { ReportDateRange, ReportSummaryMetrics, DishPerformanceRow, CustomerReportResult, InventoryReportResult } from './reportDataEngine';
 
 const cell = 'p-3';
 const headRow = 'bg-jaman-cream border-b border-jaman-border text-slate-500 font-bold uppercase text-[11px]';
@@ -248,6 +248,113 @@ const Tile: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div className="text-lg font-mono font-bold text-jaman-navy mt-1">{value}</div>
   </div>
 );
+
+export const CustomerReportPanel: React.FC<{ report: CustomerReportResult }> = ({ report }) => {
+  return (
+    <div className={card}>
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 className="font-bold text-sm text-jaman-navy">Who's buying, and how much they spend</h3>
+        <span className="text-xs text-slate-500 font-mono">{report.matchedOrders} matched · {report.unmatchedOrders} without a linked customer</span>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Tile label="New customers" value={String(report.newCustomers)} />
+        <Tile label="Repeat customers" value={String(report.repeatCustomers)} />
+        <Tile label="Avg spend / visit" value={formatINR(report.avgSpendPerVisit.current)} />
+        <Tile label="Top spenders tracked" value={String(report.topSpenders.length)} />
+      </div>
+
+      {report.topSpenders.length === 0 ? (
+        <p className="text-sm text-slate-500 py-6 text-center">No orders linked to a customer account in this period.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-jaman-border">
+          <table className="w-full text-left text-xs">
+            <thead className={headRow}><tr><th className={cell}>Customer</th><th className={cell}>Orders</th><th className={cell}>Spend</th><th className={cell}>Last visit</th><th className={cell}>Tags</th></tr></thead>
+            <tbody>
+              {report.topSpenders.map((r) => (
+                <tr key={r.phone} className="border-b border-slate-100 last:border-0">
+                  <td className={`${cell} font-bold text-jaman-navy`}>{r.name || r.phone}<span className="block text-[11px] text-slate-500 font-mono">{r.phone}</span></td>
+                  <td className={`${cell} font-mono`}>{r.ordersInRange}</td>
+                  <td className={`${cell} tabular-nums font-bold`}>{formatINR(r.spendInRange)}</td>
+                  <td className={cell}>{r.lastVisitAt ? new Date(r.lastVisitAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '-'}</td>
+                  <td className={cell}>{r.tags?.join(', ') || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const InventoryReportPanel: React.FC<{ report: InventoryReportResult }> = ({ report }) => {
+  const totalWastageCost = report.topWastageByCost.reduce((sum, r) => sum + (r.costImpactInRange ?? 0), 0);
+  return (
+    <div className={card}>
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 className="font-bold text-sm text-jaman-navy">Stock levels, movement, and wastage</h3>
+        {totalWastageCost > 0 && <span className="text-xs tabular-nums font-bold text-rose-700">{formatINR(totalWastageCost)} wasted</span>}
+      </div>
+
+      <div>
+        <h4 className="text-[11px] font-bold uppercase text-slate-500 mb-2">Low stock right now</h4>
+        {report.lowStock.length === 0 ? (
+          <p className="text-sm text-slate-500 py-3 text-center">Nothing is below its reorder level right now.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-jaman-border">
+            <table className="w-full text-left text-xs">
+              <thead className={headRow}><tr><th className={cell}>Item</th><th className={cell}>Stock</th><th className={cell}>Status</th></tr></thead>
+              <tbody>
+                {report.lowStock.map((r) => (
+                  <tr key={r.itemId} className="border-b border-slate-100 last:border-0">
+                    <td className={`${cell} font-bold text-jaman-navy`}>{r.name}<span className="block text-[11px] text-slate-500 font-mono">{r.sku}</span></td>
+                    <td className={`${cell} font-mono`}>{r.currentStock} {r.unit}</td>
+                    <td className={cell}><span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${r.status === 'OUT_OF_STOCK' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}`}>{r.status.replace('_', ' ')}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h4 className="text-[11px] font-bold uppercase text-slate-500 mb-2">Stock movement this period</h4>
+        {report.movementsInRange.length === 0 ? (
+          <p className="text-sm text-slate-500 py-3 text-center">No stock movements recorded in this period.</p>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {report.movementsInRange.map((m) => (
+              <Tile key={m.type} label={m.type.replace('_', ' ')} value={`${m.count} · ${m.quantityTotal > 0 ? '+' : ''}${m.quantityTotal}`} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h4 className="text-[11px] font-bold uppercase text-slate-500 mb-2">Top wastage by cost</h4>
+        {report.topWastageByCost.length === 0 ? (
+          <p className="text-sm text-slate-500 py-3 text-center">No wastage recorded in this period.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl border border-jaman-border">
+            <table className="w-full text-left text-xs">
+              <thead className={headRow}><tr><th className={cell}>Item</th><th className={cell}>Cost impact</th></tr></thead>
+              <tbody>
+                {report.topWastageByCost.map((r) => (
+                  <tr key={r.itemId} className="border-b border-slate-100 last:border-0">
+                    <td className={`${cell} font-bold text-jaman-navy`}>{r.name}</td>
+                    <td className={`${cell} tabular-nums font-bold text-rose-700`}>{formatINR(r.costImpactInRange ?? 0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const PHONE_KEY = 'jamanvaar_owner_whatsapp_number';
 
