@@ -24,6 +24,10 @@ COPY --from=builder /repo/node_modules/.prisma ./node_modules/.prisma
 # the builder's platform-matched schema engine so migrations need no runtime download.
 COPY --from=builder /repo/node_modules/@prisma/engines ./node_modules/@prisma/engines
 COPY cloud/api/entrypoint.sh ./cloud/api/entrypoint.sh
+# npm may place API-only packages (express, @nestjs/platform-express, multer) under cloud/api/node_modules
+# while @nestjs/core is hoisted to /repo/node_modules; Nest then cannot find its HTTP driver and the
+# container exits with "No driver (HTTP) has been selected". NODE_PATH makes that location resolvable.
+ENV NODE_PATH=/repo/cloud/api/node_modules
 WORKDIR /repo/cloud/api
 RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh \
     && mkdir -p uploads backups /data/backups && chown -R node:node uploads backups /data/backups
