@@ -1,0 +1,154 @@
+[
+ {
+  "id": "CARD-HEIGHT",
+  "app": "pos",
+  "url": "http://127.0.0.1:5302/workspace.html",
+  "viewport": "1366x768",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "table"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[{\"h\":131.8,\"w\":199,\"over\":false},{\"h\":131.8,\"w\":199,\"over\":false},{\"h\":131.8,\"w\":199,\"over\":false},{\"h\":131.8,\"w\":199,\"over\":false},{\"h\":131.8,\"w\":199,\"over\":false},{\"h\":131.8,\"w\":199,\"over\":false}]"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": 6
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[{\"h\":131.8,\"w\":199,\"over\":true},{\"h\":131.8,\"w\":199,\"over\":true},{\"h\":131.8,\"w\":199,\"over\":true},{\"h\":131.8,\"w\":199,\"over\":true},{\"h\":131.8,\"w\":199,\"over\":true},{\"h\":131.8,\"w\":199,\"over\":true}]"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/CARD-HEIGHT-selected-1366x768.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1366,
+     "scrollH": 768,
+     "interactive": 98,
+     "unnamed": 0,
+     "under24": 4,
+     "under44": 95,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+    }
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1366,
+   "scrollH": 768,
+   "interactive": 41,
+   "unnamed": 0,
+   "under24": 4,
+   "under44": 29,
+   "h1": [
+    "Select a table"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | Select a table | Pick the table first, then add dishes. Running tables continue the"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/CARD-HEIGHT-initial-1366x768.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ },
+ {
+  "id": "CARD-HEIGHT",
+  "app": "pos",
+  "url": "http://127.0.0.1:5302/workspace.html",
+  "viewport": "1920x1080",
+  "steps": [
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "table"
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[{\"h\":131.8,\"w\":228,\"over\":false},{\"h\":131.8,\"w\":228,\"over\":false},{\"h\":131.8,\"w\":228,\"over\":false},{\"h\":131.8,\"w\":228,\"over\":false},{\"h\":131.8,\"w\":228,\"over\":false},{\"h\":131.8,\"w\":228,\"over\":false}]"
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": 6
+   },
+   {
+    "do": "wait",
+    "arg": null
+   },
+   {
+    "do": "eval",
+    "arg": null,
+    "result": "[{\"h\":131.8,\"w\":228,\"over\":true},{\"h\":131.8,\"w\":228,\"over\":true},{\"h\":131.8,\"w\":228,\"over\":true},{\"h\":131.8,\"w\":228,\"over\":true},{\"h\":131.8,\"w\":228,\"over\":true},{\"h\":131.8,\"w\":228,\"over\":true}]"
+   },
+   {
+    "do": "shot",
+    "arg": null,
+    "shot": "evidence/pos/CARD-HEIGHT-selected-1920x1080.png",
+    "metrics": {
+     "overflowX": false,
+     "scrollW": 1920,
+     "scrollH": 1080,
+     "interactive": 98,
+     "unnamed": 0,
+     "under24": 4,
+     "under44": 95,
+     "h1": [],
+     "main": true,
+     "lang": "en",
+     "disabledBtns": [],
+     "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | All Menu | 12 dishes | All | Veg | Jain | Non-Veg | QUICK: | Hara Bhara Kebab (6 Pc"
+    }
+   }
+  ],
+  "metrics": {
+   "overflowX": false,
+   "scrollW": 1920,
+   "scrollH": 1080,
+   "interactive": 41,
+   "unnamed": 0,
+   "under24": 4,
+   "under44": 29,
+   "h1": [
+    "Select a table"
+   ],
+   "main": true,
+   "lang": "en",
+   "disabledBtns": [],
+   "body": "POS TERMINAL | JAMANVAAR RESTAURANT | Ahmedabad Flagship Store | • | POS-01 | + New Order | Search dishes, SKU, tables, bills, customers... | ONLINE ● Connected | Sync now | DAY OPEN | • | No Shift | JAMAN AI | 2 | ? | Staff | STAFF | Menu | CATEGORIES | All Menu | 12 | STARTERS | 3 | TANDOOR & KEBAB | 1 | MAIN COURSE | 3 | NAAN & ROTI | 2 | BIRYANI & RICE | 1 | BEVERAGES | 2 | Print Queue | Core: Offline First | Select a table | Pick the table first, then add dishes. Running tables continue the"
+  },
+  "inputs": [],
+  "shot": "evidence/pos/CARD-HEIGHT-initial-1920x1080.png",
+  "console": [],
+  "exceptions": [],
+  "failedRequests": []
+ }
+]
