@@ -66,7 +66,7 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
         !item.isAvailable
           ? 'opacity-60 border border-slate-200 bg-slate-50 cursor-not-allowed'
           : inCartCount > 0
-          ? 'border-2 border-jaman-saffron bg-[#FFFDFB] shadow-xs'
+          ? 'border border-jaman-saffron ring-2 ring-inset ring-jaman-saffron bg-[#FFFDFB] shadow-xs'
           : 'border border-jaman-border bg-white hover:border-jaman-saffron/60 hover:shadow-xs active:scale-[0.98]'
       }`}
     >
@@ -113,9 +113,9 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
       </div>
 
       {/* Bottom row: Price & Quick Action */}
-      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 mt-auto">
+      <div className="flex items-center justify-between gap-2 mt-auto min-h-[40px]">
         <div className="flex flex-col">
-          <span className="text-lg font-bold text-jaman-navy leading-tight tabular-nums">
+          <span className={`${inCartCount > 0 ? 'text-base' : 'text-lg'} font-bold text-jaman-navy leading-tight tabular-nums shrink-0`}>
             ₹{item.price}
           </span>
           {item.takeawayPrice && item.takeawayPrice !== item.price && (
@@ -134,7 +134,7 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
                 className="h-9 px-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-[#FFF4ED] hover:text-jaman-saffron text-slate-700 flex items-center gap-1 transition-colors active:scale-95 cursor-pointer"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-jaman-saffron" />
-                <span>MOD</span>
+                <span className={inCartCount > 0 ? 'sr-only' : undefined}>MOD</span>
               </button>
             )}
 
@@ -152,12 +152,12 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
                       updateItemQuantity(last.cartItemId || (last as any).id, -1);
                     }
                   }}
-                  className="w-8 h-8 rounded-lg bg-white hover:bg-orange-100 text-jaman-saffron flex items-center justify-center font-bold transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                  className="w-7 h-8 rounded-lg bg-white hover:bg-orange-100 text-jaman-saffron flex items-center justify-center font-bold transition-colors shadow-2xs active:scale-95 cursor-pointer"
                   title="Decrease quantity"
                 >
                   <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
-                <span className="font-bold text-sm text-jaman-navy px-2 min-w-[22px] text-center">
+                <span className="font-bold text-sm text-jaman-navy px-1.5 min-w-[20px] text-center">
                   {inCartCount}
                 </span>
                 <button
@@ -167,7 +167,7 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
                     sound.play('add');
                     addItemToCart(item);
                   }}
-                  className="w-8 h-8 rounded-lg bg-jaman-saffron hover:bg-[#C95A12] text-white flex items-center justify-center font-bold transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                  className="w-7 h-8 rounded-lg bg-jaman-saffron hover:bg-[#C95A12] text-white flex items-center justify-center font-bold transition-colors shadow-2xs active:scale-95 cursor-pointer"
                   title="Increase quantity"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[3]" />
