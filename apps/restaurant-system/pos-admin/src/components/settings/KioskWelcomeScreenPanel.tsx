@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Eye, ImagePlus, Monitor, RotateCcw, Save, Smartphone, Trash2 } from 'lucide-react';
 import { KioskWelcomeScreen, useConfirm } from '@jamanvaar/ui';
 import { db, KeyValueStore, KioskConfigurationRepository, WelcomeScreenSettingsRepository } from '@jamanvaar/database';

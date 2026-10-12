@@ -19,8 +19,8 @@ function emptyTenders(): TenderBreakdown {
 function addLine(t: TenderBreakdown, method: string, amount: number): void {
   const m = (method || '').toUpperCase();
   if (m === 'CASH' || m === 'CASH_AT_COUNTER') t.cash += amount;
-  else if (m === 'UPI' || m === 'UPI_QR' || m === 'BHARAT_QR') t.upi += amount;
-  else if (m === 'CARD' || m === 'CARD_TERMINAL' || m === 'POS_CARD') t.card += amount;
+  else if (['UPI', 'UPI_QR', 'BHARAT_QR', 'DYNAMIC_QR', 'UPI_INTENT'].includes(m)) t.upi += amount;
+  else if (['CARD', 'CARD_TERMINAL', 'POS_CARD', 'DEBIT_CARD', 'CREDIT_CARD', 'EDC_MACHINE'].includes(m)) t.card += amount;
   else if (m === 'WALLET') t.wallet += amount;
   else if (m === 'HOUSE_ACCOUNT' || m === 'CREDIT') t.houseAccount += amount;
   else t.other += amount;
@@ -55,4 +55,17 @@ export function getOrderTenders(order: Pick<Order, 'totalAmount' | 'paymentMetho
 export function splitsMatchTotal(splits: PaymentSplit[], total: number): boolean {
   const sum = splits.reduce((acc, l) => acc + (Number(l.amount) || 0), 0);
   return Math.abs(sum - total) < 0.011;
+}
+
+/** Remaining collection. A legacy partial mixed refund has no recorded return
+ * tender, so it is kept unattributed rather than guessed as proportional cash. */
+export function getNetOrderTenders(order: Order): TenderBreakdown {
+  const tenders = getOrderTenders(order);
+  const refund = Math.min(order.totalAmount, Math.max(0, order.refundAmount ?? (order.paymentStatus === 'REFUNDED' ? order.totalAmount : 0)));
+  if (!refund) return tenders;
+  const net = round2(order.totalAmount - refund);
+  if (net === 0) return emptyTenders();
+  if (Object.values(tenders).filter(value => value > 0).length > 1) return { ...emptyTenders(), other: net };
+  const key = (Object.keys(tenders) as (keyof TenderBreakdown)[]).find(key => tenders[key] > 0);
+  return key ? { ...emptyTenders(), [key]: net } : { ...emptyTenders(), other: net };
 }

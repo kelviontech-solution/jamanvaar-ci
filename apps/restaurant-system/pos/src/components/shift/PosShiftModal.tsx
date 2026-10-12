@@ -1,27 +1,16 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db, ShiftRepository } from '@jamanvaar/database';
+import { ShiftRepository } from '@jamanvaar/database';
 import { ShiftRecord } from '@jamanvaar/types';
-import {
-  Clock,
-  X,
-  Banknote,
-  CheckCircle2,
-  AlertTriangle,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Lock,
-  Calendar,
-  Layers
-} from 'lucide-react';
+import { Clock, X, AlertTriangle } from 'lucide-react';
 
 export const PosShiftModal: React.FC = () => {
-  const { isShiftModalOpen, setIsShiftModalOpen, currentUser } = usePosStore();
+  const { isShiftModalOpen, setIsShiftModalOpen, currentUser, posTerminalId } = usePosStore();
   const [activeTab, setActiveTab] = useState<'SUMMARY' | 'CLOSE' | 'NEW'>('SUMMARY');
   const [actualCashInput, setActualCashInput] = useState('');
   const [closingNotes, setClosingNotes] = useState('');
-  const [newOpeningFloat, setNewOpeningFloat] = useState('2000');
+  const [newOpeningFloat, setNewOpeningFloat] = useState('0');
   const [newShiftNotes, setNewShiftNotes] = useState('');
   const [feedback, setFeedback] = useState('');
 
@@ -49,13 +38,14 @@ export const PosShiftModal: React.FC = () => {
   const handleOpenNewShift = (e: React.FormEvent) => {
     e.preventDefault();
     const floatVal = parseFloat(newOpeningFloat) || 0;
-    ShiftRepository.openShift(
-      currentUser?.id || 'usr-cashier-1',
-      currentUser?.fullName || 'Cashier',
+    if (!currentUser) { setFeedback('Sign in before opening a register shift.'); return; }
+    try { ShiftRepository.openShift(
+      currentUser.id,
+      currentUser.fullName,
       floatVal,
-      'POS-01',
+      posTerminalId,
       newShiftNotes
-    );
+    ); } catch (error) { setFeedback(error instanceof Error ? error.message : 'Could not open shift.'); return; }
 
     setFeedback('New shift opened successfully!');
     setTimeout(() => {
@@ -74,7 +64,7 @@ export const PosShiftModal: React.FC = () => {
             <Clock className="w-5 h-5 text-jaman-saffron" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">Shift & Cash Drawer Management</h2>
-              <span className="text-xs text-slate-300">Terminal POS-01 • Cashier: {currentUser?.fullName}</span>
+              <span className="text-xs text-slate-300">Register shift • Cashier: {currentUser?.fullName}</span>
             </div>
           </div>
 

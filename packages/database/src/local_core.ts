@@ -1,11 +1,8 @@
 import { db } from './db';
-import {
-  BusinessDayAccountingService,
-  BusinessDaySummary
-} from './accounting_service';
-import { BusinessDayRepository, OrderRepository } from './repositories';
-import { Order, BusinessDay, DeviceRecord } from '@jamanvaar/types';
-import { formatRestaurantDate, generateBusinessDayId, generateSecureCode } from '@jamanvaar/utils';
+import { BusinessDayAccountingService } from './accounting_service';
+import './repositories';
+import { DeviceRecord } from '@jamanvaar/types';
+import { generateSecureCode } from '@jamanvaar/utils';
 
 export interface LocalCoreHealth {
   core_status: 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE';
@@ -34,8 +31,6 @@ export interface PairingTokenPayload {
 }
 
 export class JamanvaarLocalCore {
-  private static restaurantId = 'JAMANVAAR-AHM-FLAGSHIP';
-  private static outletId = 'AHM-FLAGSHIP';
   private static version = '2.4.0-LOCAL-CORE';
   private static pairingTokens: Map<string, PairingTokenPayload> = new Map();
 
@@ -47,11 +42,11 @@ export class JamanvaarLocalCore {
   }
 
   public static getRestaurantId(): string {
-    return this.restaurantId;
+    return db.restaurant.id;
   }
 
   public static getOutletId(): string {
-    return this.outletId;
+    return db.outlet.id;
   }
 
   /**
@@ -62,18 +57,18 @@ export class JamanvaarLocalCore {
     const summary = BusinessDayAccountingService.getBusinessDaySummary(activeDay.id);
 
     return {
-      core_status: 'HEALTHY',
-      database_status: 'HEALTHY',
-      realtime_status: 'CONNECTED',
-      restaurant_id: this.restaurantId,
+      core_status: db.isLocalCoreConnected() ? 'HEALTHY' : 'UNAVAILABLE',
+      database_status: db.getPersistenceHealth().ok ? 'HEALTHY' : 'SYNC_PENDING',
+      realtime_status: db.isLocalCoreConnected() ? 'CONNECTED' : 'OFFLINE',
+      restaurant_id: this.getRestaurantId(),
       restaurant_name: db.restaurant.name || '',
-      outlet_id: this.outletId,
+      outlet_id: this.getOutletId(),
       outlet_name: db.outlet.name || '',
       business_day_id: activeDay.id,
       business_day_status: activeDay.status,
       business_day_display: activeDay.displayDate,
       active_orders_count: summary.active_orders,
-      connected_devices_count: (db.devices || []).filter((d) => d.status === 'ONLINE').length || 4,
+      connected_devices_count: (db.devices || []).filter((d) => d.status === 'ONLINE' && Date.now()-Date.parse(d.lastSync ?? '') < 90000).length,
       server_timestamp: new Date().toISOString(),
       version: this.version
     };
@@ -83,59 +78,7 @@ export class JamanvaarLocalCore {
    * Returns all registered devices in the local restaurant network
    */
   public static getRegisteredDevices(): DeviceRecord[] {
-    if (!db.devices || db.devices.length === 0) {
-      // Initialize standard restaurant fleet
-      const now = new Date().toISOString();
-      db.devices = [
-        {
-          id: 'POS-01',
-          name: 'Main Counter POS (POS-01)',
-          type: 'POS',
-          platform: 'Windows Desktop',
-          status: 'ONLINE',
-          lastSync: now,
-          isPrimary: true
-        },
-        {
-          id: 'ADMIN-01',
-          name: 'Manager Backoffice (ADMIN-01)',
-          type: 'POS',
-          platform: 'Windows Desktop',
-          status: 'ONLINE',
-          lastSync: now,
-          isPrimary: false
-        },
-        {
-          id: 'KDS-01',
-          name: 'Kitchen Display System (KDS-01)',
-          type: 'KDS',
-          platform: 'Windows Touch',
-          status: 'ONLINE',
-          lastSync: now,
-          isPrimary: false
-        },
-        {
-          id: 'CAPTAIN-01',
-          name: 'Captain Rahul (Floor Tab)',
-          type: 'CAPTAIN',
-          platform: 'Android Tablet',
-          status: 'ONLINE',
-          lastSync: now,
-          isPrimary: false
-        },
-        {
-          id: 'CAPTAIN-02',
-          name: 'Captain Priya (Floor Phone)',
-          type: 'CAPTAIN',
-          platform: 'Android Handheld',
-          status: 'OFFLINE',
-          lastSync: now,
-          isPrimary: false
-        }
-      ];
-      db.notify();
-    }
-    return db.devices;
+    return db.devices || [];
   }
 
   /**
@@ -176,8 +119,8 @@ export class JamanvaarLocalCore {
 
     const payload: PairingTokenPayload = {
       token,
-      restaurant_id: this.restaurantId,
-      outlet_id: this.outletId,
+      restaurant_id: this.getRestaurantId(),
+      outlet_id: this.getOutletId(),
       host_ip: hostIp,
       port,
       expires_at: expiresAt

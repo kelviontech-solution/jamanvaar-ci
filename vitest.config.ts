@@ -5,6 +5,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    // The default reporter collapses a passing test's own console.log output, which has
+    // silently hidden real load-test numbers before (see docs/reports/robustness-scalability-
+    // audit-2026-10-11). 'verbose' always prints it; override with --reporter=default for a
+    // quiet run.
+    reporters: ['verbose'],
     // cloud/api is its own NestJS project with its own vitest config, its own
     // live-database requirements, and its own module resolution — it must not
     // be picked up (or slow down) the root offline-runtime test suite.

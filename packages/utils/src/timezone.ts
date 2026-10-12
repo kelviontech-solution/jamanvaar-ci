@@ -4,6 +4,11 @@
  */
 
 export const RESTAURANT_TIMEZONE = 'Asia/Kolkata';
+let timezoneProvider = () => RESTAURANT_TIMEZONE;
+export function configureRestaurantTimezone(provider: () => string): void { timezoneProvider = provider; }
+export function restaurantTimezone(): string {
+  try { const zone = timezoneProvider(); new Intl.DateTimeFormat('en', { timeZone: zone }).format(); return zone; } catch { return RESTAURANT_TIMEZONE; }
+}
 
 /**
  * Returns current timestamp in UTC ISO string
@@ -25,7 +30,7 @@ export function formatRestaurantDate(
   switch (format) {
     case 'DATE_ONLY':
       return new Intl.DateTimeFormat('en-IN', {
-        timeZone: RESTAURANT_TIMEZONE,
+        timeZone: restaurantTimezone(),
         day: '2-digit',
         month: 'short',
         year: 'numeric'
@@ -33,7 +38,7 @@ export function formatRestaurantDate(
 
     case 'TIME_ONLY':
       return new Intl.DateTimeFormat('en-IN', {
-        timeZone: RESTAURANT_TIMEZONE,
+        timeZone: restaurantTimezone(),
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
@@ -41,7 +46,7 @@ export function formatRestaurantDate(
 
     case 'SHORT':
       return new Intl.DateTimeFormat('en-IN', {
-        timeZone: RESTAURANT_TIMEZONE,
+        timeZone: restaurantTimezone(),
         day: 'numeric',
         month: 'short'
       }).format(date);
@@ -49,7 +54,7 @@ export function formatRestaurantDate(
     case 'ISO_DATE': {
       // Return YYYY-MM-DD in Asia/Kolkata
       const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: RESTAURANT_TIMEZONE,
+        timeZone: restaurantTimezone(),
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
@@ -63,7 +68,7 @@ export function formatRestaurantDate(
     case 'DISPLAY_FULL':
     default:
       return new Intl.DateTimeFormat('en-IN', {
-        timeZone: RESTAURANT_TIMEZONE,
+        timeZone: restaurantTimezone(),
         day: 'numeric',
         month: 'long',
         year: 'numeric',
@@ -95,7 +100,7 @@ export function getRestaurantHour(dateInput: Date | string | number = new Date()
   // doesn't crash a business-day computation, same as before this function existed.
   if (isNaN(date.getTime())) return NaN;
   const hourPart = new Intl.DateTimeFormat('en-GB', {
-    timeZone: RESTAURANT_TIMEZONE,
+    timeZone: restaurantTimezone(),
     hour: '2-digit',
     hour12: false
   })
@@ -111,7 +116,7 @@ export function getRestaurantHour(dateInput: Date | string | number = new Date()
 export function getBusinessDayDisplayDate(dateInput: Date | string = new Date()): string {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   return new Intl.DateTimeFormat('en-IN', {
-    timeZone: RESTAURANT_TIMEZONE,
+    timeZone: restaurantTimezone(),
     day: 'numeric',
     month: 'long',
     year: 'numeric'

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { Order } from '@jamanvaar/types';
-import { formatDate, formatTime, formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+import { formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import {
@@ -21,40 +21,7 @@ import { CustomerReportPanel, InventoryReportPanel, LabourPanel, LossReportPanel
 import { DonutChart } from '../charts/DonutChart';
 import { SalesTrendLineChart } from '../charts/SalesTrendLineChart';
 import { ReportKpiRow } from './ReportKpiRow';
-import {
-  Search,
-  Calendar,
-  Filter,
-  Printer,
-  Download,
-  FileSpreadsheet,
-  FileText,
-  Star,
-  RotateCcw,
-  Sparkles,
-  TrendingUp,
-  TrendingDown,
-  ChevronDown,
-  Layers,
-  ShoppingBag,
-  DollarSign,
-  Utensils,
-  Clock,
-  Users,
-  Package,
-  CheckCircle2,
-  AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight,
-  Palette,
-  X,
-  SlidersHorizontal,
-  ChevronRight,
-  Eye,
-  BarChart3,
-  PieChart,
-  HelpCircle
-} from 'lucide-react';
+import { Search, Calendar, Filter, Printer, Download, FileSpreadsheet, FileText, Star, RotateCcw, Sparkles, TrendingUp, TrendingDown, Layers, ShoppingBag, DollarSign, Utensils, Clock, Users, Package, CheckCircle2, AlertTriangle, ArrowUpRight, ArrowDownRight, Palette, X, SlidersHorizontal, Eye, BarChart3 } from 'lucide-react';
 
 interface ReportsDashboardProps {
   kioskMode?: boolean;
@@ -143,6 +110,54 @@ const ALL_REPORTS: ReportDefinition[] = [
   { id: 'ESTIMATED_GROSS_MARGIN', category: 'INVENTORY', title: 'Estimated Gross Margin', subtitle: 'Gross margin after raw material deductions (65-72%)', icon: Sparkles }
 ];
 
+const CATEGORY_TABS = [
+  { id: 'OVERVIEW', label: 'Overview', icon: TrendingUp },
+  { id: 'SALES', label: 'Sales', icon: DollarSign },
+  { id: 'MENU', label: 'Menu', icon: Utensils },
+  { id: 'FINANCIAL', label: 'Financial', icon: BarChart3 },
+  { id: 'OPERATIONS', label: 'Operations', icon: Clock },
+  { id: 'CUSTOMERS', label: 'Customers', icon: Users },
+  { id: 'INVENTORY', label: 'Inventory', icon: Package }
+] as const;
+
+/** The "Report Categories" tab row — identical in the Overview view and the catalog view below it
+ * (selectedCategory is always 'OVERVIEW' with an empty searchQuery when the Overview view renders,
+ * so isCatActive's one shared expression already reduces correctly in both places). Extracted so
+ * the two call sites can never drift out of sync with each other again. */
+const CategoryTabs: React.FC<{
+  selectedCategory: ReportCategoryKey | 'OVERVIEW';
+  searchQuery: string;
+  kioskMode: boolean;
+  reports: ReportDefinition[];
+  onSelect: (category: ReportCategoryKey | 'OVERVIEW') => void;
+}> = ({ selectedCategory, searchQuery, kioskMode, reports, onSelect }) => (
+  <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-2">
+    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
+      Report Categories
+    </span>
+    <div className="grid grid-cols-4 gap-1.5 text-xs">
+      {CATEGORY_TABS.filter((c) => !kioskMode || !['CUSTOMERS', 'INVENTORY'].includes(c.id)).map((c) => {
+        const Icon = c.icon;
+        const isCatActive = selectedCategory === c.id && !searchQuery.trim();
+        return (
+          <button
+            key={c.id}
+            onClick={() => onSelect(c.id)}
+            className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              isCatActive
+                ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
+                : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+            <span>{c.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, kioskMode = false }) => {
   const reports = useMemo(() => kioskMode ? ALL_REPORTS.filter(report => !['CUSTOMERS', 'INVENTORY'].includes(report.category) && !['LABOUR_COST', 'SHIFT_PERFORMANCE', 'CAPTAIN_PERFORMANCE', 'CASHIER_PERFORMANCE', 'SALES_BY_CAPTAIN', 'SALES_BY_CASHIER', 'OWNER_SUMMARY', 'LOSS_REPORT'].includes(report.id)) : ALL_REPORTS, [kioskMode]);
   // Navigation & Selection State
@@ -206,6 +221,14 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   const handleSelectReport = (id: string) => {
     setActiveReportId(id);
     setRecentIds((prev) => [id, ...prev.filter((item) => item !== id)].slice(0, 6));
+  };
+
+  const handleCategorySelect = (categoryId: ReportCategoryKey | 'OVERVIEW') => {
+    setSelectedCategory(categoryId);
+    setSearchQuery('');
+    if (categoryId === 'OVERVIEW') return;
+    const firstInCat = reports.find((r) => r.category === categoryId);
+    if (firstInCat) handleSelectReport(firstInCat.id);
   };
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
@@ -630,45 +653,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
       {/* 4. MAIN REPORT WORKSPACE (CATEGORIES + SUB-REPORTS + DATA VIEW) */}
       {selectedCategory === 'OVERVIEW' && !searchQuery.trim() ? (
         <div className="space-y-5">
-          <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
-              Report Categories
-            </span>
-            <div className="grid grid-cols-4 gap-1.5 text-xs">
-              {[
-                { id: 'OVERVIEW', label: 'Overview', icon: TrendingUp },
-                { id: 'SALES', label: 'Sales', icon: DollarSign },
-                { id: 'MENU', label: 'Menu', icon: Utensils },
-                { id: 'FINANCIAL', label: 'Financial', icon: BarChart3 },
-                { id: 'OPERATIONS', label: 'Operations', icon: Clock },
-                { id: 'CUSTOMERS', label: 'Customers', icon: Users },
-                { id: 'INVENTORY', label: 'Inventory', icon: Package }
-              ].filter(c => !kioskMode || !['CUSTOMERS', 'INVENTORY'].includes(c.id)).map((c) => {
-                const Icon = c.icon;
-                const isCatActive = c.id === 'OVERVIEW';
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setSelectedCategory(c.id as ReportCategoryKey | 'OVERVIEW');
-                      setSearchQuery('');
-                      if (c.id === 'OVERVIEW') return;
-                      const firstInCat = reports.find((r) => r.category === c.id);
-                      if (firstInCat) handleSelectReport(firstInCat.id);
-                    }}
-                    className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      isCatActive
-                        ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
-                        : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span>{c.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <CategoryTabs selectedCategory={selectedCategory} searchQuery={searchQuery} kioskMode={kioskMode} reports={reports} onSelect={handleCategorySelect} />
 
           <ReportKpiRow summary={summary} periodLabel={dateRange.label} hasCompare={isCompareEnabled} />
 
@@ -696,45 +681,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
         {/* LEFT COLUMN: REPORT CATEGORIES & REPORT LIST (lg:col-span-4) */}
         <div className="lg:col-span-4 space-y-4">
           {/* Category Tabs */}
-          <div className="bg-white border border-jaman-border rounded-2xl p-3 shadow-xs space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-2 block">
-              Report Categories
-            </span>
-            <div className="grid grid-cols-4 gap-1.5 text-xs">
-              {[
-                { id: 'OVERVIEW', label: 'Overview', icon: TrendingUp },
-                { id: 'SALES', label: 'Sales', icon: DollarSign },
-                { id: 'MENU', label: 'Menu', icon: Utensils },
-                { id: 'FINANCIAL', label: 'Financial', icon: BarChart3 },
-                { id: 'OPERATIONS', label: 'Operations', icon: Clock },
-                { id: 'CUSTOMERS', label: 'Customers', icon: Users },
-                { id: 'INVENTORY', label: 'Inventory', icon: Package }
-              ].filter(c => !kioskMode || !['CUSTOMERS', 'INVENTORY'].includes(c.id)).map((c) => {
-                const Icon = c.icon;
-                const isCatActive = selectedCategory === c.id && !searchQuery.trim();
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setSelectedCategory(c.id as ReportCategoryKey | 'OVERVIEW');
-                      setSearchQuery('');
-                      if (c.id === 'OVERVIEW') return;
-                      const firstInCat = reports.find((r) => r.category === c.id);
-                      if (firstInCat) handleSelectReport(firstInCat.id);
-                    }}
-                    className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      isCatActive
-                        ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
-                        : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span>{c.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <CategoryTabs selectedCategory={selectedCategory} searchQuery={searchQuery} kioskMode={kioskMode} reports={reports} onSelect={handleCategorySelect} />
 
           {/* Search Reports Input */}
           <div className="relative">

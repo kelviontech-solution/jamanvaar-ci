@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AppNotification } from '@jamanvaar/types';
-import { db, NotificationRepository } from '@jamanvaar/database';
+import { db, NotificationRepository, ServiceMessages } from '@jamanvaar/database';
 import { sound } from './SoundManager';
+import { useStaffLanguage } from './StaffLanguage';
 import { Megaphone, Check } from 'lucide-react';
 
 interface UrgentGuestAlertModalProps {
@@ -16,6 +17,7 @@ interface UrgentGuestAlertModalProps {
  * new one arrives, not just when the bell happens to be opened.
  */
 export const UrgentGuestAlertModal: React.FC<UrgentGuestAlertModalProps> = ({ role }) => {
+  const {t} = useStaffLanguage();
   const [queue, setQueue] = useState<AppNotification[]>([]);
   const seenIds = useRef<Set<string>>(new Set());
 
@@ -46,6 +48,7 @@ export const UrgentGuestAlertModal: React.FC<UrgentGuestAlertModalProps> = ({ ro
   const current = queue[0];
 
   const acknowledge = () => {
+    if (current.meta?.serviceRequestId && ServiceMessages.getRequest(current.meta.serviceRequestId)) ServiceMessages.acknowledgeRequest(current.meta.serviceRequestId, 'ACCEPTED');
     NotificationRepository.markAsRead(current.id);
     setQueue((prev) => prev.filter((n) => n.id !== current.id));
   };
@@ -68,7 +71,7 @@ export const UrgentGuestAlertModal: React.FC<UrgentGuestAlertModalProps> = ({ ro
           </span>
         </div>
         {queue.length > 1 && (
-          <p className="text-xs font-bold text-rose-600">+{queue.length - 1} more guest{queue.length > 2 ? 's' : ''} waiting</p>
+          <p className="text-xs font-bold text-rose-600">+{queue.length - 1} {t("more guest")} {queue.length > 2 ? 's' : ''} {t("waiting")} </p>
         )}
         <button
           type="button"
@@ -76,7 +79,7 @@ export const UrgentGuestAlertModal: React.FC<UrgentGuestAlertModalProps> = ({ ro
           className="w-full py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-sm shadow-lg transition-colors cursor-pointer flex items-center justify-center gap-2"
         >
           <Check className="w-5 h-5" />
-          <span>Acknowledge — On My Way</span>
+          <span> {t("Acknowledge — On My Way")} </span>
         </button>
       </div>
     </div>

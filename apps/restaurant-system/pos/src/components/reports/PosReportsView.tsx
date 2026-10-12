@@ -1,25 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { db, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
-import { ReportGeneratorService, DailyReportSummary, TopItemStat } from '@jamanvaar/business';
+import { db, PrintQueueRepository } from '@jamanvaar/database';
+import { ReportGeneratorService } from '@jamanvaar/business';
 import { PdfReportBuilder, ReportFullData, ReportDesign } from '../../services/pdfReportBuilder';
 import { CsvExportService } from '../../services/csvExportService';
 import { PosPrinterService } from '../../services/printerService';
 import { PosReportDocument } from './PosReportDocument';
 import { PosReportPreviewModal } from './PosReportPreviewModal';
 import { usePosStore } from '../../store/posStore';
-import { formatINR, slipHeader } from '@jamanvaar/utils';
-import {
-  BarChart3,
-  Calendar,
-  Download,
-  Printer,
-  FileSpreadsheet,
-  Eye,
-  RefreshCw,
-  Sparkles,
-  Layers,
-  ChevronDown
-} from 'lucide-react';
+import { slipHeader } from '@jamanvaar/utils';
+import { BarChart3, Download, Printer, FileSpreadsheet, Eye, RefreshCw, ChevronDown } from 'lucide-react';
 
 type DatePreset = 'TODAY' | 'YESTERDAY' | '7_DAYS' | '30_DAYS' | 'THIS_MONTH' | 'THIS_YEAR' | 'CUSTOM';
 

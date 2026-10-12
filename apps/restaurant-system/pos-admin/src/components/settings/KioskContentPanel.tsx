@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { getTranslation, KIOSK_CONTENT_CATALOG, type SupportedLanguage } from '@jamanvaar/i18n';

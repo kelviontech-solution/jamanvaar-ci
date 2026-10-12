@@ -4,19 +4,7 @@ import { db, PrintQueueRepository } from '@jamanvaar/database';
 import { PrintJob, PrintJobStatus } from '@jamanvaar/types';
 import { sound, ModalBackdrop } from '@jamanvaar/ui';
 import { PosPrinterService } from '../../services/printerService';
-import {
-  Printer,
-  X,
-  RotateCcw,
-  Trash2,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
-  FileText,
-  Layers,
-  ChevronRight,
-  Sparkles
-} from 'lucide-react';
+import { Printer, X, RotateCcw, CheckCircle2, AlertTriangle, Clock, FileText, Sparkles } from 'lucide-react';
 
 export const PosPrintQueueModal: React.FC = () => {
   const { isPrintQueueOpen, setIsPrintQueueOpen } = usePosStore();

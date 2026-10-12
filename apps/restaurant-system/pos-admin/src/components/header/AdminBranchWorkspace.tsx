@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from 'react';
+import { useEffect, useState } from 'react';
 import {fetchCloudBranches,fetchTenantDashboard,type CloudBranch} from '../../cloud/cloudClient';
 import {activeAdminBranch,saveAdminBranch} from '../../adminBranchScope';
 
@@ -15,7 +15,8 @@ export function AdminBranchWorkspace({onReady}:{onReady:()=>void}) {
   }
   useEffect(()=>{let stopped=false;setError('');void Promise.all([fetchCloudBranches(),fetchTenantDashboard()]).then(async([list,overview])=>{
     if(stopped)return;setBranches(list);setAllowAll(overview.scope.branchId===null);
-    const preferred=activeAdminBranch??overview.scope.branchId??(list.length===1?list[0].id:'all');
+    const accessible=list.filter(branch => branch.status==='ACTIVE');
+    const preferred=activeAdminBranch??overview.scope.branchId??(accessible.length===1?accessible[0].id:'all');
     const valid=preferred==='all'?overview.scope.branchId===null:list.some(b=>b.id===preferred);
     if(!valid){setError('The saved branch is no longer available. Choose an accessible branch.');return;}
     if(!activeAdminBranch){await change(preferred);return;}onReady();

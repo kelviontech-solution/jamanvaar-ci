@@ -1,0 +1,55 @@
+{
+  "name": "pos",
+  "route": "/",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=1.0",
+  "title": "JAMANVAAR POS — High-Speed Counter Billing Terminal",
+  "headings": [
+    "Smart Billing. Better Dining.",
+    "POS Counter",
+    "Activate This Terminal"
+  ],
+  "text": "Local Core: Unreachable\nNetwork: Online\nMon, 12 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nRESTAURANT OPERATIONS PLATFORM\n\nPOS TERMINAL\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "horizontalOverflow": false,
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "width": 146,
+      "height": 46
+    },
+    {
+      "text": "Activate Terminal",
+      "aria": null,
+      "width": 382,
+      "height": 52
+    }
+  ],
+  "images": [
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "loaded": true
+    },
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "loaded": true
+    },
+    {
+      "alt": "Tandoori Naan",
+      "loaded": true
+    },
+    {
+      "alt": "Paneer Butter Masala",
+      "loaded": true
+    },
+    {
+      "alt": "Tandoori Angaar",
+      "loaded": true
+    },
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "loaded": true
+    }
+  ],
+  "blockedRequests": 6,
+  "errors": []
+}

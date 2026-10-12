@@ -3,19 +3,7 @@ import { createPortal } from 'react-dom';
 import { DiningTable, Order } from '@jamanvaar/types';
 import { TableRepository } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  Plus,
-  Grid,
-  Users,
-  Edit2,
-  Trash2,
-  QrCode,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  ChevronDown,
-  Check
-} from 'lucide-react';
+import { Plus, Grid, Users, Edit2, Trash2, QrCode, ChevronDown, Check } from 'lucide-react';
 
 type TableStatusValue = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED' | 'CLEANING';
 

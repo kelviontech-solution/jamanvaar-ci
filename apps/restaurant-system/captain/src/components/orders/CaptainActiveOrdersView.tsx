@@ -2,19 +2,9 @@ import React, { useState } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
 import { currentTableKots } from '../../captainWorkflow';
 import { captainDb } from '@jamanvaar/database';
-import { DiningTable, Order } from '@jamanvaar/types';
+import '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  ShoppingBag,
-  Clock,
-  Receipt,
-  UtensilsCrossed,
-  ArrowRight,
-  Search,
-  Flame,
-  CheckCircle2,
-  Users
-} from 'lucide-react';
+import { ShoppingBag, Receipt, ArrowRight, Search } from 'lucide-react';
 
 interface CaptainActiveOrdersViewProps {
   onOpenTableWorkspace: (tableNumber: string) => void;

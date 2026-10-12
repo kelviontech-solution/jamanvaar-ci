@@ -4,17 +4,7 @@ import { db, KOTRepository } from '@jamanvaar/database';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { sound } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
-import {
-  ChefHat,
-  Clock,
-  Printer,
-  CheckCircle2,
-  AlertTriangle,
-  Utensils,
-  Sparkles,
-  RefreshCw,
-  Flame,
-  Check, StickyNote } from 'lucide-react';
+import { ChefHat, Printer, CheckCircle2, Check, StickyNote } from 'lucide-react';
 
 export const PosKotView: React.FC = () => {
   const { currentUser, requestManagerOverride } = usePosStore();

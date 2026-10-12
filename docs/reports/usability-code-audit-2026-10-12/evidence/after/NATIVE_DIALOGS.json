@@ -1,0 +1,61 @@
+{
+  "scope": "Calls whose resolved symbol is declared in lib.dom.d.ts. Imported custom useConfirm callbacks are excluded.",
+  "count": 11,
+  "calls": [
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "line": 186,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "line": 213,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/tables/FloorTablesModule.tsx",
+      "line": 166,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reservations/ReservationsModule.tsx",
+      "line": 86,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/InventoryRecipesModule.tsx",
+      "line": 70,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/InventoryRecipesModule.tsx",
+      "line": 91,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/customers/CustomersCrmModule.tsx",
+      "line": 241,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/staff/StaffRolesModule.tsx",
+      "line": 111,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/hardware/PrintersDevicesModule.tsx",
+      "line": 50,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/backup/BackupRestoreModule.tsx",
+      "line": 119,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/WastageLogModal.tsx",
+      "line": 137,
+      "name": "window.confirm"
+    }
+  ]
+}

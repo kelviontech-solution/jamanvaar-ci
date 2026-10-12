@@ -1,5 +1,5 @@
-import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService, isUnpaidOpenOrder } from '@jamanvaar/database';
-import { Order, DiningTable } from '@jamanvaar/types';
+import { db, ShiftRepository, PrintQueueRepository, BusinessDayRepository, BusinessDayAccountingService, isUnpaidOpenOrder, getTerminalId } from '@jamanvaar/database';
+import '@jamanvaar/types';
 import { formatINR, slipHeader, splitTax } from '@jamanvaar/utils';
 import { DynamicQueryExecutor, DynamicQueryFormula } from './dynamic_query_executor';
 import { AiConfig, delayedKotLabel } from './ai_config';
@@ -401,7 +401,7 @@ export class PosAssistantService {
       }
 
       case 'CASH_COLLECTION': {
-        const openingCash = activeShift?.openingCash || 2000;
+        const openingCash = activeShift?.openingCash ?? 0;
         const expectedInDrawer = (activeShift?.expectedCash || openingCash + cashSales);
 
         return {
@@ -1452,7 +1452,7 @@ DAILY SALES & AUDIT RECONCILIATION
 BUSINESS DAY: ${activeDay.id}
 DATE: ${summary.display_date}
 TIME: ${new Date().toLocaleTimeString()}
-TERMINAL: POS-01
+TERMINAL: ${getTerminalId('POS')}
 ----------------------------------------
 Total Completed Orders: ${completedOrdersCount}
 Gross Sales Turnover:   ${formatINR(summary.gross_sales)}

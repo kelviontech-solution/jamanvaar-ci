@@ -1,6 +1,6 @@
-import { Category, ComboDeal, DietaryType, MenuItem, ModifierGroup, SpiceLevel } from '@jamanvaar/types';
+import '@jamanvaar/types';
 import { enrichRestaurantTemplates } from './restaurant_template_catalog';
-import { PREBUILT_MENU_TEMPLATES_ALL, MenuTemplate, MenuTemplateCategory, MenuTemplateItem } from './menu_templates_data';
+import { PREBUILT_MENU_TEMPLATES_ALL, MenuTemplate } from './menu_templates_data';
 
 export * from './menu_templates_data';
 

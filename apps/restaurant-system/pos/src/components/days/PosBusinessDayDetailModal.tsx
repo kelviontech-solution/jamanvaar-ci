@@ -8,25 +8,7 @@ import { PosDayOrdersModal } from './PosDayOrdersModal';
 import { formatINR, splitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
-import {
-  X,
-  Calendar,
-  Clock,
-  Download,
-  Printer,
-  ShoppingBag,
-  CreditCard,
-  Banknote,
-  QrCode,
-  Layers,
-  Lock,
-  Unlock,
-  ChefHat,
-  AlertTriangle,
-  FileText,
-  User,
-  ShieldAlert
-} from 'lucide-react';
+import { X, Calendar, Download, Printer, ShoppingBag, Lock, Unlock, ShieldAlert } from 'lucide-react';
 
 interface PosBusinessDayDetailModalProps {
   businessDay: BusinessDay;

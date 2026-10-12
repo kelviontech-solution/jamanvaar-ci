@@ -1,7 +1,7 @@
 import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
-import { KeyValueStore, KioskConfigurationRepository } from '@jamanvaar/database';
+import { KioskConfigurationRepository } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
-import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
+import { fetchWithDeadline } from '@jamanvaar/api';
 /**
  * kiosk-user's only connection to cloud/api. Unlike every other app in this
  * monorepo's activation flow, this one is deliberately a single call: a

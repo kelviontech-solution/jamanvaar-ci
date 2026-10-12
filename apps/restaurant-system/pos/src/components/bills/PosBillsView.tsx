@@ -6,36 +6,9 @@ import { PosPrinterService } from '../../services/printerService';
 import { PdfReportBuilder, ReportFullData } from '../../services/pdfReportBuilder';
 import { db, OrderRepository, AuditRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
 import { CentralReportingService, CentralDatePreset } from '@jamanvaar/business';
-import { Order, OrderType, PaymentMethod, OrderStatus } from '@jamanvaar/types';
+import { Order } from '@jamanvaar/types';
 import { formatINR, splitTax, formatSplitTax, toCsvRow } from '@jamanvaar/utils';
-import {
-  Receipt,
-  Search,
-  Printer,
-  RotateCcw,
-  Ban,
-  CreditCard,
-  Banknote,
-  QrCode,
-  Calendar,
-  CheckCircle2,
-  AlertTriangle,
-  Download,
-  FileSpreadsheet,
-  Filter,
-  Eye,
-  Clock,
-  User,
-  UtensilsCrossed,
-  ShoppingBag,
-  Bike,
-  ChevronDown,
-  ChevronUp,
-  X,
-  Sparkles,
-  Layers,
-  ArrowRight
-} from 'lucide-react';
+import { Receipt, Search, Printer, RotateCcw, Ban, Calendar, Download, FileSpreadsheet, Filter, Eye, Clock, ChevronDown, ChevronUp, X, ArrowRight } from 'lucide-react';
 
 type TimePeriod = 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'ALL' | 'CUSTOM';
 

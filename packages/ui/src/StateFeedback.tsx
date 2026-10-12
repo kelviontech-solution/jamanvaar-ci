@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, AlertTriangle, RefreshCw, UtensilsCrossed, WifiOff } from 'lucide-react';
+import { AlertCircle, RefreshCw, UtensilsCrossed, WifiOff } from 'lucide-react';
 import { Button } from './Button';
 
 export const LoadingState: React.FC<{ message?: string; className?: string }> = ({

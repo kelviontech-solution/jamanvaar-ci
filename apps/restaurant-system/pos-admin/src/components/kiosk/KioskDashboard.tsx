@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db, MenuRepository } from '@jamanvaar/database';
 import { getPayoutSummary, type PayoutSummary, type CloudKiosk } from '../../cloud/cloudClient';
 import type { PosAdminTab } from '../../App';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, KeyRound } from 'lucide-react';
-import { CloudApiError, cloudRequestPasswordResetOwner, cloudResetPasswordOwner } from '../../cloud/cloudClient';
+import { CloudApiError, cloudRequestPasswordResetOwner, cloudResetPasswordOwner, cloudRecoverRestaurantId } from '../../cloud/cloudClient';
 
 interface Props {
   defaultRestaurantCode?: string;
@@ -25,6 +25,7 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [maskedEmail, setMaskedEmail] = useState('');
+  const [discovery, setDiscovery] = useState(false); const [recoveryEmail, setRecoveryEmail] = useState(''); const [recoverySent, setRecoverySent] = useState(false);
 
   const fail = (err: unknown, fallback: string) => setError(err instanceof CloudApiError ? err.message : fallback);
   const inputClass = 'w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors';
@@ -77,7 +78,20 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
         </p>
       </div>
 
-      {step === 'RESTAURANT_ID' ? (
+      {discovery ? <form className="space-y-3" onSubmit={async event => {
+        event.preventDefault(); setBusy(true); setError('');
+        try { await cloudRecoverRestaurantId(recoveryEmail); setRecoverySent(true); }
+        catch (error) { fail(error, 'Could not request recovery. Please try again.'); }
+        finally { setBusy(false); }
+      }}>
+        <label htmlFor="restaurant-id-recovery-email" className="text-xs font-bold">Registered owner email</label>
+        <input id="restaurant-id-recovery-email" type="email" required value={recoveryEmail} onChange={event => setRecoveryEmail(event.target.value)} className={inputClass} autoComplete="email"/>
+        <p className="text-xs text-slate-500">Restaurant IDs are sent only to the registered owner email. No activation keys or passwords are disclosed.</p>
+        {recoverySent && <p role="status" className="text-sm text-emerald-800">If this email owns an active restaurant, its Restaurant IDs have been emailed. Check your inbox and spam folder.</p>}
+        {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
+        <button type="submit" disabled={busy} className="min-h-11 w-full rounded-xl bg-jaman-saffron text-white font-bold">{busy ? 'Sending…' : 'Email my Restaurant IDs'}</button>
+        <button type="button" onClick={() => {setDiscovery(false); setError('');}} className="min-h-11 w-full font-bold">I have my Restaurant ID</button>
+      </form> : step === 'RESTAURANT_ID' ? (
         <form onSubmit={sendCode} className="space-y-3">
           <div>
             <label htmlFor="forgot-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">Restaurant ID *</label>
@@ -97,6 +111,7 @@ export const ForgotPasswordPanel: React.FC<Props> = ({ defaultRestaurantCode = '
           <button type="submit" disabled={busy || !restaurantCode.trim()} className="w-full py-3.5 rounded-2xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-[0.99] cursor-pointer mt-2">
             {busy ? 'Sending…' : 'Email me a code'}
           </button>
+          <button type="button" onClick={() => {setDiscovery(true); setError('');}} className="min-h-11 w-full text-brand font-bold text-sm">Forgot your Restaurant ID?</button>
         </form>
       ) : (
         <form onSubmit={submitReset} className="space-y-3">

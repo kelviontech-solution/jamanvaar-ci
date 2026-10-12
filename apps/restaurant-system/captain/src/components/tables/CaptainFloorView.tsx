@@ -4,15 +4,8 @@ import { captainDb } from '@jamanvaar/database';
 import { CaptainTableCard } from './CaptainTableCard';
 import { DiningTable } from '@jamanvaar/types';
 import { EmptyState } from '@jamanvaar/ui';
-import {
-  Search,
-  Filter,
-  Layers,
-  RotateCcw,
-  Sparkles,
-  UtensilsCrossed,
-  Plus
-} from 'lucide-react';
+import { isBillWaiting } from '@jamanvaar/database';
+import { Search, RotateCcw, UtensilsCrossed } from 'lucide-react';
 
 interface CaptainFloorViewProps {
   onOpenGuestModal: (table: DiningTable) => void;
@@ -96,6 +89,15 @@ export const CaptainFloorView: React.FC<CaptainFloorViewProps> = ({
 
   return (
     <div className="space-y-4 sm:space-y-5">
+      {useCaptainStore.getState().customerRequests.some(request => !request.isResolved) && <button type="button" onClick={() => useCaptainStore.getState().setActiveTab('REQUESTS')} className="min-h-12 rounded-xl border border-amber-200 bg-amber-50 px-4 text-amber-900 font-bold text-sm">Guest requests · {useCaptainStore.getState().customerRequests.filter(request => !request.isResolved).length}</button>}
+      {selectMyTables(tables,currentCaptain).some(table => activeFoodReady.some(food => food.tableNumber === table.tableNumber) || isBillWaiting(captainDb.orders.find(order => order.id === table.currentOrderId))) && <section className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
+        <h2 className="font-bold text-jaman-navy">My floor · next actions</h2>
+        <div className="flex flex-wrap gap-2">{selectMyTables(tables,currentCaptain).flatMap(table => {
+          const ready=activeFoodReady.filter(food => food.tableNumber === table.tableNumber).length;
+          const bill=isBillWaiting(captainDb.orders.find(order => order.id === table.currentOrderId));
+          return [ready > 0 ? <button type="button" key={`${table.id}:ready`} onClick={() => onDeliverFood(table)} className="min-h-12 px-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 font-bold text-sm">Table {table.tableNumber} · Deliver {ready} ready dish{ready === 1 ? '' : 'es'}</button> : null,bill ? <button type="button" key={`${table.id}:bill`} onClick={() => {onOpenWorkspace(table);useCaptainStore.getState().setTableWorkspaceTab('BILL');}} className="min-h-12 px-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 font-bold text-sm">Table {table.tableNumber} · Follow up bill</button> : null];
+        })}</div>
+      </section>}
       {/* ── 1. Dynamic Table Summary Counter Strip ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
         <button

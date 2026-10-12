@@ -28,13 +28,14 @@ import { QrAdvancedController, QrAdvancedPublicController } from './qr-advanced.
 import { QrGroupService } from './qr-group.service';
 import { QrGroupController } from './qr-group.controller';
 import { QrPromotionsService } from './qr-promotions.service';
+import { PlatformNotificationsModule } from '../platform-notifications/platform-notifications.module';
 
 /**
  * QR ordering: one more channel into the platform's single order pipeline. It owns QR codes, QR settings and QR
  * analytics events. It owns no order table, no menu, no sync protocol and no entitlement logic of its own.
  */
 @Module({
-  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule],
+  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
   controllers: [QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
   providers: [QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]

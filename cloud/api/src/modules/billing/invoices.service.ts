@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { InvoiceStatus, PaymentMethod, PlatformUser, Prisma } from '@prisma/client';
+import { InvoiceStatus, PlatformUser, Prisma } from '@prisma/client';
 import { pageOf, parsePaging } from '../../common/paging';
 import { ts } from '../../common/sql';
 import { PrismaService } from '../../prisma/prisma.service';

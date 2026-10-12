@@ -1,7 +1,7 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
 import { StaffSession } from '@jamanvaar/sync';
-import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
+import { fetchWithDeadline } from '@jamanvaar/api';
 /**
  * POS's only connection to cloud/api. Single-call activation, same pattern
  * as kiosk-user's Phase 3 cloudClient.ts: the activation-key redeem

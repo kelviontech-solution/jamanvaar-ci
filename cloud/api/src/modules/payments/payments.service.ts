@@ -644,10 +644,10 @@ export class PaymentsService {
   }
 
   /** The latest online payments for a restaurant, with the two things staff act on: paid-but-unserved and refundable balance. */
-  async tenantRecent(restaurantId: string, limit = 30, branchId?: string | null) {
+  async tenantRecent(restaurantId: string, limit = 30, branchId?: string | null, externalOrderId?: string) {
     const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.paymentTransaction.findMany({
-        where: { restaurantId, ...(branchId ? { order: { OR: [{branchId},{branchId:null,kiosk:{branchId}}] } } : {}) },
+        where: { restaurantId, order: { ...(externalOrderId ? { externalOrderId } : {}), ...(branchId ? { OR: [{branchId},{branchId:null,kiosk:{branchId}}] } : {}) } },
         orderBy: { createdAt: 'desc' },
         take: Math.min(100, Math.max(1, limit)),
         include: { order: { select: { externalOrderId: true } }, refunds: { select: { amount: true, status: true } } }

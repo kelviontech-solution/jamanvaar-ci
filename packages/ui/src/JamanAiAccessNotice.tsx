@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AiConfig, refreshConfiguredAi } from '@jamanvaar/business';
 import { Sparkles, X, RefreshCw } from 'lucide-react';
 

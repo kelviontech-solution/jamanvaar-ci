@@ -15,23 +15,7 @@ import {
   DayRow
 } from './reportDataEngine';
 import { ReportExportService } from './reportExportService';
-import {
-  X,
-  Printer,
-  FileSpreadsheet,
-  Palette,
-  Monitor,
-  FileText,
-  Receipt,
-  Download,
-  Share2,
-  Check,
-  TrendingUp,
-  Building2,
-  Calendar,
-  Clock,
-  UserCheck
-} from 'lucide-react';
+import { X, Printer, FileSpreadsheet, Palette, Monitor, FileText, Receipt, Calendar, Clock, UserCheck } from 'lucide-react';
 
 interface ReportPreviewModalProps {
   isOpen: boolean;

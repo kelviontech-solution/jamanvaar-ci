@@ -1,0 +1,66 @@
+{
+  "scope": "Calls whose resolved symbol is declared in lib.dom.d.ts. Imported custom useConfirm callbacks are excluded.",
+  "count": 12,
+  "calls": [
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/useQrUnsavedChanges.ts",
+      "line": 8,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "line": 186,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "line": 213,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/tables/FloorTablesModule.tsx",
+      "line": 178,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reservations/ReservationsModule.tsx",
+      "line": 86,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/InventoryRecipesModule.tsx",
+      "line": 82,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/InventoryRecipesModule.tsx",
+      "line": 103,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/customers/CustomersCrmModule.tsx",
+      "line": 270,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/staff/StaffRolesModule.tsx",
+      "line": 125,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/hardware/PrintersDevicesModule.tsx",
+      "line": 60,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/backup/BackupRestoreModule.tsx",
+      "line": 129,
+      "name": "window.confirm"
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/inventory/WastageLogModal.tsx",
+      "line": 137,
+      "name": "window.confirm"
+    }
+  ]
+}

@@ -4,19 +4,7 @@ import { formatINR } from '@jamanvaar/utils';
 import { sound, ModalBackdrop } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import { calculateCart } from '@jamanvaar/business';
-import {
-  X,
-  Percent,
-  IndianRupee,
-  Tag,
-  CheckCircle2,
-  AlertCircle,
-  Trash2,
-  Sparkles,
-  ShieldCheck,
-  Layers,
-  FileText
-} from 'lucide-react';
+import { X, Percent, IndianRupee, Tag, CheckCircle2, AlertCircle, Trash2, Layers, FileText } from 'lucide-react';
 
 interface PosDiscountModalProps {
   isOpen: boolean;

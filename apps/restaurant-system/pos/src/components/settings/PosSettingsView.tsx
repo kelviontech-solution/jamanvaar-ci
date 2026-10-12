@@ -1,61 +1,15 @@
 import React, { useState } from 'react';
+import { StaffPracticePanel } from '@jamanvaar/ui';
 import { usePosStore } from '../../store/posStore';
-import { db, ReceiptRepository, PrintQueueRepository, LicenseRepository } from '@jamanvaar/database';
-import { PLAN_DEFINITIONS, EntitlementService, applyLicenseCertificate } from '@jamanvaar/business';
+import { db, PrintQueueRepository, LicenseRepository } from '@jamanvaar/database';
+import { applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, PrinterRole } from '@jamanvaar/types';
 import { PosPrinterService } from '../../services/printerService';
 import { formatINR, slipHeader } from '@jamanvaar/utils';
 import { sound, ConnectionPanel, type SoundVolume, SettingsPageHeader, SettingsTabs, SettingsFeedback } from '@jamanvaar/ui';
 import { DisplaySizeCard } from './DisplaySizeCard';
 import { DetectedPrintersPanel } from './DetectedPrintersPanel';
-import {
-  Settings,
-  Printer,
-  Server,
-  Wifi,
-  WifiOff,
-  Database,
-  RefreshCw,
-  CheckCircle2,
-  Sliders,
-  FileText,
-  HardDrive,
-  Layers,
-  ChefHat,
-  ShieldCheck,
-  Award,
-  KeyRound,
-  Building,
-  Check,
-  X,
-  AlertTriangle,
-  Sparkles,
-  Smartphone,
-  Copy,
-  Terminal,
-  Zap,
-  Banknote,
-  QrCode,
-  CreditCard,
-  ChevronDown,
-  ChevronUp,
-  Bot,
-  BarChart3,
-  ShoppingBag,
-  Bell,
-  Network,
-  ArrowRight,
-  TrendingUp,
-  Activity,
-  Radio,
-  UtensilsCrossed,
-  LayoutGrid,
-  Package,
-  Users,
-  Clock,
-  Volume2,
-  VolumeX
-} from 'lucide-react';
+import { Settings, Printer, Server, Wifi, WifiOff, Database, RefreshCw, CheckCircle2, Sliders, FileText, HardDrive, ChefHat, Award, KeyRound, Building, Check, Sparkles, Smartphone, Zap, Banknote, QrCode, ChevronDown, ChevronUp, Bot, BarChart3, Network, UtensilsCrossed, LayoutGrid, Package, Users, Volume2, VolumeX } from 'lucide-react';
 
 export const PosSettingsView: React.FC = () => {
   const {
@@ -212,6 +166,7 @@ ESC/POS Command Engine Verified OK
 
   return (
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-5">
+      <StaffPracticePanel/>
       {/* Page header + section tabs (shared Settings primitives) */}
       <div className="space-y-3 shrink-0">
         <SettingsPageHeader

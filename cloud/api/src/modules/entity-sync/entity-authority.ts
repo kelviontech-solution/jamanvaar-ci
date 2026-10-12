@@ -43,6 +43,7 @@ export const ENTITY_WRITE_AUTHORITY: Record<SyncableEntityType, readonly DeviceT
 
 /** Types only some devices may even receive (everything else is readable by every terminal of the restaurant). */
 export const ENTITY_READ_AUTHORITY: Partial<Record<SyncableEntityType, readonly DeviceType[]>> = {
+  SERVICE_MESSAGE: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK_ADMIN'],
   CUSTOMER: ['POS', 'POS_ADMIN', 'CAPTAIN'],
   SHIFT: ['POS', 'POS_ADMIN'],
   CASH_MOVEMENT: ['POS', 'POS_ADMIN'],

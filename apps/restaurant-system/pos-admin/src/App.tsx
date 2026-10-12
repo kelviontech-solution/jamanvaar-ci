@@ -1,31 +1,23 @@
 import { activeAdminBranch } from './adminBranchScope';
 import { AdminBranchWorkspace } from './components/header/AdminBranchWorkspace';
 import { BranchBusinessDashboard } from './components/dashboard/BranchBusinessDashboard';
+import type { BillingEntry } from './components/dashboard/dashboardDrilldown';
 import { OnboardingChecklistCard } from './components/dashboard/OnboardingChecklistCard';
+import { MenuLaunchCheck } from './components/dashboard/MenuLaunchCheck';
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
 import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
 import { KioskComboPanel } from './components/settings/KioskComboPanel';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers, startLocalChangeSync, syncPromotions, syncInventoryMasters } from '@jamanvaar/sync';
 import React, { useEffect, useState, useMemo } from 'react';
-import {
-  AuditRepository,
-  CouponRepository,
-  db,
-  LicenseRepository,
-  MenuRepository,
-  NotificationRepository,
-  RestaurantIdentityRepository,
-  ReservationRepository,
-  StaffRepository
-} from '@jamanvaar/database';
+import { AuditRepository, CouponRepository, db, NotificationRepository, RestaurantIdentityRepository, ReservationRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
 import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
-import { isCloudConnected, redeemActivationCode, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, saveRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements, fetchCloudKiosks, sendKioskCommand, type CloudKiosk } from './cloud/cloudClient';
+import { isCloudConnected, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements, fetchCloudKiosks, sendKioskCommand, type CloudKiosk } from './cloud/cloudClient';
 import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings } from '@jamanvaar/sync';
 import {
   Category,
@@ -44,7 +36,7 @@ import {
   JamanAiAssistantModal,
   JamanAiFloatingButton,
   JAMANVAARStartup,
-  JamanvaarAuthLayout,
+  JamanvaarAuthLayout,
   SettingsPageHeader,
   APP_HERO_IMAGES,
   Modal,
@@ -67,44 +59,10 @@ import {
   ReportGeneratorService,
   SessionPersistence
 } from '@jamanvaar/business';
-import {
-  Activity,
-  AlertCircle,
-  Award,
-  CalendarClock,
-  CheckCircle2,
-  Coins,
-  CreditCard,
-  Database,
-  DollarSign,
-  Flame,
-  Grid,
-  Heart,
-  LayoutDashboard,
-  Package,
-  Printer,
-  QrCode,
-  Lock,
-  ChevronDown,
-  Settings,
-  ShieldCheck,
-  ShoppingBag,
-  TrendingUp,
-  UtensilsCrossed,
-  Users,
-  Sparkles,
-  ArrowRight,
-  LifeBuoy,
-  Truck,
-  RefreshCw,
-  Sliders,
-  Tablet,
-  Unlock,
-  Tag
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, QrCode, Lock, ChevronDown, Settings, ShieldCheck, UtensilsCrossed, Users, Sparkles, ArrowRight, RefreshCw, Tablet, Unlock } from 'lucide-react';
 
 // Reusable Feature Modules
-import { RestaurantDashboard } from './components/dashboard/RestaurantDashboard';
+// Reusable Feature Modules
 import { BillingInvoicesModule } from './components/billing/BillingInvoicesModule';
 import { OrdersModule } from './components/orders/OrdersModule';
 import { KitchenKotModule } from './components/kitchen/KitchenKotModule';
@@ -161,58 +119,9 @@ import { EodReportModal } from './components/EodReportModal';
 import { RestoreModal } from './components/RestoreModal';
 import { FinancialReconciliationModal } from './components/reports/FinancialReconciliationModal';
 
-export type PosAdminTab =
-  | 'DASHBOARD'
-  | 'QR_ORDERING'
-  | 'BILLING_SALES'
-  | 'ORDERS'
-  | 'LIVE_KDS'
-  | 'MENU'
-  | 'MENU_OPTIONS'
-  | 'TABLES'
-  | 'RESERVATIONS'
-  | 'KITCHEN_KOT'
-  | 'INVENTORY'
-  | 'CUSTOMERS'
-  | 'STAFF'
-  | 'PAYMENTS'
-  | 'REPORTS'
-  | 'SHIFTS'
-  | 'HARDWARE'
-  | 'SYNC'
-  | 'SETTINGS'
-  | 'LICENSE'
-  | 'AUDIT'
-  | 'BACKUP'
-  | 'SUPPORT'
-  | 'INVENTORY_CONTROL'
-  | 'KIOSK_DESIGN'
-  | 'KIOSK_WELCOME'
-  | 'KIOSK_COMBOS'
-  | 'KIOSKS'
-  | 'COUPONS'
-  | 'RECEIPTS'
-  | 'TEMPLATES'
-  | 'KIOSK_PAYMENTS'
-  | 'FEEDBACK'
-  | 'DOWNLOADS';
-
-/** The real production tab list, as a runtime array -- restoreActiveTab validates against this
- *  (not a hardcoded fixture), so a test can prove every actual tab round-trips, and the array
- *  can't silently drift out of sync with the PosAdminTab type above (TS flags it if they diverge). */
-export const ALL_POS_ADMIN_TABS: readonly PosAdminTab[] = [
-  'DASHBOARD', 'QR_ORDERING', 'BILLING_SALES', 'ORDERS', 'LIVE_KDS', 'MENU', 'MENU_OPTIONS',
-  'TABLES', 'RESERVATIONS', 'KITCHEN_KOT', 'INVENTORY', 'CUSTOMERS', 'STAFF', 'PAYMENTS',
-  'REPORTS', 'SHIFTS', 'HARDWARE', 'SYNC', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT',
-  'INVENTORY_CONTROL', 'KIOSK_DESIGN', 'KIOSK_WELCOME', 'KIOSK_COMBOS', 'KIOSKS', 'COUPONS', 'RECEIPTS', 'TEMPLATES', 'KIOSK_PAYMENTS', 'FEEDBACK', 'DOWNLOADS'
-];
-
-
-
-/** Compatibility validator for callers of the old tab API. Routing now restores product and page together. */
-export function restoreActiveTab(stored: string | null): PosAdminTab {
-  return stored && (ALL_POS_ADMIN_TABS as readonly string[]).includes(stored) ? (stored as PosAdminTab) : 'DASHBOARD';
-}
+import type { PosAdminTab } from './navigation/adminTabs';
+export { ALL_POS_ADMIN_TABS, restoreActiveTab } from './navigation/adminTabs';
+export type { PosAdminTab } from './navigation/adminTabs';
 
 export default function PosAdminApp() {
   const ai = useAiAccess();
@@ -448,6 +357,7 @@ export default function PosAdminApp() {
 
   // Modals Open States & Editing Entities
   const [selectedOrderDetail, setSelectedOrderDetail] = useState<Order | null>(null);
+  const [dashboardBillingEntry, setDashboardBillingEntry] = useState<BillingEntry>();
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
 
@@ -765,9 +675,6 @@ export default function PosAdminApp() {
   // same today-scoped order list.
   const todayReport = useMemo(() => ReportGeneratorService.getReportForPeriod('TODAY'), [dbTick, orders]);
   const dailyReport = todayReport.summary;
-  const topDishes = useMemo(() => ReportGeneratorService.getTopSellingItemsFromOrders(todayReport.orders), [todayReport]);
-  const hourlySales = useMemo(() => ReportGeneratorService.getHourlySalesToday(), [dbTick, orders]);
-  const peakHours = useMemo(() => ReportGeneratorService.getPeakHoursAnalysis(), [dbTick, orders]);
 
   const activeShift = shifts.find((s) => s.status === 'OPEN') || shifts[0];
   const pendingKotsCount = kots.filter((k: any) => k.status === 'PREPARING').length;
@@ -871,7 +778,7 @@ export default function PosAdminApp() {
                     className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
                   />
                   <p className="text-[11px] text-slate-500 mt-1.5">
-                    Find it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button).
+                    Find your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.
                   </p>
                 </div>
 
@@ -1271,13 +1178,14 @@ export default function PosAdminApp() {
           {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.</p></div></main> :
           <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
-            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} />{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
+            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/>{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
             {activeTab === 'DASHBOARD' && branchScopeReady && !isKioskAdmin && activeAdminBranch !== 'all' && <OnboardingChecklistCard items={[
-              {id:'menu',label:'Add and publish your menu',hint:'Add categories and dishes so all devices share the same menu.',done:menuItems.length>0,onGo:()=>setActiveTab('MENU')},
+              {id:'menu',label:'Add your dishes',hint:'Add dishes here, then use the publication check below to verify what guests can see.',done:menuItems.length>0,onGo:()=>setActiveTab('MENU')},
               {id:'tables',label:'Set up this branch’s tables',done:tables.length>0,onGo:()=>setActiveTab('TABLES')},
               {id:'staff',label:'Add your team',done:users.length>0,onGo:()=>setActiveTab('STAFF')},
               {id:'printer',label:'Connect receipt and kitchen printers',done:configuredPrinters.length>0,onGo:()=>setActiveTab('HARDWARE')}
             ]} />}
+            {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch !== 'all' && <MenuLaunchCheck branchId={activeAdminBranch ?? undefined} qrEnabled={hasApp('QR_ORDERING')} onNavigate={tab => setActiveTab(tab as typeof activeTab)}/>}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
             {activeTab === 'QR_ORDERING' && <QrConsole onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} />}
@@ -1285,6 +1193,7 @@ export default function PosAdminApp() {
             {/* TAB 3: BILLING / INVOICES */}
             {activeTab === 'BILLING_SALES' && (
               <BillingInvoicesModule
+                initialFilters={dashboardBillingEntry}
                 orders={orders}
                 onOrderUpdated={() => setDbTick((t) => t + 1)}
                 showToast={showToast}
@@ -1604,7 +1513,7 @@ export default function PosAdminApp() {
                   showToast={showToast}
                   onUpdated={() => setDbTick((t) => t + 1)}
                 />
-                {isKioskAdmin && <KioskDisplaySettingsPanel showToast={showToast} />}
+                {isKioskAdmin && <KioskDisplaySettingsPanel showToast={showToast} kiosks={kiosks.filter(kiosk => kiosk.branchId === activeAdminBranch)} />}
               </div>
             )}
 

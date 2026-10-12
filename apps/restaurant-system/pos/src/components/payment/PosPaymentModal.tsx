@@ -1,29 +1,13 @@
 import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { AuditRepository, OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound } from '@jamanvaar/ui';
+import { useStaffLanguage } from '@jamanvaar/ui';
 import { PosSplitByGuestModal, type GuestSplitPlan } from './PosSplitByGuestModal';
-import {
-  X,
-  Banknote,
-  QrCode,
-  CreditCard,
-  Wallet,
-  Building2,
-  CheckCircle2,
-  AlertCircle,
-  Trash2,
-  Edit2,
-  ArrowRight,
-  Check,
-  Sparkles,
-  Split,
-  Tag,
-  Percent
-} from 'lucide-react';
+import { X, Banknote, QrCode, CreditCard, Wallet, Building2, CheckCircle2, AlertCircle, Trash2, Edit2, Check, Sparkles, Split, Tag } from 'lucide-react';
 
 type PaymentChannel = 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT';
 
@@ -74,6 +58,7 @@ const CHANNELS: ChannelConfig[] = [
 ];
 
 export const PosPaymentModal: React.FC = () => {
+  const {t:staffText} = useStaffLanguage();
   const {
     isPaymentOpen,
     setIsPaymentOpen,
@@ -124,6 +109,8 @@ export const PosPaymentModal: React.FC = () => {
 
   // Manual payment verification flags
   const [upiConfirmed, setUpiConfirmed] = useState(false);
+  const [manualReference,setManualReference] = useState('');
+  useEffect(() => {if (isPaymentOpen) setManualReference('');},[isPaymentOpen]);
   const [cardConfirmed, setCardConfirmed] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -496,6 +483,11 @@ export const PosPaymentModal: React.FC = () => {
         setIsProcessing(false);
         setErrorMessage('Failed to finalize settlement. Please try again.');
       } else {
+        if (upiPortion > 0 || cardPortion > 0) {
+          const actor=usePosStore.getState().currentUser?.fullName ?? 'Cashier';
+          OrderRepository.updateOrder(res.id, { paymentConfirmation: { kind: 'CASHIER_CONFIRMED', actor, at: new Date().toISOString(), reference: manualReference.trim() || txnRef } });
+          AuditRepository.log({action:'MANUAL_PAYMENT_CONFIRMED',category:'PAYMENT',username:actor,details:`${res.orderNumber}: cashier acknowledged UPI/card collection ${formatINR(upiPortion+cardPortion)}; reference ${manualReference.trim() || txnRef}.`});
+        }
         sound.play('payment');
       }
     } catch (err: any) {
@@ -523,7 +515,7 @@ export const PosPaymentModal: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-black text-jaman-saffron uppercase tracking-wider bg-[#FFF4ED] px-2 py-0.5 rounded border border-[#FDBA74]">
-                PAYMENT & SETTLEMENT
+                {staffText('Payment & Settlement')}
               </span>
               <span className="text-xs text-slate-500 font-mono font-bold uppercase">
                 {savedOrder ? `Order ${savedOrder.orderNumber} · Token #${savedOrder.tokenNumber}` : 'New Order — Not Yet Saved'}
@@ -666,7 +658,7 @@ export const PosPaymentModal: React.FC = () => {
                       </div>
 
                       <div className="mt-2">
-                        <span className="text-xs font-black text-jaman-navy block">{ch.label}</span>
+                        <span className="text-xs font-black text-jaman-navy block">{staffText(ch.label)}</span>
                         <span className="text-[10px] text-slate-400 block truncate">{ch.sublabel}</span>
                       </div>
 
@@ -882,7 +874,7 @@ export const PosPaymentModal: React.FC = () => {
                             upiConfirmed ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
                           }`}
                         >
-                          {upiConfirmed ? 'UPI Verified' : 'Mark UPI Paid'}
+                          {staffText(upiConfirmed ? 'Cashier-confirmed UPI' : 'Confirm UPI received')}
                         </button>
                       </div>
                     )}
@@ -1023,7 +1015,7 @@ export const PosPaymentModal: React.FC = () => {
                             : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
                         }`}
                       >
-                        {upiConfirmed ? 'UPI Verified' : 'Mark UPI Paid'}
+                        {staffText(upiConfirmed ? 'Cashier-confirmed UPI' : 'Confirm UPI received')}
                       </button>
                     </div>
                   </div>
@@ -1064,7 +1056,7 @@ export const PosPaymentModal: React.FC = () => {
             <div className="bg-white border-2 border-jaman-border rounded-3xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="font-black text-xs uppercase tracking-wider text-jaman-navy">
-                  Payment Summary
+                  {staffText('Payment Summary')}
                 </h3>
                 {isSplitMode && (
                   <button
@@ -1209,10 +1201,12 @@ export const PosPaymentModal: React.FC = () => {
             </div>
 
             {/* PRIMARY SETTLEMENT BUTTON */}
+            {(upiPortion > 0 || cardPortion > 0) && <label className="block text-sm font-semibold text-jaman-navy mb-3">Bank / terminal reference (optional)<input aria-label="Bank or terminal payment reference" value={manualReference} maxLength={128} onChange={e => setManualReference(e.target.value)} className="block w-full min-h-11 border border-jaman-border rounded-xl px-3 mt-1" placeholder="UPI transaction ID or card approval reference"/><span className="block text-xs text-slate-600 mt-1">Confirm receipt on the merchant bank or card terminal. This records your acknowledgement; it is not gateway verification.</span></label>}
             <div className="space-y-2">
               <button
                 type="button"
                 onClick={handleSettle}
+                aria-label="Confirm and settle payment"
                 disabled={!isReadyToSettle || isProcessing}
                 className={`w-full py-4 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 ${
                   isReadyToSettle && !isProcessing
@@ -1225,7 +1219,7 @@ export const PosPaymentModal: React.FC = () => {
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    <span>CONFIRM & SETTLE {formatINR(totalPayable)}</span>
+                    <span>{staffText('Confirm & Settle')} {formatINR(totalPayable)}</span>
                   </>
                 )}
               </button>

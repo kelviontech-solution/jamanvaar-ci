@@ -1,24 +1,9 @@
 import React, { useState, useMemo, useEffect} from 'react';
-import { BusinessDay, Order, OrderStatus, OrderType, PaymentMethod } from '@jamanvaar/types';
+import { BusinessDay, Order } from '@jamanvaar/types';
 import { BusinessDayRepository } from '@jamanvaar/database';
 import { formatINR, formatSplitTax } from '@jamanvaar/utils';
 import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
-import {
-  X,
-  Search,
-  Filter,
-  ShoppingBag,
-  Clock,
-  User,
-  CreditCard,
-  Banknote,
-  QrCode,
-  ChefHat,
-  Receipt,
-  Layers,
-  Sparkles,
-  ChevronRight
-} from 'lucide-react';
+import { X, Search, ShoppingBag, Clock, Receipt } from 'lucide-react';
 
 interface PosDayOrdersModalProps {
   businessDay: BusinessDay;

@@ -62,6 +62,8 @@ export const orderSyncMetaSchema = z
     captainName: z.string().max(120).optional(),
     /** When the table asked for the bill, and the captain's split-by-seat note. Stored on the order, merged key by key. */
     billRequestedAt: z.string().max(40).optional(),
+    tableReleasedAt: z.string().datetime().optional(),
+    paymentConfirmation: z.object({kind:z.literal('CASHIER_CONFIRMED'),actor:z.string().min(1).max(120),at:z.string().datetime(),reference:z.string().max(128).optional()}).optional(),
     billSplitNote: z.string().max(200).optional(),
     customerName: z.string().max(120).optional(),
     customerPhone: z.string().max(32).optional(),
@@ -77,6 +79,7 @@ export const orderSyncMetaSchema = z
     businessDayId: z.string().max(64).optional(),
     paymentTransactionId: z.string().max(128).optional(),
     counterSettlementAmountPaise: z.number().int().min(0).optional(),
+    refundEvents: z.array(z.object({ idempotencyKey: z.string().min(1).max(128), amountPaise: z.number().int().positive(), method: z.enum(['CASH', 'UPI_TO_CUSTOMER']), originalShiftId: z.string().max(128).optional(), payingShiftId: z.string().max(128).optional(), businessDayId: z.string().max(128), at: z.string().datetime(), actor: z.string().min(1).max(200), reason: z.string().min(1).max(2000) })).max(100).optional(),
     refundAmountPaise: z.number().int().min(0).optional(),
     tenderedAmountPaise: z.number().int().optional(),
     paymentSplits: z.array(z.object({ method: z.string().max(32), amountPaise: z.number().int() })).optional(),

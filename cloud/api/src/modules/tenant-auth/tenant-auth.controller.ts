@@ -47,6 +47,7 @@ import { readActivePlatformNotice } from '../../common/platform-notice';
 import { TenantAuthGuard } from '../../common/guards/tenant-auth.guard';
 import { CurrentTenantUser } from '../../common/decorators/current-tenant-user.decorator';
 import { PublicAuthThrottle, TenantRefreshThrottle } from '../../common/throttle';
+import { z } from 'zod';
 
 const REFRESH_COOKIE = 'jamanvaar_tenant_refresh';
 
@@ -89,6 +90,12 @@ export class TenantAuthController {
   }
 
   /** "Forgot password", step 1 (BUG-142). Always the same answer, so it cannot be used to find out who has an account. */
+  @Post('recover-restaurant-id')
+  @HttpCode(200)
+  @PublicAuthThrottle()
+  @UsePipes(new ZodValidationPipe(z.object({email: z.string().trim().email().max(254)}).strict()))
+  async recoverRestaurantId(@Body() body: {email: string}) { return this.authService.recoverRestaurantId(body.email); }
+
   @Post('forgot-password')
   @HttpCode(200)
   @PublicAuthThrottle()

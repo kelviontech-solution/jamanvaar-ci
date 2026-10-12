@@ -52,11 +52,11 @@ describe('a bill request belongs to its order', () => {
       expect(isBillWaiting(order())).toBe(false);
     });
 
-    it('a paid, cancelled or completed order is not waiting, even if the guest asked', () => {
+    it('paid and cancelled orders stop waiting; completed-but-unpaid bills remain waiting', () => {
       const asked = requestedAt(2);
       expect(isBillWaiting(order({ billRequestedAt: asked, paymentStatus: 'SUCCESS' }))).toBe(false);
       expect(isBillWaiting(order({ billRequestedAt: asked, orderStatus: 'CANCELLED' }))).toBe(false);
-      expect(isBillWaiting(order({ billRequestedAt: asked, orderStatus: 'COMPLETED' }))).toBe(false);
+      expect(isBillWaiting(order({ billRequestedAt: asked, orderStatus: 'COMPLETED' }))).toBe(true);
     });
 
     it('billsWaiting lists the waiting bills oldest request first, with what they owe', () => {

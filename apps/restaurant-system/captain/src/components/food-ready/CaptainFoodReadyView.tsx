@@ -1,16 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useCaptainStore } from '../../store/captainStore';
 import { FoodReadyItem } from '@jamanvaar/types';
-import {
-  Flame,
-  Check,
-  Clock,
-  CheckCircle2,
-  ChefHat,
-  ArrowRight,
-  Sparkles,
-  Users, Search
-} from 'lucide-react';
+import { Flame, Check, Clock, CheckCircle2, Search } from 'lucide-react';
 
 interface CaptainFoodReadyViewProps {
   onOpenTableWorkspace: (tableNumber: string) => void;

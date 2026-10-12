@@ -1,3 +1,4 @@
+import type { Restaurant } from '@jamanvaar/types';
 import { RestaurantIdentityRepository } from '@jamanvaar/database';
 import { DeviceGate } from './device_gate';
 
@@ -12,6 +13,9 @@ export interface RestaurantIdentityFields {
   state?: string | null;
   /** The owner's "Show JAMAN AI Assistant" choice; every terminal follows it. */
   showJamanAI?: boolean;
+  businessDayCutoffHour?: number;
+  operatingProfile?: Restaurant['operatingProfile'];
+  branding?: Partial<Restaurant>;
 }
 
 /** What the cloud always returns for a GET — `name` is a required column, never absent. */
@@ -47,13 +51,14 @@ export async function pullRestaurantIdentity(opts: { apiBase: string; deviceToke
  * these fields, so it is the only caller. Sent before the pull above so a rename or address
  * correction saved on this device is not overwritten by the copy the cloud still had.
  */
-export async function pushRestaurantIdentity(opts: { apiBase: string; deviceToken: string; identity: RestaurantIdentityFields; requireAcknowledgement?: boolean }): Promise<void> {
+export async function pushRestaurantIdentity(opts: { apiBase: string; deviceToken: string; identity: RestaurantIdentityFields; requireAcknowledgement?: boolean; ownerAuthorization?: string }): Promise<void> {
   try {
     const response = await DeviceGate.gatedFetch(`${opts.apiBase}/api/v1/devices/me/restaurant`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${opts.deviceToken}`, ...(opts.ownerAuthorization ? { 'x-owner-authorization': opts.ownerAuthorization } : {}) },
       body: JSON.stringify(opts.identity)
     });
+    if (response.ok) { const data = await response.json(); if (data.id && data.name) RestaurantIdentityRepository.syncProfile(data); }
     if (!response.ok && opts.requireAcknowledgement) throw new Error('Restaurant settings could not be saved to the server.');
   } catch (error) {
     if (opts.requireAcknowledgement) throw error;

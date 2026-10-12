@@ -1,5 +1,7 @@
 import type { NotificationRole } from '@jamanvaar/types';
 import { NotificationRepository } from './repositories';
+import { db } from './db';
+import { KeyValueStore } from './key_value_store';
 
 /**
  * Staff messages and bill requests between devices (BUG-099/100). They used to travel only as a
@@ -27,6 +29,8 @@ export interface ServiceMessage {
   /** BILL_REQUEST only: "2× Paneer Tikka, 1× Naan", so the counter knows what it is printing. */
   billLines?: string;
   createdAt: string;
+  status?: 'SENT' | 'ACCEPTED' | 'RESOLVED';
+  updatedAt?: string;
 }
 
 export interface ServiceMessageRecord {
@@ -35,6 +39,7 @@ export interface ServiceMessageRecord {
 }
 
 const STORAGE_KEY = 'jamanvaar_service_messages_v1';
+const scopeKey = () => `${STORAGE_KEY}:${JSON.stringify([KeyValueStore.get('jamanvaar_tenant_id') || db.restaurant.id, KeyValueStore.get('jamanvaar_bound_branch_id') || db.outlet.id])}`;
 /** Messages older than this are stale by the time a device that was off comes back. */
 const MAX_AGE_MS = 12 * 60 * 60 * 1000;
 const MAX_REMEMBERED = 500;
@@ -43,19 +48,23 @@ interface State {
   outbox: ServiceMessage[];
   /** Ids already handled on this device: received before, or sent from here. */
   seen: string[];
+  requests?: ServiceMessage[];
 }
 
 let memory: State = { outbox: [], seen: [] };
 let loaded = false;
+let loadedScope = '';
 
 function load(): State {
-  if (loaded) return memory;
+  const scope = scopeKey();
+  if (loaded && loadedScope === scope) return memory;
+  memory = {outbox:[],seen:[],requests:[]}; loadedScope = scope;
   loaded = true;
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(scope) : null;
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<State>;
-      memory = { outbox: parsed.outbox ?? [], seen: parsed.seen ?? [] };
+      memory = { outbox: parsed.outbox ?? [], seen: parsed.seen ?? [], requests: parsed.requests ?? [] };
     }
   } catch {
     // Unreadable state simply starts empty.
@@ -65,7 +74,7 @@ function load(): State {
 
 function save(): void {
   try {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, JSON.stringify(memory));
+    if (typeof localStorage !== 'undefined') localStorage.setItem(loadedScope || scopeKey(), JSON.stringify(memory));
   } catch {
     // Storage unavailable — state stays in memory for this session.
   }
@@ -109,7 +118,9 @@ function parse(raw: unknown): ServiceMessage | null {
     orderId: typeof r.orderId === 'string' && r.orderId ? r.orderId : undefined,
     billAmount: typeof r.billAmount === 'number' && Number.isFinite(r.billAmount) ? r.billAmount : undefined,
     billLines: typeof r.billLines === 'string' && r.billLines ? r.billLines : undefined,
-    createdAt: r.createdAt as string
+    createdAt: r.createdAt as string,
+    status: r.status === 'RESOLVED' ? 'RESOLVED' : r.status === 'ACCEPTED' ? 'ACCEPTED' : 'SENT',
+    updatedAt: typeof r.updatedAt === 'string' ? r.updatedAt : undefined
   };
 }
 
@@ -138,6 +149,17 @@ export function billRequestNotification(input: { requestId: string; tableNumber?
 }
 
 export class ServiceMessages {
+  static getRequest(id: string): ServiceMessage | undefined { return load().requests?.find(row => row.id === id); }
+  static acknowledgeRequest(id: string, status: 'ACCEPTED' | 'RESOLVED'): void {
+    const state = load(); const request = this.getRequest(id);
+    if (!request || request.kind !== 'CALL_STAFF') throw new Error('Service request unavailable. Refresh the inbox.');
+    if (request.status === 'RESOLVED' || request.status === status) return;
+    if (status === 'RESOLVED' && request.status !== 'ACCEPTED') throw new Error('Accept the request before completing it.');
+    const update = {...request,status,updatedAt:new Date().toISOString()};
+    state.requests = state.requests!.map(row => row.id === id ? update : row);
+    state.outbox = [...state.outbox.filter(row => row.id !== id), update];
+    save(); db.notify();
+  }
   /** Queue a message to be delivered to other devices. */
   public static enqueue(input: Omit<ServiceMessage, 'id' | 'createdAt'>): ServiceMessage {
     const state = load();
@@ -147,6 +169,7 @@ export class ServiceMessages {
       createdAt: new Date().toISOString()
     };
     state.outbox.push(msg);
+    if (msg.kind === 'CALL_STAFF') (state.requests ??= []).push({...msg,status:'SENT'});
     remember(msg.id); // never notify this device about its own message
     save();
     return msg;
@@ -158,8 +181,9 @@ export class ServiceMessages {
 
   public static markPushed(records: ServiceMessageRecord[]): void {
     const state = load();
-    const sent = new Set(records.map((r) => r.externalId));
-    state.outbox = state.outbox.filter((m) => !sent.has(m.id));
+    // An accepted request can be completed while the previous push is in flight.
+    // Acknowledging the previous version must not discard the newer progress.
+    state.outbox = state.outbox.filter(m => !records.some(row => row.externalId === m.id && JSON.stringify(row.payload) === JSON.stringify({...m})));
     save();
   }
 
@@ -172,9 +196,18 @@ export class ServiceMessages {
     const msg = parse(raw);
     if (!msg) return null;
     const state = load();
-    if (state.seen.includes(msg.id)) return null;
     if (Date.now() - Date.parse(msg.createdAt) > MAX_AGE_MS) return null;
     if (!isRecipientFor(reader, msg)) return null;
+
+    if (msg.kind === 'CALL_STAFF') {
+      const existing = this.getRequest(msg.id);
+      const rank = (value?: string) => value === 'RESOLVED' ? 2 : value === 'ACCEPTED' ? 1 : 0;
+      if (!existing || rank(msg.status) > rank(existing.status)) {
+        state.requests = [...(state.requests ?? []).filter(row => row.id !== msg.id), msg].slice(-MAX_REMEMBERED);
+        save(); db.notify();
+      }
+      if (state.seen.includes(msg.id)) return existing?.status !== this.getRequest(msg.id)?.status ? msg : null;
+    } else if (state.seen.includes(msg.id)) return null;
 
     remember(msg.id);
     save();
@@ -199,6 +232,7 @@ export class ServiceMessages {
       priority: msg.kind === 'CALL_STAFF' ? 'URGENT' : 'HIGH',
       targetRoles: roles,
       tableNumber: msg.tableNumber,
+      meta: {serviceRequestId: msg.kind === 'CALL_STAFF' ? msg.id : undefined},
       timestamp: msg.createdAt
     });
     return msg;
@@ -207,6 +241,7 @@ export class ServiceMessages {
   public static resetForTests(): void {
     memory = { outbox: [], seen: [] };
     loaded = true;
+    loadedScope = scopeKey();
     save();
   }
 }

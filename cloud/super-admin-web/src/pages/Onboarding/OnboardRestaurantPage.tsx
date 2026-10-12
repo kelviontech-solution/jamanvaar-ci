@@ -1190,13 +1190,20 @@ export function OnboardRestaurantPage() {
               }}
             >
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--jv-slate-600)', marginBottom: 4, textTransform: 'uppercase' }}>
-                Applications to Provision
+                Products for this restaurant
               </div>
               <p style={{ fontSize: 11, color: 'var(--jv-slate-500)', marginTop: 0, marginBottom: 10 }}>
                 Pre-selected from {selectedPlan?.name || 'the selected plan'}'s tier — uncheck anything this
                 restaurant shouldn't have, or enable one the plan doesn't normally include.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8 }}>
+                {([
+                  ['POS only',['POS','POS_ADMIN']],
+                  ['POS + Captain',['POS','POS_ADMIN','CAPTAIN','KDS']],
+                  ['Self-order kiosk',['KIOSK','KIOSK_ADMIN','KDS']],
+                  ['QR ordering',['QR_ORDERING']],
+                  ['Full restaurant',['POS','POS_ADMIN','CAPTAIN','KDS','KIOSK','KIOSK_ADMIN','QR_ORDERING']],
+                ] as Array<[string, AppCode[]]>).map(([label,applications]) => <button key={label} type="button" onClick={() => setModulesForm(m => ({...m,applications}))} style={{minHeight:44,padding:10,borderRadius:12,border:'1px solid var(--jv-line)',background:'white',fontWeight:700}}>Use {label} setup</button>)}
                 {APP_CODES.map((code) => {
                   const checked = modulesForm.applications.includes(code);
                   return (

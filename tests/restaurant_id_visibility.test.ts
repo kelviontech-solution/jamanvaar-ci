@@ -38,7 +38,7 @@ describe('The Restaurant ID can be found and copied (BUG-127)', () => {
   it('the Restaurant Admin (pos-admin) login screen says where to find the Restaurant ID', () => {
     const source = read('apps/restaurant-system/pos-admin/src/App.tsx');
     expect(source).not.toContain("From your restaurant's admin dashboard");
-    expect(source).toMatch(/Super Admin[\s\S]{0,200}Restaurant ID|Restaurant ID[\s\S]{0,300}Super Admin/);
+    expect(source).toContain('Find your Restaurant ID in your Welcome Kit or activation email.');
   });
 
   // Captain no longer asks for a Restaurant ID at all: it activates with the Welcome Kit key alone

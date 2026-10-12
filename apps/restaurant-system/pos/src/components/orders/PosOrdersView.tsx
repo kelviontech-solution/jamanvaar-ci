@@ -9,24 +9,9 @@ import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatINR, getOrderSource, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { getPaymentStatus } from '../../cloud/cloudClient';
 import { QrOrdersInbox } from './QrOrdersInbox';
-import {
-  ShoppingBag,
-  Search,
-  CheckCircle2,
-  Clock,
-  Printer,
-  CreditCard,
-  ChefHat,
-  Filter,
-  ArrowRight,
-  Eye,
-  AlertCircle,
-  Calendar,
-  Sparkles,
-  History,
-  Flame,
-  Undo2,
-  Ban, QrCode, Smartphone, Monitor } from 'lucide-react';
+import { outstandingBillAmount } from '@jamanvaar/utils';
+import { LicenseRepository } from '@jamanvaar/database';
+import { ShoppingBag, Search, CheckCircle2, Clock, Printer, CreditCard, ChefHat, Eye, Sparkles, History, Flame, Undo2, Ban, QrCode, Smartphone, Monitor } from 'lucide-react';
 import { useConfirm } from '@jamanvaar/ui';
 
 export const PosOrdersView: React.FC = () => {
@@ -39,7 +24,9 @@ export const PosOrdersView: React.FC = () => {
     setIsReceiptOpen,
     setIsPaymentOpen,
     requestManagerOverride,
-    currentUser
+    currentUser,
+    orderInboxMode,
+    setOrderInboxMode
   } = usePosStore();
 
   const [scopeFilter, setScopeFilter] = useState<'ACTIVE_DAY' | 'ALL_DAYS'>('ACTIVE_DAY');
@@ -48,6 +35,7 @@ export const PosOrdersView: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [checkingOrderId, setCheckingOrderId] = useState<string | null>(null);
+  const [qrServiceOpen, setQrServiceOpen] = useState(false);
   const [refundVoidMode, setRefundVoidMode] = useState<'REFUND' | 'VOID' | null>(null);
   const [refundVoidReason, setRefundVoidReason] = useState('');
   const [refundAmountInput, setRefundAmountInput] = useState('');
@@ -58,7 +46,7 @@ export const PosOrdersView: React.FC = () => {
 
   // Filter orders according to active business day vs historical archive
   const scopedOrders = (() => {
-    if (scopeFilter === 'ALL_DAYS') {
+    if (scopeFilter === 'ALL_DAYS' || orderInboxMode === 'COLLECTIONS') {
       return allOrders;
     }
     // ACTIVE_DAY: Show orders belonging to the currently open business day
@@ -67,6 +55,7 @@ export const PosOrdersView: React.FC = () => {
 
   const filteredOrders = useMemo(() => {
     return scopedOrders.filter((o) => {
+      if (orderInboxMode === 'COLLECTIONS' && outstandingBillAmount(o) === 0) return false;
       if (statusFilter !== 'ALL' && o.orderStatus !== statusFilter) return false;
       if (sourceFilter !== 'ALL') {
         const orderSrc = getOrderSource(o);
@@ -82,7 +71,7 @@ export const PosOrdersView: React.FC = () => {
       }
       return true;
     });
-  }, [scopedOrders, statusFilter, sourceFilter, search]);
+  }, [scopedOrders, statusFilter, sourceFilter, search, orderInboxMode]);
 
   // Session KPIs
   const sessionStats = useMemo(() => {
@@ -90,7 +79,7 @@ export const PosOrdersView: React.FC = () => {
     const completed = scopedOrders.filter((o) => o.orderStatus === 'COMPLETED').length;
     const active = scopedOrders.filter((o) => o.orderStatus === 'PREPARING' || o.orderStatus === 'READY' || o.orderStatus === 'CONFIRMED' || o.orderStatus === 'NEW').length;
     const totalSales = scopedOrders
-      .filter((o) => o.orderStatus === 'COMPLETED')
+      .filter((o) => o.paymentStatus === 'SUCCESS' && !['CANCELLED','REFUNDED'].includes(o.orderStatus))
       .reduce((sum, o) => sum + o.totalAmount, 0);
 
     return { total, completed, active, totalSales };
@@ -191,22 +180,25 @@ export const PosOrdersView: React.FC = () => {
   return (
     <>
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-hidden select-none">
-      <QrOrdersInbox actor={currentUser?.fullName || 'Cashier'} /><QrServiceInbox api={qrRequestsApi}/>
+      {(LicenseRepository.getLicense()?.entitlements.qrTableOrdering || allOrders.some(o => o.source_type === 'QR_TABLE')) && <>
+        {orderInboxMode !== 'COLLECTIONS' && <QrOrdersInbox actor={currentUser?.fullName || 'Cashier'}/>}
+        <details className="mb-3 shrink-0 rounded-xl border border-jaman-border bg-white" onToggle={e => setQrServiceOpen(e.currentTarget.open)}><summary className="min-h-11 p-3 text-sm font-bold cursor-pointer">Table service requests</summary>{qrServiceOpen && <QrServiceInbox api={qrRequestsApi}/>}</details>
+      </>}
       {/* Header & Session Scope Indicator */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 shrink-0">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-jaman-navy flex items-center gap-2">
               <ShoppingBag className="w-6 h-6 text-jaman-saffron" />
-              <span>Live Restaurant Orders</span>
+              <span>{orderInboxMode === 'COLLECTIONS' ? 'Outstanding bills' : 'Live Restaurant Orders'}</span>
             </h1>
             <span className="text-xs font-black bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {activeDay.status === 'OPEN' ? 'Session Active' : 'Session Closing'}
+              {orderInboxMode === 'COLLECTIONS' ? 'All business dates' : activeDay.status === 'OPEN' ? 'Session Active' : 'Session Closing'}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            {scopeFilter === 'ACTIVE_DAY'
+            {orderInboxMode === 'COLLECTIONS' ? 'Collect outstanding balances from kiosk, QR, captain and counter orders. Completed service does not mean paid.' : scopeFilter === 'ACTIVE_DAY'
               ? `Showing real-time orders for current business session: ${activeDay.displayDate} (${activeDay.id})`
               : 'Viewing complete database order archive across all past and closed business sessions.'}
           </p>
@@ -216,7 +208,7 @@ export const PosOrdersView: React.FC = () => {
         <div className="flex items-center gap-1.5 bg-white border border-jaman-border p-1 rounded-2xl shadow-2xs">
           <button
             type="button"
-            onClick={() => setScopeFilter('ACTIVE_DAY')}
+            onClick={() => {setScopeFilter('ACTIVE_DAY');setOrderInboxMode('ALL');}}
             className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
               scopeFilter === 'ACTIVE_DAY'
                 ? 'bg-jaman-saffron text-white shadow-xs'
@@ -229,7 +221,7 @@ export const PosOrdersView: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setScopeFilter('ALL_DAYS')}
+            onClick={() => {setScopeFilter('ALL_DAYS');setOrderInboxMode('ALL');}}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               scopeFilter === 'ALL_DAYS'
                 ? 'bg-jaman-navy text-white shadow-xs'
@@ -257,6 +249,10 @@ export const PosOrdersView: React.FC = () => {
           />
         </div>
 
+        <div className="flex gap-2" aria-label="Order workspace">
+          <button type="button" onClick={() => {setOrderInboxMode('ALL');setStatusFilter('ALL');}} className="min-h-11 px-3 rounded-xl border border-jaman-border font-bold text-sm">All orders</button>
+          <button type="button" onClick={() => {setOrderInboxMode('COLLECTIONS');setStatusFilter('ALL');}} className={`min-h-11 px-3 rounded-xl font-bold text-sm ${orderInboxMode === 'COLLECTIONS' ? 'bg-jaman-saffron text-white' : 'bg-amber-50 text-amber-900'}`}>Outstanding bills · {allOrders.filter(o => outstandingBillAmount(o) > 0).length} · {formatINR(allOrders.reduce((sum,o) => sum+outstandingBillAmount(o),0))}</button>
+        </div>
         {/* Source Pills */}
         <div className="flex items-center gap-1 bg-white border border-jaman-border p-1 rounded-xl shadow-2xs overflow-x-auto">
           {[
@@ -318,7 +314,7 @@ export const PosOrdersView: React.FC = () => {
               // carries paymentMethod: 'UPI' with paymentStatus: 'PENDING',
               // and staff need to be able to collect cash for it too.
               const isPendingOnlineQr = order.source_type === 'QR_TABLE' && order.orderStatus === 'DRAFT';
-              const isCounterCashPending = order.paymentStatus === 'PENDING' && !isPendingOnlineQr && order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'REFUNDED';
+              const isCounterCashPending = outstandingBillAmount(order) > 0 && !isPendingOnlineQr;
               // This specific order attempted a real UPI payment first —
               // Razorpay's webhook (or this kiosk's own background
               // reconciliation) may still confirm it after the visible
@@ -406,6 +402,7 @@ export const PosOrdersView: React.FC = () => {
                     </div>
 
                     {isPendingOnlineQr && <p className="text-xs font-bold text-amber-700">Online payment pending — awaiting verification</p>}
+                    {outstandingBillAmount(order) > 0 && <span className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-bold text-amber-900">Payment due {formatINR(outstandingBillAmount(order))}</span>}
                     {/* Settle Action — opens the same Payment & Settlement modal (cash/UPI/card/split/etc.) the normal checkout flow uses */}
                     {isCounterCashPending && (
                       <div className="flex flex-col items-end gap-1">
@@ -421,7 +418,7 @@ export const PosOrdersView: React.FC = () => {
                             e.stopPropagation();
                             void handleSettleOrder(order);
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                          className="min-h-11 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-xs flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
                           title={isUnconfirmedKioskUpi ? 'Checks the real UPI payment status, then opens Cash / UPI / Card / Split settlement' : 'Opens Cash / UPI / Card / Split settlement'}
                         >
                           <CreditCard className="w-3.5 h-3.5" />
@@ -461,7 +458,7 @@ export const PosOrdersView: React.FC = () => {
         </div>
 
         {/* Right: Selected Order Detail Preview Pane */}
-        <div className="lg:col-span-4 bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs flex flex-col justify-between overflow-y-auto">
+        <div className={`lg:col-span-4 bg-white border border-jaman-border rounded-2xl p-5 shadow-2xs ${selectedOrder ? 'flex' : 'hidden lg:flex'} flex-col justify-between overflow-y-auto`}>
           {selectedOrder ? (
             <div className="space-y-4">
               <div className="border-b border-slate-100 pb-3">

@@ -3,7 +3,7 @@ import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
 import { CustomerAccount } from '@jamanvaar/types';
-import { Search, UserPlus, X, Check, Phone, Star, ShoppingBag, User } from 'lucide-react';
+import { Search, UserPlus, X, Check, Phone, Star, User } from 'lucide-react';
 
 interface PosCustomerSearchDrawerProps {
   isOpen: boolean;

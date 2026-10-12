@@ -37,6 +37,7 @@ export function buildHeartbeatBody(appVersion: string) {
     osPlatform: detectOsPlatform(),
     pendingSyncCount: stats.pendingCount,
     menuVersion: MenuVersionTracker.applied(),
+    profileRevision: db.restaurant.profileRevision,
     syncError: problems.length > 0 ? problems.join('; ').slice(0, 290) : null
   };
 }

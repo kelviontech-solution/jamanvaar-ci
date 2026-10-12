@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Circle, X, Rocket } from 'lucide-react';
 
-const DISMISS_KEY = 'jamanvaar_posadmin_onboarding_dismissed';
+const DISMISS_KEY = () => `jamanvaar_posadmin_onboarding_dismissed:${localStorage.getItem('jamanvaar_cloud_restaurant_id') ?? 'local'}:${localStorage.getItem('jamanvaar_bound_branch_id') ?? 'branch'}`;
 
 export interface OnboardingChecklistItem {
   id: string;
@@ -27,7 +27,7 @@ interface OnboardingChecklistCardProps {
 export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = ({ items }) => {
   const [dismissed, setDismissed] = useState(() => {
     try {
-      return localStorage.getItem(DISMISS_KEY) === '1';
+      return localStorage.getItem(DISMISS_KEY()) === '1';
     } catch {
       return false;
     }
@@ -42,7 +42,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
   const dismiss = () => {
     setDismissed(true);
     try {
-      localStorage.setItem(DISMISS_KEY, '1');
+      localStorage.setItem(DISMISS_KEY(), '1');
     } catch {
       // localStorage unavailable — checklist just reappears next session, harmless.
     }

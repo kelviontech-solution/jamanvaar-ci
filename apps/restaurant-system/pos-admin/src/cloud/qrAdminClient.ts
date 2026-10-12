@@ -112,6 +112,8 @@ const json = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.strin
 
 export const QrAdminApi = {
   entitlement: () => qrApi<QrEntitlementView>(`${base}/entitlement`),
+  requestFeature: (featureCode: string, featureLabel: string, note?: string) =>
+    qrApi<{ ticketNumber: number; ticketId: string }>(`${base}/feature-request`, json({ featureCode, featureLabel, ...(note ? { note } : {}) })),
   overview: () => qrApi<QrOverview>(`${base}/overview`),
   branches: () => qrApi<QrBranch[]>(`${base}/branches`),
   tables: () => qrApi<QrTableRow[]>(`${base}/tables`),

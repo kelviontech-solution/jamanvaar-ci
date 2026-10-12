@@ -1,26 +1,7 @@
 import { LocalCorePairing } from './LocalCorePairing';
 import React, { useState, useEffect } from 'react';
-import { JamanvaarLogo, JamanvaarAppBadge, AppIdentity } from './JamanvaarBrand';
-import {
-  Zap,
-  Printer,
-  Utensils,
-  Cloud,
-  ShieldCheck,
-  Lock,
-  Wifi,
-  WifiOff,
-  Clock,
-  Sparkles,
-  Layers,
-  ChefHat,
-  Smartphone,
-  CheckCircle2,
-  Calendar,
-  LayoutDashboard,
-  BarChart3,
-  Package
-} from 'lucide-react';
+import { JamanvaarLogo, AppIdentity } from './JamanvaarBrand';
+import { Zap, Printer, Utensils, Cloud, ShieldCheck, Wifi, WifiOff, ChefHat, Smartphone, Calendar, LayoutDashboard, BarChart3, Package } from 'lucide-react';
 
 export interface JamanvaarCapabilityItem {
   icon?: string;

@@ -1,14 +1,8 @@
 import React from 'react';
-import { useCaptainStore } from '../../store/captainStore';
-import {
-  LayoutGrid,
-  ShoppingBag,
-  Flame,
-  MessageSquare,
-  MoreHorizontal,
-  ChefHat,
-  Bell
-} from 'lucide-react';
+import { useStaffLanguage } from '@jamanvaar/ui';
+import { useCaptainStore, selectMyTables } from '../../store/captainStore';
+import { captainDb } from '@jamanvaar/database';
+import { LayoutGrid, ShoppingBag, Flame, MessageSquare, MoreHorizontal } from 'lucide-react';
 
 interface CaptainNavigationProps {
   activeTab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'REQUESTS' | 'SHIFT' | 'CUSTOMERS';
@@ -21,12 +15,13 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
   onSelectTab,
   onOpenMoreDrawer
 }) => {
+  const {t} = useStaffLanguage();
   const {
     tables,
     foodReadyItems,
     messages,
     customerRequests,
-    kots
+    currentCaptain
   } = useCaptainStore();
 
   const activeFoodReadyCount = foodReadyItems.filter((fr) => !fr.isServed).length;
@@ -38,14 +33,14 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
       id: 'TABLES',
       label: 'My Tables',
       icon: LayoutGrid,
-      count: tables.length,
+      count: selectMyTables(tables, currentCaptain).length,
       isUrgent: false
     },
     {
       id: 'ORDERS',
       label: 'Active Orders',
       icon: ShoppingBag,
-      count: tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILL_REQUESTED').length,
+      count: captainDb.orders.filter(order => !order.tableReleasedAt && !['DRAFT','CANCELLED','REFUNDED','COMPLETED','SERVED'].includes(order.orderStatus) && tables.some(table => (table.currentOrderId === order.id || table.id === order.tableId) && table.status !== 'AVAILABLE')).length,
       isUrgent: false
     },
     {
@@ -93,7 +88,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                       isActive ? 'text-jaman-saffron' : tab.isUrgent ? 'text-emerald-600 fill-emerald-600' : 'text-slate-500'
                     }`}
                   />
-                  <span>{tab.label}</span>
+                  <span>{t(tab.label)}</span>
                   {tab.count > 0 && (
                     <span
                       className={`text-[11px] font-mono px-2 py-0.5 rounded-full font-bold ${
@@ -124,7 +119,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
             title="Open More Tools: Live KOTs, Guest Requests, Diners CRM, Shift Stats, Settings"
           >
             <MoreHorizontal className="w-4 h-4" />
-            <span>More Options</span>
+            <span>{t('More Options')}</span>
             {pendingRequestsCount > 0 && (
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             )}
@@ -179,7 +174,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                   )}
                 </div>
                 <span className="text-[11px] font-bold tracking-tight truncate max-w-[60px]">
-                  {tab.label.replace('Active ', '')}
+                  {t(tab.label)}
                 </span>
               </button>
             );
@@ -201,7 +196,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               )}
             </div>
-            <span className="text-[11px] font-bold tracking-tight">More</span>
+            <span className="text-[11px] font-bold tracking-tight">{t('More Options')}</span>
           </button>
         </div>
       </nav>

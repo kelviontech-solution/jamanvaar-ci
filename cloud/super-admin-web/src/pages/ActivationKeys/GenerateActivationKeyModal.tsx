@@ -86,7 +86,10 @@ export function GenerateActivationKeyModal({
         allowedDeviceType: deviceType === 'QR_ORDERING' ? 'POS_ADMIN' : deviceType,
         expiresAt,
         branchId: branchId || undefined,
-        label: label.trim() || undefined
+        // Without this, a QR console key is submitted as a plain POS_ADMIN key with no label and
+        // renders in the activation keys list as "RESTAURANT ADMIN CONSOLE" -- identical to, and
+        // so indistinguishable from, a real Restaurant Admin key. It isn't missing, just unlabeled.
+        label: label.trim() || (deviceType === 'QR_ORDERING' ? 'QR Ordering Console' : undefined)
       });
       setCreatedCode(key.code);
     } catch (err) {
@@ -197,7 +200,20 @@ export function GenerateActivationKeyModal({
               </div>
               <div className="field">
                 <label htmlFor="key-label">Terminal name (optional)</label>
-                <input id="key-label" type="text" maxLength={80} placeholder="e.g. Counter 1, Kitchen wall" value={label} onChange={(e) => setLabel(e.target.value)} />
+                <input
+                  id="key-label"
+                  type="text"
+                  maxLength={80}
+                  placeholder={deviceType === 'QR_ORDERING' ? 'Defaults to "QR Ordering Console"' : 'e.g. Counter 1, Kitchen wall'}
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                />
+                {deviceType === 'QR_ORDERING' && !label.trim() && (
+                  <p style={{ fontSize: 12, color: 'var(--jv-text-muted)', margin: '4px 0 0' }}>
+                    Left blank, this key is labeled "QR Ordering Console" in the activation keys list — otherwise it would
+                    look identical to a regular Restaurant Admin key and be easy to mistake for missing.
+                  </p>
+                )}
               </div>
             </div>
 

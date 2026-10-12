@@ -105,7 +105,8 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
     expect(result.newDay.status).toBe('OPEN');
     expect(result.newDay.businessDate).toBe('2026-09-01');
     expect(result.newDay.id).toBe('BD-20260901');
-    expect(result.newDay.openingCash).toBe(2000);
+    expect(result.newDay.openingCash).toBe(0);
+    expect(result.newShift).toBeUndefined();
 
     // Active Day query now returns the new day
     const activeAfter = BusinessDayService.getActiveBusinessDay();
@@ -136,7 +137,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
     }).toThrow(/Cannot close business day/);
 
     // Forced close succeeds
-    const result = BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
+    const result = BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true, actualCash: BusinessDayService.validatePreClose('BD-20260831').expectedCash });
     expect(result.closedDay.status).toBe('CLOSED');
   });
 
@@ -214,7 +215,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
   // TEST 7: Double-Click EOD Idempotency
   it('TEST 7: should prevent double-EOD from creating multiple duplicate new days', () => {
-    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
+    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true, actualCash: BusinessDayService.validatePreClose('BD-20260831').expectedCash });
 
     // Second click on open new day should return already open active day
     const secondCall = BusinessDayRepository.openNewBusinessDay('Amit Dave', 2000, '2026-09-01');
@@ -226,7 +227,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
   // TEST 8: POS creates new order after EOD
   it('TEST 8: new order created after EOD must strictly bind to new businessDayId and start token at #101', () => {
-    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
+    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true, actualCash: BusinessDayService.validatePreClose('BD-20260831').expectedCash });
     const activeDay = BusinessDayService.getActiveBusinessDay();
     expect(activeDay.id).toBe('BD-20260901');
 
@@ -260,7 +261,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
   // TEST 9: Daily Counters Reset on New Day
   it('TEST 9: should reset new business day counters to zero while preserving historical reports', () => {
-    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
+    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true, actualCash: BusinessDayService.validatePreClose('BD-20260831').expectedCash });
     const newDay = BusinessDayService.getActiveBusinessDay();
 
     expect(newDay.grossSales).toBe(0);
@@ -276,7 +277,7 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
 
   // TEST 10: Notification System Dispatch & Badges
   it('TEST 10: should generate persistent AppNotifications with unread count updates upon EOD', () => {
-    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true });
+    BusinessDayService.closeBusinessDay({ businessDayId: 'BD-20260831', forceCloseWithExceptions: true, actualCash: BusinessDayService.validatePreClose('BD-20260831').expectedCash });
 
     const posNotifs = NotificationRepository.getNotifications('POS');
     expect(posNotifs.length).toBeGreaterThanOrEqual(2);
@@ -305,7 +306,8 @@ describe('JAMANVAAR POS — End-of-Day → New Business Day → Notification Com
     const recovery = BusinessDayService.recoverBusinessDayState();
     expect(recovery.recovered).toBe(true);
     expect(recovery.activeDay.status).toBe('OPEN');
-    expect(recovery.activeShift.status).toBe('OPEN');
+    expect(recovery.activeShift).toBeUndefined();
+    expect(db.shifts).toHaveLength(0);
   });
 
   // TEST 12: Midnight Calendar Rollover Guard

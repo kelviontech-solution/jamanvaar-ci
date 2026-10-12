@@ -18,10 +18,14 @@
 /* Size text by ticket width, so a wide TV with many columns does not enlarge narrow cards. */
 .kds-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--kds-card-width, 330px)), 1fr));
   max-width: 2400px;
 }
 .kds-board { container-type: size; }
+.kds-density-tv .kds-ticket-body { padding: 1.25rem; }
+.kds-density-tv .kds-ticket .kds-dish-name { font-size: 1.5rem; line-height: 1.25; }
+.kds-density-tv .kds-ticket button { min-height: 56px; font-size: 1rem; }
+.kds-density-compact .kds-ticket-body { padding: .75rem; }
 .kds-ticket {
   container-type: inline-size;
   max-height: max(330px, calc(100dvh - 270px));

@@ -3,16 +3,7 @@ import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
 import { CustomerAccount } from '@jamanvaar/types';
-import {
-  Users,
-  Search,
-  UserPlus,
-  Phone,
-  Gift,
-  ShoppingBag,
-  CheckCircle2,
-  Calendar,
-  Sparkles, X } from 'lucide-react';
+import { Users, Search, UserPlus, Gift, ShoppingBag, X } from 'lucide-react';
 
 export const PosCustomersView: React.FC = () => {
   const { setSelectedCustomer, setActiveTab } = usePosStore();

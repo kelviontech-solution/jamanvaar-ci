@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { useCaptainStore, InternalMessage, PRESET_MESSAGES } from '../../store/captainStore';
-import {
-  MessageSquare,
-  Send,
-  Check,
-  CheckCheck,
-  Clock,
-  Plus,
-  Filter,
-  Users,
-  ChefHat,
-  Server,
-  UserCheck
-} from 'lucide-react';
+import { MessageSquare, Send, Check, Clock } from 'lucide-react';
 
 export const CaptainMessagesView: React.FC = () => {
   const {

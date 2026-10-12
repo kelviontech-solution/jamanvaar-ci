@@ -1,5 +1,5 @@
 import React from 'react';
-import { DietaryType, KioskStatus, OrderStatus } from '@jamanvaar/types';
+import '@jamanvaar/types';
 
 export interface StatusBadgeProps {
   status: string;

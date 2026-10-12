@@ -26,3 +26,5 @@ export * from './prep_time_report';
 export * from './labour_report';
 export * from './split_bill';
 export * from './reservation_hold';
+
+export * from './shift_report';

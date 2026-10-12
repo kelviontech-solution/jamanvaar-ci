@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { PaymentConnectionsService } from './payment-connections.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';

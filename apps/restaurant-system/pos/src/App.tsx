@@ -2,10 +2,10 @@ import { syncStaffUsers, startLocalChangeSync, syncInventoryMasters, InventoryLe
 import React, { useEffect, useState } from 'react';
 import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
-import { db, CustomerRepository, NotificationRepository, StaffRepository, BILL_REQUESTED_EVENT } from '@jamanvaar/database';
+import { db, BILL_REQUESTED_EVENT, getTerminalId } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
-import type { MenuItem, Category } from '@jamanvaar/types';
+
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, syncKioskConfiguration, onAppResume } from '@jamanvaar/sync';
 import { sound, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { PosLogin } from './components/auth/PosLogin';
@@ -131,14 +131,16 @@ export const App: React.FC = () => {
   // was a genuine gap: KDS/Captain both call setAttachedDatabase, POS never did.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    lanMeshSync.registerDevice('POS', 'POS-01', 'POS Terminal');
+    const terminalId = getTerminalId('POS');
+    usePosStore.setState({posTerminalId:terminalId});
+    lanMeshSync.registerDevice('POS', terminalId, 'POS Terminal');
     lanMeshSync.setAttachedDatabase(db);
 
     // A bill request is raised from its order (see refreshBillState), so the chime follows the order too.
     const onBillRequested = () => sound.play('kot');
     window.addEventListener(BILL_REQUESTED_EVENT, onBillRequested);
     return () => window.removeEventListener(BILL_REQUESTED_EVENT, onBillRequested);
-  }, []);
+  }, [isDeviceActivated]);
 
   // Wire the real cloud sync bridge once this terminal is activated — without
   // this, orders would sit at SAVED_LOCALLY forever and no other device

@@ -1,29 +1,14 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useReducer} from 'react';
 import { BusinessDay } from '@jamanvaar/types';
-import { db, BusinessDayAccountingService, BusinessDaySummary } from '@jamanvaar/database';
+import { db, BusinessDayAccountingService, BusinessDaySummary, ShiftRepository, BusinessDayRepository } from '@jamanvaar/database';
 import { BusinessDayService } from '@jamanvaar/business';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
-import {
-  X,
-  AlertTriangle,
-  CheckCircle2,
-  Lock,
-  ArrowRight,
-  ArrowLeft,
-  Sparkles,
-  RefreshCw,
-  PlusCircle,
-  FileText,
-  CreditCard,
-  Banknote,
-  QrCode,
-  Layers,
-  ShieldCheck, Smartphone } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle2, Lock, ArrowRight, ArrowLeft, Sparkles, RefreshCw, PlusCircle, FileText, CreditCard, Banknote, QrCode, ShieldCheck, Smartphone } from 'lucide-react';
 
 interface PosCloseDayModalProps {
   businessDay: BusinessDay;
@@ -48,6 +33,14 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [closedResult, setClosedResult] = useState<{ closedDay: BusinessDay; newDay: BusinessDay } | null>(null);
+  const currentUser = usePosStore((s) => s.currentUser);
+  const requestManagerOverride = usePosStore((s) => s.requestManagerOverride);
+  const [, refreshRegisters] = useReducer(n => n + 1, 0);
+  useEffect(() => db.subscribe(refreshRegisters), []);
+  useEffect(() => {
+    if (!isOpen) return;
+    setStep(1);setActualCashInput('');setVarianceReason('');setErrorMsg(null);setClosedResult(null);
+  }, [isOpen, businessDay.id]);
 
   // Escape closes this dialog like any other in the app, not just its own Close button.
   useEffect(() => {
@@ -66,13 +59,19 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
 
   const expectedCash = summary.cash_expected;
   // The signed-in cashier closes the day — never a made-up name (BUG-103).
-  const currentUser = usePosStore((s) => s.currentUser);
-  const requestManagerOverride = usePosStore((s) => s.requestManagerOverride);
   const closedByName = currentUser?.fullName || 'Cashier';
-  const actualCash = actualCashInput !== '' ? Number(actualCashInput) : expectedCash;
-  const variance = actualCash - expectedCash;
+  const cashCountValid = actualCashInput.trim() !== '' && Number.isFinite(Number(actualCashInput)) && Number(actualCashInput) >= 0;
+  const actualCash = cashCountValid ? Number(actualCashInput) : 0;
+  const variance = cashCountValid ? actualCash - expectedCash : 0;
+  const cashReconciliationValid = cashCountValid && (variance === 0 || varianceReason.trim().length > 0);
+  const dayShifts = db.shifts.filter(s => BusinessDayService.shiftBelongsToDay(s, businessDay));
+  const openRegisters = dayShifts.filter(s => s.status === 'OPEN');
+  const registersNeedCounting = openRegisters.length > 0 && (dayShifts.length > 1 || openRegisters.some(shift => ShiftRepository.getShiftOrders(shift).some(order => !BusinessDayRepository.orderBelongsToBusinessDay(order, businessDay))));
 
   const handleFinalizeClose = () => {
+    if (!cashCountValid) { setErrorMsg('Enter the cash you counted, including 0 for an empty drawer.'); return; }
+    if (!cashReconciliationValid) { setErrorMsg('Enter a reason for the cash discrepancy before closing the day.'); setStep(3); return; }
+    if (registersNeedCounting) { setErrorMsg('Count and close the register shifts below before closing the branch day.'); setStep(2); return; }
     // security-audit MED-06: force-closing the business day (locking in the
     // day's sales/variance figures and rolling every open order forward) used
     // to need no more authority than any PIN that could log into the
@@ -99,7 +98,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
           businessDayId: summary.business_day_id,
           actualCash,
           closedBy: closedByName,
-          varianceReason: variance !== 0 ? varianceReason : 'Drawer Balanced',
+          varianceReason: variance !== 0 ? varianceReason.trim() : 'Drawer Balanced',
           forceCloseWithExceptions: true
         });
 
@@ -116,9 +115,9 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
         setIsProcessing(false);
         setStep(6); // SUCCESS
         onClosedSuccess(res.closedDay);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Day Close Error:', err);
-        setErrorMsg(err?.message || 'Failed to close business day. Please verify open orders.');
+        setErrorMsg(err instanceof Error ? err.message : 'Failed to close business day. Please verify open orders.');
         setIsProcessing(false);
       }
     }, 400);
@@ -292,6 +291,14 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 </div>
               )}
 
+              <section className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
+                <h3 className="font-bold text-jaman-navy">Register close checklist</h3>
+                {!dayShifts.length && <p className="text-sm text-slate-600">No register shifts were opened for this day.</p>}
+                {dayShifts.map(shift => <div key={shift.id} className="flex flex-wrap justify-between gap-2 border-b py-2 text-sm"><span><strong>{shift.cashierName}</strong><span className="block text-xs text-slate-500">{shift.posId}</span></span><span>{shift.status === 'OPEN' ? 'Count and close this till' : `Closed · counted ${formatINR(shift.closingCash ?? 0)}`}</span></div>)}
+                {registersNeedCounting && <p role="alert" className="text-sm text-amber-900">Each register needs its own cash count before you close the branch day.</p>}
+                <button type="button" className="min-h-11 px-4 rounded-xl bg-jaman-navy text-white font-bold text-sm" onClick={() => {onClose();usePosStore.getState().setActiveTab('SHIFTS');}}>Open register shifts</button>
+              </section>
+
               <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
@@ -304,6 +311,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
+                  disabled={registersNeedCounting}
                   className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 3: Cash Drawer Count</span>
@@ -352,6 +360,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <input
                     type="number"
                     value={actualCashInput}
+                    aria-label="Counted cash"
                     onChange={(e) => setActualCashInput(e.target.value)}
                     placeholder={String(expectedCash)}
                     className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xl font-black font-mono text-jaman-navy focus:outline-none focus:border-jaman-saffron"
@@ -371,7 +380,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                   <span className={`font-mono font-black text-sm ${
                     variance === 0 ? 'text-emerald-600' : variance > 0 ? 'text-blue-600' : 'text-rose-600'
                   }`}>
-                    {variance === 0 ? 'Balanced (₹0)' : variance > 0 ? `+ ₹${variance} (Over)` : `- ₹${Math.abs(variance)} (Short)`}
+                    {!cashCountValid ? 'Cash count required' : variance === 0 ? 'Balanced (₹0)' : variance > 0 ? `+ ₹${variance} (Over)` : `- ₹${Math.abs(variance)} (Short)`}
                   </span>
                 </div>
 
@@ -380,6 +389,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                     <input
                       type="text"
                       value={varianceReason}
+                      aria-label="Cash discrepancy reason"
                       onChange={(e) => setVarianceReason(e.target.value)}
                       placeholder="Reason for cash discrepancy (required for audit)..."
                       className="w-full bg-white border border-rose-300 rounded-xl px-3 py-1.5 text-xs font-bold text-jaman-navy focus:outline-none"
@@ -400,6 +410,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep(4)}
+                  disabled={!cashReconciliationValid}
                   className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <span>Step 4: Payment Reconciliation</span>
@@ -531,7 +542,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
                 <button
                   type="button"
                   onClick={handleFinalizeClose}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !cashReconciliationValid || registersNeedCounting}
                   className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-rose-600/25 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isProcessing ? (
@@ -586,7 +597,7 @@ export const PosCloseDayModal: React.FC<PosCloseDayModalProps> = ({
               <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-left space-y-1">
                 <div className="flex items-center gap-2 text-emerald-800 text-xs font-black">
                   <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>NEXT BUSINESS DAY ACTIVE — {closedResult.newDay.displayDate}</span>
+                  <span>ACTIVE BUSINESS DAY — {closedResult.newDay.displayDate}</span>
                 </div>
                 <p className="text-[11px] text-emerald-700">
                   Business Day {closedResult.newDay.id} opened with ₹{closedResult.newDay.openingCash} float. Order counters reset for the new session while past day history is safely preserved.

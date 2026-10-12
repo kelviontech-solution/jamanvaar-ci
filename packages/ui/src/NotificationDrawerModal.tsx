@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AppNotification, NotificationRole } from '@jamanvaar/types';
-import { db, NotificationRepository } from '@jamanvaar/database';
-import {
-  Bell,
-  CheckCheck,
-  Trash2,
-  X,
-  Sparkles,
-  Flame,
-  Receipt,
-  AlertTriangle,
-  Clock
-} from 'lucide-react';
+import { db, NotificationRepository, ServiceMessages } from '@jamanvaar/database';
+import { useStaffLanguage } from './StaffLanguage';
+import { Bell, CheckCheck, Trash2, X, Sparkles, Flame, Receipt } from 'lucide-react';
 
 interface NotificationDrawerModalProps {
   isOpen: boolean;
@@ -28,6 +19,7 @@ export const NotificationDrawerModal: React.FC<NotificationDrawerModalProps> = (
 }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [filter, setFilter] = useState<'ALL' | 'UNREAD'>('ALL');
+  const {t} = useStaffLanguage(); const [requestError, setRequestError] = useState('');
 
   const refreshList = () => {
     const list = NotificationRepository.getNotifications(role, filter === 'UNREAD');
@@ -152,6 +144,7 @@ export const NotificationDrawerModal: React.FC<NotificationDrawerModalProps> = (
 
         {/* Notifications Scroll List */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5">
+          {requestError && <p role="alert" className="text-sm text-rose-700">{requestError}</p>}
           {notifications.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-2">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
@@ -224,6 +217,11 @@ export const NotificationDrawerModal: React.FC<NotificationDrawerModalProps> = (
                       <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
                         {notif.message}
                       </p>
+                      {notif.type === 'GUEST_HELP' && notif.meta?.serviceRequestId && <button type="button" className="min-h-11 rounded-xl border px-3 font-bold text-xs" onClick={event => {
+                        event.stopPropagation(); setRequestError('');
+                        try { const id = notif.meta!.serviceRequestId as string; const status = ServiceMessages.getRequest(id)?.status; ServiceMessages.acknowledgeRequest(id,status === 'ACCEPTED' ? 'RESOLVED' : 'ACCEPTED'); }
+                        catch(error) {setRequestError(error instanceof Error ? error.message : 'Request unavailable');}
+                      }} disabled={ServiceMessages.getRequest(notif.meta.serviceRequestId)?.status === 'RESOLVED'}>{t(ServiceMessages.getRequest(notif.meta.serviceRequestId)?.status === 'RESOLVED' ? 'Request completed' : ServiceMessages.getRequest(notif.meta.serviceRequestId)?.status === 'ACCEPTED' ? 'Complete request' : 'Accept request')}</button>}
                     </div>
                   </div>
                 </div>

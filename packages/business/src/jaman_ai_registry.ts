@@ -1,4 +1,4 @@
-import { db, ShiftRepository } from '@jamanvaar/database';
+import { db } from '@jamanvaar/database';
 import { AiConfig, delayedKotLabel } from './ai_config';
 import { BusinessDayService } from './business_day_service';
 import { PosAssistantIntent } from './pos_assistant';

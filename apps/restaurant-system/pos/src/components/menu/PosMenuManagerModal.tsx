@@ -1,62 +1,12 @@
 import { CachedImg, ModalBackdrop } from '@jamanvaar/ui';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { EmptyState } from '@jamanvaar/ui';
-import {
-  db,
-  MenuRepository,
-  PREBUILT_MENU_TEMPLATES,
-  MenuTemplate,
-  MenuTemplateCategory,
-  MenuTemplateItem,
-  MenuImportRecord
-} from '@jamanvaar/database';
-import {
-  MenuBuilderService,
-  CategoryMapping,
-  DishConflict,
-  ImportAnalysisResult,
-  ImportExecutionResult
-} from '@jamanvaar/business';
-import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
+import { db, MenuRepository, PREBUILT_MENU_TEMPLATES, MenuTemplate, MenuTemplateCategory } from '@jamanvaar/database';
+import { MenuBuilderService, ImportAnalysisResult, ImportExecutionResult } from '@jamanvaar/business';
+import { MenuItem, Category, DietaryType } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  X,
-  Plus,
-  Edit2,
-  Trash2,
-  Sparkles,
-  Search,
-  Upload,
-  Download,
-  CheckCircle2,
-  AlertTriangle,
-  RotateCcw,
-  Sliders,
-  Layers,
-  Utensils,
-  Image as ImageIcon,
-  Check,
-  Zap,
-  Flame,
-  ArrowRight,
-  ArrowLeft,
-  Filter,
-  Camera,
-  UploadCloud,
-  Link as LinkIcon,
-  RefreshCw,
-  FolderOpen,
-  Clock,
-  Tag,
-  Eye,
-  History,
-  ShieldCheck,
-  CheckSquare,
-  Square,
-  ChevronsRight,
-  Info
-} from 'lucide-react';
+import { X, Plus, Edit2, Trash2, Sparkles, Search, Download, CheckCircle2, AlertTriangle, Sliders, Layers, Utensils, Image as ImageIcon, Check, Zap, ArrowRight, ArrowLeft, Camera, UploadCloud, Link as LinkIcon, RefreshCw, Clock, Eye, History, ShieldCheck, CheckSquare, Square, Info } from 'lucide-react';
 import { useConfirm } from '@jamanvaar/ui';
 
 export const PosMenuManagerModal: React.FC<{

@@ -1,11 +1,5 @@
-import {
-  PaymentInitiationRequest,
-  PaymentInitiationResponse,
-  PaymentMethod,
-  PaymentStatus,
-  PaymentVerificationResponse
-} from '@jamanvaar/types';
-import { generateUUID, sleep } from '@jamanvaar/utils';
+import { PaymentInitiationRequest, PaymentInitiationResponse, PaymentMethod, PaymentVerificationResponse } from '@jamanvaar/types';
+import { sleep } from '@jamanvaar/utils';
 
 export interface IPaymentGateway {
   initiate(req: PaymentInitiationRequest): Promise<PaymentInitiationResponse>;

@@ -76,6 +76,8 @@
   min-height: 80px;
   padding: 14px 28px;
   gap: 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--qr-line);
 }
 .qr-admin-header .qr-header-context {
   display: flex;

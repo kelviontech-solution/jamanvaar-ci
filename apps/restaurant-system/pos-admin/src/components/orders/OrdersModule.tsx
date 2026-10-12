@@ -1,40 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Order, OrderStatus } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime, getOrderSource, ORDER_SOURCE_LABELS } from '@jamanvaar/utils';
-import {
-  DayOrdersService,
-  DaySummary,
-  DateFilterPreset
-} from '@jamanvaar/business';
-import { db, OrderRepository, AuditRepository, ReceiptRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
-import {
-  Search,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  ArrowRight,
-  FileSpreadsheet,
-  Printer,
-  DollarSign,
-  ShoppingBag,
-  Clock,
-  Users,
-  Utensils,
-  Receipt,
-  RotateCcw,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  TrendingUp,
-  CreditCard,
-  Phone,
-  UserCheck,
-  Flame,
-  FileText,
-  SlidersHorizontal,
-  ChevronDown,
-  Layers,
-  Sparkles, X } from 'lucide-react';
+import { Order } from '@jamanvaar/types';
+import { formatINR, formatTime, getOrderSource, ORDER_SOURCE_LABELS } from '@jamanvaar/utils';
+import { DayOrdersService, DateFilterPreset } from '@jamanvaar/business';
+import { OrderRepository, ReceiptRepository, isUnpaidOpenOrder } from '@jamanvaar/database';
+import { Search, ChevronLeft, ChevronRight, FileSpreadsheet, Printer, ShoppingBag, Users, UserCheck, Flame, Sparkles, X } from 'lucide-react';
 import { OrderDetailModal } from '../OrderDetailModal';
 import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
 
@@ -139,7 +108,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   // Compute selected day summary when in drill-down view
   const currentDaySummary = useMemo(() => {
     if (!selectedDayKey) return daySummaries[0] || null;
-    return DayOrdersService.getDaySummary(sourceOrders, selectedDayKey, 6);
+    return DayOrdersService.getDaySummary(sourceOrders, selectedDayKey);
   }, [sourceOrders, selectedDayKey, daySummaries]);
 
   // Filtered & Sorted orders for the currently selected day
@@ -234,7 +203,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
     if (!currentDaySummary) return;
     const currDate = new Date(currentDaySummary.date);
     currDate.setDate(currDate.getDate() - 1);
-    const prevKey = DayOrdersService.getBusinessDateKey(currDate, 6);
+    const prevKey = DayOrdersService.getBusinessDateKey(currDate);
     setSelectedDayKey(prevKey);
     setCurrentPage(1);
   };
@@ -243,8 +212,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
     if (!currentDaySummary) return;
     const currDate = new Date(currentDaySummary.date);
     currDate.setDate(currDate.getDate() + 1);
-    const nextKey = DayOrdersService.getBusinessDateKey(currDate, 6);
-    const todayKey = DayOrdersService.getBusinessDateKey(new Date(), 6);
+    const nextKey = DayOrdersService.getBusinessDateKey(currDate);
+    const todayKey = DayOrdersService.getBusinessDateKey(new Date());
     if (nextKey <= todayKey) {
       setSelectedDayKey(nextKey);
       setCurrentPage(1);
@@ -605,7 +574,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  const todayKey = DayOrdersService.getBusinessDateKey(new Date(), 6);
+                  const todayKey = DayOrdersService.getBusinessDateKey(new Date());
                   setSelectedDayKey(todayKey);
                 }}
                 className="px-3.5 py-2 bg-jaman-navy text-white rounded-xl text-xs font-bold min-h-[40px]"

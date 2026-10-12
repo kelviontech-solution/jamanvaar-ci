@@ -1,4 +1,4 @@
-import { Category, ComboDeal, DietaryType, MenuItem, ModifierGroup, SpiceLevel } from '@jamanvaar/types';
+import { ComboDeal, DietaryType, ModifierGroup, SpiceLevel } from '@jamanvaar/types';
 
 export interface MenuTemplateItem {
   name: string;

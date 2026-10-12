@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateCart, calculateItemTotal, calculateItemDiscountedTotal } from '../pricing';
+import { calculateCart, calculateItemDiscountedTotal } from '../pricing';
 import { CartItem, MenuItem } from '@jamanvaar/types';
 
 describe('JAMANVAAR POS — Complete Discount & Billing Engine', () => {

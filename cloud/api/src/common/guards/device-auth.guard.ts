@@ -181,6 +181,8 @@ export class DeviceAuthGuard implements CanActivate {
     const payoutPath = /^\/api\/v1\/payments\/payout-(summary|history)(?:\?|$)/.test(authorizationPath);
     const requiresRestaurantOwner = payoutPath && await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } })) > 1;
     const requiresFinancialActor = /^\/api\/v1\/restaurant\/qr\/advanced\/orders\/[^/]+\/refund-cash(?:\?|$)/.test(authorizationPath);
+    const managesRestaurantProfile = request.method === 'PATCH' && ['/api/v1/devices/me/restaurant', '/api/v1/devices/me/branch-operating-profile'].includes(authorizationPath);
+    if (managesRestaurantProfile && !['POS_ADMIN', 'KIOSK_ADMIN'].includes(device.type)) throw new ForbiddenException('Only an administrator console can change the restaurant profile');
     const managesStaff = request.method === 'POST' && /^\/api\/v1\/entity-sync\/STAFF_USER$/.test(authorizationPath) && device.type === 'POS_ADMIN';
     const sensitiveOrder = Array.isArray(request.body?.events) && request.body.events.some((event: unknown) => {
       if (!event || typeof event !== 'object') return false;
@@ -195,8 +197,9 @@ export class DeviceAuthGuard implements CanActivate {
     // change to the payout VPA itself is gated, by diffing against what's currently stored.
     const kioskConfigPush = request.method === 'POST' && /^\/api\/v1\/entity-sync\/KIOSK_CONFIGURATION$/.test(authorizationPath) && ['POS_ADMIN', 'KIOSK_ADMIN'].includes(device.type);
     let managesUpiDestination = false;
+    let managesKitchenStations = false;
     if (kioskConfigPush) {
-      const events = (request.body as { events?: Array<{ externalId?: string; payload?: { receipt?: { upiId?: string; upiPayeeName?: string } } }> })?.events;
+      const events = (request.body as { events?: Array<{ externalId?: string; payload?: { stationRegistry?: unknown; receipt?: { upiId?: string; upiPayeeName?: string } } }> })?.events;
       for (const event of Array.isArray(events) ? events : []) {
         const incoming = event?.payload?.receipt;
         if (!incoming || typeof incoming !== 'object') continue;
@@ -207,12 +210,15 @@ export class DeviceAuthGuard implements CanActivate {
           })
         );
         const existingReceipt = (existing?.payload as { receipt?: { upiId?: string; upiPayeeName?: string } } | null)?.receipt;
+        if (event.payload?.stationRegistry !== undefined && JSON.stringify(event.payload.stationRegistry) !== JSON.stringify((existing?.payload as {stationRegistry?: unknown} | null)?.stationRegistry)) managesKitchenStations = true;
         if ((incoming.upiId ?? '') !== (existingReceipt?.upiId ?? '') || (incoming.upiPayeeName ?? '') !== (existingReceipt?.upiPayeeName ?? '')) {
           managesUpiDestination = true;
         }
       }
     }
-    if (requestedBranch !== undefined || requiresRestaurantOwner || requiresFinancialActor || managesStaff || managesOrders || managesUpiDestination) {
+    if (managesKitchenStations && device.type !== 'POS_ADMIN') throw new ForbiddenException('Kitchen stations are managed in Restaurant Admin');
+    if (managesKitchenStations && !verdict!.enabledApps.includes('POS_ADMIN')) throw new ForbiddenException('Kitchen station management requires Restaurant Admin access');
+    if (requestedBranch !== undefined || requiresRestaurantOwner || requiresFinancialActor || managesStaff || managesOrders || managesUpiDestination || managesRestaurantProfile || managesKitchenStations) {
       if (requestedBranch !== undefined && (device.type !== 'POS_ADMIN' || typeof requestedBranch !== 'string' || (!restaurantQrScope && !/^[0-9a-f-]{36}$/i.test(requestedBranch)))) throw new ForbiddenException('Invalid admin branch scope');
       const proof = request.headers['x-owner-authorization'];
       let claims: TenantAccessTokenPayload;
@@ -229,8 +235,8 @@ export class DeviceAuthGuard implements CanActivate {
         // Stricter than the branch-manager allowance just below: changing where customer payments
         // land is OWNER-only, full stop -- a branch's own manager is not exempt the way they are for
         // ordinary financial-actor or staff-administration actions.
-        if (managesUpiDestination && user.role !== 'OWNER') return false;
-        if ((requiresFinancialActor || managesStaff || managesOrders) && user.role !== 'OWNER' && user.branchId !== device.branchId) return false;
+        if ((managesUpiDestination || managesRestaurantProfile) && user.role !== 'OWNER') return false;
+        if ((requiresFinancialActor || managesStaff || managesOrders || managesKitchenStations) && user.role !== 'OWNER' && user.branchId !== device.branchId) return false;
         if (requestedBranch === undefined) return true;
         if (user.role !== 'OWNER' && (user.branchId ?? device.branchId) !== requestedBranch) return false;
         return Boolean(await tx.branch.findFirst({ where: { id: requestedBranch, restaurantId: device.restaurantId, status: 'ACTIVE' } }));

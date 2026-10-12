@@ -17,6 +17,7 @@ export * from './menu_image';
 export * from './dish_photos';
 export * from './category_visuals';
 export * from './order_source';
+export * from './outstanding_bill';
 export * from './tax_rate';
 export * from './kiosk_welcome';
 export * from './welcome_image_cache';

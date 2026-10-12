@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { db, ComboRepository, MenuRepository, KioskComboAuthoring, type KioskComboDraft } from '@jamanvaar/database';
 import { syncMenuCatalog, syncPromotions } from '@jamanvaar/sync';
 const empty = (): KioskComboDraft => ({ name: '', description: '', basePrice: 0, mainItemIds: [], sideItemIds: [], drinkItemIds: [], dessertItemIds: [], isAvailable: true, featured: false });

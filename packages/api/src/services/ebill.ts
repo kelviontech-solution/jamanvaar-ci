@@ -1,4 +1,4 @@
-import { Order, ReceiptConfig, ReceiptDeliveryMethod, ReceiptDeliveryStatus, ReceiptRecord } from '@jamanvaar/types';
+import { Order, ReceiptConfig, ReceiptRecord } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 

@@ -1,5 +1,5 @@
 import { DailyReportSummary, TopItemStat } from '@jamanvaar/business';
-import { db, ReceiptRepository } from '@jamanvaar/database';
+import { ReceiptRepository } from '@jamanvaar/database';
 
 export type ReportDesign = 'CLASSIC' | 'MODERN' | 'COMPACT' | 'STATEMENT' | 'BRANDED';
 
@@ -185,7 +185,7 @@ export class PdfReportBuilder {
     const colW = (contentWidth - 20) / 2;
 
     // Col 1: Financial Statement
-    drawRect(margin, curY - 120, colW, 120, [1, 1, 1], [0.85, 0.85, 0.85], 0.75);
+    drawRect(margin, curY - 160, colW, 160, [1, 1, 1], [0.85, 0.85, 0.85], 0.75);
     drawRect(margin, curY - 20, colW, 20, [0.94, 0.95, 0.96], undefined);
     drawText('REVENUE & TAX STATEMENT', margin + 10, curY - 14, 8, true, [0.04, 0.15, 0.23]);
 
@@ -194,7 +194,9 @@ export class PdfReportBuilder {
       ['Discounts Granted', `- Rs. ${s.discountAmount.toLocaleString('en-IN')}`],
       ['CGST', `Rs. ${s.cgstAmount.toLocaleString('en-IN')}`],
       ['SGST', `Rs. ${s.sgstAmount.toLocaleString('en-IN')}`],
-      ['Total Collected (incl. GST)', `Rs. ${s.netSales.toLocaleString('en-IN')}`]
+      ['Recorded Bill Total (incl. GST)', `Rs. ${s.netSales.toLocaleString('en-IN')}`],
+      ['Returned payments', `Rs. ${s.refundsAmount.toLocaleString('en-IN')} (${s.refundsCount})`],
+      ['Net Collected', `Rs. ${s.totalCollected.toLocaleString('en-IN')}`]
     ];
     finRows.forEach((r, idx) => {
       const rowY = curY - 36 - idx * 17;
@@ -206,7 +208,7 @@ export class PdfReportBuilder {
 
     // Col 2: Payment Mix Allocation
     const col2X = margin + colW + 20;
-    drawRect(col2X, curY - 120, colW, 120, [1, 1, 1], [0.85, 0.85, 0.85], 0.75);
+    drawRect(col2X, curY - 160, colW, 160, [1, 1, 1], [0.85, 0.85, 0.85], 0.75);
     drawRect(col2X, curY - 20, colW, 20, [0.94, 0.95, 0.96], undefined);
     drawText('PAYMENT TENDER ALLOCATION', col2X + 10, curY - 14, 8, true, [0.04, 0.15, 0.23]);
 
@@ -214,7 +216,9 @@ export class PdfReportBuilder {
       ['Cash at Counter', `Rs. ${s.paymentBreakdown.cash.toLocaleString('en-IN')}`],
       ['UPI / Dynamic QR', `Rs. ${s.paymentBreakdown.upi.toLocaleString('en-IN')}`],
       ['Credit / Debit Cards', `Rs. ${s.paymentBreakdown.card.toLocaleString('en-IN')}`],
-      ['Split Payments', `Rs. ${s.paymentBreakdown.split.toLocaleString('en-IN')}`],
+      ['Wallet', `Rs. ${s.paymentBreakdown.wallet.toLocaleString('en-IN')}`],
+      ['Other / Unattributed', `Rs. ${s.paymentBreakdown.other.toLocaleString('en-IN')}`],
+      ['Split (included above)', `Rs. ${s.paymentBreakdown.split.toLocaleString('en-IN')}`],
       ['Total Payment Reconciled', `Rs. ${s.totalCollected.toLocaleString('en-IN')}`]
     ];
     payRows.forEach((r, idx) => {
@@ -225,7 +229,11 @@ export class PdfReportBuilder {
       drawText(r[1], col2X + colW - 10, rowY, 8, isTotal, isTotal ? [0.04, 0.15, 0.23] : [0.3, 0.3, 0.3], 'right');
     });
 
-    curY -= 135;
+    curY -= 175;
+    drawText(`ORDER TYPES: Dine-in ${s.orderTypeBreakdown.dineIn.count} / Rs. ${s.orderTypeBreakdown.dineIn.total} | Takeaway ${s.orderTypeBreakdown.takeaway.count} / Rs. ${s.orderTypeBreakdown.takeaway.total}`, margin, curY, 8);
+    curY -= 14;
+    drawText(`Delivery ${s.orderTypeBreakdown.delivery.count} / Rs. ${s.orderTypeBreakdown.delivery.total} | Token ${s.orderTypeBreakdown.token.count} / Rs. ${s.orderTypeBreakdown.token.total} | Cancelled ${s.cancelledCount}`, margin, curY, 8);
+    curY -= 24;
 
     // --- TOP DISH PERFORMANCE TABLE ---
     drawText('TOP SELLING DISHES & MENU VELOCITY', margin, curY, 10, true, [0.04, 0.15, 0.23]);

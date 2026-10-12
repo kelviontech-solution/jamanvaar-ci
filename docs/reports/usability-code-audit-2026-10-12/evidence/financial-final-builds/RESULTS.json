@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-12T14:40:30.970Z",
+  "command": "node node_modules/vite/bin/vite.js build in each app directory; existing assets; no image regeneration, publication or native installer build.",
+  "results": [
+    {
+      "app": "POS",
+      "path": "apps/restaurant-system/pos",
+      "exitCode": 0,
+      "durationSeconds": 10
+    },
+    {
+      "app": "Restaurant-Kiosk-QR-Admin",
+      "path": "apps/restaurant-system/pos-admin",
+      "exitCode": 0,
+      "durationSeconds": 10
+    }
+  ]
+}

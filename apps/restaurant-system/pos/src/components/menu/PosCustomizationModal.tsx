@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { ModifierGroup, ModifierOption, SelectedModifier } from '@jamanvaar/types';
-import { X, Plus, Minus, Check, Sparkles, MessageSquare } from 'lucide-react';
+import { X, Plus, Minus, Check, Sparkles } from 'lucide-react';
 
 const QUICK_INSTRUCTIONS = [
   'Less Spicy',

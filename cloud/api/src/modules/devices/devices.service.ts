@@ -1,3 +1,4 @@
+import { activeProfile, scheduleProfile } from './profile-policy';
 import { BadRequestException, ForbiddenException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, Prisma, PlatformUser } from '@prisma/client';
 import type { RestaurantIdentityDto } from './dto/heartbeat.dto';
@@ -19,6 +20,7 @@ export interface HeartbeatDto {
   pendingSyncCount?: number;
   syncError?: string | null;
   menuVersion?: number;
+  profileRevision?: string;
   ipAddress?: string;
 }
 
@@ -30,6 +32,13 @@ export interface HeartbeatDto {
  */
 @Injectable()
 export class DevicesService {
+  async guestRequestProgress(device: Device, id: string) {
+    if (device.type !== 'KIOSK' || !id || id.length > 128) throw new ForbiddenException('Guest request unavailable');
+    const row = await this.prisma.runAsTenant(device.restaurantId, tx => tx.syncedEntity.findFirst({where:{restaurantId:device.restaurantId,entityType:'SERVICE_MESSAGE',externalId:id},select:{payload:true}}));
+    const payload = row?.payload as Record<string,unknown> | null;
+    if (!payload || payload.kind !== 'CALL_STAFF' || payload.requesterDeviceId !== device.id || (payload.branchId ?? null) !== device.branchId) throw new NotFoundException('Guest request unavailable');
+    return { status: payload.status === 'RESOLVED' ? 'RESOLVED' : payload.status === 'ACCEPTED' ? 'ACCEPTED' : 'SENT', updatedAt: payload.updatedAt };
+  }
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService
@@ -368,20 +377,26 @@ export class DevicesService {
    * piece of restaurant-owned data (menu, staff, tables, shifts) already syncs through a device
    * token, not a tenant user session.
    */
-  async getRestaurantIdentity(restaurantId: string) {
+  async getRestaurantIdentity(restaurantId: string, branchId?: string | null) {
     const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurant.findUniqueOrThrow({
         where: { id: restaurantId },
-        select: { name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, showJamanAi: true, updatedAt: true }
+        select: { id: true, timezone: true, operatingProfile: true, brandingProfile: true, name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, showJamanAi: true, businessDayCutoffHour: true, updatedAt: true }
       })
     );
     const { showJamanAi, ...rest } = restaurant;
-    return { ...rest, showJamanAI: showJamanAi };
+    const branch = branchId ? await this.prisma.runAsTenant(restaurantId, tx => tx.branch.findFirst({ where: { id: branchId, restaurantId } })) : null;
+    const current = activeProfile(restaurant.operatingProfile, { timezone: restaurant.timezone, cutoffHour: restaurant.businessDayCutoffHour });
+    return { ...rest, operatingProfile: restaurant.operatingProfile ?? current, businessDayCutoffHour: current.cutoffHour, showJamanAI: showJamanAi, branding: restaurant.brandingProfile, branchId: branch?.id ?? null, branchOperatingProfile: branch?.operatingProfile ?? null, profileRevision: `${restaurant.updatedAt.getTime()}:${branch?.updatedAt.getTime() ?? 0}` };
   }
 
-  async updateRestaurantIdentity(restaurantId: string, dto: RestaurantIdentityDto) {
-    await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.restaurant.update({
+  async updateRestaurantIdentity(restaurantId: string, dto: RestaurantIdentityDto, actorId?: string) {
+    const before = await this.getRestaurantIdentity(restaurantId);
+    const current = activeProfile(before.operatingProfile, { timezone: before.timezone, cutoffHour: before.businessDayCutoffHour });
+    const changed = dto.operatingProfile || (dto.businessDayCutoffHour !== undefined && dto.businessDayCutoffHour !== current.cutoffHour);
+    const operatingProfile = changed ? scheduleProfile(current, dto.operatingProfile ?? { cutoffHour: dto.businessDayCutoffHour }) : undefined;
+    await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.restaurant.update({
         where: { id: restaurantId },
         data: {
           ...(dto.name !== undefined ? { name: dto.name } : {}),
@@ -391,11 +406,27 @@ export class DevicesService {
           ...(dto.address !== undefined ? { address: dto.address } : {}),
           ...(dto.city !== undefined ? { city: dto.city } : {}),
           ...(dto.state !== undefined ? { state: dto.state } : {}),
+          ...(operatingProfile ? { operatingProfile } : {}),
+          ...(dto.branding ? { brandingProfile: { ...(before.branding as object ?? {}), ...dto.branding } } : {}),
           ...(dto.showJamanAI !== undefined ? { showJamanAi: dto.showJamanAI } : {})
         }
-      })
-    );
+      });
+      await this.audit.log({actorType:'TENANT',actorId,restaurantId,action:'RESTAURANT_PROFILE_UPDATED',category:'SETTINGS',details:{fields:Object.keys(dto),operatingProfile:operatingProfile ?? null} as never},tx);
+    });
     return this.getRestaurantIdentity(restaurantId);
+  }
+
+  async updateBranchOperatingProfile(device: Device, changes: { timezone?: string; cutoffHour?: number; effectiveFrom?: string; inherit?: boolean }) {
+    if (!device.branchId) throw new BadRequestException('Select a branch before changing its operating profile');
+    const before = await this.getRestaurantIdentity(device.restaurantId, device.branchId);
+    const restaurantProfile = activeProfile(before.operatingProfile, { timezone: before.timezone, cutoffHour: before.businessDayCutoffHour });
+    const current = activeProfile(before.branchOperatingProfile, restaurantProfile);
+    const next = scheduleProfile(current, changes.inherit ? { ...restaurantProfile, inherit: true, effectiveFrom: changes.effectiveFrom } : changes);
+    await this.prisma.runAsTenant(device.restaurantId, async tx => {
+      await tx.branch.update({ where: { id: device.branchId! }, data: { operatingProfile: next } });
+      await this.audit.log({actorType:'TENANT',actorId:(device as Device & {adminActorId?:string}).adminActorId,restaurantId:device.restaurantId,action:'BRANCH_OPERATING_PROFILE_UPDATED',category:'SETTINGS',details:{branchId:device.branchId,previous:before.branchOperatingProfile,next} as never},tx);
+    });
+    return this.getRestaurantIdentity(device.restaurantId, device.branchId);
   }
 
   async reportHeartbeat(device: Device, dto: HeartbeatDto) {
@@ -413,6 +444,7 @@ export class DevicesService {
           ...(dto.osPlatform ? { osPlatform: dto.osPlatform } : {}),
           ...(dto.ipAddress ? { ipAddress: dto.ipAddress } : {}),
           ...(dto.pendingSyncCount !== undefined ? { pendingSyncCount: dto.pendingSyncCount } : {}),
+          ...(dto.profileRevision !== undefined ? { profileRevision: dto.profileRevision } : {}),
           ...(dto.menuVersion !== undefined ? { menuVersion: dto.menuVersion } : {}),
           // null clears a previous error once the terminal recovers.
           ...(dto.syncError !== undefined ? { syncError: dto.syncError } : {})

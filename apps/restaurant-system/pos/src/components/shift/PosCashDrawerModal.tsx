@@ -1,15 +1,8 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
-import { db, ShiftRepository } from '@jamanvaar/database';
-import {
-  X,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  CircleDollarSign,
-  CheckCircle2,
-  Lock
-} from 'lucide-react';
+import { ShiftRepository } from '@jamanvaar/database';
+import { X, ArrowDownCircle, ArrowUpCircle, CircleDollarSign } from 'lucide-react';
 
 export const PosCashDrawerModal: React.FC = () => {
   const { isCashDrawerModalOpen, setIsCashDrawerModalOpen, currentUser, requestManagerOverride } = usePosStore();

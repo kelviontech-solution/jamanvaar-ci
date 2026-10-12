@@ -138,7 +138,7 @@ export class DeviceCommandsService {
         where: { ...this.scopeWhere(issuer), status: { not: 'REVOKED' }, ...(kioskOnly ? { type: { in: ['KIOSK', 'KIOSK_ADMIN'] as DeviceType[] } } : {}) },
         select: {
           id: true, type: true, name: true, status: true, lastSeenAt: true, lastSyncAt: true, appVersion: true, isLocked: true,
-          lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, branch: { select: { id: true, name: true } },
+          lockReason: true, pendingSyncCount: true, syncStatus: true, syncError: true, menuVersion: true, profileRevision: true, branch: { select: { id: true, name: true } },
           commands: { orderBy: { issuedAt: 'desc' }, take: 1, select: { commandType: true, status: true, errorMessage: true, payload: true, result: true } }
         },
         orderBy: [{ type: 'asc' }, { createdAt: 'asc' }]
@@ -153,6 +153,7 @@ export class DeviceCommandsService {
       id: d.id, type: d.type, name: d.name, appVersion: d.appVersion, lastSeenAt: d.lastSeenAt, lastSyncAt: d.lastSyncAt,
       health: deviceHealth(d, now), isLocked: d.isLocked, lockReason: d.lockReason,
       pendingSyncCount: d.pendingSyncCount, syncStatus: d.syncStatus, syncError: d.syncError,
+      profileRevision: d.profileRevision,
       menuVersion: d.menuVersion, latestMenuVersion,
       menuStatus: latestMenuVersion === 0 ? 'none' : (d.menuVersion ?? 0) >= latestMenuVersion ? 'current' : 'behind',
       branch: d.branch, lastCommand: d.commands[0] ?? null

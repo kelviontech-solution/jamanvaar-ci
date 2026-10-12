@@ -1,14 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { formatTime } from '@jamanvaar/utils';
-import {
-  ShieldCheck,
-  Search,
-  X,
-  Filter,
-  Calendar,
-  User,
-  Activity
-} from 'lucide-react';
+import { ShieldCheck, Search, X } from 'lucide-react';
 
 interface AuditTrailModuleProps {
   auditLogs: any[];

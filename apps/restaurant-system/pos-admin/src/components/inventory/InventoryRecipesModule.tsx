@@ -1,20 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { InventoryItem, Recipe } from '@jamanvaar/types';
 import { InventoryRepository, RecipeRepository, db } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  Package,
-  Sliders,
-  Plus,
-  Search,
-  X,
-  Edit2,
-  Trash2,
-  AlertTriangle,
-  Layers,
-  ArrowUpDown,
-  Trash
-} from 'lucide-react';
+import { Package, Sliders, Plus, Search, X, Edit2, Trash2, Trash } from 'lucide-react';
 
 interface InventoryRecipesModuleProps {
   inventoryItems: InventoryItem[];

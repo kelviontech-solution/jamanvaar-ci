@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { Modal, Button, FormInput } from '@jamanvaar/ui';
-import { ComboRepository, AuditRepository, KioskComboAuthoring, MenuRepository } from '@jamanvaar/database';
+import { KioskComboAuthoring, MenuRepository } from '@jamanvaar/database';
 import type { ComboDeal } from '@jamanvaar/types';
 
 interface ComboModalProps {

@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppNotification } from '@jamanvaar/types';
 import { db, NotificationRepository } from '@jamanvaar/database';
-import {
-  Bell,
-  CheckCircle2,
-  AlertTriangle,
-  Flame,
-  Receipt,
-  X,
-  Sparkles,
-  ArrowRight
-} from 'lucide-react';
+import { Bell, Flame, Receipt, X, Sparkles, ArrowRight } from 'lucide-react';
 
 interface NotificationToastContainerProps {
   role?: 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS';

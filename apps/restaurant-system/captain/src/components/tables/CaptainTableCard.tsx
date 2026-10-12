@@ -3,18 +3,7 @@ import { DiningTable, Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
 import { captainDb } from '@jamanvaar/database';
 import { holdLabel, tableHold } from '@jamanvaar/business';
-import {
-  Users,
-  Flame,
-  Receipt,
-  Plus,
-  Clock,
-  CheckCircle2,
-  ChefHat,
-  ShoppingBag,
-  ArrowRight,
-  UtensilsCrossed
-} from 'lucide-react';
+import { Users, Flame, Receipt, Plus, Clock, CheckCircle2, UtensilsCrossed } from 'lucide-react';
 
 interface CaptainTableCardProps {
   table: DiningTable;

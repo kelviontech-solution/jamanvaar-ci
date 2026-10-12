@@ -1,5 +1,5 @@
 import type { KOTItem, KOTRecord } from '@jamanvaar/types';
-import { kitchenRank } from '@jamanvaar/database';
+import { kitchenRank, KitchenStationRepository } from '@jamanvaar/database';
 
 /**
  * Pure helpers behind the kitchen screen: what a dish or ticket looks like right now, how old it is, what is worth a
@@ -34,13 +34,24 @@ export function effectiveItemStatus(kot: KOTRecord, item: KOTItem): KOTItem['sta
 
 export const liveItems = (kot: KOTRecord): KOTItem[] => (kot.items ?? []).filter((i) => i.status !== 'CANCELLED');
 
+/** An empty station stays empty; a similar name is never implicit routing authority. */
+export function ticketsForStation(tickets: KOTRecord[], station: string): KOTRecord[] {
+  if (station === 'ALL') return tickets;
+  return tickets.filter(ticket => KitchenStationRepository.matches(ticket.stationId || ticket.station, station) || (!ticket.stationId && ticket.items?.some(item => KitchenStationRepository.matches(item.kitchenStation, station))));
+}
+
+/** Creation age is unrelated to when the cancellation happened. Explicit acknowledgement clears the warning. */
+export function needsCancellationAcknowledgement(ticket: KOTRecord, dismissed: ReadonlySet<string>): boolean {
+  return ticket.status === 'CANCELLED' && !dismissed.has(ticket.id);
+}
+
 export type TicketAge = { mins: number; secs: number; timeStr: string; level: 'ok' | 'warn' | 'late'; prep: number };
 
 /** Minutes the kitchen should need: the longest prep time among the ticket's dishes (10 when the menu does not say). */
-export function prepMinutes(kot: KOTRecord, prepTimeOf: (menuItemId: string) => number | undefined): number {
+export function prepMinutes(kot: KOTRecord, prepTimeOf: (menuItemId: string) => number | undefined, policy: {fallbackMinutes:number;minimumMinutes:number;maximumMinutes:number} = {fallbackMinutes:10,minimumMinutes:4,maximumMinutes:60}): number {
   const times = liveItems(kot).map((i) => prepTimeOf(i.menuItemId) ?? 0).filter((n) => n > 0);
-  const longest = times.length ? Math.max(...times) : 10;
-  return Math.min(60, Math.max(4, longest));
+  const longest = times.length ? Math.max(...times) : policy.fallbackMinutes;
+  return Math.min(policy.maximumMinutes, Math.max(policy.minimumMinutes, longest));
 }
 
 /** Warns when a ticket has been waiting as long as its dishes should take, and marks it late at one and a half times that. */

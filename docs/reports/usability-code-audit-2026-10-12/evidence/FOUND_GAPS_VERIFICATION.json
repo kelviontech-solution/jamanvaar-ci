@@ -1,0 +1,60 @@
+{
+  "scope": "Local implementation; no production migration/deployment or GitHub push. Final focused results follow the changes described in FOUND_GAPS_IMPLEMENTATION.md.",
+  "rootFinal": {
+    "passed": 103,
+    "failed": 0,
+    "success": true,
+    "file": "FOUND_GAPS_FINAL_TESTS.json"
+  },
+  "apiUnit": {
+    "passed": 9,
+    "failed": 0,
+    "success": true,
+    "file": "FOUND_GAPS_API_TESTS.json"
+  },
+  "earlierFullSuite": {
+    "passed": 1928,
+    "failed": 1,
+    "success": false,
+    "file": "FOUND_GAPS_FULL_TESTS.json",
+    "limit": "Run before final legacy Captain compatibility/date/statement refinements. Its single failed Captain case passes in the final focused run. Do not claim a final green full suite."
+  },
+  "builds": {
+    "success": true,
+    "apps": 7,
+    "file": "found-gap-builds/RESULTS.json"
+  },
+  "browser": {
+    "success": true,
+    "fixtures": 10,
+    "file": "found-gap-components/RESULTS.json",
+    "limit": "Actual React components, isolated local fixture data, all backend/external requests blocked. Does not verify production authentication, real gateway payment, or cross-device server delivery."
+  },
+  "rootTypecheck": {
+    "exitCode": 0,
+    "file": "FOUND_GAPS_TYPECHECK.log"
+  },
+  "apiTypecheck": {
+    "exitCode": 0,
+    "file": "FOUND_GAPS_API_TYPECHECK.log"
+  },
+  "apiBuild": {
+    "exitCode": 0,
+    "file": "FOUND_GAPS_API_BUILD.log"
+  },
+  "prismaGeneration": {
+    "isolatedExitCode": 0,
+    "version": "5.22.0",
+    "file": "FOUND_GAPS_PRISMA.log",
+    "limit": "Normal output generation initially hit a Windows DLL lock. Same schema generated successfully in isolated output; release standard generation remains required."
+  },
+  "gitDiffCheck": {
+    "exitCode": 0
+  },
+  "remaining": [
+    "Complete advanced-screen localization",
+    "Live tenant/branch and independent-device acceptance",
+    "Email/provider/printer and offline/reconnect acceptance",
+    "Legacy analytics readers outside this pass"
+  ]
+}

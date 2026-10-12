@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useCaptainStore } from '../../store/captainStore';
-import {
-  Timer,
-  Users,
-  ShoppingBag,
-  Flame,
-  Receipt,
-  CheckCircle2,
-  Clock,
-  LogOut,
-  Award,
-  Sparkles
-} from 'lucide-react';
+import { useCaptainStore, selectMyTables } from '../../store/captainStore';
+import { getTerminalLabel } from '@jamanvaar/database';
+import { Timer, Users, ShoppingBag, Flame, Receipt, Clock, LogOut, Award } from 'lucide-react';
 import { useConfirm } from '@jamanvaar/ui';
 
 export const CaptainShiftStatsView: React.FC = () => {
@@ -24,19 +14,17 @@ export const CaptainShiftStatsView: React.FC = () => {
     logout
   } = useCaptainStore();
 
-  const [elapsedMinutes, setElapsedMinutes] = useState(120);
+  const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
   useEffect(() => {
-    if (activeShiftStartTime) {
-      const diff = Math.max(1, Math.round((Date.now() - new Date(activeShiftStartTime).getTime()) / 60000));
-      setElapsedMinutes(diff);
-    }
+    const update = () => {const start=Date.parse(activeShiftStartTime ?? '');setElapsedMinutes(Number.isFinite(start) ? Math.max(0,Math.floor((Date.now()-start)/60000)) : 0);};
+    update();const timer=window.setInterval(update,30000);return () => window.clearInterval(timer);
   }, [activeShiftStartTime]);
 
   const hours = Math.floor(elapsedMinutes / 60);
   const mins = elapsedMinutes % 60;
 
-  const assignedCount = (currentCaptain?.assignedTableNumbers || ['1', '2', '3', '4', '5', '6', '12', '14']).length;
+  const assignedCount = selectMyTables(tables,currentCaptain).length;
   const activeOccupied = tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILL_REQUESTED').length;
 
   return (
@@ -56,7 +44,7 @@ export const CaptainShiftStatsView: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-300 font-medium mt-0.5">
-              Floor Captain • Terminal CAPTAIN-01
+              Floor Captain • {getTerminalLabel('CAPTAIN')}
             </p>
           </div>
         </div>
@@ -155,7 +143,7 @@ export const CaptainShiftStatsView: React.FC = () => {
           type="button"
           onClick={async () => {
             if (await confirm({ title: 'End your shift and sign out?', message: 'Make sure any active tables have been handed over first.', confirmLabel: 'End shift', cancelLabel: 'Not yet', tone: 'danger' })) {
-              logout();
+              if (!logout()) await confirm({title:'Unsent dishes are kept',message:'Return to your order and send or deliberately remove its dishes before signing out.',confirmLabel:'Return to order',cancelLabel:'Stay signed in'});
             }
           }}
           className="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0"

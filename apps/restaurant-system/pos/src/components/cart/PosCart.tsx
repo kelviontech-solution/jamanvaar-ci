@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { PosTablePickerModal } from '../tables/PosTablePickerModal';
 import { usePosStore } from '../../store/posStore';
 import { OrderType } from '@jamanvaar/types';
-import { db, InventoryRepository, CustomerRepository } from '@jamanvaar/database';
+import { db, InventoryRepository } from '@jamanvaar/database';
 import { JAMANVAAR_LOGOS, sound } from '@jamanvaar/ui';
 import { PosOrderNotesModal } from './PosOrderNotesModal';
 import { PosCustomerSearchDrawer } from '../customers/PosCustomerSearchDrawer';
@@ -18,31 +18,7 @@ function guestCountOptions(capacity: number): number[] {
   const max = Math.max(1, Math.min(Math.floor(capacity) || 1, 12));
   return Array.from({ length: max }, (_, i) => i + 1);
 }
-import {
-  ShoppingBag,
-  Plus,
-  Minus,
-  Trash2,
-  Tag,
-  CirclePause,
-  Send,
-  CreditCard,
-  User,
-  Utensils,
-  Percent,
-  ChevronRight,
-  MessageSquare,
-  Check,
-  Flame,
-  UserPlus,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  RotateCcw,
-  Zap,
-  Bike,
-  Ticket,
-  ShoppingBag as TakeawayBag, Gift, X } from 'lucide-react';
+import { Plus, Minus, Trash2, Tag, CirclePause, CreditCard, User, Utensils, ChevronRight, MessageSquare, Check, Flame, Sparkles, ArrowRight, RotateCcw, Zap, Bike, Ticket, ShoppingBag as TakeawayBag, X } from 'lucide-react';
 
 export const PosCart: React.FC = () => {
   const [tablePickerOpen, setTablePickerOpen] = useState(false);
@@ -57,8 +33,6 @@ export const PosCart: React.FC = () => {
     orderNotes,
     updateItemQuantity,
     removeItemFromCart,
-    applyBillDiscountPercent,
-    applyDiscount,
     billDiscountPercent,
     clearCart,
     holdCurrentOrder,
@@ -66,7 +40,6 @@ export const PosCart: React.FC = () => {
     setIsPaymentOpen,
     setActiveTab,
     addItemToCart,
-    requestManagerOverride,
     currentUser,
     isDiscountModalOpen,
     setIsDiscountModalOpen,
@@ -85,7 +58,6 @@ export const PosCart: React.FC = () => {
       return next;
     });
 
-  const [discountInputOpen, setDiscountInputOpen] = useState(false);
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false);
   const [repeatModalOpen, setRepeatModalOpen] = useState(false);
@@ -103,25 +75,6 @@ export const PosCart: React.FC = () => {
     { id: 'DELIVERY', label: 'Delivery', icon: Bike },
     { id: 'TOKEN_QR', label: 'Token', icon: Ticket }
   ];
-
-  const handleApplyDiscount = (percent: number) => {
-    const isManager =
-      currentUser?.roleId === 'role-manager' || currentUser?.roleId === 'role-super-admin';
-    if (percent > 10 && !isManager) {
-      requestManagerOverride(
-        'HIGH_DISCOUNT',
-        `High Discount Authorization (${percent}%)`,
-        `Cashier ${currentUser?.fullName} requested ${percent}% bill discount exceeding standard 10% limit.`,
-        () => {
-          applyBillDiscountPercent(percent);
-          setDiscountInputOpen(false);
-        }
-      );
-    } else {
-      applyBillDiscountPercent(percent);
-      setDiscountInputOpen(false);
-    }
-  };
 
   const handleSendKot = () => {
     if (sendingKotRef.current) return;

@@ -346,7 +346,7 @@ export const PRO_PLAN_FEATURE_GROUPS: PlanFeatureGroup[] = [
     // entitlement flag for Self-Order Kiosk at all, so a plan's real
     // Kiosk/Kiosk Admin access (AppCode.KIOSK / KIOSK_ADMIN in cloud/api)
     // was never actually represented here.
-    entitlementKeys: ['qrTableOrdering', 'advancedServiceWorkflow', 'selfOrderKiosk'],
+    entitlementKeys: ['qrTableOrdering', 'advancedServiceWorkflow', 'selfOrderKiosk', 'qrServiceRequests', 'qrScheduledPickup'],
     features: [
       'Table QR Code',
       'Unique QR per Table',
@@ -551,7 +551,9 @@ export const CORE_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
   advancedCaptainReports: false,
   advancedServiceWorkflow: false,
   qrTableOrdering: false,
-  selfOrderKiosk: false
+  selfOrderKiosk: false,
+  qrServiceRequests: false,
+  qrScheduledPickup: false
 };
 
 export const PRO_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
@@ -575,7 +577,9 @@ export const PRO_DEFAULT_ENTITLEMENTS: PlanEntitlements = {
   advancedCaptainReports: true,
   advancedServiceWorkflow: true,
   qrTableOrdering: true,
-  selfOrderKiosk: true
+  selfOrderKiosk: true,
+  qrServiceRequests: true,
+  qrScheduledPickup: true
 };
 
 export const PRO_EXCLUSIVE_KEYS: (keyof PlanEntitlements)[] = [
@@ -584,7 +588,9 @@ export const PRO_EXCLUSIVE_KEYS: (keyof PlanEntitlements)[] = [
   'advancedServiceWorkflow',
   'qrTableOrdering',
   'posAssistant',
-  'selfOrderKiosk'
+  'selfOrderKiosk',
+  'qrServiceRequests',
+  'qrScheduledPickup'
 ];
 
 export const CORE_KEYS: (keyof PlanEntitlements)[] = [
@@ -619,7 +625,9 @@ export function resolveTierEntitlements(
       advancedServiceWorkflow: false,
       qrTableOrdering: false,
       posAssistant: false,
-      selfOrderKiosk: false
+      selfOrderKiosk: false,
+      qrServiceRequests: false,
+      qrScheduledPickup: false
     };
   }
 
@@ -688,7 +696,7 @@ export const OPERATIONAL_MODULE_CATEGORIES: OperationalModuleCategory[] = [
     name: '7. Connected Restaurant Ecosystem',
     description: 'Wireless Captain app for table-side ordering, QR table scan-to-order, self-service kiosk, real-time multi-terminal mesh sync, JAMAN AI assistant and advanced analytics.',
     isProExclusive: true,
-    entitlementKeys: ['captainApp', 'advancedCaptainReports', 'advancedServiceWorkflow', 'qrTableOrdering', 'posAssistant', 'selfOrderKiosk'],
+    entitlementKeys: ['captainApp', 'advancedCaptainReports', 'advancedServiceWorkflow', 'qrTableOrdering', 'posAssistant', 'selfOrderKiosk', 'qrServiceRequests', 'qrScheduledPickup'],
     catalogGroupIds: ['captain', 'qr_kiosk', 'sync', 'ai', 'analytics']
   }
 ];

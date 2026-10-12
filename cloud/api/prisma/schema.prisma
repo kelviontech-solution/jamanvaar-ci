@@ -112,6 +112,10 @@ enum RestaurantStatus {
 }
 
 model Restaurant {
+  operatingProfile Json?
+  brandingProfile Json?
+  /// Operational date rollover; cash settlement always requires reconciliation.
+  businessDayCutoffHour Int @default(5)
   /// Default display size (percent) for this restaurant's terminals; each terminal can override it (BUG-008).
   displayScalePercent      Int              @default(100)
   id                       String           @id @default(uuid())
@@ -198,6 +202,7 @@ enum BranchStatus {
 }
 
 model Branch {
+  operatingProfile Json?
   id           String       @id @default(uuid())
   restaurantId String
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
@@ -506,6 +511,7 @@ enum DeviceStatus {
 }
 
 model Device {
+  profileRevision String?
   id              String       @id @default(uuid())
   restaurantId    String
   restaurant      Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)

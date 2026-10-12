@@ -29,6 +29,7 @@ describe('JAMANVAAR POS — Shift & Cash Management System', () => {
 
     // Test 2: Create ₹500 Cash order
     OrderRepository.createOrder({
+      source_type: 'POS', kioskId: 'POS-01',
       orderType: 'DINE_IN',
       items: [{ id: 'i-1', orderId: '', menuItemId: 'm-1', name: 'Paneer Tikka', sku: 'PT-1', modifiers: [], quantity: 1, unitPrice: 500, totalPrice: 500, kitchenStatus: 'SERVED' }],
       totalAmount: 500,
@@ -44,6 +45,7 @@ describe('JAMANVAAR POS — Shift & Cash Management System', () => {
 
     // Test 3: Create ₹500 UPI order
     OrderRepository.createOrder({
+      source_type: 'POS', kioskId: 'POS-01',
       orderType: 'TAKEAWAY',
       items: [{ id: 'i-2', orderId: '', menuItemId: 'm-2', name: 'Dal Makhani', sku: 'DM-1', modifiers: [], quantity: 1, unitPrice: 500, totalPrice: 500, kitchenStatus: 'SERVED' }],
       totalAmount: 500,
@@ -59,6 +61,7 @@ describe('JAMANVAAR POS — Shift & Cash Management System', () => {
 
     // Test 4: Create ₹1,000 Split order
     OrderRepository.createOrder({
+      source_type: 'POS', kioskId: 'POS-01',
       orderType: 'DINE_IN',
       items: [{ id: 'i-3', orderId: '', menuItemId: 'm-3', name: 'Thali Combo', sku: 'TH-1', modifiers: [], quantity: 2, unitPrice: 500, totalPrice: 1000, kitchenStatus: 'SERVED' }],
       totalAmount: 1000,

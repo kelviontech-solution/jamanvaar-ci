@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '@jamanvaar/database';
-import {
-  Database,
-  Download,
-  Upload,
-  AlertTriangle,
-  RotateCcw,
-  CheckCircle2,
-  FileJson,
-  CloudUpload,
-  Cloud
-} from 'lucide-react';
+import { Download, Upload, AlertTriangle, CheckCircle2, CloudUpload, Cloud } from 'lucide-react';
 import {
   isCloudConnected,
   isCloudLoggedIn,

@@ -3,17 +3,7 @@ import React, { useState } from 'react';
 import { PrinterDevice } from '@jamanvaar/types';
 import { db, PrinterRepository } from '@jamanvaar/database';
 import { PrinterService } from '@jamanvaar/api';
-import {
-  Printer,
-  Plus,
-  Wifi,
-  Radio,
-  RotateCw,
-  CheckCircle2,
-  AlertTriangle,
-  Server,
-  Cpu
-} from 'lucide-react';
+import { Printer, Plus, Wifi, Radio, RotateCw } from 'lucide-react';
 
 interface PrintersDevicesModuleProps {
   configuredPrinters: PrinterDevice[];

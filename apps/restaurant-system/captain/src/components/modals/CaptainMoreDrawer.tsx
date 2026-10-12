@@ -1,23 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { CaptainHandover } from './CaptainHandover';
 import { useEscapeToClose } from '../useEscapeToClose';
-import { useAiAccess, ModalBackdrop } from '@jamanvaar/ui';
+import { useAiAccess, ModalBackdrop, useStaffLanguage, StaffPracticePanel } from '@jamanvaar/ui';
 import { useCaptainStore } from '../../store/captainStore';
 import { captainDb } from '@jamanvaar/database';
-import {
-  X,
-  ChefHat,
-  Bell,
-  Timer,
-  Users,
-  Settings,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  Sparkles,
-  Flame,
-  Receipt,
-  MessageSquare
-} from 'lucide-react';
+import { X, ChefHat, Bell, Timer, LogOut, ChevronRight, Sparkles } from 'lucide-react';
 
 interface CaptainMoreDrawerProps {
   isOpen: boolean;
@@ -36,6 +23,8 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
   // "closed" return made the whole app go blank the moment the drawer was opened).
   useEscapeToClose(isOpen, onClose);
   const ai = useAiAccess();
+  const {t} = useStaffLanguage();
+  const [signOutError, setSignOutError] = useState('');
   const {
     currentCaptain,
     kots,
@@ -100,6 +89,8 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
 
         {/* Content Navigation List */}
         <div className="flex-1 p-4 overflow-y-auto space-y-2.5 bg-jaman-cream">
+          <StaffPracticePanel/>
+          <details className="rounded-xl bg-white border border-jaman-border"><summary className="min-h-12 p-3 font-bold cursor-pointer text-sm">Hand over my floor</summary><CaptainHandover onDone={onClose}/></details>
           {/* AI Quick Trigger — hidden when this restaurant opted out */}
           {ai.showButton(captainDb.restaurant?.showJamanAI !== false) && (
           <button
@@ -167,16 +158,17 @@ export const CaptainMoreDrawer: React.FC<CaptainMoreDrawerProps> = ({
 
         {/* Footer: Sign Out Action */}
         <div className="p-4 bg-white border-t border-jaman-border">
+          {signOutError && <div role="alert" className="mb-3 text-sm text-amber-900"><p>{signOutError}</p><button type="button" className="min-h-11 font-bold underline" onClick={() => {onClose();setSignOutError('');}}>Return to my order</button></div>}
           <button
             type="button"
             onClick={() => {
+              if (!logout()) {setSignOutError('Your unsent dishes are kept. Return to the order and send or deliberately remove them before signing out.');return;}
               onClose();
-              logout();
             }}
             className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>End Shift Session & Sign Out</span>
+            <span>{t('Sign out')}</span>
           </button>
         </div>
       </div>

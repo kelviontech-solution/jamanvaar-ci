@@ -5,7 +5,7 @@ export function useQrUnsavedChanges(dirty: boolean) {
     if (!dirty) return;
     const unload = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
     const navigate = (event: Event) => {
-      if (!window.confirm('Discard your unsaved changes and open another page?')) event.preventDefault();
+      event.preventDefault(); // The workspace owns the themed, asynchronous confirmation.
     };
     window.addEventListener('beforeunload', unload);
     window.addEventListener(QR_BEFORE_NAVIGATE, navigate);

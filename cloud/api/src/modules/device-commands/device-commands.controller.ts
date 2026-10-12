@@ -1,6 +1,6 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
-import { Device, DeviceCommandType, PlatformUser } from '@prisma/client';
+import { Device, PlatformUser } from '@prisma/client';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';

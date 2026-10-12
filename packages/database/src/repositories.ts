@@ -1,88 +1,27 @@
+import { orderPaymentPosition } from './payment_position';
+import { KitchenStationRepository } from './kitchen_stations';
+import { resolveOperatingProfile, localDateKey } from './operating_profile';
+import { configureRestaurantTimezone } from '@jamanvaar/utils';
 import { initializeLoyaltyLedger, refreshLoyaltyBalance } from '@jamanvaar/types';
 import { normalizeMenuText } from './menu_identity';
 import { scanMenuDuplicates, archiveConfirmedDuplicates } from './menu_cleanup';
 import { KioskConfigurationRepository } from './kiosk_configuration';
 import { KeyValueStore } from './key_value_store';
 import { PaymentPolicy } from './payment_policy';
+import { getTerminalId } from './terminal_identity';
 import { NumberAllocator } from './number_allocator';
-import {
-  AppNotification,
-  PaymentSplit,
-  NotificationRole,
-  AuditLog,
-  BusinessDay,
-  BusinessDaySnapshot,
-  CashMovement,
-  Category,
-  ComboDeal,
-  Coupon,
-  CustomerAccount,
-  CustomerFeedback,
-  DeviceHealth,
-  DiningTable,
-  HeldOrder,
-  InventoryItem,
-  KioskDevice,
-  KOTItem,
-  KOTRecord,
-  KOTType,
-  LicenseInfo,
-  PlatformQrControl,
-  QrUsageSnapshot,
-  LoyaltyTier,
-  LoyaltyReward,
-  LoyaltyProgramSettings,
-  StaffShiftSchedule,
-  AttendanceRecord,
-  AttendanceStatus,
-  MarketingCampaign,
-  CustomerSegmentFilter,
-  DeliveryRider,
-  DeliveryStatus,
-  PlanTier,
-  PlanEntitlements,
-  ManagerOverrideAction,
-  ManagerOverrideRequest,
-  MenuItem,
-  ModifierGroup,
-  Offer,
-  Order,
-  OrderItem,
-  OrderStatus,
-  OrderType,
-  PaymentMethod,
-  PaymentStatus,
-  PaymentTransaction,
-  PrinterDevice,
-  PrintJob,
-  PrintJobStatus,
-  Receipt,
-  ReceiptConfig,
-  ReceiptRecord,
-  Recipe,
-  Reservation,
-  Role,
-  ServiceRequest,
-  ShiftRecord,
-  StockMovement,
-  QrOrderingSettings,
-  KioskDisplaySettings,
-  WelcomeScreenSettings,
-  SyncEvent,
-  User,
-  WaitlistEntry,
-  FoodReadyItem
-} from '@jamanvaar/types';
+import { Restaurant, AppNotification, PaymentSplit, NotificationRole, AuditLog, BusinessDay, BusinessDaySnapshot, CashMovement, Category, ComboDeal, Coupon, CustomerAccount, CustomerFeedback, DiningTable, HeldOrder, InventoryItem, KioskDevice, KOTItem, KOTRecord, KOTType, LicenseInfo, PlatformQrControl, LoyaltyTier, LoyaltyReward, LoyaltyProgramSettings, StaffShiftSchedule, AttendanceRecord, AttendanceStatus, MarketingCampaign, CustomerSegmentFilter, DeliveryRider, DeliveryStatus, PlanTier, PlanEntitlements, ManagerOverrideAction, ManagerOverrideRequest, MenuItem, ModifierGroup, Order, OrderItem, OrderStatus, OrderType, PaymentMethod, PrinterDevice, PrintJob, PrintJobStatus, ReceiptConfig, ReceiptRecord, Recipe, Reservation, Role, ServiceRequest, ShiftRecord, StockMovement, KioskDisplaySettings, WelcomeScreenSettings, User, FoodReadyItem } from '@jamanvaar/types';
 import { getOrderTenders, splitsMatchTotal } from './tender';
-import { generateOrderNumber, generateTokenNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate, menuDishImage } from '@jamanvaar/utils';
+import { generateOrderNumber, generateUUID, normalizeIndianPhone, formatRestaurantDate, getRestaurantHour, getBusinessDayDisplayDate, menuDishImage } from '@jamanvaar/utils';
 import { db } from './db';
+import { crossedOrderHistoryThreshold } from './order_history_size';
 import { resetEntitySyncCursors } from './sync_cursors';
 import { kitchenRank, resolveKitchenState, deriveTicketStatus } from './kitchen_status';
 import { TableSync } from './table_sync';
 import { canMoveTable } from './table_state';
 import { MenuItemSync, CategorySync, ComboSync, CouponSync, CustomerSync, LoyaltyTierSync, LoyaltyRewardSync } from './collection_sync';
 import { InventoryItemSync, RecipeSync, SupplierSync } from './inventory_sync';
-import { DEFAULT_QR_SETTINGS, DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
+import { DEFAULT_KIOSK_DISPLAY_SETTINGS, DEFAULT_WELCOME_SCREEN_SETTINGS, SEED_ROLES, SEED_RESTAURANT } from './seed';
 import { hashPin, verifyPinHash, generateUniquePin, pinFingerprint } from './pin';
 
 export class MenuRepository {
@@ -516,7 +455,7 @@ export class MenuRepository {
  * sales, order counts and payment totals leave it out until the payment is settled.
  */
 export function isUnpaidOpenOrder(o: Pick<Order, 'orderStatus' | 'paymentStatus'>): boolean {
-  if (o.orderStatus === 'CANCELLED' || o.orderStatus === 'COMPLETED' || o.orderStatus === 'REFUNDED') return false;
+  if (o.orderStatus === 'CANCELLED' || o.orderStatus === 'REFUNDED') return false;
   return o.paymentStatus !== 'SUCCESS' && o.paymentStatus !== 'REFUNDED';
 }
 
@@ -699,16 +638,16 @@ export class OrderRepository {
     const resolvedKioskId: string =
       orderData.kioskId ||
       (resolvedSourceType === 'POS'
-        ? 'POS-01'
+        ? getTerminalId('POS')
         : resolvedSourceType === 'CAPTAIN'
-        ? 'CAPTAIN-01'
-        : 'KIOSK-01');
+        ? getTerminalId('CAPTAIN')
+        : getTerminalId('KIOSK_USER'));
 
     const creatorActor =
       resolvedSourceType === 'CAPTAIN'
         ? 'Captain App'
         : resolvedSourceType === 'POS'
-        ? 'POS Terminal (POS-01)'
+        ? `POS Terminal (${resolvedKioskId})`
         : (resolvedKioskId || 'Self-Order Kiosk');
 
     const newOrder: Order = {
@@ -716,6 +655,7 @@ export class OrderRepository {
       orderNumber,
       tokenNumber,
       businessDayId,
+      shiftId: orderData.shiftId ?? (resolvedSourceType === 'POS' ? ShiftRepository.getActiveShift(resolvedKioskId)?.id : undefined),
       restaurantId: orderData.restaurantId || db.restaurant.id,
       outletId: orderData.outletId || db.outlet.id,
       kioskId: resolvedKioskId,
@@ -752,6 +692,8 @@ export class OrderRepository {
       paymentMethod: orderData.paymentMethod || 'UPI_QR',
       paymentStatus: orderData.paymentStatus || 'PENDING',
       paymentTransactionId: orderData.paymentTransactionId,
+      paymentSplits: orderData.paymentSplits,
+      paymentConfirmation: orderData.paymentConfirmation,
       orderStatus: orderData.orderStatus || 'CONFIRMED',
       estimatedWaitMinutes: orderData.estimatedWaitMinutes || 15,
       pickupCounter: orderData.pickupCounter || 'Counter 1',
@@ -783,7 +725,12 @@ export class OrderRepository {
     };
 
     if (newOrder.paymentStatus === 'SUCCESS' && newOrder.loyaltyRedemption) CustomerRepository.commitOrderRedemption(newOrder);
+    const orderCountBeforeThisOrder = db.orders.length;
     db.orders.unshift(newOrder);
+    const crossedThreshold = crossedOrderHistoryThreshold(orderCountBeforeThisOrder, db.orders.length);
+    if (crossedThreshold) {
+      console.warn(`[JAMANVAAR] Local order history has reached ${crossedThreshold.toLocaleString()} orders. Reports scan this in-memory list on every view (see docs/reports/robustness-scalability-audit-2026-10-11/REPORT.md) — plan a retention/archival strategy before this grows much further.`);
+    }
     BusinessDayRepository.recalculateMetrics(businessDayId);
 
     // If dine in, update table occupancy
@@ -870,8 +817,8 @@ export class OrderRepository {
     if (order.orderStatus === 'REFUNDED' || order.orderStatus === 'CANCELLED' || order.paymentStatus === 'REFUNDED' || order.paymentStatus === 'CANCELLED') throw new Error('A cancelled or refunded bill cannot be settled again');
 
     // Settling is idempotent: the same payment again changes nothing; a different one is refused.
-    if (order.paymentStatus === 'SUCCESS' && order.paymentTransactionId) {
-      if (transactionId && transactionId !== order.paymentTransactionId) {
+    if (order.paymentStatus === 'SUCCESS') {
+      if (transactionId && order.paymentTransactionId && transactionId !== order.paymentTransactionId) {
         throw new Error(`ORDER_ALREADY_PAID: this order was already paid (${order.paymentTransactionId})`);
       }
       return order;
@@ -888,10 +835,17 @@ export class OrderRepository {
       CustomerRepository.commitOrderRedemption(order);
     }
     const now = new Date().toISOString();
+    const collectingShift = ShiftRepository.getActiveShift();
+    if (collectingShift) order.shiftId = collectingShift.id;
     if (order.paymentAllocationSummary) order.counterSettlementAmountPaise = Math.round(outstanding * 100);
     order.paymentMethod = paymentMethod;
     if (splits && splits.length > 0) {
-      order.paymentSplits = [...(order.paymentAllocationSummary?.collectedPaise ? [{ method: 'CASH' as const, amount: order.paymentAllocationSummary.collectedPaise / 100 }] : []), ...splits.map((l) => ({ ...l }))];
+      const previouslyCollected = (order.paymentAllocationSummary?.collectedPaise ?? 0) / 100;
+      const priorLines = previouslyCollected > 0 ? order.paymentSplits && splitsMatchTotal(order.paymentSplits,previouslyCollected)
+        ? order.paymentSplits.map(line => ({...line}))
+        : [{method:'OTHER' as const,amount:previouslyCollected}] : [];
+      // A ledger balance without known tender lines is unattributed, never invented cash.
+      order.paymentSplits = [...priorLines, ...splits.map((l) => ({ ...l }))];
     }
     order.paymentStatus = 'SUCCESS';
     order.orderStatus = 'COMPLETED';
@@ -946,23 +900,30 @@ export class OrderRepository {
   }
 
   public static voidOrder(id: string, reason: string, managerName: string): Order | null {
+    return db.transaction(() => this.applyVoidOrder(id, reason, managerName));
+  }
+
+  private static applyVoidOrder(id: string, reason: string, managerName: string): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
     // A paid order's revenue is already booked into shift/business-day
     // totals — cancelling its status here without reversing those would
     // silently corrupt cash-drawer reconciliation. refundOrder() below does
     // that reversal; void is only for a bill that was never actually paid.
-    if (order.paymentStatus === 'SUCCESS') {
+    if (['SUCCESS', 'PARTIALLY_PAID', 'PARTIALLY_REFUNDED', 'REFUNDED'].includes(order.paymentStatus) || (order.paymentAllocationSummary?.collectedPaise ?? 0) > 0) {
       throw new Error('This order has already been paid — use Refund instead of Void.');
     }
     if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'REFUNDED') {
       throw new Error('This order has already been voided or refunded.');
     }
 
+    if (!reason.trim() || !managerName.trim()) throw new Error('A cancellation reason and actor are required.');
     const now = new Date().toISOString();
     InventoryRepository.restoreForOrder(order, `Void: ${reason}`);
     order.orderStatus = 'CANCELLED';
     order.paymentStatus = 'CANCELLED';
+    order.items.forEach(item => { item.kitchenStatus = 'CANCELLED'; });
+    KOTRepository.reconcileWithOrders();
     order.updatedAt = now;
     order.syncStatus = 'SAVED_LOCALLY';
 
@@ -998,25 +959,50 @@ export class OrderRepository {
     return order;
   }
 
-  public static refundOrder(id: string, refundAmount: number, reason: string, managerName: string): Order | null {
+  public static refundOrder(id: string, refundAmount: number, reason: string, managerName: string, options?: { idempotencyKey: string; payingShiftId: string; method: 'CASH' | 'UPI_TO_CUSTOMER' }): Order | null {
+    return db.transaction(() => this.applyRefundOrder(id, refundAmount, reason, managerName, options));
+  }
+
+  private static applyRefundOrder(id: string, refundAmount: number, reason: string, managerName: string, options?: { idempotencyKey: string; payingShiftId: string; method: 'CASH' | 'UPI_TO_CUSTOMER' }): Order | null {
     const order = db.orders.find((o) => o.id === id);
     if (!order) return null;
+    const previous = options ? order.refundEvents?.find(event => event.idempotencyKey === options.idempotencyKey) : undefined;
+    if (previous) {
+      if (previous.amountPaise !== Math.round(refundAmount * 100) || previous.method !== options?.method || previous.payingShiftId !== options?.payingShiftId) throw new Error('Refund retry does not match the original return.');
+      return order;
+    }
     if (order.paymentStatus !== 'SUCCESS') {
       throw new Error('Only a paid order can be refunded.');
     }
-    if (order.orderStatus === 'REFUNDED') {
+    if (order.orderStatus === 'REFUNDED' || (!options && (order.refundAmount ?? 0) > 0)) {
       throw new Error('This order has already been refunded.');
     }
-    if (refundAmount <= 0 || refundAmount > order.totalAmount) {
+    if (!Number.isFinite(refundAmount) || Math.round(refundAmount * 100) / 100 !== refundAmount || refundAmount <= 0 || refundAmount > order.totalAmount - (order.refundAmount ?? 0)) {
       throw new Error(`Refund amount must be between ₹1 and the order total (₹${order.totalAmount}).`);
     }
 
+    if (!reason.trim() || !managerName.trim()) throw new Error('A refund reason and actor are required.');
+    const originalShift = order.shiftId ? db.shifts.find(s => s.id === order.shiftId) : undefined;
+    if (originalShift && originalShift.status !== 'OPEN' && !options) throw new Error('The collecting register is already closed. Record this return in the payment ledger with a new cash-out reconciliation.');
+    if (refundAmount < order.totalAmount && Object.values(getOrderTenders(order)).filter(n => n > 0).length > 1) throw new Error('Use the payment ledger for a partial mixed-tender refund so its return method is recorded.');
+    const payingShift = options ? db.shifts.find(shift => shift.id === options.payingShiftId && shift.status === 'OPEN') : originalShift;
+    if (options && payingShift && !ShiftRepository.getShiftOrders(payingShift, db.orders).length && payingShift.returnBaseSales === undefined) payingShift.returnBaseSales = payingShift.totalSales;
+    if (options && (!options.idempotencyKey.trim() || !payingShift || !['CASH', 'UPI_TO_CUSTOMER'].includes(options.method))) throw new Error('Choose an open register and a valid return method.');
+    if (options && options.method === 'CASH') {
+      payingShift!.expectedCash = ShiftRepository.getShiftMetrics(payingShift).expectedCash;
+      const movement = ShiftRepository.addCashMovement(payingShift!.id, 'CASH_OUT', refundAmount, `Return of ${order.orderNumber}: ${reason}`, managerName, managerName);
+      if (!movement) throw new Error('The paying register does not have enough cash for this return.');
+      movement.id = `refund-cash-${options.idempotencyKey}`;
+    }
+    const previousRefund = order.refundAmount ?? 0;
+    const cumulativeRefund = Math.round((previousRefund + refundAmount) * 100) / 100;
     const now = new Date().toISOString();
-    const isFullRefund = refundAmount === order.totalAmount;
+    const isFullRefund = cumulativeRefund === order.totalAmount;
     // A full refund gives the stock back; a partial refund cannot say which items were returned, so it leaves stock alone.
-    if (refundAmount >= order.totalAmount) InventoryRepository.restoreForOrder(order, `Refund: ${reason}`);
-    order.orderStatus = 'REFUNDED';
-    order.refundAmount = refundAmount;
+    if (isFullRefund) InventoryRepository.restoreForOrder(order, `Refund: ${reason}`);
+    if (isFullRefund) order.orderStatus = 'REFUNDED';
+    order.refundAmount = cumulativeRefund;
+    if (options) (order.refundEvents ??= []).push({ ...options, amountPaise: Math.round(refundAmount * 100), originalShiftId: originalShift?.id, businessDayId: payingShift?.businessDayId ?? BusinessDayRepository.getActiveBusinessDay().id, at: now, actor: managerName, reason });
     // A partial refund settles a lesser amount back to the guest but the
     // order itself was still genuinely paid — only a full refund reverses
     // paymentStatus itself, matching the same distinction createOrder's own
@@ -1038,28 +1024,23 @@ export class OrderRepository {
     // incremented — without this, a processed refund leaves the cash
     // drawer's expected-vs-actual reconciliation silently wrong for the
     // rest of the shift.
-    const activeShift = ShiftRepository.getActiveShift();
-    if (activeShift) {
-      activeShift.totalSales -= refundAmount;
-      const pMethod = order.paymentMethod;
-      if (pMethod === 'CASH' || pMethod === 'CASH_AT_COUNTER') {
-        activeShift.totalCashSales -= refundAmount;
-        activeShift.expectedCash -= refundAmount;
-      } else if (pMethod === 'UPI' || pMethod === 'UPI_QR') {
-        activeShift.totalUpiSales -= refundAmount;
-      } else if (pMethod === 'CARD' || pMethod === 'CARD_TERMINAL') {
-        activeShift.totalCardSales -= refundAmount;
-      }
+    if (originalShift?.status === 'OPEN') {
+      const metrics = ShiftRepository.getShiftMetrics(originalShift, db.orders);
+      originalShift.totalSales = metrics.totalSales;
+      originalShift.totalCashSales = metrics.totalCashSales;
+      originalShift.totalUpiSales = metrics.totalUpiSales;
+      originalShift.totalCardSales = metrics.totalCardSales;
+      originalShift.expectedCash = metrics.expectedCash;
     }
-    if (order.businessDayId) {
+    if (order.businessDayId && BusinessDayRepository.getBusinessDayById(order.businessDayId)?.status !== 'CLOSED') {
       BusinessDayRepository.recalculateMetrics(order.businessDayId);
     }
 
-    if (order.customerPhone && !order.loyaltyRefundApplied) {
+    if (order.customerPhone && (!order.loyaltyRefundApplied || options)) {
       const customer = CustomerRepository.getByPhone(order.customerPhone);
       if (!order.serverQrLoyalty && customer && (order.loyaltyPointsEarned !== undefined || order.loyaltyPointsRedeemed)) {
-        const reversed = isFullRefund ? (order.loyaltyPointsEarned ?? 0) : Math.floor((order.loyaltyPointsEarned ?? 0) * refundAmount / order.totalAmount);
-        CustomerRepository.recordLoyaltyEvent(customer, `refund:${order.id}`, -reversed + (isFullRefund ? order.loyaltyPointsRedeemed ?? 0 : 0), -refundAmount, isFullRefund ? -1 : 0);
+        const reversed = Math.floor((order.loyaltyPointsEarned ?? 0) * cumulativeRefund / order.totalAmount) - Math.floor((order.loyaltyPointsEarned ?? 0) * previousRefund / order.totalAmount);
+        CustomerRepository.recordLoyaltyEvent(customer, `refund:${order.id}${options ? `:${options.idempotencyKey}` : ''}`, -reversed + (isFullRefund ? order.loyaltyPointsRedeemed ?? 0 : 0), -refundAmount, isFullRefund ? -1 : 0);
         order.loyaltyRefundApplied = true;
       }
     }
@@ -1319,7 +1300,18 @@ export class TableRepository {
     if (!canMoveTable(tbl.status, status)) return null;
     tbl.status = status;
     if (status === 'AVAILABLE') {
+      const order = db.orders.find(o => o.id === tbl.currentOrderId);
+      if (order) {
+        order.tableReleasedAt = new Date().toISOString();
+        order.updatedAt = order.tableReleasedAt;
+        order.syncStatus = 'SAVED_LOCALLY';
+        order.isSynced = false;
+        order.timeline = [...(order.timeline ?? []), { status: 'TABLE_RELEASED', title: order.paymentStatus === 'SUCCESS' ? 'Table released' : 'Table released; bill remains outstanding', timestamp: order.tableReleasedAt }];
+      }
       tbl.currentOrderId = undefined;
+      tbl.currentGuests = undefined;
+      tbl.openedById = undefined;
+      tbl.openedByName = undefined;
     }
     db.notify();
     return tbl;
@@ -1365,7 +1357,7 @@ export class TableRepository {
       if (table.status === 'BLOCKED' || table.isActive === false) continue;
       const current = db.orders.find(order => order.id === table.currentOrderId);
       if (current && !closed.has(current.orderStatus)) continue;
-      const next = db.orders.filter(order => selfService.has(order.source_type ?? '') && order.orderType === 'DINE_IN' && order.tableId === table.id && !closed.has(order.orderStatus))
+      const next = db.orders.filter(order => !order.tableReleasedAt && selfService.has(order.source_type ?? '') && order.orderType === 'DINE_IN' && order.tableId === table.id && !closed.has(order.orderStatus))
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))[0];
       if (!next) continue;
       table.status = 'OCCUPIED';
@@ -2269,24 +2261,45 @@ export class RestaurantIdentityRepository {
     state?: string | null;
     phone?: string | null;
     showJamanAI?: boolean;
+    businessDayCutoffHour?: number;
+    operatingProfile?: Restaurant['operatingProfile'];
+    branchOperatingProfile?: Restaurant['operatingProfile'] | null;
+    branchId?: string | null;
+    profileRevision?: string;
+    branding?: Partial<Restaurant>;
   }): void {
+    // Freeze missing historical attribution before a scheduled profile can change it.
+    if (profile.operatingProfile || profile.branchOperatingProfile) {
+      const historicalDay = (at: string) => { const canonical = BusinessDayRepository.getCanonicalBusinessDate(new Date(at)); return db.businessDays.find(day => day.businessDate === canonical.dateKey)?.id ?? canonical.dayId; };
+      for (const order of db.orders) if (!order.businessDayId && Number.isFinite(new Date(order.createdAt).getTime())) {order.businessDayId = historicalDay(order.createdAt); order.syncStatus = 'SAVED_LOCALLY';}
+      for (const shift of db.shifts) if (!shift.businessDayId && Number.isFinite(new Date(shift.openedAt).getTime())) shift.businessDayId = historicalDay(shift.openedAt);
+    }
     const r = db.restaurant;
     const restaurantChanged = r.id !== profile.id;
     r.id = profile.id;
     if (profile.name) r.name = profile.name;
     // The owner's choice lives in the cloud and is the same on every terminal.
     if (typeof profile.showJamanAI === 'boolean') r.showJamanAI = profile.showJamanAI;
+    if (Number.isInteger(profile.businessDayCutoffHour) && profile.businessDayCutoffHour! >= 0 && profile.businessDayCutoffHour! <= 23) r.businessDayCutoffHour = profile.businessDayCutoffHour;
+    else if (restaurantChanged) r.businessDayCutoffHour = 5;
 
+    if (profile.operatingProfile) r.operatingProfile = profile.operatingProfile;
+    if (profile.branchId && [db.outlet.id, KeyValueStore.get('jamanvaar_bound_branch_id')].includes(profile.branchId) && profile.branchOperatingProfile !== undefined) db.outlet.operatingProfile = profile.branchOperatingProfile ?? undefined;
+    if (profile.profileRevision) r.profileRevision = profile.profileRevision;
+    configureRestaurantTimezone(() => resolveOperatingProfile(db.restaurant, db.outlet).timezone);
+    if (profile.branding) for (const key of ['tagline','logoUrl','phone','email','pincode','website','ownerName','managerName','footerText','primaryColor','secondaryColor','msmeNumber'] as const) {
+      if (typeof profile.branding[key] === 'string') r[key] = profile.branding[key];
+    }
     const fields: Array<'legalName' | 'gstin' | 'fssaiNumber' | 'address' | 'city' | 'state' | 'phone'> = ['legalName', 'gstin', 'fssaiNumber', 'address', 'city', 'state', 'phone'];
     for (const f of fields) {
       const current = r[f] ?? '';
       const isDemo = current !== '' && current === (SEED_RESTAURANT[f] ?? '');
-      if (restaurantChanged || current === '' || isDemo) r[f] = profile[f] ?? '';
+      if ((profile.profileRevision && f in profile) || restaurantChanged || current === '' || isDemo) r[f] = profile[f] ?? '';
     }
     // Demo-only fields that have no platform counterpart: never leave another business's values behind.
     for (const f of ['email', 'website', 'tagline', 'msmeNumber', 'pincode', 'ownerName', 'managerName', 'footerText'] as const) {
       const current = r[f] ?? '';
-      if (restaurantChanged ? current !== '' : current !== '' && current === (SEED_RESTAURANT[f] ?? '')) r[f] = '';
+      if (!profile.branding && (restaurantChanged ? current !== '' : current !== '' && current === (SEED_RESTAURANT[f] ?? ''))) r[f] = '';
     }
 
     db.outlet = { ...db.outlet, restaurantId: profile.id, address: r.address ?? '', city: r.city ?? '', state: r.state ?? '', phone: r.phone ?? '' };
@@ -2400,11 +2413,12 @@ export class ShiftRepository {
     if (!shift) return [];
     const openTime = new Date(shift.openedAt).getTime();
     const closeTime = shift.closedAt ? new Date(shift.closedAt).getTime() : Infinity;
-    const shiftDate = new Date(shift.openedAt).toDateString();
 
     return orders.filter((o) => {
       // 1. Direct shift ID tagging
-      if (o.shiftId && o.shiftId === shift.id) return true;
+      if (o.shiftId) return o.shiftId === shift.id;
+      // Legacy untagged orders may only fall back to time within the same register.
+      if (o.kioskId && o.kioskId !== shift.posId) return false;
 
       // 2. Timestamp within shift window AND matching same calendar day
       const orderTime = new Date(o.createdAt).getTime();
@@ -2413,8 +2427,7 @@ export class ShiftRepository {
       const inWindow = orderTime >= openTime && orderTime <= closeTime;
       if (!inWindow) return false;
 
-      const orderDate = new Date(o.createdAt).toDateString();
-      return shiftDate === orderDate;
+      return true;
     });
   }
 
@@ -2432,8 +2445,9 @@ export class ShiftRepository {
       };
     }
 
+    if (shift.status === 'CLOSED') return { totalOrders: shift.totalOrders, totalSales: shift.totalSales, totalDiscounts: shift.totalDiscounts ?? 0, totalCashSales: shift.totalCashSales, totalUpiSales: shift.totalUpiSales, totalCardSales: shift.totalCardSales, expectedCash: shift.expectedCash, completedOrders: this.getShiftOrders(shift, orders) };
     const shiftOrders = this.getShiftOrders(shift, orders);
-    const completedOrders = shiftOrders.filter((o) => o.orderStatus === 'COMPLETED');
+    const completedOrders = shiftOrders.filter(o => orderPaymentPosition(o).collectedPaise > 0);
 
     let totalSales = 0;
     let totalDiscounts = 0;
@@ -2443,17 +2457,20 @@ export class ShiftRepository {
 
     if (completedOrders.length > 0) {
       completedOrders.forEach((o) => {
-        totalSales += o.totalAmount;
+        const journalRefunds = (o.refundEvents ?? []).reduce((sum, event) => sum + event.amountPaise / 100, 0);
+        const refunded = Math.max(0, Math.min(o.totalAmount, (o.refundAmount ?? (o.paymentStatus === 'REFUNDED' ? o.totalAmount : 0)) - journalRefunds));
+        const position = orderPaymentPosition({ ...o, refundAmount: refunded });
+        totalSales += position.netCollectedPaise / 100;
         totalDiscounts += o.discountAmount || 0;
 
-        const tenders = getOrderTenders(o);
+        const tenders = position.netTenders;
         totalCashSales += tenders.cash;
         totalUpiSales += tenders.upi;
         totalCardSales += tenders.card;
       });
-    } else if (shift.totalSales > 0 || shift.totalCashSales > 0 || shift.totalOrders > 0) {
+    } else if (shiftOrders.length === 0 && (shift.totalSales > 0 || shift.totalCashSales > 0 || shift.totalOrders > 0)) {
       // Preserve shift's manually assigned / historical totals if order array is empty
-      totalSales = shift.totalSales || 0;
+      totalSales = shift.returnBaseSales ?? shift.totalSales ?? 0;
       totalDiscounts = shift.totalDiscounts || 0;
       totalCashSales = shift.totalCashSales || 0;
       totalUpiSales = shift.totalUpiSales || 0;
@@ -2461,13 +2478,15 @@ export class ShiftRepository {
     }
 
     const movements = this.getCashMovements(shift.id);
+    const registerReturns = orders.flatMap(order => order.refundEvents ?? []).filter(event => event.payingShiftId === shift.id);
+    totalSales = Math.round((totalSales - registerReturns.reduce((sum,event) => sum + event.amountPaise / 100,0)) * 100) / 100;
     const totalCashIn = movements.filter((m) => m.type === 'CASH_IN').reduce((sum, m) => sum + m.amount, 0);
     const totalCashOut = movements.filter((m) => m.type === 'CASH_OUT').reduce((sum, m) => sum + m.amount, 0);
 
     const expectedCash = (shift.openingCash || 0) + totalCashSales + totalCashIn - totalCashOut;
 
     return {
-      totalOrders: completedOrders.length > 0 ? completedOrders.length : shift.totalOrders || 0,
+      totalOrders: shiftOrders.length > 0 ? completedOrders.length : shift.totalOrders || 0,
       totalSales,
       totalDiscounts,
       totalCashSales,
@@ -2478,8 +2497,10 @@ export class ShiftRepository {
     };
   }
 
-  public static getActiveShift(): ShiftRecord | undefined {
-    const shift = db.shifts.find((s) => s.status === 'OPEN');
+  public static getActiveShift(posId?: string): ShiftRecord | undefined {
+    const terminal = posId ?? (typeof localStorage !== 'undefined' ? getTerminalId('POS') : undefined);
+    const shift = db.shifts.find((s) => s.status === 'OPEN' && (!terminal || s.posId === terminal))
+      ?? (posId === undefined && db.shifts.filter(s => s.status === 'OPEN').length === 1 ? db.shifts.find(s => s.status === 'OPEN' && s.posId === 'POS-01') : undefined);
     if (shift) {
       const metrics = this.getShiftMetrics(shift, db.orders);
       shift.totalOrders = metrics.totalOrders;
@@ -2497,20 +2518,19 @@ export class ShiftRepository {
     return [...db.shifts].sort((a, b) => new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime());
   }
 
-  public static openShift(cashierId: string, cashierName: string, openingCash: number, posId: string = 'POS-01', notes?: string): ShiftRecord {
-    // Close any previous open shift if active
-    const current = this.getActiveShift();
-    if (current) {
-      this.closeShift(current.id, current.expectedCash, 'Automated closure on new shift start');
-    }
+  public static openShift(cashierId: string, cashierName: string, openingCash: number, posId: string = getTerminalId('POS'), notes?: string): ShiftRecord {
+    if (!cashierId || !Number.isFinite(openingCash) || openingCash < 0) throw new Error('Enter an authenticated cashier and a valid opening cash amount.');
+    const current = this.getActiveShift(posId);
+    if (current) throw new Error('Count and close this register’s current shift before opening another.');
 
     const newShift: ShiftRecord = {
-      id: `shift-${Date.now()}`,
+      businessDayId: BusinessDayRepository.getActiveBusinessDay().id,
+      id: `shift-${generateUUID()}`,
       // B2-046: the header/shift views used to display `activeShift.id.slice(-2)` — the last two
       // digits of this millisecond timestamp — as "Active Shift #58", which looks like a
       // sequence number but is really just whatever the clock happened to read. This is a real
       // count: this device's Nth shift ever opened, starting at #1 on a fresh restaurant.
-      shiftNumber: db.shifts.length + 1,
+      shiftNumber: db.shifts.filter(s => s.posId === posId).length + 1,
       posId,
       cashierId,
       cashierName,
@@ -2528,6 +2548,13 @@ export class ShiftRepository {
     };
 
     db.shifts.unshift(newShift);
+    const day = db.businessDays.find(d => d.id === newShift.businessDayId);
+    if (day) {
+      const registerFloats = new Map<string,number>();
+      const shifts = db.shifts.filter(s => s.businessDayId === day.id).sort((a,b) => a.openedAt.localeCompare(b.openedAt) || (a.shiftNumber ?? 0) - (b.shiftNumber ?? 0));
+      for (const shift of shifts) if (!registerFloats.has(shift.posId)) registerFloats.set(shift.posId,shift.openingCash);
+      day.openingCash = [...registerFloats.values()].reduce((sum,cash) => sum+cash,0);
+    }
     AuditRepository.log({
       action: 'SHIFT_OPEN',
       category: 'AUTH',
@@ -2539,11 +2566,13 @@ export class ShiftRepository {
     return newShift;
   }
 
-  public static closeShift(shiftId: string, actualCash: number, notes?: string): ShiftRecord | null {
+  public static closeShift(shiftId: string, actualCash: number, notes?: string, closedBy?: string): ShiftRecord | null {
     const shift = db.shifts.find((s) => s.id === shiftId);
     if (!shift) return null;
-
+    if (shift.status !== 'OPEN') throw new Error('This register shift is already closed.');
+    if (!Number.isFinite(actualCash) || actualCash < 0) throw new Error('Enter a valid counted cash amount.');
     const metrics = this.getShiftMetrics(shift, db.orders);
+    if (Math.abs(actualCash - metrics.expectedCash) >= 0.005 && !notes?.trim()) throw new Error('Explain the cash discrepancy before closing.');
     shift.status = 'CLOSED';
     shift.closedAt = new Date().toISOString();
     shift.totalOrders = metrics.totalOrders;
@@ -2561,8 +2590,8 @@ export class ShiftRepository {
     AuditRepository.log({
       action: 'SHIFT_CLOSE',
       category: 'AUTH',
-      details: `Shift ${shiftId} closed by ${shift.cashierName}. Expected ₹${shift.expectedCash}, Actual ₹${actualCash}, Variance ₹${shift.cashVariance}`,
-      username: shift.cashierName
+      details: `Shift ${shiftId} closed by ${closedBy || shift.cashierName}. Expected ₹${shift.expectedCash}, Actual ₹${actualCash}, Variance ₹${shift.cashVariance}`,
+      username: closedBy || shift.cashierName
     });
 
     db.notify();
@@ -2745,7 +2774,8 @@ export class KOTRepository {
     // Group items by Kitchen Station (e.g., 'Main Kitchen', 'Tandoor', 'Bar', 'Dessert')
     const stationMap: Record<string, KOTItem[]> = {};
     params.items.forEach((item) => {
-      const st = item.kitchenStation || 'Main Kitchen';
+      const rawStation = item.kitchenStation || 'Main Kitchen';
+      const st = KitchenStationRepository.resolve(rawStation)?.name || rawStation;
       if (!stationMap[st]) stationMap[st] = [];
       stationMap[st].push(item);
     });
@@ -2778,6 +2808,7 @@ export class KOTRepository {
         tableNumber: params.tableNumber,
         orderType: params.orderType,
         station: stationName,
+        stationId: KitchenStationRepository.resolve(stationName)?.id,
         type: kotType,
         items: stationItems,
         cashierName: params.cashierName,
@@ -4327,46 +4358,48 @@ export class BusinessDayRepository {
     // Restaurant shifts before 5:00 AM (the restaurant's own local time) belong to yesterday's
     // business day. Going back a fixed 24h in absolute time — rather than mutating a local Date's
     // day-of-month — keeps this correct regardless of the device's own timezone or DST rules.
-    const effective = getRestaurantHour(date) < 5 ? new Date(date.getTime() - 24 * 60 * 60 * 1000) : date;
-    const dateKey = formatRestaurantDate(effective, 'ISO_DATE');
+    if (typeof configureRestaurantTimezone === 'function') configureRestaurantTimezone(() => resolveOperatingProfile(db.restaurant, db.outlet).timezone);
+    const profile = resolveOperatingProfile(db.restaurant, db.outlet, date);
+    const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: profile.timezone, hour: '2-digit', hourCycle: 'h23' }).format(date));
+    const calendarKey = localDateKey(date, profile.timezone);
+    const calendarDate = new Date(`${calendarKey}T12:00:00Z`);
+    if (hour < profile.cutoffHour) calendarDate.setUTCDate(calendarDate.getUTCDate() - 1);
+    const dateKey = calendarDate.toISOString().slice(0,10);
     return {
       dateKey,
       dayId: `BD-${dateKey.replace(/-/g, '')}`,
-      displayDate: getBusinessDayDisplayDate(effective)
+      displayDate: calendarDate.toLocaleDateString('en-IN', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' })
     };
   }
 
   public static getActiveBusinessDay(): BusinessDay {
     const currentCanonical = this.getCanonicalBusinessDate();
 
-    let active = db.businessDays.find(
-      (d) => d.status === 'OPEN' || d.status === 'CLOSING' || d.status === 'REOPENED'
-    );
-
-    // If active day exists but belongs to a previous calendar/business day (past 5:00 AM cutoff),
-    // automatically close the previous day and roll over to today's new business day!
-    // Compare as dates (not just inequality) — an active day dated today-or-later must never
-    // be auto-closed just because it doesn't lexically equal the canonical key.
-    if (active && active.businessDate < currentCanonical.dateKey) {
-      console.log(`[Auto-Close] Business day ${active.id} (${active.businessDate}) is past 5:00 AM cutoff. Auto-closing day...`);
-      active.status = 'CLOSED';
-      active.closedAt = new Date().toISOString();
-      active.closedBy = 'System Auto-Close (5:00 AM)';
-      this.recalculateMetrics(active.id);
-      active = undefined; // Force creation of new day
+    // Rollover is an operational date change, never a counted settlement.
+    let rolled = false;
+    for (const day of db.businessDays) {
+      if (['OPEN', 'REOPENED'].includes(day.status) && day.businessDate < currentCanonical.dateKey) {
+        day.status = 'CLOSING';
+        day.updatedAt = new Date().toISOString();
+        this.recalculateMetrics(day.id);
+        rolled = true;
+      }
     }
+    let active = [...db.businessDays].sort((a, b) => b.businessDate.localeCompare(a.businessDate)).find(
+      d => ['OPEN', 'REOPENED', 'CLOSING'].includes(d.status) && d.businessDate >= currentCanonical.dateKey
+    );
+    if (rolled) db.notify();
 
     if (!active) {
       const now = new Date();
-      const previousDay = db.businessDays.find((d) => d.status === 'CLOSED');
-      const openingCash = previousDay?.closingCash ?? 0;
+      const openingCash = 0; // Registers explicitly count their next float; yesterday's takings are not opening cash.
 
       active = {
         id: currentCanonical.dayId,
         businessDate: currentCanonical.dateKey,
         displayDate: currentCanonical.displayDate,
         openedAt: now.toISOString(),
-        openedBy: 'System (5:00 AM Auto-Open)',
+        openedBy: 'System (business-date rollover)',
         status: 'OPEN',
         openingCash: openingCash,
         cashIn: 0,
@@ -4388,7 +4421,7 @@ export class BusinessDayRepository {
         takeawayCount: 0,
         deliveryCount: 0,
         tokenCount: 0,
-        terminalId: 'POS-01',
+        terminalId: getTerminalId('POS'),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString()
       };
@@ -4409,8 +4442,20 @@ export class BusinessDayRepository {
   }
 
   /** Imported orders retain their originating terminal's day ID; local session IDs are not a cross-device date. */
+  public static recordedBusinessDate(order: Order): string | undefined {
+    const known = order.businessDayId ? db.businessDays.find(day => day.id === order.businessDayId)?.businessDate : undefined;
+    if (known) return known;
+    const match = /^BD-(\d{4})(\d{2})(\d{2})$/.exec(order.businessDayId || '');
+    if (!match) return undefined;
+    const date = `${match[1]}-${match[2]}-${match[3]}`;
+    const parsed = new Date(`${date}T12:00:00Z`);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0,10) === date ? date : undefined;
+  }
+
   public static orderBelongsToBusinessDay(order: Order, day: BusinessDay): boolean {
     if (order.businessDayId === day.id) return true;
+    const recorded = this.recordedBusinessDate(order);
+    if (recorded) return recorded === day.businessDate;
     if (order.businessDayId && order.kioskId !== 'CLOUD-SYNC') return false;
     return this.getCanonicalBusinessDate(new Date(order.createdAt)).dateKey === day.businessDate;
   }
@@ -4425,12 +4470,14 @@ export class BusinessDayRepository {
     if (idx === -1) return null;
     const day = db.businessDays[idx];
 
+    if (day.status === 'CLOSED' && day.snapshot) return day;
     const orders = this.getOrdersForBusinessDay(businessDayId);
 
     let grossSales = 0;
     let discounts = 0;
     let tax = 0;
     let netSales = 0;
+    let refunds = 0;
     let cashSales = 0;
     let upiSales = 0;
     let cardSales = 0;
@@ -4450,8 +4497,8 @@ export class BusinessDayRepository {
         return;
       }
       // Sent to the kitchen but not paid yet: not a sale, not collected money (BUG-151/161).
-      if (isUnpaidOpenOrder(o)) return;
-      if (o.orderStatus === 'REFUNDED') {
+      if (orderPaymentPosition(o).collectedPaise === 0) return;
+      if (o.orderStatus === 'REFUNDED' || (o.refundAmount ?? 0) > 0) {
         refundedOrderCount++;
       }
       if (o.orderStatus === 'COMPLETED') {
@@ -4463,7 +4510,11 @@ export class BusinessDayRepository {
       tax += o.taxAmount || 0;
       netSales += o.totalAmount;
 
-      const tenders = getOrderTenders(o);
+      refunds += Math.min(o.totalAmount, o.refundAmount ?? (o.paymentStatus === 'REFUNDED' ? o.totalAmount : 0));
+      const journalAmount = (o.refundEvents ?? []).reduce((sum, event) => sum + event.amountPaise / 100, 0);
+      const legacyRefund = Math.max(0, (o.refundAmount ?? 0) - journalAmount);
+      const position = orderPaymentPosition(o);
+      const tenders = journalAmount ? orderPaymentPosition({ ...o, refundAmount: legacyRefund, paymentStatus: 'SUCCESS' }).netTenders : position.netTenders;
       cashSales += tenders.cash;
       upiSales += tenders.upi;
       cardSales += tenders.card;
@@ -4475,11 +4526,19 @@ export class BusinessDayRepository {
       else tokenCount++;
     });
 
+    const dayShiftIds = new Set(db.shifts.filter(shift => shift.businessDayId === day.id || (!shift.businessDayId && this.getCanonicalBusinessDate(new Date(shift.openedAt)).dateKey === day.businessDate)).map(shift => shift.id));
+    const movements = db.cashMovements.filter(movement => dayShiftIds.has(movement.shiftId));
+    if (movements.length) {
+      day.cashIn = movements.filter(m => m.type === 'CASH_IN').reduce((sum, m) => sum + m.amount, 0);
+      day.cashOut = movements.filter(m => m.type === 'CASH_OUT').reduce((sum, m) => sum + m.amount, 0);
+    }
     day.grossSales = grossSales;
     day.discounts = discounts;
     day.tax = tax;
     day.netSales = netSales;
-    day.totalCollected = netSales;
+    const laterReturns = orders.flatMap(order => order.refundEvents ?? []).filter(event => event.businessDayId !== day.id).reduce((sum,event) => sum + event.amountPaise / 100,0);
+    const externalReturns = db.orders.filter(order => !this.orderBelongsToBusinessDay(order,day)).flatMap(order => order.refundEvents ?? []).filter(event => event.businessDayId === day.id).reduce((sum,event) => sum + event.amountPaise / 100,0);
+    day.totalCollected = Math.round((orders.reduce((sum, order) => sum + orderPaymentPosition(order).netCollectedPaise / 100, 0) + laterReturns - externalReturns) * 100) / 100;
     day.cashSales = cashSales;
     day.upiSales = upiSales;
     day.cardSales = cardSales;
@@ -4664,7 +4723,7 @@ export class BusinessDayRepository {
       openedAt: openedAtIso,
       openedBy,
       status: 'OPEN',
-      openingCash: initialCash ?? 2000,
+      openingCash: initialCash ?? 0,
       cashIn: 0,
       cashOut: 0,
       grossSales: 0,
@@ -4684,7 +4743,7 @@ export class BusinessDayRepository {
       takeawayCount: 0,
       deliveryCount: 0,
       tokenCount: 0,
-      terminalId: 'POS-01',
+      terminalId: getTerminalId('POS'),
       createdAt: openedAtIso,
       updatedAt: openedAtIso
     };
@@ -4810,6 +4869,12 @@ export class KioskDisplaySettingsRepository {
 
   public static updateSettings(partial: Partial<KioskDisplaySettings>, actor: string = 'Kiosk Admin'): KioskDisplaySettings {
     const current = this.getSettings();
+    if (partial.allowedOrderTypes && (!partial.allowedOrderTypes.length || partial.allowedOrderTypes.some(t => t !== 'DINE_IN' && t !== 'TAKEAWAY'))) throw new Error('Enable at least one supported ordering mode.');
+    if (partial.defaultTableId && !db.tables.some(t => t.id === partial.defaultTableId && t.isActive !== false && t.status !== 'BLOCKED')) throw new Error('Choose an active, unblocked table.');
+    for (const override of Object.values(partial.orderingOverrides ?? {})) {
+      if (override.allowedOrderTypes && (!override.allowedOrderTypes.length || override.allowedOrderTypes.some(t => t !== 'DINE_IN' && t !== 'TAKEAWAY'))) throw new Error('Enable at least one supported ordering mode for each kiosk.');
+      if (override.defaultTableId && !db.tables.some(t => t.id === override.defaultTableId && t.isActive !== false && t.status !== 'BLOCKED')) throw new Error('Choose an active, unblocked table for each kiosk.');
+    }
 
     // A restaurant with no enabled languages, or a default that isn't in
     // the enabled list, would leave the kiosk unable to render a language

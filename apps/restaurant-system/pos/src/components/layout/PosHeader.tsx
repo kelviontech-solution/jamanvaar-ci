@@ -13,34 +13,8 @@ import { PosCloseDayModal } from '../days/PosCloseDayModal';
 import { BusinessDayService } from '@jamanvaar/business';
 import { formatINR } from '@jamanvaar/utils';
 import { lanMeshSync } from '@jamanvaar/sync';
-import {
-  Search,
-  Wifi,
-  WifiOff,
-  Server,
-  Printer,
-  ChefHat,
-  Lock,
-  LogOut,
-  HelpCircle,
-  Clock,
-  CircleDollarSign,
-  ChevronDown,
-  PlusCircle,
-  UtensilsCrossed,
-  ShoppingBag,
-  Bike,
-  Activity,
-  CheckCircle2,
-  AlertTriangle,
-  Bell,
-  Calendar,
-  Sparkles,
-  User,
-  ShieldCheck,
-  RotateCcw,
-  Check
-} from 'lucide-react';
+import { getTerminalLabel } from '@jamanvaar/database';
+import { Search, Wifi, WifiOff, Server, Printer, ChefHat, Lock, LogOut, HelpCircle, Clock, CircleDollarSign, ChevronDown, PlusCircle, UtensilsCrossed, ShoppingBag, Bike, Activity, Bell, Calendar, Sparkles } from 'lucide-react';
 import { useConfirm } from '@jamanvaar/ui';
 
 export const PosHeader: React.FC = () => {
@@ -596,7 +570,7 @@ export const PosHeader: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <p className="font-bold text-sm text-jaman-navy">{currentUser?.fullName || 'Staff'}</p>
                   <span className="text-[11px] font-bold bg-jaman-saffron/10 text-jaman-saffron px-1.5 py-0.5 rounded">
-                    POS-01
+                    {getTerminalLabel('POS')}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500">{currentUser?.email || 'No email on file'}</p>

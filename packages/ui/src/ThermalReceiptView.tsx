@@ -1,8 +1,8 @@
 import React from 'react';
 import { Order, ReceiptConfig, KOTRecord } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime, splitTax, buildUpiPaymentUri, generateQrDataUrl } from '@jamanvaar/utils';
+import { formatDate, formatTime, splitTax, buildUpiPaymentUri, generateQrDataUrl } from '@jamanvaar/utils';
 import { JAMANVAAR_LOGOS } from './assets';
-import { CheckCircle2, Phone, Mail } from 'lucide-react';
+import 'lucide-react';
 
 export interface ThermalReceiptViewProps {
   order: Order;

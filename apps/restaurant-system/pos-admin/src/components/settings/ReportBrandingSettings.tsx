@@ -1,23 +1,11 @@
+import { OperatingProfilesPanel } from './OperatingProfilesPanel';
 import React, { useState } from 'react';
 import { useAiAccess, SettingsSaveBar, type SettingsSaveState } from '@jamanvaar/ui';
 import { refreshConfiguredAi } from '@jamanvaar/business';
-import { db } from '@jamanvaar/database';
+import { db, resolveOperatingProfile } from '@jamanvaar/database';
 import { isValidGstinFormat, isValidFssaiFormat, isValidIndianPincode, isValidIndianPhone } from '@jamanvaar/utils';
 import { saveRestaurantIdentity } from '../../cloud/cloudClient';
-import {
-  Building,
-  FileText,
-  ShieldCheck,
-  Phone,
-  Mail,
-  Globe,
-  Palette,
-  User,
-  CheckCircle2,
-  Image,
-  Upload,
-  RotateCcw
-} from 'lucide-react';
+import { Building, ShieldCheck, Phone, User, CheckCircle2 } from 'lucide-react';
 
 interface ReportBrandingSettingsProps {
   showToast: (msg: string) => void;
@@ -53,8 +41,10 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   );
   const [primaryColor, setPrimaryColor] = useState(db.restaurant.primaryColor || '#0B253A');
   const [secondaryColor, setSecondaryColor] = useState(db.restaurant.secondaryColor || '#E66817');
-  const [ownerName, setOwnerName] = useState(db.restaurant.ownerName || 'Ramesh Patel');
-  const [managerName, setManagerName] = useState(db.restaurant.managerName || 'Pooja Shah');
+  const [ownerName, setOwnerName] = useState(db.restaurant.ownerName || '');
+  const [managerName, setManagerName] = useState(db.restaurant.managerName || '');
+  const [businessDayCutoffHour, setBusinessDayCutoffHour] = useState(db.restaurant.businessDayCutoffHour ?? 5);
+  const [restaurantTimezone, setRestaurantTimezone] = useState(resolveOperatingProfile(db.restaurant).timezone);
   const [showJamanAI, setShowJamanAI] = useState(db.restaurant.showJamanAI !== false);
   // B2-040: GSTIN/FSSAI/pincode/phone were accepted as any string with no format check at all —
   // "GSTIN: abc" reached real customer tax invoices via db.receiptConfig below. All four stay
@@ -140,14 +130,16 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     // The device copy is saved; only report "saved" for what actually persisted where.
     let synced = true;
     try {
-      await saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI });
+      const currentOperating = resolveOperatingProfile(db.restaurant);
+      await saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI, ...(currentOperating.timezone !== restaurantTimezone || currentOperating.cutoffHour !== businessDayCutoffHour ? {operatingProfile:{timezone:restaurantTimezone,cutoffHour:businessDayCutoffHour}} : {}), branding: { tagline, logoUrl, phone, email, pincode, website, ownerName, managerName, footerText, primaryColor, secondaryColor, msmeNumber } });
+      db.notify();
     } catch {
       synced = false;
     }
     onUpdated();
     if (synced) {
       setSaveState('saved');
-      setSaveMessage('Saved and synced to your restaurant account.');
+      setSaveMessage('Saved on this device. Restaurant identity and branding synced. Operating changes start on their scheduled date.');
       showToast('Restaurant Branding & Accounting Profile Saved!');
     } else {
       setSaveState('error');
@@ -170,6 +162,27 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
         <SettingsSaveBar state={saveState} message={saveMessage} saveType="submit" saveLabel="Save changes" />
       </div>
 
+      <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-2">
+        <label className="block text-sm font-bold text-jaman-navy" htmlFor="business-day-rollover">Business date rollover</label>
+        <select id="business-day-rollover" className="rounded-xl border border-jaman-border p-3 text-sm" value={businessDayCutoffHour} onChange={e => setBusinessDayCutoffHour(Number(e.target.value))}>
+          {Array.from({length:24},(_,hour) => <option key={hour} value={hour}>{String(hour).padStart(2,'0')}:00 restaurant time</option>)}
+        </select>
+        <label className="block text-xs font-bold" htmlFor="restaurant-timezone">Restaurant timezone</label>
+        <input id="restaurant-timezone" className="rounded-xl border border-jaman-border p-3 text-sm" value={restaurantTimezone} onChange={event => setRestaurantTimezone(event.target.value)} placeholder="Asia/Kolkata"/>
+        <p className="text-xs text-slate-600">Orders before this hour belong to the previous business date. This never counts cash or closes a register. Owner sign-in and a successful server save are required; terminals receive the setting on their next profile refresh.</p>
+      </section>
+      <OperatingProfilesPanel />
+      <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-3">
+        <h3 className="font-bold text-jaman-navy">Brand preview</h3>
+        <div className="rounded-2xl border p-5" style={{borderColor:primaryColor}}>
+          {logoUrl && <img src={logoUrl} alt="Restaurant logo preview" className="h-16 max-w-full object-contain" />}
+          <h4 className="mt-3 text-xl font-bold" style={{color:primaryColor}}>{name}</h4>
+          <p className="text-sm text-slate-600">{tagline}</p><p className="text-xs mt-2">{address} {city} {phone}</p>
+          <span className="mt-3 inline-block rounded-xl px-4 py-2 text-white font-bold" style={{background:secondaryColor}}>Order preview</span>
+          <p className="mt-3 text-xs text-slate-500">{footerText}</p>
+        </div>
+        <p className="text-xs text-slate-600">Preview shows unsaved edits. Saving publishes the branding profile; device acknowledgement is shown separately above.</p>
+      </section>
       {/* App Preferences — layered on top of the platform-wide JAMAN AI
           entitlement toggle in Super Admin, which only controls whether the
           feature exists at all; this is the per-restaurant opt-out. */}

@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { BCRYPT_COST } from '../../common/security/password-cost';
-import { User, TenantUserStatus, Device, Prisma } from '@prisma/client';
+import { User, TenantUserStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { hashOpaqueToken, generateOpaqueToken, hashLowEntropySecret, maskEmail } from '../../common/security/token.util';
@@ -21,7 +21,7 @@ import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto, LoginOwner
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
 import { EmailService } from '../notifications/email.service';
-import { passwordResetOtpEmail } from '../notifications/email-templates';
+import { passwordResetOtpEmail, restaurantIdRecoveryEmail } from '../notifications/email-templates';
 import { RestaurantsService } from '../restaurants/restaurants.service';
 
 /** A restaurant with a single active branch has an obvious answer for which branch a new terminal belongs to. */
@@ -1117,6 +1117,21 @@ export class TenantAuthService {
    * property (expiry, attempt limit, resend cooldown, HMAC hash, silent no-op for an
    * unactivated owner) carries over by construction, not by re-implementation.
    */
+  /** Discovery never returns tenant identifiers to an unverified HTTP caller. */
+  async recoverRestaurantId(email: string): Promise<{success: true}> {
+    const owners = await this.prisma.runAsPlatform(tx => tx.user.findMany({
+      where: { email: { equals: email.trim().toLowerCase(), mode: 'insensitive' }, role: 'OWNER', status: 'ACTIVE' },
+      select: { email: true, restaurant: { select: { name: true, restaurantCode: true, status: true } } }, take: 50
+    }));
+    const active = owners.filter(row => row.restaurant.status === 'ACTIVE');
+    if (active.length) {
+      const mail = restaurantIdRecoveryEmail(active.map(row => row.restaurant));
+      // Only delivery to the registered mailbox exposes IDs. SMTP latency must not enumerate owners.
+      void this.email.send(active[0].email, mail.subject, mail.html).catch(() => undefined);
+    }
+    return {success: true};
+  }
+
   async forgotPasswordOwner(identifier: { restaurantCode?: string; restaurantId?: string }): Promise<{ success: true; maskedEmail: string; activationRequired: boolean }> {
     const restaurantId = identifier.restaurantId ?? (await this.restaurants.resolveByCode(identifier.restaurantCode!)).restaurantId;
     const owner = await this.prisma.runAsTenant(restaurantId, (tx) =>

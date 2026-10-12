@@ -1,5 +1,6 @@
 import { db } from './db';
 import { KeyValueStore } from './key_value_store';
+import { KitchenStationRepository, type KitchenStation } from './kitchen_stations';
 import type { KioskDisplaySettings, WelcomeScreenSettings, ReceiptConfig } from '@jamanvaar/types';
 
 export interface KioskConfiguration {
@@ -8,6 +9,7 @@ export interface KioskConfiguration {
   display: KioskDisplaySettings;
   welcome: WelcomeScreenSettings;
   receipt: ReceiptConfig;
+  stationRegistry?: KitchenStation[];
 }
 const VERSION = 'jamanvaar_kiosk_configuration_version';
 const DIRTY = 'jamanvaar_kiosk_configuration_dirty';
@@ -20,6 +22,8 @@ export class KioskConfigurationRepository {
     if (previous !== next) {
       KeyValueStore.remove(scopedKey(DIRTY));
       db.resetKioskConfiguration();
+      db.outlet.operatingProfile = undefined;
+      db.restaurant.profileRevision = undefined;
       const cursor = 'jamanvaar_entity_sync_cursor_KIOSK_CONFIGURATION';
       for (const key of KeyValueStore.keys()) if (key === cursor || key.startsWith(cursor + ':')) KeyValueStore.remove(key);
       KeyValueStore.set('jamanvaar_bound_branch_id', next || '');
@@ -33,7 +37,8 @@ export class KioskConfigurationRepository {
   }
   static snapshot(): KioskConfiguration {
     const branchId = KeyValueStore.get('jamanvaar_bound_branch_id') || undefined;
-    return structuredClone({ branchId, updatedAt: KeyValueStore.get(scopedKey(VERSION)) || '1970-01-01T00:00:00.000Z', display: db.kioskDisplaySettings, welcome: db.welcomeScreenSettings, receipt: db.receiptConfig });
+    const stations = KitchenStationRepository.list();
+    return structuredClone({ branchId, updatedAt: KeyValueStore.get(scopedKey(VERSION)) || '1970-01-01T00:00:00.000Z', display: db.kioskDisplaySettings, welcome: db.welcomeScreenSettings, receipt: db.receiptConfig, ...(stations.length ? { stationRegistry: stations } : {}) });
   }
   static pending(): KioskConfiguration | null { return KeyValueStore.get(scopedKey(DIRTY)) === '1' ? this.snapshot() : null; }
   static acknowledge(version: string): void { if (KeyValueStore.get(scopedKey(VERSION)) === version) KeyValueStore.remove(scopedKey(DIRTY)); }
@@ -41,6 +46,7 @@ export class KioskConfigurationRepository {
     if (remote.branchId !== (KeyValueStore.get('jamanvaar_bound_branch_id') || undefined)) return false;
     if (!remote.display || !remote.welcome || !remote.receipt || !Number.isFinite(Date.parse(remote.updatedAt))) return false;
     if (Date.parse(remote.updatedAt) < (Date.parse(KeyValueStore.get(scopedKey(VERSION)) || '') || 0)) return false;
+    if (remote.stationRegistry) KitchenStationRepository.apply(remote.stationRegistry);
     db.kioskDisplaySettings = { ...remote.display };
     db.welcomeScreenSettings = structuredClone(remote.welcome);
     db.receiptConfig = { ...remote.receipt };

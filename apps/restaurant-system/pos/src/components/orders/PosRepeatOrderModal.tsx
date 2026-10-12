@@ -4,7 +4,7 @@ import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { Order } from '@jamanvaar/types';
 import { formatINR, formatTime } from '@jamanvaar/utils';
-import { X, RotateCcw, Check, ShoppingBag, Clock, Utensils, ArrowRight } from 'lucide-react';
+import { X, RotateCcw, ShoppingBag, Clock } from 'lucide-react';
 
 interface PosRepeatOrderModalProps {
   isOpen: boolean;

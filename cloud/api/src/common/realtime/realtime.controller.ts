@@ -1,6 +1,6 @@
 import { Controller, MessageEvent, Sse, UseGuards } from '@nestjs/common';
 import { Device } from '@prisma/client';
-import { Observable, Subject, concat, concatMap, filter, from, interval, map, merge, of, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, concat, concatMap, filter, interval, map, merge, of, takeUntil, tap } from 'rxjs';
 import { DeviceAuthGuard } from '../guards/device-auth.guard';
 import { CurrentDevice } from '../decorators/current-device.decorator';
 import { PrismaService } from '../../prisma/prisma.service';

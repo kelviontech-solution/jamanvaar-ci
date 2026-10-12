@@ -8,6 +8,10 @@
 
 const esc = (v: string): string => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+export function restaurantIdRecoveryEmail(rows: Array<{name: string; restaurantCode: string | null}>) {
+  return { subject: 'Your JAMANVAAR Restaurant IDs', html: `<h2>Your JAMANVAAR restaurants</h2><p>Someone requested the Restaurant IDs linked to this owner email. Use these IDs on the official JAMANVAAR sign-in page. No password or activation key is included.</p><ul>${rows.map(row => `<li>${esc(row.name)}: <strong>${esc(row.restaurantCode || 'Contact your platform administrator for the legacy Restaurant ID')}</strong></li>`).join('')}</ul><p>If you did not request this email, you can ignore it. Your account was not changed.</p>` };
+}
+
 /**
  * The owner's first email: the Restaurant ID (which every terminal asks for before it will accept a key), the login email, and
  * EITHER the first password Super Admin chose (the owner should change it after first sign-in) OR an invitation token to set one.

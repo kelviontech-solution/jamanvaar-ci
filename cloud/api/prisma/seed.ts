@@ -500,7 +500,15 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     { code: 'advancedServiceWorkflow', name: 'Real-Time Multi-Machine Mesh Sync', description: 'POS/Captain/KDS/Kiosk real-time order and table synchronization.', categoryCode: 'sync', legacyEntitlementKey: 'advancedServiceWorkflow' },
     { code: 'posAssistant', name: 'JAMAN AI Assistant', description: 'Offline, local-data-based natural-language restaurant queries.', categoryCode: 'ai', legacyEntitlementKey: 'posAssistant' },
     { code: 'advancedCaptainReports', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance and staff attribution.', categoryCode: 'analytics', legacyEntitlementKey: 'advancedCaptainReports' },
-    { code: 'kioskRemoteManagement', name: 'Kiosk Remote Fleet Management', description: 'Remote restart, cache clear, diagnostics, sync and update commands for kiosks (Kiosk Pro).', categoryCode: 'kiosk' }
+    { code: 'kioskRemoteManagement', name: 'Kiosk Remote Fleet Management', description: 'Remote restart, cache clear, diagnostics, sync and update commands for kiosks (Kiosk Pro).', categoryCode: 'kiosk' },
+    // QR_CAPABILITIES (application-entitlements/qr-capabilities.ts) defines 17 fine-grained QR
+    // add-ons, each requiring a matching, isActive Feature row before resolveQrCapability will
+    // ever check a plan's limits — with no row, a capability stays disabled for every restaurant
+    // regardless of plan, with no admin page able to grant it. Only these two (gated in the
+    // identical way by the same component, QrOperations.tsx) are seeded here; the other 15 remain
+    // the same unfinished rollout, not a regression introduced by seeding just these.
+    { code: 'QR_SERVICE_REQUESTS', name: 'QR Service Requests', description: "Lets a guest ask their table for water, cutlery, napkins, assistance or the bill directly from the QR menu, routed to the floor team's live request inbox.", categoryCode: 'qr_ordering' },
+    { code: 'QR_SCHEDULED_PICKUP', name: 'QR Scheduled Pickup', description: 'Lets a guest schedule a QR order for pickup at a chosen time instead of immediate preparation.', categoryCode: 'qr_ordering' }
   ];
 
   const featureIdByCode = new Map<string, string>();

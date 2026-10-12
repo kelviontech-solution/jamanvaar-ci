@@ -4,24 +4,7 @@ import { usePosStore } from '../../store/posStore';
 import { db, CustomerRepository } from '@jamanvaar/database';
 import { MenuItem, DiningTable, Order, CustomerAccount, KOTRecord } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  Search,
-  X,
-  Utensils,
-  LayoutGrid,
-  Receipt,
-  Users,
-  ChefHat,
-  ArrowRight,
-  Sparkles,
-  Plus,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Tag,
-  Flame,
-  CornerDownLeft
-} from 'lucide-react';
+import { Search, X, Utensils, LayoutGrid, Receipt, Users, Sparkles, Plus, Clock, AlertCircle } from 'lucide-react';
 
 export const GlobalSearchModal: React.FC = () => {
   const {

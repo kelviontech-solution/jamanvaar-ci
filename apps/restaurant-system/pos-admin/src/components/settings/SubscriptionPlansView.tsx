@@ -4,55 +4,9 @@ import { printElement } from '@jamanvaar/ui';
 import { LicenseRepository } from '@jamanvaar/database';
 import { applyLicenseCertificate } from '@jamanvaar/business';
 import { PlanTier, CORE_PLAN_FEATURE_GROUPS, PRO_PLAN_FEATURE_GROUPS, countFeatures } from '@jamanvaar/types';
-import {
-  isCloudConnected,
-  isCloudLoggedIn,
-  redeemActivationCode,
-  cloudLogin,
-  cloudSetInitialPassword,
-  fetchEntitlements,
-  applyEntitlementsToLicense,
-  CloudApiError,
-  type CloudEntitlementsResponse,
-  fetchTenantBillingSummary,
-  fetchTenantInvoices,
-  fetchTenantInvoiceDetail,
-  fetchTenantReceipt,
-  payTenantInvoice,
-  type TenantBillingSummary,
-  type TenantInvoice,
-  type TenantReceipt
-} from '../../cloud/cloudClient';
+import { isCloudConnected, isCloudLoggedIn, redeemActivationCode, cloudLogin, cloudSetInitialPassword, fetchEntitlements, applyEntitlementsToLicense, CloudApiError, type CloudEntitlementsResponse, fetchTenantBillingSummary, fetchTenantInvoices, fetchTenantReceipt, payTenantInvoice, type TenantBillingSummary, type TenantInvoice, type TenantReceipt } from '../../cloud/cloudClient';
 import { CloudDeviceLoginsPanel } from './CloudDeviceLoginsPanel';
-import {
-  Check,
-  CheckCircle2,
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
-  KeyRound,
-  UtensilsCrossed,
-  Banknote,
-  LayoutGrid,
-  ChefHat,
-  Package,
-  BarChart3,
-  HardDrive,
-  Printer,
-  Users,
-  Settings,
-  Smartphone,
-  QrCode,
-  Network,
-  Bot,
-  FileText,
-  Receipt,
-  CreditCard,
-  AlertTriangle,
-  Clock,
-  ShieldCheck,
-  Building2,
-  type LucideIcon, X } from 'lucide-react';
+import { Check, CheckCircle2, Sparkles, ChevronDown, ChevronUp, KeyRound, UtensilsCrossed, Banknote, LayoutGrid, ChefHat, Package, BarChart3, HardDrive, Printer, Users, Settings, Smartphone, QrCode, Network, Bot, Receipt, CreditCard, Clock, Building2, type LucideIcon, X } from 'lucide-react';
 
 // Feature groups themselves live in @jamanvaar/types/planFeatureCatalog (shared with cloud/api's
 // entitlement schema) — this package has no UI dependency, so icons are resolved locally by name.

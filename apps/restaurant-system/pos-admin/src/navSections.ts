@@ -95,9 +95,19 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
 
 /** Product shells share components, not one combined list of tasks. */
 export function productNavSections(product: AdminProduct): Array<GatedNavSection<NavSectionItem>> {
-  if (product === 'POS_ADMIN') return NAV_SECTIONS
-    .filter(group => group.section !== 'KIOSK')
-    .map(group => ({ ...group, items: group.items.filter(item => Object.hasOwn(PRODUCT_PAGES.POS_ADMIN, item.id)) }));
+  if (product === 'POS_ADMIN') {
+    const items = new Map(NAV_SECTIONS.flatMap(g => g.items).map(i => [i.id,i]));
+    const groups: Array<[string,string[]]> = [
+      ['TODAY',['DASHBOARD','REPORTS']],
+      ['ORDERS & BILLS',['ORDERS','BILLING_SALES','PAYMENTS','SHIFTS','LIVE_KDS','KITCHEN_KOT']],
+      ['MENU',['MENU','MENU_OPTIONS','COUPONS','INVENTORY','INVENTORY_CONTROL']],
+      ['TABLES',['TABLES','RESERVATIONS','QR_ORDERING']],
+      ['GUESTS & TEAM',['CUSTOMERS','STAFF']],
+      ['SETTINGS',['HARDWARE','RECEIPTS','SYNC','SETTINGS','LICENSE','AUDIT','BACKUP','SUPPORT','DOWNLOADS']],
+    ];
+    const labels: Record<string,string> = {DASHBOARD:'Today',STAFF:'Team & permissions',CUSTOMERS:'Customers & loyalty',KITCHEN_KOT:'Kitchen tickets',LIVE_KDS:'Kitchen progress',SYNC:'Connections & sync',AUDIT:'Activity history',SHIFTS:'Register shifts & cash'};
+    return groups.map(([section,ids]) => ({section,items:ids.filter(id => items.has(id) && Object.hasOwn(PRODUCT_PAGES.POS_ADMIN,id)).map(id => ({...items.get(id)!,label:labels[id] ?? items.get(id)!.label}))}));
+  }
   const existing = new Map(NAV_SECTIONS.flatMap(group => group.items).map(item => [item.id, item]));
   const sections = [
     ['KIOSK OPERATIONS', ['DASHBOARD', 'KIOSKS', 'ORDERS', 'LIVE_KDS', 'TABLES']],

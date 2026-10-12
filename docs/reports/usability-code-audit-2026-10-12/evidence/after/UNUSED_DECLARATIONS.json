@@ -1,0 +1,1393 @@
+{
+  "checkedAt": "2026-10-12T08:36:18.276Z",
+  "scope": "Compiler-detected unused locals/imports/parameters in the scanned source; path normalization handles Windows TS paths. Candidates are not deleted and do not prove a whole feature is unused.",
+  "count": 231,
+  "diagnostics": [
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "line": 309,
+      "code": 6133,
+      "message": "'welcomeExiting' is declared but its value is never read."
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "line": 356,
+      "code": 6133,
+      "message": "'setGuestCount' is declared but its value is never read."
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "line": 417,
+      "code": 6133,
+      "message": "'paymentTimeLeft' is declared but its value is never read."
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "line": 492,
+      "code": 6133,
+      "message": "'chatInput' is declared but its value is never read."
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "line": 508,
+      "code": 6133,
+      "message": "'idleSeconds' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/assistant/CaptainJamanAiModal.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'onNavigateToTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/assistant/CaptainJamanAiModal.tsx",
+      "line": 33,
+      "code": 6133,
+      "message": "'messages' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/assistant/CaptainJamanAiModal.tsx",
+      "line": 56,
+      "code": 6133,
+      "message": "'occupiedTables' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/food-ready/CaptainFoodReadyView.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'markEntireKotServed' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/food-ready/CaptainFoodReadyView.tsx",
+      "line": 72,
+      "code": 6133,
+      "message": "'totalDishes' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/layout/CaptainAttentionStrip.tsx",
+      "line": 32,
+      "code": 6133,
+      "message": "'totalAttentionItems' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/layout/CaptainHeader.tsx",
+      "line": 42,
+      "code": 6133,
+      "message": "'meshOnline' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/layout/CaptainNavigation.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'kots' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/messages/CaptainMessagesView.tsx",
+      "line": 11,
+      "code": 6133,
+      "message": "'currentCaptain' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/modals/CaptainMoreDrawer.tsx",
+      "line": 36,
+      "code": 6133,
+      "message": "'unreadNotifsCount' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/orders/CaptainActiveOrdersView.tsx",
+      "line": 6,
+      "code": 6133,
+      "message": "'formatINR' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/components/requests/CaptainGuestRequestsView.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'resolvedRequests' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/captain/src/store/captainStore.ts",
+      "line": 1389,
+      "code": 6133,
+      "message": "'orderId' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "line": 399,
+      "code": 6133,
+      "message": "'setGlobalSearch' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "line": 402,
+      "code": 6133,
+      "message": "'setDashFilter' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "line": 472,
+      "code": 6133,
+      "message": "'reportSubTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "line": 472,
+      "code": 6133,
+      "message": "'setReportSubTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/audit/AuditTrailModule.tsx",
+      "line": 12,
+      "code": 6133,
+      "message": "'showToast' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/billing/BillingStatementDocument.tsx",
+      "line": 1,
+      "code": 6133,
+      "message": "'React' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/kitchen/KitchenKotModule.tsx",
+      "line": 21,
+      "code": 6133,
+      "message": "'selectedKotForPrint' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/kitchen/KitchenKotModule.tsx",
+      "line": 21,
+      "code": 6133,
+      "message": "'setSelectedKotForPrint' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/ComboModal.tsx",
+      "line": 110,
+      "code": 6133,
+      "message": "'orig' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "line": 92,
+      "code": 6133,
+      "message": "'onCategoriesChanged' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/orders/OrdersModule.tsx",
+      "line": 52,
+      "code": 6133,
+      "message": "'setDrillCashierFilter' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/payments/PaymentsSplitModule.tsx",
+      "line": 29,
+      "code": 6133,
+      "message": "'showToast' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrAdvanced.tsx",
+      "line": 373,
+      "code": 6133,
+      "message": "'prompt' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrConsole.tsx",
+      "line": 1152,
+      "code": 6133,
+      "message": "'Orders' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportPreviewModal.tsx",
+      "line": 46,
+      "code": 6133,
+      "message": "'days' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportPreviewModal.tsx",
+      "line": 50,
+      "code": 6133,
+      "message": "'isCopied' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportPreviewModal.tsx",
+      "line": 50,
+      "code": 6133,
+      "message": "'setIsCopied' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "line": 3,
+      "code": 6133,
+      "message": "'Order' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "line": 171,
+      "code": 6133,
+      "message": "'recentIds' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "line": 235,
+      "code": 6133,
+      "message": "'categories' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "line": 239,
+      "code": 6133,
+      "message": "'tables' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "line": 243,
+      "code": 6133,
+      "message": "'staff' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reservations/ReservationsModule.tsx",
+      "line": 50,
+      "code": 6133,
+      "message": "'reservationToEdit' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/settings/ReportBrandingSettings.tsx",
+      "line": 41,
+      "code": 6133,
+      "message": "'setPrimaryColor' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/settings/ReportBrandingSettings.tsx",
+      "line": 42,
+      "code": 6133,
+      "message": "'setSecondaryColor' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/shifts/ShiftCashDrawerModule.tsx",
+      "line": 27,
+      "code": 6133,
+      "message": "'showToast' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/qr/QrWorkspace.tsx",
+      "line": 55,
+      "code": 6133,
+      "message": "'r' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "line": 41,
+      "code": 6133,
+      "message": "'setActiveTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "line": 44,
+      "code": 6133,
+      "message": "'isDiscountModalOpen' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "line": 116,
+      "code": 6133,
+      "message": "'quickFavorites' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosDiscountModal.tsx",
+      "line": 49,
+      "code": 6133,
+      "message": "'itemDiscountValues' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/common/GlobalSearchModal.tsx",
+      "line": 238,
+      "code": 6133,
+      "message": "'kot' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/kitchen/PosKotView.tsx",
+      "line": 10,
+      "code": 6133,
+      "message": "'currentUser' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/kitchen/PosKotView.tsx",
+      "line": 51,
+      "code": 6133,
+      "message": "'handleCancelKot' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/kitchen/PosKotView.tsx",
+      "line": 56,
+      "code": 6133,
+      "message": "'mgr' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/layout/PosHeader.tsx",
+      "line": 13,
+      "code": 6133,
+      "message": "'BusinessDayService' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/layout/PosHeader.tsx",
+      "line": 36,
+      "code": 6133,
+      "message": "'setIsShortcutsOpen' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/layout/PosHeader.tsx",
+      "line": 37,
+      "code": 6133,
+      "message": "'setIsShiftModalOpen' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosCatalog.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'sound' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "line": 30,
+      "code": 6133,
+      "message": "'isUploadingDishImg' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "line": 36,
+      "code": 6133,
+      "message": "'showCategoryUrlInput' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "line": 36,
+      "code": 6133,
+      "message": "'setShowCategoryUrlInput' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "line": 60,
+      "code": 6133,
+      "message": "'importProgress' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "line": 425,
+      "code": 6133,
+      "message": "'handleImportJsonFile' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosProductCard.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'hasRequiredModifiers' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'setSelectedTable' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "line": 21,
+      "code": 6133,
+      "message": "'loadOrderFromTable' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "line": 22,
+      "code": 6133,
+      "message": "'setActiveTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "line": 77,
+      "code": 6133,
+      "message": "'sessionStats' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/payment/PosInstantBillConfirmationModal.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'selectedTable' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'currentUser' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "line": 39,
+      "code": 6133,
+      "message": "'autoPrintCustomerReceipt' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "line": 39,
+      "code": 6133,
+      "message": "'setAutoPrintCustomerReceipt' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "line": 1321,
+      "code": 6133,
+      "message": "'Icon' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftAndCashView.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'setActiveTab' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftAndCashView.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'setIsPrintQueueOpen' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftAndCashView.tsx",
+      "line": 22,
+      "code": 6133,
+      "message": "'setSearchQuery' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftModal.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'ShiftRecord' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftModal.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'movements' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/tables/PosTableDrawer.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'setLastCompletedOrder' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/tables/PosTableDrawer.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'setIsReceiptOpen' is declared but its value is never read."
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/services/printerService.ts",
+      "line": 219,
+      "code": 6133,
+      "message": "'isTauriRuntime' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/components/ui.tsx",
+      "line": 170,
+      "code": 6133,
+      "message": "'style' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 24,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'Settings' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 26,
+      "code": 6133,
+      "message": "'Sliders' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 28,
+      "code": 6133,
+      "message": "'CreditCard' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 38,
+      "code": 6133,
+      "message": "'ChevronRight' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/AiAssistant/AiAssistantPage.tsx",
+      "line": 50,
+      "code": 6133,
+      "message": "'settings' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Applications/ApplicationsPage.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'EmptyState' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Applications/ApplicationsPage.tsx",
+      "line": 13,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Applications/ApplicationsPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'ExternalLink' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Applications/ApplicationsPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'Tag' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "line": 1,
+      "code": 6133,
+      "message": "'useMemo' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'CreditCard' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "line": 29,
+      "code": 6133,
+      "message": "'XCircle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "line": 33,
+      "code": 6133,
+      "message": "'Building2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Billing/BillingPage.tsx",
+      "line": 35,
+      "code": 6133,
+      "message": "'Eye' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Branches/BranchDetailPage.tsx",
+      "line": 22,
+      "code": 6133,
+      "message": "'MapPin' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Branches/BranchDetailPage.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Branches/BranchDetailPage.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Branches/BranchesListPage.tsx",
+      "line": 117,
+      "code": 6133,
+      "message": "'toggleSelectAll' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'Badge' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'Tag' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'Upload' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "line": 29,
+      "code": 6133,
+      "message": "'FileSpreadsheet' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Catalog/MasterCatalogPage.tsx",
+      "line": 30,
+      "code": 6133,
+      "message": "'Layers' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 10,
+      "code": 6133,
+      "message": "'Sparkles' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 11,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 12,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 13,
+      "code": 6133,
+      "message": "'CalendarClock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'Building2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'ShieldCheck' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 22,
+      "code": 6133,
+      "message": "'Database' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'CloudLightning' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 24,
+      "code": 6133,
+      "message": "'HardDriveDownload' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Dashboard/DashboardPage.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 9,
+      "code": 6133,
+      "message": "'ConfirmModal' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 11,
+      "code": 6133,
+      "message": "'statusTone' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 14,
+      "code": 6133,
+      "message": "'Laptop2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'LogOut' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'RotateCcw' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'Trash2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 23,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 26,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Devices/DeviceDetailPage.tsx",
+      "line": 27,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Entitlements/EntitlementsPage.tsx",
+      "line": 12,
+      "code": 6133,
+      "message": "'statusTone' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/OfflinePolicy/OfflinePolicyPage.tsx",
+      "line": 12,
+      "code": 6133,
+      "message": "'ShieldAlert' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/OfflinePolicy/OfflinePolicyPage.tsx",
+      "line": 13,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/OfflinePolicy/OfflinePolicyPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/OfflinePolicy/OfflinePolicyPage.tsx",
+      "line": 34,
+      "code": 6133,
+      "message": "'error' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'React' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 10,
+      "code": 6133,
+      "message": "'Badge' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 28,
+      "code": 6133,
+      "message": "'ExternalLink' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 35,
+      "code": 6133,
+      "message": "'QrCode' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 36,
+      "code": 6133,
+      "message": "'ChefHat' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 37,
+      "code": 6133,
+      "message": "'Smartphone' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Onboarding/OnboardRestaurantPage.tsx",
+      "line": 38,
+      "code": 6133,
+      "message": "'Info' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Owners/OwnerDetailPage.tsx",
+      "line": 6,
+      "code": 6196,
+      "message": "'Branch' is declared but never used."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Owners/OwnersListPage.tsx",
+      "line": 152,
+      "code": 6133,
+      "message": "'toggleSelectAll' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Reports/ReportsPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'BarChart3' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Reports/ReportsPage.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'TrendingUp' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/EditRestaurantModal.tsx",
+      "line": 3,
+      "code": 6133,
+      "message": "'RestaurantListItem' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/LicenseCertificatePanel.tsx",
+      "line": 1,
+      "code": 6133,
+      "message": "'React' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 13,
+      "code": 6196,
+      "message": "'Plan' is declared but never used."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'EntitlementKey' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 57,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 58,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 59,
+      "code": 6133,
+      "message": "'Send' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 62,
+      "code": 6133,
+      "message": "'UserRound' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 63,
+      "code": 6133,
+      "message": "'Mail' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 64,
+      "code": 6133,
+      "message": "'Phone' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 66,
+      "code": 6133,
+      "message": "'Copy' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 73,
+      "code": 6133,
+      "message": "'Check' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantDetailPage.tsx",
+      "line": 75,
+      "code": 6133,
+      "message": "'Activity' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantsListPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'Calendar' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Restaurants/RestaurantsListPage.tsx",
+      "line": 27,
+      "code": 6133,
+      "message": "'Copy' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'ExternalLink' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'ShieldCheck' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'Calendar' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'Layers' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 25,
+      "code": 6133,
+      "message": "'loading' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Sandboxes/SandboxesPage.tsx",
+      "line": 26,
+      "code": 6133,
+      "message": "'error' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Settings/PlatformSettingsPage.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'Badge' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Settings/PlatformSettingsPage.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'ShieldCheck' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Settings/PlatformSettingsPage.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'Bell' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Settings/PlatformSettingsPage.tsx",
+      "line": 5,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Settings/PlatformSettingsPage.tsx",
+      "line": 32,
+      "code": 6133,
+      "message": "'settings' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Subscriptions/ChangePlanModal.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'Badge' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Subscriptions/RenewSubscriptionModal.tsx",
+      "line": 5,
+      "code": 6192,
+      "message": "All imports in import declaration are unused."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Subscriptions/SubscriptionsListPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'CalendarClock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Subscriptions/SubscriptionsListPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'ArrowUpRight' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'Input' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'EmptyState' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 9,
+      "code": 6133,
+      "message": "'LifeBuoy' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 11,
+      "code": 6133,
+      "message": "'Users' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 12,
+      "code": 6133,
+      "message": "'Laptop2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 13,
+      "code": 6133,
+      "message": "'KeyRound' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 15,
+      "code": 6133,
+      "message": "'CheckCircle2' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 16,
+      "code": 6133,
+      "message": "'AlertTriangle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'RotateCcw' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'Mail' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'HelpCircle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/Support/SupportPage.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'Clock' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 9,
+      "code": 6133,
+      "message": "'SearchBar' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 14,
+      "code": 6133,
+      "message": "'AlertCircle' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 17,
+      "code": 6133,
+      "message": "'ArrowRight' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 18,
+      "code": 6133,
+      "message": "'ShieldCheck' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 19,
+      "code": 6133,
+      "message": "'Server' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 20,
+      "code": 6133,
+      "message": "'Filter' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 29,
+      "code": 6133,
+      "message": "'loading' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/super-admin-web/src/pages/SyncMonitor/SyncMonitorPage.tsx",
+      "line": 30,
+      "code": 6133,
+      "message": "'error' is declared but its value is never read."
+    },
+    {
+      "file": "packages/api/src/printer.ts",
+      "line": 419,
+      "code": 6133,
+      "message": "'isTauriRuntime' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/central_reporting_service.ts",
+      "line": 399,
+      "code": 6133,
+      "message": "'totalTax' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/dynamic_query_executor.ts",
+      "line": 219,
+      "code": 6133,
+      "message": "'count' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/eod_service.ts",
+      "line": 28,
+      "code": 6133,
+      "message": "'dateObj' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/jaman_ai_registry.ts",
+      "line": 3,
+      "code": 6133,
+      "message": "'BusinessDayService' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/pos_assistant.ts",
+      "line": 290,
+      "code": 6133,
+      "message": "'cancelledOrders' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/pos_assistant.ts",
+      "line": 291,
+      "code": 6133,
+      "message": "'refundedOrders' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/report_generator.ts",
+      "line": 97,
+      "code": 6133,
+      "message": "'isCash' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/report_generator.ts",
+      "line": 101,
+      "code": 6133,
+      "message": "'isUpi' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/report_generator.ts",
+      "line": 105,
+      "code": 6133,
+      "message": "'isCard' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/report_generator.ts",
+      "line": 109,
+      "code": 6133,
+      "message": "'isSplit' is declared but its value is never read."
+    },
+    {
+      "file": "packages/business/src/report_generator.ts",
+      "line": 113,
+      "code": 6133,
+      "message": "'isWallet' is declared but its value is never read."
+    },
+    {
+      "file": "packages/database/src/db.ts",
+      "line": 1039,
+      "code": 6133,
+      "message": "'putIfChanged' is declared but its value is never read."
+    },
+    {
+      "file": "packages/database/src/local_core.ts",
+      "line": 136,
+      "code": 6133,
+      "message": "'platform' is declared but its value is never read."
+    },
+    {
+      "file": "packages/database/src/repositories.ts",
+      "line": 1768,
+      "code": 6133,
+      "message": "'subtotal' is declared but its value is never read."
+    },
+    {
+      "file": "packages/database/src/repositories.ts",
+      "line": 3866,
+      "code": 6133,
+      "message": "'u' is declared but its value is never read."
+    },
+    {
+      "file": "packages/database/src/restaurant_template_catalog.ts",
+      "line": 1,
+      "code": 6196,
+      "message": "'MenuTemplateCategory' is declared but never used."
+    },
+    {
+      "file": "packages/database/src/restaurant_template_catalog.ts",
+      "line": 1,
+      "code": 6196,
+      "message": "'MenuTemplateItem' is declared but never used."
+    },
+    {
+      "file": "packages/sync/src/command_pipeline.ts",
+      "line": 261,
+      "code": 6133,
+      "message": "'amount' is declared but its value is never read."
+    },
+    {
+      "file": "packages/sync/src/lan_mesh_sync.ts",
+      "line": 62,
+      "code": 6133,
+      "message": "'heartbeatTimer' is declared but its value is never read."
+    },
+    {
+      "file": "packages/sync/src/lan_mesh_sync.ts",
+      "line": 409,
+      "code": 6133,
+      "message": "'captainName' is declared but its value is never read."
+    },
+    {
+      "file": "packages/sync/src/outbox.ts",
+      "line": 855,
+      "code": 6133,
+      "message": "'added' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JamanAiAssistantModal.tsx",
+      "line": 81,
+      "code": 6133,
+      "message": "'selectedQuestionId' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JamanvaarAuthLayout.tsx",
+      "line": 213,
+      "code": 6133,
+      "message": "'footerNote' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JAMANVAARStartup.tsx",
+      "line": 24,
+      "code": 6133,
+      "message": "'appType' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JamanvaarVectorLogo.tsx",
+      "line": 42,
+      "code": 6133,
+      "message": "'numericHeight' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JamanvaarVectorLogo.tsx",
+      "line": 234,
+      "code": 6133,
+      "message": "'animated' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/JamanvaarVectorLogo.tsx",
+      "line": 336,
+      "code": 6133,
+      "message": "'dark' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/MenuCategoryIcon.tsx",
+      "line": 1,
+      "code": 6133,
+      "message": "'React' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/ProductCard.tsx",
+      "line": 7,
+      "code": 6133,
+      "message": "'StatusBadge' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/ProductCard.tsx",
+      "line": 49,
+      "code": 6133,
+      "message": "'hasRequiredModifiers' is declared but its value is never read."
+    },
+    {
+      "file": "packages/ui/src/ThermalReceiptView.tsx",
+      "line": 4,
+      "code": 6133,
+      "message": "'JAMANVAAR_LOGOS' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/backups/backups.service.ts",
+      "line": 4,
+      "code": 6133,
+      "message": "'gunzipSync' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/payments/payment-connections.service.ts",
+      "line": 1,
+      "code": 6133,
+      "message": "'randomUUID' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/payments/payments.service.ts",
+      "line": 750,
+      "code": 6133,
+      "message": "'providerOrderId' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/payments/payments.service.ts",
+      "line": 750,
+      "code": 6133,
+      "message": "'provider' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/payments/payments.service.ts",
+      "line": 750,
+      "code": 6133,
+      "message": "'providerPaymentId' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/qr/qr-admin.service.ts",
+      "line": 429,
+      "code": 6133,
+      "message": "'refundedPaise' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/qr/qr-admin.service.ts",
+      "line": 439,
+      "code": 6133,
+      "message": "'ledgerRefunds' is declared but its value is never read."
+    },
+    {
+      "file": "cloud/api/src/modules/qr/qr-advanced.service.ts",
+      "line": 138,
+      "code": 6138,
+      "message": "Property 'menus' is declared but its value is never read."
+    }
+  ]
+}

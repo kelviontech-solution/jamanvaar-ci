@@ -8,6 +8,7 @@ export * from './kiosk_admin_db';
 export * from './captain_db';
 export * from './kds_db';
 export * from './repositories';
+export * from './order_history_size';
 export * from './inventory_control';
 export * from './accounting_service';
 export * from './local_core';
@@ -18,6 +19,9 @@ export * from './menu_cleanup';
 export * from './image_library';
 
 export * from './tender';
+export * from './payment_position';
+export * from './operating_profile';
+export * from './kitchen_stations';
 export * from './table_sync';
 export * from './table_state';
 export * from './collection_sync';
@@ -43,3 +47,4 @@ export * from './kitchen_priority';
 
 export * from './kiosk_configuration';
 export * from './kiosk_combo_authoring';
+export * from './terminal_identity';

@@ -5,36 +5,7 @@ import { LoyaltyProgramModal } from './LoyaltyProgramModal';
 import { MarketingCampaignsModal } from './MarketingCampaignsModal';
 import { formatINR, formatDate, formatTime, toCsvRow } from '@jamanvaar/utils';
 import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
-import {
-  Users,
-  Search,
-  Plus,
-  Award,
-  DollarSign,
-  TrendingUp,
-  Sparkles,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  Tag,
-  Edit2,
-  Trash2,
-  Download,
-  FileSpreadsheet,
-  MessageSquare,
-  ShoppingBag,
-  Clock,
-  CheckCircle2,
-  Star,
-  ExternalLink,
-  ChevronRight,
-  Filter,
-  X,
-  UserCheck,
-  AlertCircle,
-  Megaphone
-} from 'lucide-react';
+import { Users, Search, Plus, Award, DollarSign, Edit2, Trash2, FileSpreadsheet, MessageSquare, ShoppingBag, Star, X, Megaphone } from 'lucide-react';
 
 interface CustomersCrmModuleProps {
   customers: CustomerAccount[];

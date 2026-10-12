@@ -1,15 +1,7 @@
 import React from 'react';
 import { Order } from '@jamanvaar/types';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  CreditCard,
-  CheckCircle2,
-  DollarSign,
-  QrCode,
-  Smartphone,
-  TrendingUp,
-  Receipt
-} from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import { KioskPaymentSettingsPanel } from './KioskPaymentSettingsPanel';
 
 interface PaymentsSplitModuleProps {

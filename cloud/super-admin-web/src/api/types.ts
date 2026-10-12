@@ -19,7 +19,9 @@ export const ENTITLEMENT_KEYS = [
   'advancedCaptainReports',
   'advancedServiceWorkflow',
   'qrTableOrdering',
-  'selfOrderKiosk'
+  'selfOrderKiosk',
+  'qrServiceRequests',
+  'qrScheduledPickup'
 ] as const;
 export type EntitlementKey = (typeof ENTITLEMENT_KEYS)[number];
 export type Entitlements = Record<EntitlementKey, boolean>;
@@ -45,7 +47,9 @@ export const ENTITLEMENT_LABELS: Record<EntitlementKey, string> = {
   advancedCaptainReports: 'Advanced Captain Reports',
   advancedServiceWorkflow: 'Advanced Service Workflow',
   qrTableOrdering: 'QR Table Ordering & Standees',
-  selfOrderKiosk: 'Self-Order Kiosk & Kiosk Admin'
+  selfOrderKiosk: 'Self-Order Kiosk & Kiosk Admin',
+  qrServiceRequests: 'QR Service Requests (call waiter, water, bill...)',
+  qrScheduledPickup: 'QR Scheduled Pickup'
 };
 
 export interface Plan {

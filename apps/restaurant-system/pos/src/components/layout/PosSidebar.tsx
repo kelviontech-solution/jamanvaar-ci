@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { usePosStore, PosTab } from '../../store/posStore';
+import { usePosStore, PosTab, isManagerOrAboveRole } from '../../store/posStore';
 import { db, BusinessDayRepository } from '@jamanvaar/database';
-import { useAiAccess, sound } from '@jamanvaar/ui';
+import { useAiAccess, sound, StaffLanguagePicker, useStaffLanguage } from '@jamanvaar/ui';
 import { useCategoryGroups } from '../menu/useCategoryGroups';
 import {
   UtensilsCrossed,
@@ -30,6 +30,7 @@ interface NavItem {
 }
 
 export const PosSidebar: React.FC = () => {
+  const {t} = useStaffLanguage();
   const ai = useAiAccess();
   const {
     activeTab,
@@ -38,7 +39,8 @@ export const PosSidebar: React.FC = () => {
     setIsChatbotOpen,
     setIsHoldOrdersOpen,
     selectedCategory,
-    setSelectedCategory
+    setSelectedCategory,
+    currentUser
   } = usePosStore();
 
   // On the Billing/Menu screen, the sidebar shows dish categories instead of the main navigation
@@ -47,6 +49,8 @@ export const PosSidebar: React.FC = () => {
   // there returns to categories. Leaving the Menu tab for any other screen resets this, so the
   // categories are always what greets a cashier coming back to billing.
   const [showNavWhileOnMenu, setShowNavWhileOnMenu] = useState(false);
+  const [showMoreTools, setShowMoreTools] = useState(false);
+  const manager = isManagerOrAboveRole(currentUser);
   const showCategories = activeTab === 'MENU' && !showNavWhileOnMenu;
   const categoryGroups = useCategoryGroups();
 
@@ -86,7 +90,10 @@ export const PosSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-16 lg:w-52 xl:w-56 bg-white border border-jaman-border rounded-2xl flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs overflow-hidden">
+    <aside className="w-28 sm:w-36 lg:w-52 xl:w-56 bg-white border border-jaman-border rounded-2xl flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs overflow-hidden">
+      <nav aria-label="Everyday tasks" className="grid grid-cols-2 gap-1 p-2 border-b border-jaman-border shrink-0">
+        {([{id:'MENU',label:'Billing',icon:UtensilsCrossed},{id:'ORDERS',label:'Orders',icon:ShoppingBag},{id:'TABLES',label:'Tables',icon:LayoutGrid},{id:'ORDERS',label:'Collect',icon:Receipt}] as const).map(item => <button key={item.label} type="button" onClick={() => { usePosStore.getState().setOrderInboxMode(item.label === 'Collect' ? 'COLLECTIONS' : 'ALL'); goToTab(item.id); }} className="min-h-12 rounded-xl p-2 text-xs font-bold text-jaman-navy hover:bg-jaman-cream flex flex-col items-center justify-center gap-1"><item.icon size={18}/>{t(item.label)}</button>)}
+      </nav>
       {showCategories ? (
         /* ---- CATEGORY RAIL: shown instead of the main nav while billing, so the categories a
            cashier needs most are always one tap away on the left, exactly where the nav usually is. */
@@ -98,7 +105,7 @@ export const PosSidebar: React.FC = () => {
             title="Back to the main menu"
           >
             <ArrowLeft className="w-4 h-4 shrink-0" />
-            <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">Menu</span>
+            <span className="text-left tracking-tight text-xs">All pages</span>
           </button>
 
           <div className="hidden lg:block px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">Categories</div>
@@ -113,7 +120,7 @@ export const PosSidebar: React.FC = () => {
             }`}
           >
             <Sparkles className={`w-4 h-4 shrink-0 ${'text-jaman-saffron'}`} />
-            <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap flex-1">All Menu</span>
+            <span className="text-left tracking-tight text-xs flex-1">{t('All Menu')}</span>
             <span
               className={`hidden lg:inline-block text-[11px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
                 selectedCategory === 'ALL' ? 'bg-white text-jaman-saffron border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
@@ -138,7 +145,7 @@ export const PosSidebar: React.FC = () => {
                 }`}
               >
                 <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap flex-1">{group.displayLabel}</span>
-                <span className="lg:hidden text-[11px] font-bold truncate w-full text-center">{group.displayLabel.slice(0, 3)}</span>
+                <span className="lg:hidden text-xs font-bold break-words w-full text-left">{group.displayLabel}</span>
                 <span
                   className={`hidden lg:inline-block text-[11px] font-mono font-bold px-1.5 py-0.2 rounded-md shrink-0 ${
                     isSelected ? 'bg-white text-jaman-saffron border border-[#FDBA74]/70' : 'bg-white text-slate-600 border border-jaman-border'
@@ -152,7 +159,7 @@ export const PosSidebar: React.FC = () => {
         </nav>
       ) : (
         /* Primary Navigation Links */
-        <nav className="p-2.5 space-y-1 overflow-y-auto">
+        <nav className="p-2.5 space-y-1 overflow-y-auto flex-1 min-h-0">
           {activeTab === 'MENU' && (
             <button
               type="button"
@@ -164,7 +171,7 @@ export const PosSidebar: React.FC = () => {
               <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">Categories</span>
             </button>
           )}
-          {navItems.map((item) => {
+          {navItems.filter(item => manager || showMoreTools || ['MENU','TABLES','ORDERS','BILLS','CUSTOMERS','SHIFTS'].includes(item.id) || item.id === activeTab).map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
 
@@ -172,15 +179,15 @@ export const PosSidebar: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => goToTab(item.id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
+                className={`w-full min-h-11 flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold text-xs transition-all relative ${
                   isActive
                     ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
                     : 'text-slate-600 hover:bg-jaman-cream hover:text-jaman-navy'
                 }`}
               >
                 <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-jaman-saffron' : 'text-slate-500'}`} />
-                <span className="hidden lg:inline-block text-left tracking-tight truncate whitespace-nowrap">
-                  {item.label}
+                <span className="text-left tracking-tight break-words text-xs">
+                  {t(item.label)}
                 </span>
 
                 {/* Dynamic Live Badge */}
@@ -196,6 +203,8 @@ export const PosSidebar: React.FC = () => {
               </button>
             );
           })}
+
+          {!manager && <button type="button" aria-expanded={showMoreTools} onClick={() => setShowMoreTools(value => !value)} className="min-h-11 w-full px-3 text-left text-xs font-bold rounded-xl border border-jaman-border">{showMoreTools ? t('Fewer tools') : t('More tools')}</button>}
 
           {/* Dedicated AI ASSISTANT Navigation Trigger in Sidebar */}
           <div className="pt-2 border-t border-jaman-border my-1">
@@ -220,6 +229,7 @@ export const PosSidebar: React.FC = () => {
 
       {/* Bottom Area: Print Queue Trigger & Held Orders */}
       <div className="p-2.5 border-t border-jaman-border space-y-1.5">
+        <StaffLanguagePicker/>
         {/* Hardware Print Queue Trigger */}
         <button
           onClick={() => setIsPrintQueueOpen(true)}

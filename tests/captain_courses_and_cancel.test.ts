@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { db, StaffRepository, ServiceMessages, KOTRepository } from '@jamanvaar/database';
+import { db, StaffRepository, ServiceMessages, KOTRepository, KeyValueStore } from '@jamanvaar/database';
 import { useCaptainStore } from '../apps/restaurant-system/captain/src/store/captainStore';
 
 /**
@@ -17,6 +17,10 @@ describe('Captain: courses, held dishes and cancelling a sent dish', () => {
     saved = g.localStorage;
     memory.clear();
     g.localStorage = { getItem: (k: string) => memory.get(k) ?? null, setItem: (k: string, v: string) => void memory.set(k, v), removeItem: (k: string) => void memory.delete(k) };
+    KeyValueStore.reset();
+    // Held courses belong to this activated tablet's restaurant and branch.
+    KeyValueStore.set('jamanvaar_tenant_id', 'captain-test-restaurant');
+    KeyValueStore.set('jamanvaar_bound_branch_id', 'captain-test-branch');
     db.resetToDefaultSeed();
     // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
     db.taxGroups.forEach(group => { group.isInclusive = false; });
@@ -31,6 +35,7 @@ describe('Captain: courses, held dishes and cancelling a sent dish', () => {
     expect(await store().login(captainPin)).toBe(true);
   });
   afterEach(() => {
+    KeyValueStore.reset();
     g.localStorage = saved;
   });
 

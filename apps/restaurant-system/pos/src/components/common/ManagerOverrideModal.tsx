@@ -3,14 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { ManagerOverrideRepository, StaffRepository } from '@jamanvaar/database';
 import { StaffSession } from '@jamanvaar/sync';
 import { deviceFetch } from '../../cloud/cloudClient';
-import {
-  ShieldAlert,
-  X,
-  Unlock,
-  Delete,
-  CheckCircle2,
-  Lock
-} from 'lucide-react';
+import { ShieldAlert, Unlock, Delete } from 'lucide-react';
 
 export const ManagerOverrideModal: React.FC = () => {
   const { pendingOverride, closeOverrideModal, currentUser } = usePosStore();

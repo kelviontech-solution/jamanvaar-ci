@@ -1,0 +1,54 @@
+{
+  "rootTypecheck": {
+    "exitCode": 0,
+    "command": "node node_modules/typescript/bin/tsc -b"
+  },
+  "apiTypecheck": {
+    "exitCode": 0,
+    "command": "node node_modules/typescript/bin/tsc -p cloud/api/tsconfig.json --noEmit"
+  },
+  "fullTests": {
+    "exitCode": 0,
+    "testsPassed": 1825,
+    "evidence": "FINAL_TESTS.json"
+  },
+  "focusedFollowup": {
+    "exitCode": 0,
+    "evidence": "FINAL_FOLLOWUP_TESTS.json",
+    "testsPassed": 21
+  },
+  "superAdminTypecheck": {
+    "exitCode": 0,
+    "command": "node node_modules/typescript/bin/tsc -p cloud/super-admin-web/tsconfig.json --noEmit"
+  },
+  "diffCheck": {
+    "exitCode": 0,
+    "command": "git -c core.safecrlf=false diff --check"
+  },
+  "componentBrowser": {
+    "exitCode": 0,
+    "captures": 8,
+    "scope": "Isolated local React fixtures; not live authenticated production E2E",
+    "evidence": "components/RESULTS.json"
+  },
+  "checkedAt": "2026-10-12T08:35:47.313Z",
+  "allFrontendBuilds": {
+    "exitCode": 0,
+    "appsPassed": 7,
+    "evidence": "builds/RESULTS.json"
+  },
+  "adminRebuildAfterDeadCodeRemoval": {
+    "exitCode": 0,
+    "command": "node ../../../node_modules/vite/bin/vite.js build",
+    "workingDirectory": "apps/restaurant-system/pos-admin",
+    "reason": "Final deletion of seven private unused legacy dashboard components",
+    "warnings": [
+      "Chunks exceed 500 kB; recorded as remaining performance work."
+    ]
+  },
+  "rootTypecheckAfterDeadCodeRemoval": {
+    "exitCode": 0,
+    "command": "node node_modules/typescript/bin/tsc -b"
+  },
+  "scope": "Current working tree, root offline regression suite, API/frontend type checks, production web builds and isolated component browser fixtures. No production deployment, actual gateway transaction or physical-device acceptance."
+}

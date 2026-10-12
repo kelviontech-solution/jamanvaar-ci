@@ -1,6 +1,6 @@
-import { Order, PaymentMethod, OrderType, OrderStatus } from '@jamanvaar/types';
-import { db, BusinessDayAccountingService, BusinessDayRepository, getOrderTenders, isUnpaidOpenOrder } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { Order } from '@jamanvaar/types';
+import { db, BusinessDayAccountingService, BusinessDayRepository, getOrderTenders, isUnpaidOpenOrder, orderPaymentPosition } from '@jamanvaar/database';
+import { formatDate } from '@jamanvaar/utils';
 
 export type CentralDatePreset =
   | 'TODAY'
@@ -33,6 +33,7 @@ export interface CentralFinancialSummary {
   refundsCount: number;
   refundsAmount: number;
   netCollected: number;
+  outstandingAmount: number;
   cancelledCount: number;
   cancelledAmount: number;
   ordersCount: number;
@@ -42,6 +43,7 @@ export interface CentralFinancialSummary {
     upi: number;
     card: number;
     split: number;
+    wallet: number;
     other: number;
     totalPayments: number;
   };
@@ -303,6 +305,8 @@ export class CentralReportingService {
     let cgstAmount = 0;
     let sgstAmount = 0;
     let netSales = 0;
+    let grossCollections = 0;
+    let outstandingAmount = 0;
     let refundsCount = 0;
     let refundsAmount = 0;
     let cancelledCount = 0;
@@ -314,6 +318,7 @@ export class CentralReportingService {
       upi: 0,
       card: 0,
       split: 0,
+      wallet: 0,
       other: 0,
       totalPayments: 0
     };
@@ -327,7 +332,7 @@ export class CentralReportingService {
 
     orders.forEach((o) => {
       const isCancelled = o.orderStatus === 'CANCELLED';
-      const isRefunded = o.orderStatus === 'REFUNDED';
+      const isRefunded = o.orderStatus === 'REFUNDED' || (o.refundAmount ?? 0) > 0;
       const orderTotal = Number(o.totalAmount || 0);
 
       if (isCancelled) {
@@ -337,7 +342,10 @@ export class CentralReportingService {
       }
 
       // Sent to the kitchen / pay-at-counter but not paid yet: not a sale and not collected money (BUG-151/161).
-      if (isUnpaidOpenOrder(o)) return;
+      const position = orderPaymentPosition(o);
+      outstandingAmount += position.outstandingPaise / 100;
+      if (position.collectedPaise === 0) return;
+      grossCollections += position.collectedPaise / 100;
 
       completedOrdersCount++;
 
@@ -355,29 +363,17 @@ export class CentralReportingService {
 
       if (isRefunded) {
         refundsCount++;
-        const refAmt = Number((o as any).refundAmount || orderTotal);
+        const refAmt = position.refundedPaise / 100;
         refundsAmount += refAmt;
       }
 
-      // Apportion payment method
-      const pm = (o.paymentMethod || '').toUpperCase();
-      if (pm === 'CASH' || pm === 'CASH_AT_COUNTER') {
-        paymentBreakdown.cash += orderTotal;
-      } else if (pm === 'UPI' || pm === 'UPI_QR' || pm === 'BHARAT_QR') {
-        paymentBreakdown.upi += orderTotal;
-      } else if (pm === 'CARD' || pm === 'CARD_TERMINAL' || pm === 'POS_CARD') {
-        paymentBreakdown.card += orderTotal;
-      } else if (pm === 'SPLIT') {
-        // Apportion by the tender lines that were actually recorded — never a guessed 50/50.
-        const t = getOrderTenders(o);
-        paymentBreakdown.cash += t.cash;
-        paymentBreakdown.upi += t.upi;
-        paymentBreakdown.card += t.card;
-        paymentBreakdown.other += t.wallet + t.houseAccount + t.other;
-        paymentBreakdown.split += orderTotal;
-      } else {
-        paymentBreakdown.other += orderTotal;
-      }
+      const t = position.netTenders;
+      paymentBreakdown.cash += t.cash;
+      paymentBreakdown.upi += t.upi;
+      paymentBreakdown.card += t.card;
+      paymentBreakdown.wallet += t.wallet;
+      paymentBreakdown.other += t.houseAccount + t.other;
+      if (o.paymentMethod === 'SPLIT') paymentBreakdown.split += position.netCollectedPaise / 100;
 
       // Apportion Order Type
       if (o.orderType === 'DINE_IN') {
@@ -397,43 +393,46 @@ export class CentralReportingService {
 
     const taxableAmount = Math.max(0, grossSales - discountAmount);
     const totalTax = cgstAmount + sgstAmount;
-    const netCollected = netSales - refundsAmount;
+    const netCollected = grossCollections - refundsAmount;
 
-    paymentBreakdown.totalPayments = paymentBreakdown.cash + paymentBreakdown.upi + paymentBreakdown.card + paymentBreakdown.other;
+    paymentBreakdown.totalPayments = paymentBreakdown.cash + paymentBreakdown.upi + paymentBreakdown.card + paymentBreakdown.wallet + paymentBreakdown.other;
     
     // Variance check: Net Sales must equal Payments Total
-    const varianceAmount = Math.abs(netSales - paymentBreakdown.totalPayments);
+    const varianceAmount = Math.abs(netCollected - paymentBreakdown.totalPayments);
     const reconciled = varianceAmount === 0;
 
-    const roundedTotalTax = Math.round(cgstAmount + sgstAmount);
-    const roundedCgst = Math.round(cgstAmount);
+    const money = (value: number) => Math.round(value * 100) / 100;
+    const roundedTotalTax = money(cgstAmount + sgstAmount);
+    const roundedCgst = money(cgstAmount);
     const roundedSgst = roundedTotalTax - roundedCgst;
 
-    const avgOrderValue = completedOrdersCount > 0 ? Math.round(netSales / completedOrdersCount) : 0;
+    const avgOrderValue = completedOrdersCount > 0 ? money(netSales / completedOrdersCount) : 0;
 
     return {
       dateStr: label,
-      grossSales: Math.round(grossSales),
-      discountAmount: Math.round(discountAmount),
-      taxableAmount: Math.round(taxableAmount),
+      grossSales: money(grossSales),
+      discountAmount: money(discountAmount),
+      taxableAmount: money(taxableAmount),
       cgstAmount: roundedCgst,
       sgstAmount: roundedSgst,
       totalTax: roundedTotalTax,
-      netSales: Math.round(netSales),
+      netSales: money(netSales),
       refundsCount,
-      refundsAmount: Math.round(refundsAmount),
-      netCollected: Math.round(netCollected),
+      refundsAmount: money(refundsAmount),
+      netCollected: money(netCollected),
+      outstandingAmount: money(outstandingAmount),
       cancelledCount,
-      cancelledAmount: Math.round(cancelledAmount),
+      cancelledAmount: money(cancelledAmount),
       ordersCount: completedOrdersCount,
       avgOrderValue,
       paymentBreakdown: {
-        cash: Math.round(paymentBreakdown.cash),
-        upi: Math.round(paymentBreakdown.upi),
-        card: Math.round(paymentBreakdown.card),
-        split: Math.round(paymentBreakdown.split),
-        other: Math.round(paymentBreakdown.other),
-        totalPayments: Math.round(paymentBreakdown.totalPayments)
+        cash: money(paymentBreakdown.cash),
+        upi: money(paymentBreakdown.upi),
+        card: money(paymentBreakdown.card),
+        split: money(paymentBreakdown.split),
+        wallet: money(paymentBreakdown.wallet),
+        other: money(paymentBreakdown.other),
+        totalPayments: money(paymentBreakdown.totalPayments)
       },
       orderTypeBreakdown,
       reconciled,

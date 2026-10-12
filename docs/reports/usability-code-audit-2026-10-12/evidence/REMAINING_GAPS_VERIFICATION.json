@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-12T14:42:20.290337+00:00",
+  "baselineHead": "8a6a402eb17409dc2e0c4737ae1204fa20d9df43",
+  "scope": "Local working tree; previous edits preserved. No production migration, deployment or GitHub push.",
+  "fullRootTests": {
+    "passed": 1898,
+    "failed": 0,
+    "files": 263,
+    "evidence": "REMAINING_GAPS_FULL_TESTS.json",
+    "limit": "Before final partial-return and daily-date refinements; subsequent final focused matrix verifies those changes."
+  },
+  "finalFocusedTests": {
+    "passed": 147,
+    "failed": 0,
+    "files": 14,
+    "evidence": "REMAINING_GAPS_TESTS.json"
+  },
+  "apiUnitTests": {
+    "passed": 4,
+    "failed": 0,
+    "evidence": "REMAINING_GAPS_API_TESTS.json"
+  },
+  "testCountsOverlap": true,
+  "frontendBuilds": {
+    "passed": 7,
+    "evidence": "remaining-gap-builds/RESULTS.json"
+  },
+  "finalChangedAppBuilds": {
+    "passed": 2,
+    "evidence": "financial-final-builds/RESULTS.json"
+  },
+  "apiBuild": {
+    "command": "npm run build --workspace=@jamanvaar/cloud-api",
+    "exitCode": 0
+  },
+  "apiTypecheck": {
+    "command": "npm run typecheck --workspace=@jamanvaar/cloud-api",
+    "exitCode": 0
+  },
+  "finalRootTypecheck": {
+    "command": "npx tsc --noEmit --pretty false",
+    "exitCode": 0
+  },
+  "diffWhitespaceCheck": {
+    "command": "git diff --check",
+    "exitCode": 0
+  },
+  "browser": {
+    "broadFixtures": 19,
+    "finalFocusedFixtures": 8,
+    "evidence": [
+      "remaining-gap-components/RESULTS.json",
+      "financial-final-components/RESULTS.json"
+    ],
+    "backend": "Blocked/mocked isolated fixture data; no production auth, live payment or real printer acceptance"
+  },
+  "requiredMigration": "cloud/api/prisma/migrations/20261012200000_business_day_rollover_hour/migration.sql",
+  "report": "../REMAINING_GAPS_IMPLEMENTATION.md"
+}

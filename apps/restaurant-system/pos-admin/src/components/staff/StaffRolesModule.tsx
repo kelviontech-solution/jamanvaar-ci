@@ -3,21 +3,7 @@ import { User, StaffShiftSchedule, AttendanceStatus, DeliveryRider } from '@jama
 import { StaffRepository, StaffScheduleRepository, RiderRepository } from '@jamanvaar/database';
 import { formatRestaurantDate } from '@jamanvaar/utils';
 import { syncStaffUsers, pendingStaffChanges } from '@jamanvaar/sync';
-import {
-  Plus,
-  Shield,
-  Edit2,
-  Trash2,
-  UserCheck,
-  Phone,
-  Mail,
-  Key,
-  Calendar,
-  Clock,
-  LogIn,
-  LogOut,
-  Bike
-} from 'lucide-react';
+import { Plus, Edit2, Trash2, Calendar, Clock, LogIn, LogOut, Bike } from 'lucide-react';
 import { ScheduleShiftModal } from './ScheduleShiftModal';
 import { RiderModal } from './RiderModal';
 import { useConfirm } from '@jamanvaar/ui';

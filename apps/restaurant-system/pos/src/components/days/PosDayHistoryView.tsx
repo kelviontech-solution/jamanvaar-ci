@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { BusinessDay } from '@jamanvaar/types';
 import {
   BusinessDayRepository,
@@ -30,6 +30,8 @@ export const PosDayHistoryView: React.FC = () => {
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  useEffect(() => db.subscribe(() => setRefreshKey(k => k + 1)), []);
+
   const activeDay = useMemo(() => {
     return BusinessDayAccountingService.getActiveBusinessDay();
   }, [refreshKey, db.orders.length, db.businessDays.length]);
@@ -54,13 +56,15 @@ export const PosDayHistoryView: React.FC = () => {
 
       // Filter preset
       if (selectedFilter === 'TODAY') {
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = BusinessDayRepository.getCanonicalBusinessDate().dateKey;
         if (d.businessDate !== todayStr) return false;
       } else if (selectedFilter === 'YESTERDAY') {
         const y = new Date();
         y.setDate(y.getDate() - 1);
-        const yStr = y.toISOString().slice(0, 10);
+        const yStr = BusinessDayRepository.getCanonicalBusinessDate(new Date(Date.now() - 86400000)).dateKey;
         if (d.businessDate !== yStr) return false;
+      } else if (selectedFilter === 'THIS_MONTH') {
+        if (!d.businessDate.startsWith(BusinessDayRepository.getCanonicalBusinessDate().dateKey.slice(0, 7))) return false;
       } else if (selectedFilter === '7_DAYS') {
         const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         if (new Date(d.openedAt) < cutoff) return false;
@@ -126,6 +130,12 @@ export const PosDayHistoryView: React.FC = () => {
         </div>
       </div>
 
+      {allDays.filter(day => day.status === 'CLOSING' && day.id !== activeDay.id).map(day => (
+        <section key={day.id} className="rounded-2xl border border-amber-300 bg-amber-50 p-4 flex flex-wrap items-center justify-between gap-3">
+          <div><h2 className="font-bold text-jaman-navy">Cash reconciliation needed ? {day.displayDate}</h2><p className="text-xs text-slate-600">The date rolled over. This day is still unsettled; count and close its registers before finalizing.</p></div>
+          <button className="rounded-xl bg-jaman-navy px-4 py-2 text-white text-xs font-bold" onClick={() => { setSelectedDay(day); setIsCloseModalOpen(true); }}>Reconcile this day</button>
+        </section>
+      ))}
       {/* 2. Active Business Day Hero Card */}
       {activeDay && (
         <div className="bg-gradient-to-r from-jaman-navy via-[#123652] to-jaman-navy text-white p-5 sm:p-6 rounded-3xl shadow-md border border-jaman-border/20 space-y-4">
@@ -285,7 +295,7 @@ export const PosDayHistoryView: React.FC = () => {
                       ? 'bg-slate-100 text-slate-700 border border-slate-300'
                       : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                   }`}>
-                    {isClosed ? 'CLOSED' : 'ACTIVE'}
+                    {isClosed ? 'CLOSED' : summary.status === 'CLOSING' ? 'NEEDS RECONCILIATION' : 'ACTIVE'}
                   </span>
                 </div>
 

@@ -1,4 +1,4 @@
-import { KeyValueStore, KioskConfigurationRepository } from '@jamanvaar/database';
+import { KioskConfigurationRepository, KeyValueStore } from '@jamanvaar/database';
 import { activeAdminBranch } from '../adminBranchScope';
 import { stopRealtime } from '@jamanvaar/sync';
 import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
@@ -530,6 +530,10 @@ export async function cloudRequestPasswordResetOwner(restaurantCode: string): Pr
     body: { restaurantCode },
     skipAuthRetry: true
   });
+}
+
+export async function cloudRecoverRestaurantId(email: string): Promise<void> {
+  await request('/api/v1/tenant-auth/recover-restaurant-id', { method: 'POST', body: {email}, skipAuthRetry: true });
 }
 
 /** Restaurant-code forgot-password, step 2: the emailed code and the new password. */
@@ -1069,7 +1073,9 @@ export async function syncRestaurantIdentity(): Promise<void> {
 export async function saveRestaurantIdentity(identity: RestaurantIdentityFields): Promise<void> {
   const deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
   if (!deviceToken) throw new CloudApiError('Activate this terminal before saving restaurant settings.', 401);
-  await pushRestaurantIdentity({ apiBase: API_BASE, deviceToken, identity, requireAcknowledgement: true });
+  await request('/api/v1/tenant/me/applications');
+  if (!accessToken) throw new CloudApiError('Sign in as the owner before changing restaurant settings.', 401);
+  await pushRestaurantIdentity({ apiBase: API_BASE, deviceToken, identity, requireAcknowledgement: true, ownerAuthorization: accessToken });
 }
 
 /**
@@ -1081,7 +1087,7 @@ export async function saveRestaurantIdentity(identity: RestaurantIdentityFields)
 export type RefundMethod = 'CASH' | 'UPI_TO_CUSTOMER';
 
 /** Records a refund the restaurant has already paid the customer by hand (cash, or UPI from the owner's account). Razorpay is not involved. */
-export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, method: RefundMethod): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
+export async function createRefund(paymentId: string, amountPaise: number, reason: string, requestedBy: string, method: RefundMethod, idempotencyKey?: string): Promise<{ refundId: string; providerRefundId: string; status: string; amount: number }> {
   const token = getStoredDeviceToken();
   if (!token) throw new CloudApiError('Device not activated', 401);
   // The device credential alone cannot authorize money movement. This also refreshes expired owner access once.
@@ -1089,7 +1095,10 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
   if (!accessToken) throw new CloudApiError('Sign in again before issuing a refund', 401);
 
   const path = `/api/v1/payments/${paymentId}/refund`;
-  const body = JSON.stringify({ amountPaise, reason, requestedBy, method, idempotencyKey: crypto.randomUUID() });
+  const attemptStorageKey = `payment-refund:${paymentId}:${amountPaise}:${method}:${reason}`;
+  const attemptKey = idempotencyKey ?? KeyValueStore.get(attemptStorageKey) ?? crypto.randomUUID();
+  if (!idempotencyKey) KeyValueStore.set(attemptStorageKey, attemptKey);
+  const body = JSON.stringify({ amountPaise, reason, requestedBy, method, idempotencyKey: attemptKey });
   const signed = await signDeviceRequest('POS_ADMIN', 'POST', path, body).catch((err) => {
     console.error('Could not sign device request; sending unsigned:', err);
     return null;
@@ -1109,6 +1118,9 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
   if (!res.ok) {
     throw new CloudApiError(data?.message ?? `Refund failed (${res.status})`, res.status);
   }
+  // Only an acknowledged successful response ends a default attempt. Lost
+  // responses/reloads keep the key; a later deliberate return can start anew.
+  if (!idempotencyKey && data?.status === 'SUCCESS') KeyValueStore.remove(attemptStorageKey);
   return data;
 }
 
@@ -1318,6 +1330,8 @@ export interface SyncIssue {
 }
 
 export interface FleetDevice {
+  profileRevision?: string | null;
+  branch?: { id: string; name: string } | null;
   id: string;
   type: string;
   name: string | null;
@@ -1610,8 +1624,8 @@ async function signedJsonOrThrow<T>(res: Response, what: string): Promise<T> {
   return data as T;
 }
 
-export async function getRecentPayments(): Promise<RecentPayment[]> {
-  const data = await signedJsonOrThrow<{ rows: RecentPayment[] }>(await signedDeviceFetch('/api/v1/payments/tenant-recent'), 'Recent payments');
+export async function getRecentPayments(externalOrderId?: string): Promise<RecentPayment[]> {
+  const data = await signedJsonOrThrow<{ rows: RecentPayment[] }>(await signedDeviceFetch(`/api/v1/payments/tenant-recent${externalOrderId ? `?externalOrderId=${encodeURIComponent(externalOrderId)}` : ''}`), 'Recent payments');
   return data.rows;
 }
 

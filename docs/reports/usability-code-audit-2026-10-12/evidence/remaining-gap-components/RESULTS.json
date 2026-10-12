@@ -1,0 +1,1203 @@
+{
+  "checkedAt": "2026-10-12T13:55:31.518Z",
+  "scope": "Actual React components, isolated local fixture data, all backend/external requests blocked. Does not verify production authentication, real gateway payment, or cross-device server delivery.",
+  "results": [
+    {
+      "mode": "pos",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Billing\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nTable service requests\nOutstanding bills\nAll business dates\n\nCollect outstanding balances from kiosk, QR, captain and counter orders. Completed service does not mean paid.\n\nActive Session (1)\nAll History (2)\nAll orders\nOutstanding bills · 1 · ₹250\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#AUDIT-OLD\nToken #K-91\nTAKEAWAY\nKiosk (KIOSK_USER-f5b50db1-54c0-46f7-9f04-e6c2c2372b14)\n07:25 PM\n•\n1 items\n₹250\nCOMPLETED\nPayment due ₹250\nSettle\n\nSelect an order from the list to view full itemized breakdown and print receipt.",
+      "buttons": [
+        {
+          "text": "Billing",
+          "height": 54
+        },
+        {
+          "text": "Orders",
+          "height": 54
+        },
+        {
+          "text": "Tables",
+          "height": 54
+        },
+        {
+          "text": "Collect",
+          "height": 54
+        },
+        {
+          "text": "Billing / Menu",
+          "height": 44
+        },
+        {
+          "text": "Floor & Tables",
+          "height": 44
+        },
+        {
+          "text": "Live Orders",
+          "height": 44
+        },
+        {
+          "text": "Bills & Invoices",
+          "height": 44
+        },
+        {
+          "text": "Customers CRM",
+          "height": 44
+        },
+        {
+          "text": "Shift & Cash",
+          "height": 44
+        },
+        {
+          "text": "More tools",
+          "height": 44
+        },
+        {
+          "text": "JAMAN AI AssistantAI",
+          "height": 38
+        },
+        {
+          "text": "Print Queue",
+          "height": 34
+        },
+        {
+          "text": "Active Session (1)",
+          "height": 28
+        },
+        {
+          "text": "All History (2)",
+          "height": 28
+        },
+        {
+          "text": "All orders",
+          "height": 44
+        },
+        {
+          "text": "Outstanding bills · 1 · ₹250",
+          "height": 44
+        },
+        {
+          "text": "All Sources",
+          "height": 24
+        },
+        {
+          "text": "QR Table",
+          "height": 24
+        },
+        {
+          "text": "Counter POS",
+          "height": 24
+        },
+        {
+          "text": "Self-Order Kiosk",
+          "height": 24
+        },
+        {
+          "text": "Floor Captain",
+          "height": 24
+        },
+        {
+          "text": "all",
+          "height": 24
+        },
+        {
+          "text": "new",
+          "height": 24
+        },
+        {
+          "text": "confirmed",
+          "height": 24
+        },
+        {
+          "text": "preparing",
+          "height": 24
+        },
+        {
+          "text": "ready",
+          "height": 24
+        },
+        {
+          "text": "served",
+          "height": 24
+        },
+        {
+          "text": "completed",
+          "height": 24
+        },
+        {
+          "text": "Settle",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "persistentTasks": true,
+        "oldOutstandingVisible": true,
+        "paidBillHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "pos",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Billing\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nTable service requests\nOutstanding bills\nAll business dates\n\nCollect outstanding balances from kiosk, QR, captain and counter orders. Completed service does not mean paid.\n\nActive Session (1)\nAll History (2)\nAll orders\nOutstanding bills · 1 · ₹250\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#AUDIT-OLD\nToken #K-91\nTAKEAWAY\nKiosk (KIOSK_USER-f5b50db1-54c0-46f7-9f04-e6c2c2372b14)\n07:25 PM\n•\n1 items\n₹250\nCOMPLETED\nPayment due ₹250\nSettle",
+      "buttons": [
+        {
+          "text": "Billing",
+          "height": 54
+        },
+        {
+          "text": "Orders",
+          "height": 54
+        },
+        {
+          "text": "Tables",
+          "height": 54
+        },
+        {
+          "text": "Collect",
+          "height": 54
+        },
+        {
+          "text": "Billing / Menu",
+          "height": 48
+        },
+        {
+          "text": "Floor & Tables",
+          "height": 48
+        },
+        {
+          "text": "Live Orders",
+          "height": 44
+        },
+        {
+          "text": "Bills & Invoices",
+          "height": 48
+        },
+        {
+          "text": "Customers CRM",
+          "height": 48
+        },
+        {
+          "text": "Shift & Cash",
+          "height": 44
+        },
+        {
+          "text": "More tools",
+          "height": 44
+        },
+        {
+          "text": "JAMAN AI AssistantAI",
+          "height": 38
+        },
+        {
+          "text": "Print Queue",
+          "height": 32
+        },
+        {
+          "text": "Active Session (1)",
+          "height": 28
+        },
+        {
+          "text": "All History (2)",
+          "height": 28
+        },
+        {
+          "text": "All orders",
+          "height": 44
+        },
+        {
+          "text": "Outstanding bills · 1 · ₹250",
+          "height": 44
+        },
+        {
+          "text": "All Sources",
+          "height": 24
+        },
+        {
+          "text": "QR Table",
+          "height": 24
+        },
+        {
+          "text": "Counter POS",
+          "height": 24
+        },
+        {
+          "text": "Self-Order Kiosk",
+          "height": 24
+        },
+        {
+          "text": "Floor Captain",
+          "height": 24
+        },
+        {
+          "text": "all",
+          "height": 24
+        },
+        {
+          "text": "new",
+          "height": 24
+        },
+        {
+          "text": "confirmed",
+          "height": 24
+        },
+        {
+          "text": "preparing",
+          "height": 24
+        },
+        {
+          "text": "ready",
+          "height": 24
+        },
+        {
+          "text": "served",
+          "height": 24
+        },
+        {
+          "text": "completed",
+          "height": 24
+        },
+        {
+          "text": "Settle",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "persistentTasks": true,
+        "oldOutstandingVisible": true,
+        "paidBillHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "kds",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "#K-91\nMAIN-AUDIT-1\nTable 3\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n12:00\n1×\nRoyal Gujarati Thali with fresh seasonal vegetable accompaniments\nALLERGY / DIET: ALLERGY: peanuts\n2×\nFreshly prepared dish 2\n3×\nFreshly prepared dish 3\n4×\nFreshly prepared dish 4\n5×\nFreshly prepared dish 5\n6×\nFreshly prepared dish 6\n7×\nFreshly prepared dish 7\n8×\nFreshly prepared dish 8\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nFixture Captain\n#e-kot\nALL DISHES READY",
+      "buttons": [
+        {
+          "text": "",
+          "height": 56
+        },
+        {
+          "text": "1×Royal Gujarati Thali with fresh seasonal vegetable accompanimentsALLERGY / DIET: ALLERGY: peanuts",
+          "height": 113
+        },
+        {
+          "text": "2×Freshly prepared dish 2",
+          "height": 56
+        },
+        {
+          "text": "3×Freshly prepared dish 3",
+          "height": 56
+        },
+        {
+          "text": "4×Freshly prepared dish 4",
+          "height": 56
+        },
+        {
+          "text": "5×Freshly prepared dish 5",
+          "height": 56
+        },
+        {
+          "text": "6×Freshly prepared dish 6",
+          "height": 56
+        },
+        {
+          "text": "7×Freshly prepared dish 7",
+          "height": 56
+        },
+        {
+          "text": "8×Freshly prepared dish 8",
+          "height": 56
+        },
+        {
+          "text": "All Dishes Ready",
+          "height": 56
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "kds",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "#K-91\nMAIN-AUDIT-1\nTable 3\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n12:00\n1×\nRoyal Gujarati Thali with fresh seasonal vegetable accompaniments\nALLERGY / DIET: ALLERGY: peanuts\n2×\nFreshly prepared dish 2\n3×\nFreshly prepared dish 3\n4×\nFreshly prepared dish 4\n5×\nFreshly prepared dish 5\n6×\nFreshly prepared dish 6\n7×\nFreshly prepared dish 7\n8×\nFreshly prepared dish 8\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nFixture Captain\n#e-kot\nALL DISHES READY",
+      "buttons": [
+        {
+          "text": "",
+          "height": 56
+        },
+        {
+          "text": "1×Royal Gujarati Thali with fresh seasonal vegetable accompanimentsALLERGY / DIET: ALLERGY: peanuts",
+          "height": 113
+        },
+        {
+          "text": "2×Freshly prepared dish 2",
+          "height": 56
+        },
+        {
+          "text": "3×Freshly prepared dish 3",
+          "height": 56
+        },
+        {
+          "text": "4×Freshly prepared dish 4",
+          "height": 56
+        },
+        {
+          "text": "5×Freshly prepared dish 5",
+          "height": 56
+        },
+        {
+          "text": "6×Freshly prepared dish 6",
+          "height": 56
+        },
+        {
+          "text": "7×Freshly prepared dish 7",
+          "height": 56
+        },
+        {
+          "text": "8×Freshly prepared dish 8",
+          "height": 56
+        },
+        {
+          "text": "All Dishes Ready",
+          "height": 56
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "captain",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Hand over my floor\n\nThe next captain reviews these tasks and enters their own PIN to accept. Bills and kitchen progress stay unchanged.\n\n0 tables · 0 ready tickets · ₹0 outstanding\n\nTables: No active tables\n\nHandover note\nReceiving captain's PIN\n1\n2\n3\n4\n5\n6\n7\n8\n9\nClear\n0\n⌫\nAccept handover & switch captain",
+      "buttons": [
+        {
+          "text": "1",
+          "height": 44
+        },
+        {
+          "text": "2",
+          "height": 44
+        },
+        {
+          "text": "3",
+          "height": 44
+        },
+        {
+          "text": "4",
+          "height": 44
+        },
+        {
+          "text": "5",
+          "height": 44
+        },
+        {
+          "text": "6",
+          "height": 44
+        },
+        {
+          "text": "7",
+          "height": 44
+        },
+        {
+          "text": "8",
+          "height": 44
+        },
+        {
+          "text": "9",
+          "height": 44
+        },
+        {
+          "text": "Clear",
+          "height": 44
+        },
+        {
+          "text": "0",
+          "height": 44
+        },
+        {
+          "text": "⌫",
+          "height": 44
+        },
+        {
+          "text": "Accept handover & switch captain",
+          "height": 48
+        }
+      ],
+      "assertions": {
+        "touchPinWorks": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "captain",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Hand over my floor\n\nThe next captain reviews these tasks and enters their own PIN to accept. Bills and kitchen progress stay unchanged.\n\n0 tables · 0 ready tickets · ₹0 outstanding\n\nTables: No active tables\n\nHandover note\nReceiving captain's PIN\n1\n2\n3\n4\n5\n6\n7\n8\n9\nClear\n0\n⌫\nAccept handover & switch captain",
+      "buttons": [
+        {
+          "text": "1",
+          "height": 44
+        },
+        {
+          "text": "2",
+          "height": 44
+        },
+        {
+          "text": "3",
+          "height": 44
+        },
+        {
+          "text": "4",
+          "height": 44
+        },
+        {
+          "text": "5",
+          "height": 44
+        },
+        {
+          "text": "6",
+          "height": 44
+        },
+        {
+          "text": "7",
+          "height": 44
+        },
+        {
+          "text": "8",
+          "height": 44
+        },
+        {
+          "text": "9",
+          "height": 44
+        },
+        {
+          "text": "Clear",
+          "height": 44
+        },
+        {
+          "text": "0",
+          "height": 44
+        },
+        {
+          "text": "⌫",
+          "height": 44
+        },
+        {
+          "text": "Accept handover & switch captain",
+          "height": 48
+        }
+      ],
+      "assertions": {
+        "touchPinWorks": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "kiosk-settings",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Ordering choices\n\nGuests skip screens with only one choice. A table binding is optional; leave it empty for a shared kiosk.\n\nApply to\nBranch defaults · all kiosks\nDine in\nTakeaway\nDefault table\nLet guests choose\nTable 1\nTable 2\nTable 3\nTable 4\nTable 5\nTable 6\nTable 7\nTable 8\nTable 9\nTable 10\nTable 11\nTable 12\nCustomer kiosk language & idle timeout\n\nWhich languages the self-order kiosk offers, and how long it waits before resetting an idle session.\n\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nमराठी (Marathi)\nதமிழ் (Tamil)\nతెలుగు (Telugu)\nಕನ್ನಡ (Kannada)\nDefault Language\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nIdle Warning After (seconds)\nKiosk order token counter\n\nThe kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.\n\nNEXT KIOSK TOKEN\n\nK-101\n\nReset to 101",
+      "buttons": [
+        {
+          "text": "Reset to 101",
+          "height": 30
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "kiosk-settings",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Ordering choices\n\nGuests skip screens with only one choice. A table binding is optional; leave it empty for a shared kiosk.\n\nApply to\nBranch defaults · all kiosks\nDine in\nTakeaway\nDefault table\nLet guests choose\nTable 1\nTable 2\nTable 3\nTable 4\nTable 5\nTable 6\nTable 7\nTable 8\nTable 9\nTable 10\nTable 11\nTable 12\nCustomer kiosk language & idle timeout\n\nWhich languages the self-order kiosk offers, and how long it waits before resetting an idle session.\n\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nमराठी (Marathi)\nதமிழ் (Tamil)\nతెలుగు (Telugu)\nಕನ್ನಡ (Kannada)\nDefault Language\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nIdle Warning After (seconds)\nKiosk order token counter\n\nThe kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.\n\nNEXT KIOSK TOKEN\n\nK-101\n\nReset to 101",
+      "buttons": [
+        {
+          "text": "Reset to 101",
+          "height": 30
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "close-day",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Toggle close day\nEnd of Day Settlement — 12 October 2026\nBD-20261012 • Step 3 of 5\nSTEP 3: CASH DRAWER RECONCILIATION\nDRAWER MATH\nOpening Cash Float:\n₹0\nCash Sales Collected:\n+ ₹200\nCash Refunds Paid Out:\n- ₹0\nExpected Cash in Drawer:\n₹200\nEnter Counted Physical Cash in Drawer:\n₹\nExact (200)\nCalculated Cash Variance:\n- ₹190 (Short)\nBack\nStep 4: Payment Reconciliation",
+      "buttons": [
+        {
+          "text": "Toggle close day",
+          "height": 24
+        },
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "Exact (200)",
+          "height": 32
+        },
+        {
+          "text": "Back",
+          "height": 32
+        },
+        {
+          "text": "Step 4: Payment Reconciliation",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "blankCountBlocked": true,
+        "countRequired": true,
+        "discrepancyReasonRequired": true,
+        "explainedCountAccepted": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "close-day",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Toggle close day\nEnd of Day Settlement — 12 October 2026\nBD-20261012 • Step 3 of 5\nSTEP 3: CASH DRAWER RECONCILIATION\nDRAWER MATH\nOpening Cash Float:\n₹0\nCash Sales Collected:\n+ ₹200\nCash Refunds Paid Out:\n- ₹0\nExpected Cash in Drawer:\n₹200\nEnter Counted Physical Cash in Drawer:\n₹\nExact (200)\nCalculated Cash Variance:\n- ₹190 (Short)\nBack\nStep 4: Payment Reconciliation",
+      "buttons": [
+        {
+          "text": "Toggle close day",
+          "height": 24
+        },
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "Exact (200)",
+          "height": 32
+        },
+        {
+          "text": "Back",
+          "height": 32
+        },
+        {
+          "text": "Step 4: Payment Reconciliation",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "blankCountBlocked": true,
+        "countRequired": true,
+        "discrepancyReasonRequired": true,
+        "explainedCountAccepted": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "qr-status",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Order completed\n\nQR-AUDIT\n\nReference fixture-qr-paid · Table 1 · ₹250\n\nOrder received\nPreparing\nReady\nCompleted\n\nPayment received\n\nRefresh order & payment\n\nCollected: ₹250 · Remaining: ₹0\n\nOrder details / receipt\nOrder more",
+      "buttons": [
+        {
+          "text": "Refresh order & payment",
+          "height": 44
+        },
+        {
+          "text": "Print / save receipt",
+          "height": 44
+        },
+        {
+          "text": "Order more",
+          "height": 56
+        }
+      ],
+      "assertions": {
+        "laterPaymentReceived": true,
+        "explicitRefresh": true,
+        "staleDueHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "qr-status",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Order completed\n\nQR-AUDIT\n\nReference fixture-qr-paid · Table 1 · ₹250\n\nOrder received\nPreparing\nReady\nCompleted\n\nPayment received\n\nRefresh order & payment\n\nCollected: ₹250 · Remaining: ₹0\n\nOrder details / receipt\nOrder more",
+      "buttons": [
+        {
+          "text": "Refresh order & payment",
+          "height": 44
+        },
+        {
+          "text": "Print / save receipt",
+          "height": 44
+        },
+        {
+          "text": "Order more",
+          "height": 56
+        }
+      ],
+      "assertions": {
+        "laterPaymentReceived": true,
+        "explicitRefresh": true,
+        "staleDueHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "qr-status",
+      "width": 390,
+      "height": 844,
+      "horizontalOverflow": false,
+      "text": "Order completed\n\nQR-AUDIT\n\nReference fixture-qr-paid · Table 1 · ₹250\n\nOrder received\nPreparing\nReady\nCompleted\n\nPayment received\n\nRefresh order & payment\n\nCollected: ₹250 · Remaining: ₹0\n\nOrder details / receipt\nOrder more",
+      "buttons": [
+        {
+          "text": "Refresh order & payment",
+          "height": 44
+        },
+        {
+          "text": "Print / save receipt",
+          "height": 44
+        },
+        {
+          "text": "Order more",
+          "height": 56
+        }
+      ],
+      "assertions": {
+        "laterPaymentReceived": true,
+        "explicitRefresh": true,
+        "staleDueHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "shift-close",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Shift & Cash Management\n\nManage cashier shifts, cash drawer movements, float reconciliation and settlements.\n\n+ Cash Movement\nClose Shift\nActive Shift #1\n● SHIFT OPEN\nCashier: Fixture Captain\n•\nTerminal: fixture-counter\n•\nOpened: 07:25 pm\nEXPECTED DRAWER CASH\n₹0\nTOTAL SHIFT SALES\n₹0\n● 0 Completed Orders\nCASH SALES ADDED\n₹0\nCounter cash receipts\nUPI / DIGITAL QR\n₹0\nDirect bank settlement\nOPENING CASH FLOAT\n₹0\nStarting drawer balance\nCASH DRAWER MATHEMATICAL RECONCILIATION\nREAL-TIME MATH\nOpening Float:\n₹0\n+ Cash Sales:\n+ ₹0\n+ Cash In (Paid In):\n+ ₹0\n- Cash Out (Paid Out):\n- ₹0\n= Current Expected Cash in Drawer:\n₹0\nSHIFT PAYMENT CHANNEL BREAKDOWN\nTENDER SETTLEMENT\nCash Collections:\n₹0\nUPI / Bharat QR:\n₹0\nCard POS Terminal:\n₹0\nDiscounts Granted:\n- ₹0\nTotal Billed (incl. GST):\n₹0\nCASH MOVEMENTS IN THIS SHIFT (0)\n+ Record Movement\nNo cash in/out float adjustments recorded during this shift.\nHistorical Shift Archives\n\nPermanent cashier shift records, actual counts, and variance audits.\n\nAll Shifts\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nNo Data Found\n\nNo historical shifts found for the selected filter.\n\nClose Cashier Shift & Settle Drawer\nShift #1 • Fixture Captain\nOpening Float:\n₹0\nCash Sales Collected:\n+ ₹0\nNet Cash Movements:\n₹0\nExpected Drawer Cash:\n₹0\nCASH DRAWER DENOMINATION COUNT\nCURRENCY CALCULATOR\n₹2,000\n₹500\n₹200\n₹100\n₹50\n₹20\n₹10\nCoins (₹)\nCounted Cash:\n₹0\nCalculated Variance:\nMATCHED (₹0)\nI have counted the cash in this register. Zero means the drawer is empty.\nCancel\nFinalize & Close Shift",
+      "buttons": [
+        {
+          "text": "+ Cash Movement",
+          "height": 34
+        },
+        {
+          "text": "Close Shift",
+          "height": 32
+        },
+        {
+          "text": "+ Record Movement",
+          "height": 16
+        },
+        {
+          "text": "All Shifts",
+          "height": 24
+        },
+        {
+          "text": "Today",
+          "height": 26
+        },
+        {
+          "text": "Yesterday",
+          "height": 26
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 26
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 26
+        },
+        {
+          "text": "",
+          "height": 24
+        },
+        {
+          "text": "Cancel",
+          "height": 32
+        },
+        {
+          "text": "Finalize & Close Shift",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "untouchedCountBlocked": true,
+        "confirmedEmptyCountAccepted": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "shift-close",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Shift & Cash Management\n\nManage cashier shifts, cash drawer movements, float reconciliation and settlements.\n\n+ Cash Movement\nClose Shift\nActive Shift #1\n● SHIFT OPEN\nCashier: Fixture Captain\n•\nTerminal: fixture-counter\n•\nOpened: 07:25 pm\nEXPECTED DRAWER CASH\n₹0\nTOTAL SHIFT SALES\n₹0\n● 0 Completed Orders\nCASH SALES ADDED\n₹0\nCounter cash receipts\nUPI / DIGITAL QR\n₹0\nDirect bank settlement\nOPENING CASH FLOAT\n₹0\nStarting drawer balance\nCASH DRAWER MATHEMATICAL RECONCILIATION\nREAL-TIME MATH\nOpening Float:\n₹0\n+ Cash Sales:\n+ ₹0\n+ Cash In (Paid In):\n+ ₹0\n- Cash Out (Paid Out):\n- ₹0\n= Current Expected Cash in Drawer:\n₹0\nSHIFT PAYMENT CHANNEL BREAKDOWN\nTENDER SETTLEMENT\nCash Collections:\n₹0\nUPI / Bharat QR:\n₹0\nCard POS Terminal:\n₹0\nDiscounts Granted:\n- ₹0\nTotal Billed (incl. GST):\n₹0\nCASH MOVEMENTS IN THIS SHIFT (0)\n+ Record Movement\nNo cash in/out float adjustments recorded during this shift.\nHistorical Shift Archives\n\nPermanent cashier shift records, actual counts, and variance audits.\n\nAll Shifts\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nNo Data Found\n\nNo historical shifts found for the selected filter.\n\nClose Cashier Shift & Settle Drawer\nShift #1 • Fixture Captain\nOpening Float:\n₹0\nCash Sales Collected:\n+ ₹0\nNet Cash Movements:\n₹0\nExpected Drawer Cash:\n₹0\nCASH DRAWER DENOMINATION COUNT\nCURRENCY CALCULATOR\n₹2,000\n₹500\n₹200\n₹100\n₹50\n₹20\n₹10\nCoins (₹)\nCounted Cash:\n₹0\nCalculated Variance:\nMATCHED (₹0)\nI have counted the cash in this register. Zero means the drawer is empty.\nCancel\nFinalize & Close Shift",
+      "buttons": [
+        {
+          "text": "+ Cash Movement",
+          "height": 34
+        },
+        {
+          "text": "Close Shift",
+          "height": 32
+        },
+        {
+          "text": "+ Record Movement",
+          "height": 16
+        },
+        {
+          "text": "All Shifts",
+          "height": 24
+        },
+        {
+          "text": "Today",
+          "height": 26
+        },
+        {
+          "text": "Yesterday",
+          "height": 26
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 26
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 26
+        },
+        {
+          "text": "",
+          "height": 24
+        },
+        {
+          "text": "Cancel",
+          "height": 32
+        },
+        {
+          "text": "Finalize & Close Shift",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "untouchedCountBlocked": true,
+        "confirmedEmptyCountAccepted": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "day-history",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Business Days & Day History\n\nPermanent daily audit archives, cash reconciliations, and historical order records.\n\nClose Business Day\nCash reconciliation needed ? 11 October 2026\n\nThe date rolled over. This day is still unsettled; count and close its registers before finalizing.\n\nReconcile this day\nCURRENT ACTIVE DAY\n(BD-20261012)\n12 October 2026\nOpened at 7:25:00 pm by System (business-date rollover)\nToday's Orders (1)\nDay Details\nClose Day\nTOTAL BILLED (INCL. GST)\n₹200\n● 1 of 1 Orders Billed\nCASH COLLECTED\n₹200\nIn Drawer\nUPI / QR SALES\n₹0\nSettled to Bank\nCARD TERMINAL\n₹0\nCards\nAll Days\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nPERMANENT DAY ARCHIVES (2)\nAUTHORITATIVE\n12 October 2026\nBD-20261012\nACTIVE\nTOTAL BILLED (INCL. GST)\n₹200\n● 1 of 1 Orders Billed\nCASH\n₹200\nUPI\n₹0\nCARD\n₹0\nActive\nView Day\n11 October 2026\nBD-20261011\nNEEDS RECONCILIATION\nTOTAL BILLED (INCL. GST)\n₹0\n● 0 of 0 Orders Billed\nCASH\n₹0\nUPI\n₹0\nCARD\n₹0\nActive\nView Day",
+      "buttons": [
+        {
+          "text": "Close Business Day",
+          "height": 32
+        },
+        {
+          "text": "Reconcile this day",
+          "height": 32
+        },
+        {
+          "text": "Today's Orders (1)",
+          "height": 30
+        },
+        {
+          "text": "Day Details",
+          "height": 30
+        },
+        {
+          "text": "Close Day",
+          "height": 28
+        },
+        {
+          "text": "All Days",
+          "height": 28
+        },
+        {
+          "text": "Today",
+          "height": 30
+        },
+        {
+          "text": "Yesterday",
+          "height": 30
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 30
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 30
+        },
+        {
+          "text": "This Month",
+          "height": 30
+        },
+        {
+          "text": "View Day",
+          "height": 30
+        },
+        {
+          "text": "View Day",
+          "height": 30
+        }
+      ],
+      "assertions": {
+        "reconciliationVisible": true,
+        "reconcileAction": true,
+        "statusTruthful": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "day-history",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Business Days & Day History\n\nPermanent daily audit archives, cash reconciliations, and historical order records.\n\nClose Business Day\nCash reconciliation needed ? 11 October 2026\n\nThe date rolled over. This day is still unsettled; count and close its registers before finalizing.\n\nReconcile this day\nCURRENT ACTIVE DAY\n(BD-20261012)\n12 October 2026\nOpened at 7:25:00 pm by System (business-date rollover)\nToday's Orders (1)\nDay Details\nClose Day\nTOTAL BILLED (INCL. GST)\n₹200\n● 1 of 1 Orders Billed\nCASH COLLECTED\n₹200\nIn Drawer\nUPI / QR SALES\n₹0\nSettled to Bank\nCARD TERMINAL\n₹0\nCards\nAll Days\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nPERMANENT DAY ARCHIVES (2)\nAUTHORITATIVE\n12 October 2026\nBD-20261012\nACTIVE\nTOTAL BILLED (INCL. GST)\n₹200\n● 1 of 1 Orders Billed\nCASH\n₹200\nUPI\n₹0\nCARD\n₹0\nActive\nView Day\n11 October 2026\nBD-20261011\nNEEDS RECONCILIATION\nTOTAL BILLED (INCL. GST)\n₹0\n● 0 of 0 Orders Billed\nCASH\n₹0\nUPI\n₹0\nCARD\n₹0\nActive\nView Day",
+      "buttons": [
+        {
+          "text": "Close Business Day",
+          "height": 32
+        },
+        {
+          "text": "Reconcile this day",
+          "height": 32
+        },
+        {
+          "text": "Today's Orders (1)",
+          "height": 30
+        },
+        {
+          "text": "Day Details",
+          "height": 30
+        },
+        {
+          "text": "Close Day",
+          "height": 28
+        },
+        {
+          "text": "All Days",
+          "height": 28
+        },
+        {
+          "text": "Today",
+          "height": 30
+        },
+        {
+          "text": "Yesterday",
+          "height": 30
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 30
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 30
+        },
+        {
+          "text": "This Month",
+          "height": 30
+        },
+        {
+          "text": "View Day",
+          "height": 30
+        },
+        {
+          "text": "View Day",
+          "height": 30
+        }
+      ],
+      "assertions": {
+        "reconciliationVisible": true,
+        "reconcileAction": true,
+        "statusTruthful": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "billing",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Billing & Invoices\n● REAL-TIME DB\n\nManage sales, payments, invoices, and financial reconciliation.\n\nFlat Ledger\nDay-by-Day\nExport PDF\nExport CSV\nDATE SCOPE:\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nThis Year\nCustom Date\nShowing: Today (12 Oct 2026) (1 Invoices)\nTOTAL ORDER VALUE\n₹200\n1 accepted orders\nTax: ₹0\nCASH\n₹200\n1 orders\nUPI / QR\n₹0\n0 orders\nCARD\n₹0\n0 orders\n↩️ REFUNDS\n-₹0\n0 refunds\nORDER MIX:\nDine-in: ₹0 (0)\nTakeaway: ₹200 (1)\nDelivery: ₹0 (0)\nQuick Token: ₹0 (0)\nCOLLECTED REVENUE\n₹200\n\nPayments received, after refunds.\n\nPENDING COLLECTION\n₹0\n\n0 orders awaiting payment. Settle kiosk cash orders in POS.\n\nAll order sources\nPOS orders\nKiosk orders\nQR Table orders\nCaptain orders\nOnline orders\nOther orders\nAll payment states\nPending collection\nPaid / refunded\nAll Statuses\nCompleted\nConfirmed\nPreparing\nReady\nVoided / Cancelled\nRefunded\nAll Cashiers\nAll Captains\nINVOICE #\tTOKEN\tDATE & TIME\tTYPE / TABLE\tCUSTOMER\tSTAFF\tITEMS\tSUBTOTAL\tGST\tTOTAL AMOUNT\tTENDER / SPLIT\tSTATUS\tACTIONS\n\n#AUDIT-PAID\nINV-AUDIT-PAID\t#P-92\t\n12 Oct 2026\n07:25 pm\n\t\nTAKEAWAY\nPOS\t\nWalk-in\n\t\nCashier: Counter\n\t0 dishes\t₹0\t₹0\t₹200\tCASH\tCOMPLETED\t\nView\nShowing 1–1 of 1 invoices\nPer Page:\n25\n50\n100\nPrev\n1 / 1\nNext\nInvoice #AUDIT-PAID\nToken #P-92\n\n12 Oct 2026 at 07:25 pm • TAKEAWAY\n\nCUSTOMER\nWalk-in Guest\nCounter\nDINING SECTION\nQuick Takeaway\nTAKEAWAY\nSTAFF\nCashier: —\nCaptain: —\nCURRENT STATUS\nCOMPLETED\nItem Description\tQty\tRate\tTax (5%)\tLine Total\nPAYMENT SETTLEMENT BREAKDOWN:\nTender Method:\nCASH\nAmount Paid:\n₹200\nPayment Status: ● FULLY SETTLED\nSubtotal (Net Items):\n₹0\nDiscount:\n-₹0\nCGST (2.5%):\n₹0\nSGST (2.5%):\n₹0\nGRAND TOTAL:\n₹200\n↩️ Refund Bill\nReprint Receipt\nDone\nProcess Invoice Refund\n\nAre you sure you want to refund Invoice #AUDIT-PAID for total amount of ₹200?\n\nReason for Refund:\n\nThis records money already returned by staff. It does not automatically send money through Razorpay.\n\nReturn method\nCash returned\nUPI sent to customer\nI confirm the full amount has already been returned to this customer.\nCancel\nRecord returned payment",
+      "buttons": [
+        {
+          "text": "Flat Ledger",
+          "height": 28
+        },
+        {
+          "text": "Day-by-Day",
+          "height": 28
+        },
+        {
+          "text": "Export PDF",
+          "height": 32
+        },
+        {
+          "text": "Export CSV",
+          "height": 34
+        },
+        {
+          "text": "Today",
+          "height": 28
+        },
+        {
+          "text": "Yesterday",
+          "height": 28
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 28
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 28
+        },
+        {
+          "text": "This Month",
+          "height": 28
+        },
+        {
+          "text": "This Year",
+          "height": 28
+        },
+        {
+          "text": "Custom Date",
+          "height": 28
+        },
+        {
+          "text": "Dine-in: ₹0 (0)",
+          "height": 24
+        },
+        {
+          "text": "Takeaway: ₹200 (1)",
+          "height": 24
+        },
+        {
+          "text": "Delivery: ₹0 (0)",
+          "height": 24
+        },
+        {
+          "text": "Quick Token: ₹0 (0)",
+          "height": 25
+        },
+        {
+          "text": "Pending collection₹00 orders awaiting payment. Settle kiosk cash orders in POS.",
+          "height": 114
+        },
+        {
+          "text": "",
+          "height": 28
+        },
+        {
+          "text": "View",
+          "height": 24
+        },
+        {
+          "text": "25",
+          "height": 24
+        },
+        {
+          "text": "50",
+          "height": 26
+        },
+        {
+          "text": "100",
+          "height": 26
+        },
+        {
+          "text": "Prev",
+          "height": 26
+        },
+        {
+          "text": "Next",
+          "height": 26
+        },
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "↩️ Refund Bill",
+          "height": 32
+        },
+        {
+          "text": "Reprint Receipt",
+          "height": 34
+        },
+        {
+          "text": "Done",
+          "height": 32
+        },
+        {
+          "text": "Cancel",
+          "height": 32
+        },
+        {
+          "text": "Record returned payment",
+          "height": 32
+        }
+      ],
+      "assertions": {
+        "paidVoidHidden": true,
+        "unconfirmedReturnBlocked": true,
+        "returnedMoneyConfirmationWorks": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "billing",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Billing & Invoices\n● REAL-TIME DB\n\nManage sales, payments, invoices, and financial reconciliation.\n\nFlat Ledger\nDay-by-Day\nExport PDF\nExport CSV\nDATE SCOPE:\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nThis Year\nCustom Date\nShowing: Today (12 Oct 2026) (1 Invoices)\nTOTAL ORDER VALUE\n₹200\n1 accepted orders\nTax: ₹0\nCASH\n₹200\n1 orders\nUPI / QR\n₹0\n0 orders\nCARD\n₹0\n0 orders\n↩️ REFUNDS\n-₹0\n0 refunds\nORDER MIX:\nDine-in: ₹0 (0)\nTakeaway: ₹200 (1)\nDelivery: ₹0 (0)\nQuick Token: ₹0 (0)\nCOLLECTED REVENUE\n₹200\n\nPayments received, after refunds.\n\nPENDING COLLECTION\n₹0\n\n0 orders awaiting payment. Settle kiosk cash orders in POS.\n\nAll order sources\nPOS orders\nKiosk orders\nQR Table orders\nCaptain orders\nOnline orders\nOther orders\nAll payment states\nPending collection\nPaid / refunded\nAll Statuses\nCompleted\nConfirmed\nPreparing\nReady\nVoided / Cancelled\nRefunded\nAll Cashiers\nAll Captains\nINVOICE #\tTOKEN\tDATE & TIME\tTYPE / TABLE\tCUSTOMER\tSTAFF\tITEMS\tSUBTOTAL\tGST\tTOTAL AMOUNT\tTENDER / SPLIT\tSTATUS\tACTIONS\n\n#AUDIT-PAID\nINV-AUDIT-PAID\t#P-92\t\n12 Oct 2026\n07:25 pm\n\t\nTAKEAWAY\nPOS\t\nWalk-in\n\t\nCashier: Counter\n\t0 dishes\t₹0\t₹0\t₹200\tCASH\tCOMPLETED\t\nView\nShowing 1–1 of 1 invoices\nPer Page:\n25\n50\n100\nPrev\n1 / 1\nNext\nInvoice #AUDIT-PAID\nToken #P-92\n\n12 Oct 2026 at 07:25 pm • TAKEAWAY\n\nCUSTOMER\nWalk-in Guest\nCounter\nDINING SECTION\nQuick Takeaway\nTAKEAWAY\nSTAFF\nCashier: —\nCaptain: —\nCURRENT STATUS\nCOMPLETED\nItem Description\tQty\tRate\tTax (5%)\tLine Total\nPAYMENT SETTLEMENT BREAKDOWN:\nTender Method:\nCASH\nAmount Paid:\n₹200\nPayment Status: ● FULLY SETTLED\nSubtotal (Net Items):\n₹0\nDiscount:\n-₹0\nCGST (2.5%):\n₹0\nSGST (2.5%):\n₹0\nGRAND TOTAL:\n₹200\n↩️ Refund Bill\nReprint Receipt\nDone\nProcess Invoice Refund\n\nAre you sure you want to refund Invoice #AUDIT-PAID for total amount of ₹200?\n\nReason for Refund:\n\nThis records money already returned by staff. It does not automatically send money through Razorpay.\n\nReturn method\nCash returned\nUPI sent to customer\nI confirm the full amount has already been returned to this customer.\nCancel\nRecord returned payment",
+      "buttons": [
+        {
+          "text": "Flat Ledger",
+          "height": 28
+        },
+        {
+          "text": "Day-by-Day",
+          "height": 28
+        },
+        {
+          "text": "Export PDF",
+          "height": 32
+        },
+        {
+          "text": "Export CSV",
+          "height": 34
+        },
+        {
+          "text": "Today",
+          "height": 28
+        },
+        {
+          "text": "Yesterday",
+          "height": 28
+        },
+        {
+          "text": "Last 7 Days",
+          "height": 28
+        },
+        {
+          "text": "Last 30 Days",
+          "height": 28
+        },
+        {
+          "text": "This Month",
+          "height": 28
+        },
+        {
+          "text": "This Year",
+          "height": 28
+        },
+        {
+          "text": "Custom Date",
+          "height": 28
+        },
+        {
+          "text": "Dine-in: ₹0 (0)",
+          "height": 24
+        },
+        {
+          "text": "Takeaway: ₹200 (1)",
+          "height": 24
+        },
+        {
+          "text": "Delivery: ₹0 (0)",
+          "height": 24
+        },
+        {
+          "text": "Quick Token: ₹0 (0)",
+          "height": 25
+        },
+        {
+          "text": "Pending collection₹00 orders awaiting payment. Settle kiosk cash orders in POS.",
+          "height": 114
+        },
+        {
+          "text": "",
+          "height": 28
+        },
+        {
+          "text": "View",
+          "height": 24
+        },
+        {
+          "text": "25",
+          "height": 24
+        },
+        {
+          "text": "50",
+          "height": 26
+        },
+        {
+          "text": "100",
+          "height": 26
+        },
+        {
+          "text": "Prev",
+          "height": 26
+        },
+        {
+          "text": "Next",
+          "height": 26
+        },
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "↩️ Refund Bill",
+          "height": 32
+        },
+        {
+          "text": "Reprint Receipt",
+          "height": 34
+        },
+        {
+          "text": "Done",
+          "height": 32
+        },
+        {
+          "text": "Cancel",
+          "height": 32
+        },
+        {
+          "text": "Record returned payment",
+          "height": 32
+        }
+      ],
+      "assertions": {
+        "paidVoidHidden": true,
+        "unconfirmedReturnBlocked": true,
+        "returnedMoneyConfirmationWorks": true
+      },
+      "errors": []
+    }
+  ]
+}

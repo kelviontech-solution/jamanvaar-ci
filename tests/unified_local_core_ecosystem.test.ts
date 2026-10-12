@@ -20,9 +20,9 @@ describe('JAMANVAAR — Unified Multi-App Restaurant Ecosystem Suite', () => {
 
   it('1. Single Authoritative Local Core: All role databases reference identical shared state', () => {
     const health = JamanvaarLocalCore.getHealth();
-    expect(health.restaurant_id).toBe('JAMANVAAR-AHM-FLAGSHIP');
-    expect(health.outlet_id).toBe('AHM-FLAGSHIP');
-    expect(health.core_status).toBe('HEALTHY');
+    expect(health.restaurant_id).toBe(db.restaurant.id);
+    expect(health.outlet_id).toBe(db.outlet.id);
+    expect(health.core_status).toBe(db.isLocalCoreConnected() ? 'HEALTHY' : 'UNAVAILABLE');
 
     // Mutate via posDb -> Check reflection in captainDb, kdsDb, posAdminDb
     posDb.restaurant.name = 'JAMANVAAR — Royal Cuisine';
@@ -213,13 +213,15 @@ describe('JAMANVAAR — Unified Multi-App Restaurant Ecosystem Suite', () => {
   it('5. Device Fleet & QR Pairing: Generates short-lived tokens and registers new devices', () => {
     const tokenPayload = JamanvaarLocalCore.generatePairingToken('192.168.1.10', 8765);
     expect(tokenPayload.token.startsWith('PAIR-')).toBe(true);
-    expect(tokenPayload.restaurant_id).toBe('JAMANVAAR-AHM-FLAGSHIP');
+    expect(tokenPayload.restaurant_id).toBe(db.restaurant.id);
+    expect(tokenPayload.outlet_id).toBe(db.outlet.id);
 
     // Redeem Token on Captain Handheld
     const pairedDevice = JamanvaarLocalCore.redeemPairingToken(tokenPayload.token, 'Captain Hardik', 'Android Tablet');
     expect(pairedDevice).not.toBeNull();
     expect(pairedDevice?.name).toBe('Captain Hardik');
     expect(pairedDevice?.status).toBe('ONLINE');
+    expect(JamanvaarLocalCore.redeemPairingToken(tokenPayload.token, 'Another device', 'Android Tablet')).toBeNull();
 
     const devices = JamanvaarLocalCore.getRegisteredDevices();
     expect(devices.some((d) => d.id === pairedDevice?.id)).toBe(true);

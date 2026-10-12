@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { PlatformSetting, AuditLogRow } from '../../api/types';
-import { Card, Button, Input, Badge } from '../../components/ui';
+import { Card, Button, Input, Badge, FilterTabs } from '../../components/ui';
 import { Sliders, Save, ShieldCheck, Wrench, Building2, Bell, AlertTriangle, History, Megaphone } from 'lucide-react';
 import '../../components/shared.css';
 import './settings.css';
@@ -28,7 +28,22 @@ const ANNOUNCEMENT_TARGET_APPS: Array<{ value: string; label: string }> = [
   { value: 'POS_ADMIN', label: 'Restaurant Admin' }
 ];
 
+type SettingsTab = 'GENERAL' | 'BILLING' | 'COMMS' | 'KIOSK';
+
+/** Six unrelated setting groups used to sit in one flat scroll (identity, onboarding defaults,
+ * statutory invoice data, two separate broadcast mechanisms, and a whole image library), in an
+ * order that put the longest card first and pushed everything else below the fold. Grouped here
+ * by what an admin is actually trying to do, matching the FilterTabs pattern already used on
+ * Billing/Devices/Notifications. */
+const SETTINGS_TABS: Array<{ id: SettingsTab; label: string }> = [
+  { id: 'GENERAL', label: 'General' },
+  { id: 'BILLING', label: 'Billing & Legal' },
+  { id: 'COMMS', label: 'Communications' },
+  { id: 'KIOSK', label: 'Kiosk Designs' }
+];
+
 export function PlatformSettingsPage() {
+  const [tab, setTab] = useState<SettingsTab>('GENERAL');
   const [settings, setSettings] = useState<PlatformSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -327,11 +342,16 @@ export function PlatformSettingsPage() {
       {error && <div className="page-error" role="alert">{error}</div>}
       {successToast && <div className="page-success" role="status">{successToast}</div>}
 
+      <div className="toolbar" style={{ marginTop: 8, marginBottom: 20 }}>
+        <FilterTabs<SettingsTab> value={tab} onChange={setTab} options={SETTINGS_TABS} />
+      </div>
+
       {loading ? (
         <div className="page-loading">Loading platform configuration…</div>
       ) : (
+        <>
+        {tab === 'GENERAL' && (
         <div className="settings-grid">
-          <KioskWelcomeDesignsCard />
           {/* Platform Branding */}
           <Card className="settings-card">
             <div className="settings-card-header">
@@ -371,16 +391,6 @@ export function PlatformSettingsPage() {
               </div>
             </form>
           </Card>
-
-          <InvoiceSellerCard
-            className="settings-card-wide"
-            value={sellerValue}
-            onSaved={(message) => {
-              setSuccessToast(message);
-              setTimeout(() => setSuccessToast(null), 4000);
-              loadSettings();
-            }}
-          />
 
           {/* Onboarding Defaults */}
           <Card className="settings-card">
@@ -432,7 +442,25 @@ export function PlatformSettingsPage() {
               </div>
             </form>
           </Card>
+        </div>
+        )}
 
+        {tab === 'BILLING' && (
+        <div className="settings-grid">
+          <InvoiceSellerCard
+            className="settings-card-wide"
+            value={sellerValue}
+            onSaved={(message) => {
+              setSuccessToast(message);
+              setTimeout(() => setSuccessToast(null), 4000);
+              loadSettings();
+            }}
+          />
+        </div>
+        )}
+
+        {tab === 'COMMS' && (
+        <div className="settings-grid">
           {/* Maintenance & Operational Status */}
           <Card className="settings-card">
             <div className="settings-card-header">
@@ -650,6 +678,14 @@ export function PlatformSettingsPage() {
             )}
           </Card>
         </div>
+        )}
+
+        {tab === 'KIOSK' && (
+        <div className="settings-grid">
+          <KioskWelcomeDesignsCard />
+        </div>
+        )}
+        </>
       )}
     </div>
   );

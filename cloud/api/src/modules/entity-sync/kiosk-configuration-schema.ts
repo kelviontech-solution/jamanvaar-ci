@@ -4,6 +4,9 @@ const language = z.enum(['en', 'hi', 'gu', 'mr', 'ta', 'te', 'kn']);
 const text = z.string().max(2000);
 const image = z.string().max(4_000_000).refine(v => !v || /^https?:\/\//i.test(v) || /^\/(?!\/)/.test(v) || /^data:image\/(png|jpeg|webp);base64,/i.test(v), 'Use an HTTP(S), local asset, PNG, JPEG or WebP image.');
 const display = z.object({
+  allowedOrderTypes: z.array(z.enum(['DINE_IN','TAKEAWAY'])).min(1).max(2).refine(v => new Set(v).size === v.length).optional(),
+  defaultTableId: z.string().max(128).optional(),
+  orderingOverrides: z.record(z.string().min(1).max(128),z.object({allowedOrderTypes:z.array(z.enum(['DINE_IN','TAKEAWAY'])).min(1).max(2).refine(v => new Set(v).size === v.length).optional(),defaultTableId:z.string().max(128).optional()}).strict()).refine(v => Object.keys(v).length <= 100,'Too many ordering overrides.').optional(),
   enabledLanguages: z.array(language).min(1).max(7), defaultLanguage: language,
   idleWarningAfterSeconds: z.number().int().min(5).max(3600), idleResetCountdownSeconds: z.number().int().min(3).max(120),
   logoUrl: image.optional(), accentColor: z.string().regex(/^#[0-9a-f]{6}$/i).optional(),
@@ -31,4 +34,16 @@ const receipt = z.object({
   accentColor: text.optional(), showCashWatermark: z.boolean().optional(), cashWatermarkText: text.optional(), kotThemeColor: text.optional(),
   upiId: text.optional(), upiPayeeName: text.optional(), showUpiQrOnReceipt: z.boolean().optional()
 }).strict();
-export const kioskConfigurationSchema = z.object({ branchId: z.string().min(1).max(128).optional(), updatedAt: z.string().datetime(), display, welcome, receipt }).strict();
+const stationRegistry = z.array(z.object({ id: z.string().uuid(), name: z.string().trim().min(1).max(100), aliases: z.array(z.string().trim().min(1).max(100)).max(30) }).strict()).max(100).superRefine((rows, context) => {
+  const ids = new Set<string>(); const names = new Set<string>();
+  for (const row of rows) {
+    if (ids.has(row.id)) context.addIssue({ code: 'custom', message: 'Station IDs must be unique.' });
+    ids.add(row.id);
+    for (const name of [row.name, ...row.aliases]) {
+      const key = name.toLocaleLowerCase();
+      if (names.has(key)) context.addIssue({ code: 'custom', message: 'Station names and aliases must be unique.' });
+      names.add(key);
+    }
+  }
+});
+export const kioskConfigurationSchema = z.object({ branchId: z.string().min(1).max(128).optional(), updatedAt: z.string().datetime(), display, welcome, receipt, stationRegistry: stationRegistry.optional() }).strict();

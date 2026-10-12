@@ -39,11 +39,11 @@ export class PaymentOrdersController {
   }
 
   @Get('tenant-recent')
-  async tenantRecent(@CurrentDevice() device: Device, @Query('limit') limit?: string) {
+  async tenantRecent(@CurrentDevice() device: Device, @Query('limit') limit?: string, @Query('externalOrderId') externalOrderId?: string) {
     if (device.type !== 'KIOSK_ADMIN' && device.type !== 'POS_ADMIN') {
       throw new ForbiddenException('Only Kiosk Admin or POS Admin can list the restaurant\'s payments');
     }
-    return this.payments.tenantRecent(device.restaurantId, Number(limit) || 30, device.branchId);
+    return this.payments.tenantRecent(device.restaurantId, Number(limit) || 30, device.branchId, externalOrderId);
   }
 
   @Get('tenant-statement')

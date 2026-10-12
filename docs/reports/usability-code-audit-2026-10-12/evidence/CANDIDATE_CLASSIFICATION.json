@@ -1,0 +1,125 @@
+{
+  "scope": "Classification of static reachability candidates; not deletion authorization or proof of runtime behavior.",
+  "counts": {
+    "review-candidate": 2,
+    "tests-not-runtime-dead-code": 30,
+    "seed-cli-helper": 1,
+    "separate-service-entrypoint": 11,
+    "durable-database-drivers-and-worker": 3,
+    "public-library-exports-review-consumers": 2
+  },
+  "groups": {
+    "review-candidate": [
+      "apps/restaurant-system/pos/src/components/common/ShortcutsHelpModal.tsx",
+      "cloud/api/src/common/guards/entitlement.guard.ts"
+    ],
+    "tests-not-runtime-dead-code": [
+      "cloud/super-admin-web/src/__tests__/access-parity.test.ts",
+      "cloud/api/src/common/cors.spec.ts",
+      "cloud/api/src/common/device-health.spec.ts",
+      "cloud/api/src/common/paging.spec.ts",
+      "cloud/api/src/common/rbac/access.spec.ts",
+      "cloud/api/src/common/security/admin-product-access.spec.ts",
+      "cloud/api/src/common/security/credential-encryption.util.spec.ts",
+      "cloud/api/src/common/security/geo.spec.ts",
+      "cloud/api/src/common/security/step-up.util.spec.ts",
+      "cloud/api/src/common/validation/gstin.spec.ts",
+      "cloud/api/src/common/validation/password.spec.ts",
+      "cloud/api/src/common/validation/phone.spec.ts",
+      "cloud/api/src/common/version.spec.ts",
+      "cloud/api/src/config/env.validation.spec.ts",
+      "cloud/api/src/config/seed-options.spec.ts",
+      "cloud/api/src/modules/menu-publications/menu-publications.service.spec.ts",
+      "cloud/api/src/modules/menu-publications/menu-snapshot.spec.ts",
+      "cloud/api/src/modules/offline-policy/signing-status.spec.ts",
+      "cloud/api/src/modules/payments/commission.util.spec.ts",
+      "cloud/api/src/modules/payments/kitchen-admission.util.spec.ts",
+      "cloud/api/src/modules/payments/menu-sync.service.spec.ts",
+      "cloud/api/src/modules/payments/pricing.util.spec.ts",
+      "cloud/api/src/modules/payments/razorpay-gateway.service.spec.ts",
+      "cloud/api/src/modules/payments/refund-authorization.guard.spec.ts",
+      "cloud/api/src/modules/qr/qr-operations.spec.ts",
+      "cloud/api/src/modules/qr/qr-rules.spec.ts",
+      "cloud/api/src/modules/restaurants/restaurant-code.util.spec.ts",
+      "cloud/api/src/prisma/rls-role.spec.ts",
+      "packages/business/src/__tests__/discount_pricing.test.ts",
+      "packages/database/src/__tests__/menu_integrity.test.ts"
+    ],
+    "seed-cli-helper": [
+      "cloud/api/src/config/seed-options.ts"
+    ],
+    "separate-service-entrypoint": [
+      "packages/branch-core/src/backup.ts",
+      "packages/branch-core/src/core.ts",
+      "packages/branch-core/src/discovery.ts",
+      "packages/branch-core/src/main.ts",
+      "packages/branch-core/src/rules.ts",
+      "packages/branch-core/src/secret-seal.ts",
+      "packages/branch-core/src/server.ts",
+      "packages/branch-core/src/store.ts",
+      "packages/branch-core/src/supervisor.ts",
+      "packages/branch-core/src/uplink.ts",
+      "packages/branch-core/src/windows-key-protection.ts"
+    ],
+    "durable-database-drivers-and-worker": [
+      "packages/database/src/durable/node_driver.ts",
+      "packages/database/src/durable/sqlite_worker.ts",
+      "packages/database/src/durable/wasm_driver.ts"
+    ],
+    "public-library-exports-review-consumers": [
+      "packages/validation/src/index.ts",
+      "packages/validation/src/schemas.ts"
+    ]
+  },
+  "unusedDeclarationCount": 881,
+  "mostUnused": [
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "count": 39
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "count": 32
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/shift/PosShiftAndCashView.tsx",
+      "count": 24
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/orders/OrdersModule.tsx",
+      "count": 23
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/EodZReportDocument.tsx",
+      "count": 23
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/settings/PosSettingsView.tsx",
+      "count": 21
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/billing/BillingInvoicesModule.tsx",
+      "count": 18
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosMenuManagerModal.tsx",
+      "count": 18
+    },
+    {
+      "file": "apps/restaurant-system/pos-admin/src/components/customers/CustomersCrmModule.tsx",
+      "count": 15
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/bills/PosBillsView.tsx",
+      "count": 14
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/reports/PosReportDocument.tsx",
+      "count": 14
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosCart.tsx",
+      "count": 13
+    }
+  ]
+}

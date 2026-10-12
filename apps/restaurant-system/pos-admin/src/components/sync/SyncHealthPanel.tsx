@@ -55,7 +55,7 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
     try {
       const res = await publishMenu(note.trim() || undefined);
       setNote('');
-      showToast(`Menu version ${res.version} published. Devices update within moments.`);
+      showToast(`Menu version ${res.version} published. Check device acknowledgements below; offline devices catch up after reconnecting.`);
       await load();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Could not publish the menu');

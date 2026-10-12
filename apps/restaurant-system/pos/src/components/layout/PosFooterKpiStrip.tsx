@@ -3,15 +3,7 @@ import { usePosStore } from '../../store/posStore';
 import { db, BusinessDayRepository } from '@jamanvaar/database';
 import { CentralReportingService } from '@jamanvaar/business';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  TrendingUp,
-  ShoppingBag,
-  Clock,
-  ChefHat,
-  LayoutGrid,
-  ShieldCheck,
-  Zap
-} from 'lucide-react';
+import { TrendingUp, ShoppingBag, Clock, ChefHat, LayoutGrid, ShieldCheck } from 'lucide-react';
 
 export const PosFooterKpiStrip: React.FC = () => {
   const { setActiveTab } = usePosStore();

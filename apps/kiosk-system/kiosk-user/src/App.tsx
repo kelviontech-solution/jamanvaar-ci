@@ -3,7 +3,7 @@ import { KioskWelcomeScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
 import { welcomePresentation, welcomeBackgroundUrl, welcomeLandscapeUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
 import { kioskActivationError } from './activationErrors';
-import { resetTerminal } from './cloud/cloudClient';
+import { resetTerminal, deviceFetch } from './cloud/cloudClient';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { syncStaffUsers } from '@jamanvaar/sync';
 import { runStaffTriggeredUpdate, type DesktopUpdateProgress } from './desktopUpdater';
@@ -13,77 +13,10 @@ import { KioskProductCard } from './KioskProductCard';
 import { KioskReceiptDeliveryDialog, type ReceiptDeliveryChannel, type ReceiptDeliveryResult } from './KioskReceiptDeliveryDialog';
 import { useKioskConfirmationReturn } from './useKioskConfirmationReturn';
 import { cancelAbandonedKioskDraft, confirmKioskCashOrder } from './kioskOrderLifecycle';
-import {
-  activateKioskDevice,
-  resolveRestaurantByCode,
-  syncRestaurantIdentity,
-  RESTAURANT_CODE_RE,
-  isKioskDeviceConnected,
-  getKioskDeviceId,
-  getKioskRestaurantId,
-  createPaymentOrder,
-  createPaymentQr,
-  markPaymentFulfilled,
-  claimKitchenTicket,
-  savePendingPayment,
-  loadPendingPayment,
-  clearPendingPayment,
-  getPaymentOrderStatus,
-  sendReceipt,
-  emailReceipt,
-  whatsappReceipt,
-  pushOrderSync,
-  pullOrderSync,
-  reportHeartbeat, reportCustomerAiQuery,
-  pushEntitySync,
-  pullEntitySync,
-  CloudApiError,
-  type CartLinePayload, leaseNumberBlock, verifyManagerPin } from './cloud/cloudClient';
-import {
-  AuditRepository,
-  ComboRepository,
-  CouponRepository,
-  CustomerRepository,
-  db,
-  KeyValueStore,
-  FeedbackRepository,
-  KioskDisplaySettingsRepository,
-  KioskRepository,
-  KOTRepository,
-  MenuRepository,
-  OrderRepository,
-  ReceiptRepository,
-  ServiceMessages,
-  ServiceRequestRepository,
-  TableRepository,
-  WelcomeScreenSettingsRepository,
-  StaffRepository,
-  RestaurantIdentityRepository,
-  KioskLocalPrinterRepository
-} from '@jamanvaar/database';
+import { activateKioskDevice, resolveRestaurantByCode, syncRestaurantIdentity, RESTAURANT_CODE_RE, isKioskDeviceConnected, getKioskDeviceId, getKioskRestaurantId, createPaymentOrder, createPaymentQr, markPaymentFulfilled, claimKitchenTicket, savePendingPayment, loadPendingPayment, clearPendingPayment, getPaymentOrderStatus, emailReceipt, whatsappReceipt, pushOrderSync, pullOrderSync, reportHeartbeat, reportCustomerAiQuery, pushEntitySync, pullEntitySync, CloudApiError, type CartLinePayload, leaseNumberBlock, verifyManagerPin } from './cloud/cloudClient';
+import { AuditRepository, ComboRepository, CouponRepository, CustomerRepository, db, KeyValueStore, FeedbackRepository, KioskDisplaySettingsRepository, KioskRepository, KOTRepository, MenuRepository, OrderRepository, ReceiptRepository, ServiceMessages, ServiceRequestRepository, TableRepository, WelcomeScreenSettingsRepository, RestaurantIdentityRepository, KioskLocalPrinterRepository } from '@jamanvaar/database';
 import { KioskPrinterSettingsModal } from './KioskPrinterSettingsModal';
-import {
-  CartItem,
-  Category,
-  ChatMessage,
-  ComboDeal,
-  Coupon,
-  CustomerAccount,
-  DietaryType,
-  DiningTable,
-  KioskDevice,
-  MenuItem,
-  ModifierGroup,
-  ModifierOption,
-  NetworkState,
-  Order,
-  OrderStatus,
-  OrderType,
-  PaymentMethod,
-  PaymentStatus,
-  SelectedModifier,
-  VoiceLanguage
-} from '@jamanvaar/types';
+import { CartItem, ChatMessage, ComboDeal, Coupon, CustomerAccount, DiningTable, KioskDevice, MenuItem, NetworkState, Order, OrderType, PaymentMethod, PaymentStatus, SelectedModifier, VoiceLanguage } from '@jamanvaar/types';
 import { buildStandardMenu } from './standardMenu';
 import {
   calculateCart,
@@ -93,81 +26,13 @@ import {
   RecommendationEngine,
   validateModifiers
 } from '@jamanvaar/business';
-import {
-  Button,
-  EmptyState,
-  JamanvaarLogo,
-  BrandHeader,
-  Logo,
-  Modal,
-  OfflineBanner,
-  StatusBadge,
-  ThermalReceiptView,
-  JAMANVAARStartup,
-  JamanvaarKioskAuthLayout,
-  ActivationNoticeBanner,
-  ActivationHelpNote,
-  CachedImg,
-  MenuCategoryIcon,
-  LocalCorePairing, useAiAccess, JamanAiAccessNotice
-} from '@jamanvaar/ui';
-import { formatDate, formatINR, formatSplitTax, splitTaxPaise, formatTime, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
-import { getTranslation, SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
+import { Button, EmptyState, JamanvaarLogo, BrandHeader, Modal, StatusBadge, ThermalReceiptView, JAMANVAARStartup, JamanvaarKioskAuthLayout, ActivationNoticeBanner, ActivationHelpNote, CachedImg, MenuCategoryIcon, LocalCorePairing, useAiAccess, JamanAiAccessNotice } from '@jamanvaar/ui';
+import { formatINR, formatSplitTax, splitTaxPaise, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
+import { SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
 import { EBillService, NetworkStatusService, PrinterService, VoiceService, Platform, isOrderStillSyncingMessage } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
-import {
-  AlertCircle,
-  ArrowLeft,
-  Award,
-  Bell,
-  Bot,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Coins,
-  Download,
-  Eye,
-  Flame,
-  Globe,
-  Grid,
-  Heart,
-  Info,
-  ArrowRight,
-  Key,
-  KeyRound,
-  HelpCircle,
-  Lock,
-  Mail,
-  MessageCircle,
-  Minus,
-  PackagePlus,
-  PhoneCall,
-  Plus,
-  Printer,
-  QrCode,
-  RotateCcw,
-  Search,
-  Send,
-  Settings,
-  Share2,
-  ShieldAlert,
-  ShoppingBag,
-  Smartphone,
-  Sparkles,
-  Star,
-  Store,
-  Tag,
-  ThumbsUp,
-  Trash2,
-  Unlock,
-  UserCheck,
-  UtensilsCrossed,
-  Wallet,
-  Wifi,
-  WifiOff,
-  X
-} from 'lucide-react';
+import { AlertCircle, ArrowLeft, Award, Bell, CheckCircle2, Clock, Coins, Eye, Flame, Grid, ArrowRight, KeyRound, HelpCircle, Mail, MessageCircle, Minus, Plus, Printer, QrCode, Search, Settings, ShoppingBag, Smartphone, Sparkles, Star, Store, Trash2, UserCheck, UtensilsCrossed, X } from 'lucide-react';
 // Namespace import used only to resolve a category's admin-set iconName to
 // an actual icon component for the left nav (see CategoryCard.tsx, which
 // does the same lookup) — everything else in this file uses the named
@@ -596,7 +461,6 @@ export default function KioskUserApp() {
   // Modals for Extra Features
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
   const [isHandoffModalOpen, setIsHandoffModalOpen] = useState(false);
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isStaffPinModalOpen, setIsStaffPinModalOpen] = useState(false);
   const [staffPin, setStaffPin] = useState('');
   const [staffOverrideActive, setStaffOverrideActive] = useState(false);
@@ -1004,7 +868,7 @@ export default function KioskUserApp() {
 
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
-  const kioskSettings = KioskDisplaySettingsRepository.getSettings();
+  const kioskSettings = kioskOrderingSettings(KioskDisplaySettingsRepository.getSettings(),kioskId);
   const welcomeSettings = welcomePresentation(WelcomeScreenSettingsRepository.getSettings(), kioskId);
 
   // Categories & Items from DB
@@ -1018,6 +882,12 @@ export default function KioskUserApp() {
   const combos = allCombos.filter(combo => combo.isAvailable !== false && menuItems.some(item => item.id === `combo-${combo.id}`)).map(combo => ({ ...combo, imageUrl: menuDishImage(combo.imageUrl, combo.name) }));
   const isNonVegCombo = (combo: ComboDeal) => MenuRepository.getMenuItemById(`combo-${combo.id}`)?.dietaryType === 'NON_VEG' || [...combo.mainItemIds, ...combo.sideItemIds, ...combo.drinkItemIds, ...combo.dessertItemIds].some(id => MenuRepository.getMenuItemById(id)?.dietaryType === 'NON_VEG');
   const tables = TableRepository.getAllTables();
+  const allowedOrderTypes = availableKioskModes(kioskSettings);
+  useEffect(() => {
+    if (!kioskSettings.enabledLanguages.includes(lang)) setLang(kioskSettings.defaultLanguage);
+    const next = nextKioskSelection(step,kioskSettings,tables);
+    if (next) {if (next.language) setLang(next.language);if (next.mode) setOrderType(next.mode);if (next.table !== undefined) setSelectedTable(next.table);setStep(next.step);}
+  }, [step, lang, kioskSettings.enabledLanguages.join(','), allowedOrderTypes.join(','), kioskSettings.defaultTableId, dbTick]);
   const kioskConfig = KioskRepository.getKioskById(kioskId);
   const receiptConfig = ReceiptRepository.getConfig();
 
@@ -1702,6 +1572,20 @@ export default function KioskUserApp() {
   // Whether the counter really received the last "call staff" request. The guest is told a team member is on the
   // way only when it did; otherwise they are asked to go to the counter (BUG-137).
   const [staffCallDelivered, setStaffCallDelivered] = useState<boolean | null>(null);
+  const [staffRequestId, setStaffRequestId] = useState('');
+  const [staffRequestStatus, setStaffRequestStatus] = useState<'SENT'|'ACCEPTED'|'RESOLVED'>('SENT');
+  useEffect(() => {
+    if (!isStaffModalOpen || !staffRequestId || staffCallDelivered !== true) return;
+    let stopped = false; let busy = false;
+    const refresh = async () => {
+      if (busy || stopped) return; busy = true;
+      try { const response = await deviceFetch(`/api/v1/devices/me/guest-request/${encodeURIComponent(staffRequestId)}`); if (!response.ok) return; const value = await response.json(); if (!stopped && ['SENT','ACCEPTED','RESOLVED'].includes(value.status)) setStaffRequestStatus(value.status); }
+      catch { /* Keep the last verified stage; delivery never implies staff acceptance. */ }
+      finally {busy = false;}
+    };
+    void refresh(); const timer = setInterval(() => void refresh(), 3000);
+    return () => {stopped = true; clearInterval(timer);};
+  }, [isStaffModalOpen,staffRequestId,staffCallDelivered]);
 
   const handleCallStaff = () => {
     SoundService.playTap();
@@ -1713,13 +1597,14 @@ export default function KioskUserApp() {
       type: 'CALL_STAFF'
     });
     // Send it to the people who staff the counter (POS, Restaurant Admin, Kiosk Admin).
-    ServiceMessages.enqueue({
+    const request = ServiceMessages.enqueue({
       kind: 'CALL_STAFF',
       recipient: 'COUNTER',
       senderName: 'Self-order kiosk',
       presetText: selectedTable?.tableNumber ? `A guest at Table ${selectedTable.tableNumber} asked for help.` : 'A guest at the self-order kiosk asked for help.',
       tableNumber: selectedTable?.tableNumber
     });
+    setStaffRequestId(request.id); setStaffRequestStatus('SENT');
     setStaffCallDelivered(null);
     setIsStaffModalOpen(true);
     void pushServiceMessages().then(setStaffCallDelivered);
@@ -2226,7 +2111,7 @@ export default function KioskUserApp() {
             <button
               onClick={() => {
                 SoundService.playTap();
-                if (step === 'MENU') setStep('ORDER_TYPE');
+                if (step === 'MENU') setStep(allowedOrderTypes.length > 1 ? 'ORDER_TYPE' : kioskSettings.enabledLanguages.length > 1 ? 'LANGUAGE_SELECT' : 'WELCOME');
                 else if (step === 'CHECKOUT_PAYMENT') {
                   // B2-021: leaving the payment screen this way must not leave behind the real,
                   // unpaid order handleProceedToPayment already created — see cancelAbandonedPendingOrder.
@@ -2236,8 +2121,8 @@ export default function KioskUserApp() {
     setQuotedPayable(null);
                   setStep('MENU');
                 }
-                else if (step === 'TABLE_SELECT') setStep('ORDER_TYPE');
-                else if (step === 'ORDER_TYPE') setStep('LANGUAGE_SELECT');
+                else if (step === 'TABLE_SELECT') setStep(allowedOrderTypes.length > 1 ? 'ORDER_TYPE' : kioskSettings.enabledLanguages.length > 1 ? 'LANGUAGE_SELECT' : 'WELCOME');
+                else if (step === 'ORDER_TYPE') setStep(kioskSettings.enabledLanguages.length > 1 ? 'LANGUAGE_SELECT' : 'WELCOME');
               }}
               className="w-12 h-12 rounded-2xl bg-jaman-ivory border border-jaman-border text-jaman-navy hover:bg-[#F4EFE6] flex items-center justify-center transition-transform active:scale-95"
             >
@@ -2529,6 +2414,7 @@ export default function KioskUserApp() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-2xl">
             <button
+              hidden={!allowedOrderTypes.includes('DINE_IN')}
               onClick={() => {
                 SoundService.playTap();
                 setOrderType('DINE_IN');
@@ -2551,6 +2437,7 @@ export default function KioskUserApp() {
             </button>
 
             <button
+              hidden={!allowedOrderTypes.includes('TAKEAWAY')}
               onClick={() => {
                 SoundService.playTap();
                 setOrderType('TAKEAWAY');
@@ -4276,7 +4163,7 @@ export default function KioskUserApp() {
           ) : staffCallDelivered ? (
             <>
               <h3 className="text-xl font-bold text-jaman-navy">{kioskCopy("screen_team_member_notified_0a21d5", "Team Member Notified")}</h3>
-              <p className="text-sm text-[#4A5568] leading-relaxed">{t('staffOnTheWay')}</p>
+              <p role="status" className="text-sm text-[#4A5568] leading-relaxed">{staffRequestStatus === 'RESOLVED' ? kioskCopy('staff_request_resolved','Your assistance request is completed.') : staffRequestStatus === 'ACCEPTED' ? t('staffOnTheWay') : kioskCopy('staff_request_sent','Your request has reached the counter. Waiting for a staff member to accept it.')}</p>
             </>
           ) : (
             <>
@@ -4350,3 +4237,4 @@ export default function KioskUserApp() {
     </JAMANVAARStartup>
   );
 }
+import { nextKioskSelection, availableKioskModes, kioskOrderingSettings } from './kioskJourney';

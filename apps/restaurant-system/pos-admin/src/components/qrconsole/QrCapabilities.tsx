@@ -4,6 +4,7 @@ import { QrPromotions } from "./QrPromotions";
 import { useEffect, useState, useRef } from "react";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi, type QrOrderRow } from "../../cloud/qrAdminClient";
+import { FeatureRequestButton } from "./FeatureRequestButton";
 const base = "/api/v1/restaurant/qr/advanced";
 const input =
   "mt-1 w-full min-w-0 rounded-xl border border-jaman-border bg-white px-3 py-2.5 text-sm";
@@ -37,6 +38,10 @@ const labels: Record<string, string> = {
   QR_USAGE_LIMITS: "Advanced quotas",
   QR_ACCESSIBILITY: "Presentation preferences",
   QR_INVENTORY_SYNC: "Inventory controls",
+  QR_SERVICE_REQUESTS: "Service requests",
+  QR_SCHEDULED_PICKUP: "Scheduled pickup",
+  QR_MENU_ANALYTICS: "Menu analytics",
+  QR_BRANDING: "Customer branding",
 };
 
 export function QrCapabilities({
@@ -393,10 +398,16 @@ export function QrCapabilities({
         <div className="rounded-2xl border bg-white p-5">
           <h3 className="font-bold">Menu translations</h3>
           {!licensed("QR_MULTILINGUAL") ? (
-            <p className="mt-3 text-sm">
-              Multilingual menu management is not included. Contact your
-              platform administrator.
-            </p>
+            <div className="mt-3 text-sm">
+              <p>
+                Multilingual menu management is not included. Contact your
+                platform administrator.
+              </p>
+              <FeatureRequestButton
+                featureCode="QR_MULTILINGUAL"
+                featureLabel="Multilingual menu"
+              />
+            </div>
           ) : (
             <>
               <div className="my-4 grid gap-4 sm:grid-cols-2">
@@ -575,9 +586,13 @@ export function QrCapabilities({
         (licensed("QR_PROMOTIONS") ? (
           <QrPromotions showToast={showToast} />
         ) : (
-          <p className="rounded-2xl border bg-white p-5">
-            Promotions are not included in this license.
-          </p>
+          <div className="rounded-2xl border bg-white p-5">
+            <p>Promotions are not included in this license.</p>
+            <FeatureRequestButton
+              featureCode="QR_PROMOTIONS"
+              featureLabel="Promotions"
+            />
+          </div>
         ))}
       {section === "Feedback" && (
         <div className="rounded-2xl border bg-white p-5">
@@ -666,7 +681,13 @@ export function QrCapabilities({
             </div>
           )}
           {!licensed("QR_FEEDBACK") ? (
-            <p className="mt-3">Feedback is not included in this license.</p>
+            <div className="mt-3">
+              <p>Feedback is not included in this license.</p>
+              <FeatureRequestButton
+                featureCode="QR_FEEDBACK"
+                featureLabel="Private order feedback"
+              />
+            </div>
           ) : feedback ? (
             <>
               <p className="my-3">
@@ -689,7 +710,10 @@ export function QrCapabilities({
               ))}
             </>
           ) : (
-            <p className="mt-3">Loading feedback...</p>
+            <p className="mt-3 text-slate-500">
+              Choose a date range and click Filter feedback to see verified
+              responses.
+            </p>
           )}
         </div>
       )}
@@ -784,7 +808,7 @@ export function QrCapabilities({
                       Record cash returned to the customer
                     </legend>
                     <label className="block text-sm">
-                      Amount refunded (?)
+                      Amount refunded (₹)
                       <input
                         className={input}
                         type="number"
@@ -953,7 +977,12 @@ export function QrCapabilities({
               .filter(([k, v]) => k.startsWith("qr") && typeof v === "number")
               .map(([k, v]) => (
                 <div key={k} className="flex justify-between border-b py-2">
-                  <dt>{k}</dt>
+                  <dt>
+                    {k
+                      .replace(/^qr/, "")
+                      .replace(/([A-Z])/g, " $1")
+                      .trim()}
+                  </dt>
                   <dd>{String(v)}</dd>
                 </div>
               ))}

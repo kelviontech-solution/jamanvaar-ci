@@ -1,15 +1,7 @@
 import React from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { formatINR, formatTime } from '@jamanvaar/utils';
-import {
-  Coins,
-  FileText,
-  Printer,
-  CheckCircle2,
-  Clock,
-  ArrowDownRight,
-  ArrowUpRight
-} from 'lucide-react';
+import { Coins, FileText, Printer, CheckCircle2 } from 'lucide-react';
 
 interface ShiftCashDrawerModuleProps {
   activeShift: any;

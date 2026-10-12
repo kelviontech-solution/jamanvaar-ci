@@ -11,6 +11,7 @@ import { menuEntityProblem } from './menu-entity-schemas';
 import { staffVisibleTo } from './entity-authority';
 import { WelcomeDesignsService } from '../platform-settings/welcome-designs.service';
 import { BRANCH_ENTITY_TYPES, BRANCH_FILTER_TYPES } from './branch-entity-scope';
+import { serviceRequestProgress } from './service-request-progress';
 
 /** What is worth an audit line when a synced record changes: money, tax, staff access and coupon value. Never the PIN hash itself. */
 export function sensitiveChange(entityType: string, before: Record<string, unknown> | null, after: Record<string, unknown>): Record<string, unknown> | null {
@@ -166,6 +167,8 @@ export class EntitySyncService {
             }
           });
           const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
+          if (entityType === 'KIOSK_CONFIGURATION' && evt.payload.stationRegistry === undefined && (existing?.payload as {stationRegistry?:unknown} | null)?.stationRegistry) evt = {...evt,payload:{...evt.payload,stationRegistry:(existing!.payload as unknown as {stationRegistry:unknown}).stationRegistry}};
+          if (entityType === 'SERVICE_MESSAGE') evt = {...evt, payload:serviceRequestProgress(evt.payload, existing?.payload as Record<string,unknown> | null ?? null, evt.externalId, deviceId, deviceType)};
           if (entityType === 'STAFF_USER' && typeof evt.payload.branchId !== 'string' && (existingBranch || (!existing && deviceBranchId))) {
             evt = { ...evt, payload: { ...evt.payload, branchId: existingBranch ?? deviceBranchId } };
           }

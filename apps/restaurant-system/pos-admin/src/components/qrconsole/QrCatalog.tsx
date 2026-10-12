@@ -1,5 +1,5 @@
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CachedImg } from "@jamanvaar/ui";
 import {
   previewMenuCsv,
@@ -64,6 +64,12 @@ export function QrCatalog() {
   const [search, setSearch] = useState(""),
     [categoryFilter, setCategoryFilter] = useState(""),
     [page, setPage] = useState(0);
+  // Opening "Edit" (or "Add", against these same blank defaults) snapshots the starting point here,
+  // so merely opening an editor and then navigating away without changing a field is never reported
+  // as unsaved changes -- only a field that actually differs from this baseline is.
+  const draftOriginal = useRef<any>(null), categoryDraftOriginal = useRef<any>(null);
+  const itemDirty = !!draft && JSON.stringify(draft) !== JSON.stringify(draftOriginal.current);
+  const categoryDirty = !!categoryDraft && JSON.stringify(categoryDraft) !== JSON.stringify(categoryDraftOriginal.current);
   const filtered = items.filter(
     (i) =>
       (!categoryFilter || i.categoryId === categoryFilter) &&
@@ -77,7 +83,7 @@ export function QrCatalog() {
   useEffect(() => {
     setPage(0);
   }, [search, categoryFilter]);
-  useQrUnsavedChanges(!!draft || !!categoryDraft);
+  useQrUnsavedChanges(itemDirty || categoryDirty);
   const load = async () => {
     try {
       const [i, c, g, t] = await Promise.all([
@@ -250,20 +256,26 @@ export function QrCatalog() {
       <div className="flex flex-wrap gap-3">
         <button
           className={button}
-          onClick={() =>
-            setDraft({
+          onClick={() => {
+            const blank = {
               name: "",
               categoryId: categories[0]?.id || "",
               price: 0,
               isAvailable: true,
-            })
-          }
+            };
+            draftOriginal.current = blank;
+            setDraft(blank);
+          }}
         >
           Add dish
         </button>
         <button
           className={button}
-          onClick={() => setCategoryDraft({ name: "", isActive: true })}
+          onClick={() => {
+            const blank = { name: "", isActive: true };
+            categoryDraftOriginal.current = blank;
+            setCategoryDraft(blank);
+          }}
         >
           Add category
         </button>
@@ -315,7 +327,7 @@ export function QrCatalog() {
                 {c.name} {c.isActive === false ? "(hidden)" : ""}
               </span>
               <div className="flex gap-3">
-                <button onClick={() => setCategoryDraft({ ...c })}>
+                <button onClick={() => { categoryDraftOriginal.current = { ...c }; setCategoryDraft({ ...c }); }}>
                   Edit category
                 </button>
                 <button
@@ -648,7 +660,7 @@ export function QrCatalog() {
                 <div className="qr-dish-actions">
                   <button
                     className="font-bold text-orange-700"
-                    onClick={() => setDraft({ ...i })}
+                    onClick={() => { draftOriginal.current = { ...i }; setDraft({ ...i }); }}
                   >
                     Edit
                   </button>

@@ -2,7 +2,7 @@ import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, PRESET_MESSAGES } from '../../store/captainStore';
-import { Send, X, MessageSquare, ChefHat, Server, UserCheck } from 'lucide-react';
+import { Send, X, MessageSquare } from 'lucide-react';
 
 interface CaptainQuickMessageModalProps {
   isOpen: boolean;

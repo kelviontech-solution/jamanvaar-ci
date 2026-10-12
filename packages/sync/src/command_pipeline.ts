@@ -1,20 +1,5 @@
-import {
-  db,
-  BusinessDayAccountingService,
-  OrderRepository,
-  BusinessDayRepository,
-  TableRepository,
-  KOTRepository,
-  projectTableBillState
-} from '@jamanvaar/database';
-import {
-  Order,
-  OrderItem,
-  KOTRecord,
-  KOTStatus,
-  TableStatus,
-  DiningTable
-} from '@jamanvaar/types';
+import { db, BusinessDayAccountingService, OrderRepository, projectTableBillState } from '@jamanvaar/database';
+import { KOTRecord, KOTStatus } from '@jamanvaar/types';
 import { lanMeshSync } from './lan_mesh_sync';
 import { generateUUID } from '@jamanvaar/utils';
 

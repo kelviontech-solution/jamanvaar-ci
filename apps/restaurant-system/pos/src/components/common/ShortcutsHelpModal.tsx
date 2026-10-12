@@ -1,6 +1,4 @@
-import React from 'react';
-import { usePosStore } from '../../store/posStore';
-import { X, Keyboard, Command } from 'lucide-react';
+import type React from 'react';
 
 // Deliberately decommissioned — POS is touch-first and must not expose any
 // keyboard-shortcut UI (see tests/pos_touch_first_no_shortcuts_ui.test.ts).

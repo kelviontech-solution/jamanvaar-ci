@@ -1,4 +1,4 @@
-import { GeneratedReport, Order, PaymentMethod } from '@jamanvaar/types';
+import { GeneratedReport, Order } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { formatDate, formatINR, formatTime, toCsvRow } from '@jamanvaar/utils';
 import { CentralReportingService } from './central_reporting_service';
@@ -138,7 +138,7 @@ export class ReportGeneratorService {
         cash: central.paymentBreakdown.cash,
         upi: central.paymentBreakdown.upi,
         card: central.paymentBreakdown.card,
-        wallet: 0,
+        wallet: central.paymentBreakdown.wallet,
         split: central.paymentBreakdown.split,
         other: central.paymentBreakdown.other
       },

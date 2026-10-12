@@ -9,6 +9,7 @@ import {
 import { QrServiceInbox } from "@jamanvaar/ui";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi } from "../../cloud/qrAdminClient";
+import { FeatureRequestButton } from "./FeatureRequestButton";
 const base = "/api/v1/restaurant/qr/operations";
 export const qrRequestsApi = async <T,>(
   path: string,
@@ -238,15 +239,23 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
         {mode === "service" ? "Service request settings" : "Pickup scheduling"}
       </h2>
       {!licensed && (
-        <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-          This optional feature is not licensed. Ask your platform administrator
-          to enable it.
-        </p>
+        <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+          <p>
+            This optional feature is not licensed. Ask your platform
+            administrator to enable it.
+          </p>
+          <FeatureRequestButton
+            featureCode={
+              mode === "service" ? "QR_SERVICE_REQUESTS" : "QR_SCHEDULED_PICKUP"
+            }
+            featureLabel={
+              mode === "service" ? "Service requests" : "Scheduled pickup"
+            }
+          />
+        </div>
       )}
-      <fieldset
-        disabled={!licensed || busy}
-        className="space-y-4 disabled:opacity-60"
-      >
+      {licensed && (
+      <fieldset disabled={busy} className="space-y-4 disabled:opacity-60">
         {mode === "service" ? (
           <>
             <label className="flex items-center gap-2">
@@ -508,6 +517,7 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
           {busy ? "Saving…" : "Save settings"}
         </button>
       </fieldset>
+      )}
       {error && (
         <p role="alert" className="text-rose-700">
           {error}
@@ -555,8 +565,6 @@ export function QrMenuPerformance() {
         "Collected (paise)",
         "Refunded (paise)",
         "Net collected (paise)",
-        "Cost",
-        "Profit",
       ],
       ...data.items.map((i: any) => [
         i.name,
@@ -570,8 +578,6 @@ export function QrMenuPerformance() {
         i.collectedPaise,
         i.refundedPaise,
         i.netCollectedPaise,
-        "Unavailable",
-        "Unavailable",
       ]),
     ];
     const a = document.createElement("a"),
@@ -618,9 +624,15 @@ export function QrMenuPerformance() {
         )}
       </div>
       {error && (
-        <p role="alert" className="text-rose-700">
-          {error}
-        </p>
+        <div role="alert" className="text-rose-700">
+          <p>{error}</p>
+          {error.includes("not included in the current license") && (
+            <FeatureRequestButton
+              featureCode="QR_MENU_ANALYTICS"
+              featureLabel="Menu analytics"
+            />
+          )}
+        </div>
       )}
       {data && (
         <>
@@ -651,7 +663,6 @@ export function QrMenuPerformance() {
                     "Quantity",
                     "Orders / discount",
                     "Net collections",
-                    "Cost / profit",
                   ].map((t) => (
                     <th className="p-3" key={t}>
                       {t}
@@ -678,7 +689,6 @@ export function QrMenuPerformance() {
                     <td>
                       ₹{(i.netCollectedPaise / 100).toLocaleString("en-IN")}
                     </td>
-                    <td>Unavailable</td>
                   </tr>
                 ))}
               </tbody>
@@ -895,15 +905,20 @@ export function QrBrandStudio() {
             />
           </label>
           <button
-            className="text-sm"
+            className="rounded-xl border px-4 py-2 text-sm"
             onClick={() => setImages((p: any) => ({ ...p, logo: null }))}
           >
             Use default logo
           </button>
-          <fieldset disabled={!licensed} className="space-y-3">
-            <legend className="font-bold">Optional advanced branding</legend>
+          <fieldset
+            disabled={!licensed}
+            className="space-y-3 rounded-xl border border-jaman-border bg-slate-50 p-4"
+          >
+            <legend className="px-1 font-bold">
+              Optional advanced branding
+            </legend>
             {!licensed && (
-              <p className="text-sm text-amber-800">
+              <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                 QR Branding is not included in this license.
               </p>
             )}
@@ -917,7 +932,7 @@ export function QrBrandStudio() {
               />
             </label>
             <button
-              className="text-sm"
+              className="rounded-xl border px-4 py-2 text-sm"
               onClick={() => setImages((p: any) => ({ ...p, cover: null }))}
             >
               Use menu cover
@@ -1054,9 +1069,15 @@ export function QrBrandStudio() {
                 FRESH FROM OUR KITCHEN
               </span>
               <h3 className="my-3 text-2xl font-bold">
-                Good food.
-                <br />
-                Great company.
+                {draft.welcomeTitle ? (
+                  draft.welcomeTitle
+                ) : (
+                  <>
+                    Good food.
+                    <br />
+                    Great company.
+                  </>
+                )}
               </h3>
               <p className="text-sm">
                 {draft.welcomeMessage ||

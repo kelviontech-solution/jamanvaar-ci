@@ -3,17 +3,7 @@ import { AiConfig, refreshConfiguredAi } from '@jamanvaar/business';
 import { JamanAiAccessNotice, ModalBackdrop } from '@jamanvaar/ui';
 import { reportAiQueryNow } from '../../cloud/cloudClient';
 import { useCaptainStore } from '../../store/captainStore';
-import {
-  Sparkles,
-  X,
-  Send,
-  Flame,
-  Receipt,
-  AlertTriangle,
-  Users,
-  CheckCircle2,
-  Bot
-} from 'lucide-react';
+import { Sparkles, X, Bot } from 'lucide-react';
 
 interface CaptainJamanAiModalProps {
   isOpen: boolean;

@@ -2,21 +2,7 @@ import React from 'react';
 import { ReportFullData, ReportDesign } from '../../services/pdfReportBuilder';
 import { db, ReceiptRepository } from '@jamanvaar/database';
 import { formatINR, formatSplitTax } from '@jamanvaar/utils';
-import {
-  Building2,
-  Calendar,
-  Clock,
-  TrendingUp,
-  Receipt,
-  Banknote,
-  QrCode,
-  CreditCard,
-  ChefHat,
-  Percent,
-  CheckCircle2,
-  Layers,
-  Award,
-  Sparkles, CalendarDays } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 
 interface PosReportDocumentProps {
   data: ReportFullData;

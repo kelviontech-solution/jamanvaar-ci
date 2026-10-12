@@ -959,6 +959,14 @@ export function RestaurantDetailPage() {
                         </span>
                         <Badge tone={statusTone(k.status)}>{k.status}</Badge>
                       </div>
+                      {/* Without this, every POS_ADMIN-typed key (a real Restaurant Admin console
+                          and a QR Ordering console alike -- the latter has no device type of its
+                          own) renders identically, so a QR key looks missing rather than unlabeled. */}
+                      {k.label && (
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--jv-text-secondary)', marginTop: -4 }}>
+                          {k.label}
+                        </div>
+                      )}
 
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--jv-surface-card)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: '8px 12px' }}>
                         <span className="mono" style={{ fontSize: 15, fontWeight: 800, color: 'var(--jv-text)', letterSpacing: '0.04em' }}>
@@ -1494,7 +1502,10 @@ export function RestaurantDetailPage() {
                           )}
                         </div>
                       </td>
-                      <td><Badge tone="accent">{formatDeviceTypeLabel(k.allowedDeviceType)}</Badge></td>
+                      <td>
+                        <Badge tone="accent">{formatDeviceTypeLabel(k.allowedDeviceType)}</Badge>
+                        {k.label && <div style={{ fontSize: 11, color: 'var(--jv-text-muted)', marginTop: 4 }}>{k.label}</div>}
+                      </td>
                       <td><Badge tone={statusTone(k.status)} pulse={k.status === 'ACTIVE'}>{k.status}</Badge></td>
                       <td>{new Date(k.expiresAt).toLocaleDateString('en-IN')}</td>
                       <td>

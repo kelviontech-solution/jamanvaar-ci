@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, ShoppingBag, UtensilsCrossed, Users, User, Grid, ArrowRight } from 'lucide-react';
+import { Search, X, ShoppingBag, UtensilsCrossed, Users, User, Grid } from 'lucide-react';
 import { CachedImg, Modal } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import { formatINR, formatTime } from '@jamanvaar/utils';

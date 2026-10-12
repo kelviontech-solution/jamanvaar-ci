@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-12T06:58:15.072Z",
+  "method": "Current-source Vite servers, installed headless Chrome/CDP, isolated browser profile, all backend/external requests intercepted with 503. No app source edits, no predev hooks, no authentication bypass, no production requests. This covers public/activation/error pages only; protected workflows are source-reviewed, not end-to-end verified.",
+  "results": [
+    {
+      "name": "pos",
+      "route": "/",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "unloadedImages": 0,
+      "errors": 0,
+      "screenshot": "evidence/browser/pos-1366x768.png"
+    },
+    {
+      "name": "pos",
+      "route": "/",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "unloadedImages": 0,
+      "errors": 0,
+      "screenshot": "evidence/browser/pos-768x1024.png"
+    }
+  ]
+}

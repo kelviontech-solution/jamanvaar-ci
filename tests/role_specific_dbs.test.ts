@@ -31,8 +31,10 @@ describe('Unified Local Core Architecture: Single Authoritative Database Client 
 
   it('should expose Local Core health and device fleet authority', () => {
     const health = JamanvaarLocalCore.getHealth();
-    expect(health.restaurant_id).toBe('JAMANVAAR-AHM-FLAGSHIP');
-    expect(health.outlet_id).toBe('AHM-FLAGSHIP');
-    expect(health.core_status).toBe('HEALTHY');
+    expect(health.restaurant_id).toBe(db.restaurant.id);
+    expect(health.outlet_id).toBe(db.outlet.id);
+    expect(health.core_status).toBe(db.isLocalCoreConnected() ? 'HEALTHY' : 'UNAVAILABLE');
+    expect(health.realtime_status).toBe(db.isLocalCoreConnected() ? 'CONNECTED' : 'OFFLINE');
+    expect(JamanvaarLocalCore.getRegisteredDevices()).toEqual(db.devices);
   });
 });

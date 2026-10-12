@@ -58,8 +58,7 @@ export async function syncServiceMessages(reader: ServiceMessageReader): Promise
 
 /**
  * Sends the messages this device queued (a self-order kiosk only sends). Returns true only when everything
- * queued has really been delivered to the cloud - a caller that tells a guest "a team member is on the way"
- * must check this first (BUG-137).
+ * queued has really been delivered to the cloud. Delivery alone does not mean that a staff member accepted it.
  */
 export async function pushServiceMessages(): Promise<boolean> {
   const records = ServiceMessages.collectSyncRecords();

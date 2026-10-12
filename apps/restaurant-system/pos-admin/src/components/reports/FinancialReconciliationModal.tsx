@@ -2,25 +2,10 @@ import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect } from 'react';
 import { db } from '@jamanvaar/database';
 import { CentralReportingService, PeriodReconciliationResult, CentralDatePreset } from '@jamanvaar/business';
-import { formatINR, formatDate, formatTime, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
-import {
-  ShieldCheck,
-  AlertTriangle,
-  CheckCircle2,
-  X,
-  RefreshCw,
-  Layers,
-  ArrowRight,
-  TrendingUp,
-  Receipt,
-  DollarSign,
-  CreditCard,
-  QrCode,
-  Coins,
-  Scale
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle2, X, RefreshCw, Scale } from 'lucide-react';
 
 interface FinancialReconciliationModalProps {
   isOpen: boolean;

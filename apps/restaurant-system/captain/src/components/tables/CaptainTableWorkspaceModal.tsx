@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
 import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
-import { formatINR, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+import { formatINR, restaurantGstRate, taxLabels, outstandingBillAmount } from '@jamanvaar/utils';
 import { priceOrderLines } from '@jamanvaar/business';
 import { captainDb, isBillWaiting } from '@jamanvaar/database';
 import { CachedImg, EmptyState, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
@@ -127,6 +127,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
 
   // What the kitchen is doing with each dish right now, read from the running order (each dish is its own order line).
   const liveOrder = table?.currentOrderId ? captainDb.orders.find((o) => o.id === table.currentOrderId) : undefined;
+  const outstandingBill = liveOrder ? outstandingBillAmount(liveOrder) : 0;
   const dishState = (item: CartItemEntry): DishState => {
     if (item.status === 'CANCELLED') return 'CANCELLED';
     const line = item.orderItemId ? liveOrder?.items.find((i) => i.id === item.orderItemId) : undefined;
@@ -565,10 +566,10 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                   <button
                     type="button"
                     onClick={async () => {
-                      const warn = total > 0
-                        ? `Free Table ${table!.tableNumber}? It still shows ${formatINR(total)} owed — this will mark that bill as paid/completed without collecting it. Only do this if the guest already paid another way or left without paying.`
+                      const warn = outstandingBill > 0
+                        ? `Release Table ${table!.tableNumber}? ${formatINR(outstandingBill)} remains outstanding at the counter. This does not collect payment or change kitchen progress.`
                         : `Free Table ${table!.tableNumber}? It will show as available for the next guest.`;
-                      if (await confirm({ title: `Free Table ${table!.tableNumber}?`, message: warn, confirmLabel: 'Free table', cancelLabel: 'Cancel', tone: total > 0 ? 'danger' : 'default' })) {
+                      if (await confirm({ title: `Free Table ${table!.tableNumber}?`, message: warn, confirmLabel: 'Free table', cancelLabel: 'Cancel', tone: outstandingBill > 0 ? 'danger' : 'default' })) {
                         closeTable(table!.tableNumber);
                         onClose();
                       }

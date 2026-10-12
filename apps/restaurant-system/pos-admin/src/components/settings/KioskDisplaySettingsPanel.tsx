@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, SettingsSection } from '@jamanvaar/ui';
-import { KioskDisplaySettingsRepository, OrderRepository, TokenSequenceRepository } from '@jamanvaar/database';
+import { db, KioskDisplaySettingsRepository, OrderRepository, TokenSequenceRepository } from '@jamanvaar/database';
+import { syncKioskConfiguration } from '@jamanvaar/sync';
+import type { KioskDisplaySettings } from '@jamanvaar/types';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
 const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
@@ -19,12 +21,31 @@ const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
  * the Receipt & E-Bill and Payment Gateway sections of that same tab, which are general restaurant
  * settings and don't belong behind a kiosk-only gate.
  */
-export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => void }> = ({ showToast }) => {
+export const KioskDisplaySettingsPanel: React.FC<{ showToast: (msg: string) => void; kiosks?: Array<{id:string;name:string}> }> = ({ showToast, kiosks = [] }) => {
   const [confirmingTokenReset, setConfirmingTokenReset] = useState(false);
-  const settings = KioskDisplaySettingsRepository.getSettings();
+  const [orderingScope,setOrderingScope] = useState('branch');
+  const [orderingBusy,setOrderingBusy] = useState(false);
+  const shared = KioskDisplaySettingsRepository.getSettings();
+  const settings = {...shared,...(orderingScope === 'branch' ? {} : shared.orderingOverrides?.[orderingScope])};
+  const saveChoices = async (partial: Pick<KioskDisplaySettings,'allowedOrderTypes'|'defaultTableId'> | null) => {
+    setOrderingBusy(true);
+    try {
+      if (orderingScope === 'branch') KioskDisplaySettingsRepository.updateSettings(partial ?? {});
+      else {const overrides={...shared.orderingOverrides};if (partial) overrides[orderingScope]={...overrides[orderingScope],...partial};else delete overrides[orderingScope];KioskDisplaySettingsRepository.updateSettings({orderingOverrides:overrides});}
+      await syncKioskConfiguration({push:true});showToast('Ordering choices published. Offline kiosks receive them after reconnecting.');
+    } catch(error) {showToast((error as Error).message);} finally {setOrderingBusy(false);}
+  };
 
   return (
     <>
+      <SettingsSection title="Ordering choices" description="Guests skip screens with only one choice. A table binding is optional; leave it empty for a shared kiosk.">
+        <label className="block text-sm font-semibold mb-3">Apply to<select aria-label="Ordering choices scope" disabled={orderingBusy} value={orderingScope} onChange={e => setOrderingScope(e.target.value)} className="block min-h-12 w-full rounded-xl border border-jaman-border bg-white px-3 mt-1"><option value="branch">Branch defaults · all kiosks</option>{kiosks.map(kiosk => <option key={kiosk.id} value={kiosk.id}>{kiosk.name}</option>)}</select></label>
+        {orderingScope !== 'branch' && <div className="flex flex-wrap items-center gap-2 mb-3 text-sm"><span>{shared.orderingOverrides?.[orderingScope] ? 'Terminal override' : 'Following branch defaults'}</span><button type="button" disabled={orderingBusy || !shared.orderingOverrides?.[orderingScope]} onClick={() => void saveChoices(null)} className="min-h-11 px-3 rounded-xl border">Use branch defaults</button></div>}
+        <div className="flex flex-wrap gap-3">
+          {(['DINE_IN','TAKEAWAY'] as const).map(mode => <label key={mode} className="min-h-12 flex items-center gap-2 rounded-xl border border-jaman-border p-3 text-sm font-semibold"><input type="checkbox" disabled={orderingBusy} checked={(settings.allowedOrderTypes ?? ['DINE_IN','TAKEAWAY']).includes(mode)} onChange={e => {const current = settings.allowedOrderTypes ?? ['DINE_IN','TAKEAWAY'];void saveChoices({allowedOrderTypes:e.target.checked ? [...current,mode] : current.filter(t => t !== mode)});}}/>{mode === 'DINE_IN' ? 'Dine in' : 'Takeaway'}</label>)}
+        </div>
+        <label className="block text-sm font-semibold mt-3">Default table<select disabled={orderingBusy} value={settings.defaultTableId ?? ''} onChange={e => void saveChoices({defaultTableId:e.target.value})} className="block w-full mt-1 min-h-12 rounded-xl border border-jaman-border px-3 bg-white"><option value="">Let guests choose</option>{db.tables.filter(t => t.isActive !== false && t.status !== 'BLOCKED').map(t => <option key={t.id} value={t.id}>Table {t.tableNumber}</option>)}</select></label>
+      </SettingsSection>
       <SettingsSection
         title="Customer kiosk language & idle timeout"
         description="Which languages the self-order kiosk offers, and how long it waits before resetting an idle session."

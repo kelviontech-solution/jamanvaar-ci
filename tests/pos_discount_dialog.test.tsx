@@ -25,7 +25,7 @@ describe('discount checkout dialog', () => {
     CustomerRepository.updateProgramSettings({ earnPoints: 1, perRupeesSpent: 10, enabled: true });
     usePosStore.getState().setSelectedCustomer(guest); usePosStore.getState().selectLoyaltyReward('reward-100off'); usePosStore.getState().setIsPaymentOpen(true);
     act(() => root.render(<PosPaymentModal />));
-    const settle = [...container.querySelectorAll('button')].find(b => b.textContent?.includes('CONFIRM & SETTLE'))!;
+    const settle = container.querySelector<HTMLButtonElement>('button[aria-label="Confirm and settle payment"]')!;
     expect(settle.disabled).toBe(false); expect(settle.textContent).toContain('₹0');
     act(() => usePosStore.getState().setIsPaymentOpen(false));
   });

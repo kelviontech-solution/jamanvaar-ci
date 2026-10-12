@@ -57,7 +57,7 @@ export function KioskWelcomeDesignsCard() {
     finally { setBusy(false); }
   }
   return <Card className="settings-card" style={{ gridColumn: '1 / -1' }}>
-    <div className="settings-card-header"><div className="settings-icon-box"><ImagePlus size={20} /></div><div><h3 className="settings-card-title">Kiosk Welcome Designs</h3><p className="settings-card-desc">Manage the collection, restaurant allowances, and new backgrounds.</p></div></div>
+    <div className="settings-card-header"><div className="settings-card-icon"><ImagePlus size={20} /></div><div><h3 className="settings-card-title">Kiosk Welcome Designs</h3><p className="settings-card-desc">Manage the collection, restaurant allowances, and new backgrounds.</p></div></div>
     {message && <p role="status" style={{ ...border, background: '#fff5e7', color: '#70421b', marginBottom: 16 }}>{message}</p>}
     {!policy ? <p>Loading welcome collection…</p> : <fieldset disabled={busy || !writable} style={{ border: 0, padding: 0, minWidth: 0 }}>
       <div className="form-row"><label className="form-field">Design access scope<select aria-label="Design access scope" value={scope} onChange={e => setScope(e.target.value)}><option value="global">Platform default / all restaurants</option>{restaurants.map(r => <option key={r.id} value={r.id}>{r.name} · {r.restaurantCode || r.id.slice(0,8)}</option>)}</select></label><label className="form-field">{scope === 'global' ? 'Default maximum designs' : 'Restaurant maximum designs'}<Input aria-label="Maximum available welcome designs" type="number" min={1} max={100} value={limit} onChange={e => { const n = Number(e.target.value); if (n >= 1 && n <= 100) setAccess(selected || null, n); }} /></label></div>

@@ -470,10 +470,12 @@ describe('Captain service workflow', () => {
 
       expect(store().closeTable('6')).toBe(true);
       expect(t6).toMatchObject({ status: 'AVAILABLE', currentOrderId: undefined });
-      expect(OrderRepository.getOrderById(kioskOrder.id)!.orderStatus).toBe('COMPLETED');
+      expect(OrderRepository.getOrderById(kioskOrder.id)!.orderStatus).toBe('PREPARING');
+      expect(OrderRepository.getOrderById(kioskOrder.id)!.paymentStatus).toBe('PENDING');
+      expect(OrderRepository.getOrderById(kioskOrder.id)!.tableReleasedAt).toBeTruthy();
     });
 
-    it('freeing a table with a live KOT completes that order instead of leaving it open forever', async () => {
+    it('freeing a table preserves the live KOT and outstanding bill', async () => {
       await signIn();
       store().openTable('1', 2);
       addDish(0, 1);
@@ -484,7 +486,8 @@ describe('Captain service workflow', () => {
       expect(store().closeTable('1')).toBe(true);
 
       expect(table('1')).toMatchObject({ status: 'AVAILABLE', currentOrderId: undefined });
-      expect(OrderRepository.getOrderById(orderId)!.orderStatus).toBe('COMPLETED');
+      expect(OrderRepository.getOrderById(orderId)!.orderStatus).toBe('PREPARING');
+      expect(OrderRepository.getOrderById(orderId)!.tableReleasedAt).toBeTruthy();
     });
   });
 });

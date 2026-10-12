@@ -1,4 +1,5 @@
 import {ServiceRequests,PickupSelector} from './Operations';
+import { shouldRefreshGuestOrder } from './paymentProgress';
 import { LoyaltyPanel } from './LoyaltyPanel';
 import { GroupOrder } from './GroupOrder';
 import { OrderFeedback, GuestHistory } from './AdvancedGuest';
@@ -129,7 +130,7 @@ function Ordering({ token }: { token: string }) {
         network
           ? { title: 'No connection', text: err.message, retry: true }
           : err.code === 'MENU_NOT_PUBLISHED'
-            ? { title: 'The menu is not available yet', text: 'The restaurant is preparing its menu. Check again, or ask the team to publish it from Menu & Catalog.', retry: true }
+            ? { title: 'The menu is not available yet', text: 'The restaurant is preparing its menu. Try again shortly, or ask a team member to help you order at the counter.', retry: true }
             : { title: 'QR Ordering is currently unavailable', text: err.status === 410 && (err.code === 'QR_REVOKED' || err.code === 'QR_DISABLED') ? err.message : 'QR Ordering is currently unavailable for this restaurant. Please ask a team member.', retry: false }
       );
     }
@@ -526,7 +527,7 @@ function Checkout({ token, info, cart, setCart, onBack, onPlaced }: { token: str
 
 const STEPS: Array<[Placed['status'], string]> = [['RECEIVED', 'Order received'], ['PREPARING', 'Preparing'], ['READY', 'Ready'], ['COMPLETED', 'Completed']];
 
-function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Placed; setPlaced: (p: Placed) => void; showStatus: boolean; onMore: () => void }) {
+export function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Placed; setPlaced: (p: Placed) => void; showStatus: boolean; onMore: () => void }) {
   if (placed.currency) currencyCode = placed.currency;
   const [error,setError]=useState<string|null>(null);
   const [busy,setBusy]=useState(false);
@@ -552,13 +553,15 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
     finally{acting.current=false;if(mounted.current)setBusy(false);}
   };
   useEffect(() => {
-    if (placed.status === 'COMPLETED' || placed.status === 'CANCELLED' || (!showStatus && placed.status !== 'PENDING_PAYMENT')) return;
-    const t = setInterval(() => { void refresh(); }, 5000);
+    if (!shouldRefreshGuestOrder(placed, showStatus)) return;
+    // Keep automatic refresh bounded; explicit refresh remains available afterwards.
+    const deadline = Date.now() + 30 * 60 * 1000;
+    const t = setInterval(() => { if (Date.now() < deadline && !document.hidden) void refresh(); }, 5000);
     const onResume=()=>{if(!document.hidden)void refresh();};
     void refresh();
     window.addEventListener('focus',onResume);document.addEventListener('visibilitychange',onResume);
     return () => {clearInterval(t);window.removeEventListener('focus',onResume);document.removeEventListener('visibilitychange',onResume);};
-  }, [placed.publicOrderId, placed.status, setPlaced, showStatus]);
+  }, [placed.publicOrderId, placed.status, placed.paymentStatus, placed.payment?.status, placed.balance?.outstandingPaise, setPlaced, showStatus]);
   useEffect(()=>{const resume=(event:PageTransitionEvent)=>{if(event.persisted){setOpening(null);void refresh();}};window.addEventListener('pageshow',resume);return()=>window.removeEventListener('pageshow',resume);},[placed.publicOrderId]);
   if(opening)return <Message title="Opening secure payment" text="Finish payment in secure checkout. We will verify the result here." action={opening === 'STANDARD' ? undefined : {label:'Continue to Razorpay',run:()=>location.assign(opening)}} />;
   const at = STEPS.findIndex(([s]) => s === placed.status);
@@ -573,7 +576,8 @@ function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed: Place
         <ol className="steps">{STEPS.map(([s, label], i) => <li key={s} className={i <= at ? 'done' : ''}>{label}</li>)}</ol>
       )}
       {placed.status === 'CANCELLED' && <p className="warn">The restaurant could not take this order. Please ask a team member.</p>}
-      <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?'Payment verified':placed.paymentMethod==='ONLINE'?'Complete secure checkout to confirm your order. The kitchen receives it after payment is verified.':`Payment due at counter: ${inr(placed.total)}. Please pay our team.`}</p>
+      <p className="muted">{placed.payment?.status==='SUCCESS'||placed.paymentStatus==='SUCCESS'?(placed.paymentMethod==='ONLINE'?'Payment verified':'Payment received'):placed.paymentMethod==='ONLINE'?'Complete secure checkout to confirm your order. The kitchen receives it after payment is verified.':`Payment due at counter: ${inr(placed.balance ? placed.balance.outstandingPaise / 100 : placed.total)}. Please pay our team.`}</p>
+      {placed.status !== 'PENDING_PAYMENT' && <button className="link" disabled={busy} onClick={() => void refresh()}>Refresh order & payment</button>}
       {placed.status==='PENDING_PAYMENT'&&<>
         <button className="primary" disabled={busy} onClick={()=>void changePayment()}>{busy?'Checking…':placed.payment?.status==='FAILED'?'Try payment again':'Continue payment'}</button>
         <p className="muted">Choose UPI on secure Razorpay checkout, then select your preferred payment app. Return here to see the verified result.</p>

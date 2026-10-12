@@ -1,39 +1,7 @@
 import { create } from 'zustand';
-import {
-  Cart,
-  CartItem,
-  Category,
-  CustomerAccount,
-  DiningTable,
-  DraftCartSession,
-  HeldOrder,
-  InstantBillConfig,
-  KOTRecord,
-  ManagerOverrideAction,
-  MenuItem,
-  Order,
-  OrderType,
-  PaymentMethod,
-  PrintJob,
-  ReceiptPaperSize,
-  SelectedModifier,
-  ShiftRecord,
-  User,
-  PaymentSplit
-} from '@jamanvaar/types';
-import {
-  CustomerRepository,
-  AuditRepository,
-  db,
-  HeldOrderRepository,
-  KOTRepository,
-  OrderRepository,
-  PrintQueueRepository,
-  ReceiptRepository,
-  ShiftRepository,
-  StaffRepository,
-  InventoryRepository
-} from '@jamanvaar/database';
+import { Cart, CartItem, CustomerAccount, DiningTable, DraftCartSession, InstantBillConfig, KOTRecord, ManagerOverrideAction, MenuItem, Order, OrderType, PaymentMethod, SelectedModifier, User, PaymentSplit } from '@jamanvaar/types';
+import { CustomerRepository, AuditRepository, db, HeldOrderRepository, KOTRepository, OrderRepository, ReceiptRepository, StaffRepository, InventoryRepository } from '@jamanvaar/database';
+import { getTerminalId } from '@jamanvaar/database';
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
@@ -41,6 +9,7 @@ import { lanMeshSync, SyncOutboxEngine, StaffSession, verifyPinWithSync, type Re
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
 import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
+import { outstandingBillAmount } from '@jamanvaar/utils';
 
 export type PosTab =
   | 'MENU'
@@ -101,6 +70,8 @@ interface PosState {
 
   // Navigation & Filtering
   activeTab: PosTab;
+  orderInboxMode: 'ALL' | 'COLLECTIONS';
+  setOrderInboxMode: (mode: 'ALL' | 'COLLECTIONS') => void;
   selectedCategory: string; // 'ALL' or category id
   dietaryFilter: 'ALL' | 'VEG' | 'JAIN' | 'NON_VEG';
   searchQuery: string;
@@ -375,12 +346,13 @@ function findRunningOrder(state: { selectedTable: DiningTable | null; runningOrd
   const byRunning = state.runningOrderId ? OrderRepository.getOrderById(state.runningOrderId) : null;
   const found = byTable || byRunning || null;
   if (!found) return null;
-  if (found.paymentStatus === 'SUCCESS' || found.orderStatus === 'CANCELLED' || found.orderStatus === 'COMPLETED') return null;
+  if (found.paymentStatus === 'SUCCESS' || found.orderStatus === 'CANCELLED' || found.orderStatus === 'REFUNDED') return null;
   return found;
 }
 
 /** Brings an open order's lines and totals in line with the cart, and flags it for cloud sync. */
 function syncOrderToCart(order: Order, cart: Cart): void {
+  if (order.orderStatus === 'COMPLETED' || order.tableReleasedAt) return;
   // A partially collected QR bill keeps its canonical prices and reward reservation.
   if (order.paymentAllocationSummary?.collectedPaise || (order.source_type === "QR_TABLE" && order.discountAmount > 0)) return;
   order.items = cartLinesToOrderItems(cart.items, order.items).map((it) => ({ ...it, orderId: order.id }));
@@ -442,7 +414,7 @@ export const usePosStore = create<PosState>((set, get) => {
     // regardless of whether the terminal was locked before the reload —
     // restore the persisted lock state instead of hardcoding false.
     isLocked: initialAuthStatus === 'AUTHENTICATED' && Boolean(savedSession?.locked),
-    posTerminalId: savedSession?.terminalId || 'POS-01',
+    posTerminalId: getTerminalId('POS'),
     isOnline: true,
     hardwareStatus: {
       localDb: true,
@@ -453,6 +425,8 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     activeTab: (savedSession?.activeTab as PosTab) || 'MENU',
+    orderInboxMode: 'ALL',
+    setOrderInboxMode: (mode) => set({ orderInboxMode: mode }),
     selectedCategory: 'ALL',
     dietaryFilter: 'ALL',
     searchQuery: '',
@@ -513,7 +487,7 @@ export const usePosStore = create<PosState>((set, get) => {
           // security-audit LOW-05: restore the persisted lock state, not a
           // hardcoded unlocked — see lockTerminal/unlockTerminal below.
           isLocked: Boolean(session.locked),
-          posTerminalId: session.terminalId || get().posTerminalId,
+          posTerminalId: getTerminalId('POS'),
           activeTab: (session.activeTab as PosTab) || get().activeTab
         });
       } else {
@@ -927,45 +901,11 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     applyBillDiscountPercent: (percent: number) => {
-      const state = get();
-      const updatedCart = recomputeCart(state.cart.items, 'PERCENTAGE', percent, 'BILL', 'Bill Discount');
-      set({
-        discountType: 'PERCENTAGE',
-        discountValue: percent,
-        discountScope: 'BILL',
-        discountReason: 'Bill Discount',
-        billDiscountPercent: percent,
-        billDiscountFlat: 0,
-        cart: updatedCart
-      });
-
-      AuditRepository.log({
-        action: 'DISCOUNT_APPLIED',
-        category: 'FINANCIAL',
-        details: `Applied ${percent}% bill discount (-₹${updatedCart.discountAmount})`,
-        username: state.currentUser?.fullName || 'Cashier'
-      });
+      get().applyDiscount({ scope: 'BILL', type: 'PERCENTAGE', value: percent, reason: 'Bill Discount' });
     },
 
     applyBillDiscountFlat: (amount: number) => {
-      const state = get();
-      const updatedCart = recomputeCart(state.cart.items, 'FIXED', amount, 'BILL', 'Flat Bill Discount');
-      set({
-        discountType: 'FIXED',
-        discountValue: amount,
-        discountScope: 'BILL',
-        discountReason: 'Flat Bill Discount',
-        billDiscountPercent: 0,
-        billDiscountFlat: amount,
-        cart: updatedCart
-      });
-
-      AuditRepository.log({
-        action: 'DISCOUNT_APPLIED',
-        category: 'FINANCIAL',
-        details: `Applied flat discount of ₹${amount}`,
-        username: state.currentUser?.fullName || 'Cashier'
-      });
+      get().applyDiscount({ scope: 'BILL', type: 'FIXED', value: amount, reason: 'Flat Bill Discount' });
     },
 
     applyDiscount: (params: {
@@ -1161,6 +1101,10 @@ export const usePosStore = create<PosState>((set, get) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
 
+      const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
+      const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
+      if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED','REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Refresh the order and open its receipt; do not collect payment again.');
+
       // Only what has not been sent yet goes to the kitchen. Once everything is
       // sent there is nothing to do - this used to create a duplicate order and
       // a duplicate kitchen ticket on every press.
@@ -1270,6 +1214,9 @@ export const usePosStore = create<PosState>((set, get) => {
     completePayment: (method: PaymentMethod, tenderedAmount?: number, transactionId?: string, splits?: PaymentSplit[]) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
+      const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
+      const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
+      if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED','REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Refresh the order and open its receipt; do not collect payment again.');
 
       CustomerRepository.validateOrderRedemption({ loyaltyRedemption: state.cart.loyaltyRedemption, customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone, discountAmount: state.cart.discountAmount });
       // 1. Settle the running order if there is one (items added after the KOT
@@ -1492,7 +1439,7 @@ export const usePosStore = create<PosState>((set, get) => {
     // in Live Orders has none at all).
     loadOrderForSettlement: (orderId: string) => {
       const order = OrderRepository.getOrderById(orderId);
-      if (!order) return false;
+      if (!order || outstandingBillAmount(order) === 0) return false;
 
       const table = db.tables.find((t) => t.currentOrderId === orderId) ?? null;
 
@@ -1543,7 +1490,8 @@ export const usePosStore = create<PosState>((set, get) => {
       set({
         selectedTable: table,
         orderType: table ? 'DINE_IN' : order.orderType,
-        cart: { ...updatedCart, loyaltyRedemption: order.loyaltyRedemption },
+        runningOrderId: order.id,
+        cart: { ...updatedCart, subtotal:order.subtotal, discountAmount:order.discountAmount, cgstAmount:order.cgstAmount, sgstAmount:order.sgstAmount, taxAmount:order.taxAmount, totalPayable:order.totalAmount, roundOffAmount:order.roundOffAmount, loyaltyRedemption: order.loyaltyRedemption },
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });

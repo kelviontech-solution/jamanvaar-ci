@@ -1,7 +1,7 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useEffect} from 'react';
 import { usePosStore } from '../../store/posStore';
-import { X, MessageSquare, Plus, Check } from 'lucide-react';
+import { X, MessageSquare, Check } from 'lucide-react';
 
 interface PosOrderNotesModalProps {
   isOpen: boolean;

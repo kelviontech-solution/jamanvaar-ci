@@ -4,23 +4,7 @@ import { db, MenuRepository } from '@jamanvaar/database';
 import { MenuItem } from '@jamanvaar/types';
 import { usePosStore } from '../../store/posStore';
 import { formatINR } from '@jamanvaar/utils';
-import {
-  Package,
-  Search,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Eye,
-  EyeOff,
-  Filter,
-  Check,
-  X,
-  Sparkles,
-  Utensils,
-  ChevronDown,
-  ShieldCheck,
-  AlertCircle
-} from 'lucide-react';
+import { Package, Search, CheckCircle2, Eye, EyeOff, Filter, Check, X, Utensils, AlertCircle } from 'lucide-react';
 
 type AvailabilityFilter = 'ALL' | 'AVAILABLE' | 'UNAVAILABLE' | 'LOW_STOCK' | 'OUT_OF_STOCK';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
 import { db, AuditRepository, scanMenuDuplicates, archiveConfirmedDuplicates, captureMenuCleanupBackup, restoreMenuCleanupBackup, menuCleanupReportIsCurrent, type MenuCleanupReport } from '@jamanvaar/database';
 import { applyMenuCsv, type MenuCsvPreview } from '@jamanvaar/business';

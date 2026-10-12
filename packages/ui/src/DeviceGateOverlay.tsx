@@ -1,6 +1,6 @@
 import { NativeUpdateButton } from './NativeUpdateButton';
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
-import { Lock, WifiOff, RefreshCw, Download } from 'lucide-react';
+import { Lock, WifiOff, RefreshCw } from 'lucide-react';
 import { AppUpdate, DeviceGate, type DeviceGateCode } from '@jamanvaar/sync';
 
 export interface DeviceGateOverlayProps {

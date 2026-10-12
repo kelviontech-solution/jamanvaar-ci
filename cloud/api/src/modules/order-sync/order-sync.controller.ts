@@ -2,10 +2,12 @@ import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards, Use
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { OrderSyncService } from './order-sync.service';
+import { OrderSyncAdmission } from './order-sync-admission';
 import { pushOrderSyncSchema, PushOrderSyncDto } from './dto/push-order-sync.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { DeviceAuthGuard } from '../../common/guards/device-auth.guard';
 import { CurrentDevice } from '../../common/decorators/current-device.decorator';
+import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 
 // Any activated device on the tenant (POS, KDS, Captain, ...) can push or
 // pull here — unlike payments' Kiosk-only gate, order sync is deliberately
@@ -34,5 +36,17 @@ export class OrderSyncController {
       throw new BadRequestException('afterSeq must be a non-negative integer');
     }
     return this.orderSync.catchUp(device, since, parsed);
+  }
+}
+
+/** Operating figures for platform staff: how the device order-sync admission gate is behaving on this instance. */
+@Controller('api/v1/orders/sync/runtime')
+@UseGuards(PlatformAuthGuard)
+export class OrderSyncRuntimeController {
+  constructor(private readonly admission: OrderSyncAdmission) {}
+
+  @Get()
+  runtime() {
+    return { admission: this.admission.stats };
   }
 }

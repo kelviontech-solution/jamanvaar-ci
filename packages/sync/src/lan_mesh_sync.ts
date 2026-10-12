@@ -1,15 +1,6 @@
-import {
-  Order,
-  KOTRecord,
-  MenuItem,
-  Category,
-  DiningTable,
-  User,
-  SyncEventType,
-  SyncEventStatus
-} from '@jamanvaar/types';
+import { Order, KOTRecord } from '@jamanvaar/types';
 import { generateUUID } from '@jamanvaar/utils';
-import { db, JamanvaarDatabase, NotificationRepository, KeyValueStore } from '@jamanvaar/database';
+import { db, JamanvaarDatabase, NotificationRepository, KeyValueStore, getTerminalId } from '@jamanvaar/database';
 
 export type MeshDeviceRole = 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK_USER' | 'KIOSK_ADMIN';
 
@@ -60,7 +51,7 @@ export class LanMeshSyncEngine {
   private static instance: LanMeshSyncEngine;
   private channel: BroadcastChannel | null = null;
   private deviceRole: MeshDeviceRole = 'POS_ADMIN';
-  private deviceId: string = 'ADMIN-01';
+  private deviceId: string = `ADMIN-${generateUUID()}`;
   private deviceName: string = 'Restaurant Admin Center';
   private isOnline: boolean = true;
   private listeners: Map<string, Set<MeshEventListener>> = new Map();
@@ -93,7 +84,7 @@ export class LanMeshSyncEngine {
    */
   public registerDevice(role: MeshDeviceRole, deviceId?: string, name?: string): void {
     this.deviceRole = role;
-    if (deviceId) this.deviceId = deviceId;
+    this.deviceId = deviceId ?? getTerminalId(role);
     if (name) this.deviceName = name;
 
     // Broadcast initial join heartbeat
@@ -567,12 +558,8 @@ export class LanMeshSyncEngine {
           day.closedAt = closedAt || new Date().toISOString();
           if (closedBy) day.closedBy = closedBy;
         }
-        dbInst.shifts.forEach((s) => {
-          if (s.status === 'OPEN') {
-            s.status = 'CLOSED';
-            s.closedAt = closedAt || new Date().toISOString();
-          }
-        });
+        // A day-close notification is not a cashier count. Register state
+        // follows the individually reconciled shift record through entity sync.
         if (!isOriginator) {
           NotificationRepository.createNotification({
             type: 'BUSINESS_DAY_CLOSED',
@@ -587,7 +574,7 @@ export class LanMeshSyncEngine {
       }
 
       case 'BUSINESS_DAY_STARTED': {
-        const { businessDayId, businessDate, displayDate, openedBy, openingCash } = payload || {};
+        const { businessDayId, businessDate, displayDate, openedBy, openingCash, terminalId } = payload || {};
         const existing = dbInst.businessDays.find((d) => d.id === businessDayId);
         if (!existing && businessDayId) {
           dbInst.businessDays.unshift({
@@ -597,7 +584,7 @@ export class LanMeshSyncEngine {
             openedAt: new Date().toISOString(),
             openedBy: openedBy || 'Manager',
             status: 'OPEN',
-            openingCash: openingCash || 2000,
+            openingCash: openingCash ?? 0,
             cashIn: 0,
             cashOut: 0,
             grossSales: 0,
@@ -617,17 +604,17 @@ export class LanMeshSyncEngine {
             takeawayCount: 0,
             deliveryCount: 0,
             tokenCount: 0,
-            terminalId: 'POS-01',
+            terminalId: terminalId ?? event.deviceId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           });
         }
-        dbInst.kots = dbInst.kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING' || k.status === 'ACCEPTED');
+        // Keep kitchen history until the originating day is reconciled.
         if (!isOriginator) {
           NotificationRepository.createNotification({
             type: 'BUSINESS_DAY_STARTED',
             title: `☀️ NEW BUSINESS DAY STARTED (${displayDate || 'Day'})`,
-            message: `Business day ${displayDate || ''} is now active. Token sequence reset to #101.`,
+            message: `Business day ${displayDate || ''} is now active.`,
             targetRoles: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS'],
             priority: 'NORMAL'
           });

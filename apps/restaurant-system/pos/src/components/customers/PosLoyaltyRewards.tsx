@@ -12,7 +12,10 @@ export const PosLoyaltyRewards: React.FC = () => {
   const customer = CustomerRepository.getByPhone(selectedCustomer?.phone ?? '');
   if (!customer) return null;
   const enabled = CustomerRepository.getProgramSettings().enabled !== false;
+  const eligible = enabled ? CustomerRepository.getRewards().filter(reward => reward.isActive && customer.loyaltyPoints >= reward.pointsCost && CustomerRepository.rewardDiscount(reward, cart.items, cart.subtotal) > 0).sort((a,b) => CustomerRepository.rewardDiscount(b, cart.items, cart.subtotal) - CustomerRepository.rewardDiscount(a, cart.items, cart.subtotal))[0] : undefined;
   return (
+    <div className="col-span-full w-full">
+    {eligible && !cart.loyaltyRedemption && <div className="flex flex-wrap items-center justify-between gap-2 mb-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm"><span><strong>{eligible.name}</strong> · Save {formatINR(CustomerRepository.rewardDiscount(eligible,cart.items,cart.subtotal))} for {eligible.pointsCost} points</span><button type="button" onClick={() => {try {selectLoyaltyReward(eligible.id);setError('');} catch(e) {setError(e instanceof Error ? e.message : 'Unable to apply reward');}}} className="min-h-11 px-4 rounded-xl bg-emerald-700 text-white font-bold">Use reward</button><span className="text-xs text-slate-600">Keep your points by continuing without a reward.</span></div>}
     <details className="col-span-full w-full rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs" data-testid="loyalty-rewards">
       <summary className="cursor-pointer font-bold text-emerald-800 flex items-center gap-2">
         <Gift className="w-4 h-4" />
@@ -41,7 +44,8 @@ export const PosLoyaltyRewards: React.FC = () => {
           {CustomerRepository.getRewards().length === 0 && <p>No rewards have been configured in Restaurant Admin.</p>}
         </div>
       )}
-      {error && <p role="alert" className="mt-2 text-rose-700">{error}</p>}
     </details>
+    {error && <p role="alert" className="mt-2 text-rose-700">{error}</p>}
+    </div>
   );
 };

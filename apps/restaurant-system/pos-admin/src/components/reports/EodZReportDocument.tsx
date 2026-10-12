@@ -1,37 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { printElement } from '@jamanvaar/ui';
 import { EodReport } from '@jamanvaar/types';
-import { formatINR, formatDate, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
+import { formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { db } from '@jamanvaar/database';
 import { EodReportService, DayOrdersService } from '@jamanvaar/business';
-import {
-  Printer,
-  FileText,
-  Lock,
-  RotateCcw,
-  CheckCircle2,
-  AlertTriangle,
-  Receipt,
-  Calendar,
-  Clock,
-  User,
-  Users,
-  DollarSign,
-  CreditCard,
-  Building,
-  Phone,
-  Mail,
-  ShieldCheck,
-  Percent,
-  Layers,
-  Flame,
-  Award,
-  ChevronDown,
-  Sparkles,
-  Download
-} from 'lucide-react';
+import { Printer, FileText, Lock } from 'lucide-react';
 
 interface EodZReportDocumentProps {
   initialReport?: EodReport;
@@ -51,7 +26,7 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
   
   // Default to current business day
   const defaultDateKey = useMemo(() => {
-    return initialReport?.businessDate || DayOrdersService.getBusinessDateKey(new Date(), 6);
+    return initialReport?.businessDate || DayOrdersService.getBusinessDateKey(new Date());
   }, [initialReport]);
 
   const [selectedDate, setSelectedDate] = useState<string>(defaultDateKey);
@@ -61,9 +36,9 @@ export const EodZReportDocument: React.FC<EodZReportDocumentProps> = ({
   const availableDates = useMemo(() => {
     const dates = new Set<string>();
     db.orders.forEach((o) => {
-      dates.add(DayOrdersService.getBusinessDateKey(o.createdAt, 6));
+      dates.add(DayOrdersService.getBusinessDateKey(o.createdAt));
     });
-    dates.add(DayOrdersService.getBusinessDateKey(new Date(), 6));
+    dates.add(DayOrdersService.getBusinessDateKey(new Date()));
     return Array.from(dates).sort((a, b) => b.localeCompare(a)).slice(0, 6);
   }, []);
 

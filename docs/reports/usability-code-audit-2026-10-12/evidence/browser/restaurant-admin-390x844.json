@@ -1,0 +1,78 @@
+{
+  "name": "restaurant-admin",
+  "route": "/",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "title": "JAMANVAAR | Owner Sign-in",
+  "headings": [
+    "Restaurant Control. Live Intelligence.",
+    "JAMANVAAR"
+  ],
+  "text": "Local Core: Unreachable\nPair\nNetwork: Online\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind it in Super Admin: Restaurants, open the restaurant, Restaurant ID (with a Copy button).\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nYOUR RESTAURANT ACCOUNT\n\nOWNER SIGN-IN\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "horizontalOverflow": false,
+  "buttons": [
+    {
+      "text": "Pair",
+      "aria": null,
+      "width": 34,
+      "height": 24
+    },
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "width": 112,
+      "height": 62
+    },
+    {
+      "text": "Show Password",
+      "aria": null,
+      "width": 100,
+      "height": 44
+    },
+    {
+      "text": "Forgot password?",
+      "aria": null,
+      "width": 112,
+      "height": 44
+    },
+    {
+      "text": "Sign In",
+      "aria": null,
+      "width": 302,
+      "height": 48
+    },
+    {
+      "text": "Set your password from the welcome email",
+      "aria": null,
+      "width": 260,
+      "height": 44
+    }
+  ],
+  "images": [
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "loaded": true
+    },
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "loaded": true
+    },
+    {
+      "alt": "Tandoori Naan",
+      "loaded": true
+    },
+    {
+      "alt": "Paneer Butter Masala",
+      "loaded": true
+    },
+    {
+      "alt": "Tandoori Angaar",
+      "loaded": true
+    },
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "loaded": true
+    }
+  ],
+  "blockedRequests": 8,
+  "errors": []
+}

@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-12T12:28:17.824Z",
+  "tests": {
+    "files": 63,
+    "passed": 195,
+    "failed": 0
+  },
+  "browser": {
+    "fixtures": 13,
+    "scope": "Actual React components, isolated local fixture data, all backend/external requests blocked. Does not verify production authentication, real gateway payment, or cross-device server delivery.",
+    "failures": 0
+  },
+  "builds": [
+    {
+      "app": "POS",
+      "path": "apps/restaurant-system/pos",
+      "exitCode": 0,
+      "durationSeconds": 14
+    },
+    {
+      "app": "Restaurant-Kiosk-QR-Admin",
+      "path": "apps/restaurant-system/pos-admin",
+      "exitCode": 0,
+      "durationSeconds": 16
+    },
+    {
+      "app": "Captain",
+      "path": "apps/restaurant-system/captain",
+      "exitCode": 0,
+      "durationSeconds": 14
+    },
+    {
+      "app": "KDS",
+      "path": "apps/restaurant-system/kds",
+      "exitCode": 0,
+      "durationSeconds": 15
+    },
+    {
+      "app": "Kiosk",
+      "path": "apps/kiosk-system/kiosk-user",
+      "exitCode": 0,
+      "durationSeconds": 13
+    },
+    {
+      "app": "QR-Guest",
+      "path": "apps/qr-guest",
+      "exitCode": 0,
+      "durationSeconds": 8
+    },
+    {
+      "app": "Super-Admin",
+      "path": "cloud/super-admin-web",
+      "exitCode": 0,
+      "durationSeconds": 16
+    }
+  ],
+  "finalPosBuild": {
+    "app": "POS",
+    "exitCode": 0,
+    "checkedAt": "2026-10-12T12:27:59.281Z"
+  },
+  "rootTypecheck": "pass",
+  "diffCheck": "pass",
+  "deployed": false,
+  "githubPush": false,
+  "remaining": "See NEXT_GAPS_IMPLEMENTATION.md; partial enhancements and newly found issues are explicitly retained."
+}

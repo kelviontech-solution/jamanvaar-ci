@@ -164,7 +164,7 @@ export function OnlinePaymentsPanel() {
   }
 
   async function handleRefund() {
-    if (!refundFor) return;
+    if (!refundFor || busyId === refundFor.id) return;
     const paise = Math.round(Number(refundAmount) * 100);
     if (!Number.isFinite(paise) || paise < 1 || paise > refundFor.refundableAmount) {
       setMessage(`Enter an amount between ₹0.01 and ${rupees(refundFor.refundableAmount)}.`);
@@ -177,8 +177,10 @@ export function OnlinePaymentsPanel() {
     setBusyId(refundFor.id);
     setMessage('');
     try {
-      await createRefund(refundFor.id, paise, refundReason.trim(), staff?.fullName ?? 'Restaurant Admin', refundMethod);
-      setMessage(`Refund of ${rupees(paise)} recorded as paid to the customer by ${refundMethod === 'CASH' ? 'cash' : 'UPI from the owner account'}.`);
+      const refund = await createRefund(refundFor.id, paise, refundReason.trim(), staff?.fullName ?? 'Restaurant Admin', refundMethod);
+      setMessage(refund.status === 'SUCCESS'
+        ? `Refund of ${rupees(paise)} recorded as paid to the customer by ${refundMethod === 'CASH' ? 'cash' : 'UPI from the owner account'}.`
+        : 'Refund recorded; confirmation is pending. Check the ledger before returning any more money.');
       setRefundFor(null);
       setRefundReason('');
       load(); loadPayouts(); loadStatement(date);

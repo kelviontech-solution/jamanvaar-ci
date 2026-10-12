@@ -15,6 +15,11 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     testTimeout: 20000,
     fileParallelism: false,
+    // The default reporter collapses a passing test's own console.log output, which has
+    // silently hidden real load-test numbers before (see docs/reports/robustness-scalability-
+    // audit-2026-10-11). 'verbose' always prints it; override with --reporter=default for a
+    // quiet run.
+    reporters: ['verbose'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/target/**']
   },
   resolve: {

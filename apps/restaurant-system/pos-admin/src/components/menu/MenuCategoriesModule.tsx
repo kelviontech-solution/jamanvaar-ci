@@ -2,7 +2,7 @@ import { CachedImg, MenuCategoryIcon } from '@jamanvaar/ui';
 import { isMenuPlaceholder, menuDishImage, menuCategoryImage } from '@jamanvaar/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { Category, MenuItem, ComboDeal } from '@jamanvaar/types';
-import { db, MenuRepository, ComboRepository, AuditRepository, PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
+import { db, MenuRepository, ComboRepository, AuditRepository } from '@jamanvaar/database';
 import { MenuBuilderService, previewMenuCsv, MENU_CSV_SAMPLE, type MenuCsvPreview } from '@jamanvaar/business';
 import { MenuCsvPreviewModal, MenuDuplicateModal, downloadMenuFile } from './MenuImportModals';
 import { publishMenuToGuests, MenuPublishRefused } from '../../cloud/cloudClient';
@@ -107,8 +107,8 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
     setPublishing(true); setPublicationMessage('Sending your menu and publishing it for guests…');
     try {
       const result = await publishMenuToGuests('Publish from menu manager');
-      setPublicationMessage(`Menu version ${result.version} published to QR ordering and connected terminals.${result.warnings.length ? ' '+result.warnings.join(' ') : ''}`);
-      showToast('Menu published to QR ordering and connected terminals.');
+      setPublicationMessage(`Menu version ${result.version} published on the server. Check Connections & sync for terminal acknowledgements; offline devices update after reconnecting.${result.warnings.length ? ' '+result.warnings.join(' ') : ''}`);
+      showToast('Menu published. Terminal delivery is confirmed in Connections & sync.');
     } catch (error) {
       setPublicationMessage(error instanceof MenuPublishRefused ? `${error.message}: ${error.errors.join(' ')}` : (error as Error).message);
     } finally { setPublishing(false); }

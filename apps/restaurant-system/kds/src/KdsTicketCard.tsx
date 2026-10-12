@@ -1,4 +1,5 @@
 import React from 'react';
+import { useStaffLanguage } from '@jamanvaar/ui';
 import type { KOTItem, KOTRecord } from '@jamanvaar/types';
 import { Flame, Bell, CheckCheck, Check, Clock, AlertTriangle, AlertCircle, RotateCcw, X, Undo2, Printer } from 'lucide-react';
 import { COURSE_LABEL, dishAllergy, effectiveItemStatus, allergyText, type TicketAge } from './kdsLogic';
@@ -26,6 +27,7 @@ interface Props {
 const BTN = 'w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer';
 
 export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, captainHandlesService, onRecall, onDismiss, priority, onPriority, onReprint }) => {
+  const {t} = useStaffLanguage();
   const cancelled = kot.status === 'CANCELLED';
   const isReady = kot.status === 'READY';
   const isServed = kot.status === 'SERVED';
@@ -65,13 +67,13 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         {cancelled && (
           <div className="rounded-2xl bg-rose-600 text-white px-3 py-2 text-xs sm:text-sm font-black flex items-center gap-2 animate-pulse" role="alert">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>CANCELLED: stop cooking this ticket</span>
+            <span> {t("CANCELLED: stop cooking this ticket")} </span>
           </div>
         )}
         {hasCancelledDish && (
           <div className="rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 px-3 py-1.5 text-[11px] sm:text-xs font-black flex items-center gap-2" role="alert">
             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            <span>A dish on this ticket was cancelled: do not cook it.</span>
+            <span> {t("A dish on this ticket was cancelled: do not cook it.")} </span>
           </div>
         )}
 
@@ -97,7 +99,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           <select aria-label={`Priority for token ${kot.tokenNumber}`} value={priority} disabled={cancelled || isServed}
             onChange={e => onPriority(kot, e.target.value as 'NORMAL' | 'URGENT')}
             className={`min-h-[44px] min-w-0 rounded-xl border px-2 text-xs font-bold ${priority === 'URGENT' ? 'bg-rose-50 text-rose-800 border-rose-300' : 'bg-jaman-cream text-jaman-navy border-jaman-border'}`}>
-            <option value="NORMAL">Normal priority</option><option value="URGENT">Urgent · cook first</option>
+            <option value="NORMAL"> {t("Normal priority")} </option><option value="URGENT"> {t("Urgent · cook first")} </option>
           </select>
           {!isServed && !cancelled && (
             <span
@@ -122,11 +124,11 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
             <span className="inline-block h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
               <span className="block h-full bg-emerald-500" style={{ width: `${Math.round((progress.ready / progress.total) * 100)}%` }} />
             </span>
-            <span className="font-mono">{progress.ready}/{progress.total} of the order ready</span>
+            <span className="font-mono">{progress.ready}/{progress.total} {t("of the order ready")} </span>
           </div>
         )}
 
-        {kot.pickupAt&&<div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm font-bold text-indigo-900">Scheduled pickup: {new Date(kot.pickupAt).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}<p className="mt-1 text-xs">Start preparation by {new Date(Date.parse(kot.pickupAt)-age.prep*60000).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}</p></div>}
+        {kot.pickupAt&&<div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm font-bold text-indigo-900"> {t("Scheduled pickup:")} {new Date(kot.pickupAt).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}<p className="mt-1 text-xs"> {t("Start preparation by")} {new Date(Date.parse(kot.pickupAt)-age.prep*60000).toLocaleString(undefined,{timeZone:kot.pickupTimezone})}</p></div>}
         {kot.orderNotes && (
           <div className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-start gap-1.5 border ${allergyText(kot.orderNotes) ? 'bg-rose-100 text-rose-900 border-rose-400' : 'bg-amber-100/80 text-amber-900 border-amber-300/60'}`}>
             <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -176,7 +178,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
                         <span className="text-[10px] font-black uppercase bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">{COURSE_LABEL[it.course] ?? it.course}</span>
                       )}
                     </span>
-                    {gone && <span className="block text-xs font-black text-rose-700 mt-0.5">CANCELLED{it.cancelReason ? `: ${it.cancelReason}` : ''}</span>}
+                    {gone && <span className="block text-xs font-black text-rose-700 mt-0.5"> {t("CANCELLED")} {it.cancelReason ? `: ${it.cancelReason}` : ''}</span>}
                     {!gone && it.modifiers && it.modifiers.length > 0 && (
                       <span className="block text-sm font-bold text-slate-800 pt-0.5">
                         {it.modifiers.map((m, i) => (
@@ -197,7 +199,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
           })}
         </ul>
         {ticketAllergy && !cancelled && (
-          <p className="text-[11px] font-black text-rose-700 uppercase tracking-wide flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Allergy or diet request on this ticket</p>
+          <p className="text-[11px] font-black text-rose-700 uppercase tracking-wide flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {t("Allergy or diet request on this ticket")} </p>
         )}
       </div>
 
@@ -209,38 +211,36 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
 
         {cancelled && (
           <button type="button" onClick={() => onDismiss(kot)} className={`${BTN} bg-rose-600 hover:bg-rose-700 text-white shadow-md`}>
-            <Check className="w-4 h-4" /> Got it: dismiss
-          </button>
+            <Check className="w-4 h-4" /> {t("Got it: dismiss")} </button>
         )}
 
         {isPending && (
           <button type="button" onClick={() => onStart(kot)} className={`${BTN} bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/25`}>
-            <Flame className="w-4 h-4" /> Start cooking
+            <Flame className="w-4 h-4" /> {t('Start Cooking')}
           </button>
         )}
 
         {isPreparing && (
           <button type="button" onClick={() => onAllReady(kot)} className={`${BTN} bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md shadow-emerald-600/25`}>
-            <Bell className="w-4 h-4" /> All dishes ready
+            <Bell className="w-4 h-4" /> {t('All Dishes Ready')}
           </button>
         )}
 
         {isReady && (
           <div className="flex gap-2">
             <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Marked ready by mistake? Put it back to cooking">
-              <Undo2 className="w-4 h-4" /> Undo
+              <Undo2 className="w-4 h-4" /> {t('Undo')}
             </button>
             {kitchenMayServe ? (
               <button type="button" onClick={() => onServe(kot)} className={`${BTN} bg-gradient-to-r from-jaman-navy to-jaman-darkBorder text-white shadow-md shadow-slate-900/20`}>
-                <CheckCheck className="w-4 h-4 text-emerald-400" /> Served
+                <CheckCheck className="w-4 h-4 text-emerald-400" /> {t('Served')}
               </button>
             ) : (
               <div
                 className="w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 bg-amber-50 border border-amber-300 text-amber-800"
                 title="Only the captain who delivers this dish to the table marks it served"
               >
-                <Bell className="w-4 h-4" /> Waiting for captain
-              </div>
+                <Bell className="w-4 h-4" /> {t("Waiting for captain")} </div>
             )}
           </div>
         )}
@@ -248,11 +248,10 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         {isServed && (
           <div className="flex items-center gap-2">
             <div className="flex-1 min-h-[44px] rounded-2xl bg-slate-100 text-slate-500 font-bold text-xs flex items-center justify-center gap-1.5">
-              <Check className="w-4 h-4 text-emerald-600" /> Served
+              <Check className="w-4 h-4 text-emerald-600" /> {t('Served')}
             </div>
             <button type="button" onClick={() => onRecall(kot)} className={`${BTN} !w-auto shrink-0 whitespace-nowrap px-4 bg-white text-slate-700 border border-jaman-border hover:bg-slate-50`} title="Served by mistake? Bring the ticket back">
-              <RotateCcw className="w-4 h-4" /> Recall
-            </button>
+              <RotateCcw className="w-4 h-4" /> {t("Recall")} </button>
           </div>
         )}
       </div>

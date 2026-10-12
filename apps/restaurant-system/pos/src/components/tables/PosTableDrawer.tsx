@@ -3,20 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, OrderRepository, TableRepository } from '@jamanvaar/database';
 import { DiningTable } from '@jamanvaar/types';
-import {
-  X,
-  Plus,
-  ArrowRightLeft,
-  Merge,
-  CreditCard,
-  CheckCircle2,
-  Trash2,
-  Users,
-  Clock,
-  Send,
-  Receipt,
-  FileText
-} from 'lucide-react';
+import { X, Plus, ArrowRightLeft, Merge, CreditCard, CheckCircle2, Trash2 } from 'lucide-react';
 
 interface PosTableDrawerProps {
   table: DiningTable;
@@ -81,12 +68,6 @@ export const PosTableDrawer: React.FC<PosTableDrawerProps> = ({ table, onClose }
 
   const handleMarkAvailable = () => {
     TableRepository.updateTableStatus(table.id, 'AVAILABLE');
-    if (table.currentOrderId) {
-      const ord = OrderRepository.getOrderById(table.currentOrderId);
-      if (ord && (ord.orderStatus === 'PREPARING' || ord.orderStatus === 'READY')) {
-        OrderRepository.updateOrderStatus(ord.id, 'COMPLETED', 'Table Vacated');
-      }
-    }
     onClose();
   };
 

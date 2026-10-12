@@ -1,23 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
+import { ReceiptRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../../services/printerService';
 import { EBillService } from '@jamanvaar/api';
 import { sendReceipt, whatsappReceipt } from '../../cloud/cloudClient';
 import { ThermalReceiptView } from '@jamanvaar/ui';
-import {
-  X,
-  Printer,
-  Phone,
-  Mail,
-  QrCode,
-  CheckCircle2,
-  AlertTriangle,
-  Download,
-  RotateCcw,
-  Sliders,
-  Share2
-} from 'lucide-react';
+import { X, Printer, Phone, Mail, CheckCircle2, AlertTriangle, Download, RotateCcw } from 'lucide-react';
 
 export const PosThermalReceiptModal: React.FC = () => {
   const {

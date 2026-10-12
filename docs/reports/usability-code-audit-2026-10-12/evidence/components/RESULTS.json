@@ -1,0 +1,570 @@
+{
+  "checkedAt": "2026-10-12T08:30:34.458Z",
+  "scope": "Actual React components, isolated local fixture data, all backend/external requests blocked. Does not verify production authentication, real gateway payment, or cross-device server delivery.",
+  "results": [
+    {
+      "mode": "pos",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Billing\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nKitchen & KOT\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nTable service requests\nOutstanding bills\nAll business dates\n\nCollect outstanding balances from kiosk, QR, captain and counter orders. Completed service does not mean paid.\n\nActive Session (1)\nAll History (2)\nAll orders\nOutstanding bills · 1 · ₹250\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#AUDIT-OLD\nToken #K-91\nTAKEAWAY\nKiosk (KIOSK_USER-db2aa4ad-42c1-4371-962f-0247d8c7340c)\n02:00 PM\n•\n1 items\n₹250\nCOMPLETED\nPayment due ₹250\nSettle\n\nSelect an order from the list to view full itemized breakdown and print receipt.",
+      "buttons": [
+        {
+          "text": "Billing",
+          "height": 54
+        },
+        {
+          "text": "Orders",
+          "height": 54
+        },
+        {
+          "text": "Tables",
+          "height": 54
+        },
+        {
+          "text": "Collect",
+          "height": 54
+        },
+        {
+          "text": "Billing / Menu",
+          "height": 44
+        },
+        {
+          "text": "Floor & Tables",
+          "height": 44
+        },
+        {
+          "text": "Live Orders",
+          "height": 44
+        },
+        {
+          "text": "Bills & Invoices",
+          "height": 44
+        },
+        {
+          "text": "Kitchen & KOT",
+          "height": 44
+        },
+        {
+          "text": "Customers CRM",
+          "height": 44
+        },
+        {
+          "text": "Shift & Cash",
+          "height": 44
+        },
+        {
+          "text": "Day History",
+          "height": 44
+        },
+        {
+          "text": "POS Reports",
+          "height": 44
+        },
+        {
+          "text": "Inventory & Stock",
+          "height": 44
+        },
+        {
+          "text": "Settings",
+          "height": 44
+        },
+        {
+          "text": "JAMAN AI AssistantAI",
+          "height": 38
+        },
+        {
+          "text": "Print Queue",
+          "height": 34
+        },
+        {
+          "text": "Active Session (1)",
+          "height": 28
+        },
+        {
+          "text": "All History (2)",
+          "height": 28
+        },
+        {
+          "text": "All orders",
+          "height": 44
+        },
+        {
+          "text": "Outstanding bills · 1 · ₹250",
+          "height": 44
+        },
+        {
+          "text": "All Sources",
+          "height": 24
+        },
+        {
+          "text": "QR Table",
+          "height": 24
+        },
+        {
+          "text": "Counter POS",
+          "height": 24
+        },
+        {
+          "text": "Self-Order Kiosk",
+          "height": 24
+        },
+        {
+          "text": "Floor Captain",
+          "height": 24
+        },
+        {
+          "text": "all",
+          "height": 24
+        },
+        {
+          "text": "new",
+          "height": 24
+        },
+        {
+          "text": "confirmed",
+          "height": 24
+        },
+        {
+          "text": "preparing",
+          "height": 24
+        },
+        {
+          "text": "ready",
+          "height": 24
+        },
+        {
+          "text": "served",
+          "height": 24
+        },
+        {
+          "text": "completed",
+          "height": 24
+        },
+        {
+          "text": "Settle",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "persistentTasks": true,
+        "oldOutstandingVisible": true,
+        "paidBillHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "pos",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Billing\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nKitchen & KOT\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nTable service requests\nOutstanding bills\nAll business dates\n\nCollect outstanding balances from kiosk, QR, captain and counter orders. Completed service does not mean paid.\n\nActive Session (1)\nAll History (2)\nAll orders\nOutstanding bills · 1 · ₹250\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#AUDIT-OLD\nToken #K-91\nTAKEAWAY\nKiosk (KIOSK_USER-db2aa4ad-42c1-4371-962f-0247d8c7340c)\n02:00 PM\n•\n1 items\n₹250\nCOMPLETED\nPayment due ₹250\nSettle",
+      "buttons": [
+        {
+          "text": "Billing",
+          "height": 54
+        },
+        {
+          "text": "Orders",
+          "height": 54
+        },
+        {
+          "text": "Tables",
+          "height": 54
+        },
+        {
+          "text": "Collect",
+          "height": 54
+        },
+        {
+          "text": "Billing / Menu",
+          "height": 48
+        },
+        {
+          "text": "Floor & Tables",
+          "height": 48
+        },
+        {
+          "text": "Live Orders",
+          "height": 44
+        },
+        {
+          "text": "Bills & Invoices",
+          "height": 48
+        },
+        {
+          "text": "Kitchen & KOT",
+          "height": 48
+        },
+        {
+          "text": "Customers CRM",
+          "height": 48
+        },
+        {
+          "text": "Shift & Cash",
+          "height": 44
+        },
+        {
+          "text": "Day History",
+          "height": 44
+        },
+        {
+          "text": "POS Reports",
+          "height": 44
+        },
+        {
+          "text": "Inventory & Stock",
+          "height": 48
+        },
+        {
+          "text": "Settings",
+          "height": 44
+        },
+        {
+          "text": "JAMAN AI AssistantAI",
+          "height": 38
+        },
+        {
+          "text": "Print Queue",
+          "height": 32
+        },
+        {
+          "text": "Active Session (1)",
+          "height": 28
+        },
+        {
+          "text": "All History (2)",
+          "height": 28
+        },
+        {
+          "text": "All orders",
+          "height": 44
+        },
+        {
+          "text": "Outstanding bills · 1 · ₹250",
+          "height": 44
+        },
+        {
+          "text": "All Sources",
+          "height": 24
+        },
+        {
+          "text": "QR Table",
+          "height": 24
+        },
+        {
+          "text": "Counter POS",
+          "height": 24
+        },
+        {
+          "text": "Self-Order Kiosk",
+          "height": 24
+        },
+        {
+          "text": "Floor Captain",
+          "height": 24
+        },
+        {
+          "text": "all",
+          "height": 24
+        },
+        {
+          "text": "new",
+          "height": 24
+        },
+        {
+          "text": "confirmed",
+          "height": 24
+        },
+        {
+          "text": "preparing",
+          "height": 24
+        },
+        {
+          "text": "ready",
+          "height": 24
+        },
+        {
+          "text": "served",
+          "height": 24
+        },
+        {
+          "text": "completed",
+          "height": 24
+        },
+        {
+          "text": "Settle",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "persistentTasks": true,
+        "oldOutstandingVisible": true,
+        "paidBillHidden": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "kds",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "#K-91\nMAIN-AUDIT-1\nTable 3\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n12:00\n1×\nRoyal Gujarati Thali with fresh seasonal vegetable accompaniments\nALLERGY / DIET: ALLERGY: peanuts\n2×\nFreshly prepared dish 2\n3×\nFreshly prepared dish 3\n4×\nFreshly prepared dish 4\n5×\nFreshly prepared dish 5\n6×\nFreshly prepared dish 6\n7×\nFreshly prepared dish 7\n8×\nFreshly prepared dish 8\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nFixture Captain\n#e-kot\nALL DISHES READY",
+      "buttons": [
+        {
+          "text": "",
+          "height": 56
+        },
+        {
+          "text": "1×Royal Gujarati Thali with fresh seasonal vegetable accompanimentsALLERGY / DIET: ALLERGY: peanuts",
+          "height": 113
+        },
+        {
+          "text": "2×Freshly prepared dish 2",
+          "height": 56
+        },
+        {
+          "text": "3×Freshly prepared dish 3",
+          "height": 56
+        },
+        {
+          "text": "4×Freshly prepared dish 4",
+          "height": 56
+        },
+        {
+          "text": "5×Freshly prepared dish 5",
+          "height": 56
+        },
+        {
+          "text": "6×Freshly prepared dish 6",
+          "height": 56
+        },
+        {
+          "text": "7×Freshly prepared dish 7",
+          "height": 56
+        },
+        {
+          "text": "8×Freshly prepared dish 8",
+          "height": 56
+        },
+        {
+          "text": "All Dishes Ready",
+          "height": 56
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "kds",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "#K-91\nMAIN-AUDIT-1\nTable 3\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n12:00\n1×\nRoyal Gujarati Thali with fresh seasonal vegetable accompaniments\nALLERGY / DIET: ALLERGY: peanuts\n2×\nFreshly prepared dish 2\n3×\nFreshly prepared dish 3\n4×\nFreshly prepared dish 4\n5×\nFreshly prepared dish 5\n6×\nFreshly prepared dish 6\n7×\nFreshly prepared dish 7\n8×\nFreshly prepared dish 8\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nFixture Captain\n#e-kot\nALL DISHES READY",
+      "buttons": [
+        {
+          "text": "",
+          "height": 56
+        },
+        {
+          "text": "1×Royal Gujarati Thali with fresh seasonal vegetable accompanimentsALLERGY / DIET: ALLERGY: peanuts",
+          "height": 113
+        },
+        {
+          "text": "2×Freshly prepared dish 2",
+          "height": 56
+        },
+        {
+          "text": "3×Freshly prepared dish 3",
+          "height": 56
+        },
+        {
+          "text": "4×Freshly prepared dish 4",
+          "height": 56
+        },
+        {
+          "text": "5×Freshly prepared dish 5",
+          "height": 56
+        },
+        {
+          "text": "6×Freshly prepared dish 6",
+          "height": 56
+        },
+        {
+          "text": "7×Freshly prepared dish 7",
+          "height": 56
+        },
+        {
+          "text": "8×Freshly prepared dish 8",
+          "height": 56
+        },
+        {
+          "text": "All Dishes Ready",
+          "height": 56
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "captain",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Hand over my floor\n\nThe next captain reviews these tasks and enters their own PIN to accept. Bills and kitchen progress stay unchanged.\n\n0 tables · 0 ready tickets · ₹0 outstanding\n\nTables: No active tables\n\nHandover note\nReceiving captain's PIN\n1\n2\n3\n4\n5\n6\n7\n8\n9\nClear\n0\n⌫\nAccept handover & switch captain",
+      "buttons": [
+        {
+          "text": "1",
+          "height": 44
+        },
+        {
+          "text": "2",
+          "height": 44
+        },
+        {
+          "text": "3",
+          "height": 44
+        },
+        {
+          "text": "4",
+          "height": 44
+        },
+        {
+          "text": "5",
+          "height": 44
+        },
+        {
+          "text": "6",
+          "height": 44
+        },
+        {
+          "text": "7",
+          "height": 44
+        },
+        {
+          "text": "8",
+          "height": 44
+        },
+        {
+          "text": "9",
+          "height": 44
+        },
+        {
+          "text": "Clear",
+          "height": 44
+        },
+        {
+          "text": "0",
+          "height": 44
+        },
+        {
+          "text": "⌫",
+          "height": 44
+        },
+        {
+          "text": "Accept handover & switch captain",
+          "height": 48
+        }
+      ],
+      "assertions": {
+        "touchPinWorks": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "captain",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Hand over my floor\n\nThe next captain reviews these tasks and enters their own PIN to accept. Bills and kitchen progress stay unchanged.\n\n0 tables · 0 ready tickets · ₹0 outstanding\n\nTables: No active tables\n\nHandover note\nReceiving captain's PIN\n1\n2\n3\n4\n5\n6\n7\n8\n9\nClear\n0\n⌫\nAccept handover & switch captain",
+      "buttons": [
+        {
+          "text": "1",
+          "height": 44
+        },
+        {
+          "text": "2",
+          "height": 44
+        },
+        {
+          "text": "3",
+          "height": 44
+        },
+        {
+          "text": "4",
+          "height": 44
+        },
+        {
+          "text": "5",
+          "height": 44
+        },
+        {
+          "text": "6",
+          "height": 44
+        },
+        {
+          "text": "7",
+          "height": 44
+        },
+        {
+          "text": "8",
+          "height": 44
+        },
+        {
+          "text": "9",
+          "height": 44
+        },
+        {
+          "text": "Clear",
+          "height": 44
+        },
+        {
+          "text": "0",
+          "height": 44
+        },
+        {
+          "text": "⌫",
+          "height": 44
+        },
+        {
+          "text": "Accept handover & switch captain",
+          "height": 48
+        }
+      ],
+      "assertions": {
+        "touchPinWorks": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "kiosk-settings",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Ordering choices\n\nGuests skip screens with only one choice. A table binding is optional; leave it empty for a shared kiosk.\n\nApply to\nBranch defaults · all kiosks\nDine in\nTakeaway\nDefault table\nLet guests choose\nTable 1\nTable 2\nTable 3\nTable 4\nTable 5\nTable 6\nTable 7\nTable 8\nTable 9\nTable 10\nTable 11\nTable 12\nCustomer kiosk language & idle timeout\n\nWhich languages the self-order kiosk offers, and how long it waits before resetting an idle session.\n\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nमराठी (Marathi)\nதமிழ் (Tamil)\nతెలుగు (Telugu)\nಕನ್ನಡ (Kannada)\nDefault Language\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nIdle Warning After (seconds)\nKiosk order token counter\n\nThe kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.\n\nNEXT KIOSK TOKEN\n\nK-101\n\nReset to 101",
+      "buttons": [
+        {
+          "text": "Reset to 101",
+          "height": 30
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    },
+    {
+      "mode": "kiosk-settings",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Ordering choices\n\nGuests skip screens with only one choice. A table binding is optional; leave it empty for a shared kiosk.\n\nApply to\nBranch defaults · all kiosks\nDine in\nTakeaway\nDefault table\nLet guests choose\nTable 1\nTable 2\nTable 3\nTable 4\nTable 5\nTable 6\nTable 7\nTable 8\nTable 9\nTable 10\nTable 11\nTable 12\nCustomer kiosk language & idle timeout\n\nWhich languages the self-order kiosk offers, and how long it waits before resetting an idle session.\n\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nमराठी (Marathi)\nதமிழ் (Tamil)\nతెలుగు (Telugu)\nಕನ್ನಡ (Kannada)\nDefault Language\nEnglish\nहिन्दी (Hindi)\nગુજરાતી (Gujarati)\nIdle Warning After (seconds)\nKiosk order token counter\n\nThe kiosk hands out sequential tokens (K-101, K-102...) that reset automatically each new business day. Use this only to force an early restart mid-day.\n\nNEXT KIOSK TOKEN\n\nK-101\n\nReset to 101",
+      "buttons": [
+        {
+          "text": "Reset to 101",
+          "height": 30
+        }
+      ],
+      "assertions": {},
+      "errors": []
+    }
+  ]
+}

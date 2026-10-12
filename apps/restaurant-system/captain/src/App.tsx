@@ -1,9 +1,9 @@
-import { syncStaffUsers, startLocalChangeSync } from '@jamanvaar/sync';
+import { syncStaffUsers } from '@jamanvaar/sync';
 import React, { useState, useEffect } from 'react';
 import { useCaptainStore } from './store/captainStore';
 import { registerNativeUpdateGuard } from '@jamanvaar/ui';
-import { DiningTable, MenuItem, Category } from '@jamanvaar/types';
-import { captainDb, StaffRepository } from '@jamanvaar/database';
+import { DiningTable } from '@jamanvaar/types';
+import { captainDb } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 import { EntitlementService } from '@jamanvaar/business';

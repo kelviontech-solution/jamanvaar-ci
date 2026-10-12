@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
+import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
 import { QrResolutionCache } from './qr-resolution-cache';
 import { QrSettingsService, QrSettingsUpdate, QrBrandingUpdate } from './qr-settings.service';
 import { PaymentsService } from '../payments/payments.service';
@@ -44,6 +45,15 @@ export const updateTableSchema = z
   .refine((v) => Object.keys(v).length > 0, { message: 'Nothing to change' });
 export type UpdateTable = z.infer<typeof updateTableSchema>;
 
+export const requestFeatureSchema = z
+  .object({
+    featureCode: z.string().trim().min(1).max(60),
+    featureLabel: z.string().trim().min(1).max(120),
+    note: z.string().trim().max(2000).optional()
+  })
+  .strict();
+export type RequestFeature = z.infer<typeof requestFeatureSchema>;
+
 type Tx = Prisma.TransactionClient;
 const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 
@@ -63,7 +73,8 @@ export class QrAdminService {
     private readonly cache: QrResolutionCache<{ restaurant: { id: string } }>,
     private readonly realtime: RealtimeBus,
     private readonly payments: PaymentsService,
-    private readonly orderSync: OrderSyncService
+    private readonly orderSync: OrderSyncService,
+    private readonly notifications: PlatformNotificationsService
   ) {}
 
   /** Only the restaurant's own Restaurant Admin console may manage QR codes. */
@@ -81,6 +92,67 @@ export class QrAdminService {
   urlFor(token: string): string | null {
     const base = this.publicBaseUrl();
     return base ? `${base}/q/${token}` : null;
+  }
+
+  // ------------------------------------------------------------------ feature requests -> platform support inbox
+
+  /**
+   * An owner asking "please enable this for us" from inside QR Admin, raised as an ordinary
+   * FEATURE_REQUEST support ticket -- the same inbox and notification path platform staff already
+   * use for every other ticket, so enabling it here never requires its own separate admin screen.
+   */
+  async requestFeature(device: Device, input: RequestFeature) {
+    this.assertConsole(device);
+    const restaurantId = device.restaurantId;
+    const slaDueAt = new Date(Date.now() + 168 * 60 * 60 * 1000); // LOW priority SLA, matches support-tickets.service.ts
+    const { restaurant, raiser } = await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const restaurant = await tx.restaurant.findUnique({ where: { id: restaurantId }, select: { name: true } });
+      const adminActorId = (device as Device & { adminActorId?: string }).adminActorId;
+      const raiser = adminActorId
+        ? await tx.user.findFirst({ where: { id: adminActorId, restaurantId }, select: { id: true, fullName: true, email: true } })
+        : await tx.user.findFirst({ where: { restaurantId, role: 'OWNER', status: 'ACTIVE' }, select: { id: true, fullName: true, email: true } });
+      return { restaurant, raiser };
+    });
+    const subject = `Enable ${input.featureLabel} for ${restaurant?.name ?? 'this restaurant'}`;
+    const description = `Requested from QR Admin: please enable "${input.featureLabel}" (${input.featureCode}) for this restaurant.${input.note ? `\n\nNote from the owner: ${input.note}` : ''}`;
+    const ticket = await this.prisma.runAsPlatform(async (tx) => {
+      const created = await tx.supportTicket.create({
+        data: {
+          restaurantId,
+          subject,
+          description,
+          category: 'FEATURE_REQUEST',
+          priority: 'LOW',
+          slaDueAt,
+          source: 'RESTAURANT',
+          raisedByUserId: raiser?.id ?? null,
+          raisedByName: raiser?.fullName ?? null,
+          raisedByEmail: raiser?.email ?? null
+        }
+      });
+      await tx.ticketEvent.create({ data: { ticketId: created.id, type: 'CREATED', actorType: 'RESTAURANT', actorName: raiser?.fullName ?? 'Restaurant', toValue: 'OPEN' } });
+      return created;
+    });
+    await this.audit.log({
+      actorType: 'TENANT',
+      actorId: raiser?.id,
+      restaurantId,
+      action: 'SUPPORT_TICKET_CREATED',
+      category: 'SUPPORT',
+      details: { ticketId: ticket.id, number: ticket.number, category: 'FEATURE_REQUEST', priority: 'LOW', source: 'RESTAURANT', featureCode: input.featureCode }
+    });
+    await this.notifications.notify({
+      type: 'TICKET_CREATED',
+      severity: 'INFO',
+      title: `${restaurant?.name ?? 'A restaurant'}: feature request, ${input.featureLabel}`,
+      body: `TKT-${String(ticket.number).padStart(6, '0')} · feature request · from ${raiser?.fullName ?? 'the restaurant'}`,
+      restaurantId,
+      targetType: 'ticket',
+      targetId: ticket.id,
+      link: `/tickets?open=${ticket.id}`,
+      dedupeKey: `ticket-created:${ticket.id}`
+    });
+    return { ticketNumber: ticket.number, ticketId: ticket.id };
   }
 
   // ------------------------------------------------------------------ entitlement, for display

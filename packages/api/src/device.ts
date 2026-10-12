@@ -1,4 +1,4 @@
-import { DeviceHealth, KioskStatus } from '@jamanvaar/types';
+import { DeviceHealth } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
 import { PrinterService } from './printer';
 

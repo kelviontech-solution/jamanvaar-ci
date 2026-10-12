@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Device } from '@prisma/client';
 import type { Request, Response } from 'express';
@@ -13,7 +13,7 @@ import { QrResolutionCache } from './qr-resolution-cache';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { MenuPublicationsService } from '../menu-publications/menu-publications.service';
 import { QrBusyException } from './qr-resilience';
-import { QrAdminService, generateQrSchema, GenerateQr, createTableSchema, CreateTable, updateTableSchema, UpdateTable } from './qr-admin.service';
+import { QrAdminService, generateQrSchema, GenerateQr, createTableSchema, CreateTable, updateTableSchema, UpdateTable, requestFeatureSchema, RequestFeature } from './qr-admin.service';
 import { QrPublicService, placeQrOrderSchema, PlaceQrOrder, quoteQrOrderSchema, QuoteQrOrder } from './qr-public.service';
 import { qrSettingsSchema, QrSettingsUpdate, qrBrandingSchema, QrBrandingUpdate, qrPrintDesignSchema } from './qr-settings.service';
 import { z } from 'zod';
@@ -126,6 +126,12 @@ export class QrRestaurantController {
   entitlement(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
     return this.qr.entitlement(device.restaurantId);
+  }
+
+  @Post('feature-request')
+  @UsePipes(new ZodValidationPipe(requestFeatureSchema))
+  requestFeature(@CurrentDevice() device: Device, @Body() body: RequestFeature) {
+    return this.qr.requestFeature(device, body);
   }
 
   @Get('overview')

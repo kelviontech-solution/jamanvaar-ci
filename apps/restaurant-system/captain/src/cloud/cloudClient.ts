@@ -1,6 +1,6 @@
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
-import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
+import { fetchWithDeadline } from '@jamanvaar/api';
 /**
  * Captain's only connection to cloud/api — owner-issued login id + password,
  * not a separate activation code (mirrors pos-admin's cloudLogin/cloudActivateDevice

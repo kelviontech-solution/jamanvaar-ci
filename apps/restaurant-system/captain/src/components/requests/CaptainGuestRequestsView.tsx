@@ -1,23 +1,12 @@
-import { QrServiceInbox, ModalBackdrop } from '@jamanvaar/ui';
+import { QrServiceInbox, ModalBackdrop, useStaffLanguage } from '@jamanvaar/ui';
 import {deviceFetch} from '../../cloud/cloudClient';
 const qrRequestsApi=async<T,>(path:string,method='GET',body?:unknown):Promise<T>=>{const r=await deviceFetch('/api/v1/restaurant/qr/operations'+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json();if(!r.ok)throw new Error(data.message||'Service request unavailable');return data;};
 import React, { useState } from 'react';
 import { useCaptainStore, CustomerRequest } from '../../store/captainStore';
-import {
-  Bell,
-  Check,
-  Clock,
-  Plus,
-  CheckCircle2,
-  AlertCircle,
-  X,
-  Droplet,
-  Utensils,
-  Sparkles,
-  UserCheck
-} from 'lucide-react';
+import { Bell, Clock, Plus, CheckCircle2, X } from 'lucide-react';
 
 export const CaptainGuestRequestsView: React.FC = () => {
+  const {t} = useStaffLanguage();
   const {
     customerRequests,
     acknowledgeCustomerRequest,
@@ -71,14 +60,11 @@ export const CaptainGuestRequestsView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-amber-600" />
-            <h2 className="text-xl font-bold text-jaman-navy">Guest Service Requests</h2>
+            <h2 className="text-xl font-bold text-jaman-navy"> {t("Guest Service Requests")} </h2>
             <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-0.5 rounded-full">
-              {pendingRequests.length} Pending
-            </span>
+              {pendingRequests.length} {t("Pending")} </span>
           </div>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Diner requests for water, extra cutlery, table cleaning, and staff assistance.
-          </p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5"> {t("Diner requests for water, extra cutlery, table cleaning, and staff assistance.")} </p>
         </div>
 
         <button
@@ -87,7 +73,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
           className="px-4 py-2 rounded-2xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Log Guest Request</span>
+          <span> {t("+ Log Guest Request")} </span>
         </button>
       </div>
 
@@ -112,7 +98,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                         {getRequestIcon(req.type)}
                       </div>
                       <div>
-                        <span className="text-xl font-bold text-jaman-navy">TABLE {req.tableNumber}</span>
+                        <span className="text-xl font-bold text-jaman-navy"> {t("TABLE")} {req.tableNumber}</span>
                         <span className="text-xs font-bold text-amber-800 uppercase block tracking-wider">
                           {req.type.replace('_', ' ')}
                         </span>
@@ -121,13 +107,13 @@ export const CaptainGuestRequestsView: React.FC = () => {
 
                     <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-xl">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>{elapsedMins}m ago</span>
+                      <span>{elapsedMins} {t("m ago")} </span>
                     </div>
                   </div>
 
                   {req.notes && (
                     <div className="mt-3 p-3 rounded-2xl bg-jaman-cream border border-jaman-border text-xs text-slate-700 font-medium">
-                      <span className="font-bold text-slate-900 block mb-0.5">Guest Note:</span>
+                      <span className="font-bold text-slate-900 block mb-0.5"> {t("Guest Note:")} </span>
                       {req.notes}
                     </div>
                   )}
@@ -140,9 +126,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                       type="button"
                       onClick={() => acknowledgeCustomerRequest(req.id)}
                       className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                    >
-                      Accept
-                    </button>
+                    > {t("Accept")} </button>
                   )}
 
                   <button
@@ -151,7 +135,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
                     className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Mark Done</span>
+                    <span> {t("Mark Done")} </span>
                   </button>
                 </div>
               </div>
@@ -161,10 +145,8 @@ export const CaptainGuestRequestsView: React.FC = () => {
       ) : (
         <div className="p-12 text-center rounded-3xl bg-white border-2 border-dashed border-jaman-border space-y-3">
           <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-          <h3 className="text-lg font-bold text-jaman-navy">All Guest Requests Completed!</h3>
-          <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
-            No pending diner requests on your floor right now.
-          </p>
+          <h3 className="text-lg font-bold text-jaman-navy"> {t("All Guest Requests Completed!")} </h3>
+          <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto"> {t("No pending diner requests on your floor right now.")} </p>
         </div>
       )}
 
@@ -176,7 +158,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
             className="w-full max-w-md bg-white rounded-3xl p-6 shadow-md border border-jaman-border space-y-4 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-jaman-navy">Log Guest Request</h3>
+              <h3 className="text-lg font-bold text-jaman-navy"> {t("Log Guest Request")} </h3>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
@@ -187,9 +169,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                Table Number
-              </label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1"> {t("Table Number")} </label>
               <input
                 type="text"
                 value={newReqTable}
@@ -201,9 +181,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                Request Type
-              </label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1"> {t("Request Type")} </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: 'WATER', label: '💧 Drinking Water' },
@@ -230,9 +208,7 @@ export const CaptainGuestRequestsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                Special Note
-              </label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1"> {t("Special Note")} </label>
               <input
                 type="text"
                 value={newReqNotes}
@@ -247,15 +223,11 @@ export const CaptainGuestRequestsView: React.FC = () => {
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
                 className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs"
-              >
-                Cancel
-              </button>
+              > {t("Cancel")} </button>
               <button
                 type="submit"
                 className="flex-1 py-3 rounded-xl bg-jaman-saffron hover:bg-[#EA580C] text-white font-bold text-xs shadow-md"
-              >
-                Submit Request
-              </button>
+              > {t("Submit Request")} </button>
             </div>
           </form>
         </ModalBackdrop>

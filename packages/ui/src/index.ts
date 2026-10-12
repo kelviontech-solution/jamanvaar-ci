@@ -47,3 +47,5 @@ export * from './JamanAiAccessNotice';
 export {QrServiceInbox,type QrServiceRequest} from './QrServiceInbox';
 export * from './native_update';
 export * from './NativeUpdateButton';
+export * from './StaffLanguage';
+export * from './StaffPracticePanel';

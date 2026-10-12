@@ -1,11 +1,14 @@
-import { syncStaffUsers, startLocalChangeSync, verifyPinWithSync } from '@jamanvaar/sync';
+import { syncStaffUsers, verifyPinWithSync } from '@jamanvaar/sync';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore, setKitchenPriority } from '@jamanvaar/database';
+import { db, kdsDb, KOTRepository, AuditRepository, NotificationRepository, StaffRepository, KeyValueStore, setKitchenPriority, getTerminalId } from '@jamanvaar/database';
 import { DeviceGate, getAssignedStation, EntitySyncEngine, lanMeshSync, SyncOutboxEngine, syncServiceMessages, syncMenuCatalog, EndpointResolver, onAppResume } from '@jamanvaar/sync';
 import { KOTRecord, KOTStatus, KOTItem } from '@jamanvaar/types';
 import { KdsTicketCard } from './KdsTicketCard';
+import { loadKitchenDisplay, saveKitchenDisplay } from './displayPreferences';
+import { StaffLanguagePicker, useStaffLanguage, StaffPracticePanel } from '@jamanvaar/ui';
+import { KitchenStationRepository } from '@jamanvaar/database';
 import { KdsExpoBoard } from './KdsExpoBoard';
-import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge, matchesKitchenSearch } from './kdsLogic';
+import { buildExpoBoard, connectionLevel, effectiveItemStatus, liveItems, orderProgress, prepMinutes, prepSummary, sortForKitchen, ticketAge, matchesKitchenSearch, ticketsForStation, needsCancellationAcknowledgement } from './kdsLogic';
 import { Platform } from '@jamanvaar/api';
 import { activateKdsDevice, isKdsDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, reportAiQueryNow, CloudApiError, leaseNumberBlock } from './cloud/cloudClient';
 import {
@@ -22,25 +25,7 @@ import {
 } from '@jamanvaar/ui';
 import { SessionPersistence, EntitlementService } from '@jamanvaar/business';
 import { sound } from '@jamanvaar/ui';
-import {
-  ChefHat,
-  Flame,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Timer,
-  Bell,
-  UtensilsCrossed,
-  Check,
-  CheckCheck,
-  LogOut,
-  Zap,
-  WifiOff,
-  Delete,
-  AlertTriangle,
-  RefreshCw,
-  ArrowRight, Search, X, Sparkles
-} from 'lucide-react';
+import { ChefHat, Flame, AlertCircle, Bell, UtensilsCrossed, CheckCheck, LogOut, WifiOff, Delete, AlertTriangle, ArrowRight, Search, X, Sparkles } from 'lucide-react';
 
 /** Who took the order: a table order from the Captain app is the waiter's, anything else was rung up by a cashier (BUG-157). */
 function kotTakenByLabel(kot: KOTRecord): string {
@@ -69,6 +54,9 @@ const ORDER_TYPE_LABEL: Record<string, string> = {
 
 export const App: React.FC = () => {
   const ai = useAiAccess();
+  const {t:staffText} = useStaffLanguage();
+  const [display, setDisplay] = useState(() => loadKitchenDisplay('ALL'));
+  const [displayError, setDisplayError] = useState('');
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [captainServicePolicy, setCaptainServicePolicy] = useState(() => DeviceGate.getState().captainHandlesService);
   useEffect(() => DeviceGate.subscribe(() => setCaptainServicePolicy(DeviceGate.getState().captainHandlesService)), []);
@@ -243,6 +231,11 @@ export const App: React.FC = () => {
     return () => clearInterval(t);
   }, []);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PREPARING' | 'READY' | 'SERVED' | 'EXPO'>('ALL');
+  useEffect(() => {setDisplay(loadKitchenDisplay(selectedStation));setDisplayError('');},[selectedStation]);
+  const updateDisplay = (partial: Partial<typeof display>) => {
+    try {const next = {...display,...partial};saveKitchenDisplay(selectedStation,next);setDisplay(next);setDisplayError('');}
+    catch(e) {setDisplayError(e instanceof Error ? e.message : 'Could not save display settings.');}
+  };
   const [ticketSearch, setTicketSearch] = useState('');
   const [sortMode, setSortMode] = useState<'PRIORITY' | 'FIFO'>('PRIORITY');
   const [currentTime, setCurrentTime] = useState<string>(
@@ -265,7 +258,7 @@ export const App: React.FC = () => {
   // Real-time Multi-Device Sync Engine & Cluster Listeners
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      lanMeshSync.registerDevice('KDS', 'KDS-01', 'Kitchen Display System');
+      lanMeshSync.registerDevice('KDS', getTerminalId('KDS'), 'Kitchen Display System');
       lanMeshSync.setAttachedDatabase(kdsDb);
 
       // 1. Initial Merge: Synchronize central db.kots into kdsDb if missing
@@ -393,7 +386,7 @@ export const App: React.FC = () => {
             restaurantId: matchedUser.restaurantId || db.restaurant.id,
             stationId: kdsStationSelection.toLowerCase().replace(/\s+/g, '-'),
             stationName: kdsStationSelection,
-            terminalId: 'KDS-01'
+            terminalId: getTerminalId('KDS')
           });
         } else {
           setKdsPinError(true);
@@ -419,39 +412,21 @@ export const App: React.FC = () => {
   const kitchenStations = useMemo(() => {
     const seen = new Map<string, string>();
     const add = (name?: string) => {
-      const t = (name || '').trim();
+      const t = (KitchenStationRepository.resolve(name || '')?.name || name || '').trim();
       if (t && t.toUpperCase() !== 'ALL' && !seen.has(t.toLowerCase())) seen.set(t.toLowerCase(), t);
     };
+    KitchenStationRepository.list().forEach(station => add(station.name));
     db.menuItems.forEach((m) => add(m.kitchenStation));
     kots.forEach((k) => { add(k.station); k.items?.forEach((it) => add(it.kitchenStation)); });
     add(getAssignedStation() || undefined);
     return [...seen.values()].sort((a, b) => a.localeCompare(b));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kots, db.menuItems.length]);
-  const stationChoices = useMemo(() => [{ id: 'ALL', label: 'All stations' }, ...kitchenStations.map((n) => ({ id: n, label: n }))], [kitchenStations]);
+  const stationChoices = useMemo(() => [{ id: 'ALL', label: 'All stations' }, ...kitchenStations.map((n) => ({ id: KitchenStationRepository.resolve(n)?.id || n, label: n }))], [kitchenStations]);
 
   // Station Filtering Logic
   const stationKots = useMemo(() => {
-    if (selectedStation === 'ALL') return kots;
-    const exact = selectedStation.trim().toLowerCase();
-    const sameStation = kots.filter((kot) => (kot.station || '').trim().toLowerCase() === exact || kot.items?.some((it) => (it.kitchenStation || '').trim().toLowerCase() === exact));
-    if (sameStation.length > 0) return sameStation;
-    const stLower = selectedStation.toLowerCase();
-    return kots.filter((kot) => {
-      const kotStation = (kot.station || '').toLowerCase();
-      if (kotStation.includes(stLower)) return true;
-      if (stLower.includes('main') && (kotStation.includes('main') || kotStation.includes('curry') || kotStation.includes('kitchen'))) return true;
-      if (stLower.includes('tandoor') && kotStation.includes('tandoor')) return true;
-      if (stLower.includes('dessert') && (kotStation.includes('dessert') || kotStation.includes('sweet'))) return true;
-      if (stLower.includes('beverage') && (kotStation.includes('bar') || kotStation.includes('drink') || kotStation.includes('beverage'))) return true;
-      return kot.items?.some((it) => {
-        const itSt = (it.kitchenStation || '').toLowerCase();
-        if (itSt.includes(stLower)) return true;
-        if (stLower.includes('main') && (itSt.includes('main') || itSt.includes('curry') || itSt.includes('pantry'))) return true;
-        if (stLower.includes('beverage') && (itSt.includes('bar') || itSt.includes('drink') || itSt.includes('beverage'))) return true;
-        return false;
-      });
-    });
+    return ticketsForStation(kots, selectedStation);
   }, [kots, selectedStation]);
 
   // Derived KPI Counts (Station Aware)
@@ -469,8 +444,8 @@ export const App: React.FC = () => {
     return stationKots.filter((k) => k.status === 'SERVED').length;
   }, [stationKots]);
 
-  // A cancelled ticket stays in view (red) until a cook dismisses it, but not for ever.
-  const cancelledAlert = (k: KOTRecord) => k.status === 'CANCELLED' && !dismissed.has(k.id) && Date.now() - new Date(k.createdAt).getTime() < 12 * 60 * 60 * 1000;
+  // Cancellation stays visible until acknowledged; ticket creation age cannot suppress a new cancellation.
+  const cancelledAlert = (k: KOTRecord) => needsCancellationAcknowledgement(k, dismissed);
   const alertCount = useMemo(() => stationKots.filter(cancelledAlert).length,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [stationKots, dismissed]);
@@ -634,7 +609,7 @@ export const App: React.FC = () => {
     void SyncOutboxEngine.catchUpFromCloud();
   };
 
-  const stationName = selectedStation === 'ALL' ? 'All stations' : selectedStation;
+  const stationName = selectedStation === 'ALL' ? 'All stations' : KitchenStationRepository.resolve(selectedStation)?.name || selectedStation;
 
   // Device activation gate — this terminal has no cloud identity until an
   // activation code is redeemed. Runs before the PIN-login screen below,
@@ -865,7 +840,7 @@ export const App: React.FC = () => {
                   type="button"
                   onClick={() => setSelectedStation(st.id)}
                   className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap active:scale-95 cursor-pointer ${
-                    selectedStation === st.id ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:bg-white hover:text-jaman-navy'
+                    selectedStation === st.id || KitchenStationRepository.resolve(selectedStation)?.id === st.id ? 'bg-jaman-navy text-white shadow-xs' : 'text-slate-600 hover:bg-white hover:text-jaman-navy'
                   }`}
                 >
                   {st.label}
@@ -875,6 +850,8 @@ export const App: React.FC = () => {
           </nav>
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+            <StaffLanguagePicker/>
+            <details className="relative text-xs"><summary className="min-h-11 flex items-center cursor-pointer font-bold">{staffText('Staff practice')}</summary><div className="absolute right-0 top-full w-80 max-w-[85vw] shadow-lg bg-white z-50 rounded-2xl"><StaffPracticePanel/></div></details>
             <div
               data-testid="kds-live-pill"
               data-level={conn.level}
@@ -914,6 +891,15 @@ export const App: React.FC = () => {
         </header>
 
         {/* STATUS TABS */}
+        <details className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0">
+          <summary className="min-h-11 cursor-pointer font-bold text-sm text-jaman-navy">Display & station timing</summary>
+          <div className="flex flex-wrap gap-3 py-3 text-sm">
+            <label>Screen layout<select aria-label="Kitchen screen layout" value={display.density} onChange={e => updateDisplay({density:e.target.value as typeof display.density})} className="block min-h-11 rounded-xl border px-3"><option value="compact">Compact</option><option value="comfortable">Comfortable / tablet</option><option value="tv">Large / TV</option></select></label>
+            {(['minimumMinutes','fallbackMinutes','maximumMinutes'] as const).map(field => <label key={`${selectedStation}:${field}`}>{field === 'minimumMinutes' ? 'Minimum prep (min)' : field === 'maximumMinutes' ? 'Maximum prep (min)' : 'Default prep (min)'}<input aria-label={field} type="number" min="1" max="240" defaultValue={display[field]} onBlur={e => updateDisplay({[field]:Number(e.target.value)})} className="block min-h-11 w-32 rounded-xl border px-3"/></label>)}
+            <p className="self-end text-slate-600">Saved for this screen and selected station. Dish prep times take precedence.</p>
+          </div>
+          {displayError && <p role="alert" className="text-rose-700 text-sm mb-2">{displayError}</p>}
+        </details>
         <div className="bg-white border-b border-jaman-border px-3 sm:px-6 py-2 shrink-0 shadow-2xs">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto max-w-[1920px] mx-auto" role="tablist">
             {tabs.map((tab) => {
@@ -931,7 +917,7 @@ export const App: React.FC = () => {
                 >
                   <tab.icon className="w-4 h-4 hidden sm:block" />
                   <span className="sm:hidden">{tab.short}</span>
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden sm:inline">{staffText(tab.label)}</span>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-black ${isSelected ? 'bg-white text-jaman-saffron' : 'bg-white border border-jaman-border text-slate-600'}`}>{tab.count}</span>
                 </button>
               );
@@ -965,7 +951,7 @@ export const App: React.FC = () => {
 
         {/* TICKETS */}
         <main data-testid="kds-board" className="kds-board flex-1 p-3 sm:p-5 overflow-y-auto min-h-0 min-w-0">
-          <div className="kds-grid gap-3 sm:gap-4 mx-auto items-start">
+          <div className={`kds-grid kds-density-${display.density} gap-3 sm:gap-4 mx-auto items-start`} style={{'--kds-card-width':display.density === 'compact' ? '270px' : display.density === 'tv' ? '460px' : '330px'} as React.CSSProperties}>
             {statusFilter === 'EXPO' && <KdsExpoBoard orders={expoBoard} orderTypeLabel={(t) => ORDER_TYPE_LABEL[t] || t} onServeOrder={serveOrder} captainHandlesService={captainHandlesService} />}
 
             {statusFilter !== 'EXPO' && filteredKots.map((kot) => {
@@ -974,7 +960,7 @@ export const App: React.FC = () => {
                 <KdsTicketCard
                   key={kot.id}
                   kot={kot}
-                  age={ticketAge(kot, nowMs, prepMinutes(kot, prepTimeOf))}
+                  age={ticketAge(kot, nowMs, prepMinutes(kot, prepTimeOf, display))}
                   progress={orderProgress(kdsDb.kots, kot.orderId)}
                   orderTypeLabel={ORDER_TYPE_LABEL[kot.orderType] || kot.orderType}
                   takenBy={cashier}

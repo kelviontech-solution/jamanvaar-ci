@@ -1,6 +1,6 @@
-import { Order, OrderStatus } from '@jamanvaar/types';
-import { isUnpaidOpenOrder } from '@jamanvaar/database';
-import { formatDate, formatINR, formatTime, toCsvRow } from '@jamanvaar/utils';
+import { Order } from '@jamanvaar/types';
+import { isUnpaidOpenOrder, BusinessDayRepository, db, orderPaymentPosition } from '@jamanvaar/database';
+import { formatTime, toCsvRow, getRestaurantHour, formatRestaurantDate } from '@jamanvaar/utils';
 
 export interface DaySummary {
   dateKey: string; // YYYY-MM-DD
@@ -77,21 +77,13 @@ export class DayOrdersService {
    */
   public static getBusinessDateKey(
     dateInput: Date | string,
-    businessDayStartsAtHour: number = 6
+    businessDayStartsAtHour?: number
   ): string {
     const d = new Date(dateInput);
-    if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
-
-    const hour = d.getHours();
-    const adjusted = new Date(d);
-    if (hour < businessDayStartsAtHour) {
-      // Order belongs to previous business day
-      adjusted.setDate(adjusted.getDate() - 1);
-    }
-    const year = adjusted.getFullYear();
-    const month = String(adjusted.getMonth() + 1).padStart(2, '0');
-    const day = String(adjusted.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    if (businessDayStartsAtHour === undefined) return BusinessDayRepository.getCanonicalBusinessDate(d).dateKey;
+    if (isNaN(d.getTime())) return 'Invalid Date';
+    const adjusted = getRestaurantHour(d) < businessDayStartsAtHour ? new Date(d.getTime() - 86400000) : d;
+    return formatRestaurantDate(adjusted, 'ISO_DATE');
   }
 
   /**
@@ -100,10 +92,12 @@ export class DayOrdersService {
   public static getDaySummary(
     allOrders: Order[],
     dateKey: string,
-    businessDayStartsAtHour: number = 6
+    businessDayStartsAtHour?: number
   ): DaySummary {
     const dayOrders = allOrders.filter(
-      (o) => this.getBusinessDateKey(o.createdAt, businessDayStartsAtHour) === dateKey
+      o => {
+        return (BusinessDayRepository.recordedBusinessDate(o) ?? this.getBusinessDateKey(o.createdAt, businessDayStartsAtHour)) === dateKey;
+      }
     );
 
     const [y, m, d] = dateKey.split('-').map(Number);
@@ -166,7 +160,7 @@ export class DayOrdersService {
     // Process all orders for this day
     dayOrders.forEach((o) => {
       const isCancelled = o.orderStatus === 'CANCELLED';
-      const isRefunded = o.orderStatus === 'REFUNDED';
+      const isRefunded = o.orderStatus === 'REFUNDED' || (o.refundAmount ?? 0) > 0;
 
       if (isCancelled) {
         cancelledOrders++;
@@ -183,14 +177,16 @@ export class DayOrdersService {
 
       if (isRefunded) {
         refundedOrders++;
-        refunds += o.totalAmount;
+        const refundAmount = o.refundAmount ?? o.totalAmount;
+        const event = [...(o.timeline ?? [])].reverse().find(entry => entry.status === 'REFUNDED');
+        refunds += refundAmount;
         refundsList.push({
           orderId: o.id,
           orderNumber: o.orderNumber,
           originalAmount: o.totalAmount,
-          refundAmount: o.totalAmount,
-          reason: 'Customer return / Dispute',
-          approvedBy: 'Manager',
+          refundAmount,
+          reason: event?.note?.replace(/^Reason:\s*/i, '') || 'Not recorded',
+          approvedBy: event?.actor || 'Not recorded',
           time: formatTime(o.updatedAt || o.createdAt)
         });
       } else if (o.orderStatus === 'COMPLETED' || o.paymentStatus === 'SUCCESS') {
@@ -201,8 +197,9 @@ export class DayOrdersService {
 
       // Still open and unpaid (in the kitchen, bill requested, pay-at-counter): listed as an order, but it is
       // not a sale and not collected money until it is settled (BUG-151/161).
-      if (isUnpaidOpenOrder(o)) {
-        openBills += o.totalAmount;
+      const position = orderPaymentPosition(o);
+      if (position.outstandingPaise > 0) openBills += position.outstandingPaise / 100;
+      if (position.collectedPaise === 0) {
         return;
       }
 
@@ -212,21 +209,13 @@ export class DayOrdersService {
       discounts += o.discountAmount || 0;
       tax += o.taxAmount || ((o.cgstAmount || 0) + (o.sgstAmount || 0));
 
-      // Payment allocations
-      const pMethod = (o.paymentMethod || '').toUpperCase();
-      if (pMethod.includes('CASH')) {
-        paymentBreakdown.cash += o.totalAmount;
-      } else if (pMethod.includes('UPI')) {
-        paymentBreakdown.upi += o.totalAmount;
-      } else if (pMethod.includes('CARD') || pMethod.includes('EDC') || pMethod.includes('POS')) {
-        paymentBreakdown.card += o.totalAmount;
-      } else if (pMethod.includes('WALLET') || pMethod.includes('PAYTM')) {
-        paymentBreakdown.wallet += o.totalAmount;
-      } else if (pMethod.includes('SPLIT')) {
-        paymentBreakdown.split += o.totalAmount;
-      } else {
-        paymentBreakdown.other += o.totalAmount;
-      }
+      const t = position.netTenders;
+      paymentBreakdown.cash += t.cash;
+      paymentBreakdown.upi += t.upi;
+      paymentBreakdown.card += t.card;
+      paymentBreakdown.wallet += t.wallet;
+      paymentBreakdown.other += t.houseAccount + t.other;
+      if (o.paymentMethod === 'SPLIT') paymentBreakdown.split += position.netCollectedPaise / 100;
 
       // Order Type Breakdown
       const oType = (o.orderType || '').toUpperCase();
@@ -278,9 +267,9 @@ export class DayOrdersService {
       }
     });
 
-    const netSales = Math.max(0, totalSales - refunds);
+    const netSales = dayOrders.reduce((sum, order) => sum + orderPaymentPosition(order).netCollectedPaise / 100, 0);
     const validOrdersCount = completedOrders + refundedOrders;
-    const avgOrderValue = validOrdersCount > 0 ? Math.round(totalSales / validOrdersCount) : 0;
+    const avgOrderValue = validOrdersCount > 0 ? Math.round(totalSales / validOrdersCount * 100) / 100 : 0;
 
     // Top ranked items sorted by quantity
     const topItems = Array.from(itemCounts.values())
@@ -357,7 +346,7 @@ export class DayOrdersService {
     filterPreset: DateFilterPreset = 'TODAY',
     customStart?: Date,
     customEnd?: Date,
-    businessDayStartsAtHour: number = 6
+    businessDayStartsAtHour?: number
   ): DaySummary[] {
     const allDateKeysSet = new Set<string>();
 

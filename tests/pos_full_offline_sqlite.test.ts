@@ -127,7 +127,7 @@ describe('POS: every counter function works with no network, on SQLite', () => {
     // End of shift and business-day figures are computed from local data
     const metrics = ShiftRepository.getShiftMetrics(ShiftRepository.getActiveShift());
     expect(metrics).toBeTruthy();
-    ShiftRepository.closeShift(shift.id, 2100 + 5);
+    ShiftRepository.closeShift(shift.id, 2100 + 5, 'Physical count confirmed; manager reviewed the difference from recorded collections.');
     expect(ShiftRepository.getAllShifts().find((s) => s.id === shift.id)?.status).toBe('CLOSED');
     const day = BusinessDayRepository.getActiveBusinessDay();
     expect(BusinessDayRepository.recalculateMetrics(day.id)).toBeTruthy();

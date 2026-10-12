@@ -2,20 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CustomerAccount } from '@jamanvaar/types';
 import { Modal, Button, FormInput } from '@jamanvaar/ui';
 import { CustomerRepository, db } from '@jamanvaar/database';
-import { formatINR, formatDate, formatTime, isValidIndianPhone, normalizeIndianPhone } from '@jamanvaar/utils';
-import {
-  Award,
-  ShoppingBag,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  Tag,
-  FileText,
-  Clock,
-  Sparkles
-} from 'lucide-react';
+import { formatINR, isValidIndianPhone, normalizeIndianPhone } from '@jamanvaar/utils';
+import { Award, User, Phone, Mail, MapPin, Calendar, Tag, FileText, Sparkles } from 'lucide-react';
 
 interface CustomerModalProps {
   isOpen: boolean;

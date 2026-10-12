@@ -1,47 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import { RefundRegisterSelect } from './RefundRegisterSelect';
+import React, { useState, useMemo, useRef } from 'react';
 import { Order } from '@jamanvaar/types';
 import { formatINR, formatDate, formatTime, getOrderSource, getBillingTender, ORDER_SOURCE_LABELS, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
-import { db, AuditRepository, OrderRepository, ReceiptRepository, isUnpaidOpenOrder, billsWaiting, billLinesOf } from '@jamanvaar/database';
+import { db, ReceiptRepository, isUnpaidOpenOrder, billsWaiting, billLinesOf } from '@jamanvaar/database';
 import { DayOrdersService, CentralReportingService } from '@jamanvaar/business';
 import { printThermalReceipt, EmptyState, printElement, ModalBackdrop } from '@jamanvaar/ui';
 import { exportBillingCsv, formatBillingMoney, isPendingCollection, isSubmittedBillingOrder, summarizeBillingLedger } from './billingLedger';
+import { refundBillingOrder, voidBillingOrder } from './billingCommands';
 import { BillingStatementDocument } from './BillingStatementDocument';
-import {
-  DollarSign,
-  CreditCard,
-  QrCode,
-  Coins,
-  Receipt,
-  Search,
-  Filter,
-  FileSpreadsheet,
-  Printer,
-  Calendar,
-  X,
-  Eye,
-  RotateCcw,
-  Ban,
-  CheckCircle2,
-  Clock,
-  User,
-  Users,
-  ChevronDown,
-  ChevronRight,
-  Sparkles,
-  ShoppingBag,
-  Utensils,
-  Share2,
-  MessageSquare,
-  FileText,
-  Layers,
-  ArrowRight,
-  TrendingUp,
-  AlertTriangle
-} from 'lucide-react';
+import type { BillingEntry } from '../dashboard/dashboardDrilldown';
+import { DollarSign, CreditCard, QrCode, Coins, Receipt, Search, FileSpreadsheet, Printer, X, RotateCcw, Ban, FileText, AlertTriangle } from 'lucide-react';
 
 interface BillingInvoicesModuleProps {
+  initialFilters?: BillingEntry;
   orders: Order[];
   onOrderUpdated: () => void;
   showToast: (msg: string) => void;
@@ -59,21 +32,27 @@ export type DateFilterPreset =
 export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
   orders,
   onOrderUpdated,
-  showToast
+  showToast,
+  initialFilters
 }) => {
+  const operationLock = useRef(false);
+  const [operationBusy, setOperationBusy] = useState(false);
+  const [payingShiftId, setPayingShiftId] = useState('');
+  const [moneyReturned, setMoneyReturned] = useState(false);
+  const [returnMethod, setReturnMethod] = useState<'CASH' | 'UPI_TO_CUSTOMER'>('CASH');
   // Date Filters
-  const [datePreset, setDatePreset] = useState<DateFilterPreset>('TODAY');
+  const [datePreset, setDatePreset] = useState<DateFilterPreset>(initialFilters ? 'CUSTOM' : 'TODAY');
   const [customStartDate, setCustomStartDate] = useState<string>(
-    new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    initialFilters?.from ?? new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   );
   const [customEndDate, setCustomEndDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
+    initialFilters?.to ?? new Date().toISOString().split('T')[0]
   );
 
   // Clickable Summary Filters
   const [paymentFilter, setPaymentFilter] = useState<string>('ALL'); // 'ALL' | 'CASH' | 'UPI_QR' | 'CARD_TERMINAL' | 'SPLIT'
-  const [sourceFilter, setSourceFilter] = useState('ALL');
-  const [collectionFilter, setCollectionFilter] = useState('ALL');
+  const [sourceFilter, setSourceFilter] = useState(initialFilters?.source ?? 'ALL');
+  const [collectionFilter, setCollectionFilter] = useState<string>(initialFilters?.collection ?? 'ALL');
   const [orderTypeFilter, setOrderTypeFilter] = useState<string>('ALL'); // 'ALL' | 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY' | 'TOKEN'
   const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'COMPLETED' | 'CONFIRMED' | 'PREPARING' | 'READY' | 'CANCELLED' | 'REFUNDED'
   const [refundOnlyFilter, setRefundOnlyFilter] = useState<boolean>(false);
@@ -84,7 +63,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
   const [posTerminalFilter, setPosTerminalFilter] = useState<string>('ALL');
 
   // Search
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(initialFilters?.search ?? '');
 
   // View Mode: Flat vs Day-Grouped
   const [viewMode, setViewMode] = useState<'FLAT' | 'DAY_GROUPED'>('FLAT');
@@ -206,6 +185,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
+        const matchOrderId = ord.id.toLowerCase().includes(q);
         const matchOrderNum = ord.orderNumber?.toLowerCase().includes(q);
         const matchInvoiceNum = (ord as any).invoiceNumber?.toLowerCase().includes(q);
         const matchToken = ord.tokenNumber?.toLowerCase().includes(q);
@@ -217,6 +197,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
         const matchItem = ord.items.some((it) => it.name?.toLowerCase().includes(q));
 
         if (
+          !matchOrderId &&
           !matchOrderNum &&
           !matchInvoiceNum &&
           !matchToken &&
@@ -250,13 +231,13 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
   const dayGroupedLedger = useMemo(() => {
     const map = new Map<string, Order[]>();
     filteredOrders.forEach((o) => {
-      const key = DayOrdersService.getBusinessDateKey(o.createdAt, 6);
+      const key = DayOrdersService.getBusinessDateKey(o.createdAt);
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(o);
     });
 
     return Array.from(map.entries()).map(([dateKey, dayOrds]) => {
-      const daySummary = DayOrdersService.getDaySummary(dayOrds, dateKey, 6);
+      const daySummary = DayOrdersService.getDaySummary(dayOrds, dateKey);
       return {
         dateKey,
         displayDate: daySummary.formattedDate,
@@ -343,37 +324,24 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
     printThermalReceipt(ord, '80mm', ReceiptRepository.getConfig());
   };
 
-  // Handler: Process Refund
-  const handleProcessRefund = () => {
-    if (!selectedOrder) return;
-    selectedOrder.orderStatus = 'REFUNDED';
-    AuditRepository.log({
-      action: 'ORDER_REFUNDED',
-      category: 'ORDER',
-      details: `Refunded Order #${selectedOrder.orderNumber} (₹${selectedOrder.totalAmount}) - Reason: ${refundReason}`,
-      username: 'Floor Manager'
-    });
-    db.notify();
-    onOrderUpdated();
-    setIsRefundModalOpen(false);
-    showToast(`Order #${selectedOrder.orderNumber} Refunded Successfully!`);
+  const handleProcessRefund = async () => {
+    if (!selectedOrder || operationLock.current) return;
+    operationLock.current = true; setOperationBusy(true);
+    try {
+      const message = await refundBillingOrder(selectedOrder, refundReason, moneyReturned, returnMethod, selectedOrder.totalAmount, payingShiftId || undefined);
+      onOrderUpdated(); setIsRefundModalOpen(false); setMoneyReturned(false); showToast(message);
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Refund could not be recorded.'); }
+    finally { operationLock.current = false; setOperationBusy(false); }
   };
 
-  // Handler: Void / Cancel
-  const handleVoidOrder = () => {
-    if (!selectedOrder) return;
-    selectedOrder.orderStatus = 'CANCELLED';
-    selectedOrder.updatedAt = new Date().toISOString();
-    AuditRepository.log({
-      action: 'ORDER_CANCELLED',
-      category: 'ORDER',
-      details: `Voided Order #${selectedOrder.orderNumber} - Reason: ${cancelReason}`,
-      username: 'Floor Manager'
-    });
-    db.notify();
-    onOrderUpdated();
-    setIsCancelModalOpen(false);
-    showToast(`Order #${selectedOrder.orderNumber} Voided / Cancelled!`);
+  const handleVoidOrder = async () => {
+    if (!selectedOrder || operationLock.current) return;
+    operationLock.current = true; setOperationBusy(true);
+    try {
+      await voidBillingOrder(selectedOrder, cancelReason);
+      onOrderUpdated(); setIsCancelModalOpen(false); showToast('Cancellation recorded. Kitchen synchronization requested.');
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Cancellation could not be recorded.'); }
+    finally { operationLock.current = false; setOperationBusy(false); }
   };
 
   return (
@@ -1317,7 +1285,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                   )}
 
                   <div className="pt-2 text-[11px] text-slate-500 font-bold">
-                    Payment Status: <span className="text-emerald-700">● FULLY SETTLED</span>
+                    Payment Status: <span className="text-jaman-navy">{selectedOrder.paymentStatus === 'SUCCESS' ? 'FULLY SETTLED' : selectedOrder.paymentStatus.replace(/_/g, ' ')}</span>
                   </div>
                 </div>
 
@@ -1352,16 +1320,16 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             {/* Modal Actions Footer */}
             <div className="p-4 bg-jaman-cream border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                {selectedOrder.orderStatus !== 'REFUNDED' && (
+                {selectedOrder.paymentStatus === 'SUCCESS' && !selectedOrder.refundAmount && selectedOrder.orderStatus !== 'REFUNDED' && selectedOrder.orderStatus !== 'CANCELLED' && (
                   <button
-                    onClick={() => setIsRefundModalOpen(true)}
+                    onClick={() => { setMoneyReturned(false); setReturnMethod('CASH'); setIsRefundModalOpen(true); }}
                     className="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs rounded-xl transition-colors"
                   >
                     ↩️ Refund Bill
                   </button>
                 )}
 
-                {selectedOrder.orderStatus !== 'CANCELLED' && (
+                {!['CANCELLED', 'REFUNDED'].includes(selectedOrder.orderStatus) && !['SUCCESS', 'REFUNDED', 'PARTIALLY_PAID', 'PARTIALLY_REFUNDED'].includes(selectedOrder.paymentStatus) && !(selectedOrder.paymentAllocationSummary?.collectedPaise) && (
                   <button
                     onClick={() => setIsCancelModalOpen(true)}
                     className="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-900 font-bold text-xs rounded-xl transition-colors"
@@ -1416,6 +1384,10 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 className="w-full bg-jaman-cream border border-slate-300 rounded-xl p-2.5 text-xs font-bold"
               />
             </div>
+            <p className="text-xs text-slate-600">This records money already returned by staff. It does not automatically send money through Razorpay.</p>
+            <label className="block text-xs font-bold">Return method<select className="mt-1 w-full rounded-xl border p-2" value={returnMethod} onChange={e => { setReturnMethod(e.target.value as 'CASH' | 'UPI_TO_CUSTOMER'); setMoneyReturned(false); }}><option value="CASH">Cash returned</option><option value="UPI_TO_CUSTOMER">UPI sent to customer</option></select></label>
+            <RefundRegisterSelect value={payingShiftId} onChange={value => { setPayingShiftId(value); setMoneyReturned(false); }} />
+            <label className="flex items-start gap-2 text-xs"><input type="checkbox" checked={moneyReturned} onChange={e => setMoneyReturned(e.target.checked)} />I confirm the full amount has already been returned to this customer.</label>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={() => setIsRefundModalOpen(false)}
@@ -1424,10 +1396,11 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 Cancel
               </button>
               <button
+                disabled={operationBusy || !moneyReturned || !refundReason.trim()}
                 onClick={handleProcessRefund}
                 className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl"
               >
-                Confirm Refund
+                {operationBusy ? 'Recording...' : 'Record returned payment'}
               </button>
             </div>
           </div>
@@ -1462,10 +1435,11 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 Cancel
               </button>
               <button
+                disabled={operationBusy || !cancelReason.trim()}
                 onClick={handleVoidOrder}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl"
               >
-                Confirm Void
+                {operationBusy ? 'Cancelling...' : 'Confirm Void'}
               </button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { db, LicenseRepository } from '@jamanvaar/database';
+import { LicenseRepository } from '@jamanvaar/database';
 import { PlanTier, PlanEntitlements, LicenseInfo } from '@jamanvaar/types';
 
 export interface PlanDefinition {

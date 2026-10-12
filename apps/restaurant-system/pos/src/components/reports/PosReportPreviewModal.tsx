@@ -5,17 +5,7 @@ import { ReportFullData, ReportDesign, PdfReportBuilder } from '../../services/p
 import { PosPrinterService } from '../../services/printerService';
 import { db, PrintQueueRepository } from '@jamanvaar/database';
 import { slipHeader } from '@jamanvaar/utils';
-import {
-  X,
-  Download,
-  Printer,
-  ZoomIn,
-  ZoomOut,
-  Sparkles,
-  CheckCircle2,
-  FileText,
-  RefreshCw
-} from 'lucide-react';
+import { X, Download, Printer, ZoomIn, ZoomOut, FileText, RefreshCw } from 'lucide-react';
 
 interface PosReportPreviewModalProps {
   isOpen: boolean;

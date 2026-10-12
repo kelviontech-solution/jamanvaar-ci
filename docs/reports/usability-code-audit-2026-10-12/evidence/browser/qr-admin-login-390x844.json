@@ -1,0 +1,48 @@
+{
+  "name": "qr-admin-login",
+  "route": "/qr/login/",
+  "viewport": "width=device-width, initial-scale=1.0",
+  "title": "Jamanvaar QR Admin",
+  "headings": [
+    "Good service starts here.",
+    "Welcome to QR Admin"
+  ],
+  "text": "QR ORDERING\nMenu\nLogin\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\nExplore the interactive demo →\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+  "horizontalOverflow": false,
+  "buttons": [
+    {
+      "text": "Menu",
+      "aria": null,
+      "width": 50,
+      "height": 39
+    },
+    {
+      "text": "Show",
+      "aria": null,
+      "width": 55,
+      "height": 42
+    },
+    {
+      "text": "Sign in",
+      "aria": null,
+      "width": 303,
+      "height": 46
+    }
+  ],
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "loaded": true
+    },
+    {
+      "alt": "A warm restaurant table with a Gujarati meal",
+      "loaded": true
+    },
+    {
+      "alt": "Jamanvaar",
+      "loaded": true
+    }
+  ],
+  "blockedRequests": 0,
+  "errors": []
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePosStore } from '../../store/posStore';
-import { AlertCircle, RotateCcw, Trash2, ShoppingBag } from 'lucide-react';
+import { AlertCircle, RotateCcw, Trash2 } from 'lucide-react';
 
 export const CrashRecoveryBanner: React.FC = () => {
   const { recoverableDraft, recoverDraftSession, discardDraftSession } = usePosStore();

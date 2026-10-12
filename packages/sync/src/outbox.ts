@@ -44,6 +44,8 @@ export interface OrderSyncPushItem {
 }
 
 export interface OrderSyncMeta {
+  tableReleasedAt?: string;
+  paymentConfirmation?: Order['paymentConfirmation'];
   pickupAt?:string;pickupTimezone?:string;pickupInstructions?:string;
   serverDishStockConsumed?:Record<string,number>;
   paymentAllocationSummary?: Order['paymentAllocationSummary'];
@@ -71,6 +73,7 @@ export interface OrderSyncMeta {
   businessDayId?: string;
   paymentTransactionId?: string;
   refundAmountPaise?: number;
+  refundEvents?: Order['refundEvents'];
   tenderedAmountPaise?: number;
   paymentSplits?: Array<{ method: string; amountPaise: number }>;
   cgstPaise?: number;
@@ -252,6 +255,8 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       cashierName: order.cashierName,
       captainName: order.captainName,
       billRequestedAt: order.billRequestedAt,
+      tableReleasedAt: order.tableReleasedAt,
+      paymentConfirmation: order.paymentConfirmation,
       billSplitNote: order.billSplitNote,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
@@ -266,6 +271,7 @@ function toPushEvent(order: Order): OrderSyncPushEvent {
       acceptedBy: order.acceptedByDeviceId,
       businessDayId: order.businessDayId,
       paymentTransactionId: order.paymentTransactionId,
+      refundEvents: order.refundEvents,
       refundAmountPaise: order.refundAmount === undefined ? undefined : toPaise(order.refundAmount),
       tenderedAmountPaise: order.tenderedAmount !== undefined ? toPaise(order.tenderedAmount) : undefined,
       paymentSplits: order.paymentSplits?.map((l) => ({ method: l.method, amountPaise: toPaise(l.amount) })),
@@ -331,6 +337,8 @@ function applyPaymentAndTotals(local: Order, remote: CloudSyncedOrder): void {
   if (m?.paymentAllocationSummary) local.paymentAllocationSummary = m.paymentAllocationSummary;
   if (m?.sourceType === "QR_TABLE" && m?.verifiedCustomerId) local.serverQrLoyalty = true;
   if (m) {
+    if (m.tableReleasedAt && (!local.tableReleasedAt || m.tableReleasedAt > local.tableReleasedAt)) local.tableReleasedAt = m.tableReleasedAt;
+    if (m.paymentConfirmation) local.paymentConfirmation = m.paymentConfirmation;
     if (m.customerPhone !== undefined) local.customerPhone = m.customerPhone;
     if (m.customerName !== undefined) local.customerName = m.customerName;
     if (m.loyaltyRedemption) local.loyaltyRedemption = m.loyaltyRedemption;
@@ -372,6 +380,7 @@ function applyRemoteToLocalOrder(local: Order, remote: CloudSyncedOrder): boolea
   if (remote.meta?.acceptedBy) local.acceptedByDeviceId = remote.meta.acceptedBy;
   if (remote.meta?.billRequestedAt) local.billRequestedAt = remote.meta.billRequestedAt;
   if (remote.meta?.billSplitNote) local.billSplitNote = remote.meta.billSplitNote;
+  if (remote.meta?.refundEvents) local.refundEvents = remote.meta.refundEvents;
   if (remote.meta?.refundAmountPaise !== undefined) local.refundAmount = fromPaise(remote.meta.refundAmountPaise);
   let addedItems = false;
   remote.items.forEach((ri) => {
@@ -437,6 +446,7 @@ function buildLocalOrderFromRemote(remote: CloudSyncedOrder): Order {
     tableId: remote.tableId || undefined,
     tableNumber: remote.tableLabel || undefined,
     guestCount: m.guestCount,
+    refundEvents: m.refundEvents,
     refundAmount: m.refundAmountPaise === undefined ? undefined : fromPaise(m.refundAmountPaise),
     pickupAt:m.pickupAt,pickupTimezone:m.pickupTimezone,pickupInstructions:m.pickupInstructions,
     customerName: m.customerName,

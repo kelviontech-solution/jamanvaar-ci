@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { KitchenStationRepository } from '@jamanvaar/database';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
 import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage, FormInput, FormSelect } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
-import { Upload, Sparkles, Image as ImageIcon, Sliders, Plus } from 'lucide-react';
+import { Image as ImageIcon, Sliders, Plus } from 'lucide-react';
 import { GroupEditor } from './menu/MenuOptionsModule';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
@@ -362,7 +363,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
 
             />
             <datalist id="kitchen-station-options">
-              {Array.from(new Set(['Main Kitchen', ...db.menuItems.map((m) => (m.kitchenStation || '').trim()).filter(Boolean)])).map((n) => (
+              {Array.from(new Set(['Main Kitchen', ...KitchenStationRepository.list().map(row => row.name), ...db.menuItems.map((m) => KitchenStationRepository.resolve(m.kitchenStation || '')?.name || (m.kitchenStation || '').trim()).filter(Boolean)])).map((n) => (
                 <option key={n} value={n} />
               ))}
             </datalist>

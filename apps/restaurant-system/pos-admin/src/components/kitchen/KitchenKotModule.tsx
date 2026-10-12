@@ -1,26 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { KOTRecord, KOTItem, KOTStatus } from '@jamanvaar/types';
-import { db, KOTRepository, AuditRepository } from '@jamanvaar/database';
+import { KitchenStationsPanel } from './KitchenStationsPanel';
+import { KOTRecord, KOTStatus } from '@jamanvaar/types';
+import { db, KOTRepository, AuditRepository, KitchenStationRepository } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { formatTime } from '@jamanvaar/utils';
 import { printThermalKotTicket, EmptyState } from '@jamanvaar/ui';
-import {
-  Flame,
-  ChefHat,
-  Clock,
-  Printer,
-  CheckCircle2,
-  AlertCircle,
-  RefreshCw,
-  Search,
-  Filter,
-  CheckCheck,
-  XCircle,
-  Utensils,
-  Coffee,
-  IceCream,
-  Timer
-} from 'lucide-react';
+import { Flame, ChefHat, Printer, CheckCircle2, Search, CheckCheck, Utensils, Coffee, IceCream, Timer } from 'lucide-react';
 
 interface KitchenKotModuleProps {
   showToast: (msg: string) => void;
@@ -43,7 +28,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
   const filteredKots = useMemo(() => {
     return kots.filter((kot) => {
       // Station filter
-      if (stationFilter !== 'ALL' && kot.station !== stationFilter) {
+      if (stationFilter !== 'ALL' && !KitchenStationRepository.matches(kot.stationId || kot.station,stationFilter)) {
         return false;
       }
 
@@ -109,6 +94,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto select-none">
+      <KitchenStationsPanel/>
       
       {/* Header & Quick Action Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -182,10 +168,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
           <div className="flex items-center gap-1.5 overflow-x-auto">
             {[
               { id: 'ALL', label: 'All Kitchen Stations', icon: ChefHat },
-              { id: 'Main Kitchen', label: 'Main Kitchen', icon: Utensils },
-              { id: 'Tandoor', label: 'Tandoor & Breads', icon: Flame },
-              { id: 'Bar', label: 'Beverages & Bar', icon: Coffee },
-              { id: 'Dessert', label: 'Dessert Station', icon: IceCream }
+              ...Array.from(new Set([...KitchenStationRepository.list().map(row => row.name), ...db.menuItems.map(item => item.kitchenStation), ...kots.map(ticket => ticket.station)].filter(Boolean).map(name => KitchenStationRepository.resolve(name!)?.name || name!))).sort().map(name => ({id:KitchenStationRepository.resolve(name)?.id || name,label:name,icon:ChefHat}))
             ].map((st) => (
               <button
                 key={st.id}

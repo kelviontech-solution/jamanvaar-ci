@@ -1,4 +1,4 @@
-import { Cart, MenuItem, Order, SelectedModifier } from './domain';
+import { Cart, Order } from './domain';
 import { OrderType, PaymentMethod } from './enums';
 
 export interface CreateOrderRequest {

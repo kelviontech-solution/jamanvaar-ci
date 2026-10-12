@@ -1,0 +1,308 @@
+{
+  "checkedAt": "2026-10-12T16:12:59.699Z",
+  "scope": "Actual React components, isolated local fixture data, all backend/external requests blocked. Does not verify production authentication, real gateway payment, or cross-device server delivery.",
+  "results": [
+    {
+      "mode": "practice",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Staff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice −\n\nPractice only: no real order, payment, stock change or printing.\n\n1. Menu\n2. Orders\n3. Cooking\n4. Served\n5. Collect\n6. Done\nPractice completed\n\nPractice completed · ₹100 · Cash\n\nStart again",
+      "buttons": [
+        {
+          "text": "Staff practice −",
+          "height": 44
+        },
+        {
+          "text": "Start again",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "completed": true,
+        "isolationWarning": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "practice",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Staff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice −\n\nPractice only: no real order, payment, stock change or printing.\n\n1. Menu\n2. Orders\n3. Cooking\n4. Served\n5. Collect\n6. Done\nPractice completed\n\nPractice completed · ₹100 · Cash\n\nStart again",
+      "buttons": [
+        {
+          "text": "Staff practice −",
+          "height": 44
+        },
+        {
+          "text": "Start again",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "completed": true,
+        "isolationWarning": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "stations",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Kitchen stations & previous names\n\nRenaming keeps the station identity. Previous names route to the same station; similar names never route automatically.\n\nRegister existing kitchen names\nAdd station\nStation name\nPrevious names (comma separated)\nSave",
+      "buttons": [
+        {
+          "text": "Register existing kitchen names",
+          "height": 44
+        },
+        {
+          "text": "Add station",
+          "height": 44
+        },
+        {
+          "text": "Save",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "namesVisible": true,
+        "aliasEditing": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "stations",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Kitchen stations & previous names\n\nRenaming keeps the station identity. Previous names route to the same station; similar names never route automatically.\n\nRegister existing kitchen names\nAdd station\nStation name\nPrevious names (comma separated)\nSave",
+      "buttons": [
+        {
+          "text": "Register existing kitchen names",
+          "height": 44
+        },
+        {
+          "text": "Add station",
+          "height": 44
+        },
+        {
+          "text": "Save",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "namesVisible": true,
+        "aliasEditing": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "branding",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Report branding & legal profile\n\nRestaurant identity used on End of Day (EOD) Z-Reports, GST tax invoices, and thermal bills. Applies to this restaurant on every terminal.\n\nSave changes\nBusiness date rollover\n00:00 restaurant time\n01:00 restaurant time\n02:00 restaurant time\n03:00 restaurant time\n04:00 restaurant time\n05:00 restaurant time\n06:00 restaurant time\n07:00 restaurant time\n08:00 restaurant time\n09:00 restaurant time\n10:00 restaurant time\n11:00 restaurant time\n12:00 restaurant time\n13:00 restaurant time\n14:00 restaurant time\n15:00 restaurant time\n16:00 restaurant time\n17:00 restaurant time\n18:00 restaurant time\n19:00 restaurant time\n20:00 restaurant time\n21:00 restaurant time\n22:00 restaurant time\n23:00 restaurant time\nRestaurant timezone\n\nOrders before this hour belong to the previous business date. This never counts cash or closes a register. Owner sign-in and a successful server save are required; terminals receive the setting on their next profile refresh.\n\nBranch operating profile\n\nSelected branch: current rollover 05:00 in Asia/Kolkata. Changes start tomorrow in the current restaurant timezone.\n\nFollow restaurant defaults\n\nPreview: Use the restaurant timezone and rollover rule, including future default changes.\n\nApply branch profile\nRefresh device acknowledgement\n\nCould not refresh profile or device acknowledgements. Check the connection and retry.\n\nBrand preview\nJAMANVAAR RESTAURANT\n\nAuthentic Indian Cuisine & Seamless Dining by KELVIONTECH\n\nSindhu Bhavan Road, Bodakdev Ahmedabad +91 79 4890 1234\n\nOrder preview\n\nOfficial Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH\n\nPreview shows unsaved edits. Saving publishes the branding profile; device acknowledgement is shown separately above.\n\nShow JAMAN AI Assistant\nControls JAMAN AI visibility in Restaurant Admin, POS, Captain, KDS and Kiosk. Platform access is granted separately by your plan or Super Admin.\n\nPlatform access: Waiting for server settings\n\nRefresh assistant access\nLIVE DOCUMENT HEADER PREVIEW:\nJAMANVAAR RESTAURANT\nJAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED\nAuthentic Indian Cuisine & Seamless Dining by KELVIONTECH\nSindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054\nGSTIN: 24ABCDE1234F1Z5 • FSSAI: 10722001000452\nPhone: +91 79 4890 1234 • Email: hello@jamanvaar.com\n1. Restaurant Identity & Trade Names\nRestaurant Trade / Brand Name:\nUsed in customer apps, bills & headings\nLegal Registered Entity Name:\nUsed on GST Invoices & official EOD Reports\nBrand Tagline / Slogan:\nRestaurant Logo Asset Path / URL:\nReset\n2. Statutory Tax & Regulatory Credentials\nGSTIN Number (15 Digits):\nOptional — leave blank if not GST-registered\nFSSAI License Number (14 Digits):\nMSME / Udyam Number (Optional):\n3. Address & Geographical Location\nStreet Address:\nCity:\nState & Pincode:\n4. Contact Channels & Website\nContact Phone:\nContact Email:\nOfficial Website URL:\n5. Signatories & Printed Statement Footer\nRestaurant Owner Name:\nFloor Manager Name:\nReport Footer Closing Remark:\nSave & Apply Across All Reports",
+      "buttons": [
+        {
+          "text": "Save changes",
+          "height": 40
+        },
+        {
+          "text": "Apply branch profile",
+          "height": 32
+        },
+        {
+          "text": "Refresh device acknowledgement",
+          "height": 32
+        },
+        {
+          "text": "Refresh assistant access",
+          "height": 16
+        },
+        {
+          "text": "Reset",
+          "height": 36
+        },
+        {
+          "text": "Save & Apply Across All Reports",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "operatingRules": true,
+        "rollover": true,
+        "noNestedForms": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "branding",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Report branding & legal profile\n\nRestaurant identity used on End of Day (EOD) Z-Reports, GST tax invoices, and thermal bills. Applies to this restaurant on every terminal.\n\nSave changes\nBusiness date rollover\n00:00 restaurant time\n01:00 restaurant time\n02:00 restaurant time\n03:00 restaurant time\n04:00 restaurant time\n05:00 restaurant time\n06:00 restaurant time\n07:00 restaurant time\n08:00 restaurant time\n09:00 restaurant time\n10:00 restaurant time\n11:00 restaurant time\n12:00 restaurant time\n13:00 restaurant time\n14:00 restaurant time\n15:00 restaurant time\n16:00 restaurant time\n17:00 restaurant time\n18:00 restaurant time\n19:00 restaurant time\n20:00 restaurant time\n21:00 restaurant time\n22:00 restaurant time\n23:00 restaurant time\nRestaurant timezone\n\nOrders before this hour belong to the previous business date. This never counts cash or closes a register. Owner sign-in and a successful server save are required; terminals receive the setting on their next profile refresh.\n\nBranch operating profile\n\nSelected branch: current rollover 05:00 in Asia/Kolkata. Changes start tomorrow in the current restaurant timezone.\n\nFollow restaurant defaults\n\nPreview: Use the restaurant timezone and rollover rule, including future default changes.\n\nApply branch profile\nRefresh device acknowledgement\n\nCould not refresh profile or device acknowledgements. Check the connection and retry.\n\nBrand preview\nJAMANVAAR RESTAURANT\n\nAuthentic Indian Cuisine & Seamless Dining by KELVIONTECH\n\nSindhu Bhavan Road, Bodakdev Ahmedabad +91 79 4890 1234\n\nOrder preview\n\nOfficial Daily Closing Statement • Powered by JAMANVAAR by KELVIONTECH\n\nPreview shows unsaved edits. Saving publishes the branding profile; device acknowledgement is shown separately above.\n\nShow JAMAN AI Assistant\nControls JAMAN AI visibility in Restaurant Admin, POS, Captain, KDS and Kiosk. Platform access is granted separately by your plan or Super Admin.\n\nPlatform access: Waiting for server settings\n\nRefresh assistant access\nLIVE DOCUMENT HEADER PREVIEW:\nJAMANVAAR RESTAURANT\nJAMANVAAR FOODS & HOSPITALITY PRIVATE LIMITED\nAuthentic Indian Cuisine & Seamless Dining by KELVIONTECH\nSindhu Bhavan Road, Bodakdev, Ahmedabad, Gujarat 380054\nGSTIN: 24ABCDE1234F1Z5 • FSSAI: 10722001000452\nPhone: +91 79 4890 1234 • Email: hello@jamanvaar.com\n1. Restaurant Identity & Trade Names\nRestaurant Trade / Brand Name:\nUsed in customer apps, bills & headings\nLegal Registered Entity Name:\nUsed on GST Invoices & official EOD Reports\nBrand Tagline / Slogan:\nRestaurant Logo Asset Path / URL:\nReset\n2. Statutory Tax & Regulatory Credentials\nGSTIN Number (15 Digits):\nOptional — leave blank if not GST-registered\nFSSAI License Number (14 Digits):\nMSME / Udyam Number (Optional):\n3. Address & Geographical Location\nStreet Address:\nCity:\nState & Pincode:\n4. Contact Channels & Website\nContact Phone:\nContact Email:\nOfficial Website URL:\n5. Signatories & Printed Statement Footer\nRestaurant Owner Name:\nFloor Manager Name:\nReport Footer Closing Remark:\nSave & Apply Across All Reports",
+      "buttons": [
+        {
+          "text": "Save changes",
+          "height": 40
+        },
+        {
+          "text": "Apply branch profile",
+          "height": 32
+        },
+        {
+          "text": "Refresh device acknowledgement",
+          "height": 32
+        },
+        {
+          "text": "Refresh assistant access",
+          "height": 16
+        },
+        {
+          "text": "Reset",
+          "height": 36
+        },
+        {
+          "text": "Save & Apply Across All Reports",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "operatingRules": true,
+        "rollover": true,
+        "noNestedForms": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "recovery",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "FORGOT PASSWORD\nReset your password\n\nEnter your Restaurant ID. We'll email a 6-digit code to your recovery email.\n\nRegistered owner email\n\nRestaurant IDs are sent only to the registered owner email. No activation keys or passwords are disclosed.\n\nEmail my Restaurant IDsI have my Restaurant ID\n← Back to Sign In",
+      "buttons": [
+        {
+          "text": "Email my Restaurant IDs",
+          "height": 44
+        },
+        {
+          "text": "I have my Restaurant ID",
+          "height": 44
+        },
+        {
+          "text": "← Back to Sign In",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "emailDiscovery": true,
+        "mailboxRestriction": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "recovery",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "FORGOT PASSWORD\nReset your password\n\nEnter your Restaurant ID. We'll email a 6-digit code to your recovery email.\n\nRegistered owner email\n\nRestaurant IDs are sent only to the registered owner email. No activation keys or passwords are disclosed.\n\nEmail my Restaurant IDsI have my Restaurant ID\n← Back to Sign In",
+      "buttons": [
+        {
+          "text": "Email my Restaurant IDs",
+          "height": 44
+        },
+        {
+          "text": "I have my Restaurant ID",
+          "height": 44
+        },
+        {
+          "text": "← Back to Sign In",
+          "height": 36
+        }
+      ],
+      "assertions": {
+        "emailDiscovery": true,
+        "mailboxRestriction": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "service-inbox",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "text": "Notifications\n1 new\nSystem & Workflow Real-Time Events\nAll (1)\nUnread (1)\nMark read\n🙋 Guest needs help\n09:42 PM\n\nGuest waiting at counter\n\nRequest completed",
+      "buttons": [
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "All (1)",
+          "height": 24
+        },
+        {
+          "text": "Unread (1)",
+          "height": 24
+        },
+        {
+          "text": "Mark read",
+          "height": 25
+        },
+        {
+          "text": "",
+          "height": 26
+        },
+        {
+          "text": "Request completed",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "accepted": true,
+        "resolved": true
+      },
+      "errors": []
+    },
+    {
+      "mode": "service-inbox",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "text": "Notifications\n1 new\nSystem & Workflow Real-Time Events\nAll (1)\nUnread (1)\nMark read\n🙋 Guest needs help\n09:42 PM\n\nGuest waiting at counter\n\nRequest completed",
+      "buttons": [
+        {
+          "text": "",
+          "height": 32
+        },
+        {
+          "text": "All (1)",
+          "height": 24
+        },
+        {
+          "text": "Unread (1)",
+          "height": 24
+        },
+        {
+          "text": "Mark read",
+          "height": 25
+        },
+        {
+          "text": "",
+          "height": 26
+        },
+        {
+          "text": "Request completed",
+          "height": 44
+        }
+      ],
+      "assertions": {
+        "accepted": true,
+        "resolved": true
+      },
+      "errors": []
+    }
+  ]
+}

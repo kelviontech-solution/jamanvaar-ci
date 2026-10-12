@@ -1,5 +1,5 @@
 import { Order, OrderStatus } from '@jamanvaar/types';
-import { db, OrderRepository } from '@jamanvaar/database';
+import { db } from '@jamanvaar/database';
 
 export class KdsMeshService {
   private static listeners: Set<(order: Order) => void> = new Set();

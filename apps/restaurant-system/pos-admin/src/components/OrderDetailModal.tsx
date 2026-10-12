@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { createRefund, CloudApiError } from '../cloud/cloudClient';
+import { RefundRegisterSelect } from './billing/RefundRegisterSelect';
+import React, { useState, useRef, useEffect } from 'react';
+import { refundBillingOrder, voidBillingOrder } from './billing/billingCommands';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
@@ -7,7 +8,7 @@ import { SessionPersistence } from '@jamanvaar/business';
 import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
-import { Printer, XCircle, RefreshCw, CheckCircle, Clock, Utensils, AlertTriangle, Check } from 'lucide-react';
+import { Printer, CheckCircle, Clock, Check } from 'lucide-react';
 
 interface OrderDetailModalProps {
   order: Order | null;
@@ -22,6 +23,12 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   onClose,
   onOrderUpdated
 }) => {
+  const operationLock = useRef(false);
+  const [operationBusy, setOperationBusy] = useState(false);
+  const [payingShiftId, setPayingShiftId] = useState('');
+  const [moneyReturned, setMoneyReturned] = useState(false);
+  const [returnMethod, setReturnMethod] = useState<'CASH' | 'UPI_TO_CUSTOMER'>('CASH');
+  useEffect(() => { setMoneyReturned(false); setPayingShiftId(''); setIsVoiding(false); setIsRefunding(false); }, [order?.id, isOpen]);
   const [isVoiding, setIsVoiding] = useState(false);
   const [voidReason, setVoidReason] = useState('');
   const [isRefunding, setIsRefunding] = useState(false);
@@ -47,62 +54,24 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     onOrderUpdated();
   };
 
-  const handleVoid = (e: React.FormEvent) => {
+  const handleVoid = async (e: React.FormEvent) => {
     e.preventDefault();
-    setVoidError('');
-    if (!voidReason) {
-      setVoidError('A reason is required to void this order.');
-      return;
-    }
-    // security-audit LOW-02: this used to hard-code 'Manager' regardless of
-    // who was actually signed in — POS-Admin's login is already restricted
-    // to MANAGER+ roles (HIGH-04), so a real identity is always available.
-    const actorName = SessionPersistence.load('admin')?.fullName || 'Manager';
-    try {
-      OrderRepository.voidOrder(order.id, voidReason, actorName);
-    } catch (err: any) {
-      setVoidError(err?.message || 'Void failed.');
-      return;
-    }
-    setIsVoiding(false);
-    setVoidReason('');
-    onOrderUpdated();
+    if (operationLock.current) return;
+    operationLock.current = true; setOperationBusy(true); setVoidError('');
+    try { await voidBillingOrder(order, voidReason); setIsVoiding(false); setVoidReason(''); onOrderUpdated(); }
+    catch (error) { setVoidError(error instanceof Error ? error.message : 'Cancellation failed.'); }
+    finally { operationLock.current = false; setOperationBusy(false); }
   };
 
   const handleRefund = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRefundError('');
-    const amt = parseFloat(refundAmount) || order.totalAmount;
-    if (!amt || !refundReason) {
-      setRefundError('A valid amount and reason are required to process this refund.');
-      return;
-    }
-
-    // security-audit LOW-02: this used to hard-code 'Manager' as the actor on
-    // both the cloud refund's attribution and the local audit log, regardless
-    // of who was actually signed in. POS-Admin's login is already restricted
-    // to MANAGER+ roles (HIGH-04), so a real identity is always available.
-    const actorName = SessionPersistence.load('admin')?.fullName || 'Manager';
-
-    if (order.paymentMethod === 'UPI' && order.paymentTransactionId) {
-      try {
-        await createRefund(order.paymentTransactionId, Math.round(amt * 100), refundReason, actorName, 'UPI_TO_CUSTOMER');
-      } catch (err) {
-        setRefundError(err instanceof CloudApiError ? err.message : 'Refund request failed');
-        return; // never flip local status on a failed cloud refund
-      }
-    }
-
+    if (operationLock.current) return;
+    operationLock.current = true; setOperationBusy(true); setRefundError('');
     try {
-      OrderRepository.refundOrder(order.id, amt, refundReason, actorName);
-    } catch (err: any) {
-      setRefundError(err?.message || 'Refund failed.');
-      return;
-    }
-    setIsRefunding(false);
-    setRefundAmount('');
-    setRefundReason('');
-    onOrderUpdated();
+      await refundBillingOrder(order, refundReason, moneyReturned, returnMethod, Number(refundAmount), payingShiftId || undefined);
+      setIsRefunding(false); setRefundAmount(''); setRefundReason(''); setMoneyReturned(false); onOrderUpdated();
+    } catch (error) { setRefundError(error instanceof Error ? error.message : 'Refund failed.'); }
+    finally { operationLock.current = false; setOperationBusy(false); }
   };
 
   return (
@@ -339,10 +308,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 Cancel
               </Button>
               <button
-                type="submit"
+                type="submit" disabled={operationBusy || !voidReason.trim()}
                 className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs"
               >
-                Confirm Void Order
+                {operationBusy ? 'Cancelling...' : 'Confirm Void Order'}
               </button>
             </div>
           </form>
@@ -354,7 +323,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 type="number"
                 required
                 value={refundAmount}
-                onChange={(e) => setRefundAmount(e.target.value)}
+                min="0.01" max={order.totalAmount} step="0.01"
+                onChange={(e) => { setRefundAmount(e.target.value); setMoneyReturned(false); }}
                 placeholder={`Amount (Max ₹${order.totalAmount})`}
                 className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-bold font-mono focus:outline-none"
               />
@@ -367,16 +337,20 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
               />
             </div>
+            <p>This records money already returned by staff; it does not send money through Razorpay.</p>
+            <label className="block font-bold">Return method<select className="ml-2 rounded-xl border p-2" value={returnMethod} onChange={e => { setReturnMethod(e.target.value as 'CASH' | 'UPI_TO_CUSTOMER'); setMoneyReturned(false); }}><option value="CASH">Cash</option><option value="UPI_TO_CUSTOMER">UPI sent to customer</option></select></label>
+            <RefundRegisterSelect value={payingShiftId} onChange={value => { setPayingShiftId(value); setMoneyReturned(false); }} />
+            <label className="flex gap-2 items-center"><input type="checkbox" checked={moneyReturned} onChange={e => setMoneyReturned(e.target.checked)} />I confirm this amount has already been returned to the customer.</label>
             {refundError && <p className="font-bold text-amber-800">{refundError}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" type="button" onClick={() => setIsRefunding(false)}>
                 Cancel
               </Button>
               <button
-                type="submit"
+                type="submit" disabled={operationBusy || !moneyReturned || !refundReason.trim()}
                 className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs"
               >
-                Confirm Refund
+                {operationBusy ? 'Recording...' : 'Record returned payment'}
               </button>
             </div>
           </form>
@@ -386,13 +360,16 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               {order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'REFUNDED' && (
                 <>
                   <button
+                    disabled={['SUCCESS', 'REFUNDED', 'PARTIALLY_PAID', 'PARTIALLY_REFUNDED'].includes(order.paymentStatus) || !!order.paymentAllocationSummary?.collectedPaise}
                     onClick={() => setIsVoiding(true)}
                     className="px-3 py-1.5 bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold text-xs rounded-xl"
                   >
                     Void Order
                   </button>
                   <button
+                    disabled={order.paymentStatus !== 'SUCCESS' || !!order.refundAmount}
                     onClick={() => {
+                      setMoneyReturned(false);
                       setRefundAmount(order.totalAmount.toString());
                       setIsRefunding(true);
                     }}

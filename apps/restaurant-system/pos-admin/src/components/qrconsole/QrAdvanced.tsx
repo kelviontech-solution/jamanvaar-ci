@@ -1,17 +1,7 @@
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { activeAdminBranch } from "../../adminBranchScope";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Download,
-  Printer,
-  Save,
-  Search,
-  RefreshCw,
-  Palette,
-  Clock,
-  CreditCard,
-  AlertCircle,
-} from "lucide-react";
+import { Download, Printer, Save, RefreshCw, Palette, Clock, CreditCard } from "lucide-react";
 import {
   QrAdminApi,
   type QrBranch,
@@ -132,7 +122,8 @@ function Failure({ error }: { error: string | null }) {
 export function QrDesignStudio({ showToast }: Props) {
   const tables = useData("tables", QrAdminApi.tables),
     branches = useData("branches", QrAdminApi.branches),
-    current = useData("design", QrAdminApi.printDesign);
+    current = useData("design", QrAdminApi.printDesign),
+    branding = useData("branding", QrAdminApi.branding);
   const [design, setDesign] = useState<QrPrintDesign>(DEFAULT_DESIGN),
     [branch, setBranch] = useState(scopedBranch),
     [selected, setSelected] = useState<string[]>([]),
@@ -161,6 +152,27 @@ export function QrDesignStudio({ showToast }: Props) {
       live = false;
     };
   }, [row?.qr?.id]);
+  // A design tool that can only show you what your choice looks like after you've already gone to
+  // a different page and generated a real table QR is backwards -- a new restaurant with zero
+  // tables yet (the exact state this was reported broken in) saw a permanently empty preview panel
+  // no matter what they picked. This renders something illustrative immediately, from the
+  // restaurant's real logo where one's already set, clearly labelled as a sample so it's never
+  // mistaken for (or downloaded as) a real, scannable code.
+  const [samplePreview, setSamplePreview] = useState<QrPrintData | null>(null);
+  useEffect(() => {
+    let live = true;
+    void withLogo({
+      logoUrl: branding.data?.logoUrl ?? null,
+      restaurantName: "Your Restaurant Name",
+      branchName: null,
+      tableLabel: "12",
+      url: "https://menu.example/sample-preview",
+      tagline: "",
+    }).then((p) => { if (live) setSamplePreview(p); });
+    return () => { live = false; };
+  }, [branding.data?.logoUrl]);
+  const isSample = !preview;
+  const previewData = preview ?? samplePreview;
   const patch = (change: Partial<QrPrintDesign>) =>
     setDesign((d) => ({ ...d, ...change }));
   const run = async (fn: () => Promise<void> | void) => {
@@ -194,21 +206,31 @@ export function QrDesignStudio({ showToast }: Props) {
             destination.
           </p>
           <Failure error={tables.error || current.error} />
-          <div className="grid sm:grid-cols-3 gap-2 mt-4">
-            {QR_DESIGNS.map((t) => (
-              <button
-                key={t.id}
-                aria-pressed={design.template === t.id}
-                onClick={() => patch({ template: t.id, accent: t.color })}
-                className={`border rounded-xl p-3 text-left text-sm ${design.template === t.id ? "ring-2 ring-brand border-brand" : "border-jaman-border"}`}
-              >
-                <span
-                  className="block w-6 h-6 rounded-full mb-2"
-                  style={{ background: t.color }}
-                />
-                {t.name}
-              </button>
-            ))}
+          <div className="grid sm:grid-cols-3 gap-3 mt-4">
+            {QR_DESIGNS.map((t) => {
+              const isSelected = design.template === t.id;
+              return (
+                <button
+                  key={t.id}
+                  aria-pressed={isSelected}
+                  onClick={() => patch({ template: t.id, accent: t.color })}
+                  className={`relative overflow-hidden rounded-xl border p-3 text-left text-sm transition-all ${isSelected ? "ring-2 ring-brand border-brand shadow-sm" : "border-jaman-border hover:border-slate-300"}`}
+                >
+                  <div
+                    className="absolute inset-x-0 top-0 h-10"
+                    style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}cc)` }}
+                  />
+                  <div className="relative mt-5 flex items-center justify-between">
+                    <span className="font-bold text-jaman-navy">{t.name}</span>
+                    {isSelected && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-brand bg-brand/10 rounded-full px-2 py-0.5">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
           <div className="grid sm:grid-cols-2 gap-4 mt-5">
             <label className="text-xs font-bold">
@@ -311,7 +333,7 @@ export function QrDesignStudio({ showToast }: Props) {
               </label>
             ))}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               disabled={busy || !active.length}
               className={button}
@@ -332,31 +354,45 @@ export function QrDesignStudio({ showToast }: Props) {
               <Download size={16} />
               Download design set
             </button>
+            {!active.length && (
+              <span className="text-xs text-slate-500">
+                No active table QR codes yet — generate one in Tables & QR first.
+              </span>
+            )}
           </div>
         </div>
       </div>
       <div className={box + " h-fit"}>
         <h3 className="font-bold mb-3">Print preview</h3>
-        {preview ? (
+        {previewData ? (
           <>
+            {isSample && (
+              <p className="text-xs font-bold text-brand bg-brand/[0.08] border border-brand/30 rounded-lg px-3 py-2 mb-3">
+                Sample preview — illustrates your design choices, not a real scannable code.
+                Generate a table in Tables & QR for the real one.
+              </p>
+            )}
             <div
               data-testid="qr-design-preview"
               className="max-w-xs mx-auto min-w-0 [&>svg]:w-full [&>svg]:h-auto"
-              dangerouslySetInnerHTML={{ __html: designSvg(preview, design) }}
+              dangerouslySetInnerHTML={{ __html: designSvg(previewData, design) }}
             />
             <div className="flex flex-wrap gap-2 mt-4">
               <button
                 className={button}
-                disabled={busy}
+                disabled={busy || isSample}
+                title={isSample ? "Generate a real table QR first — a sample can't be downloaded as a working code." : undefined}
                 onClick={() =>
-                  void run(() => downloadCardPng(preview, "table-qr", design))
+                  void run(() => downloadCardPng(preview!, "table-qr", design))
                 }
               >
                 PNG
               </button>
               <button
                 className={button}
-                onClick={() => downloadDesignSvg(preview, "table-qr", design)}
+                disabled={isSample}
+                title={isSample ? "Generate a real table QR first — a sample can't be downloaded as a working code." : undefined}
+                onClick={() => downloadDesignSvg(preview!, "table-qr", design)}
               >
                 SVG
               </button>
@@ -367,9 +403,7 @@ export function QrDesignStudio({ showToast }: Props) {
             </p>
           </>
         ) : (
-          <p className="text-sm text-slate-500">
-            Generate a table QR in Tables & QR to preview it here.
-          </p>
+          <p className="text-sm text-slate-500">Loading preview…</p>
         )}
       </div>
     </div>
@@ -755,6 +789,7 @@ export function QrOrderingRules({
   );
 }
 
+const QR_ORDER_SOUND_KEY = "qr_admin_new_order_sound";
 export function QrOperationalOrders({ showToast }: Props) {
   const { confirm, prompt, confirmDialog } = useConfirm();
   const [branch, setBranch] = useState(scopedBranch),
@@ -762,7 +797,13 @@ export function QrOperationalOrders({ showToast }: Props) {
     [status, setStatus] = useState("ALL"),
     [detail, setDetail] = useState<QrOrderRow | null>(null),
     [busy, setBusy] = useState(false),
-    [sound, setSound] = useState(false);
+    [sound, setSound] = useState(() => {
+      try {
+        return localStorage.getItem(QR_ORDER_SOUND_KEY) === "1";
+      } catch {
+        return false;
+      }
+    });
   const branches = useData("branches", QrAdminApi.branches),
     orders = useData(branch, () => QrAdminApi.orders(branch), 5000),
     seen = useRef<Set<string> | null>(null);
@@ -873,7 +914,15 @@ export function QrOperationalOrders({ showToast }: Props) {
           <input
             type="checkbox"
             checked={sound}
-            onChange={(e) => setSound(e.target.checked)}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setSound(checked);
+              try {
+                localStorage.setItem(QR_ORDER_SOUND_KEY, checked ? "1" : "0");
+              } catch {
+                /* storage unavailable: the toggle still applies for this session */
+              }
+            }}
           />
           New-order sound
         </label>
@@ -1184,8 +1233,8 @@ export function QrAnalyticsView({
             <h3 className="font-bold mt-5">By table / QR version</h3>
             {stats.data.byCode.map((row) => (
               <p className="text-sm my-2" key={row.codeId}>
-                Table {row.table} ? v{row.version}: {row.scans} visits ?{" "}
-                {row.orders} orders ? {money(row.sales)}
+                Table {row.table} · v{row.version}: {row.scans} visits ·{" "}
+                {row.orders} orders · {money(row.sales)}
               </p>
             ))}
             <h3 className="font-bold mt-5">By branch</h3>
@@ -1252,11 +1301,16 @@ export function QrMenuAvailability({ showToast }: Props) {
   };
   return (
     <div className={box + " space-y-4"}>
-      <h2 className="font-bold text-lg">Menu & Availability</h2>
+      <h2 className="font-bold text-lg">Publish & branch availability</h2>
       <p className="text-sm text-slate-500">
-        Uses the same catalog, modifiers, taxes and branch availability as your
-        restaurant. Edit dishes in Menu & Categories. Publishing makes the
-        current catalog available to guests.
+        {/^\/qr\//.test(location.pathname)
+          ? // Solo-QR restaurants have no separate Restaurant Admin app, so QrCatalog's "Shared
+            // menu editor" renders directly above this on the same page — this used to still say
+            // "Edit dishes in Menu & Categories" with the link to it hidden, pointing guests at a
+            // page that, in this exact context, both doesn't exist and isn't needed: the editor is
+            // already right there.
+            'Add, edit or remove dishes using the menu editor above. This list is separate: it controls which already-published dishes each branch shows guests, and when your edits actually go live.'
+          : 'Uses the same catalog, modifiers, taxes and branch availability as your restaurant. Publishing makes the current catalog available to guests.'}
       </p>
       {!/^\/qr\//.test(location.pathname) && (
         <a

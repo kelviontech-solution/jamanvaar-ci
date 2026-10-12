@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { guestCountOptions } from '../../store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
-import { Users, X, ArrowRight, Plus, Minus } from 'lucide-react';
+import { X, ArrowRight, Plus, Minus } from 'lucide-react';
 
 interface CaptainGuestCountModalProps {
   table: DiningTable | null;

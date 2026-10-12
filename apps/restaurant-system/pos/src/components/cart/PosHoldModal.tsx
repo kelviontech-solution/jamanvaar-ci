@@ -1,7 +1,7 @@
 import { ModalBackdrop } from '@jamanvaar/ui';
 import React from 'react';
 import { usePosStore } from '../../store/posStore';
-import { db, HeldOrderRepository } from '@jamanvaar/database';
+import { HeldOrderRepository } from '@jamanvaar/database';
 import { X, Play, Trash2, Clock, CirclePause, ShoppingBag } from 'lucide-react';
 
 export const PosHoldModal: React.FC = () => {

@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, NotFoundException, Injectable } from '@nestjs/common';
 import { mergeKitchenPriority } from './kitchen-priority';
 import { randomUUID } from 'node:crypto';
+import { validateRefundJournal, type RefundJournalEvent } from './refund-journal-policy';
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
@@ -14,6 +15,7 @@ import { StaffSessionService } from '../entity-sync/staff-session.service';
 import { MANAGER_ROLES } from '../entity-sync/entity-authority';
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { OrderSyncEventDto, orderSyncEventSchema } from './dto/push-order-sync.dto';
+import { OrderSyncAdmission } from './order-sync-admission';
 
 const CATCH_UP_DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000; // 24h
 const CATCH_UP_MAX_ROWS = 500;
@@ -114,14 +116,17 @@ export class OrderSyncService {
     private readonly audit: AuditService,
     private readonly sessions: StaffSessionService,
     private readonly config: ConfigService,
-    private readonly whatsappOutbound: WhatsAppOutboundWebhookService
+    private readonly whatsappOutbound: WhatsAppOutboundWebhookService,
+    private readonly admission: OrderSyncAdmission
   ) {}
 
   /**
    * Upserts each event by (restaurantId, externalOrderId) — the local app's
    * own order id is the idempotency key, so a retried push after a dropped
    * response (the exact failure mode BUG-009 traced to) never double-creates
-   * a row, it just re-applies the same state.
+   * a row, it just re-applies the same state. Runs through OrderSyncAdmission so a burst of
+   * concurrent pushes queues briefly and, past that wait, gets a clean 503 retry instead of
+   * exhausting the database connection pool — the same protection QrAdmission gives QR orders.
    */
   async pushEvents(device: Device, rawEvents: unknown[]): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
     const results: OrderSyncPushResult[] = [];
@@ -130,7 +135,7 @@ export class OrderSyncService {
     // collection point inside the loop for why.
     const whatsappStatusChanges: Array<{ paymentId: string; orderId: string; publicOrderId: string | null; status: string; previousStatus: string }> = [];
 
-    await this.prisma.runAsTenant(device.restaurantId, async (tx) => {
+    await this.admission.run(() => this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       // Serialise writers of the same order. Two devices creating or updating one order at once used to
       // race (both see "no such order", one create then fails and aborts the whole transaction). Locks are
       // taken up front in sorted order, before the sequence counter is touched, so two batches can never
@@ -323,7 +328,17 @@ export class OrderSyncService {
             ...(reviewFlags.length > 0 ? { reviewFlags } : {}),
             ...(staleHeader ? { needsTotalsReview: true } : {})
           };
-          const finalMeta = { ...(mergedMeta ?? {}), ...serverMeta, ...(existing && Array.isArray(priorMeta.reviewFlags) && reviewFlags.length === 0 ? { reviewFlags: priorMeta.reviewFlags } : {}) };
+          const finalMeta: Record<string, unknown> = { ...(mergedMeta ?? {}), ...serverMeta, ...(existing && Array.isArray(priorMeta.reviewFlags) && reviewFlags.length === 0 ? { reviewFlags: priorMeta.reviewFlags } : {}) };
+          // Service occupancy never grants payment authority. Keep release markers monotonic under retries.
+          if (evt.meta?.tableReleasedAt && typeof priorMeta.tableReleasedAt === 'string' && evt.meta.tableReleasedAt < priorMeta.tableReleasedAt) finalMeta.tableReleasedAt = priorMeta.tableReleasedAt;
+          if (evt.meta?.paymentConfirmation) {
+            if (!PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)) {
+              if (priorMeta.paymentConfirmation) finalMeta.paymentConfirmation = priorMeta.paymentConfirmation;
+              else delete finalMeta.paymentConfirmation;
+            } else {
+              finalMeta.paymentConfirmation = {...evt.meta.paymentConfirmation,deviceId:device.id,recordedAt:new Date().toISOString(),actorVerified:false};
+            }
+          }
           if (capturedKiosk) Object.assign(finalMeta, {
             cgstPaise: Math.round(capturedKiosk.taxAmount / 2), sgstPaise: capturedKiosk.taxAmount - Math.round(capturedKiosk.taxAmount / 2),
             roundOffPaise: 0, serviceChargePaise: 0, tipPaise: 0
@@ -374,13 +389,24 @@ export class OrderSyncService {
             if (!PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type)) {
               if (typeof priorMeta.refundAmountPaise === 'number') staffFinalMeta.refundAmountPaise = priorMeta.refundAmountPaise;
               else delete staffFinalMeta.refundAmountPaise;
-            } else if (evt.meta.refundAmountPaise > header.totalAmount || !existing || decision.status !== 'REFUNDED') {
-              throw new Error('Refund amount requires an existing refunded order and cannot exceed its total');
+            } else if (evt.meta.refundAmountPaise > header.totalAmount || !existing || !['SUCCESS','PARTIALLY_REFUNDED','REFUNDED'].includes(existing.paymentStatus ?? '') || (evt.meta.refundAmountPaise >= header.totalAmount && decision.status !== 'REFUNDED')) {
+              throw new Error('Refund amount requires an existing collected order and cannot exceed its total');
+            }
+          }
+          if (evt.meta?.refundEvents !== undefined) {
+            if (!PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type) || existing?.source === 'QR') throw new Error('Use the authoritative payment ledger to return this payment');
+            validateRefundJournal(evt.meta.refundEvents, (priorMeta.refundEvents as RefundJournalEvent[] | undefined) ?? [], evt.meta.refundAmountPaise ?? (Number(priorMeta.refundAmountPaise) || 0), header.totalAmount);
+            const priorKeys = new Set(((priorMeta.refundEvents as RefundJournalEvent[] | undefined) ?? []).map(row => row.idempotencyKey));
+            for (const row of evt.meta.refundEvents.filter(row => !priorKeys.has(row.idempotencyKey))) {
+              const register = await tx.syncedEntity.findFirst({where:{restaurantId:device.restaurantId,entityType:'SHIFT',externalId:row.payingShiftId},select:{payload:true}});
+              const payload = register?.payload as {branchId?:string;businessDayId?:string;status?:string} | null;
+              if (!payload || (payload.branchId ?? null) !== device.branchId || payload.businessDayId !== row.businessDayId) throw new Error('The return register must belong to this branch and business date; sync the register before retrying');
             }
           }
           delete staffFinalMeta.staffSession;
           delete staffFinalMeta.approvalSession;
           const takesBack = !!existing && (['CANCELLED', 'VOID', 'VOIDED', 'REFUNDED'].includes(decision.status) && existing.status !== decision.status
+            || (evt.meta?.refundEvents !== undefined && JSON.stringify(evt.meta.refundEvents) !== JSON.stringify(priorMeta.refundEvents ?? []))
             || (payStatus === 'REFUNDED' && existing.paymentStatus !== 'REFUNDED')
               || (typeof evt.meta?.refundAmountPaise === 'number' && evt.meta.refundAmountPaise !== priorMeta.refundAmountPaise && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type))
             || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status));
@@ -420,6 +446,17 @@ export class OrderSyncService {
                 continue;
               }
               staffFinalMeta.actorVerified = false;
+            }
+          }
+
+          if (evt.meta?.refundEvents?.length && takesBack) {
+            const actorId = (device as Device & {adminActorId?:string}).adminActorId;
+            const admin = actorId ? await tx.user.findFirst({where:{id:actorId,restaurantId:device.restaurantId,status:'ACTIVE'},select:{fullName:true}}) : null;
+            const verified = staffFinalMeta.verifiedStaff as {name?:string} | undefined;
+            const actor = admin?.fullName ?? verified?.name;
+            if (actor) {
+              const previous = (priorMeta.refundEvents as RefundJournalEvent[] | undefined) ?? [];
+              staffFinalMeta.refundEvents = evt.meta.refundEvents.map(row => previous.find(prior => prior.idempotencyKey === row.idempotencyKey) ?? {...row,actor});
             }
           }
 
@@ -537,7 +574,7 @@ export class OrderSyncService {
           results.push({ externalOrderId: evt.externalOrderId, status: 'error', error: err?.message ?? 'Unknown error' });
         }
       }
-    });
+    }));
 
     // Wake the branch only after the transaction has committed, so a woken device's pull always sees the change.
     if (results.some((r) => r.status === 'ok' && !r.duplicate)) {

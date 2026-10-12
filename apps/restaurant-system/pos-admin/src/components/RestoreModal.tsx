@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button } from '@jamanvaar/ui';
 import { db, AuditRepository, TableSync, MenuItemSync, CategorySync } from '@jamanvaar/database';
-import { Upload, AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
+import { Upload, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface RestoreModalProps {
   isOpen: boolean;

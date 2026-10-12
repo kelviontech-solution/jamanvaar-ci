@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
 import { DiningTable } from '@jamanvaar/types';
-import { X, ArrowRight, GitMerge, RotateCcw, Check } from 'lucide-react';
+import { X, ArrowRight, GitMerge } from 'lucide-react';
 
 interface CaptainTransferMergeModalProps {
   currentTable: DiningTable | null;

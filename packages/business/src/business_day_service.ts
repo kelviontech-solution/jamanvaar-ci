@@ -1,10 +1,4 @@
-import {
-  BusinessDay,
-  BusinessDayPreCloseCheck,
-  Order,
-  ShiftRecord,
-  AppNotification
-} from '@jamanvaar/types';
+import { BusinessDay, BusinessDayPreCloseCheck, ShiftRecord } from '@jamanvaar/types';
 import {
   db,
   BusinessDayRepository,
@@ -26,12 +20,16 @@ export interface CloseBusinessDayOptions {
 export interface CloseBusinessDayResult {
   closedDay: BusinessDay;
   newDay: BusinessDay;
-  newShift: ShiftRecord;
+  newShift?: ShiftRecord;
   reconciled: boolean;
   warnings: string[];
 }
 
 export class BusinessDayService {
+  public static shiftBelongsToDay(shift: ShiftRecord, day: BusinessDay): boolean {
+    return shift.businessDayId ? shift.businessDayId === day.id : BusinessDayRepository.getCanonicalBusinessDate(new Date(shift.openedAt)).dateKey === day.businessDate;
+  }
+
   /**
    * Returns the currently active (OPEN / REOPENED / CLOSING) Business Day.
    */
@@ -67,12 +65,11 @@ export class BusinessDayService {
       (o) => o.paymentStatus !== 'SUCCESS' && o.orderStatus !== 'CANCELLED' && o.orderStatus !== 'REFUNDED'
     );
 
-    const pendingKots = db.kots.filter(
-      (k) => k.status !== 'SERVED' && k.status !== 'CANCELLED'
-    );
+    const orderIds = new Set(orders.map(o => o.id));
+    const pendingKots = db.kots.filter(k => (orderIds.has(k.orderId) || (!db.orders.some(o => o.id === k.orderId) && BusinessDayRepository.getCanonicalBusinessDate(new Date(k.createdAt)).dateKey === day.businessDate)) && k.status !== 'SERVED' && k.status !== 'CANCELLED');
 
     const unclosedShifts = db.shifts.filter(
-      (s) => s.status === 'OPEN'
+      s => s.status === 'OPEN' && this.shiftBelongsToDay(s, day)
     );
 
     const expectedCash = (day.openingCash || 0) + (day.cashSales || 0) + (day.cashIn || 0) - (day.cashOut || 0);
@@ -110,24 +107,40 @@ export class BusinessDayService {
    * 4. Mark current business day CLOSED
    * 5. Spool EOD Z-Report to printer
    * 6. Create next business day & mark ACTIVE
-   * 7. Open initial shift for next day
+   * 7. Registers remain closed until their cashier counts and opens a shift
    * 8. Broadcast BUSINESS_DAY_CLOSED and BUSINESS_DAY_STARTED
    * 9. Dispatch role-specific AppNotifications
    */
   public static closeBusinessDay(options: CloseBusinessDayOptions = {}): CloseBusinessDayResult {
+    return db.transaction(() => this.finalizeBusinessDay(options));
+  }
+
+  private static finalizeBusinessDay(options: CloseBusinessDayOptions): CloseBusinessDayResult {
     const dayId = options.businessDayId || this.getActiveBusinessDay().id;
     const closedBy = options.closedBy || 'Staff';
 
     // Pre-close validation
     const check = this.validatePreClose(dayId);
+    if (check.day.status === 'CLOSED') throw new Error('This business day is already closed.');
+    const dayShifts = db.shifts.filter(s => this.shiftBelongsToDay(s, check.day));
+    const openShifts = dayShifts.filter(s => s.status === 'OPEN');
+    // Branch cash is an aggregate. Once more than one shift participated, it
+    // cannot be used as the counted cash of the last remaining open register.
+    const spansBusinessDates = openShifts.some(shift => ShiftRepository.getShiftOrders(shift).some(order => !BusinessDayRepository.orderBelongsToBusinessDay(order, check.day)));
+    if (openShifts.length > 1 || (openShifts.length > 0 && dayShifts.length > 1) || spansBusinessDates) {
+      throw new Error('Count and close each register shift before closing the branch business day.');
+    }
     if (!check.isReadyToClose && !options.forceCloseWithExceptions) {
       throw new Error(`Cannot close business day: ${check.warnings.join(' ')}`);
     }
 
     const expectedCash = check.expectedCash;
-    const actualCash = options.actualCash !== undefined ? options.actualCash : expectedCash;
+    if (options.actualCash === undefined) throw new Error('Count the cash before closing the business day, including zero for an empty drawer.');
+    const actualCash = options.actualCash;
+    if (!Number.isFinite(actualCash) || actualCash < 0) throw new Error('Enter a valid counted cash amount.');
     const variance = actualCash - expectedCash;
-    const varianceReason = options.varianceReason || (variance === 0 ? 'Drawer Balanced' : 'Cash Variance Recorded');
+    if (Math.abs(variance) >= 0.005 && !options.varianceReason?.trim()) throw new Error('Explain the cash discrepancy before closing the business day.');
+    const varianceReason = options.varianceReason?.trim() || 'Drawer Balanced';
 
     // 1. Close current business day
     const closedDay = BusinessDayRepository.closeBusinessDay(
@@ -138,13 +151,9 @@ export class BusinessDayService {
     );
 
     // 2. Close active shifts for this day
-    const activeShifts = db.shifts.filter((s) => s.status === 'OPEN');
+    const activeShifts = openShifts;
     activeShifts.forEach((s) => {
-      s.status = 'CLOSED';
-      s.closedAt = new Date().toISOString();
-      s.closingCash = actualCash;
-      s.cashVariance = variance;
-      s.notes = `${s.notes || ''} [Closed during EOD by ${closedBy}]`.trim();
+      ShiftRepository.closeShift(s.id, actualCash, `Closed during EOD by ${closedBy}`);
     });
 
     // 3. Spool official EOD Z-Report to Print Queue
@@ -162,7 +171,7 @@ BY: ${closedDay.closedBy}
 ----------------------------------------
 NET SALES: Rs. ${closedDay.netSales}
 ORDERS BILLED: ${closedDay.orderCount}
-GST TAX (5%): Rs. ${closedDay.tax}
+GST TAX: Rs. ${closedDay.tax}
 ----------------------------------------
 CASH SALES: Rs. ${closedDay.cashSales}
 UPI SALES: Rs. ${closedDay.upiSales}
@@ -192,31 +201,12 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
     const nextDd = String(nextDate.getDate()).padStart(2, '0');
     const nextDateKey = `${nextYyyy}-${nextMm}-${nextDd}`;
 
-    const newDay = BusinessDayRepository.openNewBusinessDay(closedBy, 2000, nextDateKey);
-
-    // 5. Open new shift for the new business day
-    const newShiftId = `shift-${nextYyyy}${nextMm}${nextDd}-01`;
-    const newShift: ShiftRecord = {
-      id: newShiftId,
-      posId: 'POS-01',
-      cashierId: 'usr-cashier-1',
-      cashierName: closedBy,
-      openedAt: new Date().toISOString(),
-      status: 'OPEN',
-      openingCash: 2000,
-      expectedCash: 2000,
-      totalCashSales: 0,
-      totalUpiSales: 0,
-      totalCardSales: 0,
-      totalSales: 0,
-      totalDiscounts: 0,
-      totalOrders: 0,
-      notes: `Morning shift opening float ₹2,000 verified for ${newDay.displayDate}`
-    };
-    db.shifts.unshift(newShift);
+    const alreadyActive = db.businessDays.find(d => d.id !== dayId && ['OPEN', 'REOPENED'].includes(d.status) && d.businessDate >= nextDateKey);
+    const newDay = alreadyActive ?? BusinessDayRepository.openNewBusinessDay(closedBy, 0, nextDateKey);
 
     // 6. Clean operational served tickets for fresh day start
-    db.kots = db.kots.filter((k) => k.status === 'PENDING' || k.status === 'PREPARING' || k.status === 'ACCEPTED');
+    const closedOrderIds = new Set(BusinessDayRepository.getOrdersForBusinessDay(dayId).map(o => o.id));
+    db.kots = db.kots.filter(k => !closedOrderIds.has(k.orderId) || (k.status !== 'SERVED' && k.status !== 'CANCELLED'));
 
     // 7. Dispatch Mesh Events
     lanMeshSync.broadcast('BUSINESS_DAY_CLOSED', {
@@ -230,7 +220,7 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
       cashVariance: closedDay.cashVariance
     });
 
-    lanMeshSync.broadcast('BUSINESS_DAY_STARTED', {
+    if (!alreadyActive) lanMeshSync.broadcast('BUSINESS_DAY_STARTED', {
       businessDayId: newDay.id,
       businessDate: newDay.businessDate,
       displayDate: newDay.displayDate,
@@ -243,7 +233,7 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
     NotificationRepository.createNotification({
       type: 'BUSINESS_DAY_CLOSED',
       title: `✓ END OF DAY COMPLETE (${closedDay.displayDate})`,
-      message: `${closedDay.displayDate} closed with ₹${closedDay.netSales} net sales across ${closedDay.orderCount} orders. New business day ${newDay.displayDate} started.`,
+      message: `${closedDay.displayDate} closed with ₹${closedDay.netSales} net sales across ${closedDay.orderCount} orders. Active business day: ${newDay.displayDate}.`,
       targetRoles: ['POS', 'POS_ADMIN'],
       priority: 'HIGH',
       meta: {
@@ -272,18 +262,17 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
     return {
       closedDay,
       newDay,
-      newShift,
       reconciled: closedDay.cashVariance === 0,
       warnings: check.warnings
     };
   }
 
   /**
-   * System startup recovery: ensures an active business day and shift exist
+   * Recover the day and an existing register shift; never invent counted money or a cashier.
    */
   public static recoverBusinessDayState(): {
     activeDay: BusinessDay;
-    activeShift: ShiftRecord;
+    activeShift?: ShiftRecord;
     recovered: boolean;
   } {
     let activeDay = db.businessDays.find(
@@ -296,35 +285,13 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
       recovered = true;
     }
 
-    let activeShift = ShiftRepository.getActiveShift();
-    if (!activeShift) {
-      const now = new Date();
-      activeShift = {
-        id: `shift-${Date.now()}`,
-        posId: 'POS-01',
-        cashierId: 'system',
-        cashierName: 'Auto-opened shift',
-        openedAt: now.toISOString(),
-        status: 'OPEN',
-        openingCash: 2000,
-        expectedCash: 2000,
-        totalCashSales: 0,
-        totalUpiSales: 0,
-        totalCardSales: 0,
-        totalSales: 0,
-        totalDiscounts: 0,
-        totalOrders: 0,
-        notes: `System startup auto-initialized shift for ${activeDay.displayDate}`
-      };
-      db.shifts.unshift(activeShift);
-      recovered = true;
-    }
+    const activeShift = ShiftRepository.getActiveShift();
 
     if (recovered) {
       AuditRepository.log({
         action: 'STATE_RECOVERED',
         category: 'SYSTEM',
-        details: `BusinessDayService recovered active day ${activeDay.id} (${activeDay.displayDate}) and shift ${activeShift.id}`,
+        details: `BusinessDayService recovered active day ${activeDay.id} (${activeDay.displayDate}); ${activeShift ? `existing shift ${activeShift.id}` : 'register awaiting cashier opening'}`,
         username: 'System'
       });
       db.notify();
@@ -341,8 +308,8 @@ CASH VARIANCE: Rs. ${closedDay.cashVariance}
     activeDay: BusinessDay;
     currentCalendarDate: string;
   } {
-    // Pure read: do NOT use getActiveBusinessDay() here, since it auto-closes
-    // stale days as a side effect — this check must detect rollover without closing.
+    // Pure read: do NOT trigger the operational date rollover here
+    // while detecting an outstanding prior day — this check must detect rollover without closing.
     const activeDay = db.businessDays.find(
       (d) => d.status === 'OPEN' || d.status === 'CLOSING' || d.status === 'REOPENED'
     ) || this.getActiveBusinessDay();

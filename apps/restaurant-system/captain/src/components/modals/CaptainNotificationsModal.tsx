@@ -2,17 +2,7 @@ import { ModalBackdrop } from '@jamanvaar/ui';
 import React from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore } from '../../store/captainStore';
-import {
-  X,
-  Bell,
-  Check,
-  CheckCheck,
-  Flame,
-  Receipt,
-  MessageSquare,
-  Clock,
-  Trash2
-} from 'lucide-react';
+import { X, Bell, Trash2 } from 'lucide-react';
 
 interface CaptainNotificationsModalProps {
   isOpen: boolean;

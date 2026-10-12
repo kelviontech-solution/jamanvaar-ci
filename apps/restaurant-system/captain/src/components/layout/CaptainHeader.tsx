@@ -1,21 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrandHeader, sound, useConfirm } from '@jamanvaar/ui';
+import { BrandHeader, sound, useConfirm, StaffLanguagePicker } from '@jamanvaar/ui';
 import { lanMeshSync, EndpointResolver, connectionLevel, type ConnectionLevel } from '@jamanvaar/sync';
 import { isVibrationOn, setVibrationOn, alertWaiter } from '../../alerts';
 import { useCaptainStore, selectMyTables } from '../../store/captainStore';
-import { captainDb } from '@jamanvaar/database';
-import {
-  MessageSquare,
-  LogOut,
-  Bell,
-  Wifi,
-  Server,
-  User,
-  X,
-  ChevronDown,
-  CheckCircle2,
-  Clock
-} from 'lucide-react';
+import { captainDb, getTerminalLabel } from '@jamanvaar/database';
+import { MessageSquare, LogOut, Bell, Server, X, ChevronDown } from 'lucide-react';
 
 interface CaptainHeaderProps {
   onOpenNotifications: () => void;
@@ -58,13 +47,14 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
     <>
     <header className="bg-white border-b border-jaman-border px-3 sm:px-5 py-2.5 sticky top-0 z-30 shadow-2xs">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-3">
+        <StaffLanguagePicker/>
         {/* Left: Prominent Official Master Brand Header */}
         <div className="flex items-center gap-3 shrink-0">
           <BrandHeader
             app="CAPTAIN"
             restaurantName="JAMANVAAR"
             outletName="Floor Service"
-            terminalId="CAPTAIN-01"
+            terminalId={getTerminalLabel('CAPTAIN')}
             logoHeight={46}
             badgeSize="sm"
             showContext={false}
@@ -236,7 +226,7 @@ export const CaptainHeader: React.FC<CaptainHeaderProps> = ({
                   onClick={async () => {
                     setIsProfileOpen(false);
                     if (await confirm({ title: 'End your session?', message: 'You will be logged out of Captain on this device.', confirmLabel: 'Log out', cancelLabel: 'Stay signed in', tone: 'danger' })) {
-                      logout();
+                      if (!logout()) await confirm({title:'Unsent dishes are kept',message:'Return to your order and send or deliberately remove its dishes before signing out.',confirmLabel:'Return to order',cancelLabel:'Stay signed in'});
                     }
                   }}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-rose-50 text-rose-600 text-left transition-colors font-bold cursor-pointer"

@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-12T08:31:25.580Z",
+  "command": "node node_modules/vite/bin/vite.js build in each app directory; existing assets; no image regeneration, publication or native installer build.",
+  "results": [
+    {
+      "app": "POS",
+      "path": "apps/restaurant-system/pos",
+      "exitCode": 0,
+      "durationSeconds": 31
+    },
+    {
+      "app": "Restaurant-Kiosk-QR-Admin",
+      "path": "apps/restaurant-system/pos-admin",
+      "exitCode": 0,
+      "durationSeconds": 36
+    },
+    {
+      "app": "Captain",
+      "path": "apps/restaurant-system/captain",
+      "exitCode": 0,
+      "durationSeconds": 26
+    },
+    {
+      "app": "KDS",
+      "path": "apps/restaurant-system/kds",
+      "exitCode": 0,
+      "durationSeconds": 30
+    },
+    {
+      "app": "Kiosk",
+      "path": "apps/kiosk-system/kiosk-user",
+      "exitCode": 0,
+      "durationSeconds": 20
+    },
+    {
+      "app": "QR-Guest",
+      "path": "apps/qr-guest",
+      "exitCode": 0,
+      "durationSeconds": 9
+    },
+    {
+      "app": "Super-Admin",
+      "path": "cloud/super-admin-web",
+      "exitCode": 0,
+      "durationSeconds": 23
+    }
+  ]
+}

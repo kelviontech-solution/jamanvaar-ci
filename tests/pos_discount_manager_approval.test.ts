@@ -95,6 +95,21 @@ describe('POS discount manager-approval enforcement (SEC-013)', () => {
     expect(usePosStore.getState().pendingOverride).toBeNull();
     expect(usePosStore.getState().cart.discountAmount).toBeGreaterThan(0);
   });
+
+  it('legacy bill discount methods also wait for manager approval', () => {
+    usePosStore.setState({ currentUser: { id: 'u-cashier', roleId: 'role-cashier', fullName: 'Test Cashier' } as any });
+    usePosStore.getState().applyBillDiscountPercent(50);
+    expect(usePosStore.getState().cart.discountAmount).toBe(0);
+    const pending = usePosStore.getState().pendingOverride;
+    expect(pending?.action).toBe('HIGH_DISCOUNT');
+    pending!.onApprove('Test Manager');
+    expect(usePosStore.getState().cart.discountAmount).toBeGreaterThan(0);
+    usePosStore.getState().closeOverrideModal();
+    usePosStore.getState().removeDiscount();
+    usePosStore.getState().applyBillDiscountFlat(600);
+    expect(usePosStore.getState().cart.discountAmount).toBe(0);
+    expect(usePosStore.getState().pendingOverride?.action).toBe('HIGH_DISCOUNT');
+  });
 });
 
 /**

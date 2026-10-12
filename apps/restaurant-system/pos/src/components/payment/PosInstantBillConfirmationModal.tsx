@@ -3,7 +3,7 @@ import React from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
-import { Zap, X, Check, Banknote, QrCode, CreditCard, Wallet, Building2 } from 'lucide-react';
+import { Zap, X, Check, Banknote, QrCode } from 'lucide-react';
 import { PaymentMethod } from '@jamanvaar/types';
 
 export const PosInstantBillConfirmationModal: React.FC = () => {

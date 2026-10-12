@@ -48,6 +48,10 @@ export interface Restaurant {
   name: string;
   /** A stock count worth more than this (rupees) needs a manager's approval. */
   stockAdjustmentApprovalLimit?: number;
+  /** Restaurant-local hour when a new operational business date begins. */
+  businessDayCutoffHour?: number;
+  operatingProfile?: { timezone: string; cutoffHour: number; effectiveFrom?: string; previous?: { timezone: string; cutoffHour: number }; inherit?: boolean };
+  profileRevision?: string;
   legalName?: string;
   tagline?: string;
   logoUrl?: string;
@@ -80,6 +84,7 @@ export interface Restaurant {
 }
 
 export interface Outlet {
+  operatingProfile?: Restaurant['operatingProfile'];
   id: string;
   restaurantId: string;
   name: string;
@@ -578,7 +583,7 @@ export interface BusinessDay {
 
 /** One tender line of a settled bill (a split bill has several). */
 export interface PaymentSplit {
-  method: 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT';
+  method: 'CASH' | 'UPI' | 'CARD' | 'WALLET' | 'HOUSE_ACCOUNT' | 'OTHER';
   amount: number;
   reference?: string;
 }
@@ -630,8 +635,13 @@ export interface Order {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   paymentTransactionId?: string;
+  /** Manual collection evidence is distinct from gateway verification. */
+  paymentConfirmation?: { kind: 'CASHIER_CONFIRMED'; actor: string; at: string; reference?: string };
+  /** Releasing a table does not complete preparation or collect its bill. */
+  tableReleasedAt?: string;
   /** Rupees actually returned to the guest; retained for partial-refund reporting. */
   refundAmount?: number;
+  refundEvents?: Array<{ idempotencyKey: string; amountPaise: number; method: 'CASH' | 'UPI_TO_CUSTOMER'; originalShiftId?: string; payingShiftId?: string; businessDayId: string; at: string; actor: string; reason: string }>;
   /** Operational kitchen urgency; it never changes prices, payment or service status. */
   kitchenPriority?: 'NORMAL' | 'URGENT';
   kitchenPriorityRev?: number;
@@ -758,6 +768,9 @@ export type DisplayLanguage = 'en' | 'hi' | 'gu' | 'mr' | 'ta' | 'te' | 'kn';
  * just create two conflicting sources of truth for the same text.
  */
 export interface KioskDisplaySettings {
+  allowedOrderTypes?: Array<'DINE_IN' | 'TAKEAWAY'>;
+  defaultTableId?: string;
+  orderingOverrides?: Record<string,{allowedOrderTypes?: Array<'DINE_IN'|'TAKEAWAY'>;defaultTableId?: string}>;
   logoUrl?: string;
   accentColor?: string;
   texts?: Partial<Record<DisplayLanguage, Record<string, string>>>;
@@ -1014,6 +1027,10 @@ export interface PlanEntitlements {
    *  never represented at all until now, so it never showed up anywhere
    *  a plan's feature set was displayed or gated. */
   selfOrderKiosk?: boolean;
+  /** Gated by cloud/api's QR_CAPABILITIES (application-entitlements/qr-capabilities.ts) alongside
+   *  a matching, isActive Feature row — only meaningful when qrTableOrdering is also true. */
+  qrServiceRequests?: boolean;
+  qrScheduledPickup?: boolean;
 }
 
 /**
@@ -1276,6 +1293,9 @@ export interface SplitPaymentPortion {
 }
 
 export interface ShiftRecord {
+  /** Preserves an imported register's recorded base when its detailed bills are unavailable. */
+  returnBaseSales?: number;
+  businessDayId?: string;
   id: string;
   /** This device's Nth shift ever opened (B2-046) — the display label used to be the last 2 digits of the shift id's millisecond timestamp, which looked like a sequence number but wasn't one. */
   shiftNumber?: number;
@@ -1346,6 +1366,7 @@ export interface KOTRecord {
   tableNumber?: string;
   orderType: OrderType;
   station: string; // 'Main Kitchen', 'Tandoor', 'Bar', 'Dessert'
+  stationId?: string;
   type: KOTType;
   items: KOTItem[];
   serverName?: string;

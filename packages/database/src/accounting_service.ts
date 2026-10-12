@@ -1,9 +1,7 @@
+import { orderPaymentPosition } from './payment_position';
 import { db } from './db';
-import { Order, BusinessDay, BusinessDayStatus, KOTRecord } from '@jamanvaar/types';
-import {
-  formatRestaurantDate,
-  getBusinessDayDisplayDate
-} from '@jamanvaar/utils';
+import { BusinessDay, BusinessDayStatus, KOTRecord } from '@jamanvaar/types';
+import { getBusinessDayDisplayDate } from '@jamanvaar/utils';
 import { BusinessDayRepository } from './repositories';
 
 export interface BusinessDaySummary {
@@ -130,9 +128,9 @@ export class BusinessDayAccountingService {
         return; // Cancelled orders do not contribute to revenue totals
       }
 
-      if (o.orderStatus === 'REFUNDED') {
+      if (o.orderStatus === 'REFUNDED' || (o.refundAmount ?? 0) > 0) {
         refunded_orders++;
-        refunds += (o.totalAmount || 0);
+        refunds += o.refundAmount ?? (o.totalAmount || 0);
       }
 
       if (o.orderStatus === 'COMPLETED') {
@@ -142,7 +140,7 @@ export class BusinessDayAccountingService {
       }
 
       // Check if order is unpaid
-      if (o.paymentStatus !== 'SUCCESS') {
+      if (orderPaymentPosition(o).outstandingPaise > 0) {
         unpaid_orders_count++;
       }
 
@@ -157,44 +155,28 @@ export class BusinessDayAccountingService {
       net_sales += (o.totalAmount || 0);
 
       // Payment Method Breakdown (only for successful payments)
-      if (o.paymentStatus === 'SUCCESS') {
-        const method = (o.paymentMethod || '').toUpperCase();
-        if (method === 'CASH' || method === 'CASH_AT_COUNTER') {
-          cash_sales += (o.totalAmount || 0);
-        } else if (
-          method === 'UPI' ||
-          method === 'UPI_QR' ||
-          method === 'DYNAMIC_QR' ||
-          method === 'UPI_INTENT' ||
-          method === 'BHARAT_QR'
-        ) {
-          upi_sales += (o.totalAmount || 0);
-        } else if (
-          method === 'CARD' ||
-          method === 'DEBIT_CARD' ||
-          method === 'CREDIT_CARD' ||
-          method === 'EDC_MACHINE' ||
-          method === 'CARD_TERMINAL' ||
-          method === 'POS_CARD'
-        ) {
-          card_sales += (o.totalAmount || 0);
-        } else if (method === 'SPLIT') {
-          const half = Math.round((o.totalAmount || 0) / 2);
-          cash_sales += half;
-          upi_sales += ((o.totalAmount || 0) - half);
-        } else {
-          other_sales += (o.totalAmount || 0);
-        }
+      if (orderPaymentPosition(o).collectedPaise > 0) {
+        const journalAmount = (o.refundEvents ?? []).reduce((sum, event) => sum + event.amountPaise / 100, 0);
+        const legacyRefund = Math.max(0, (o.refundAmount ?? 0) - journalAmount);
+        const tenders = journalAmount ? orderPaymentPosition({ ...o, refundAmount: legacyRefund, paymentStatus: 'SUCCESS' }).netTenders : orderPaymentPosition(o).netTenders;
+        cash_sales += tenders.cash;
+        upi_sales += tenders.upi;
+        card_sales += tenders.card;
+        other_sales += tenders.wallet + tenders.houseAccount + tenders.other;
       }
     });
 
     const total_payments_recorded = cash_sales + upi_sales + card_sales + other_sales;
-    const net_collected = Math.max(0, total_payments_recorded - refunds);
-    const average_order_value = completed_orders > 0 ? Math.round(net_sales / completed_orders) : 0;
+    const laterReturns = dayOrders.flatMap(order => order.refundEvents ?? []).filter(event => event.businessDayId !== targetDayRecord.id).reduce((sum,event) => sum + event.amountPaise / 100,0);
+    const net_collected = targetDayRecord.status === 'CLOSED' && targetDayRecord.snapshot ? targetDayRecord.totalCollected : Math.round((dayOrders.reduce((sum, order) => sum + orderPaymentPosition(order).netCollectedPaise / 100, 0) + laterReturns - db.orders.filter(order => !BusinessDayRepository.orderBelongsToBusinessDay(order, targetDayRecord)).flatMap(order => order.refundEvents ?? []).filter(event => event.businessDayId === targetDayRecord.id).reduce((sum, event) => sum + event.amountPaise / 100, 0)) * 100) / 100;
+    let average_order_value = completed_orders > 0 ? Math.round(net_collected / completed_orders * 100) / 100 : 0;
 
     // Cash drawer math
-    const opening_cash = targetDayRecord.openingCash || 2000;
-    const cash_expected = opening_cash + cash_sales;
+    const opening_cash = targetDayRecord.openingCash ?? 0;
+    const registerIds = new Set(db.shifts.filter(shift => shift.businessDayId === targetDayRecord.id || (!shift.businessDayId && BusinessDayRepository.getCanonicalBusinessDate(new Date(shift.openedAt)).dateKey === targetDayRecord.businessDate)).map(shift => shift.id));
+    const movements = db.cashMovements.filter(movement => registerIds.has(movement.shiftId));
+    const movementCash = movements.reduce((sum, movement) => sum + (movement.type === 'CASH_IN' ? movement.amount : -movement.amount), 0);
+    const cash_expected = targetDayRecord.status === 'CLOSED' && targetDayRecord.snapshot ? targetDayRecord.snapshot.cashDrawerSnapshot.expectedCash : Math.round((opening_cash + cash_sales + movementCash) * 100) / 100;
     const cash_counted = targetDayRecord.closingCash;
     const cash_variance = cash_counted !== undefined ? cash_counted - cash_expected : undefined;
 
@@ -221,6 +203,19 @@ export class BusinessDayAccountingService {
 
     const has_blocking_items = blocking_reasons.length > 0;
 
+    if (targetDayRecord.status === 'CLOSED' && targetDayRecord.snapshot) {
+      const snapshot = targetDayRecord.snapshot;
+      gross_sales = snapshot.grossSalesSnapshot; discounts = snapshot.discountSnapshot;
+      tax_amount = snapshot.taxSnapshot; net_sales = snapshot.netSalesSnapshot;
+      cash_sales = snapshot.paymentSnapshot.cash; upi_sales = snapshot.paymentSnapshot.upi;
+      card_sales = snapshot.paymentSnapshot.card; other_sales = snapshot.paymentSnapshot.other;
+      total_orders = snapshot.orderCountSnapshot; completed_orders = snapshot.completedOrderCountSnapshot;
+      cancelled_orders = snapshot.cancelledOrderCountSnapshot; refunded_orders = snapshot.refundedOrderCountSnapshot;
+      refunds = Math.round(Math.max(0,targetDayRecord.netSales - targetDayRecord.totalCollected) * 100) / 100;
+      active_orders = 0;
+      average_order_value = completed_orders > 0 ? Math.round(net_collected / completed_orders * 100) / 100 : 0;
+    }
+
     return {
       business_day_id: targetDayRecord.id,
       business_date: targetDayRecord.businessDate,
@@ -246,7 +241,7 @@ export class BusinessDayAccountingService {
       upi_sales,
       card_sales,
       other_sales,
-      total_payments_recorded,
+      total_payments_recorded: cash_sales + upi_sales + card_sales + other_sales,
 
       total_orders,
       completed_orders,

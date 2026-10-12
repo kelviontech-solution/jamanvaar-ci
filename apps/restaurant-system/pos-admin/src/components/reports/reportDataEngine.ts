@@ -1,6 +1,6 @@
 import { db, isUnpaidOpenOrder } from '@jamanvaar/database';
-import { Order, MenuItem, Category, DiningTable, User, CustomerAccount, InventoryItem, StockMovement } from '@jamanvaar/types';
-import { formatDate, formatINR, formatTime } from '@jamanvaar/utils';
+import { Order, User } from '@jamanvaar/types';
+import { formatDate } from '@jamanvaar/utils';
 
 export type ReportPeriodPreset =
   | 'TODAY'
@@ -418,32 +418,44 @@ export class ReportDataEngine {
    * canonical check now applies here too, so every screen agrees.
    */
   public static getOrders(range: ReportDateRange, filters?: ReportFilterOptions, includeCancelled = false): Order[] {
-    return (db.orders || []).filter((o) => {
-      if (!includeCancelled && o.orderStatus === 'CANCELLED') return false;
+    const all = db.orders || [];
+    const result: Order[] = [];
+    // db.orders is always newest-first (every full rebuild in db.ts re-sorts descending by
+    // createdAt; the only append, in repositories.ts, is unshift — correct for a just-created
+    // order; in-place updates there never move an order or touch its createdAt). A report asking
+    // about a narrow recent window otherwise scanned the restaurant's entire order history on
+    // every render; relying on that invariant lets it stop once it passes the window's start,
+    // instead of visiting however many years of older orders remain. Orders newer than the
+    // window (e.g. today's, while viewing "Yesterday") sit ahead of it in this order and are
+    // skipped without stopping.
+    for (const o of all) {
+      const oDate = new Date(o.createdAt);
+      if (oDate > range.endDate) continue;
+      if (oDate < range.startDate) break;
+
+      if (!includeCancelled && o.orderStatus === 'CANCELLED') continue;
       // Independent of includeCancelled — an unpaid open order was never money collected
       // regardless of whether cancelled orders are also being shown.
-      if (isUnpaidOpenOrder(o)) return false;
+      if (isUnpaidOpenOrder(o)) continue;
 
-      const oDate = new Date(o.createdAt);
-      if (oDate < range.startDate || oDate > range.endDate) return false;
-
-      if (filters?.orderType && filters.orderType !== 'ALL' && o.orderType !== filters.orderType) return false;
-      if (filters?.paymentMethod && filters.paymentMethod !== 'ALL' && o.paymentMethod !== filters.paymentMethod) return false;
-      if (filters?.tableNumber && filters.tableNumber !== 'ALL' && o.tableNumber !== filters.tableNumber) return false;
-      if (filters?.captainId && filters.captainId !== 'ALL' && ((o as any).captainId !== filters.captainId && o.captainName !== filters.captainId)) return false;
-      if (filters?.cashierId && filters.cashierId !== 'ALL' && ((o as any).cashierId !== filters.cashierId && o.cashierName !== filters.cashierId)) return false;
-      if (filters?.customerPhone && o.customerPhone !== filters.customerPhone) return false;
+      if (filters?.orderType && filters.orderType !== 'ALL' && o.orderType !== filters.orderType) continue;
+      if (filters?.paymentMethod && filters.paymentMethod !== 'ALL' && o.paymentMethod !== filters.paymentMethod) continue;
+      if (filters?.tableNumber && filters.tableNumber !== 'ALL' && o.tableNumber !== filters.tableNumber) continue;
+      if (filters?.captainId && filters.captainId !== 'ALL' && ((o as any).captainId !== filters.captainId && o.captainName !== filters.captainId)) continue;
+      if (filters?.cashierId && filters.cashierId !== 'ALL' && ((o as any).cashierId !== filters.cashierId && o.cashierName !== filters.cashierId)) continue;
+      if (filters?.customerPhone && o.customerPhone !== filters.customerPhone) continue;
 
       if (filters?.searchQuery) {
         const q = filters.searchQuery.toLowerCase();
         const matchesOrder = o.orderNumber?.toLowerCase().includes(q) || o.tokenNumber?.toLowerCase().includes(q);
         const matchesCust = o.customerName?.toLowerCase().includes(q) || o.customerPhone?.toLowerCase().includes(q);
         const matchesItem = o.items?.some((i) => i.name?.toLowerCase().includes(q) || i.sku?.toLowerCase().includes(q));
-        if (!matchesOrder && !matchesCust && !matchesItem) return false;
+        if (!matchesOrder && !matchesCust && !matchesItem) continue;
       }
 
-      return true;
-    });
+      result.push(o);
+    }
+    return result;
   }
 
   /**

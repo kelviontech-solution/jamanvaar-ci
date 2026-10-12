@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MenuItem, InventoryItem, Recipe, RecipeIngredient } from '@jamanvaar/types';
 import { Modal, Button } from '@jamanvaar/ui';
 import { RecipeRepository } from '@jamanvaar/database';
-import { Plus, Trash2, Scale } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface RecipeModalProps {
   isOpen: boolean;

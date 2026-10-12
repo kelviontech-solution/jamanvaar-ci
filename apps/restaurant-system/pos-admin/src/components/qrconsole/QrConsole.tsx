@@ -87,14 +87,16 @@ export function QrConsole({
   layout?: "embedded" | "workspace";
 }) {
   const { state, refresh } = useQrEntitlement();
+  const {confirm:confirmNavigation,confirmDialog:navigationDialog} = useConfirm();
   const [tab, setTab] = useState<Tab>(currentQrTab);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [advancedNavigation, setAdvancedNavigation] = useState(false);
   const [feature, setFeature] = useState(currentQrFeature);
   const menuTrigger = useRef<HTMLButtonElement>(null);
   const sidebar = useRef<HTMLElement>(null);
   const workspace = layout === "workspace";
-  const navigate = (next: Tab, section = "Settings") => {
-    if (!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE, {cancelable:true}))) return;
+  const navigate = async (next: Tab, section = "Settings") => {
+    if (!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE, {cancelable:true})) && !(await confirmNavigation({title:'Leave without saving?',message:'Your changes on this page have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'}))) return;
     setTab(next);
     setFeature(section);
     const url = new URL(location.href);
@@ -181,7 +183,9 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const tabs: Array<[Tab, string]> = QR_PAGES.map((p) => [p.id, p.label]);
+  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','RULES','ADVANCED','ANALYTICS']);
+  const visiblePages = QR_PAGES.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
+  const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (
     <div
       className={
@@ -189,6 +193,7 @@ export function QrConsole({
       }
       data-testid="qr-console"
     >
+      {navigationDialog}
       {workspace && (
         <>
           <button
@@ -229,15 +234,11 @@ export function QrConsole({
               </button>
             </div>
             <nav aria-label="QR administration">
-              {[
-                "Workspace",
-                "Guest experience",
-                "Configuration",
-                "Insights",
-              ].map((group) => (
+              <button type="button" aria-expanded={advancedNavigation} onClick={() => setAdvancedNavigation(value => !value)} className="qr-btn secondary">{advancedNavigation ? 'Show daily tools' : 'Show advanced tools'}</button>
+              {[...new Set(visiblePages.map(page => page.group))].map((group) => (
                 <div className="qr-nav-group" key={group}>
                   <span>{group}</span>
-                  {QR_PAGES.filter((p) => p.group === group).map((p) => (
+                  {visiblePages.filter((p) => p.group === group).map((p) => (
                     <div key={p.id}>
                       <button
                         aria-current={tab === p.id ? "page" : undefined}
@@ -348,7 +349,8 @@ export function QrConsole({
 
         {tab === "OVERVIEW" && (
           <div className="space-y-5">
-            <Overview />
+            <Overview navigate={navigate} />
+            <section className="rounded-2xl border border-jaman-border bg-white p-5 space-y-3"><h2 className="font-bold text-lg">Set up guest ordering</h2><p className="text-sm text-slate-600">Work through the setup checks below, then open your live table QR to verify the guest experience.</p><div className="flex flex-wrap gap-3">{([['MENU','1. Publish menu'],['TABLES','2. Set up table QR'],['PAYMENTS','3. Check payments'],['BRAND','4. Preview appearance']] as const).map(([id,label]) => <button key={id} type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => void navigate(id)}>{label}</button>)}<button type="button" className="min-h-11 rounded-xl border px-4 text-sm font-bold" onClick={() => setAdvancedNavigation(value => !value)}>{advancedNavigation ? 'Show daily tools' : 'Show advanced tools'}</button></div></section>
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
@@ -360,6 +362,18 @@ export function QrConsole({
         {tab === "MENU" && (
           <div className="space-y-5">
             {/^\/qr\//.test(location.pathname) && <QrCatalog />}
+            {/* A visible break, not just spacing — without it, this reads as a second,
+                duplicate dish list rather than a separate tool (edit the catalog above;
+                this one toggles which already-published dishes each branch shows guests). */}
+            {/^\/qr\//.test(location.pathname) && (
+              <div className="flex items-center gap-3 pt-1" aria-hidden="true">
+                <div className="h-px flex-1 bg-jaman-border" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Guest availability
+                </span>
+                <div className="h-px flex-1 bg-jaman-border" />
+              </div>
+            )}
             <QrMenuAvailability showToast={showToast} />
           </div>
         )}
@@ -383,7 +397,25 @@ export function QrConsole({
         {tab === "SETTINGS" && (
           <div className="space-y-6">
             <Settings showToast={showToast} />
-            <BrandingForm showToast={showToast} />
+            <div className="rounded-2xl border border-jaman-border bg-white p-4 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-jaman-navy text-sm">
+                  Guest page: words, colour and logo
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 max-w-md">
+                  Edit your heading, messages, colour and logo with a live
+                  preview of exactly what guests will see, on Customer
+                  Branding.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="min-h-11 rounded-xl border px-4 text-sm font-bold whitespace-nowrap"
+                onClick={() => void navigate("BRAND")}
+              >
+                Open Customer Branding →
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -478,13 +510,39 @@ function Tile({
   );
 }
 
-function Overview() {
+function Overview({ navigate }: { navigate: (t: Tab) => void }) {
   const { data, error } = useLoad<QrOverview>(QrAdminApi.overview, 30000);
   if (error) return <div className="text-sm text-rose-700">{error}</div>;
   if (!data) return <div className="text-sm text-slate-500">Loading…</div>;
   const t = data.today;
+  const missingCodes = data.tables - data.activeCodes;
   return (
     <div className="space-y-5">
+      {(t.ordersPending > 0 || missingCodes > 0) && (
+        <div className="rounded-2xl border border-jaman-saffron/40 bg-jaman-ivory p-4 space-y-2">
+          <div className="font-bold text-jaman-navy">Needs attention today</div>
+          {t.ordersPending > 0 && (
+            <button
+              type="button"
+              className="block w-full text-left text-sm font-bold text-jaman-navy underline"
+              onClick={() => navigate("ORDERS")}
+            >
+              {t.ordersPending} order{t.ordersPending === 1 ? "" : "s"} waiting
+              or in the kitchen — view QR Orders →
+            </button>
+          )}
+          {missingCodes > 0 && (
+            <button
+              type="button"
+              className="block w-full text-left text-sm font-bold text-jaman-navy underline"
+              onClick={() => navigate("TABLES")}
+            >
+              {missingCodes} table{missingCodes === 1 ? "" : "s"} without an
+              active QR code — set up Tables & QR →
+            </button>
+          )}
+        </div>
+      )}
       <div className="qr-overview-welcome">
         <div>
           <small>MAKE EVERY TABLE FEEL WELCOME</small>
@@ -578,6 +636,13 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   const activeBranches = useMemo(
     () => (branches.data ?? []).filter((b) => b.status === "ACTIVE"),
     [branches.data],
+  );
+  // "Print selected" / "Generate selected" were already correctly disabled with nothing selected;
+  // "Print All" / "Download All" had no such guard at all, so they stayed clickable even with zero
+  // tables — the only feedback was a toast explaining, after the fact, that the click did nothing.
+  const hasActiveQr = useMemo(
+    () => (tables.data ?? []).some((r) => r.qr?.status === "ACTIVE"),
+    [tables.data],
   );
   const chosenBranch =
     branchId || (activeBranches.length === 1 ? activeBranches[0].id : "");
@@ -741,13 +806,17 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
         </button>
         <button
           onClick={printAll}
-          className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"
+          disabled={!hasActiveQr}
+          title={hasActiveQr ? undefined : "No active QR codes yet — add a table and generate its code first."}
+          className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"
         >
           <Printer className="w-3.5 h-3.5" /> Print All
         </button>
         <button
           onClick={downloadAll}
-          className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5"
+          disabled={!hasActiveQr}
+          title={hasActiveQr ? undefined : "No active QR codes yet — add a table and generate its code first."}
+          className="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40"
         >
           <Download className="w-3.5 h-3.5" /> Download All
         </button>
@@ -801,10 +870,16 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
           >
             Save table
           </button>
-          {activeBranches.length > 1 && !chosenBranch && (
+          {activeBranches.length > 1 && !chosenBranch ? (
             <span className="text-xs text-amber-700">
               Choose a branch above first.
             </span>
+          ) : (
+            !newNumber.trim() && (
+              <span className="text-xs text-slate-500">
+                Enter a table number or name to save.
+              </span>
+            )
           )}
         </div>
       )}
@@ -1309,161 +1384,6 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
           />
         </label>
       ))}
-    </div>
-  );
-}
-
-/** The restaurant's own words, colour and logo on the guest page. Saved straight to the cloud; guests see it on their next scan. */
-export function BrandingForm({
-  showToast,
-}: {
-  showToast: (m: string) => void;
-}) {
-  const current = useLoad<import("../../cloud/qrAdminClient").QrBrandingView>(
-    QrAdminApi.branding,
-  );
-  const [f, setF] = useState<Record<string, string>>({});
-  const [logo, setLogo] = useState<string | null | undefined>(undefined);
-  const [saving, setSaving] = useState(false);
-  const val = (k: string) =>
-    f[k] ??
-    (current.data as unknown as Record<string, string | null> | null)?.[k] ??
-    "";
-  const set = (k: string, v: string) => setF((o) => ({ ...o, [k]: v }));
-
-  const pickLogo = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, 400 / Math.max(img.width, img.height));
-        const c = document.createElement("canvas");
-        c.width = Math.round(img.width * scale);
-        c.height = Math.round(img.height * scale);
-        c.getContext("2d")?.drawImage(img, 0, 0, c.width, c.height);
-        setLogo(c.toDataURL("image/png"));
-      };
-      img.src = ev.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const save = async () => {
-    setSaving(true);
-    try {
-      const body: Record<string, string | null> = { ...f };
-      if (logo !== undefined) body.logo = logo;
-      if (Object.keys(body).length === 0) return showToast("Nothing to save.");
-      await QrAdminApi.updateBranding(body);
-      setF({});
-      setLogo(undefined);
-      current.reload();
-      showToast("Saved. Guests see it on their next scan.");
-    } catch (e) {
-      showToast(errText(e));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const inputCls =
-    "block mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm";
-  return (
-    <div className="rounded-2xl border border-jaman-border bg-white p-4 space-y-3">
-      <h3 className="font-bold text-jaman-navy text-sm">
-        Guest page: your words, colour and logo
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label className="text-xs font-bold text-slate-600">
-          Heading (default: your restaurant name)
-          <input
-            className={inputCls}
-            maxLength={80}
-            value={val("welcomeTitle")}
-            onChange={(e) => set("welcomeTitle", e.target.value)}
-          />
-        </label>
-        <label className="text-xs font-bold text-slate-600">
-          Order button text (default: Place order)
-          <input
-            className={inputCls}
-            maxLength={30}
-            value={val("orderButtonLabel")}
-            onChange={(e) => set("orderButtonLabel", e.target.value)}
-          />
-        </label>
-        <label className="text-xs font-bold text-slate-600">
-          Welcome message
-          <input
-            className={inputCls}
-            maxLength={300}
-            value={val("welcomeMessage")}
-            onChange={(e) => set("welcomeMessage", e.target.value)}
-          />
-        </label>
-        <label className="text-xs font-bold text-slate-600">
-          Footer message
-          <input
-            className={inputCls}
-            maxLength={300}
-            value={val("footerMessage")}
-            onChange={(e) => set("footerMessage", e.target.value)}
-          />
-        </label>
-        <label className="text-xs font-bold text-slate-600">
-          Brand colour
-          <input
-            type="color"
-            className="block mt-1 h-10 w-20 rounded-lg border border-slate-300"
-            value={
-              /^#[0-9a-fA-F]{6}$/.test(val("accentColor"))
-                ? val("accentColor")
-                : "#0b253a"
-            }
-            onChange={(e) => set("accentColor", e.target.value)}
-          />
-        </label>
-        <div className="text-xs font-bold text-slate-600">
-          Logo
-          <div className="flex items-center gap-2 mt-1">
-            {(logo !== undefined ? logo : current.data?.logoUrl) && (
-              <img
-                src={
-                  logo !== undefined
-                    ? (logo ?? undefined)
-                    : (current.data?.logoUrl ?? undefined)
-                }
-                alt="Restaurant logo preview"
-                className="h-10 rounded"
-              />
-            )}
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) pickLogo(file);
-              }}
-            />
-            {(logo || current.data?.logoUrl) && (
-              <button
-                type="button"
-                className="text-rose-600"
-                onClick={() => setLogo(null)}
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-      <button
-        disabled={saving}
-        onClick={save}
-        className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold disabled:opacity-40"
-      >
-        Save
-      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { AiConfig, refreshAiConfigIfStale, reportAiQuery } from '@jamanvaar/business';
 import { KeyValueStore } from '@jamanvaar/database';
 import { stopRealtime } from '@jamanvaar/sync';
-import { fetchWithDeadline, withSessionLock } from '@jamanvaar/api';
+import { fetchWithDeadline } from '@jamanvaar/api';
 /**
  * KDS's only connection to cloud/api. Same pattern as pos/src/cloud/cloudClient.ts:
  * a single activation-key redeem call gets a device token, used as a Bearer

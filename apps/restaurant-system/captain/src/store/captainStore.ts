@@ -1,17 +1,5 @@
 import { create } from 'zustand';
-import {
-  CaptainProfile,
-  CaptainNotification,
-  FoodReadyItem,
-  DiningTable,
-  MenuItem,
-  Category,
-  Order,
-  KOT,
-  SelectedModifier,
-  DietaryType,
-  CustomerAccount
-} from '@jamanvaar/types';
+import { CaptainProfile, CaptainNotification, FoodReadyItem, DiningTable, MenuItem, Category, Order, KOT, SelectedModifier, CustomerAccount } from '@jamanvaar/types';
 import {
   captainDb,
   OrderRepository,
@@ -23,6 +11,8 @@ import {
   ServiceMessages,
   projectTableBillState,
   CustomerRepository,
+  getTerminalId,
+  KeyValueStore,
   type ServiceMessage
 } from '@jamanvaar/database';
 import type { User } from '@jamanvaar/types';
@@ -68,17 +58,32 @@ export interface CartItemEntry {
  * Dishes taken but not yet sent to the kitchen (a course held back, or a table opened and closed again) belong to the table,
  * not to the open screen: they are kept per table so closing the workspace, or a reload, does not lose them.
  */
-const HELD_KEY = 'jamanvaar_captain_held_v1';
+// Table numbers repeat across restaurants and branches. Unknown legacy drafts
+// remain untouched for support recovery; they cannot safely be assigned here.
+function heldKey(): string | null {
+  const tenant = KeyValueStore.get('jamanvaar_tenant_id');
+  const branch = KeyValueStore.get('jamanvaar_bound_branch_id');
+  return tenant && branch ? `jamanvaar_captain_held_v2:${JSON.stringify([tenant, branch])}` : null;
+}
 function readHeld(): Record<string, CartItemEntry[]> {
   try {
-    return JSON.parse(localStorage.getItem(HELD_KEY) ?? '{}') as Record<string, CartItemEntry[]>;
+    const key = heldKey();
+    if (!key) return {};
+    const parsed: unknown = JSON.parse(KeyValueStore.get(key) ?? '{}');
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return Object.fromEntries(Object.entries(parsed).filter(([, items]) => Array.isArray(items)).map(([table, items]) => [table, (items as unknown[]).filter((item): item is CartItemEntry => {
+      if (!item || typeof item !== 'object') return false;
+      const line = item as Partial<CartItemEntry>;
+      return typeof line.id === 'string' && !!line.menuItem && typeof line.menuItem.id === 'string' && typeof line.quantity === 'number' && Number.isFinite(line.quantity) && line.quantity > 0 && Array.isArray(line.selectedModifiers) && line.isFired === false && line.status !== 'CANCELLED';
+    })]));
   } catch {
     return {};
   }
 }
 function writeHeld(all: Record<string, CartItemEntry[]>): void {
   try {
-    localStorage.setItem(HELD_KEY, JSON.stringify(all));
+    const key = heldKey();
+    if (key) KeyValueStore.set(key, JSON.stringify(all));
   } catch {
     // Storage unavailable: held dishes last until the screen is closed.
   }
@@ -197,6 +202,7 @@ interface CaptainState {
   // Active Floor & Table
   tables: DiningTable[];
   selectedTable: DiningTable | null;
+  draftScope: string | null;
   selectedTableOrder: Order | null;
   tableFilter: 'MY_TABLES' | 'ALL_TABLES' | 'OCCUPIED' | 'FOOD_READY' | 'BILL_REQUESTED';
   selectedZone: string;
@@ -219,7 +225,7 @@ interface CaptainState {
   cartItems: CartItemEntry[];
 
   // Navigation & Modals
-  activeTab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT';
+  activeTab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT' | 'REQUESTS';
   isTableWorkspaceOpen: boolean;
   tableWorkspaceTab: 'ORDER' | 'CART' | 'KOTS' | 'CUSTOMER' | 'BILL';
   customizingItem: MenuItem | null;
@@ -243,8 +249,9 @@ interface CaptainState {
   /** Why the last sign-in was refused, in words for the person at the keypad (BUG-147). Null when there is nothing to say. */
   loginError: string | null;
   login: (pin: string) => Promise<boolean>;
-  logout: () => void;
-  setActiveTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT') => void;
+  logout: () => boolean;
+  handover: (pin: string, note: string) => Promise<boolean>;
+  setActiveTab: (tab: 'TABLES' | 'ORDERS' | 'FOOD_READY' | 'KOTS' | 'MESSAGES' | 'CUSTOMERS' | 'SHIFT' | 'REQUESTS') => void;
   setTableWorkspaceTab: (tab: 'ORDER' | 'CART' | 'KOTS' | 'CUSTOMER' | 'BILL') => void;
   openTableWorkspace: (table: DiningTable) => void;
   closeTableWorkspace: () => void;
@@ -341,6 +348,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   tables: captainDb.tables,
   selectedTable: null,
+  draftScope: null,
   selectedTableOrder: null,
   tableFilter: 'ALL_TABLES',
   selectedZone: 'ALL',
@@ -408,7 +416,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
         fullName: matchedUser.fullName,
         roleId: matchedUser.roleId || 'CAPTAIN',
         restaurantId: matchedUser.restaurantId || db.restaurant.id,
-        terminalId: 'CAPTAIN-01'
+        terminalId: getTerminalId('CAPTAIN')
       });
       set({
         currentCaptain: captainProfile,
@@ -427,7 +435,28 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     return false;
   },
 
+  handover: async (pin, note) => {
+    const outgoing = get().currentCaptain;
+    if (!outgoing) return false;
+    if (get().cartItems.some(item => !item.isFired && item.status !== 'CANCELLED')) {set({loginError:'Send or deliberately remove unsent dishes before handing over.'});return false;}
+    const receiver = (await verifyPinWithSync(pin))?.user;
+    if (!receiver || !StaffRepository.canUseTerminal(receiver.roleId, 'CAPTAIN')) {set({loginError:'The receiving captain must enter a valid floor staff PIN.'});return false;}
+    if (receiver.id === outgoing.id) {set({loginError:'Ask the receiving captain to enter their own PIN.'});return false;}
+    const assigned = captainDb.tables.filter(t => t.openedById === outgoing.id && (t.status !== 'AVAILABLE' || !!t.currentOrderId));
+    if (!await get().login(pin)) {set({loginError:get().loginError ?? 'The receiving captain must enter a valid staff PIN.'});return false;}
+    const incoming = get().currentCaptain!;
+    for (const table of assigned) {
+      if (table.openedById !== outgoing.id) continue;
+      table.openedById = incoming.id; table.openedByName = incoming.name;
+    }
+    AuditRepository.log({action:'CAPTAIN_HANDOVER',category:'AUTH',username:incoming.name,details:`${incoming.name} accepted ${assigned.length} table(s) from ${outgoing.name}. ${note.trim().slice(0,500)}`});
+    ServiceMessages.enqueue({kind:'MESSAGE',recipient:'MANAGER',senderName:incoming.name,presetText:`Floor handover accepted: ${outgoing.name} → ${incoming.name}`,customNote:`Tables: ${assigned.map(t => t.tableNumber).join(', ') || 'none'}. ${note.trim().slice(0,500)}`});
+    captainDb.notify(); get().refreshState();pushNow();return true;
+  },
+
   logout: () => {
+    // Every sign-out entry point shares this guard, including future UI callers.
+    if (get().cartItems.some(item => !item.isFired && item.status !== 'CANCELLED')) return false;
     SessionPersistence.clear('captain');
     StaffSession.clear();
     set({
@@ -438,6 +467,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
       isTableWorkspaceOpen: false,
       cartItems: []
     });
+    return true;
   },
 
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -541,6 +571,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
     set({
       selectedTable: table,
+      draftScope: heldKey(),
       selectedTableOrder: activeOrder,
       guestCount: table.currentGuests || 2,
       cartItems: [...loadedCart, ...held],
@@ -714,24 +745,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     if (!tbl) return false;
     saveHeld(tableNumber, []);
 
-    // Freeing an occupied table must never orphan a still-open order (unbilled, forever stuck
-    // PREPARING) — a walkout, or a table recovered from a stuck self-service order (BUG: a kiosk
-    // dine-in order never occupied its table at all, so the next guest could be seated on top of
-    // one already eating), both need the table AND its order closed together, matching how POS's
-    // own "Mark Available" already force-completes a lingering order rather than abandoning it.
-    if (tbl.currentOrderId) {
-      const lingering = OrderRepository.getOrderById(tbl.currentOrderId);
-      if (lingering && lingering.orderStatus !== 'COMPLETED' && lingering.orderStatus !== 'CANCELLED') {
-        OrderRepository.updateOrderStatus(lingering.id, 'COMPLETED', 'Table Vacated');
-      }
-    }
-
-    tbl.status = 'AVAILABLE';
-    tbl.currentGuests = undefined;
-    tbl.currentOrderId = undefined;
-    tbl.openedById = undefined;
-    tbl.openedByName = undefined;
-    captainDb.notify();
+    // Table occupancy, kitchen progress and money are independent lifecycles.
+    if (!TableRepository.updateTableStatus(tbl.id, 'AVAILABLE')) return false;
 
     if (get().selectedTable?.tableNumber === tableNumber) {
       set({
@@ -1208,6 +1223,10 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
     // (its own accept/resolve workflow), not buried in the general staff inbox mislabeled as a
     // manager message from nobody in particular.
     const staffCalls = incoming.filter((m) => m.kind === 'CALL_STAFF');
+    if (staffCalls.length) set(s => ({customerRequests:s.customerRequests.map(row => {
+      const remote = staffCalls.find(message => `svc-${message.id}` === row.id);
+      return remote ? {...row,isAcknowledged:row.isAcknowledged || remote.status === 'ACCEPTED' || remote.status === 'RESOLVED',isResolved:row.isResolved || remote.status === 'RESOLVED'} : row;
+    })}));
     const otherMessages = incoming.filter((m) => m.kind !== 'CALL_STAFF');
 
     const knownMessageIds = new Set(get().messages.map((m) => m.id));
@@ -1242,8 +1261,8 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
           type: 'HELP',
           notes: m.customNote || m.presetText,
           createdAt: m.createdAt,
-          isAcknowledged: false,
-          isResolved: false
+          isAcknowledged: m.status === 'ACCEPTED' || m.status === 'RESOLVED',
+          isResolved: m.status === 'RESOLVED'
         })),
         ...s.customerRequests
       ],
@@ -1310,6 +1329,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   acknowledgeCustomerRequest: (id) => {
+    if (id.startsWith('svc-svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'ACCEPTED'); void pushServiceMessages(); }
     set((s) => ({
       customerRequests: s.customerRequests.map((cr) =>
         cr.id === id ? { ...cr, isAcknowledged: true } : cr
@@ -1320,6 +1340,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   resolveCustomerRequest: (id) => {
+    if (id.startsWith('svc-svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'RESOLVED'); void pushServiceMessages(); }
     set((s) => ({
       customerRequests: s.customerRequests.map((cr) =>
         cr.id === id ? { ...cr, isResolved: true } : cr
@@ -1380,7 +1401,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
 // Whatever is in the open table's cart and not yet sent is remembered for that table (see heldForTable).
 useCaptainStore.subscribe((state, prev) => {
-  if (state.cartItems === prev.cartItems || !state.selectedTable) return;
+  if (state.cartItems === prev.cartItems || !state.selectedTable || state.draftScope !== heldKey()) return;
   saveHeld(state.selectedTable.tableNumber, state.cartItems.filter((ci) => !ci.isFired));
 });
 
@@ -1388,7 +1409,7 @@ useCaptainStore.subscribe((state, prev) => {
 // REAL-TIME CLUSTER EVENT LISTENERS (CROSS-APP MESH)
 // =========================================================================
 if (typeof window !== 'undefined') {
-  lanMeshSync.registerDevice('CAPTAIN', 'CAPTAIN-01', 'Captain Mobile App');
+  lanMeshSync.registerDevice('CAPTAIN', getTerminalId('CAPTAIN'), 'Captain Mobile App');
   lanMeshSync.setAttachedDatabase(captainDb);
 
   // 2. Bill Settled at POS Counter
