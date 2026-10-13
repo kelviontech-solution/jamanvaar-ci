@@ -105,19 +105,19 @@ export function RestaurantHealthPage() {
               />
             ) : (
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
-                      <th style={{ padding: '12px 14px' }}>Restaurant</th>
-                      <th style={{ padding: '12px 14px' }}>Score</th>
-                      <th style={{ padding: '12px 14px' }}>Status</th>
-                      <th style={{ padding: '12px 14px' }}>Why</th>
+                      <th style={{ padding: '12px 14px', width: '22%' }}>Restaurant</th>
+                      <th style={{ padding: '12px 14px', width: '10%' }}>Score</th>
+                      <th style={{ padding: '12px 14px', width: '14%' }}>Status</th>
+                      <th style={{ padding: '12px 14px', width: '54%' }}>Why</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((r) => (
                       <tr key={r.restaurantId} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
-                        <td style={{ padding: '14px' }}>
+                        <td style={{ padding: '14px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           <Link to={`/restaurants/${r.restaurantId}`} className="table-link" style={{ fontWeight: 700 }}>
                             {r.name}
                           </Link>
@@ -127,7 +127,7 @@ export function RestaurantHealthPage() {
                         <td style={{ padding: '14px' }}>
                           <Badge tone={TONE_META[r.tone].badge}>{TONE_META[r.tone].label}</Badge>
                         </td>
-                        <td style={{ padding: '14px', color: 'var(--jv-text-muted)' }}>
+                        <td style={{ padding: '14px', color: 'var(--jv-text-muted)', whiteSpace: 'normal', wordBreak: 'break-word' }}>
                           {r.reasons.length === 0 ? '—' : r.reasons.join(' · ')}
                         </td>
                       </tr>

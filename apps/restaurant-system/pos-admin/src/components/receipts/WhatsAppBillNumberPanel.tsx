@@ -135,6 +135,14 @@ export const WhatsAppBillNumberView: React.FC<{
               {settings.templateStatus === 'REJECTED' ? 'Submit again' : 'Create bill template'}
             </button>
           )}
+          {/* A PENDING template used to just sit there with no action and no auto-refresh -- the panel
+              polls Meta in the background (see WhatsAppBillNumberPanel), but this button lets the admin
+              check right now instead of wondering whether anything is actually happening. */}
+          {settings.templateStatus === 'PENDING' && (
+            <button type="button" disabled={busy} onClick={onRecheck} className="mt-2 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 font-bold disabled:opacity-50 flex items-center gap-1.5">
+              <RefreshCw className="w-3.5 h-3.5" /> Check status
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -172,6 +180,18 @@ export const WhatsAppBillNumberPanel: React.FC<{ showToast: (msg: string) => voi
       });
     return () => { cancelled = true; };
   }, [connected, loggedIn]);
+
+  // BUG: "waiting for Meta approval" used to sit there unchanged forever -- nothing ever re-asked
+  // Meta once the admin left this screen, so an approval that actually landed hours ago still read
+  // "pending" until they happened to press the unrelated number's "Check again" button. While the
+  // template is PENDING, silently re-check on an interval so this resolves itself.
+  useEffect(() => {
+    if (!connected || !loggedIn || settings?.templateStatus !== 'PENDING') return;
+    const id = setInterval(() => {
+      recheckWhatsAppBillNumber().then(setSettings).catch(() => {});
+    }, 30_000);
+    return () => clearInterval(id);
+  }, [connected, loggedIn, settings?.templateStatus]);
 
   if (!connected) return null;
   if (!loggedIn) {

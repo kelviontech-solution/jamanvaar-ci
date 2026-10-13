@@ -1175,7 +1175,7 @@ export default function PosAdminApp() {
           </aside>
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
-          {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.</p></div></main> :
+          {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6 max-w-xl"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">{branchScopeReady ? "Orders, tables, staff and devices belong to one branch at a time — pick one below." : 'Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.'}</p>{branchScopeReady && <div className="mt-4 -mx-2"><AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} /></div>}</div></main> :
           <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/>{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
@@ -1353,8 +1353,17 @@ export default function PosAdminApp() {
                   <p className="text-sm text-[#4A5568] mt-1">Manage self-ordering stations, lockdown states, and maintenance modes.</p>
                 </div>
                 {kiosks.length === 0 && (
-                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-xs text-[#64748B]">
-                    No Kiosk Terminals yet. A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network.
+                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-center space-y-3">
+                    <p className="text-xs text-[#64748B]">
+                      No Kiosk Terminals yet. A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => { setActiveTab('SUPPORT'); showToast('Raise a ticket to request a new Kiosk activation key.'); }}
+                      className="inline-flex items-center justify-center font-semibold rounded-xl bg-brand text-white px-4 py-2.5 text-sm cursor-pointer hover:opacity-90"
+                    >
+                      Request Activation Key
+                    </button>
                   </div>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

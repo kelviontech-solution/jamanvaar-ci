@@ -8,7 +8,8 @@ import {
   LogOut,
   Radio,
   Building2,
-  Menu
+  Menu,
+  LayoutGrid
 } from 'lucide-react';
 import { db } from '@jamanvaar/database';
 import { useAiAccess, JAMANVAAR_LOGOS } from '@jamanvaar/ui';
@@ -127,11 +128,14 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </div>
       </div>
 
-      {availableProducts.length > 1 && onSwitchProduct && <label className="text-xs shrink-0">
-        <span className="sr-only">Switch application</span>
-        <select aria-label="Switch application" value={selectedProduct} onChange={e => onSwitchProduct(e.target.value as AdminProduct)} className="rounded-xl border border-jaman-border bg-white p-2 text-jaman-navy font-semibold max-w-40">
-          {availableProducts.map(app => <option key={app} value={app}>{ADMIN_PRODUCTS[app].name}</option>)}
-        </select>
+      {availableProducts.length > 1 && onSwitchProduct && <label className="text-xs shrink-0 flex flex-col gap-0.5">
+        <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">App</span>
+        <span className="flex items-center gap-1.5 rounded-xl border-2 border-brand/30 bg-brand/[0.04] px-1">
+          <LayoutGrid className="w-3.5 h-3.5 text-brand shrink-0 ml-1.5" aria-hidden="true" />
+          <select aria-label="Switch application" value={selectedProduct} onChange={e => onSwitchProduct(e.target.value as AdminProduct)} className="bg-transparent p-2 text-jaman-navy font-semibold max-w-40 cursor-pointer">
+            {availableProducts.map(app => <option key={app} value={app}>{ADMIN_PRODUCTS[app].name}</option>)}
+          </select>
+        </span>
       </label>}
 
       {/* ── 2. Center: Dedicated Global Search ── */}

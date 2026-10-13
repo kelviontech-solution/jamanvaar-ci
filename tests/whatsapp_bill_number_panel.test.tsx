@@ -50,10 +50,11 @@ describe('WhatsApp number for bills — admin panel', () => {
     expect(html).toContain('Create bill template');
   });
 
-  it('a pending template shows the wait, with no button', () => {
+  it('a pending template shows the wait, and offers a way to check status right now', () => {
     const html = render({ ...base, number: '9428521735', status: 'READY', templateStatus: 'PENDING' });
     expect(html).toContain('waiting for Meta approval');
     expect(html).not.toContain('Create bill template');
+    expect(html).toContain('Check status');
   });
 
   it('a rejected template offers Submit again', () => {

@@ -23,6 +23,14 @@ export interface JamanvaarAuthLayoutProps {
   applicationLabel?: string;
   appTitle: string;
   appSubtitle: string;
+  /**
+   * Once a device is activated and bound to one specific restaurant, its own name — not just
+   * the generic app name — is what tells whoever is standing in front of it that this is their
+   * restaurant's terminal. Passed by the post-activation sign-in screens (POS/Captain/KDS); left
+   * unset on activation screens and Restaurant Admin's owner login, where no single restaurant is
+   * known yet.
+   */
+  restaurantName?: string;
   isOnline?: boolean;
   onToggleNetwork?: () => void;
   /**
@@ -196,6 +204,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   applicationLabel,
   appTitle,
   appSubtitle,
+  restaurantName,
   isOnline = true,
   onToggleNetwork,
   isLocalCoreUnauthorized = false,
@@ -513,7 +522,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
               </div>
 
               <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight ${dark ? 'text-[#F5F1E8]' : 'text-[#0B253A]'}`}>
-                {appTitle}
+                {restaurantName || appTitle}
               </h2>
               <p className={`text-xs sm:text-sm font-medium ${dark ? 'text-[#8CA0B3]' : 'text-slate-500'}`}>
                 {appSubtitle}

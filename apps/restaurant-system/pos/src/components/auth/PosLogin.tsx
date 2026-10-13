@@ -77,6 +77,7 @@ export const PosLogin: React.FC = () => {
       appIdentity="POS"
       appTitle="POS Counter"
       appSubtitle="Enter your 4-digit staff PIN to continue"
+      restaurantName={db.restaurant.name}
       isOnline={isOnline}
       onToggleNetwork={toggleNetworkStatus}
       isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}

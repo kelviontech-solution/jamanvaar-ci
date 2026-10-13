@@ -694,6 +694,7 @@ export const App: React.FC = () => {
           appIdentity="KDS"
           appTitle="Kitchen Display System"
           appSubtitle="Kitchen Stations & Line Cook Display"
+          restaurantName={kdsDb.restaurant?.name}
           isLocalCoreUnauthorized={kdsDb.isLocalCoreUnauthorized()}
           isLocalCoreConnected={kdsDb.isLocalCoreConnected()}
           localCoreUrl={kdsDb.getSyncServerUrl()}

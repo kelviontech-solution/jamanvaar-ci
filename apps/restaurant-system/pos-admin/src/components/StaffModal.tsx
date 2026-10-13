@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User as UserType } from '@jamanvaar/types';
 import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { StaffRepository, StaffScheduleRepository } from '@jamanvaar/database';
+import { syncStaffUsers, pendingStaffChanges } from '@jamanvaar/sync';
 import { copyText } from '@jamanvaar/utils';
 import { Check, Copy, KeyRound } from 'lucide-react';
 
@@ -46,6 +47,22 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   const [formError, setFormError] = useState('');
   const [issuedPin, setIssuedPin] = useState<string | null>(null);
   const [pinCopied, setPinCopied] = useState(false);
+  const [pinSyncStatus, setPinSyncStatus] = useState<'syncing' | 'synced' | 'pending'>('syncing');
+
+  // BUG: a PIN just issued here worked on POS/Captain/KDS/Kiosk only once the admin had
+  // clicked "Done" and walked over -- not because Done does anything, but because the actual
+  // cloud push ran as a fire-and-forget microtask nobody waited on, so it just happened to
+  // land by the time they got there. Awaiting the same syncStaffUsers({push:true}) call
+  // StaffRolesModule already uses for staff removal tells the admin the true state instead.
+  const syncIssuedPin = async () => {
+    setPinSyncStatus('syncing');
+    try {
+      await syncStaffUsers({ push: true });
+      setPinSyncStatus(pendingStaffChanges() ? 'pending' : 'synced');
+    } catch {
+      setPinSyncStatus('pending');
+    }
+  };
 
   useEffect(() => {
     setIssuedPin(null);
@@ -83,6 +100,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
     if (result) {
       setIssuedPin(result.issuedPin);
       setPinCopied(false);
+      void syncIssuedPin();
     }
   };
 
@@ -132,6 +150,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       StaffScheduleRepository.setPayRate(created.id, Number(hourlyPay));
       setIssuedPin(created.issuedPin ?? null);
       onSaved();
+      if (created.issuedPin) void syncIssuedPin();
     }
   };
 
@@ -160,6 +179,15 @@ export const StaffModal: React.FC<StaffModalProps> = ({
             <p className="text-[11px] text-emerald-700">
               This PIN logs {fullName || 'this staff member'} into POS, Captain, KDS and Kiosk. It can be reset any time from here.
             </p>
+            {pinSyncStatus === 'syncing' && (
+              <p className="text-[11px] font-bold text-amber-700">Syncing to POS, Captain, KDS and Kiosk… don't hand it out yet.</p>
+            )}
+            {pinSyncStatus === 'synced' && (
+              <p className="text-[11px] font-bold text-emerald-800">Synced — ready to use on POS, Captain, KDS and Kiosk now.</p>
+            )}
+            {pinSyncStatus === 'pending' && (
+              <p className="text-[11px] font-bold text-amber-700">Saved here, but not synced yet — keep this admin online; the PIN will work on other devices once it catches up.</p>
+            )}
           </div>
           <div className="flex justify-end pt-2 border-t border-slate-200">
             <Button

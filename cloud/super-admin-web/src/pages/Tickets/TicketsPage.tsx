@@ -17,7 +17,7 @@ import {
   EmptyState
 } from '../../components/ui';
 import { RefreshButton } from '../../components/RefreshButton';
-import { LifeBuoy, Plus, Clock, AlertCircle, UserCheck, UserX } from 'lucide-react';
+import { LifeBuoy, Plus, Clock, AlertCircle, UserCheck, UserX, CircleDot, Loader2, CheckCircle2, Archive } from 'lucide-react';
 import '../../components/shared.css';
 
 const PRIORITY_TONE: Record<TicketPriority, BadgeTone> = {
@@ -33,6 +33,33 @@ const STATUS_TONE: Record<TicketStatus, BadgeTone> = {
   RESOLVED: 'success',
   CLOSED: 'neutral'
 };
+
+// A color-only dot is too subtle in a table already full of colored pills (priority, category,
+// "from restaurant"). Each status gets its own icon shape too, so open vs. closed reads at a
+// glance even in grayscale or for a colorblind viewer -- the same pattern GitHub/Linear/Jira use.
+const STATUS_ICON: Record<TicketStatus, typeof CircleDot> = {
+  OPEN: CircleDot,
+  IN_PROGRESS: Loader2,
+  RESOLVED: CheckCircle2,
+  CLOSED: Archive
+};
+
+const STATUS_LABEL: Record<TicketStatus, string> = {
+  OPEN: 'Open',
+  IN_PROGRESS: 'In progress',
+  RESOLVED: 'Resolved',
+  CLOSED: 'Closed'
+};
+
+function TicketStatusBadge({ status }: { status: TicketStatus }) {
+  const Icon = STATUS_ICON[status];
+  return (
+    <span className={`badge badge-${STATUS_TONE[status]}`}>
+      <Icon className="w-3 h-3" />
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}
 
 type View = 'all' | 'my-work' | 'unassigned' | 'created-by-me' | 'overdue' | 'from-restaurants';
 
@@ -428,8 +455,11 @@ export function TicketsPage() {
                   <tbody>
                     {tickets.map((t) => {
                       const sla = slaLabel(t.slaDueAt, t.resolvedAt);
+                      // Resolved/closed tickets are done work: muting them (not hiding them --
+                      // they're one filter away) lets whatever is still open visually lead the table.
+                      const isDone = t.status === 'RESOLVED' || t.status === 'CLOSED';
                       return (
-                        <tr key={t.id} style={{ cursor: 'pointer' }} onClick={() => openTicket(t.id)}>
+                        <tr key={t.id} style={{ cursor: 'pointer', opacity: isDone ? 0.6 : 1 }} onClick={() => openTicket(t.id)}>
                           <td className="mono" style={{ whiteSpace: 'nowrap' }}>{ticketNumber(t.number)}</td>
                           <td>
                             <button type="button" className="table-link" style={{ fontWeight: 700, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
@@ -442,7 +472,7 @@ export function TicketsPage() {
                           </td>
                           <td>{t.restaurant?.name || '— Platform-wide —'}</td>
                           <td><Badge tone={PRIORITY_TONE[t.priority]}>{t.priority}</Badge></td>
-                          <td><Badge tone={STATUS_TONE[t.status]}>{t.status.replace('_', ' ')}</Badge></td>
+                          <td><TicketStatusBadge status={t.status} /></td>
                           <td style={{ whiteSpace: 'nowrap' }}>{new Date(t.createdAt).toLocaleDateString('en-IN')}</td>
                           <td>
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: sla.overdue ? '#dc2626' : undefined, fontWeight: sla.overdue ? 700 : 500 }}>

@@ -397,6 +397,7 @@ export const App: React.FC = () => {
           appIdentity="CAPTAIN"
           appTitle="Floor Captain & Service"
           appSubtitle="High-Speed Table Orders & Service"
+          restaurantName={captainDb.restaurant?.name}
           isLocalCoreUnauthorized={captainDb.isLocalCoreUnauthorized()}
           isLocalCoreConnected={captainDb.isLocalCoreConnected()}
           localCoreUrl={captainDb.getSyncServerUrl()}
