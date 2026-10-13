@@ -30,7 +30,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
   return (
     <div
       data-testid="kiosk-menu-card"
-      className="group flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden cursor-pointer select-none transition-colors hover:border-jaman-saffron/60 active:scale-[0.99]"
+      className="group flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden cursor-pointer select-none shadow-sm transition-all hover:border-jaman-saffron/60 hover:shadow-md active:scale-[0.99]"
     >
       <button type="button" disabled={!onSelectDetails} aria-label={`View details for ${displayName || item.name}`} onClick={() => onSelectDetails?.(item)} className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden text-left focus-visible:outline focus-visible:outline-4 focus-visible:outline-jaman-navy focus-visible:-outline-offset-4">
         <CachedImg
@@ -45,7 +45,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
         </div>
       </button>
 
-      <div className="flex flex-col flex-1 p-3 gap-1.5">
+      <div className="flex flex-col flex-1 p-3.5 gap-1.5">
         <h3 className="text-base font-bold text-jaman-navy leading-snug min-h-[2.75rem]">
           <button type="button" disabled={!onSelectDetails} onClick={() => onSelectDetails?.(item)} className="text-left w-full line-clamp-2" title={displayName || item.name}>{displayName || item.name}</button>
         </h3>
@@ -75,7 +75,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
                   e.stopPropagation();
                   onCustomize(item);
                 }}
-                className="h-11 px-3.5 rounded-full border-[1.5px] border-jaman-saffron text-jaman-saffron bg-white text-sm font-bold whitespace-nowrap active:bg-jaman-saffron/10 transition-colors"
+                className="h-11 px-3.5 rounded-xl border border-jaman-saffron text-jaman-saffron bg-white text-sm font-bold whitespace-nowrap active:bg-jaman-saffron/10 transition-colors"
                 title="Customize"
               >
                 Customize
@@ -87,7 +87,7 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
                 e.stopPropagation();
                 onAdd(item);
               }}
-              className="w-12 h-12 rounded-full bg-jaman-saffron text-white flex items-center justify-center shadow-sm active:scale-90 active:bg-[#D1560D] transition-transform"
+              className="w-12 h-12 rounded-xl bg-jaman-saffron text-white flex items-center justify-center shadow-sm active:scale-90 active:bg-[#D1560D] transition-transform"
               title="Add to Cart"
               aria-label={`Add ${displayName || item.name} to cart`}
             >

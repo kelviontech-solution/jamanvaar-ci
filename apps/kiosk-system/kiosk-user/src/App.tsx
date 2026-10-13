@@ -407,6 +407,32 @@ export default function KioskUserApp() {
     }
   };
   const [isCartOpen, setIsCartOpen] = useState(false);
+  useEffect(() => {
+    if (!isCartOpen || typeof document === 'undefined') return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsCartOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isCartOpen]);
+  useEffect(() => {
+    if (cartItems.length === 0 && isCartOpen) setIsCartOpen(false);
+  }, [cartItems.length, isCartOpen]);
+  // The header wraps onto a second row on narrow/portrait kiosks (flex-wrap), so its real height is
+  // not the 80/96px floor. Publish the measured height so the menu area, the cart backdrop and the
+  // cart drawer all start exactly where the header ends instead of cutting through it.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const header = document.querySelector<HTMLElement>('[data-kiosk-header]');
+    if (!header) return;
+    const root = document.documentElement;
+    const publish = () => root.style.setProperty('--kiosk-header-h', `${Math.ceil(header.getBoundingClientRect().height)}px`);
+    publish();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(publish);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [step]);
   const [couponCodeInput, setCouponCodeInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
@@ -865,6 +891,16 @@ export default function KioskUserApp() {
   const staffDiscount = staffOverrideActive ? Math.round(rawCalculated.subtotal * 0.1) : 0;
   const netTotalPayable = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && quotedPayable !== null
     ? quotedPayable : Math.max(0, rawCalculated.totalPayable - redeemedPoints - staffDiscount);
+  const cartItemQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const kioskSurfaceClass = 'rounded-xl border border-jaman-border bg-white shadow-sm';
+  const kioskAmountClass = 'text-right tabular-nums whitespace-nowrap';
+  const kioskCategoryTileClass = (active: boolean) =>
+    `w-full flex flex-col items-center gap-1.5 p-2 rounded-xl border text-center transition-colors active:scale-95 ${
+      active
+        ? 'bg-white border-jaman-saffron text-jaman-navy shadow-sm'
+        : 'bg-white/90 border-jaman-border text-[#4A5568] hover:bg-white hover:border-jaman-saffron/30'
+    }`;
+  const kioskCategoryMediaClass = 'w-full h-[68px] rounded-lg bg-jaman-ivory flex items-center justify-center text-jaman-saffron';
 
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
@@ -2038,11 +2074,9 @@ export default function KioskUserApp() {
         .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
         .kiosk-lang-page.kiosk-lang-entered .kiosk-lang-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.38s; }
 
-        /* Menu screen — cart panel's own reveal, on top of the layout's
-           10/90 → 10/70/20 width transition (see the inline style on the
-           grid container below). Plays once on mount (cart empty → first
-           item added); does not replay on later item adds since the panel
-           stays mounted for as long as the cart is non-empty. */
+        /* Menu screen — the cart stays mounted as an overlay drawer so the
+           category rail, menu scroll position, filters and search state remain
+           stable while the drawer slides in and out. */
         @keyframes kioskCartRise {
           from { transform: translate3d(0, 100%, 0); }
           to { transform: translate3d(0, 0, 0); }
@@ -2070,7 +2104,7 @@ export default function KioskUserApp() {
         @keyframes kioskFadeIn { from { opacity: 0.4; } to { opacity: 1; } }
         @keyframes kioskFadeOut { from { opacity: 1; } to { opacity: 0.4; } }
         @supports not (view-transition-name: none) {
-          .kiosk-cart-panel { animation: kioskCartRise 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+          .kiosk-cart-drawer { will-change: transform; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -2081,7 +2115,7 @@ export default function KioskUserApp() {
           .kiosk-lang-logo,
           .kiosk-lang-heading,
           .kiosk-lang-card,
-          .kiosk-cart-panel {
+          .kiosk-cart-drawer {
             animation: none !important;
             transition: none !important;
           }
@@ -2105,7 +2139,7 @@ export default function KioskUserApp() {
           would otherwise duplicate, and reads cleaner as a distraction-free
           first screen. */}
       {step !== 'LANGUAGE_SELECT' && step !== 'WELCOME' && (
-      <header className="min-h-20 sm:min-h-24 bg-white border-b border-jaman-border px-6 py-2 flex flex-wrap items-center justify-between gap-2 shadow-sm sticky top-0 z-30">
+      <header data-kiosk-header className="min-h-20 sm:min-h-24 bg-white border-b border-jaman-border px-6 py-2 flex flex-wrap items-center justify-between gap-2 shadow-sm sticky top-0 z-30">
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4">
           {(
@@ -2526,13 +2560,11 @@ export default function KioskUserApp() {
           // to work against, independent of the ambiguous parent sizing —
           // this is what makes the three-panel independent scroll actually
           // hold, not just the panels' own overflow classes.
-          className="h-[calc(100dvh-80px)] sm:h-[calc(100dvh-96px)] min-h-0 grid overflow-hidden"
+          className="relative h-[calc(100dvh-var(--kiosk-header-h,96px))] min-h-0 grid overflow-hidden"
           style={{
-            // Three fixed panels that never resize as the cart fills: the
-            // category rail, the menu, and the cart (which shows an empty
-            // state until items are added). minmax(0, …) keeps each track
-            // from being pushed wider by its content.
-            gridTemplateColumns: cartItems.length > 0 ? 'minmax(72px, 11fr) minmax(0, 66fr) minmax(0, 23fr)' : 'minmax(72px, 11fr) minmax(0, 89fr) 0fr',
+            // The cart is now an overlay drawer, so the category rail and menu
+            // keep their normal width whether the cart is empty, filled or open.
+            gridTemplateColumns: 'clamp(96px, 9vw, 132px) minmax(0, 1fr)',
             boxSizing: 'border-box'
           }}
         >
@@ -2541,19 +2573,15 @@ export default function KioskUserApp() {
               active tile is marked with an orange border and tint. Images
               are existing dish photos from each category (categories carry
               no photo of their own). */}
-          <div className="min-w-0 h-full overflow-y-auto overflow-x-hidden bg-white border-r border-jaman-border flex flex-col gap-2 p-2">
+          <div className="min-w-0 h-full overflow-y-auto overflow-x-hidden bg-jaman-ivory border-r border-jaman-border flex flex-col gap-2.5 p-3">
             <button
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('ALL');
               }}
-              className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-2xl border text-center transition-colors active:scale-95 ${
-                selectedCategoryId === 'ALL'
-                  ? 'bg-jaman-saffron/10 border-jaman-saffron text-jaman-navy'
-                  : 'bg-white border-jaman-border text-[#4A5568] hover:bg-jaman-ivory'
-              }`}
+              className={kioskCategoryTileClass(selectedCategoryId === 'ALL')}
             >
-              <div className="w-full h-16 rounded-xl bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
+              <div className={kioskCategoryMediaClass}>
                 <Grid className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold leading-tight line-clamp-2">{t('allMenu')}</span>
@@ -2564,13 +2592,9 @@ export default function KioskUserApp() {
                 SoundService.playTap();
                 setSelectedCategoryId('cat-combos');
               }}
-              className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-2xl border text-center transition-colors active:scale-95 ${
-                selectedCategoryId === 'cat-combos'
-                  ? 'bg-jaman-saffron/10 border-jaman-saffron text-jaman-navy'
-                  : 'bg-white border-jaman-border text-[#4A5568] hover:bg-jaman-ivory'
-              }`}
+              className={kioskCategoryTileClass(selectedCategoryId === 'cat-combos')}
             >
-              <div className="w-full h-16 rounded-xl bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
+              <div className={kioskCategoryMediaClass}>
                 <Flame className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold leading-tight line-clamp-2">{kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}</span>
@@ -2588,13 +2612,9 @@ export default function KioskUserApp() {
                     SoundService.playTap();
                     setSelectedCategoryId(cat.id);
                   }}
-                  className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-2xl border text-center transition-colors active:scale-95 ${
-                    active
-                      ? 'bg-jaman-saffron/10 border-jaman-saffron text-jaman-navy'
-                      : 'bg-white border-jaman-border text-[#4A5568] hover:bg-jaman-ivory'
-                  }`}
+                  className={kioskCategoryTileClass(active)}
                 >
-                  <div className="relative w-full h-16 rounded-xl overflow-hidden bg-jaman-ivory flex items-center justify-center text-jaman-saffron">
+                  <div className={`relative overflow-hidden ${kioskCategoryMediaClass}`}>
                     {photo ? (
                       <CachedImg src={photo} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -2669,7 +2689,7 @@ export default function KioskUserApp() {
             </div>
 
             {/* Scrollable: hero banners + category title + grid */}
-            <div className="flex-1 overflow-y-auto pb-8">
+            <div className={`flex-1 overflow-y-auto ${cartItems.length > 0 ? 'pb-32' : 'pb-8'}`}>
               {/* Featured deals — a compact horizontally-scrolling strip
                   (small thumbnail + two lines of text) instead of three
                   full-width hero cards, so the actual food menu below is
@@ -2770,12 +2790,12 @@ export default function KioskUserApp() {
                 {filteredCombos.length === 0 && (selectedCategoryId === 'cat-combos' || filteredItems.length === 0) ? (
                   <EmptyState title="No dishes found" description="Try another search term or filter category." actionText="View All Dishes" onAction={() => { setSelectedCategoryId('ALL'); setDietaryFilter('ALL'); setSearchQuery(''); }} />
                 ) : (
-                  <div data-testid="kiosk-menu-grid" className="grid gap-4 sm:gap-5 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 230px), 1fr))' }}>
+                  <div data-testid="kiosk-menu-grid" className="grid gap-4 sm:gap-5 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))' }}>
                       {filteredCombos.map((combo) => (
                         <div
                           key={combo.id}
                           data-testid="kiosk-menu-card"
-                          className="flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm hover:border-jaman-saffron/60 transition-colors"
+                          className="flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm hover:border-jaman-saffron/60 hover:shadow-md transition-all"
                         >
                           <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
                             <CachedImg
@@ -2791,7 +2811,7 @@ export default function KioskUserApp() {
                               {isNonVegCombo(combo) ? kioskCopy('nonVegCombo', 'Non-Vegetarian Combo') : t('pureVegCombo')}
                             </span>
                           </div>
-                          <div className="flex flex-col flex-1 p-3 gap-1.5">
+                          <div className="flex flex-col flex-1 p-3.5 gap-1.5">
                             <h4 className="font-black text-base text-jaman-navy leading-snug line-clamp-2 min-h-[2.75rem]">{localizedName(combo, lang)}</h4>
                             <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{localizedDescription(combo, lang)}</p>
                             <div className="mt-auto pt-2 flex items-end justify-between gap-2">
@@ -2832,46 +2852,86 @@ export default function KioskUserApp() {
             </div>
           </div>
 
-          {/* RIGHT — CART (0 width until the first item is added, then rises
-              in from the bottom while its grid track widens). */}
-          <div className="min-w-0 h-full overflow-hidden">
-            {cartItems.length > 0 && (
-              <div
-                className="kiosk-cart-panel h-full w-full min-w-0 box-border bg-white border-l border-jaman-border flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]"
-                style={{ viewTransitionName: 'kiosk-cart' }}
+          {/* CART DRAWER — the existing cart content is reused, but shown as
+              a right-side overlay so the menu/category layout stays mounted
+              and does not permanently reserve a cart column. */}
+          {cartItems.length > 0 && (
+            <div
+              className={`fixed inset-x-0 top-[var(--kiosk-header-h,96px)] bottom-0 z-50 transition-opacity duration-300 ease-out ${
+                isCartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+              }`}
+              aria-hidden={!isCartOpen}
+            >
+              <button
+                type="button"
+                className="absolute inset-0 bg-jaman-navy/35 transition-opacity"
+                onClick={() => setIsCartOpen(false)}
+                aria-label="Close cart drawer"
+                tabIndex={isCartOpen ? 0 : -1}
+              />
+              <aside
+                role="dialog"
+                aria-modal="true"
+                aria-label={t('orderSummary')}
+                className={`kiosk-cart-drawer absolute right-0 top-0 h-full max-w-full min-w-0 box-border bg-white border-l border-jaman-border flex flex-col shadow-[-8px_0_24px_rgba(11,37,58,0.12)] transition-transform duration-300 ease-out ${
+                  isCartOpen ? 'translate-x-0' : 'translate-x-full'
+                }`}
+                style={{ width: 'min(100vw, clamp(380px, 34vw, 680px))' }}
+                onClick={(event) => event.stopPropagation()}
               >
-                <div className="px-5 py-4 sm:px-6 sm:py-5 bg-jaman-navy shrink-0">
-                  <h2 className="text-lg sm:text-xl font-black text-white flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <ShoppingBag className="w-5 h-5" />
-                      {t('orderSummary')}
-                      <span className="ml-1 bg-jaman-saffron text-white text-xs px-2.5 py-0.5 rounded-full align-middle">
-                        {cartItems.reduce((acc, ci) => acc + ci.quantity, 0)}
+                <div className="px-4 py-3 sm:px-5 bg-white border-b border-jaman-border shrink-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex items-center gap-2">
+                      <h2 className="min-w-0 text-xl font-black text-jaman-navy flex items-center gap-2 leading-tight">
+                        <ShoppingBag className="w-5 h-5 text-jaman-saffron" />
+                        <span className="truncate">{t('orderSummary')}</span>
+                      </h2>
+                      <span className="shrink-0 bg-jaman-saffron/10 border border-jaman-saffron/30 text-jaman-saffron text-xs font-black px-2.5 py-1 rounded-lg">
+                        {cartItemQuantity}
                       </span>
-                    </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsCartOpen(false)}
+                      className="h-11 w-11 rounded-xl bg-jaman-ivory border border-jaman-border text-jaman-navy flex items-center justify-center hover:bg-[#F4EFE6] active:scale-95 transition-colors shrink-0"
+                      aria-label="Close order summary"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-[#52677A]">
+                      {kioskCopy("screen_total__18e872", "Total:")}<span className="ml-1 font-black text-jaman-navy tabular-nums">{formatINR(netTotalPayable)}</span>
+                    </p>
                     <button
                       onClick={handleFullSessionReset}
-                      className="text-xs font-bold text-white/90 hover:text-white flex items-center gap-1.5 transition-colors"
+                      className="h-10 px-3 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 flex items-center gap-1.5 transition-colors shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />{kioskCopy("screen_clear_all_ddceb7", "Clear All")}</button>
-                  </h2>
+                  </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 sm:p-6 space-y-4 bg-white">
+                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 space-y-3 bg-white">
                   <div className="space-y-3">
                     {cartItems.map((ci) => (
-                      <div key={ci.cartItemId} className="rounded-2xl border border-jaman-border bg-white p-3 shadow-sm">
-                        <div className="flex items-start gap-3 relative">
+                      <div key={ci.cartItemId} className={`${kioskSurfaceClass} p-3`}>
+                        <div className="flex items-start gap-3">
                           {ci.item.imageUrl && (
-                            <CachedImg src={ci.item.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
+                            <CachedImg src={ci.item.imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
                           )}
-                          <div className="flex-1 min-w-0 pr-6">
-                            <h4 className="font-bold text-base text-jaman-navy leading-snug">{localizedName(ci.item, lang)}</h4>
-                            <span className="font-black text-base text-jaman-saffron block mt-0.5">
-                              {formatINR(ci.itemTotal)}
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <h4 className="min-w-0 font-bold text-base text-jaman-navy leading-snug line-clamp-2">{localizedName(ci.item, lang)}</h4>
+                              <button
+                                onClick={() => updateCartItemQuantity(ci.cartItemId, -ci.quantity)}
+                                className="w-10 h-10 -mt-2 -mr-2 rounded-xl flex items-center justify-center text-[#52677A] hover:text-jaman-navy hover:bg-jaman-ivory active:bg-[#F4EFE6] transition-colors shrink-0"
+                                aria-label="Remove item"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
                             {ci.selectedModifiers && ci.selectedModifiers.length > 0 && (
-                              <div className="text-[10px] text-[#52677A] mt-1 leading-tight">
+                              <div className="text-[11px] text-[#52677A] leading-snug">
                                 {ci.selectedModifiers.map((m) => `+ ${m.optionName}`).join(', ')}
                               </div>
                             )}
@@ -2880,33 +2940,28 @@ export default function KioskUserApp() {
                                 *{ci.specialInstructions}
                               </div>
                             )}
-                          </div>
-                          
-                          <button
-                            onClick={() => updateCartItemQuantity(ci.cartItemId, -ci.quantity)}
-                            className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center text-[#52677A] hover:text-jaman-navy hover:bg-gray-50 active:bg-gray-100 transition-colors" aria-label="Remove item"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="flex justify-end mt-2">
-                          <div className="flex items-center gap-3 bg-white border border-jaman-border py-1 px-1 rounded-xl shadow-sm">
-                            <button
-                              onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
-                              className="w-11 h-11 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Decrease quantity of ${localizedName(ci.item, lang)}`}
-                            >
-                              <Minus className="w-5 h-5 text-jaman-navy" />
-                            </button>
-                            <span className="font-bold text-lg w-8 text-center text-jaman-navy">{ci.quantity}</span>
-                            <button
-                              onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
-                              className="w-11 h-11 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors"
-                              aria-label={`Increase quantity of ${localizedName(ci.item, lang)}`}
-                            >
-                              <Plus className="w-5 h-5 text-jaman-navy" />
-                            </button>
+                            <div className="flex items-center justify-between gap-3 mt-2">
+                              <span className="font-black text-base text-jaman-saffron tabular-nums">
+                                {formatINR(ci.itemTotal)}
+                              </span>
+                              <div className="flex items-center gap-1.5 bg-jaman-ivory border border-jaman-border p-1 rounded-xl shrink-0">
+                                <button
+                                  onClick={() => updateCartItemQuantity(ci.cartItemId, -1)}
+                                  className="w-10 h-10 rounded-lg bg-white flex items-center justify-center active:bg-[#F4EFE6] transition-colors"
+                                  aria-label={`Decrease quantity of ${localizedName(ci.item, lang)}`}
+                                >
+                                  <Minus className="w-5 h-5 text-jaman-navy" />
+                                </button>
+                                <span className="font-bold text-base w-8 text-center text-jaman-navy tabular-nums">{ci.quantity}</span>
+                                <button
+                                  onClick={() => updateCartItemQuantity(ci.cartItemId, 1)}
+                                  className="w-10 h-10 rounded-lg bg-jaman-saffron text-white flex items-center justify-center active:bg-[#D1560D] transition-colors"
+                                  aria-label={`Increase quantity of ${localizedName(ci.item, lang)}`}
+                                >
+                                  <Plus className="w-5 h-5" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -2915,24 +2970,23 @@ export default function KioskUserApp() {
 
                   {/* Smart Recommendations Engine */}
                   {intelligentRecommendations.length > 0 && (
-                    <div className="pt-4 space-y-3">
-                      <div className="flex items-center justify-between text-[#4A5568] px-1">
+                    <div className="pt-3 mt-1 border-t border-jaman-border space-y-2.5">
+                      <div className="flex items-center text-[#4A5568] px-1">
                         <span className="text-sm font-bold flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>{kioskCopy("screen_add_ons_suggested__fa91bb", "Add-ons (Suggested)")}</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                          <Plus className="w-4 h-4 text-jaman-saffron" />{kioskCopy("screen_add_ons_suggested__fa91bb", "Add-ons (Suggested)")}</span>
                       </div>
                       <div className="space-y-2">
                         {intelligentRecommendations.map((rec) => (
-                          <div key={rec.item.id} className="p-3 bg-white rounded-2xl border border-jaman-border flex items-center justify-between gap-2 shadow-sm">
+                          <div key={rec.item.id} className={`${kioskSurfaceClass} p-3 flex items-center justify-between gap-3`}>
                             <div className="flex items-center gap-3 min-w-0 pr-2">
-                              <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#F3EFE6]" />
+                              <CachedImg src={rec.item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=60'} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 border border-[#F3EFE6]" />
                               <div className="min-w-0">
-                                <h5 className="font-bold text-sm text-jaman-navy truncate">{localizedName(rec.item, lang)}</h5>
-                                <span className="text-sm font-black text-jaman-saffron block">{formatINR(rec.item.price)}</span>
+                                <h5 className="font-bold text-sm text-jaman-navy leading-snug line-clamp-2">{localizedName(rec.item, lang)}</h5>
+                                <span className="text-sm font-black text-jaman-saffron block tabular-nums">{formatINR(rec.item.price)}</span>
                               </div>
                             </div>
                             <button
-                              className="h-11 px-5 rounded-full border-[1.5px] border-jaman-saffron bg-white text-jaman-saffron text-sm font-bold shrink-0 active:bg-jaman-saffron/10 transition-colors"
+                              className="h-10 px-4 rounded-xl border border-jaman-saffron bg-white text-jaman-saffron text-sm font-bold shrink-0 active:bg-jaman-saffron/10 transition-colors"
                               onClick={() => handleSelectItem(rec.item)}
                             >{kioskCopy("screen_add_9fd728", "Add")}</button>
                           </div>
@@ -2943,7 +2997,7 @@ export default function KioskUserApp() {
                 </div>
 
                 {/* Financial Summary */}
-                <div className="p-5 sm:p-6 border-t border-[#F3EFE6] bg-jaman-ivory space-y-4 shrink-0">
+                <div className="px-4 py-3 sm:px-5 border-t border-jaman-border bg-white space-y-2.5 shrink-0 shadow-[0_-6px_18px_rgba(11,37,58,0.04)]">
 
                   {/* Coupon Code (B2-065: handleApplyCoupon/getByCode/incrementUsage already existed and
                       worked, but no input or button anywhere in this file ever called them, so a guest
@@ -2968,13 +3022,13 @@ export default function KioskUserApp() {
                           value={couponCodeInput}
                           onChange={(e) => { setCouponCodeInput(e.target.value.toUpperCase()); setCouponError(null); }}
                           placeholder="Enter coupon code"
-                          className="flex-1 bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-navy"
+                          className="min-w-0 flex-1 h-11 bg-white border border-jaman-border rounded-xl px-3 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-saffron/30 focus:border-jaman-saffron"
                         />
                         <button
                           type="button"
                           onClick={handleApplyCoupon}
                           disabled={!couponCodeInput.trim()}
-                          className="px-4 py-2 bg-jaman-navy text-white text-xs font-bold rounded-xl disabled:opacity-40 shrink-0"
+                          className="h-11 px-4 bg-[#BF540F] text-white text-xs font-bold rounded-xl disabled:opacity-40 shrink-0 active:bg-[#A9480C] transition-colors"
                         >{kioskCopy("screen_apply_31e392", "Apply")}</button>
                       </div>
                       {couponError && <p className="text-[10px] text-rose-600 font-semibold">{couponError}</p>}
@@ -3005,56 +3059,89 @@ export default function KioskUserApp() {
                   )}
 
                   {/* Subtotal / Tax breakdown */}
-                  <div className="rounded-2xl bg-jaman-ivory border border-jaman-border p-4 space-y-2">
-                    <div className="flex justify-between text-sm font-semibold text-jaman-navy">
+                  <div className="rounded-xl bg-jaman-ivory border border-jaman-border px-4 py-3 space-y-1.5">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm font-semibold text-jaman-navy">
                       <span>{t('subtotal')}</span>
-                      <span>{formatINR(rawCalculated.subtotal)}</span>
+                      <span className={kioskAmountClass}>{formatINR(rawCalculated.subtotal)}</span>
                     </div>
                     {rawCalculated.discountAmount > 0 && (
-                      <div className="flex justify-between text-sm text-emerald-600 font-bold">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-600 font-bold">
                         <span>{t('discount')} ({appliedCoupon?.code})</span>
-                        <span>-{formatINR(rawCalculated.discountAmount)}</span>
+                        <span className={kioskAmountClass}>-{formatINR(rawCalculated.discountAmount)}</span>
                       </div>
                     )}
                     {redeemedPoints > 0 && (
-                      <div className="flex justify-between text-sm text-emerald-600 font-bold">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-600 font-bold">
                         <span>{kioskCopy("screen_loyalty_reward_points_fe7dc0", "Loyalty Reward Points")}</span>
-                        <span>-{formatINR(redeemedPoints)}</span>
+                        <span className={kioskAmountClass}>-{formatINR(redeemedPoints)}</span>
                       </div>
                     )}
                     {staffDiscount > 0 && (
-                      <div className="flex justify-between text-indigo-600 font-bold">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-indigo-600 font-bold">
                         <span>{kioskCopy("screen_staff_manager_discount_10__c08554", "Staff Manager Discount (10%)")}</span>
-                        <span>-{formatINR(staffDiscount)}</span>
+                        <span className={kioskAmountClass}>-{formatINR(staffDiscount)}</span>
                       </div>
                     )}
                     {/* B2-036: derived via formatSplitTax so the two halves always sum to the displayed Total Payable. */}
-                    <div className="flex justify-between text-xs text-[#52677A]">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-xs text-[#52677A]">
                       <span>{t('cgst')}</span>
-                      <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span>
+                      <span className={kioskAmountClass}>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).cgst}</span>
                     </div>
-                    <div className="flex justify-between text-xs text-[#52677A]">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-xs text-[#52677A]">
                       <span>{t('sgst')}</span>
-                      <span>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span>
+                      <span className={kioskAmountClass}>{formatSplitTax(rawCalculated.taxAmount, rawCalculated.cgstAmount, rawCalculated.sgstAmount).sgst}</span>
                     </div>
-                    <div className="flex justify-between items-end text-base font-black text-jaman-navy pt-3 mt-1 border-t border-jaman-border">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-end text-base font-black text-jaman-navy pt-2 mt-1 border-t border-jaman-border">
                       <span>{t('totalPayable')}</span>
-                      <span className="text-jaman-saffron text-2xl font-black leading-none">{formatINR(netTotalPayable)}</span>
+                      <span className="text-jaman-saffron text-2xl font-black leading-none text-right tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
                     </div>
                   </div>
 
                   <Button
                     variant="accent"
                     size="touch"
-                    className="w-full"
+                    className="w-full min-h-[56px] py-3 text-lg rounded-xl"
                     onClick={handleProceedToPayment}
                   >
                     {t('proceedToPayment')}
                   </Button>
                 </div>
-              </div>
-            )}
-          </div>
+              </aside>
+            </div>
+          )}
+
+          {cartItems.length > 0 && !isCartOpen && (
+            <div
+              className="pointer-events-none fixed z-40 bottom-[calc(env(safe-area-inset-bottom)+28px)] right-4 sm:right-6 flex justify-center"
+              style={{ left: 'calc(clamp(96px, 9vw, 132px) + 1rem)' }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  SoundService.playTap();
+                  setIsCartOpen(true);
+                }}
+                className="pointer-events-auto w-full max-w-[760px] min-h-[64px] rounded-xl overflow-hidden bg-jaman-saffron/90 text-white shadow-[0_14px_30px_rgba(230,104,23,0.24)] border border-white/30 backdrop-blur-sm flex items-stretch justify-between active:scale-[0.99] transition-transform"
+              >
+                <span className="flex items-center gap-3 px-4 sm:px-5 min-w-0">
+                  <span className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                    <ShoppingBag className="w-5 h-5 text-white" />
+                  </span>
+                  <span className="text-left min-w-0">
+                    <span className="block text-[11px] sm:text-xs font-bold uppercase tracking-wide text-white/85">
+                      {cartItemQuantity} {cartItemQuantity === 1 ? kioskCopy("screen_item_in_cart_9f91ad", "item in cart") : kioskCopy("screen_items_in_cart_07b69e", "items in cart")}
+                    </span>
+                    <span className="block text-lg sm:text-xl font-black leading-tight tabular-nums">{formatINR(netTotalPayable)}</span>
+                  </span>
+                </span>
+                <span className="bg-white/95 text-jaman-saffron px-4 sm:px-6 flex items-center gap-2 text-sm sm:text-base font-black whitespace-nowrap border-l border-white/20">
+                  <span className="hidden sm:inline">{kioskCopy("screen_view_cart_checkout_2d62d4", "View Cart & Checkout")}</span>
+                  <span className="sm:hidden">{kioskCopy("screen_checkout_8b785d", "Checkout")}</span>
+                  <ArrowRight className="w-5 h-5" />
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
