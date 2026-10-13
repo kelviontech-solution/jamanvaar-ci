@@ -29,7 +29,7 @@ interface NavItem {
   badge?: number;
 }
 
-export const PosSidebar: React.FC = () => {
+export const PosSidebar: React.FC<{ onNavigate?: () => void; className?: string }> = ({ onNavigate, className = '' }) => {
   const {t} = useStaffLanguage();
   const ai = useAiAccess();
   const {
@@ -86,11 +86,12 @@ export const PosSidebar: React.FC = () => {
 
   const goToTab = (id: PosTab) => {
     setActiveTab(id);
+    onNavigate?.();
     setShowNavWhileOnMenu(false); // arriving anywhere (including back on Menu) always shows that screen's own content, not the nav overlay
   };
 
   return (
-    <aside className="w-28 sm:w-36 lg:w-52 xl:w-56 bg-white border border-jaman-border rounded-2xl flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs overflow-hidden">
+    <aside className={`w-28 sm:w-36 lg:w-52 xl:w-56 bg-white border border-jaman-border rounded-2xl flex flex-col justify-between select-none shrink-0 z-20 shadow-2xs overflow-hidden ${className}`}>
       <nav aria-label="Everyday tasks" className="grid grid-cols-2 gap-1 p-2 border-b border-jaman-border shrink-0">
         {([{id:'MENU',label:'Billing',icon:UtensilsCrossed},{id:'ORDERS',label:'Orders',icon:ShoppingBag},{id:'TABLES',label:'Tables',icon:LayoutGrid},{id:'ORDERS',label:'Collect',icon:Receipt}] as const).map(item => <button key={item.label} type="button" onClick={() => { usePosStore.getState().setOrderInboxMode(item.label === 'Collect' ? 'COLLECTIONS' : 'ALL'); goToTab(item.id); }} className="min-h-12 rounded-xl p-2 text-xs font-bold text-jaman-navy hover:bg-jaman-cream flex flex-col items-center justify-center gap-1"><item.icon size={18}/>{t(item.label)}</button>)}
       </nav>
@@ -112,7 +113,7 @@ export const PosSidebar: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => { sound.play('click'); setSelectedCategory('ALL'); }}
+            onClick={() => { sound.play('click'); setSelectedCategory('ALL'); onNavigate?.(); }}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative ${
               selectedCategory === 'ALL'
                 ? 'bg-[#FFF2E8] text-jaman-saffron border border-[#FDBA74]/70'
@@ -136,7 +137,7 @@ export const PosSidebar: React.FC = () => {
               <button
                 key={group.canonicalKey}
                 type="button"
-                onClick={() => { sound.play('click'); setSelectedCategory(group.canonicalKey); }}
+                onClick={() => { sound.play('click'); setSelectedCategory(group.canonicalKey); onNavigate?.(); }}
                 title={group.primaryCategory.name}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-bold text-xs transition-all relative ${
                   isSelected

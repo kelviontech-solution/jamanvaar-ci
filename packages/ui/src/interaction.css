@@ -1,0 +1,49 @@
+:root {
+  --jv-ui-navy: #0b253a;
+  --jv-ui-action: #bf540f;
+  --jv-ui-action-hover: #a9480c;
+  --jv-ui-action-pressed: #933e0a;
+  --jv-ui-surface: #fff;
+  --jv-ui-muted: #52677a;
+  --jv-ui-border: #ebe6dd;
+  --jv-ui-touch: 44px;
+}
+
+/* Screen-only rules keep receipt and document typography independent. */
+@media screen {
+  :where([data-jv-workspace], [data-jv-dialog]) :where(button, a, input, select, textarea, summary):focus-visible {
+    outline: 3px solid var(--jv-ui-navy);
+    outline-offset: 3px;
+  }
+  :where([data-jv-workspace], [data-jv-dialog]) :where(button, a, input, select, textarea) {
+    touch-action: manipulation;
+  }
+  :where([data-jv-workspace], [data-jv-dialog]) :is(.bg-jaman-saffron, .bg-jaman-orange).text-white {
+    background-color: var(--jv-ui-action);
+  }
+  :where([data-jv-workspace], [data-jv-dialog]) :is(.bg-jaman-saffron, .bg-jaman-orange, .bg-brand).text-white:hover {
+    background-color: var(--jv-ui-action-hover);
+  }
+  :where([data-jv-workspace], [data-jv-dialog]) :is(.bg-jaman-saffron, .bg-jaman-orange, .bg-brand).text-white:active {
+    background-color: var(--jv-ui-action-pressed);
+  }
+  [data-jv-workspace] :is(.text-\[10px\], .text-\[11px\]) { font-size: 0.8125rem; }
+  [data-jv-workspace] :is(.text-\[8px\], .text-\[9px\]) { font-size: 0.75rem; }
+}
+
+@media screen and (pointer: coarse) {
+  :where([data-jv-workspace], [data-jv-dialog]) :where(button, [role="button"]) {
+    min-height: var(--jv-ui-touch);
+    min-width: var(--jv-ui-touch);
+  }
+}
+
+.jv-dialog-body { overscroll-behavior: contain; min-height: 0; }
+.jv-dialog-footer { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+.jv-state { padding: 2rem; text-align: center; color: var(--jv-ui-muted); }
+.jv-state h2, .jv-state h3 { color: var(--jv-ui-navy); }
+@media screen and (max-width: 767px) {
+  .jv-report-preview > div:first-child { max-height: 38dvh; overflow-y: auto; }
+  .jv-report-preview > div:first-child > div { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  .jv-report-preview > div:first-child button { min-height: 44px; }
+}

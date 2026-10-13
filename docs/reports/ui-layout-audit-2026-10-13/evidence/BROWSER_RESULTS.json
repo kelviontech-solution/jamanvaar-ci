@@ -1,0 +1,86 @@
+{
+  "scope": "Current-source components with synthetic local restaurant data; backend/external traffic blocked. Public entry pages and isolated component layout only. Not authenticated end-to-end, payment, device, production or native-shell acceptance.",
+  "results": [
+    {
+      "screen": "admin-BillingInvoicesModule",
+      "app": "admin",
+      "kind": "fixture",
+      "component": "apps/restaurant-system/pos-admin/src/components/billing/BillingInvoicesModule.tsx",
+      "route": null,
+      "width": 1366,
+      "height": 768,
+      "title": "",
+      "text": "",
+      "headings": [],
+      "horizontalOverflow": false,
+      "documentWidth": 1366,
+      "controls": [],
+      "tinyControls": [],
+      "unnamedControls": [],
+      "overflowing": [],
+      "fixtureError": null,
+      "images": [],
+      "navigationError": "page.waitForFunction: Timeout 20000ms exceeded.",
+      "errors": [
+        "The requested module '/@fs/C:/Users/OM Sanjhira/OneDrive/Desktop/k2/node_modules/qrcode/lib/browser.js?v=01f9eace' does not provide an export named 'default'"
+      ],
+      "blockedApiRequests": 0,
+      "resourceFailures": [],
+      "screenshot": "admin-BillingInvoicesModule-1366x768.png"
+    },
+    {
+      "screen": "admin-BillingInvoicesModule",
+      "app": "admin",
+      "kind": "fixture",
+      "component": "apps/restaurant-system/pos-admin/src/components/billing/BillingInvoicesModule.tsx",
+      "route": null,
+      "width": 390,
+      "height": 844,
+      "title": "",
+      "text": "",
+      "headings": [],
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "controls": [],
+      "tinyControls": [],
+      "unnamedControls": [],
+      "overflowing": [],
+      "fixtureError": null,
+      "images": [],
+      "navigationError": "page.waitForFunction: Timeout 20000ms exceeded.",
+      "errors": [
+        "The requested module '/@fs/C:/Users/OM Sanjhira/OneDrive/Desktop/k2/node_modules/qrcode/lib/browser.js?v=01f9eace' does not provide an export named 'default'"
+      ],
+      "blockedApiRequests": 0,
+      "resourceFailures": [],
+      "screenshot": "admin-BillingInvoicesModule-390x844.png"
+    },
+    {
+      "screen": "admin-OrdersModule",
+      "app": "admin",
+      "kind": "fixture",
+      "component": "apps/restaurant-system/pos-admin/src/components/orders/OrdersModule.tsx",
+      "route": null,
+      "width": 1366,
+      "height": 768,
+      "title": "",
+      "text": "",
+      "headings": [],
+      "horizontalOverflow": false,
+      "documentWidth": 1366,
+      "controls": [],
+      "tinyControls": [],
+      "unnamedControls": [],
+      "overflowing": [],
+      "fixtureError": null,
+      "images": [],
+      "navigationError": "page.waitForFunction: Timeout 20000ms exceeded.",
+      "errors": [
+        "The requested module '/@fs/C:/Users/OM Sanjhira/OneDrive/Desktop/k2/node_modules/qrcode/lib/browser.js?v=01f9eace' does not provide an export named 'default'"
+      ],
+      "blockedApiRequests": 0,
+      "resourceFailures": [],
+      "screenshot": "admin-OrdersModule-1366x768.png"
+    }
+  ]
+}

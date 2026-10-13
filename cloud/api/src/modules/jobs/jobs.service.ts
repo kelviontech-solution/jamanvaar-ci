@@ -7,6 +7,7 @@ import { OfflinePolicyService } from '../offline-policy/offline-policy.service';
 import { PlatformNotificationsService } from '../platform-notifications/platform-notifications.service';
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { RestaurantPayoutsService } from '../payments/restaurant-payouts.service';
+import { DigestService } from '../digest/digest.service';
 
 export interface JobDefinition {
   name: string;
@@ -45,7 +46,8 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     private readonly backups: BackupsService,
     private readonly notifications: PlatformNotificationsService,
     private readonly whatsappOutbound: WhatsAppOutboundWebhookService,
-    private readonly payouts: RestaurantPayoutsService
+    private readonly payouts: RestaurantPayoutsService,
+    private readonly digest: DigestService
   ) {}
 
   get schedulerEnabled(): boolean {
@@ -65,6 +67,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       { name: 'expire-offline-extensions', description: 'Expire emergency offline extensions past their end date', run: () => this.offline.expireDueExtensions() },
       { name: 'backup-retention', description: 'Delete backups past their retention period', run: () => this.backups.applyRetention() },
       { name: 'scheduled-backups', description: 'Snapshot every active restaurant without a backup in the last 24 hours', run: () => this.backups.snapshotStaleRestaurants() as unknown as Promise<Record<string, unknown>> },
+      { name: 'backup-integrity-check', description: 'Verify the SHA256 checksum of every UNVERIFIED backup (up to 50 per run) instead of leaving that to a manual click', run: () => this.backups.verifyDueBackups() as unknown as Promise<Record<string, unknown>> },
       { name: 'notifications', description: 'Announce what needs attention (expiring subscriptions, failed backups, overdue invoices, offline terminals…) to the team, once each', run: () => this.notifications.scan() as unknown as Promise<Record<string, unknown>> },
       // Last-resort safety net -- the fast 20s interval inside WhatsAppOutboundWebhookService
       // itself handles near-real-time retries; this only matters if that interval ever dies.
@@ -72,6 +75,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       // Manual payout mode (Route pending): claims each restaurant's unpaid, unrefunded collections into a PENDING
       // payout batch. Creates no bank transfer — a Super Admin still has to pay it and record the UTR.
       { name: 'restaurant-payouts-eod', description: "Batch each restaurant's unclaimed collections into a payout for Super Admin to pay manually", run: () => this.payouts.runEodBatch() },
+      { name: 'weekly-digest', description: 'Email the Platform Owner/Super Admins a weekly summary (restaurants, MRR, sync and backup health) -- a no-op until 7 days have passed since the last send', run: () => this.digest.sendIfDue() },
       ...this.extra
     ];
   }

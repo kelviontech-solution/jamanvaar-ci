@@ -1,4 +1,6 @@
 import {ServiceRequests,PickupSelector} from './Operations';
+import { accentInk, accentText } from './brandContrast';
+import { printElement } from '../../../packages/ui/src/printElement';
 import { shouldRefreshGuestOrder } from './paymentProgress';
 import { LoyaltyPanel } from './LoyaltyPanel';
 import { GroupOrder } from './GroupOrder';
@@ -199,7 +201,7 @@ function Ordering({ token }: { token: string }) {
   };
 
   return (
-    <div className={`app brand-${info.branding?.layout??'CARDS'}`} style={{'--saffron':info.branding?.accentColor||'#c2570c','--bg':info.branding?.backgroundColor||'#faf7f2','--accent-ink':accentInk(info.branding?.accentColor||'#c2570c'),'--accent-text':accentInk(info.branding?.accentColor||'#c2570c')==='#0b253a'?'#0b253a':info.branding?.accentColor||'#c2570c'} as React.CSSProperties}>
+    <div className={`app brand-${info.branding?.layout??'CARDS'}`} style={{'--saffron':info.branding?.accentColor||'#c2570c','--bg':info.branding?.backgroundColor||'#faf7f2','--accent-ink':accentInk(info.branding?.accentColor||'#c2570c'),'--accent-text':accentText(info.branding?.accentColor||'#c2570c')} as React.CSSProperties}>
       <header className="top">
         <img src={imageSrc(info.branding?.logoUrl || '/assets/branding/jamanvaar-logo.png')} alt={info.branding?.logoUrl ? info.restaurant.name : 'Jamanvaar by Kelviontech'} className="logo" />
         <div className="restaurant-heading">
@@ -588,16 +590,15 @@ export function StatusScreen({ placed, setPlaced, showStatus, onMore }: { placed
       </>}
       {error&&<p role="alert" className="warn">{error}<button className="link" onClick={()=>void refresh()}>Check again</button></p>}
       {placed.balance&&<p className="muted" role="status">Collected: {inr(placed.balance.collectedPaise/100)} · Remaining: {inr(placed.balance.outstandingPaise/100)}{placed.balance.refundedPaise>0?` · Refunded: ${inr(placed.balance.refundedPaise/100)}`:''}</p>}
-      <details className="receipt"><summary>Order details / receipt</summary>
+      <details className="receipt" id="qr-order-receipt"><summary>Order details / receipt</summary>
         <p><b>{placed.restaurantName}</b>{placed.branchName && ` · ${placed.branchName}`}</p>
         <p>{new Date(placed.placedAt).toLocaleString()}</p>
         <ul className="lines">{placed.items?.map((item,i)=><li key={i}><div className="grow"><b>{item.name} × {item.quantity}</b><p className="idesc">{item.options.join(', ')} {item.note}</p></div><span>{inr(item.lineTotal)}</span></li>)}</ul>
         <dl className="totals"><div><dt>Subtotal</dt><dd>{inr(placed.subtotal??0)}</dd></div><div><dt>Tax</dt><dd>{inr(placed.tax??0)}</dd></div><div><dt>Discount</dt><dd>{inr(placed.discount??0)}</dd></div><div className="grand"><dt>Total</dt><dd>{inr(placed.total)}</dd></div></dl>
-        {placed.paymentStatus==='SUCCESS'&&<button className="link" onClick={()=>window.print()}>Print / save receipt</button>}
+        <p className="receipt-payment-status">{placed.paymentStatus === 'SUCCESS' ? 'Payment received' : placed.paymentMethod === 'ONLINE' ? 'Online payment pending verification' : 'Payment due at counter'} · Reference {placed.publicOrderId}</p>
+        {placed.paymentStatus==='SUCCESS'&&<button className="link no-print" onClick={()=>printElement('#qr-order-receipt', { title: `${placed.restaurantName} - ${placed.orderNumber || placed.publicOrderId}`, margin: '12mm' })}>Print / save receipt</button>}
       </details>
       <button className="primary" onClick={onMore}>Order more</button>
     </section>
   );
 }
-
-function accentInk(hex:string){const c=hex.replace('#','');return .299*parseInt(c.slice(0,2),16)+.587*parseInt(c.slice(2,4),16)+.114*parseInt(c.slice(4,6),16)>160?'#0b253a':'#ffffff';}

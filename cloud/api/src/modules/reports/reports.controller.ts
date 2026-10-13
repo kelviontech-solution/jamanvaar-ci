@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
@@ -16,6 +16,18 @@ export class ReportsController {
   @Get('revenue')
   getRevenue() {
     return this.reportsService.getRevenue();
+  }
+
+  @Get('margins')
+  getMargins() {
+    return this.reportsService.getMargins();
+  }
+
+  @Patch('margins/cost-assumption')
+  setAssumedCost(@Body() body: { rupees: number }) {
+    const rupees = Number(body?.rupees);
+    if (!Number.isFinite(rupees) || rupees < 0) throw new BadRequestException('rupees must be a non-negative number');
+    return this.reportsService.setAssumedMonthlyCost(rupees);
   }
 
   @Get('restaurants')

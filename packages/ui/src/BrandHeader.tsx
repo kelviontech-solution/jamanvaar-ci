@@ -57,7 +57,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-0 shrink-0 select-none ${
+      className={`jv-brand-header flex items-center gap-0 min-w-0 max-w-full select-none ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
@@ -93,11 +93,11 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
       />
 
       {/* ── App badge + context ── */}
-      <div className="flex flex-col gap-0.5 shrink-0 justify-center">
+      <div className="flex flex-col gap-0.5 min-w-0 justify-center">
         <div className="flex items-center gap-2 min-w-0">
           <JamanvaarAppBadge app={app} variant="light" size={badgeSize} />
           {restaurantName && (
-            <span className="text-xs font-black text-[#0B253A] tracking-tight truncate max-w-[140px] sm:max-w-[200px]">
+            <span title={restaurantName} className="text-xs font-black text-[#0B253A] tracking-tight truncate max-w-[140px] sm:max-w-[200px]">
               {restaurantName}
             </span>
           )}
@@ -111,7 +111,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
               <span className="text-[#D4CBB9]" aria-hidden>•</span>
             )}
             {terminalId && (
-              <span className="text-[#E66817] font-extrabold tracking-wide">{terminalId}</span>
+              <span title={terminalId} className="truncate max-w-[100px] sm:max-w-[140px] text-[#BF540F] font-extrabold tracking-wide">{terminalId}</span>
             )}
           </p>
         )}

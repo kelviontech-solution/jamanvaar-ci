@@ -1,0 +1,1667 @@
+{
+  "scope": "Existing compiled web artifacts served locally. All backend and external traffic mocked unavailable. Login/activation/invalid-link states only. May differ from current unbuilt source changes.",
+  "results": [
+    {
+      "name": "restaurant-admin",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nTue, 13 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Restaurant Control.\nLive Intelligence.",
+          "font": "42px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "e.g. JM9876543210",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 100,
+          "height": 44
+        },
+        {
+          "text": "Enter owner password",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Forgot password?",
+          "width": 112,
+          "height": 44
+        },
+        {
+          "text": "Admin activation key (optional)",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Sign In",
+          "width": 478,
+          "height": 48
+        },
+        {
+          "text": "Set your password from the welcome email",
+          "width": 260,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "restaurant-admin-1366x768.png"
+    },
+    {
+      "name": "restaurant-admin",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Restaurant Control.\nLive Intelligence.",
+          "font": "30px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "text": "Network: Online",
+          "width": 114,
+          "height": 62
+        },
+        {
+          "text": "e.g. JM9876543210",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 100,
+          "height": 44
+        },
+        {
+          "text": "Enter owner password",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Forgot password?",
+          "width": 112,
+          "height": 44
+        },
+        {
+          "text": "Admin activation key (optional)",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Sign In",
+          "width": 308,
+          "height": 48
+        },
+        {
+          "text": "Set your password from the welcome email",
+          "width": 260,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "restaurant-admin-390x844.png"
+    },
+    {
+      "name": "qr-marketing",
+      "width": 1366,
+      "height": 768,
+      "route": "/qr/",
+      "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nFROM YOUR TABLE TO THEIR PHONE\nEvery table.\nA delicious\nnew experience.\n\nGuests scan, explore your menu, make it their own and order from their phones. You manage the menu, payments and kitchen handoff in one clear workspace.\n\nExplore QR Ordering →\nLogin to QR Admin\n\nWorks as a standalone product. Connect POS, KDS and Captain when licensed.\n\nGood food begins here.\n▦\nIllustrative table card · not a live QR\nJAMANVAAR · DEMO TABLE\nA taste of home.\n\nFresh flavours. Your favourites.\n\nGujarati Thali\n₹299\nTry the sample menu\n✓ Clear totals\nSecure online checkout or pay at counter\nMORE TIME FOR HOSPITALITY\nSimple for your guests.\nUseful for your team.\n01\nA menu in every hand\n\nGuests browse food images, customise dishes and check their cart before ordering.\n\n02\nYour menu stays yours\n\nPublish prices deliberately and keep availability current across your branch.\n\n03\nA connected service\n\nSee QR orders in QR Admin and route them into licensed counter and kitchen workflows.\n\nTRY IT WITHOUT SIGNING IN\nMeet your next\ndigital menu.\n\nA sample guest experience. Explore a dish, choose extras and preview checkout. This demo cannot submit an order or collect money.\n\nDEMO · NO REAL ORDERS OR PAYMENTS\nGujarati Thali\n\nShaak, dal, rice, rotli and a sweet finish.\n\n₹299\nCustomise dish\nA COMPLETE ORDERING WORKSPACE\nFrom the first scan\nto the last plate.\nSmart digital menu\n\nCategories, search, variants, add-ons and published menu images.\n\nTables & QR\n\nMap codes to tables and download print-ready designs.\n\nOrders & payments\n\nPayment status stays separate from preparation and completion.\n\nInsights that matter\n\nUnderstand accepted orders, confirmed collections and outstanding cash.\n\nYour restaurant, your page\n\nReview branding and the customer page before saving changes.\n\nOptional advanced tools\n\nLanguages, loyalty, group ordering, feedback and promotions are available when licensed and enabled.\n\nLess waiting. More enjoying.\nDESIGNED AROUND YOUR GUESTS\nA menu that feels\nlike your restaurant.\n\nYour food, your photos, your welcome. Let guests find a favourite, choose their extras and see clear totals before checkout.\n\n01\nMake it personal\n\nKeep your logo, colours and welcome message in the customer experience.\n\n02\nMake ordering comfortable\n\nMobile-friendly menus, useful choices and table assistance when enabled.\n\n03\nKeep guests informed\n\nReal preparation, readiness and completion updates from your team.\n\nTry the guest experience →\nYOUR FIRST TABLE, STEP BY STEP\nSet up once. Serve every day.\nSign in and activate your licensed QR Admin access.\nConfirm your restaurant and branch.\nReview and publish the menu you already manage.\nChoose payment methods and ordering hours.\nMap, design and print your table QR codes.\nCheck your setup, then manage orders as guests arrive.\nActivate QR Ordering →\nPAYMENTS WITH CLARITY\nThe choice is yours.\nThe totals are clear.\nOnline, when configured\n\nSecure Razorpay checkout appears when your merchant integration is ready. A payment is confirmed after backend verification.\n\nCash at counter\n\nEnable counter collection independently. Staff record money received, while guests see the balance due.\n\nILLUSTRATIVE CHECKOUT\nOne meal. Clear choices.\nOnline checkout\nVerified by your payment provider\nPay at counter\nCollected and recorded by staff\n\nGuests see the methods you enable. Both use the same order record.\n\nFROM THE FLOOR TO THE PASS\nGood food deserves\na smooth handoff.\n\nBring QR orders into your branch’s workflow. Follow progress in QR Admin and connect your licensed POS, Captain and kitchen displays.\n\nGuest order\n→\nYour team\n→\nReady to serve\nExplore your workspace →\nOne branch. One connected team.\nONE RESTAURANT PLATFORM\nQR on its own.\nMore connected together.\nRestaurant Admin\nPOS\nKitchen / KDS\nCaptain\nVerified payment gateway\n\nQR Ordering can operate through its own admin workspace. Additional applications follow your subscription and branch configuration.\n\nA few things you might ask.\nDo my guests need an app?\nDo I need a POS subscription?\nWhere do I get an activation key?\nCan I recover my account?\nDoes the demo place real orders?\nA warm welcome.\nA simpler way to order.\nGet started\n\nQR Ordering · Built by Kelviontech\n\nQR Admin login\nAccount recovery\nRestaurant Admin",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Every table.\nA delicious\nnew experience.",
+          "font": "65.568px"
+        },
+        {
+          "text": "A taste of home.",
+          "font": "40.98px"
+        },
+        {
+          "text": "Simple for your guests.\nUseful for your team.",
+          "font": "40.98px"
+        },
+        {
+          "text": "A menu in every hand",
+          "font": "18px"
+        },
+        {
+          "text": "Your menu stays yours",
+          "font": "18px"
+        },
+        {
+          "text": "A connected service",
+          "font": "18px"
+        },
+        {
+          "text": "Meet your next\ndigital menu.",
+          "font": "40.98px"
+        },
+        {
+          "text": "Gujarati Thali",
+          "font": "18px"
+        },
+        {
+          "text": "From the first scan\nto the last plate.",
+          "font": "40.98px"
+        },
+        {
+          "text": "Smart digital menu",
+          "font": "18px"
+        },
+        {
+          "text": "Tables & QR",
+          "font": "18px"
+        },
+        {
+          "text": "Orders & payments",
+          "font": "18px"
+        },
+        {
+          "text": "Insights that matter",
+          "font": "18px"
+        },
+        {
+          "text": "Your restaurant, your page",
+          "font": "18px"
+        },
+        {
+          "text": "Optional advanced tools",
+          "font": "18px"
+        },
+        {
+          "text": "A menu that feels\nlike your restaurant.",
+          "font": "40.98px"
+        },
+        {
+          "text": "Make it personal",
+          "font": "15px"
+        },
+        {
+          "text": "Make ordering comfortable",
+          "font": "15px"
+        },
+        {
+          "text": "Keep guests informed",
+          "font": "15px"
+        },
+        {
+          "text": "Set up once. Serve every day.",
+          "font": "40.98px"
+        },
+        {
+          "text": "The choice is yours.\nThe totals are clear.",
+          "font": "40.98px"
+        },
+        {
+          "text": "Online, when configured",
+          "font": "18px"
+        },
+        {
+          "text": "Cash at counter",
+          "font": "18px"
+        },
+        {
+          "text": "One meal. Clear choices.",
+          "font": "18px"
+        },
+        {
+          "text": "Good food deserves\na smooth handoff.",
+          "font": "40.98px"
+        },
+        {
+          "text": "QR on its own.\nMore connected together.",
+          "font": "40.98px"
+        },
+        {
+          "text": "A few things you might ask.",
+          "font": "40.98px"
+        },
+        {
+          "text": "A warm welcome.\nA simpler way to order.",
+          "font": "40.98px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": false
+        },
+        {
+          "src": "/qr/assets/qr-experience/kitchen.webp",
+          "loaded": false
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING\nA little scan. A better meal.",
+          "width": 263,
+          "height": 52
+        },
+        {
+          "text": "Menu",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Features",
+          "width": 45,
+          "height": 18
+        },
+        {
+          "text": "How it works",
+          "width": 69,
+          "height": 18
+        },
+        {
+          "text": "Benefits",
+          "width": 42,
+          "height": 18
+        },
+        {
+          "text": "Payments",
+          "width": 51,
+          "height": 18
+        },
+        {
+          "text": "Integrations",
+          "width": 64,
+          "height": 18
+        },
+        {
+          "text": "FAQ",
+          "width": 22,
+          "height": 18
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 20
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "Explore QR Ordering →",
+          "width": 185,
+          "height": 46
+        },
+        {
+          "text": "Login to QR Admin",
+          "width": 161,
+          "height": 46
+        },
+        {
+          "text": "Try the sample menu",
+          "width": 219,
+          "height": 62
+        },
+        {
+          "text": "Customise dish",
+          "width": 136,
+          "height": 46
+        },
+        {
+          "text": "Try the guest experience →",
+          "width": 209,
+          "height": 46
+        },
+        {
+          "text": "Activate QR Ordering →",
+          "width": 189,
+          "height": 46
+        },
+        {
+          "text": "Explore your workspace →",
+          "width": 204,
+          "height": 46
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "QR Admin login",
+          "width": 84,
+          "height": 18
+        },
+        {
+          "text": "Account recovery",
+          "width": 92,
+          "height": 18
+        },
+        {
+          "text": "Restaurant Admin",
+          "width": 94,
+          "height": 18
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-marketing-1366x768.png"
+    },
+    {
+      "name": "qr-marketing",
+      "width": 390,
+      "height": 844,
+      "route": "/qr/",
+      "text": "QR ORDERING\nMenu\nLogin\nFROM YOUR TABLE TO THEIR PHONE\nEvery table.\nA delicious\nnew experience.\n\nGuests scan, explore your menu, make it their own and order from their phones. You manage the menu, payments and kitchen handoff in one clear workspace.\n\nExplore QR Ordering →\nLogin to QR Admin\n\nWorks as a standalone product. Connect POS, KDS and Captain when licensed.\n\nGood food begins here.\n▦\nIllustrative table card · not a live QR\nJAMANVAAR · DEMO TABLE\nA taste of home.\n\nFresh flavours. Your favourites.\n\nGujarati Thali\n₹299\nTry the sample menu\n✓ Clear totals\nSecure online checkout or pay at counter\nMORE TIME FOR HOSPITALITY\nSimple for your guests.\nUseful for your team.\n01\nA menu in every hand\n\nGuests browse food images, customise dishes and check their cart before ordering.\n\n02\nYour menu stays yours\n\nPublish prices deliberately and keep availability current across your branch.\n\n03\nA connected service\n\nSee QR orders in QR Admin and route them into licensed counter and kitchen workflows.\n\nTRY IT WITHOUT SIGNING IN\nMeet your next\ndigital menu.\n\nA sample guest experience. Explore a dish, choose extras and preview checkout. This demo cannot submit an order or collect money.\n\nDEMO · NO REAL ORDERS OR PAYMENTS\nGujarati Thali\n\nShaak, dal, rice, rotli and a sweet finish.\n\n₹299\nCustomise dish\nA COMPLETE ORDERING WORKSPACE\nFrom the first scan\nto the last plate.\nSmart digital menu\n\nCategories, search, variants, add-ons and published menu images.\n\nTables & QR\n\nMap codes to tables and download print-ready designs.\n\nOrders & payments\n\nPayment status stays separate from preparation and completion.\n\nInsights that matter\n\nUnderstand accepted orders, confirmed collections and outstanding cash.\n\nYour restaurant, your page\n\nReview branding and the customer page before saving changes.\n\nOptional advanced tools\n\nLanguages, loyalty, group ordering, feedback and promotions are available when licensed and enabled.\n\nLess waiting. More enjoying.\nDESIGNED AROUND YOUR GUESTS\nA menu that feels\nlike your restaurant.\n\nYour food, your photos, your welcome. Let guests find a favourite, choose their extras and see clear totals before checkout.\n\n01\nMake it personal\n\nKeep your logo, colours and welcome message in the customer experience.\n\n02\nMake ordering comfortable\n\nMobile-friendly menus, useful choices and table assistance when enabled.\n\n03\nKeep guests informed\n\nReal preparation, readiness and completion updates from your team.\n\nTry the guest experience →\nYOUR FIRST TABLE, STEP BY STEP\nSet up once. Serve every day.\nSign in and activate your licensed QR Admin access.\nConfirm your restaurant and branch.\nReview and publish the menu you already manage.\nChoose payment methods and ordering hours.\nMap, design and print your table QR codes.\nCheck your setup, then manage orders as guests arrive.\nActivate QR Ordering →\nPAYMENTS WITH CLARITY\nThe choice is yours.\nThe totals are clear.\nOnline, when configured\n\nSecure Razorpay checkout appears when your merchant integration is ready. A payment is confirmed after backend verification.\n\nCash at counter\n\nEnable counter collection independently. Staff record money received, while guests see the balance due.\n\nILLUSTRATIVE CHECKOUT\nOne meal. Clear choices.\nOnline checkout\nVerified by your payment provider\nPay at counter\nCollected and recorded by staff\n\nGuests see the methods you enable. Both use the same order record.\n\nFROM THE FLOOR TO THE PASS\nGood food deserves\na smooth handoff.\n\nBring QR orders into your branch’s workflow. Follow progress in QR Admin and connect your licensed POS, Captain and kitchen displays.\n\nGuest order\n→\nYour team\n→\nReady to serve\nExplore your workspace →\nOne branch. One connected team.\nONE RESTAURANT PLATFORM\nQR on its own.\nMore connected together.\nRestaurant Admin\nPOS\nKitchen / KDS\nCaptain\nVerified payment gateway\n\nQR Ordering can operate through its own admin workspace. Additional applications follow your subscription and branch configuration.\n\nA few things you might ask.\nDo my guests need an app?\nDo I need a POS subscription?\nWhere do I get an activation key?\nCan I recover my account?\nDoes the demo place real orders?\nA warm welcome.\nA simpler way to order.\nGet started\n\nQR Ordering · Built by Kelviontech\n\nQR Admin login\nAccount recovery\nRestaurant Admin",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Every table.\nA delicious\nnew experience.",
+          "font": "46px"
+        },
+        {
+          "text": "A taste of home.",
+          "font": "30px"
+        },
+        {
+          "text": "Simple for your guests.\nUseful for your team.",
+          "font": "30px"
+        },
+        {
+          "text": "A menu in every hand",
+          "font": "18px"
+        },
+        {
+          "text": "Your menu stays yours",
+          "font": "18px"
+        },
+        {
+          "text": "A connected service",
+          "font": "18px"
+        },
+        {
+          "text": "Meet your next\ndigital menu.",
+          "font": "30px"
+        },
+        {
+          "text": "Gujarati Thali",
+          "font": "18px"
+        },
+        {
+          "text": "From the first scan\nto the last plate.",
+          "font": "30px"
+        },
+        {
+          "text": "Smart digital menu",
+          "font": "18px"
+        },
+        {
+          "text": "Tables & QR",
+          "font": "18px"
+        },
+        {
+          "text": "Orders & payments",
+          "font": "18px"
+        },
+        {
+          "text": "Insights that matter",
+          "font": "18px"
+        },
+        {
+          "text": "Your restaurant, your page",
+          "font": "18px"
+        },
+        {
+          "text": "Optional advanced tools",
+          "font": "18px"
+        },
+        {
+          "text": "A menu that feels\nlike your restaurant.",
+          "font": "30px"
+        },
+        {
+          "text": "Make it personal",
+          "font": "15px"
+        },
+        {
+          "text": "Make ordering comfortable",
+          "font": "15px"
+        },
+        {
+          "text": "Keep guests informed",
+          "font": "15px"
+        },
+        {
+          "text": "Set up once. Serve every day.",
+          "font": "30px"
+        },
+        {
+          "text": "The choice is yours.\nThe totals are clear.",
+          "font": "30px"
+        },
+        {
+          "text": "Online, when configured",
+          "font": "18px"
+        },
+        {
+          "text": "Cash at counter",
+          "font": "18px"
+        },
+        {
+          "text": "One meal. Clear choices.",
+          "font": "18px"
+        },
+        {
+          "text": "Good food deserves\na smooth handoff.",
+          "font": "30px"
+        },
+        {
+          "text": "QR on its own.\nMore connected together.",
+          "font": "30px"
+        },
+        {
+          "text": "A few things you might ask.",
+          "font": "30px"
+        },
+        {
+          "text": "A warm welcome.\nA simpler way to order.",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": false
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": false
+        },
+        {
+          "src": "/qr/assets/qr-experience/kitchen.webp",
+          "loaded": false
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING",
+          "width": 188,
+          "height": 40
+        },
+        {
+          "text": "Menu",
+          "width": 50,
+          "height": 39
+        },
+        {
+          "text": "Features",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "How it works",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Benefits",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Payments",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Integrations",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "FAQ",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 20
+        },
+        {
+          "text": "Get started",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Explore QR Ordering →",
+          "width": 185,
+          "height": 46
+        },
+        {
+          "text": "Login to QR Admin",
+          "width": 161,
+          "height": 46
+        },
+        {
+          "text": "Try the sample menu",
+          "width": 199,
+          "height": 60
+        },
+        {
+          "text": "Customise dish",
+          "width": 136,
+          "height": 46
+        },
+        {
+          "text": "Try the guest experience →",
+          "width": 209,
+          "height": 46
+        },
+        {
+          "text": "Activate QR Ordering →",
+          "width": 189,
+          "height": 46
+        },
+        {
+          "text": "Explore your workspace →",
+          "width": 204,
+          "height": 46
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "QR Admin login",
+          "width": 84,
+          "height": 18
+        },
+        {
+          "text": "Account recovery",
+          "width": 92,
+          "height": 18
+        },
+        {
+          "text": "Restaurant Admin",
+          "width": 94,
+          "height": 18
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-marketing-390x844.png"
+    },
+    {
+      "name": "qr-login",
+      "width": 1366,
+      "height": 768,
+      "route": "/qr/login/",
+      "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\n\nManage the menu, QR codes, guest orders and payments from your restaurant's own workspace.\n\nExplore the interactive demo →\nYour hospitality. A simpler way to order.\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Good service starts here.",
+          "font": "65.568px"
+        },
+        {
+          "text": "Welcome to QR Admin",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING\nA little scan. A better meal.",
+          "width": 263,
+          "height": 52
+        },
+        {
+          "text": "Menu",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Features",
+          "width": 45,
+          "height": 18
+        },
+        {
+          "text": "How it works",
+          "width": 69,
+          "height": 18
+        },
+        {
+          "text": "Benefits",
+          "width": 42,
+          "height": 18
+        },
+        {
+          "text": "Payments",
+          "width": 51,
+          "height": 18
+        },
+        {
+          "text": "Integrations",
+          "width": 64,
+          "height": 18
+        },
+        {
+          "text": "FAQ",
+          "width": 22,
+          "height": 18
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 20
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "Explore the interactive demo →",
+          "width": 179,
+          "height": 17
+        },
+        {
+          "text": "",
+          "width": 408,
+          "height": 48
+        },
+        {
+          "text": "Password",
+          "width": 408,
+          "height": 48
+        },
+        {
+          "text": "Show",
+          "width": 55,
+          "height": 42
+        },
+        {
+          "text": "Sign in",
+          "width": 408,
+          "height": 46
+        },
+        {
+          "text": "Login",
+          "width": 27,
+          "height": 17
+        },
+        {
+          "text": "Activate QR Ordering",
+          "width": 103,
+          "height": 17
+        },
+        {
+          "text": "Forgot password?",
+          "width": 86,
+          "height": 17
+        },
+        {
+          "text": "Return to product website",
+          "width": 126,
+          "height": 17
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-login-1366x768.png"
+    },
+    {
+      "name": "qr-login",
+      "width": 390,
+      "height": 844,
+      "route": "/qr/login/",
+      "text": "QR ORDERING\nMenu\nLogin\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\nExplore the interactive demo →\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Good service starts here.",
+          "font": "34px"
+        },
+        {
+          "text": "Welcome to QR Admin",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING",
+          "width": 188,
+          "height": 40
+        },
+        {
+          "text": "Menu",
+          "width": 50,
+          "height": 39
+        },
+        {
+          "text": "Features",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "How it works",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Benefits",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Payments",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Integrations",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "FAQ",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 20
+        },
+        {
+          "text": "Get started",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Explore the interactive demo →",
+          "width": 179,
+          "height": 17
+        },
+        {
+          "text": "",
+          "width": 309,
+          "height": 48
+        },
+        {
+          "text": "Password",
+          "width": 309,
+          "height": 48
+        },
+        {
+          "text": "Show",
+          "width": 55,
+          "height": 42
+        },
+        {
+          "text": "Sign in",
+          "width": 309,
+          "height": 46
+        },
+        {
+          "text": "Login",
+          "width": 27,
+          "height": 17
+        },
+        {
+          "text": "Activate QR Ordering",
+          "width": 103,
+          "height": 17
+        },
+        {
+          "text": "Forgot password?",
+          "width": 86,
+          "height": 17
+        },
+        {
+          "text": "Return to product website",
+          "width": 126,
+          "height": 17
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-login-390x844.png"
+    },
+    {
+      "name": "pos",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Smart Billing.\nBetter Dining.",
+          "font": "42px"
+        },
+        {
+          "text": "POS Counter",
+          "font": "30px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:52738/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:52738/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 478,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "pos-1366x768.png"
+    },
+    {
+      "name": "pos",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Smart Billing.\nBetter Dining.",
+          "font": "30px"
+        },
+        {
+          "text": "POS Counter",
+          "font": "24px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "20px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:52738/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:52738/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 128,
+          "height": 62
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 308,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "pos-390x844.png"
+    },
+    {
+      "name": "captain",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nTue, 13 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nActivate this Tablet\n\nOne-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.\n\nActivation Key *\nActivate Tablet\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per tablet and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Touch-First Restaurant Floor Command\nInstant KOT",
+          "font": "42px"
+        },
+        {
+          "text": "Floor Captain & Service",
+          "font": "30px"
+        },
+        {
+          "text": "Activate this Tablet",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/main-course/DM-05.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/beverages/mojito.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Activate Tablet",
+          "width": 478,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "captain-1366x768.png"
+    },
+    {
+      "name": "captain",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nActivate this Tablet\n\nOne-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.\n\nActivation Key *\nActivate Tablet\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per tablet and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Touch-First Restaurant Floor Command\nInstant KOT",
+          "font": "30px"
+        },
+        {
+          "text": "Floor Captain & Service",
+          "font": "24px"
+        },
+        {
+          "text": "Activate this Tablet",
+          "font": "20px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/thali/gujarati-thali.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/main-course/DM-05.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/beverages/mojito.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 34,
+          "height": 24
+        },
+        {
+          "text": "Network: Online",
+          "width": 114,
+          "height": 62
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Activate Tablet",
+          "width": 308,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "captain-390x844.png"
+    },
+    {
+      "name": "kds",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display to start receiving tickets.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Real-Time Kitchen Production Command\nLive KOTs",
+          "font": "42px"
+        },
+        {
+          "text": "Kitchen Display System",
+          "font": "30px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/tandoor/PT-04.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/chinese/hakka-noodles.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/south-indian/masala-dosa.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 478,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "kds-1366x768.png"
+    },
+    {
+      "name": "kds",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display to start receiving tickets.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Real-Time Kitchen Production Command\nLive KOTs",
+          "font": "30px"
+        },
+        {
+          "text": "Kitchen Display System",
+          "font": "24px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "20px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/tandoor/PT-04.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/chinese/hakka-noodles.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/south-indian/masala-dosa.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 128,
+          "height": 62
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 308,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "kds-390x844.png"
+    },
+    {
+      "name": "kiosk",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "KIOSK\nSELF ORDERING\n🍲 Delicious Food\n⚡ Faster Service\n👥 Happier Customers\nDevice:\nActivation required\nNetwork:\nConnected\nTue, 13 Oct 2026 · 11:21\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nCrave\nTap\nEnjoy!\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART DINING · BETTER EXPERIENCE\n\nActivate Your Kiosk\n\nEnter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.\n\nRestaurant ID *\nActivation Key *\nWhere can I find this?\nActivate Kiosk\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per kiosk and shares it with you.\nSecure & Reliable\n|\nWorks Offline\n|\nAuto Sync\n\nMore than a POS — it's your partner\n\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\n\nBuilt for Modern Restaurants ♥",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Guests order.\nKitchen fires\ninstantly.",
+          "font": "58px"
+        },
+        {
+          "text": "JAMANVAAR KIOSK",
+          "font": "28px"
+        },
+        {
+          "text": "Activate Your Kiosk",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:58748/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/biryani/royal-veg-biryani.jpg",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:58748/assets/mark-BjfVnFoC.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Need Help?",
+          "width": 107,
+          "height": 44
+        },
+        {
+          "text": "JM9876543210",
+          "width": 558,
+          "height": 62
+        },
+        {
+          "text": "Where can I find this?",
+          "width": 143,
+          "height": 44
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 558,
+          "height": 62
+        },
+        {
+          "text": "Activate Kiosk",
+          "width": 558,
+          "height": 56
+        }
+      ],
+      "errors": [],
+      "screenshot": "kiosk-1366x768.png"
+    },
+    {
+      "name": "kiosk",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Crave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART DINING · BETTER EXPERIENCE\n\nActivate Your Kiosk\n\nEnter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.\n\nRestaurant ID *\nActivation Key *\nWhere can I find this?\nActivate Kiosk\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per kiosk and shares it with you.\nSecure & Reliable\n|\nWorks Offline\n|\nAuto Sync\n\nMore than a POS — it's your partner\n\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\n\nBuilt for Modern Restaurants ♥",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Guests order.\nKitchen fires\ninstantly.",
+          "font": "38px"
+        },
+        {
+          "text": "JAMANVAAR KIOSK",
+          "font": "24px"
+        },
+        {
+          "text": "Activate Your Kiosk",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:58748/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/biryani/royal-veg-biryani.jpg",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:58748/assets/mark-BjfVnFoC.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Need help?",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "text": "JM9876543210",
+          "width": 308,
+          "height": 62
+        },
+        {
+          "text": "Where can I find this?",
+          "width": 143,
+          "height": 44
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 308,
+          "height": 62
+        },
+        {
+          "text": "Activate Kiosk",
+          "width": 308,
+          "height": 56
+        }
+      ],
+      "errors": [],
+      "screenshot": "kiosk-390x844.png"
+    },
+    {
+      "name": "qr-guest",
+      "width": 1366,
+      "height": 768,
+      "route": "/q/ui-audit-invalid/",
+      "text": "Loading your restaurant menu…",
+      "horizontalOverflow": false,
+      "headings": [],
+      "images": [],
+      "controls": [],
+      "errors": [],
+      "screenshot": "qr-guest-1366x768.png"
+    },
+    {
+      "name": "qr-guest",
+      "width": 390,
+      "height": 844,
+      "route": "/q/ui-audit-invalid/",
+      "text": "Loading your restaurant menu…",
+      "horizontalOverflow": false,
+      "headings": [],
+      "images": [],
+      "controls": [],
+      "errors": [],
+      "screenshot": "qr-guest-390x844.png"
+    },
+    {
+      "name": "super-admin",
+      "width": 1366,
+      "height": 768,
+      "route": "/login",
+      "text": "Cloud API: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Platform Control.\nUnified Cloud Engine.",
+          "font": "42px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63387/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63387/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "e.g. superadmin@jamanvaar.app",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 96,
+          "height": 44
+        },
+        {
+          "text": "Enter your password",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "",
+          "width": 13,
+          "height": 13
+        },
+        {
+          "text": "CONTINUE",
+          "width": 478,
+          "height": 48
+        }
+      ],
+      "errors": [],
+      "screenshot": "super-admin-1366x768.png"
+    },
+    {
+      "name": "super-admin",
+      "width": 390,
+      "height": 844,
+      "route": "/login",
+      "text": "Cloud API: Unreachable\nNetwork: Online\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Platform Control.\nUnified Cloud Engine.",
+          "font": "30px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63387/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63387/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 128,
+          "height": 62
+        },
+        {
+          "text": "e.g. superadmin@jamanvaar.app",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 96,
+          "height": 44
+        },
+        {
+          "text": "Enter your password",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "",
+          "width": 13,
+          "height": 13
+        },
+        {
+          "text": "CONTINUE",
+          "width": 308,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "super-admin-390x844.png"
+    }
+  ]
+}

@@ -25,6 +25,24 @@
 }
 
 /* Touch Screen POS Optimizations */
+.pos-cart { width: 100%; }
+.pos-header-brand { flex: 1 1 340px; max-width: 520px; }
+.pos-header-brand .jv-brand-header { flex: 1; }
+.pos-header > div:last-child { flex-wrap: wrap; min-width: 0; }
+.pos-mobile-cart-bar { display: flex; }
+.pos-order-pane { display: none; width: 100%; }
+.pos-billing-workspace[data-cart-open="true"] .pos-order-pane { display: flex; }
+.pos-billing-workspace[data-cart-open="true"] .pos-catalog-pane { display: none; }
+@media (min-width: 1280px) {
+  .pos-mobile-cart-bar { display: none; }
+  .pos-order-pane { display: flex; width: clamp(360px, 31vw, 448px); flex-shrink: 0; }
+  .pos-billing-workspace[data-cart-open="true"] .pos-catalog-pane { display: flex; }
+}
+@media (max-width: 1279px) {
+  [data-jv-workspace="pos"] > header { height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-block: 8px; }
+  [data-jv-workspace="pos"] > header > div { min-width: 0; max-width: 100%; }
+}
+
 * {
   touch-action: manipulation;
 }

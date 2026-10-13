@@ -5,6 +5,7 @@ import { AuditService } from '../audit/audit.service';
 import { UpdateApplicationEntitlementDto } from './dto/application-entitlement.dto';
 import { getDependentsOf } from './feature-catalog';
 import { QR_CAPABILITIES, QrCapability } from './qr-capabilities';
+import { isRestaurantInRollout } from './rollout.util';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -68,10 +69,11 @@ export class ApplicationEntitlementsService {
 
   async resolveQrCapability(tx: TxClient, restaurantId: string, code: QrCapability) {
     const base = await this.resolve(tx, restaurantId, 'QR_ORDERING');
-    const feature = await tx.feature.findUnique({ where: { code }, select: { isActive: true, legacyEntitlementKey: true } });
+    const feature = await tx.feature.findUnique({ where: { code }, select: { isActive: true, legacyEntitlementKey: true, rolloutPercent: true } });
     const key = feature?.legacyEntitlementKey ?? QR_CAPABILITIES[code];
-    const enabled = base.enabled && feature?.isActive === true && base.limits[key] === true;
-    return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
+    const inRollout = feature?.isActive === true && isRestaurantInRollout(restaurantId, feature.rolloutPercent);
+    const enabled = base.enabled && inRollout && base.limits[key] === true;
+    return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive || !inRollout ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
   }
 
   async resolveQrCapabilities(tx: TxClient, restaurantId: string) {
@@ -79,8 +81,9 @@ export class ApplicationEntitlementsService {
     const features = await tx.feature.findMany({ where: { code: { in: Object.keys(QR_CAPABILITIES) } } });
     return { module: base, capabilities: Object.entries(QR_CAPABILITIES).map(([code, key]) => {
       const feature = features.find(f => f.code === code);
-      const enabled = base.enabled && feature?.isActive === true && base.limits[feature.legacyEntitlementKey ?? key] === true;
-      return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED' };
+      const inRollout = feature?.isActive === true && isRestaurantInRollout(restaurantId, feature.rolloutPercent);
+      const enabled = base.enabled && inRollout && base.limits[feature.legacyEntitlementKey ?? key] === true;
+      return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive || !inRollout ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED' };
     }) };
   }
 

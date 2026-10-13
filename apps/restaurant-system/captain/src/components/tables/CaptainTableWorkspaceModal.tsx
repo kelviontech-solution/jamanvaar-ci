@@ -188,7 +188,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
               key={g.id}
               type="button"
               onClick={() => handleFireKot([g.id])}
-              className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-bold cursor-pointer min-h-[36px]"
+              className="px-2.5 py-1.5 rounded-xl bg-white border border-jaman-saffron text-jaman-saffron text-[11px] font-bold cursor-pointer min-h-[44px]"
             >
               Send {g.label} ({g.items.length})
             </button>
@@ -224,7 +224,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
   return (
     <>
     <ModalBackdrop className="flex items-stretch sm:items-center justify-center sm:p-4">
-      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92vh] bg-white sm:rounded-3xl shadow-md sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="w-full sm:max-w-5xl h-dvh sm:h-[92dvh] bg-white sm:rounded-3xl shadow-md sm:border border-jaman-border flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-jaman-navy text-white px-3 py-2.5 sm:p-4 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -243,11 +243,11 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            {(currentCaptain?.permissions.CAN_TRANSFER_TABLE || currentCaptain?.permissions.CAN_MERGE_TABLE) && <button type="button" onClick={onOpenTransferMerge} aria-label="Transfer or merge this table" title="Transfer or merge this table" className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5"><UtensilsCrossed className="w-4 h-4" /><span className="hidden lg:inline">Transfer / Merge</span></button>}
+            {(currentCaptain?.permissions.CAN_TRANSFER_TABLE || currentCaptain?.permissions.CAN_MERGE_TABLE) && <button type="button" onClick={onOpenTransferMerge} aria-label="Transfer or merge this table" title="Transfer or merge this table" className="min-w-[44px] min-h-[44px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5"><UtensilsCrossed className="w-4 h-4" /><span className="hidden lg:inline">Transfer / Merge</span></button>}
             <button
               type="button"
               onClick={() => onOpenSendMessage(table.tableNumber)}
-              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="min-w-[44px] min-h-[44px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               title="Send note to kitchen or manager for this table"
               aria-label="Send a note to the kitchen"
             >
@@ -257,7 +257,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <button
               type="button"
               onClick={() => setIsCustomerModalOpen(true)}
-              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="min-w-[44px] min-h-[44px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               title={attachedCustomer ? `${attachedCustomer.name} · ${attachedCustomer.loyaltyPoints || 0} pts` : 'Attach a guest for CRM & loyalty points'}
               aria-label="Attach guest"
             >
@@ -267,14 +267,14 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <button
               type="button"
               onClick={() => sendBill(false)}
-              className="min-w-[40px] min-h-[40px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+              className="min-w-[44px] min-h-[44px] px-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
               title={billWaiting ? 'Bill already with the counter. Send it again after adding dishes.' : 'Send the bill to the counter POS'}
               aria-label={billWaiting ? 'Re-send the bill' : 'Request the bill'}
             >
               <Receipt className="w-4 h-4" />
               <span className="hidden sm:inline">{billWaiting ? 'Bill sent · re-send' : 'Request Bill'}</span>
             </button>
-            <button type="button" onClick={onClose} aria-label="Close" className="min-w-[40px] min-h-[40px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
+            <button type="button" onClick={onClose} aria-label="Close" className="min-w-[44px] min-h-[44px] rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer flex items-center justify-center">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -388,7 +388,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-xs font-bold text-jaman-navy">{g.short} course: {g.label}</span>
                               {multiCourse && (
-                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-bold cursor-pointer min-h-[36px]">
+                                <button type="button" onClick={() => handleFireKot([g.id])} className="px-3 py-1.5 rounded-xl bg-jaman-saffron text-white text-[11px] font-bold cursor-pointer min-h-[44px]">
                                   Send now
                                 </button>
                               )}
@@ -410,8 +410,8 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                 </div>
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <div className="flex items-center gap-1">
-                                    <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">−</button>
-                                    <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">+</button>
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, -1)} aria-label="One less" className="w-11 h-11 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">−</button>
+                                    <button type="button" onClick={() => updateCartQuantity(item.id, 1)} aria-label="One more" className="w-11 h-11 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold cursor-pointer">+</button>
                                   </div>
                                   <span className="text-[11px] font-bold uppercase text-slate-400 ml-1">Seat</span>
                                   {Array.from({ length: seatCount }, (_, n) => n + 1).map((n) => (
@@ -421,7 +421,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                       onClick={() => setCartItemSeat(item.id, item.seat === n ? undefined : n)}
                                       aria-pressed={item.seat === n}
                                       aria-label={`Seat ${n}`}
-                                      className={`w-9 h-9 rounded-lg text-[11px] font-bold cursor-pointer ${item.seat === n ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                                      className={`w-11 h-11 rounded-lg text-[11px] font-bold cursor-pointer ${item.seat === n ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
                                     >
                                       {n}
                                     </button>
@@ -433,7 +433,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                                       type="button"
                                       onClick={() => setCartItemCourse(item.id, c.id)}
                                       aria-pressed={(item.course ?? 'COURSE_1') === c.id}
-                                      className={`px-2.5 h-9 rounded-lg text-[11px] font-bold cursor-pointer ${(item.course ?? 'COURSE_1') === c.id ? 'bg-jaman-navy text-white' : 'bg-slate-100 text-slate-600'}`}
+                                      className={`px-3 min-h-11 rounded-lg text-[11px] font-bold cursor-pointer ${(item.course ?? 'COURSE_1') === c.id ? 'bg-jaman-navy text-white' : 'bg-slate-100 text-slate-600'}`}
                                     >
                                       {c.short}
                                     </button>
@@ -710,9 +710,9 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                       </div>
                       {!ci.isFired && (
                         <div className="flex items-center gap-1.5 shrink-0">
-                          <button type="button" onClick={() => updateCartQuantity(ci.id, -1)} aria-label="One less" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">−</button>
+                          <button type="button" onClick={() => updateCartQuantity(ci.id, -1)} aria-label="One less" className="w-11 h-11 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">−</button>
                           <span className="font-bold font-mono text-xs w-5 text-center">{ci.quantity}</span>
-                          <button type="button" onClick={() => updateCartQuantity(ci.id, 1)} aria-label="One more" className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">+</button>
+                          <button type="button" onClick={() => updateCartQuantity(ci.id, 1)} aria-label="One more" className="w-11 h-11 rounded-lg bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer">+</button>
                         </div>
                       )}
                     </div>

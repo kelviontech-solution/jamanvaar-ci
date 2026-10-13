@@ -22,6 +22,55 @@ import {
   Calendar
 } from 'lucide-react';
 import './reports.css';
+import '../Dashboard/dashboard.css';
+
+/** The same hand-rolled bar chart the Executive Dashboard already uses (see DashboardPage.tsx) --
+ * reused here so "Reports & Analytics" actually has charts, not just number cards and tables. */
+function MiniBarChart({
+  title,
+  subtitle,
+  data,
+  color = 'navy',
+  formatValue = (v: number) => String(v)
+}: {
+  title: string;
+  subtitle: string;
+  data: Array<{ label: string; value: number }>;
+  color?: 'navy' | 'orange';
+  formatValue?: (v: number) => string;
+}) {
+  if (data.length === 0) return null;
+  const maxValue = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div className="chart-card">
+      <div className="chart-card-header">
+        <div className="chart-card-title-group">
+          <span className="chart-card-title">
+            <BarChart3 className="w-4 h-4" />
+            {title}
+          </span>
+          <span className="chart-card-subtitle">{subtitle}</span>
+        </div>
+      </div>
+      <div className="mini-bar-chart">
+        {data.map((d) => {
+          const heightPct = Math.max(15, Math.round((d.value / maxValue) * 100));
+          return (
+            <div key={d.label} className="chart-bar-wrap">
+              <span className="chart-bar-val">{formatValue(d.value)}</span>
+              <div
+                className={`chart-bar-pillar chart-bar-pillar-${color}`}
+                style={{ height: `${heightPct}%` }}
+                title={`${d.label}: ${formatValue(d.value)}`}
+              />
+              <span className="chart-bar-label">{d.label}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 interface SummaryData {
   restaurants: { total: number; active: number; suspended: number };
@@ -90,6 +139,15 @@ interface SubscriptionReportData {
 
 type ReportTab = 'revenue' | 'restaurants' | 'devices' | 'subscriptions';
 type DateRange = '7d' | '30d' | '90d' | 'all';
+
+/** PAST_DUE -> "Past Due", ACTIVE -> "Active" -- the raw status enum, not fit to show a reader. */
+function humanizeStatus(status: string): string {
+  return status
+    .toLowerCase()
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
 
 export function ReportsPage() {
   const [activeTab, setActiveTab] = useState<ReportTab>('revenue');
@@ -285,6 +343,13 @@ export function ReportsPage() {
           {/* 1. REVENUE ANALYTICS */}
           {activeTab === 'revenue' && revenue && (
             <div className="reports-revenue-section">
+              <MiniBarChart
+                title="Revenue by Plan"
+                subtitle="Invoiced revenue generated per subscription plan"
+                color="navy"
+                data={revenue.byPlan.map((p) => ({ label: p.name, value: p.revenue }))}
+                formatValue={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+              />
               <div className="revenue-breakdown-grid">
                 {revenue.byPlan.map((p) => (
                   <Card key={p.tier} className="plan-revenue-card">
@@ -377,6 +442,12 @@ export function ReportsPage() {
           {/* 2. RESTAURANT COHORTS */}
           {activeTab === 'restaurants' && restaurantData && (
             <div className="reports-restaurants-section">
+              <MiniBarChart
+                title="Restaurants by City"
+                subtitle="Geographic footprint across onboarded tenants"
+                color="orange"
+                data={restaurantData.cityBreakdown.map((c) => ({ label: c.city, value: c.count }))}
+              />
               <div className="city-distribution-card">
                 <div className="table-card-title">Geographic Footprint by City</div>
                 <div className="city-pills-row">
@@ -434,6 +505,12 @@ export function ReportsPage() {
           {/* 3. DEVICE TELEMETRY */}
           {activeTab === 'devices' && deviceData && (
             <div className="reports-devices-section">
+              <MiniBarChart
+                title="Hardware Terminals by Type"
+                subtitle="Registered devices grouped by terminal type"
+                color="navy"
+                data={deviceData.byType.map((d) => ({ label: d.type, value: d.count }))}
+              />
               <div className="device-types-grid">
                 {deviceData.byType.map((d) => (
                   <Card key={d.type} className="device-type-card">
@@ -501,10 +578,16 @@ export function ReportsPage() {
           {/* 4. SUBSCRIPTION DISTRIBUTION */}
           {activeTab === 'subscriptions' && subData && (
             <div className="reports-subscriptions-section">
+              <MiniBarChart
+                title="Subscriptions by Status"
+                subtitle="Where every issued subscription stands right now"
+                color="orange"
+                data={subData.byStatus.map((s) => ({ label: humanizeStatus(s.status), value: s.count }))}
+              />
               <div className="sub-status-grid">
                 {subData.byStatus.map((s) => (
                   <Card key={s.status} className="sub-status-card">
-                    <span className="sub-status-label">{s.status}</span>
+                    <span className="sub-status-label">{humanizeStatus(s.status)}</span>
                     <span className="sub-status-count">{s.count}</span>
                     <span className="sub-status-sub">Subscriptions</span>
                   </Card>
@@ -535,7 +618,7 @@ export function ReportsPage() {
                           </td>
                           <td>
                             <Badge tone={s.status === 'ACTIVE' ? 'success' : 'warning'}>
-                              {s.status}
+                              {humanizeStatus(s.status)}
                             </Badge>
                           </td>
                           <td className="text-secondary text-sm">

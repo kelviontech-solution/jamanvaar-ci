@@ -609,9 +609,11 @@ html.qr-document #root {
   flex-wrap: wrap;
   gap: 16px;
   margin: 22px 0;
-  font-size: 11px;
+  font-size: 13px;
   text-decoration: underline;
 }
+.qr-auth-links a { min-height: 44px; display: inline-flex; align-items: center; padding: 8px 4px; }
+.qr-auth aside a { display: inline-flex; align-items: center; min-height: 44px; }
 .qr-error {
   padding: 16px;
   border: 1px solid #efbfbf;
@@ -837,3 +839,6 @@ html.qr-document #root {
     animation: none !important;
   }
 }
+
+/* Header and footer text links retain generous, independent tap areas. */
+.qr-site-header a:not(.qr-identity), .qr-footer a { min-height:44px; display:inline-flex; align-items:center; }

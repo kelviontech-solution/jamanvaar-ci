@@ -25,9 +25,9 @@
 
 .onboard-steps {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  overflow-x: auto;
   padding-bottom: 8px;
   margin-bottom: 24px;
 }

@@ -62,7 +62,7 @@ export const CaptainNavigation: React.FC<CaptainNavigationProps> = ({
   return (
     <>
       {/* ── Desktop / Tablet Top Navigation Bar ── */}
-      <nav className="hidden md:block bg-white border-b border-jaman-border px-4 py-2 sticky top-[53px] z-20 shadow-2xs">
+      <nav className="hidden md:block bg-white border-b border-jaman-border px-4 py-2 shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* Primary 4 Tabs */}
           <div className="flex items-center gap-2">

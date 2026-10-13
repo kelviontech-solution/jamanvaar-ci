@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, Eye, ImagePlus, Monitor, RotateCcw, Save, Smartphone, Trash2 } from 'lucide-react';
-import { KioskWelcomeScreen, useConfirm } from '@jamanvaar/ui';
+import { KioskWelcomeScreen, useConfirm, Modal } from '@jamanvaar/ui';
 import { db, KeyValueStore, KioskConfigurationRepository, WelcomeScreenSettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
 import { CUSTOM_WELCOME_MAX_COUNT, DEFAULT_WELCOME_PRESENTATION, isWelcomeImageUrl, optimizeWelcomeUpload, resolveMenuImage, welcomeBackgroundUrl, welcomePresentation } from '@jamanvaar/utils';
@@ -37,6 +37,8 @@ export function KioskWelcomeScreenPanel({ kiosks, showToast }: { kiosks: CloudKi
   const branchKiosks = kiosks.filter(k => k.branchId === branchId);
   const settings = WelcomeScreenSettingsRepository.getSettings();
   const active = welcomePresentation(settings, scope === 'branch' ? undefined : scope);
+  const targetKiosk = branchKiosks.find(k => k.id === scope);
+  const hasTerminalOverride = scope !== 'branch' && Boolean(settings.deviceOverrides?.[scope]);
   const selectedUrl = welcomeBackgroundUrl(draft, custom);
   const configurationVersion = KioskConfigurationRepository.snapshot().updatedAt;
   useEffect(() => {
@@ -107,8 +109,14 @@ export function KioskWelcomeScreenPanel({ kiosks, showToast }: { kiosks: CloudKi
     finally { setBusy(false); setReplaceId(null); if (uploadInput.current) uploadInput.current.value = ''; }
   }
   return <div className="space-y-6" data-testid="kiosk-welcome-manager" aria-busy={busy}>
+    {dirty && <div role="status" className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"><span>Preview changes have not been applied to your kiosks.</span><button type="button" disabled={busy} onClick={() => void apply()} className="min-h-11 rounded-xl bg-[#bf540f] px-4 font-bold text-white">{busy ? 'Applying…' : 'Apply changes'}</button></div>}
     <header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-orange-600">Kiosk · Appearance</p><h1 className="mt-1 text-3xl font-extrabold text-[#0b2b40]">Welcome Screen</h1><p className="mt-2 text-sm text-slate-600">Customize the experience guests see before they start ordering.</p></div><div className="flex gap-2"><button type="button" className="flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-sm font-bold" onClick={() => setResetOpen(true)} disabled={busy}><RotateCcw size={16} />Reset to Default</button><button type="button" className="flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60" onClick={() => void apply()} disabled={busy}><Save size={16} />{busy ? 'Saving…' : 'Apply to Kiosk'}</button></div></header>
     <fieldset disabled={busy} className="min-w-0 space-y-6 border-0 p-0">
+    <section aria-label="Welcome configuration scope" className="rounded-2xl border border-blue-200 bg-blue-50 p-4 space-y-2 text-sm text-[#0b253a]">
+      <h2 className="font-bold">{scope === 'branch' ? `Branch default · ${db.outlet.name}` : `This kiosk only · ${targetKiosk?.name || scope}`}</h2>
+      <p>{scope === 'branch' ? `Applies to ${branchKiosks.length} kiosk(s) in this branch. Kiosks with their own saved override keep their design.` : hasTerminalOverride ? 'This terminal has its own saved welcome screen. Applying here does not change other kiosks.' : 'This terminal currently follows the branch default. Applying creates an override for this terminal only.'}</p>
+      <p className="font-semibold">{dirty ? 'Unsaved preview — Apply to publish these changes.' : 'Showing the saved configuration.'}</p>
+    </section>
     <div className="rounded-2xl border border-[#e7ded1] bg-white p-4"><div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-bold text-[#0b2b40]">Apply to<select aria-label="Welcome screen scope" className={input} value={scope} onChange={e => chooseScope(e.target.value)}><option value="branch">All kiosks in this branch</option>{branchKiosks.map(k => <option key={k.id} value={k.id}>{k.name} · {k.id.slice(0,8)}</option>)}</select></label><div className="text-sm text-slate-600"><p className="font-bold text-[#0b2b40]">{db.outlet.name}</p><p className="mt-1">Branch settings stay within this branch. Individual kiosks can use their own design. Switch branch before configuring another location.</p>{scope !== 'branch' && <button className="mt-2 font-bold text-orange-700" disabled={busy} onClick={() => void apply(true)}>Use branch default on this kiosk</button>}</div></div></div>
     {message && <p role="status" className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-[#774a24]">{message}</p>}
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
@@ -137,6 +145,6 @@ export function KioskWelcomeScreenPanel({ kiosks, showToast }: { kiosks: CloudKi
     </div>
     </fieldset>
     {confirmDialog}
-    {resetOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4" role="dialog" aria-modal="true" aria-label="Reset welcome screen"><div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-xl font-bold">Reset welcome screen?</h2><p className="mt-3 text-sm text-slate-600">Restore the default JAMANVAAR design for the selected scope. Custom images stay in your library. Review the preview, then Apply to Kiosk.</p><div className="mt-5 flex justify-end gap-3"><button className="rounded-xl border px-4 py-2" onClick={() => setResetOpen(false)}>Cancel</button><button className="rounded-xl bg-orange-600 px-4 py-2 font-bold text-white" onClick={() => { setDraft({ ...DEFAULT_WELCOME_PRESENTATION, backgroundId: catalog.designs[0]?.id || DEFAULT_WELCOME_PRESENTATION.backgroundId, backgroundImageUrl: catalog.designs[0]?.id.startsWith('platform-') ? catalog.designs[0].imageUrl : undefined, backgroundLandscapeImageUrl: catalog.designs[0]?.id.startsWith('platform-') ? catalog.designs[0].landscapeImageUrl : undefined }); setDirty(true); setResetOpen(false); }}>Reset</button></div></div></div>}
+    <Modal isOpen={resetOpen} onClose={() => setResetOpen(false)} title="Reset welcome screen?" maxWidth="sm" footer={<div className="flex flex-wrap justify-end gap-3"><button type="button" className="min-h-11 rounded-xl border px-4 py-2" onClick={() => setResetOpen(false)}>Cancel</button><button type="button" className="min-h-11 rounded-xl bg-[#bf540f] px-4 py-2 font-bold text-white" onClick={() => { setDraft({ ...DEFAULT_WELCOME_PRESENTATION, backgroundId: catalog.designs[0]?.id || DEFAULT_WELCOME_PRESENTATION.backgroundId, backgroundImageUrl: catalog.designs[0]?.id.startsWith('platform-') ? catalog.designs[0].imageUrl : undefined, backgroundLandscapeImageUrl: catalog.designs[0]?.id.startsWith('platform-') ? catalog.designs[0].landscapeImageUrl : undefined }); setDirty(true); setResetOpen(false); }}>Reset preview</button></div>}><p className="text-sm text-slate-600">Restore the default JAMANVAAR design for the selected scope. Custom images stay in your library. Review the preview, then Apply to Kiosk.</p></Modal>
   </div>;
 }

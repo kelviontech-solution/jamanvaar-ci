@@ -4,7 +4,7 @@ import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
 import { AuditRepository, OrderRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
-import { sound } from '@jamanvaar/ui';
+import { sound, useDialogFocus } from '@jamanvaar/ui';
 import { useStaffLanguage } from '@jamanvaar/ui';
 import { PosSplitByGuestModal, type GuestSplitPlan } from './PosSplitByGuestModal';
 import { X, Banknote, QrCode, CreditCard, Wallet, Building2, CheckCircle2, AlertCircle, Trash2, Edit2, Check, Sparkles, Split, Tag } from 'lucide-react';
@@ -119,6 +119,8 @@ export const PosPaymentModal: React.FC = () => {
   // second time before React commits the isProcessing state update, which
   // would otherwise settle the same bill twice.
   const settlingRef = useRef(false);
+  const closePayment = () => { if (!settlingRef.current) setIsPaymentOpen(false); };
+  const { cardRef } = useDialogFocus<HTMLDivElement>(isPaymentOpen, closePayment);
 
   // The modal component stays mounted while closed (it just renders null), so
   // its state survives between bills. Without this, `isProcessing` stayed true
@@ -508,10 +510,10 @@ export const PosPaymentModal: React.FC = () => {
     <>
     <PosSplitByGuestModal isOpen={isGuestSplitOpen} onClose={() => setIsGuestSplitOpen(false)} lines={guestSplitLines} bill={guestSplitBill} onApply={applyGuestPlan} />
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-150 font-sans">
-      <div className="bg-white border border-jaman-border rounded-3xl max-w-4xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <div ref={cardRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Payment and settlement" data-jv-dialog className="bg-white border border-jaman-border rounded-3xl max-w-4xl w-full max-h-[94dvh] flex flex-col shadow-2xl overflow-hidden">
         
         {/* TOP HEADER: Clean, Large, Prominent */}
-        <div className="bg-jaman-cream border-b border-jaman-border p-4 sm:p-5 flex items-center justify-between shrink-0">
+        <div className="bg-jaman-cream border-b border-jaman-border p-4 sm:p-5 flex flex-wrap gap-3 items-center justify-between shrink-0">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-black text-jaman-saffron uppercase tracking-wider bg-[#FFF4ED] px-2 py-0.5 rounded border border-[#FDBA74]">
@@ -590,7 +592,7 @@ export const PosPaymentModal: React.FC = () => {
             </div>
 
             <button
-              onClick={() => setIsPaymentOpen(false)}
+              onClick={closePayment}
               className="p-2 rounded-2xl hover:bg-slate-200 text-slate-400 hover:text-jaman-navy transition-colors"
               title="Close (Esc)"
             >

@@ -1,0 +1,89 @@
+{
+  "name": "restaurant-admin",
+  "width": 390,
+  "height": 844,
+  "route": "/",
+  "text": "Local Core: Unreachable\nPair\nNetwork: Online\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Restaurant Control.\nLive Intelligence.",
+      "font": "30px"
+    },
+    {
+      "text": "JAMANVAAR",
+      "font": "24px"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:53273/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/butter-naan.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Pair",
+      "width": 34,
+      "height": 24
+    },
+    {
+      "text": "Network: Online",
+      "width": 114,
+      "height": 62
+    },
+    {
+      "text": "e.g. JM9876543210",
+      "width": 308,
+      "height": 46
+    },
+    {
+      "text": "Show Password",
+      "width": 100,
+      "height": 44
+    },
+    {
+      "text": "Enter owner password",
+      "width": 308,
+      "height": 46
+    },
+    {
+      "text": "Forgot password?",
+      "width": 112,
+      "height": 44
+    },
+    {
+      "text": "Admin activation key (optional)",
+      "width": 308,
+      "height": 46
+    },
+    {
+      "text": "Sign In",
+      "width": 308,
+      "height": 48
+    },
+    {
+      "text": "Set your password from the welcome email",
+      "width": 260,
+      "height": 44
+    }
+  ],
+  "errors": [],
+  "screenshot": "restaurant-admin-390x844.png"
+}

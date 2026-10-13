@@ -1,0 +1,63 @@
+{
+  "name": "kds",
+  "width": 1366,
+  "height": 768,
+  "route": "/",
+  "text": "Local Core: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nReal-Time Kitchen Production Command\nLive KOTs\n\nInstant station routing, live ticket timers, and cross-terminal food ready dispatch for kitchen staff.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoor Station\nWok Station\nDosa Station\nWELCOME TO\nKITCHEN DISPLAY (KDS)\nKitchen Display System\n\nOne-time setup — activate this display to start receiving tickets.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this Kitchen Display to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Real-Time Kitchen Production Command\nLive KOTs",
+      "font": "42px"
+    },
+    {
+      "text": "Kitchen Display System",
+      "font": "30px"
+    },
+    {
+      "text": "Activate This Terminal",
+      "font": "24px"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:63207/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/tandoor/PT-04.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/chinese/hakka-noodles.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/south-indian/masala-dosa.jpg",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Network: Online",
+      "width": 146,
+      "height": 46
+    },
+    {
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "width": 478,
+      "height": 46
+    },
+    {
+      "text": "Activate Terminal",
+      "width": 478,
+      "height": 52
+    }
+  ],
+  "errors": [],
+  "screenshot": "kds-1366x768.png"
+}

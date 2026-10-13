@@ -79,6 +79,8 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
               />
               {auditSearch && (
                 <button
+                  type="button"
+                  aria-label="Clear audit search"
                   onClick={() => setAuditSearch('')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600 cursor-pointer"
                 >

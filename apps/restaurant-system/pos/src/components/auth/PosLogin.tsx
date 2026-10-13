@@ -93,7 +93,7 @@ export const PosLogin: React.FC = () => {
         { label: 'Table Management', icon: 'table' },
         { label: 'Offline First', icon: 'cloud' }
       ]}
-      footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
+      footerNote="Role-Based Security • Instant Offline Boot • Role-based access"
     >
       {/* Staff Profile Cards (48-56px Touch Targets) — every active staff member this
           restaurant's owner/manager has actually created in Restaurant Admin, not a

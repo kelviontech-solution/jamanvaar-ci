@@ -32,8 +32,8 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-4 py-2.5 text-sm gap-2',
+    sm: 'min-h-11 px-3 py-2 text-sm gap-1.5',
+    md: 'min-h-11 px-4 py-2.5 text-sm gap-2',
     lg: 'px-6 py-3.5 text-base gap-2.5',
     xl: 'px-8 py-4 text-lg gap-3',
     touch: 'px-8 py-5 text-xl font-bold rounded-2xl gap-3 shadow-lg' // Touch-optimized for customer kiosk
@@ -43,6 +43,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       {...props}
     >
       {isLoading ? (

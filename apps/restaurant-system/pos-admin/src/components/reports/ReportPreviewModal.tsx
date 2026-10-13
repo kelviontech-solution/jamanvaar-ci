@@ -1,7 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { Order } from '@jamanvaar/types';
 import { db } from '@jamanvaar/database';
-import { JAMANVAAR_LOGOS, printElement } from '@jamanvaar/ui';
+import { JAMANVAAR_LOGOS, printElement, useDialogFocus } from '@jamanvaar/ui';
 import { formatDate, formatTime, formatINR, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
@@ -48,16 +48,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'A4' | 'DESKTOP' | 'THERMAL'>('A4');
   const [isCopied, setIsCopied] = useState(false);
-
-  // Escape closes this dialog like any other in the app, not just its own Close button.
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose]);
+  const { cardRef, dialogId } = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -161,7 +152,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white print:static">
-      <div className="bg-[#EFECE6] border border-[#D5CEC2] rounded-3xl max-w-6xl w-full h-[95vh] flex flex-col shadow-2xl overflow-hidden print:border-none print:shadow-none print:h-auto print:max-w-none print:bg-white">
+      <div ref={cardRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={dialogId} data-jv-dialog className="jv-report-preview bg-[#EFECE6] border border-[#D5CEC2] rounded-3xl max-w-6xl w-full h-[95dvh] flex flex-col shadow-2xl overflow-hidden print:border-none print:shadow-none print:h-auto print:max-w-none print:bg-white">
         {/* Top Action Toolbar (Hidden in Print) */}
         <div className="p-3.5 bg-white border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0 print:hidden">
           <div className="flex items-center gap-2">
@@ -172,7 +163,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
               <span>← Back</span>
             </button>
             <span className="text-slate-300">|</span>
-            <span className="text-xs font-extrabold text-jaman-navy uppercase tracking-wider">
+            <span id={dialogId} className="text-sm font-extrabold text-jaman-navy uppercase tracking-wider break-words min-w-0">
               {reportTitle} • Document Preview
             </span>
           </div>
@@ -234,7 +225,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
               <span>Print / Save PDF</span>
             </button>
 
-            <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+            <button type="button" data-modal-close aria-label="Close report preview" onClick={onClose} className="w-11 h-11 flex items-center justify-center shrink-0 rounded-lg hover:bg-slate-100 text-slate-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -363,11 +354,11 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                   <h4 className="font-extrabold text-xs text-jaman-navy uppercase tracking-wider">
                     Hourly Sales Trend (Peak Rush Hours)
                   </h4>
-                  <span className="text-[10px] text-slate-400 font-mono">10 AM - 11 PM</span>
+                  <span className="text-xs text-slate-600 font-mono">{hourly[0].label} – {hourly[hourly.length - 1].label} · local time</span>
                 </div>
 
-                <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5">
-                  <div className="flex items-end gap-1.5 h-24 pt-4 px-2">
+                <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 overflow-x-auto" tabIndex={0} aria-label="Hourly sales chart; scroll to see every hour">
+                  <div className="flex items-end gap-1.5 h-28 pt-4 px-2 min-w-[720px] print:min-w-0">
                     {(() => {
                       const maxSales = Math.max(...hourly.map((h) => h.sales), 1);
                       return hourly.map((h) => {
@@ -375,7 +366,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                         return (
                           <div key={h.hour} className="flex-1 flex flex-col items-center gap-1 group relative">
                             {h.sales > 0 && (
-                              <span className="text-[8px] font-mono font-bold text-brand absolute -top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-xs font-mono font-bold text-brand absolute -top-5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                                 ₹{Math.round(h.sales / 1000)}k
                               </span>
                             )}
@@ -389,7 +380,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                                 }`}
                               />
                             </div>
-                            <span className="text-[8px] font-mono text-slate-500 whitespace-nowrap">
+                            <span className="text-xs font-mono text-slate-600 whitespace-nowrap">
                               {h.hour % 12 || 12}
                               {h.hour >= 12 ? 'p' : 'a'}
                             </span>

@@ -15,6 +15,21 @@ interface PayoutOverview {
   unallocatedCollection: number;
 }
 
+interface ReconciliationRow {
+  restaurantId: string;
+  name: string;
+  bankVerificationStatus: 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
+  claimableAmount: number;
+  blockedAmount: number;
+  reason: 'BANK_NOT_VERIFIED' | 'READY_FOR_NEXT_BATCH' | 'ONLY_BLOCKED_TRANSACTIONS';
+}
+
+const RECONCILIATION_REASON_LABEL: Record<ReconciliationRow['reason'], string> = {
+  BANK_NOT_VERIFIED: 'Waiting on bank verification',
+  READY_FOR_NEXT_BATCH: 'Ready for next EOD batch',
+  ONLY_BLOCKED_TRANSACTIONS: 'Blocked by refund/status, excluded from every batch'
+};
+
 interface Payout {
   id: string;
   restaurantId: string;
@@ -48,6 +63,7 @@ function statusTone(status: Payout['status']): 'success' | 'warning' | 'error' |
 
 export function PayoutsListPage() {
   const [overview, setOverview] = useState<PayoutOverview | null>(null);
+  const [reconciliation, setReconciliation] = useState<ReconciliationRow[] | null>(null);
   const [payouts, setPayouts] = useState<Payout[] | null>(null);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -74,6 +90,13 @@ export function PayoutsListPage() {
     api.get<PayoutOverview>('/api/v1/payments/payouts/overview').then(setOverview).catch(() => {});
   }, []);
 
+  const loadReconciliation = useCallback(() => {
+    api
+      .get<{ rows: ReconciliationRow[] }>('/api/v1/payments/payouts/reconciliation')
+      .then((d) => setReconciliation(d.rows))
+      .catch(() => {});
+  }, []);
+
   const loadPayouts = useCallback(() => {
     setLoading(true);
     setError(null);
@@ -93,11 +116,13 @@ export function PayoutsListPage() {
 
   useEffect(loadOverview, [loadOverview]);
   useEffect(loadPayouts, [loadPayouts]);
+  useEffect(loadReconciliation, [loadReconciliation]);
 
   const refreshAll = useCallback(() => {
     loadOverview();
     loadPayouts();
-  }, [loadOverview, loadPayouts]);
+    loadReconciliation();
+  }, [loadOverview, loadPayouts, loadReconciliation]);
 
   async function handleRunEod() {
     setRunningEod(true);
@@ -199,6 +224,48 @@ export function PayoutsListPage() {
           {tile('Pending payout', formatRupees(overview.pendingPayout), 'warn')}
           {tile('Paid out', formatRupees(overview.paidPayout), 'good')}
         </div>
+      )}
+
+      {reconciliation && reconciliation.length > 0 && (
+        <Card style={{ marginBottom: 16 }}>
+          <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 800 }}>Why money is stuck</h3>
+          <p className="muted" style={{ margin: '0 0 14px', fontSize: 12 }}>
+            Every restaurant with collection not yet paid out, and the specific reason it hasn't moved —
+            instead of cross-checking Payment Gateways' bank status against this page's totals by hand.
+          </p>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--jv-border-subtle)', textAlign: 'left', color: 'var(--jv-text-muted)' }}>
+                  <th style={{ padding: '10px 12px' }}>Restaurant</th>
+                  <th style={{ padding: '10px 12px' }}>Bank status</th>
+                  <th style={{ padding: '10px 12px' }}>Claimable</th>
+                  <th style={{ padding: '10px 12px' }}>Blocked</th>
+                  <th style={{ padding: '10px 12px' }}>Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reconciliation.map((r) => (
+                  <tr key={r.restaurantId} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
+                    <td style={{ padding: '10px 12px' }}>
+                      <Link to={`/restaurants/${r.restaurantId}`} className="table-link" style={{ fontWeight: 600 }}>
+                        {r.name}
+                      </Link>
+                    </td>
+                    <td style={{ padding: '10px 12px' }}>
+                      <Badge tone={r.bankVerificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
+                        {r.bankVerificationStatus.replace('_', ' ')}
+                      </Badge>
+                    </td>
+                    <td style={{ padding: '10px 12px' }}>{formatRupees(r.claimableAmount)}</td>
+                    <td style={{ padding: '10px 12px' }}>{formatRupees(r.blockedAmount)}</td>
+                    <td style={{ padding: '10px 12px', color: 'var(--jv-text-muted)' }}>{RECONCILIATION_REASON_LABEL[r.reason]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       <div className="toolbar" style={{ marginTop: 12 }}>

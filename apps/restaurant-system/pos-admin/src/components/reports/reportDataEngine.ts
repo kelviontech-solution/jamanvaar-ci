@@ -580,11 +580,11 @@ export class ReportDataEngine {
   }
 
   /**
-   * Hourly Performance Breakdown (10 AM to 11 PM)
+   * Complete local-hour breakdown. Overnight and early trading must not disappear from reports.
    */
   public static getHourlySales(orders: Order[]): HourlySalesBucket[] {
     const buckets: Record<number, { sales: number; count: number }> = {};
-    for (let h = 9; h <= 23; h++) {
+    for (let h = 0; h < 24; h++) {
       buckets[h] = { sales: 0, count: 0 };
     }
 

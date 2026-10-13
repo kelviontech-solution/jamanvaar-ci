@@ -44,6 +44,32 @@ export function FeatureCatalogPage() {
     }
   }
 
+  const [rolloutEdits, setRolloutEdits] = useState<Record<string, string>>({});
+  const [savingRolloutId, setSavingRolloutId] = useState<string | null>(null);
+
+  async function saveRollout(feature: FeatureRecord) {
+    const raw = rolloutEdits[feature.id];
+    const value = raw === undefined ? feature.rolloutPercent : Number(raw);
+    if (!Number.isFinite(value) || value < 0 || value > 100) {
+      setError('Rollout must be a whole number between 0 and 100');
+      return;
+    }
+    setSavingRolloutId(feature.id);
+    try {
+      await api.patch(`/api/v1/features/${feature.id}`, { rolloutPercent: Math.round(value) });
+      setRolloutEdits((prev) => {
+        const next = { ...prev };
+        delete next[feature.id];
+        return next;
+      });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to update rollout');
+    } finally {
+      setSavingRolloutId(null);
+    }
+  }
+
   async function confirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -63,7 +89,7 @@ export function FeatureCatalogPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <PageHeader
         title="Feature Catalog"
-        subtitle="The database-backed catalog of every feature and category the platform recognises. Edits apply immediately across Plans, Entitlements and Application controls, with no deploy."
+        subtitle="The database-backed catalog of every feature and category the platform recognises. Edits apply immediately across Plans, Entitlements and Application controls, with no deploy. Rollout % soft-launches an active feature to a slice of restaurants instead of all-or-nothing — currently enforced for QR ordering's capability-level flags."
         actions={
           <>
             <Button variant="ghost" onClick={() => setCategoryModal({})}>+ New Category</Button>
@@ -104,6 +130,25 @@ export function FeatureCatalogPage() {
                           <td style={{ padding: '10px 20px' }}>{f.appCode && <Badge tone="accent">{f.appCode}</Badge>}</td>
                           <td style={{ padding: '10px 20px' }}>
                             <Badge tone={f.isActive ? 'success' : 'neutral'}>{f.isActive ? 'Active' : 'Inactive'}</Badge>
+                          </td>
+                          <td style={{ padding: '10px 20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <input
+                                type="number"
+                                min={0}
+                                max={100}
+                                className="input"
+                                style={{ width: 64 }}
+                                value={rolloutEdits[f.id] ?? String(f.rolloutPercent)}
+                                onChange={(e) => setRolloutEdits((prev) => ({ ...prev, [f.id]: e.target.value }))}
+                              />
+                              <span className="muted" style={{ fontSize: 12 }}>%</span>
+                              {rolloutEdits[f.id] !== undefined && rolloutEdits[f.id] !== String(f.rolloutPercent) && (
+                                <Button size="sm" variant="ghost" disabled={savingRolloutId === f.id} onClick={() => saveRollout(f)}>
+                                  {savingRolloutId === f.id ? 'Saving…' : 'Save'}
+                                </Button>
+                              )}
+                            </div>
                           </td>
                           <td style={{ padding: '10px 20px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                             <Button variant="ghost" size="sm" onClick={() => setFeatureModal({ feature: f })}>Edit</Button>

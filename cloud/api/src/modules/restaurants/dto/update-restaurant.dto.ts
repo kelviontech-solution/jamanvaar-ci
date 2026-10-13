@@ -19,7 +19,22 @@ export const updateRestaurantSchema = z
     mobile: z.string().trim().refine(isValidIndianPhone, 'A valid 10-digit Indian mobile number is required').transform(normalizeIndianPhone).optional(),
     timezone: z.string().trim().optional(),
     currency: z.string().trim().optional(),
-    defaultLanguage: z.string().trim().optional()
+    defaultLanguage: z.string().trim().optional(),
+    // White-label branding Super Admin can set on a restaurant's behalf -- e.g. onboarding an
+    // enterprise chain that wants its own identity on customer-facing Kiosk/QR screens rather
+    // than leaving it to the restaurant owner's own Settings page (same brandingProfile JSON
+    // column devices.service.ts's tenant-scoped updateRestaurantIdentity() already writes to;
+    // merged the same way, never replaced wholesale, so one side setting one field never wipes
+    // out a field the other side set).
+    branding: z
+      .object({
+        logoUrl: z.string().trim().url().max(500).optional(),
+        primaryColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex color, e.g. #0B253A').optional(),
+        accentColor: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex color, e.g. #E66817').optional(),
+        displayName: z.string().trim().max(120).optional()
+      })
+      .strict()
+      .optional()
   })
   // BUG-054: same GSTIN/FSSAI validation as create — see create-restaurant.dto.ts.
   .superRefine((val, ctx) => {

@@ -186,9 +186,9 @@ export const PosHeader: React.FC = () => {
 
   return (
     <>
-    <header className="w-full h-14 bg-white border border-jaman-border rounded-2xl px-3 sm:px-4 flex items-center justify-between text-jaman-navy select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
+    <header className="pos-header w-full min-h-14 bg-white border border-jaman-border rounded-2xl px-3 sm:px-4 py-2 flex flex-wrap gap-2 items-center justify-between text-jaman-navy select-none shrink-0 z-30 shadow-2xs max-w-full overflow-visible">
       {/* Left: Brand Header & New Order */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="pos-header-brand flex items-center gap-2 sm:gap-3 min-w-0 max-w-full">
         <BrandHeader
           app="POS"
           restaurantName={db.restaurant.name}

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import '../../components/shared.css';
 import { api, ApiError } from '../../api/client';
-import type { RestaurantListItem } from '../../api/types';
+import type { RestaurantListItem, Plan } from '../../api/types';
 import { Badge, BulkActionsBar, Button, Card, EmptyState, statusTone, ModalShell } from '../../components/ui';
 import {
   Plus,
@@ -75,6 +75,9 @@ export function RestaurantsListPage() {
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [bulkPlanModalOpen, setBulkPlanModalOpen] = useState(false);
+  const [bulkPlans, setBulkPlans] = useState<Plan[] | null>(null);
+  const [bulkTargetPlanId, setBulkTargetPlanId] = useState('');
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -259,6 +262,41 @@ export function RestaurantsListPage() {
       );
       setSelectedIds(new Set());
       load();
+    } finally {
+      setBulkPending(false);
+    }
+  }
+
+  function openBulkPlanModal() {
+    setBulkPlanModalOpen(true);
+    if (!bulkPlans) {
+      api.get<Plan[]>('/api/v1/plans').then(setBulkPlans).catch(() => setBulkPlans([]));
+    }
+  }
+
+  async function handleBulkChangePlan() {
+    if (!bulkTargetPlanId) {
+      showToast('Pick a plan first');
+      return;
+    }
+    const ids = Array.from(selectedIds);
+    setBulkPending(true);
+    try {
+      const result = await api.post<{ changed: number; skipped: number }>('/api/v1/subscriptions/bulk-change-plan', {
+        restaurantIds: ids,
+        planId: bulkTargetPlanId
+      });
+      showToast(
+        result.skipped === 0
+          ? `${result.changed} restaurant(s) moved to the new plan`
+          : `${result.changed} moved, ${result.skipped} skipped (no matching active subscription, or already on that plan)`
+      );
+      setBulkPlanModalOpen(false);
+      setBulkTargetPlanId('');
+      setSelectedIds(new Set());
+      load();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Failed to change plan for the selected restaurants');
     } finally {
       setBulkPending(false);
     }
@@ -467,6 +505,9 @@ export function RestaurantsListPage() {
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
+        <Button size="sm" variant="ghost" disabled={bulkPending || !canWrite} onClick={openBulkPlanModal}>
+          Change Plan…
+        </Button>
         <Button size="sm" variant="danger" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('suspend')}>
           Suspend Selected
         </Button>
@@ -915,6 +956,42 @@ export function RestaurantsListPage() {
                 </Button>
               </div>
             </div>
+        </ModalShell>
+      )}
+
+      {/* Bulk Change Plan Modal */}
+      {bulkPlanModalOpen && (
+        <ModalShell onClose={() => setBulkPlanModalOpen(false)} label={`Change plan for ${selectedIds.size} restaurant(s)`} className="modal confirmation-dialog">
+          <div className="confirmation-body">
+            <h2 className="confirmation-title">Change plan for {selectedIds.size} restaurant(s)</h2>
+            <p className="confirmation-desc">
+              Restaurants without an active subscription matching the target plan's product family, or
+              already on that plan, are skipped rather than failing the whole batch.
+            </p>
+            <div style={{ margin: '12px 0' }}>
+              <label className="label">Target plan</label>
+              {!bulkPlans ? (
+                <div className="muted" style={{ fontSize: 13 }}>Loading plans…</div>
+              ) : (
+                <select className="input" value={bulkTargetPlanId} onChange={(e) => setBulkTargetPlanId(e.target.value)}>
+                  <option value="">Select a plan…</option>
+                  {bulkPlans.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.productFamily} · {p.tier})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <div className="confirmation-actions">
+              <Button variant="ghost" onClick={() => setBulkPlanModalOpen(false)} disabled={bulkPending}>
+                Cancel
+              </Button>
+              <Button variant="primary" disabled={bulkPending || !bulkTargetPlanId} onClick={handleBulkChangePlan}>
+                {bulkPending ? 'Changing…' : 'Change Plan'}
+              </Button>
+            </div>
+          </div>
         </ModalShell>
       )}
     </div>

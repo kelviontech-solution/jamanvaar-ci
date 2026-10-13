@@ -740,7 +740,9 @@ export function RestaurantDetailPage() {
               {restaurant.status}
             </Badge>
             <Badge tone={isPro ? 'gold' : 'neutral'}>
-              {isPro ? 'PRO PLAN (₹7,000)' : 'CORE PLAN (₹5,000)'}
+              {activeSub?.plan
+                ? `${activeSub.plan.name} (₹${(activeSub.plan.priceMonthly / 100).toLocaleString('en-IN')}/mo)`
+                : 'No Active Plan'}
             </Badge>
             {restaurant.activationKeys.some((k) => k.status === 'ACTIVE') && (
               <span
@@ -797,7 +799,7 @@ export function RestaurantDetailPage() {
       )}
 
       {/* 12-Tab Navigation Bar */}
-      <div className="tabs" style={{ overflowX: 'auto', whiteSpace: 'nowrap', marginBottom: 20 }}>
+      <div className="tabs" style={{ marginBottom: 20 }}>
         {visibleTabs.map((t) => {
           const IconComponent = t.icon;
           return (

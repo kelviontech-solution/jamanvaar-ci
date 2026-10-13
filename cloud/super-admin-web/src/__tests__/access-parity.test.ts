@@ -12,7 +12,11 @@ const ROUTES: Array<[string, string]> = [
   ['/devices', '/api/v1/devices'], ['/applications', '/api/v1/applications'], ['/support', '/api/v1/support'],
   ['/tickets', '/api/v1/support-tickets'], ['/qr-ordering', '/api/v1/qr-ordering'], ['/ai-assistant', '/api/v1/ai-assistant'],
   ['/catalog', '/api/v1/master-catalog'], ['/audit-logs', '/api/v1/audit-logs'], ['/team', '/api/v1/platform-users'],
-  ['/feature-catalog', '/api/v1/features'], ['/entitlements', '/api/v1/application-entitlements/catalog']
+  ['/feature-catalog', '/api/v1/features'], ['/entitlements', '/api/v1/application-entitlements/catalog'],
+  ['/restaurant-health', '/api/v1/platform/dashboard/restaurant-health'],
+  ['/announcements', '/api/v1/platform/settings/announcements'],
+  ['/status-history', '/api/v1/platform/telemetry/incidents'],
+  ['/margins', '/api/v1/platform/reports/margins']
 ];
 
 describe('web/API route-area parity', () => {

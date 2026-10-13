@@ -28,6 +28,9 @@
   font-size: 12px;
   border-radius: var(--jv-radius-sm);
 }
+@media (pointer: coarse) {
+  .btn, .btn-sm, .btn-md, button[title] { min-height:44px; }
+}
 .btn-md {
   height: 38px;
   padding: 0 16px;

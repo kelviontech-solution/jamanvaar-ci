@@ -1,0 +1,13 @@
+{
+  "name": "qr-guest",
+  "width": 1366,
+  "height": 768,
+  "route": "/q/ui-audit-invalid/",
+  "text": "Loading your restaurant menu…",
+  "horizontalOverflow": false,
+  "headings": [],
+  "images": [],
+  "controls": [],
+  "errors": [],
+  "screenshot": "qr-guest-1366x768.png"
+}

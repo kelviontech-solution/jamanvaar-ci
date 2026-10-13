@@ -6,7 +6,7 @@ import { formatINR, formatDate, formatTime, getOrderSource, getBillingTender, OR
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { db, ReceiptRepository, isUnpaidOpenOrder, billsWaiting, billLinesOf } from '@jamanvaar/database';
 import { DayOrdersService, CentralReportingService } from '@jamanvaar/business';
-import { printThermalReceipt, EmptyState, printElement, ModalBackdrop } from '@jamanvaar/ui';
+import { printThermalReceipt, EmptyState, printElement, ModalBackdrop, OrderSummaryCards } from '@jamanvaar/ui';
 import { exportBillingCsv, formatBillingMoney, isPendingCollection, isSubmittedBillingOrder, summarizeBillingLedger } from './billingLedger';
 import { refundBillingOrder, voidBillingOrder } from './billingCommands';
 import { BillingStatementDocument } from './BillingStatementDocument';
@@ -903,7 +903,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
               </div>
 
               {/* Day Orders Table */}
-              <div className="overflow-x-auto">
+              <OrderSummaryCards orders={grp.orders} onView={setSelectedOrder} />
+              <div className="hidden md:block print:block overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold">
                     <tr>
@@ -975,7 +976,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
       ) : (
         /* FLAT COMPLETE INVOICE LEDGER TABLE */
         <div data-ledger-view="invoice-statement" className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
+          <OrderSummaryCards orders={paginatedOrders} onView={setSelectedOrder} />
+          <div className="hidden md:block print:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold sticky top-0 z-10">
                 <tr>

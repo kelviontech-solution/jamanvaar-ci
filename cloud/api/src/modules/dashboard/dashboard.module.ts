@@ -10,6 +10,6 @@ import { TenantDashboardService } from './tenant-dashboard.service';
   imports: [PlatformAuthModule,TenantAuthModule],
   controllers: [DashboardController,TenantDashboardController],
   providers: [DashboardService,TenantDashboardService],
-  exports: [TenantDashboardService]
+  exports: [TenantDashboardService, DashboardService]
 })
 export class DashboardModule {}

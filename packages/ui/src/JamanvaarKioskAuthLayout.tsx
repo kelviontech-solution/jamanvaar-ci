@@ -61,7 +61,7 @@ export const JamanvaarKioskAuthLayout: React.FC<JamanvaarKioskAuthLayoutProps> =
   const formattedTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden font-['Plus_Jakarta_Sans',_sans-serif] text-[#062A43] antialiased select-none">
+    <div data-jv-workspace="auth" className="relative min-h-dvh w-full overflow-x-hidden font-['Plus_Jakarta_Sans',_sans-serif] text-[#062A43] antialiased select-none">
       {/* Background: warm restaurant photography, softened so text stays readable */}
       <div className="fixed inset-0 -z-10">
         <img src={resolveMenuImage(backgroundPhoto)} alt="" className="w-full h-full object-cover" aria-hidden="true" />

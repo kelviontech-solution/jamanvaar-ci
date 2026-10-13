@@ -1,0 +1,5 @@
+# Reproducible, local test builds; keep the small screenshots, results and PDFs.
+evidence/qr-test-build/
+evidence/fixed/fixture.js
+evidence/fixed/fixture.css
+evidence/fixed/styles.css

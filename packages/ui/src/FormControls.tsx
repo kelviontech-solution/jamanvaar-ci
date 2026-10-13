@@ -37,7 +37,7 @@ FormTextarea.displayName = 'FormTextarea';
  */
 export const ModalBackdrop = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className = '', ...rest }, ref) => (
-    <div ref={ref} className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs ${className}`.trim()} {...rest} />
+    <div ref={ref} data-jv-dialog className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs ${className}`.trim()} {...rest} />
   )
 );
 ModalBackdrop.displayName = 'ModalBackdrop';

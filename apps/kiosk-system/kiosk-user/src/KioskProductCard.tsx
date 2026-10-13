@@ -30,10 +30,9 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
   return (
     <div
       data-testid="kiosk-menu-card"
-      onClick={() => onSelectDetails?.(item)}
       className="group flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden cursor-pointer select-none transition-colors hover:border-jaman-saffron/60 active:scale-[0.99]"
     >
-      <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
+      <button type="button" disabled={!onSelectDetails} aria-label={`View details for ${displayName || item.name}`} onClick={() => onSelectDetails?.(item)} className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden text-left focus-visible:outline focus-visible:outline-4 focus-visible:outline-jaman-navy focus-visible:-outline-offset-4">
         <CachedImg
           src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
           dishName={item.name}
@@ -44,18 +43,18 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
         <div className="absolute bottom-2 left-2">
           <StatusBadge status={item.dietaryType} type="dietary" />
         </div>
-      </div>
+      </button>
 
       <div className="flex flex-col flex-1 p-3 gap-1.5">
-        <h3 className="text-base font-bold text-jaman-navy leading-snug line-clamp-2 min-h-[2.75rem]">
-          {displayName || item.name}
+        <h3 className="text-base font-bold text-jaman-navy leading-snug min-h-[2.75rem]">
+          <button type="button" disabled={!onSelectDetails} onClick={() => onSelectDetails?.(item)} className="text-left w-full line-clamp-2" title={displayName || item.name}>{displayName || item.name}</button>
         </h3>
         {item.subcategory && <span className="text-xs font-semibold text-slate-600">{item.subcategory}</span>}
         {description && (
           <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{description}</p>
         )}
 
-        <div className="mt-auto pt-2 flex items-end justify-between gap-2">
+        <div className="mt-auto pt-2 flex flex-wrap items-end justify-between gap-2">
           <div className="min-w-0">
             <div className="text-xl font-black text-jaman-saffron leading-none">
               {formatINR(item.price)}

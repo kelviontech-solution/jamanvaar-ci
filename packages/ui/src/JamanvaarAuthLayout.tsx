@@ -210,7 +210,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
   heroImages = DEFAULT_HERO_IMAGES,
   theme = 'light',
   children,
-  footerNote = 'Role-Based Security • Instant Offline Boot • 100% Secure',
+  footerNote = 'Role-Based Security • Instant Offline Boot • Role-based access',
   className = ''
 }) => {
   const dark = theme === 'dark';
@@ -319,7 +319,8 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
     // keypad and Unlock button were simply cut off below the fold on short screens. This
     // container now scrolls internally instead.
     <div
-      className={`min-h-screen max-h-screen overflow-y-auto flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${
+      data-jv-workspace="auth"
+      className={`min-h-dvh max-h-dvh overflow-y-auto flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans antialiased select-none ${
         dark ? 'bg-[#081B2C] text-[#F5F1E8]' : 'bg-[#FAF7F2] text-[#0B253A]'
       } ${className}`}
     >
@@ -357,7 +358,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
                 </strong>
               )}
             </span>
-            {onPairLocalCore && <button type="button" onClick={() => setPairingOpen(true)} className="text-xs font-bold underline px-1.5 py-1 -my-1 min-h-[24px] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current">{isLocalCoreUnauthorized ? 'Pair' : 'Setup'}</button>}
+            {onPairLocalCore && <button type="button" onClick={() => setPairingOpen(true)} className="text-sm font-bold underline px-3 py-2 min-h-11 min-w-11 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current">{isLocalCoreUnauthorized ? 'Pair' : 'Setup'}</button>}
           </div>
           )}
           {pairingOpen && onPairLocalCore && localCoreUrl && <div role="dialog" aria-modal="true" aria-label="Local Core setup" className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
@@ -539,7 +540,7 @@ export const JamanvaarAuthLayout: React.FC<JamanvaarAuthLayoutProps> = ({
             <span>•</span>
             <div className="flex items-center gap-1.5">
               <Cloud className={`w-3.5 h-3.5 ${dark ? 'text-blue-400' : 'text-blue-600'}`} />
-              <span>100% Secure</span>
+              <span>Role-based access</span>
             </div>
           </div>
         </div>

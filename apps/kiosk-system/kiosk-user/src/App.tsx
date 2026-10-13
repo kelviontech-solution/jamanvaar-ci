@@ -1972,6 +1972,7 @@ export default function KioskUserApp() {
   return (
     <JAMANVAARStartup appName="Self-Order Kiosk" appType="KIOSK" subtitle="Customer Self-Ordering Experience">
       <div
+        data-jv-workspace="kiosk"
         style={{ '--color-brand': kioskSettings.accentColor || '#EF6A0B', '--kiosk-accent': kioskSettings.accentColor || '#EF6A0B' } as React.CSSProperties}
         onClick={resetIdleTimer}
         onTouchStart={resetIdleTimer}

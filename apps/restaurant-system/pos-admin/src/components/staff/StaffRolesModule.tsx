@@ -210,14 +210,14 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onOpenStaffModal(usr)}
-                  className="p-1.5 text-brand hover:bg-brand/[0.07] rounded-lg transition-colors cursor-pointer"
+                  className="min-w-11 min-h-11 p-2 text-brand hover:bg-brand/[0.07] rounded-lg transition-colors cursor-pointer"
                   title="Edit Staff"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleDeleteStaff(usr)}
-                  className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                  className="min-w-11 min-h-11 p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                   title="Delete Staff"
                   aria-label={`Remove staff ${usr.fullName}`}
                 >
@@ -281,13 +281,13 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => { setShiftToEdit(shift); setIsShiftModalOpen(true); }}
-                        className="p-1.5 hover:bg-white rounded-lg text-slate-500 hover:text-brand cursor-pointer"
+                        className="min-w-11 min-h-11 p-2 hover:bg-white rounded-lg text-slate-500 hover:text-brand cursor-pointer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteShift(shift)}
-                        className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer"
+                        className="min-w-11 min-h-11 p-2 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -321,14 +321,14 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                           <button
                             onClick={() => handleClockIn(usr)}
                             title="Clock In"
-                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-pointer"
+                            className="min-w-11 min-h-11 p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 cursor-pointer"
                           >
                             <LogIn className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleClockOut(usr)}
                             title="Clock Out"
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 cursor-pointer"
+                            className="min-w-11 min-h-11 p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 cursor-pointer"
                           >
                             <LogOut className="w-3.5 h-3.5" />
                           </button>
@@ -389,10 +389,10 @@ export const StaffRolesModule: React.FC<StaffRolesModuleProps> = ({
                   >
                     {rider.isActive ? 'Active' : 'Inactive'}
                   </button>
-                  <button onClick={() => { setRiderToEdit(rider); setIsRiderModalOpen(true); }} className="p-1.5 hover:bg-white rounded-lg text-slate-500 hover:text-brand cursor-pointer">
+                  <button type="button" aria-label={`Edit rider ${rider.name}`} onClick={() => { setRiderToEdit(rider); setIsRiderModalOpen(true); }} className="min-w-11 min-h-11 p-2 hover:bg-white rounded-lg text-slate-500 hover:text-brand cursor-pointer">
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => handleDeleteRider(rider)} className="p-1.5 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer">
+                  <button type="button" aria-label={`Remove rider ${rider.name}`} onClick={() => handleDeleteRider(rider)} className="min-w-11 min-h-11 p-2 hover:bg-rose-50 rounded-lg text-slate-500 hover:text-rose-600 cursor-pointer">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

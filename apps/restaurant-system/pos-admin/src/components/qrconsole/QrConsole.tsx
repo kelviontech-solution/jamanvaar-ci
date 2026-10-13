@@ -192,6 +192,7 @@ export function QrConsole({
         workspace ? "qr-console qr-console--workspace" : "qr-console space-y-5"
       }
       data-testid="qr-console"
+      data-jv-workspace="qr-admin"
     >
       {navigationDialog}
       {workspace && (

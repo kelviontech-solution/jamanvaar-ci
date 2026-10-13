@@ -1,0 +1,188 @@
+{
+  "scope": "Current source, isolated synthetic component layouts and interactions; no backend mutations or payment acceptance.",
+  "results": [
+    {
+      "screen": "pos",
+      "width": 390,
+      "cartVisible": true,
+      "catalogHidden": true,
+      "cartPreserved": true,
+      "catalogRestored": true,
+      "overflow": false,
+      "text": "POS TERMINAL\nSaffron Courtyard Restaurant with a long display name\n\nAhmedabad Flagship Store\n•\nPOS-a182f73e-626d-444c-9214-a3d7494ed238\n\nSearch dishes, SKU, tables, bills, customers...\n2\nU\nBack to dishes\nOrder (1) · ₹220\nNEW ORDER — UNSAVED\n• UI Test Owner\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nHara Bhara Kebab (6 Pcs)\n₹220\nHBK-01 • @ ₹220\n1\nAdd note\nFREQUENTLY PAIRED TOGETHER\nHara Bhara Kebab (6 Pcs)\n₹220\nCrispy Corn Salt & Pepper\n₹240\nCheese Corn Cigar Rolls (5 Pcs)\n₹210\nDiscount\nHold Order\nClear All\nSubtotal ₹209.52\nGST ₹10.48\nTotal Payable\n₹220\nPAY ₹220\nSEND KOT\nINSTANT BILL\nCash • Auto Print",
+      "errors": [],
+      "screenshot": "pos-390.png"
+    },
+    {
+      "screen": "pos",
+      "width": 768,
+      "cartVisible": true,
+      "catalogHidden": true,
+      "cartPreserved": true,
+      "catalogRestored": true,
+      "overflow": false,
+      "text": "POS TERMINAL\nSaffron Courtyard Restaurant with a long display name\n\nAhmedabad Flagship Store\n•\nPOS-401cf0e1-2e2e-4706-b276-066129a16439\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nJAMAN AI\n2\nU\nBack to dishes\nOrder (1) · ₹220\nNEW ORDER — UNSAVED\n• UI Test Owner\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nHara Bhara Kebab (6 Pcs)\n₹220\nHBK-01 • @ ₹220\n1\nAdd note\nFREQUENTLY PAIRED TOGETHER\nHara Bhara Kebab (6 Pcs)\n₹220\nCrispy Corn Salt & Pepper\n₹240\nCheese Corn Cigar Rolls (5 Pcs)\n₹210\nDiscount\nHold Order\nClear All\nSubtotal ₹209.52\nGST ₹10.48\nTotal Payable\n₹220\nPAY ₹220\nSEND KOT\nINSTANT BILL\nCash • Auto Print",
+      "errors": [],
+      "screenshot": "pos-768.png"
+    },
+    {
+      "screen": "pos",
+      "width": 1024,
+      "cartVisible": true,
+      "catalogHidden": true,
+      "cartPreserved": true,
+      "catalogRestored": true,
+      "overflow": false,
+      "text": "POS TERMINAL\nSaffron Courtyard Restaurant with a long display name\n\nAhmedabad Flagship Store\n•\nPOS-1545bff3-1c1f-4d08-a730-702111581d0b\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\n2\nU\nBack to dishes\nOrder (1) · ₹220\nNEW ORDER — UNSAVED\n• UI Test Owner\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nHara Bhara Kebab (6 Pcs)\n₹220\nHBK-01 • @ ₹220\n1\nAdd note\nFREQUENTLY PAIRED TOGETHER\nHara Bhara Kebab (6 Pcs)\n₹220\nCrispy Corn Salt & Pepper\n₹240\nCheese Corn Cigar Rolls (5 Pcs)\n₹210\nDiscount\nHold Order\nClear All\nSubtotal ₹209.52\nGST ₹10.48\nTotal Payable\n₹220\nPAY ₹220\nSEND KOT\nINSTANT BILL\nCash • Auto Print",
+      "errors": [],
+      "screenshot": "pos-1024.png"
+    },
+    {
+      "screen": "pos",
+      "width": 1366,
+      "overflow": false,
+      "text": "POS TERMINAL\nSaffron Courtyard Restaurant with a long display name\n\nAhmedabad Flagship Store\n•\nPOS-4e1bfe5f-69aa-46c4-8f65-9e01329d7fc2\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\n2\nU\nUI Test Owner\nADMIN\nAll Menu\n12 dishes\nAll\nVeg\nJain\nNon-Veg\nQUICK:\nHara Bhara Kebab (6 Pcs)\n₹220\nCrispy Corn Salt & Pepper\n₹240\nCheese Corn Cigar Rolls (5 Pcs)\n₹210\nPaneer Tikka (Tandoori Angaar)\n₹260\nDal Makhani (Slow Cooked)\n₹195\nMenu\n1\nHara Bhara Kebab (6 Pcs)\nKitchen · HBK-01\n₹220\nMOD\n1\nCrispy Corn Salt & Pepper\nKitchen · CC-02\n₹240\nMOD\nCheese Corn Cigar Rolls (5 Pcs)\nKitchen · CCR-03\n₹210\nMOD\nPaneer Tikka (Tandoori Angaar)\nTandoor · PT-04\n₹260\nMOD\nDal Makhani (Slow Cooked)\nCurry Station · DM-05\n₹195\nMOD\nPaneer Butter Masala\nCurry Station · PBM-06\n₹250\nMOD\nButter Naan (Tandoori)\nTandoor · BN-07\n₹60\nGarlic Butter Naan\nTandoor · GN-08\n₹75\nRoyal Veg Handi Dum Biryani\nBiryani Station · VGB-09\n₹240\nMOD\nCold Coffee with Vanilla Ice Cream\nBeverages · CC-10\n₹120\nShahi Gulab Jamun (2 Pcs)\nDessert Station · GJ-11\n₹80\nAuthentic Gujarati Special Thali\nCurry Station · THL-12\n₹280\nMOD\nNEW ORDER — UNSAVED\n• UI Test Owner\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nHara Bhara Kebab (6 Pcs)\n₹220\nHBK-01 • @ ₹220\n1\nAdd note\nFREQUENTLY PAIRED TOGETHER\nHara Bhara Kebab (6 Pcs)\n₹220\nCrispy Corn Salt & Pepper\n₹240\nCheese Corn Cigar Rolls (5 Pcs)\n₹210\nDiscount\nHold Order\nClear All\nSubtotal ₹209.52\nGST ₹10.48\nTotal Payable\n₹220\nPAY ₹220\nSEND KOT\nINSTANT BILL\nCash • Auto Print",
+      "errors": [],
+      "screenshot": "pos-1366.png"
+    },
+    {
+      "screen": "captain",
+      "width": 768,
+      "navigationNotOverlapping": true,
+      "overflow": false,
+      "text": "Staff interface language\nEnglish\nગુજરાતી\nहिन्दी\nCAPTAIN APP\nJAMANVAAR\n?\nStaff\n•\nSaffron Courtyard Restaurant with a long display name\nLIVE\nSend Msg\n?\nMy Tables\nActive Orders\nFood Ready\nMessages\nMore Options\nFloor content",
+      "errors": [],
+      "screenshot": "captain-768.png"
+    },
+    {
+      "screen": "captain",
+      "width": 1024,
+      "navigationNotOverlapping": true,
+      "overflow": false,
+      "text": "Staff interface language\nEnglish\nગુજરાતી\nहिन्दी\nCAPTAIN APP\nJAMANVAAR\n?\nStaff\n•\nSaffron Courtyard Restaurant with a long display name\nLIVE\nSend Msg\n?\nMy Tables\nActive Orders\nFood Ready\nMessages\nMore Options\nFloor content",
+      "errors": [],
+      "screenshot": "captain-1024.png"
+    },
+    {
+      "screen": "keyboard",
+      "width": 390,
+      "minimumKeyWidth": 59.59375,
+      "resultVisible": true,
+      "overflow": false,
+      "text": "Email Your Bill\nEmail sent\n\nYour test bill was sent.\n\nCheck your inbox or spam folder for your bill.\n\nTap Done when you are finished.\n\nBack to receipt\nDone · Next customer",
+      "errors": [],
+      "screenshot": "keyboard-390.png"
+    },
+    {
+      "screen": "keyboard",
+      "width": 1366,
+      "overflow": false,
+      "text": "Email Your Bill\n\nEnter your email using the touch keyboard below to receive your PDF bill.\n\nEmail Address\n\nUse @ and . for your address. Tap inside the field to correct a character.\n\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\nq\nw\ne\nr\nt\ny\nu\ni\no\np\na\ns\nd\nf\ng\nh\nj\nk\nl\nz\nx\nc\nv\nb\nn\nm\n⇧\n?123\n@\n.\n-\n_\n+\n@gmail.com\n@outlook.com\n@yahoo.com\nClear address\n\nYour contact details clear when this popup closes.\n\nCancel\nEmail My Bill",
+      "errors": [],
+      "screenshot": "keyboard-1366.png"
+    },
+    {
+      "screen": "menu",
+      "width": 390,
+      "detailsOpened": true,
+      "detailsClosed": true,
+      "focusReturned": true,
+      "overflow": false,
+      "text": "Pure Veg\nHara Bhara Kebab (6 Pcs)\n\nCrispy spinach, green pea and paneer patties served with fresh mint chutney.\n\n₹220+\nCustomizable",
+      "errors": [],
+      "screenshot": "menu-390.png"
+    },
+    {
+      "screen": "menu",
+      "width": 1366,
+      "detailsOpened": true,
+      "detailsClosed": true,
+      "focusReturned": true,
+      "overflow": false,
+      "text": "Pure Veg\nHara Bhara Kebab (6 Pcs)\n\nCrispy spinach, green pea and paneer patties served with fresh mint chutney.\n\n₹220+\nCustomizable",
+      "errors": [],
+      "screenshot": "menu-1366.png"
+    },
+    {
+      "screen": "notifications",
+      "width": 390,
+      "toastFits": true,
+      "overflow": false,
+      "text": "Show notification\nFood ready for a very long table name\n\nPlease deliver this order promptly and confirm service.\n\n12:11 PM",
+      "errors": [],
+      "screenshot": "notifications-390.png"
+    },
+    {
+      "screen": "notifications",
+      "width": 1366,
+      "toastFits": true,
+      "overflow": false,
+      "text": "Show notification\nFood ready for a very long table name\n\nPlease deliver this order promptly and confirm service.\n\n12:11 PM",
+      "errors": [],
+      "screenshot": "notifications-1366.png"
+    },
+    {
+      "screen": "summary",
+      "width": 390,
+      "detailsOpened": true,
+      "overflow": false,
+      "text": "#MAIN-20261013-123\n\n13 Oct 2026 · 12:11 pm\n\n₹250.00\n\nKiosk · TAKEAWAY · K-123\n\nWalk-in guest · 0 items\n\nCollected\n₹0.00\nOutstanding\n₹250.00\nCONFIRMED\nView details",
+      "errors": [],
+      "screenshot": "summary-390.png"
+    },
+    {
+      "screen": "summary",
+      "width": 1366,
+      "overflow": false,
+      "text": "",
+      "errors": [],
+      "screenshot": "summary-1366.png"
+    },
+    {
+      "screen": "kds",
+      "width": 768,
+      "overflow": false,
+      "text": "#K-123\nMAIN-20261013-123\nTable TN12\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\nLate 15m\n1×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 0\nALLERGY / DIET: ALLERGY: peanuts\n2×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 1\n3×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 2\n4×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 3\n5×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 4\n6×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 5\n7×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 6\n8×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 7\n9×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 8\n10×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 9\n11×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 10\n12×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 11\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nTest Captain\n#i-kot\nALL DISHES READY",
+      "errors": [],
+      "screenshot": "kds-768.png"
+    },
+    {
+      "screen": "kds",
+      "width": 1366,
+      "overflow": false,
+      "text": "#K-123\nMAIN-20261013-123\nTable TN12\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\nLate 15m\n1×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 0\nALLERGY / DIET: ALLERGY: peanuts\n2×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 1\n3×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 2\n4×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 3\n5×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 4\n6×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 5\n7×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 6\n8×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 7\n9×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 8\n10×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 9\n11×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 10\n12×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 11\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nTest Captain\n#i-kot\nALL DISHES READY",
+      "errors": [],
+      "screenshot": "kds-1366.png"
+    },
+    {
+      "screen": "kds",
+      "width": 1920,
+      "overflow": false,
+      "text": "#K-123\nMAIN-20261013-123\nTable TN12\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\nLate 15m\n1×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 0\nALLERGY / DIET: ALLERGY: peanuts\n2×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 1\n3×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 2\n4×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 3\n5×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 4\n6×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 5\n7×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 6\n8×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 7\n9×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 8\n10×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 9\n11×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 10\n12×\nRoyal Gujarati Grand Thali with seasonal vegetables and traditional accompaniments 11\n\nALLERGY OR DIET REQUEST ON THIS TICKET\n\nTest Captain\n#i-kot\nALL DISHES READY",
+      "errors": [],
+      "screenshot": "kds-1920.png"
+    },
+    {
+      "screen": "print",
+      "width": 390,
+      "receiptVisible": true,
+      "unrelatedHidden": true,
+      "actionHidden": true,
+      "overflow": false,
+      "text": "Saffron Courtyard\n\nReceipt MAIN-123, Total ₹250",
+      "errors": [],
+      "screenshot": "print-390.png"
+    },
+    {
+      "screen": "print",
+      "width": 1366,
+      "receiptVisible": true,
+      "unrelatedHidden": true,
+      "actionHidden": true,
+      "overflow": false,
+      "text": "Saffron Courtyard\n\nReceipt MAIN-123, Total ₹250",
+      "errors": [],
+      "screenshot": "print-1366.png"
+    }
+  ]
+}

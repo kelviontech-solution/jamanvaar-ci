@@ -1,0 +1,719 @@
+{
+  "scope": "Existing compiled web artifacts served locally. All backend and external traffic mocked unavailable. Login/activation/invalid-link states only. May differ from current unbuilt source changes.",
+  "results": [
+    {
+      "name": "restaurant-admin",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nTue, 13 Oct 2026\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Restaurant Control.\nLive Intelligence.",
+          "font": "42px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63830/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63830/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 49,
+          "height": 44
+        },
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "e.g. JM9876543210",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 100,
+          "height": 44
+        },
+        {
+          "text": "Enter owner password",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Forgot password?",
+          "width": 112,
+          "height": 44
+        },
+        {
+          "text": "Admin activation key (optional)",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Sign In",
+          "width": 478,
+          "height": 48
+        },
+        {
+          "text": "Set your password from the welcome email",
+          "width": 260,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "restaurant-admin-1366x768.png"
+    },
+    {
+      "name": "restaurant-admin",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nPair\nNetwork: Online\nRestaurant Control.\nLive Intelligence.\n\nSign in once. Open the apps included in your plan, with a separate workspace for each.\n\nRestaurant Management\nReports & Analytics\nMenu Management\nInventory & Staff\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nOWNER SIGN-IN\nJAMANVAAR\n\nOne account for your restaurant and kiosk apps\n\nRestaurant ID *\n\nFind your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.\n\nOwner Password *\nShow Password\nYour owner account\nForgot password?\nConnecting a new device? Add your admin key\nSign In\nSet your password from the welcome email\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Restaurant Control.\nLive Intelligence.",
+          "font": "30px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:63830/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:63830/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Pair",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "text": "Network: Online",
+          "width": 110,
+          "height": 62
+        },
+        {
+          "text": "e.g. JM9876543210",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 100,
+          "height": 44
+        },
+        {
+          "text": "Enter owner password",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Forgot password?",
+          "width": 112,
+          "height": 44
+        },
+        {
+          "text": "Admin activation key (optional)",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Sign In",
+          "width": 308,
+          "height": 48
+        },
+        {
+          "text": "Set your password from the welcome email",
+          "width": 260,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "restaurant-admin-390x844.png"
+    },
+    {
+      "name": "qr-login",
+      "width": 1366,
+      "height": 768,
+      "route": "/qr/login/",
+      "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\n\nManage the menu, QR codes, guest orders and payments from your restaurant's own workspace.\n\nExplore the interactive demo →\nYour hospitality. A simpler way to order.\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Good service starts here.",
+          "font": "65.568px"
+        },
+        {
+          "text": "Welcome to QR Admin",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING\nA little scan. A better meal.",
+          "width": 263,
+          "height": 52
+        },
+        {
+          "text": "Menu",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Features",
+          "width": 45,
+          "height": 44
+        },
+        {
+          "text": "How it works",
+          "width": 69,
+          "height": 44
+        },
+        {
+          "text": "Benefits",
+          "width": 42,
+          "height": 44
+        },
+        {
+          "text": "Payments",
+          "width": 51,
+          "height": 44
+        },
+        {
+          "text": "Integrations",
+          "width": 64,
+          "height": 44
+        },
+        {
+          "text": "FAQ",
+          "width": 22,
+          "height": 44
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 44
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "Explore the interactive demo →",
+          "width": 179,
+          "height": 44
+        },
+        {
+          "text": "",
+          "width": 408,
+          "height": 48
+        },
+        {
+          "text": "Password",
+          "width": 408,
+          "height": 48
+        },
+        {
+          "text": "Show",
+          "width": 55,
+          "height": 42
+        },
+        {
+          "text": "Sign in",
+          "width": 408,
+          "height": 46
+        },
+        {
+          "text": "Login",
+          "width": 40,
+          "height": 44
+        },
+        {
+          "text": "Activate QR Ordering",
+          "width": 130,
+          "height": 44
+        },
+        {
+          "text": "Forgot password?",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "text": "Return to product website",
+          "width": 157,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-login-1366x768.png"
+    },
+    {
+      "name": "qr-login",
+      "width": 390,
+      "height": 844,
+      "route": "/qr/login/",
+      "text": "QR ORDERING\nMenu\nLogin\nGet started\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\nExplore the interactive demo →\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Good service starts here.",
+          "font": "34px"
+        },
+        {
+          "text": "Welcome to QR Admin",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/qr-experience/dining.webp",
+          "loaded": true
+        },
+        {
+          "src": "/qr/assets/branding/jamanvaar-logo.png",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "QR ORDERING",
+          "width": 188,
+          "height": 40
+        },
+        {
+          "text": "Menu",
+          "width": 50,
+          "height": 39
+        },
+        {
+          "text": "Features",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "How it works",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Benefits",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Payments",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Integrations",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "FAQ",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "text": "Login",
+          "width": 34,
+          "height": 44
+        },
+        {
+          "text": "Get started",
+          "width": 112,
+          "height": 46
+        },
+        {
+          "text": "Explore the interactive demo →",
+          "width": 179,
+          "height": 44
+        },
+        {
+          "text": "",
+          "width": 309,
+          "height": 48
+        },
+        {
+          "text": "Password",
+          "width": 309,
+          "height": 48
+        },
+        {
+          "text": "Show",
+          "width": 55,
+          "height": 42
+        },
+        {
+          "text": "Sign in",
+          "width": 309,
+          "height": 46
+        },
+        {
+          "text": "Login",
+          "width": 40,
+          "height": 44
+        },
+        {
+          "text": "Activate QR Ordering",
+          "width": 130,
+          "height": 44
+        },
+        {
+          "text": "Forgot password?",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "text": "Return to product website",
+          "width": 157,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "qr-login-390x844.png"
+    },
+    {
+      "name": "pos",
+      "width": 1366,
+      "height": 768,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Smart Billing.\nBetter Dining.",
+          "font": "42px"
+        },
+        {
+          "text": "POS Counter",
+          "font": "30px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 478,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "pos-1366x768.png"
+    },
+    {
+      "name": "pos",
+      "width": 390,
+      "height": 844,
+      "route": "/",
+      "text": "Local Core: Unreachable\nNetwork: Online\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Smart Billing.\nBetter Dining.",
+          "font": "30px"
+        },
+        {
+          "text": "POS Counter",
+          "font": "24px"
+        },
+        {
+          "text": "Activate This Terminal",
+          "font": "20px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 128,
+          "height": 62
+        },
+        {
+          "text": "JMV-XXXX-XXXX-XXXX",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Activate Terminal",
+          "width": 308,
+          "height": 52
+        }
+      ],
+      "errors": [],
+      "screenshot": "pos-390x844.png"
+    },
+    {
+      "name": "super-admin",
+      "width": 1366,
+      "height": 768,
+      "route": "/login",
+      "text": "Cloud API: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Platform Control.\nUnified Cloud Engine.",
+          "font": "42px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "30px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 146,
+          "height": 46
+        },
+        {
+          "text": "e.g. superadmin@jamanvaar.app",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 96,
+          "height": 44
+        },
+        {
+          "text": "Enter your password",
+          "width": 478,
+          "height": 46
+        },
+        {
+          "text": "",
+          "width": 13,
+          "height": 13
+        },
+        {
+          "text": "CONTINUE",
+          "width": 478,
+          "height": 48
+        }
+      ],
+      "errors": [],
+      "screenshot": "super-admin-1366x768.png"
+    },
+    {
+      "name": "super-admin",
+      "width": 390,
+      "height": 844,
+      "route": "/login",
+      "text": "Cloud API: Unreachable\nNetwork: Online\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+      "horizontalOverflow": false,
+      "headings": [
+        {
+          "text": "Platform Control.\nUnified Cloud Engine.",
+          "font": "30px"
+        },
+        {
+          "text": "JAMANVAAR",
+          "font": "24px"
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/butter-naan.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+          "loaded": true
+        },
+        {
+          "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+          "loaded": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "Network: Online",
+          "width": 128,
+          "height": 62
+        },
+        {
+          "text": "e.g. superadmin@jamanvaar.app",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "Show Password",
+          "width": 96,
+          "height": 44
+        },
+        {
+          "text": "Enter your password",
+          "width": 308,
+          "height": 46
+        },
+        {
+          "text": "",
+          "width": 13,
+          "height": 13
+        },
+        {
+          "text": "CONTINUE",
+          "width": 308,
+          "height": 44
+        }
+      ],
+      "errors": [],
+      "screenshot": "super-admin-390x844.png"
+    }
+  ]
+}

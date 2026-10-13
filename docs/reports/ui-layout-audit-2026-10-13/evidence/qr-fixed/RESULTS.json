@@ -1,0 +1,79 @@
+{
+  "scope": "Actual built guest app with synthetic API responses; no live payment/production order created.",
+  "results": [
+    {
+      "scenario": "menu",
+      "width": 390,
+      "menuVisible": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "menu-390.png"
+    },
+    {
+      "scenario": "menu",
+      "width": 768,
+      "menuVisible": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "menu-768.png"
+    },
+    {
+      "scenario": "checkout",
+      "width": 390,
+      "menuVisible": true,
+      "cashVisible": true,
+      "onlineVisible": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "checkout-390.png"
+    },
+    {
+      "scenario": "checkout",
+      "width": 768,
+      "menuVisible": true,
+      "cashVisible": true,
+      "onlineVisible": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "checkout-768.png"
+    },
+    {
+      "scenario": "pending",
+      "width": 390,
+      "recoveryVisible": true,
+      "counterRecoveryWorks": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "pending-390.png"
+    },
+    {
+      "scenario": "pending",
+      "width": 768,
+      "recoveryVisible": true,
+      "counterRecoveryWorks": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "pending-768.png"
+    },
+    {
+      "scenario": "completed",
+      "width": 390,
+      "receiptVisible": true,
+      "orderMoreHidden": true,
+      "statusHeadingHidden": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "completed-390.png"
+    },
+    {
+      "scenario": "completed",
+      "width": 768,
+      "receiptVisible": true,
+      "orderMoreHidden": true,
+      "statusHeadingHidden": true,
+      "overflow": false,
+      "errors": [],
+      "screenshot": "completed-768.png"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "name": "qr-login",
+  "width": 1366,
+  "height": 768,
+  "route": "/qr/login/",
+  "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nYOUR RESTAURANT, IN YOUR HANDS\nGood service starts here.\n\nManage the menu, QR codes, guest orders and payments from your restaurant's own workspace.\n\nExplore the interactive demo →\nYour hospitality. A simpler way to order.\nWelcome to QR Admin\n\nSign in with your existing Restaurant ID and owner password, or your manager email and password.\n\nRestaurant ID or manager email\nPassword\nShow\nSign in\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Good service starts here.",
+      "font": "65.568px"
+    },
+    {
+      "text": "Welcome to QR Admin",
+      "font": "30px"
+    }
+  ],
+  "images": [
+    {
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/qr-experience/dining.webp",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "QR ORDERING\nA little scan. A better meal.",
+      "width": 263,
+      "height": 52
+    },
+    {
+      "text": "Menu",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "text": "Features",
+      "width": 45,
+      "height": 44
+    },
+    {
+      "text": "How it works",
+      "width": 69,
+      "height": 44
+    },
+    {
+      "text": "Benefits",
+      "width": 42,
+      "height": 44
+    },
+    {
+      "text": "Payments",
+      "width": 51,
+      "height": 44
+    },
+    {
+      "text": "Integrations",
+      "width": 64,
+      "height": 44
+    },
+    {
+      "text": "FAQ",
+      "width": 22,
+      "height": 44
+    },
+    {
+      "text": "Login",
+      "width": 34,
+      "height": 44
+    },
+    {
+      "text": "Get started",
+      "width": 112,
+      "height": 46
+    },
+    {
+      "text": "Explore the interactive demo →",
+      "width": 179,
+      "height": 44
+    },
+    {
+      "text": "",
+      "width": 408,
+      "height": 48
+    },
+    {
+      "text": "Password",
+      "width": 408,
+      "height": 48
+    },
+    {
+      "text": "Show",
+      "width": 55,
+      "height": 42
+    },
+    {
+      "text": "Sign in",
+      "width": 408,
+      "height": 46
+    },
+    {
+      "text": "Login",
+      "width": 40,
+      "height": 44
+    },
+    {
+      "text": "Activate QR Ordering",
+      "width": 130,
+      "height": 44
+    },
+    {
+      "text": "Forgot password?",
+      "width": 110,
+      "height": 44
+    },
+    {
+      "text": "Return to product website",
+      "width": 157,
+      "height": 44
+    }
+  ],
+  "errors": [],
+  "screenshot": "qr-login-1366x768.png"
+}

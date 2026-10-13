@@ -73,6 +73,8 @@ model PlatformUser {
   assignedTickets SupportTicket[]
   createdTickets  SupportTicket[]        @relation("SupportTicketCreatedBy")
   ticketComments  TicketComment[]
+  announcements   PlatformAnnouncement[]
+  incidents       PlatformIncident[]
 }
 
 model PlatformRefreshToken {
@@ -349,6 +351,11 @@ model Feature {
   // database) proves referential integrity here (see FeaturesService).
   dependsOnFeatureIds  String[]        @default([])
   isActive             Boolean         @default(true)
+  /// Super Admin feature request: percentage rollout. 100 = every restaurant (the old all-or-nothing
+  /// behavior, and the default so existing features are unaffected); 0 = isActive in all but name.
+  /// Only consulted when isActive is already true -- this narrows an active feature, it never widens
+  /// an inactive one. See rollout.util.ts's isRestaurantInRollout for the deterministic hash.
+  rolloutPercent       Int             @default(100)
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 
@@ -1749,6 +1756,50 @@ model PlatformNotificationRead {
 
   @@id([notificationId, userId])
   @@index([userId])
+}
+
+/// Super Admin feature request: platform-wide announcement / broadcast. Distinct from
+/// PlatformNotification above -- that one is the internal team's own "something needs attention"
+/// feed; this one is Super Admin -> restaurant owners (maintenance windows, new features, policy
+/// changes), authored and managed from Super Admin, read via a tenant-facing endpoint. v1 scope:
+/// authoring, a visibility window (publishedAt/expiresAt), and severity -- not per-restaurant
+/// targeting (audience is always every active restaurant for now).
+model PlatformAnnouncement {
+  id          String    @id @default(uuid())
+  title       String
+  body        String
+  severity    String    @default("INFO") // INFO | WARNING | CRITICAL
+  createdById String
+  createdBy   PlatformUser @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  publishedAt DateTime  @default(now())
+  /// Null = no expiry; stays visible until withdrawn.
+  expiresAt   DateTime?
+  /// Set when a Super Admin withdraws it early -- kept for history rather than deleted.
+  withdrawnAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([publishedAt])
+}
+
+/// Super Admin feature request: public/internal status history. "Platform Online" on every page is a
+/// live badge with no memory -- this is the paper trail: what broke, when, how it was tracked as it
+/// was worked, and when it was resolved. v1 scope: a single incident record with an append-only
+/// timeline (`updates`, oldest first: [{ status, message, at }]) rather than a second table, since
+/// nothing here needs to be queried independently of its parent incident.
+model PlatformIncident {
+  id          String    @id @default(uuid())
+  title       String
+  severity    String    @default("MINOR") // MINOR | MAJOR | CRITICAL
+  status      String    @default("INVESTIGATING") // INVESTIGATING | IDENTIFIED | MONITORING | RESOLVED
+  /// [{ status: string, message: string, at: ISO string }], oldest first.
+  updates     Json
+  startedAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  createdById String
+  createdBy   PlatformUser @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@index([startedAt])
 }
 
 // ---------------------------------------------------------------------------

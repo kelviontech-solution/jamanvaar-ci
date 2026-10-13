@@ -1,4 +1,4 @@
-import { ModalBackdrop } from '@jamanvaar/ui';
+import { ModalBackdrop, useDialogFocus } from '@jamanvaar/ui';
 import React, { useState, useEffect} from 'react';
 import { PosReportDocument } from './PosReportDocument';
 import { ReportFullData, ReportDesign, PdfReportBuilder } from '../../services/pdfReportBuilder';
@@ -24,16 +24,7 @@ export const PosReportPreviewModal: React.FC<PosReportPreviewModalProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [feedback, setFeedback] = useState('');
-
-  // Escape closes this dialog like any other in the app, not just its own Close button.
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onClose]);
+  const { cardRef, dialogId } = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -99,7 +90,7 @@ Dispatched to ${printer.name}
 
   return (
     <ModalBackdrop className="flex items-center justify-center p-3 sm:p-6 animate-in fade-in select-none">
-      <div className="bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[95vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+      <div ref={cardRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Report document preview" data-jv-dialog className="jv-report-preview bg-jaman-cream border border-jaman-border w-full max-w-4xl max-h-[95dvh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {/* Top Modal Action Bar */}
         <div className="p-4 bg-white border-b border-jaman-border flex flex-wrap items-center justify-between gap-3 shrink-0">
@@ -173,8 +164,10 @@ Dispatched to ${printer.name}
             {/* Close */}
             <button
               type="button"
+              data-modal-close
+              aria-label="Close report preview"
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
+              className="w-11 h-11 flex items-center justify-center shrink-0 text-slate-600 hover:text-jaman-navy rounded-xl hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

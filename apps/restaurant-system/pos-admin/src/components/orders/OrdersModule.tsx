@@ -1,3 +1,4 @@
+import { OrderSummaryCards } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect } from 'react';
 import { Order } from '@jamanvaar/types';
 import { formatINR, formatTime, getOrderSource, ORDER_SOURCE_LABELS } from '@jamanvaar/utils';
@@ -776,7 +777,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
           {/* Daily Orders Table (Full Desktop Table) */}
           <div data-print-doc="orders-report" className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
+            <OrderSummaryCards orders={paginatedOrders} onView={setSelectedOrder} />
+            <div className="hidden md:block print:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-[#F8F6F0] border-b border-jaman-border text-slate-500 uppercase font-bold">
                   <tr>

@@ -529,7 +529,8 @@ export const App: React.FC = () => {
   // =========================================================================
   return (
     <JAMANVAARStartup appName="CAPTAIN APP" appType="CAPTAIN">
-      <div className="min-h-screen bg-[#FBF8F2] flex flex-col select-none text-jaman-navy">
+      <div data-jv-workspace="captain" className="min-h-dvh bg-[#FBF8F2] flex flex-col select-none text-jaman-navy">
+        <div className="sticky top-0 z-30 bg-white">
         {/* ── Brand Header with Master Logo & Quick Actions ── */}
         <CaptainHeader
           onOpenNotifications={() => setIsNotificationsOpen(true)}
@@ -551,6 +552,7 @@ export const App: React.FC = () => {
           onSelectTab={(tab) => setActiveTab(tab as any)}
           onOpenMoreDrawer={() => setIsMoreDrawerOpen(true)}
         />
+        </div>
 
         {/* ── Main View Container ── */}
         <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 lg:p-6">

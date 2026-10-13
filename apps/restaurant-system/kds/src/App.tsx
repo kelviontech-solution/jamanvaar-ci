@@ -797,7 +797,7 @@ export const App: React.FC = () => {
 
   return (
     <JAMANVAARStartup appName="Kitchen Display (KDS)" appType="KDS" subtitle="Kitchen Production & Expediter System">
-      <div className="h-dvh bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans overflow-hidden">
+      <div data-jv-workspace="kds" className="h-dvh bg-jaman-cream text-jaman-navy flex flex-col select-none font-sans overflow-hidden">
         {/* CONNECTION BAR: shown only when this screen has stopped hearing from the server */}
         {conn.level !== 'ok' && (
           <div

@@ -105,7 +105,26 @@ export function DevicesListPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const counts = devices.extra?.healthCounts;
+  // "By restaurant" (the default view) never fetches /api/v1/devices (it's disabled while that
+  // view is active, to avoid loading the whole flat device list it doesn't display), so
+  // devices.extra was always null there -- every summary tile above the restaurant cards showed
+  // "-" even though the cards right below it were already showing real online/degraded/offline
+  // counts per restaurant. Summed from the same rows already on screen instead of adding a
+  // second always-on fetch.
+  const counts: Record<Health, number> | undefined =
+    view === 'RESTAURANTS'
+      ? restaurants.items.reduce(
+          (acc, r) => ({
+            ...acc,
+            online: acc.online + r.online,
+            degraded: acc.degraded + r.degraded,
+            offline: acc.offline + r.offline,
+            never_seen: acc.never_seen + r.neverSeen,
+            revoked: acc.revoked + r.revoked
+          }),
+          { online: 0, degraded: 0, offline: 0, never_seen: 0, revoked: 0, pending: 0 } as Record<Health, number>
+        )
+      : devices.extra?.healthCounts;
   const hasFilters = !!(search || health !== 'ALL' || lockedOnly || typeFilter !== 'ALL' || restaurant);
   const clearFilters = () => {
     setSearch('');

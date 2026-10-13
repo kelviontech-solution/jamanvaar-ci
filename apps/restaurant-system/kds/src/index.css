@@ -46,6 +46,13 @@
   padding-right: 3px;
 }
 .kds-dishes:focus-visible { outline: 2px solid #E66817; outline-offset: 3px; }
+.kds-density-tv .kds-token { font-size: clamp(2rem, 10cqi, 3rem); }
+.kds-ticket-footer > .flex { flex-wrap:wrap; gap:.5rem; min-width:0; }
+.kds-ticket-footer button { white-space:normal; overflow-wrap:anywhere; }
+@media (max-height: 600px) {
+  .kds-ticket { max-height: none; }
+  .kds-dishes { max-height: 35dvh; }
+}
 
 /* Custom scrollbars for kitchen touch panels */
 ::-webkit-scrollbar {

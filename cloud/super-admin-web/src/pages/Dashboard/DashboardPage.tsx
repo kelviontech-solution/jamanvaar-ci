@@ -569,7 +569,7 @@ export function DashboardPage() {
                               <div className="activity-row-top">
                                 <span className="activity-event-name">{formatted.title}</span>
                                 <Badge tone={tone} className="activity-action-tag">
-                                  {event.action}
+                                  {formatted.category}
                                 </Badge>
                               </div>
                               <div className="activity-row-meta">

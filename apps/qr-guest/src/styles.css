@@ -205,7 +205,24 @@ textarea { resize:vertical; min-height:88px; }
   .steps li { font-size:10px; }
 }
 @media (prefers-reduced-motion:reduce) { button { transition:none; } }
-@media print { body { background:white; } .journey,.status-seal,.brand-footer,.menu-hero,.secure-note { display:none; } .app { padding:0; } .page { box-shadow:none; border:0; margin:0; } }
+@media print {
+  body { background:white; }
+  button, nav, .journey, .status-seal, .brand-footer, .menu-hero, .secure-note, .receipt > summary { display:none !important; }
+  .app { padding:0; } .page { box-shadow:none; border:0; margin:0; }
+  .receipt { border:0; padding:0; text-align:left; }
+  .receipt .lines li, .receipt .totals > div { break-inside:avoid; }
+}
+
+/* Readable customer labels and a stable, touch-sized progression. */
+.diet { font-size:12px; }
+.journey span, .journey b { font-size:12px; }
+.journey { flex-wrap:wrap; }
+.payment-card small { font-size:13px; }
+.secure-note { font-size:12px; }
+.item .idesc { font-size:13px; line-height:1.55; }
+.payment-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+.payment-actions .link, .receipt > summary { min-height:44px; display:flex; align-items:center; }
+.receipt-payment-status { font-size:13px; overflow-wrap:anywhere; }
 
 /* Compact first screen: menu navigation and the first dishes are immediately accessible. */
 .menu-hero { margin:12px 16px; min-height:0; padding:16px; }
@@ -235,3 +252,4 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .brand-COMPACT .items{grid-template-columns:1fr}.brand-COMPACT .items .item{flex-direction:row;align-items:center;padding:12px;gap:12px}.brand-COMPACT .items .item>img,.brand-COMPACT .items .dish-photo{width:80px;height:80px;flex:none;object-fit:cover;border-radius:12px}.brand-COMPACT .item .grow{padding:0}.brand-COMPACT .item .iname,.brand-COMPACT .item .idesc{min-height:0}.brand-COMPACT .item .add{position:static;flex:none;margin:0;padding:10px}.pickup-confirmation{margin:16px 0;padding:16px;background:#fff6e9;border:1px solid #e9c78e;border-radius:16px;font-weight:700}
 
 .app .item .price,.app .eyebrow{color:var(--accent-text,var(--saffron))}.app .add{color:var(--accent-text,var(--saffron));border-color:var(--accent-text,var(--saffron))}
+.app .primary { background:var(--saffron); color:var(--accent-ink,#fff); }

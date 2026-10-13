@@ -33,6 +33,7 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/backups', area: 'ops' },
   { prefix: '/system-health', area: 'ops' },
   { prefix: '/sandboxes', area: 'ops' },
+  { prefix: '/status-history', area: 'ops' },
   { prefix: '/offline-policy', area: 'licensing' },
   { prefix: '/support', area: 'support' },
   { prefix: '/tickets', area: 'support' },
@@ -48,9 +49,12 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/ai-assistant', area: 'catalog' },
   { prefix: '/catalog', area: 'catalog' },
   { prefix: '/reports', area: 'reports' },
+  { prefix: '/margins', area: 'reports' },
+  { prefix: '/restaurant-health', area: 'reports' },
   { prefix: '/audit-logs', area: 'audit' },
   { prefix: '/team', area: 'team' },
   { prefix: '/settings', area: 'settings' },
+  { prefix: '/announcements', area: 'settings' },
   { prefix: '/notifications', area: 'self' },
   { prefix: '/profile', area: 'self' }
 ];

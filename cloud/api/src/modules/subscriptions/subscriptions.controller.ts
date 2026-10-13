@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { SubscriptionsService } from './subscriptions.service';
-import { assignSubscriptionSchema, changePlanSchema, extendSchema, renewSchema } from './dto/subscription.dto';
+import { assignSubscriptionSchema, bulkChangePlanSchema, BulkChangePlanDto, changePlanSchema, extendSchema, renewSchema } from './dto/subscription.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -28,6 +28,12 @@ export class SubscriptionsController {
     @CurrentPlatformUser() actor: PlatformUser
   ) {
     return this.subscriptions.assign(body, actor);
+  }
+
+  @Post('bulk-change-plan')
+  @UsePipes(new ZodValidationPipe(bulkChangePlanSchema))
+  bulkChangePlan(@Body() body: BulkChangePlanDto, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.subscriptions.bulkChangePlan(body.restaurantIds, body.planId, actor);
   }
 
   @Patch(':id/change-plan')

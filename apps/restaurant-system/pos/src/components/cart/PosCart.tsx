@@ -116,7 +116,7 @@ export const PosCart: React.FC = () => {
   const quickFavorites = db.menuItems.filter((i) => i.isAvailable !== false).slice(0, 4);
 
   return (
-    <div className="w-96 md:w-[26rem] lg:w-[28rem] min-w-[380px] max-w-[460px] bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 select-none shrink-0 shadow-xs z-10 overflow-hidden">
+    <div className="pos-cart bg-white border border-jaman-border rounded-2xl flex flex-col h-full min-h-0 min-w-0 select-none shadow-xs z-10 overflow-hidden">
       {/* Active Order Header */}
       <div className="px-3 pt-2 pb-2 border-b border-jaman-border bg-white shrink-0 space-y-1.5">
         {/* Order Identifier & Clear Button */}
@@ -133,7 +133,7 @@ export const PosCart: React.FC = () => {
         </div>
 
         {/* Order Type Switcher: one compact row */}
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           {orderTypes.map((t) => {
             const active = orderType === t.id;
             return (

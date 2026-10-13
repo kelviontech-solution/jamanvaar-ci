@@ -60,6 +60,7 @@ export function printStyles(options: PrintOptions = {}): string {
     backdrop-filter: none !important;
   }
   .${PRINT_TARGET_CLASS} { width: 100% !important; }
+  .${PRINT_TARGET_CLASS}, .${PRINT_TARGET_CLASS} * { visibility: visible !important; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }`;
 }

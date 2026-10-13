@@ -58,7 +58,7 @@ export function CopyButton({
       size={size}
       variant={variant}
       title={title ?? label}
-      style={{ padding: '2px 8px', height: 'auto', fontSize: 11, ...style }}
+      style={{ padding: '8px 12px', minHeight: 44, height: 'auto', fontSize: 13, ...style }}
       onClick={async (e) => {
         e.stopPropagation();
         onResult?.(await copy(text));

@@ -725,7 +725,7 @@ export default function PosAdminApp() {
             { label: 'Menu Management', icon: 'table' },
             { label: 'Inventory & Staff', icon: 'package' }
           ]}
-          footerNote="Plan-Based Access • Instant Offline Boot • 100% Secure"
+          footerNote="Plan-Based Access • Instant Offline Boot • Role-based access"
         >
           <ActivationNoticeBanner />
           {authScreenState === 'ACTIVATE' ? (
@@ -1015,7 +1015,7 @@ export default function PosAdminApp() {
 
   return (
     <JAMANVAARStartup appName={appName} appType={isKioskAdmin ? 'KIOSK_ADMIN' : 'ADMIN'} subtitle="Your restaurant workspace">
-      <div className="h-screen w-screen bg-jaman-cream text-jaman-navy flex flex-col font-sans select-none antialiased overflow-hidden">
+      <div data-jv-workspace="admin" className="h-dvh w-full bg-jaman-cream text-jaman-navy flex flex-col font-sans select-none antialiased overflow-hidden">
         {/* Toast Notification Banner */}
         {toastMessage && (
           <div role="status" aria-live="polite" className="fixed top-4 right-4 z-50 bg-jaman-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-white/20 animate-in fade-in slide-in-from-top-2">

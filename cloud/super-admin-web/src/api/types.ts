@@ -136,6 +136,8 @@ export interface FeatureRecord {
   defaultDeviceQuota: number | null;
   dependsOnFeatureIds: string[];
   isActive: boolean;
+  /** 100 = every restaurant once active (the default). Currently only consulted for QR ordering's capability-level flags. */
+  rolloutPercent: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -169,6 +171,7 @@ export interface RestaurantCore {
   fssaiNumber?: string | null;
   status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
   createdAt: string;
+  brandingProfile?: { logoUrl?: string | null; primaryColor?: string | null; accentColor?: string | null; displayName?: string | null } | null;
 }
 
 /** GET /api/v1/restaurants — carries _count instead of the full related rows. */
@@ -394,6 +397,54 @@ export interface SyncMetrics {
   successRatePercent: number;
   activeSyncingDevices: number;
   pendingConflicts: number;
+}
+
+export interface IncidentUpdateEntry {
+  status: string;
+  message: string;
+  at: string;
+}
+
+export interface MarginsReport {
+  assumedCostPerRestaurant: number;
+  plans: Array<{ planId: string; name: string; tier: string; restaurantCount: number; mrr: number; assumedCost: number; estimatedMargin: number }>;
+  totals: { mrr: number; assumedCost: number; estimatedMargin: number };
+}
+
+export interface PlatformIncident {
+  id: string;
+  title: string;
+  severity: 'MINOR' | 'MAJOR' | 'CRITICAL';
+  status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED';
+  updates: IncidentUpdateEntry[];
+  startedAt: string;
+  resolvedAt: string | null;
+  createdBy: { id: string; fullName: string; email: string };
+}
+
+export interface PlatformAnnouncement {
+  id: string;
+  title: string;
+  body: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  publishedAt: string;
+  expiresAt: string | null;
+  withdrawnAt: string | null;
+  createdBy: { id: string; fullName: string; email: string };
+}
+
+export interface RestaurantHealthRow {
+  restaurantId: string;
+  name: string;
+  city: string | null;
+  score: number;
+  tone: 'healthy' | 'watch' | 'at_risk';
+  reasons: string[];
+}
+
+export interface RestaurantHealthBoard {
+  restaurants: RestaurantHealthRow[];
+  summary: { healthy: number; watch: number; atRisk: number };
 }
 
 export interface OfflineExtension {

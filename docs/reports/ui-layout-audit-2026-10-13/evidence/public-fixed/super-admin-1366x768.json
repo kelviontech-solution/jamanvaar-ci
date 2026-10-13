@@ -1,0 +1,74 @@
+{
+  "name": "super-admin",
+  "width": 1366,
+  "height": 768,
+  "route": "/login",
+  "text": "Cloud API: Unreachable\nNetwork: Online\nTue, 13 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Platform Control.\nUnified Cloud Engine.",
+      "font": "42px"
+    },
+    {
+      "text": "JAMANVAAR",
+      "font": "30px"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:61124/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/butter-naan.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Network: Online",
+      "width": 146,
+      "height": 46
+    },
+    {
+      "text": "e.g. superadmin@jamanvaar.app",
+      "width": 478,
+      "height": 46
+    },
+    {
+      "text": "Show Password",
+      "width": 96,
+      "height": 44
+    },
+    {
+      "text": "Enter your password",
+      "width": 478,
+      "height": 46
+    },
+    {
+      "text": "",
+      "width": 13,
+      "height": 13
+    },
+    {
+      "text": "CONTINUE",
+      "width": 478,
+      "height": 48
+    }
+  ],
+  "errors": [],
+  "screenshot": "super-admin-1366x768.png"
+}

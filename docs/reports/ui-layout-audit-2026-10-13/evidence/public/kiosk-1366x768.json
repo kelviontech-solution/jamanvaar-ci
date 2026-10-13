@@ -1,0 +1,69 @@
+{
+  "name": "kiosk",
+  "width": 1366,
+  "height": 768,
+  "route": "/",
+  "text": "KIOSK\nSELF ORDERING\n🍲 Delicious Food\n⚡ Faster Service\n👥 Happier Customers\nDevice:\nActivation required\nNetwork:\nConnected\nTue, 13 Oct 2026 · 11:21\nNeed Help?\n\nCrave. Tap. Enjoy! :)\n\nGuests order.\nKitchen fires\ninstantly.\n\nA modern self-ordering kiosk for a smoother and happier dining experience.\n\nTouch to Order\nInstant Kitchen Orders\nSmart Suggestions\nHappier Customers\n\nGood Food, Better Moments\n\nLet's Serve Happiness ♥\n\nCrave\nTap\nEnjoy!\nWELCOME TO\nJAMANVAAR KIOSK\n\nSELF ORDERING · SMART DINING · BETTER EXPERIENCE\n\nActivate Your Kiosk\n\nEnter the activation key from your Super Admin Welcome Kit to connect this kiosk to your restaurant.\n\nRestaurant ID *\nActivation Key *\nWhere can I find this?\nActivate Kiosk\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per kiosk and shares it with you.\nSecure & Reliable\n|\nWorks Offline\n|\nAuto Sync\n\nMore than a POS — it's your partner\n\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.\n\nBuilt for Modern Restaurants ♥",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Guests order.\nKitchen fires\ninstantly.",
+      "font": "58px"
+    },
+    {
+      "text": "JAMANVAAR KIOSK",
+      "font": "28px"
+    },
+    {
+      "text": "Activate Your Kiosk",
+      "font": "30px"
+    }
+  ],
+  "images": [
+    {
+      "src": "/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:58748/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/biryani/royal-veg-biryani.jpg",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:58748/assets/mark-BjfVnFoC.png",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Need Help?",
+      "width": 107,
+      "height": 44
+    },
+    {
+      "text": "JM9876543210",
+      "width": 558,
+      "height": 62
+    },
+    {
+      "text": "Where can I find this?",
+      "width": 143,
+      "height": 44
+    },
+    {
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "width": 558,
+      "height": 62
+    },
+    {
+      "text": "Activate Kiosk",
+      "width": 558,
+      "height": 56
+    }
+  ],
+  "errors": [],
+  "screenshot": "kiosk-1366x768.png"
+}

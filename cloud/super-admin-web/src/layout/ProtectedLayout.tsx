@@ -53,7 +53,10 @@ import {
   MessageCircle,
   ListChecks,
   Wallet,
-  LayoutGrid
+  LayoutGrid,
+  Megaphone,
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 import './layout.css';
 
@@ -84,6 +87,9 @@ const ROLE_LABEL: Record<string, string> = {
 /** Words people type for a page that are not in its menu name (including common misspellings), so the header search finds pages too. */
 const PAGE_KEYWORDS: Record<string, string> = {
   '/': 'home overview dashboard kpi revenue summary',
+  '/restaurant-health': 'health risk churn score watch at risk radar',
+  '/announcements': 'announcement announcements broadcast maintenance notice',
+  '/status-history': 'status incident incidents history outage postmortem timeline',
   '/restaurants': 'tenant tenants onboard onboarding customer hotel dhaba suspend',
   '/owners': 'owner owners login account password',
   '/branches': 'branch outlet location',
@@ -107,6 +113,7 @@ const PAGE_KEYWORDS: Record<string, string> = {
   '/system-health': 'health telemetry status uptime database latency',
   '/sandboxes': 'staging sandbox test demo',
   '/reports': 'report reports analytics chart sales export',
+  '/margins': 'margin margins cost profit profitability estimate',
   '/audit-logs': 'audit log logs history activity security',
   '/offline-policy': 'offline policy emergency extension grace',
   '/team': 'team staff admin admins role roles invite platform user users',
@@ -119,7 +126,10 @@ const PAGE_KEYWORDS: Record<string, string> = {
 const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Platform Control Center',
-    items: [{ to: '/', label: 'Executive Dashboard', icon: LayoutDashboard, end: true }]
+    items: [
+      { to: '/', label: 'Executive Dashboard', icon: LayoutDashboard, end: true },
+      { to: '/restaurant-health', label: 'Restaurant Health & Risk', icon: ShieldAlert }
+    ]
   },
   {
     label: 'Business Management',
@@ -155,6 +165,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/sync-monitor', label: 'Sync & Conflict Monitor', icon: Activity },
       { to: '/backups', label: 'Backups & Recovery', icon: Database },
       { to: '/system-health', label: 'System Telemetry', icon: HeartPulse },
+      { to: '/status-history', label: 'Status History', icon: AlertTriangle },
       { to: '/sandboxes', label: 'Staging Sandboxes', icon: Boxes }
     ]
   },
@@ -162,11 +173,13 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Security & Reports',
     items: [
       { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
+      { to: '/margins', label: 'Margin & Cost', icon: TrendingUp },
       { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
       { to: '/offline-policy', label: 'Emergency Offline Policy', icon: ShieldAlert },
       { to: '/team', label: 'Platform Team', icon: ShieldCheck },
       { to: '/tickets', label: 'Support Tickets', icon: Ticket },
       { to: '/support', label: 'Diagnostics & Support', icon: LifeBuoy },
+      { to: '/announcements', label: 'Announcements', icon: Megaphone },
       { to: '/settings/platform', label: 'Platform Settings', icon: Sliders }
     ]
   },
@@ -359,7 +372,7 @@ export function ProtectedLayout() {
       appType="SUPER_ADMIN"
       subtitle="JAMANVAAR Cloud Platform Control"
     >
-      <div className="app-shell">
+      <div data-jv-workspace="platform" className="app-shell">
       {/* Mobile Drawer Backdrop */}
       {mobileMenuOpen && (
         <div

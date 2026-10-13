@@ -157,6 +157,74 @@ export class ReportsService {
     };
   }
 
+  private static readonly COST_SETTING_KEY = 'reports.assumedMonthlyCostPerRestaurantPaise';
+  private static readonly DEFAULT_ASSUMED_COST_PAISE = 15000; // ₹150/mo -- a starting estimate, editable by Super Admin
+
+  /**
+   * Super Admin feature request: margin/cost view. Reports showed revenue but nothing about what it
+   * actually costs to serve a restaurant (support load, infra) against what it pays. JAMANVAAR does
+   * not track real per-restaurant infra cost anywhere yet, so this is explicitly an ESTIMATE built
+   * from a single admin-editable assumption (₹/restaurant/month), not real billing data -- labeled
+   * as such in the API response and the page, not presented as audited numbers.
+   */
+  async getMargins() {
+    const [subscriptions, setting] = await Promise.all([
+      this.prisma.runAsPlatform((tx) =>
+        tx.subscription.findMany({
+          where: { status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
+          include: { plan: { select: { id: true, name: true, tier: true, priceMonthly: true } } }
+        })
+      ),
+      this.prisma.runAsPlatform((tx) => tx.platformSetting.findUnique({ where: { key: ReportsService.COST_SETTING_KEY } }))
+    ]);
+    const assumedCostPaise = (setting?.value as { paise: number } | undefined)?.paise ?? ReportsService.DEFAULT_ASSUMED_COST_PAISE;
+
+    const byPlan = new Map<string, { planId: string; name: string; tier: string; restaurantCount: number; mrrPaise: number }>();
+    for (const sub of subscriptions) {
+      if (!sub.plan) continue;
+      const row = byPlan.get(sub.plan.id) ?? { planId: sub.plan.id, name: sub.plan.name, tier: sub.plan.tier, restaurantCount: 0, mrrPaise: 0 };
+      row.restaurantCount += 1;
+      row.mrrPaise += sub.plan.priceMonthly;
+      byPlan.set(sub.plan.id, row);
+    }
+
+    const plans = [...byPlan.values()]
+      .map((p) => {
+        const assumedCostTotalPaise = p.restaurantCount * assumedCostPaise;
+        return {
+          planId: p.planId,
+          name: p.name,
+          tier: p.tier,
+          restaurantCount: p.restaurantCount,
+          mrr: Math.round(p.mrrPaise / 100),
+          assumedCost: Math.round(assumedCostTotalPaise / 100),
+          estimatedMargin: Math.round((p.mrrPaise - assumedCostTotalPaise) / 100)
+        };
+      })
+      .sort((a, b) => b.mrr - a.mrr);
+
+    const totalMrrPaise = plans.reduce((sum, p) => sum + p.mrr * 100, 0);
+    const totalCostPaise = plans.reduce((sum, p) => sum + p.assumedCost * 100, 0);
+
+    return {
+      assumedCostPerRestaurant: Math.round(assumedCostPaise / 100),
+      plans,
+      totals: { mrr: Math.round(totalMrrPaise / 100), assumedCost: Math.round(totalCostPaise / 100), estimatedMargin: Math.round((totalMrrPaise - totalCostPaise) / 100) }
+    };
+  }
+
+  async setAssumedMonthlyCost(rupees: number) {
+    const paise = Math.round(rupees * 100);
+    await this.prisma.runAsPlatform((tx) =>
+      tx.platformSetting.upsert({
+        where: { key: ReportsService.COST_SETTING_KEY },
+        update: { value: { paise } },
+        create: { key: ReportsService.COST_SETTING_KEY, value: { paise }, category: 'REPORTS', description: 'Assumed monthly cost (₹) to serve one restaurant, used only for the estimated margin view' }
+      })
+    );
+    return this.getMargins();
+  }
+
   async getRestaurants() {
     const [restaurants, cities, total] = await Promise.all([
       this.prisma.platformDb.restaurant.findMany({ where: { deletedAt: null },

@@ -26,7 +26,8 @@ export const updateFeatureSchema = z
     appCode: z.enum(APP_CODES).nullable().optional(),
     dependsOnFeatureIds: z.array(z.string().uuid()).optional(),
     defaultDeviceQuota: z.number().int().positive().nullable().optional(),
-    isActive: z.boolean().optional()
+    isActive: z.boolean().optional(),
+    rolloutPercent: z.number().int().min(0).max(100).optional()
   })
   .strict();
 export type UpdateFeatureDto = z.infer<typeof updateFeatureSchema>;

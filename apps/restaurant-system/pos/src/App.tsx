@@ -12,8 +12,7 @@ import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
 import { PosSidebar } from './components/layout/PosSidebar';
 import { PosFooterKpiStrip } from './components/layout/PosFooterKpiStrip';
-import { PosCatalog } from './components/menu/PosCatalog';
-import { PosCart } from './components/cart/PosCart';
+import { PosBillingWorkspace } from './components/menu/PosBillingWorkspace';
 import { PosFloorPlan } from './components/tables/PosFloorPlan';
 import { PosTableSelectionScreen } from './components/tables/PosTableSelectionScreen';
 import { PosOrdersView } from './components/orders/PosOrdersView';
@@ -38,9 +37,11 @@ import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
 import { NotificationToastContainer, UrgentGuestAlertModal, JAMANVAARStartup, JamanvaarAuthLayout, APP_HERO_IMAGES, ActivationWelcomeScreen, ActivationNoticeBanner, ActivationHelpNote } from '@jamanvaar/ui';
-import { UtensilsCrossed, ArrowRight, AlertCircle } from 'lucide-react';
+import { Modal } from '@jamanvaar/ui';
+import { UtensilsCrossed, ArrowRight, AlertCircle, Menu } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isPosDeviceConnected());
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
@@ -328,7 +329,7 @@ export const App: React.FC = () => {
             { label: 'Offline First', icon: 'cloud' }
           ]}
           heroImages={APP_HERO_IMAGES.POS}
-          footerNote="Role-Based Security • Instant Offline Boot • 100% Secure"
+          footerNote="Role-Based Security • Instant Offline Boot • Role-based access"
         >
           <ActivationNoticeBanner />
           <div>
@@ -407,17 +408,20 @@ export const App: React.FC = () => {
 
   return (
     <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
-      <div className="h-screen w-screen flex flex-col gap-2.5 p-2.5 bg-jaman-cream overflow-hidden select-none">
+      <div data-jv-workspace="pos" className="h-dvh w-full flex flex-col gap-2.5 p-2.5 bg-jaman-cream overflow-hidden select-none">
         {/* Top Application Header */}
         <PosHeader />
 
       {/* Auto-saved Unfinished Order Recovery Notification */}
       <CrashRecoveryBanner />
+      <div className="xl:hidden shrink-0">
+        <button type="button" onClick={() => setNavigationOpen(true)} className="min-h-11 px-4 bg-white border border-jaman-border rounded-xl text-sm font-bold flex items-center gap-2"><Menu size={20} />Pages & categories</button>
+      </div>
 
       {/* Main Workspace Body */}
       <div className="flex-1 flex gap-2.5 overflow-hidden relative min-h-0">
         {/* Left Navigation Sidebar */}
-        <PosSidebar />
+        <div className="hidden xl:flex min-h-0"><PosSidebar /></div>
 
         {/* Dynamic Center Stage */}
         <main className={`flex-1 flex overflow-hidden relative min-w-0 ${activeTab === 'MENU' ? '' : 'rounded-2xl border border-jaman-border bg-white'}`}>
@@ -427,10 +431,7 @@ export const App: React.FC = () => {
             orderType === 'DINE_IN' && !selectedTable && (cart?.items?.length ?? 0) === 0 ? (
               <PosTableSelectionScreen />
             ) : (
-              <div className="flex-1 flex gap-2.5 overflow-hidden min-w-0">
-                <PosCatalog />
-                <PosCart />
-              </div>
+              <PosBillingWorkspace />
             )
           )}
 
@@ -451,6 +452,9 @@ export const App: React.FC = () => {
       <PosFooterKpiStrip />
 
       {/* Global Application Modals */}
+      <Modal isOpen={navigationOpen} onClose={() => setNavigationOpen(false)} title="Pages & categories" maxWidth="sm" bodyClassName="!p-0 flex min-h-0">
+        <PosSidebar onNavigate={() => setNavigationOpen(false)} className="!w-full h-[65dvh] !border-0 !rounded-none" />
+      </Modal>
       <PosPaymentModal />
       {/* Mounted globally (not tab-scoped) so F8 works from any tab, not just Menu. */}
       <PosHoldModal />

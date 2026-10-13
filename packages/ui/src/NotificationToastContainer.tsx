@@ -48,7 +48,7 @@ export const NotificationToastContainer: React.FC<NotificationToastContainerProp
   if (activeToasts.length === 0) return null;
 
   return (
-    <aside aria-label="System Notifications" role="status" aria-live="polite" className="fixed bottom-14 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none select-none">
+    <aside aria-label="System Notifications" role="status" aria-live="polite" className="fixed right-4 z-40 flex flex-col gap-2.5 pointer-events-none select-none" style={{ width: 'min(384px, calc(100vw - 32px))', bottom: 'calc(var(--jv-notification-bottom, 5rem) + env(safe-area-inset-bottom))', maxHeight: 'min(60dvh, 500px)', overflowY: 'auto' }}>
       {activeToasts.map((toast) => {
         const isEod = toast.type === 'BUSINESS_DAY_CLOSED' || toast.type === 'BUSINESS_DAY_STARTED';
         const isFoodReady = toast.type === 'FOOD_READY';

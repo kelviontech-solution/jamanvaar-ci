@@ -32,6 +32,11 @@ export class RestaurantPayoutsController {
     return this.payouts.platformOverview();
   }
 
+  @Get('reconciliation')
+  reconciliation() {
+    return this.payouts.reconciliationBoard();
+  }
+
   @Post('run-eod')
   @UsePipes(new ZodValidationPipe(runEodBatchSchema))
   runEod(@Body() body: RunEodBatchDto) {

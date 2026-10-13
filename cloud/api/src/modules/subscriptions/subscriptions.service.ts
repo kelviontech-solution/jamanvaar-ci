@@ -150,6 +150,43 @@ export class SubscriptionsService {
     });
   }
 
+  /**
+   * Super Admin feature request: bulk plan/feature changes -- "move every restaurant on Kiosk
+   * Standard to Kiosk Pro" instead of opening each one's Subscription tab individually. Reuses
+   * changePlan() per restaurant so every side effect (entitlement resync, audit log) stays
+   * identical to the single-restaurant flow; this only resolves which subscription row each
+   * restaurant's change applies to, and keeps going past a restaurant that doesn't qualify instead
+   * of failing the whole batch.
+   */
+  async bulkChangePlan(restaurantIds: string[], targetPlanId: string, actor: PlatformUser) {
+    const targetPlan = await this.prisma.runAsPlatform((tx) => tx.plan.findUnique({ where: { id: targetPlanId } }));
+    if (!targetPlan) throw new NotFoundException('Plan not found');
+
+    const results: Array<{ restaurantId: string; status: 'changed' | 'skipped'; reason?: string }> = [];
+    for (const restaurantId of restaurantIds) {
+      const existing = await this.prisma.runAsPlatform((tx) =>
+        tx.subscription.findFirst({
+          where: {
+            restaurantId,
+            status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] },
+            plan: { productFamily: targetPlan.productFamily }
+          }
+        })
+      );
+      if (!existing) {
+        results.push({ restaurantId, status: 'skipped', reason: `No active ${targetPlan.productFamily} subscription` });
+        continue;
+      }
+      if (existing.planId === targetPlanId) {
+        results.push({ restaurantId, status: 'skipped', reason: 'Already on this plan' });
+        continue;
+      }
+      await this.changePlan(existing.id, targetPlanId, actor);
+      results.push({ restaurantId, status: 'changed' });
+    }
+    return { changed: results.filter((r) => r.status === 'changed').length, skipped: results.filter((r) => r.status === 'skipped').length, results };
+  }
+
   async renew(id: string, expiresAt: Date, actor: PlatformUser) {
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.subscription.findUnique({ where: { id } });

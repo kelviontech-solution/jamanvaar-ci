@@ -128,9 +128,9 @@ export function KioskReceiptDeliveryDialog({ channel, onClose, onDone, onActivit
       {sending && <p role="status" className="rounded-xl bg-orange-50 p-3 text-sm text-jaman-navy">Please wait. This screen stays open while we send your bill.</p>}
       <section aria-label={email ? 'Email touch keyboard' : 'Phone touch keypad'} className="rounded-2xl border border-jaman-border bg-jaman-ivory p-2 sm:p-3 space-y-2">
         {email ? <>
-          {!symbolMode && <div className="flex gap-1 sm:gap-2">{[...'1234567890'].map(key)}</div>}
-          {(symbolMode ? symbols : letters).map((row, i) => <div className="flex gap-1 sm:gap-2" key={i}>{[...row].map(key)}</div>)}
-          <div className="flex gap-1 sm:gap-2">
+          {!symbolMode && <div className="grid grid-cols-5 sm:flex gap-1 sm:gap-2">{[...'1234567890'].map(key)}</div>}
+          {(symbolMode ? symbols : letters).map((row, i) => <div className="grid grid-cols-5 sm:flex gap-1 sm:gap-2" key={i}>{[...row].map(key)}</div>)}
+          <div className="grid grid-cols-4 sm:flex gap-1 sm:gap-2">
             <button type="button" aria-label="Shift" aria-pressed={shift} disabled={sending} onPointerDown={e => e.preventDefault()} onClick={() => { setShift(!shift);onActivity(); }} className={`${keyClass} ${shift ? '!bg-jaman-navy !text-white' : ''}`}>⇧</button>
             <button type="button" disabled={sending} onPointerDown={e => e.preventDefault()} onClick={() => { setSymbolMode(!symbolMode);onActivity(); }} className={keyClass}>{symbolMode ? 'ABC' : '?123'}</button>
             {['@', '.', '-', '_', '+'].map(key)}

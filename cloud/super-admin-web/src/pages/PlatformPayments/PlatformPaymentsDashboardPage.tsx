@@ -208,10 +208,6 @@ export function PlatformPaymentsDashboardPage() {
             {tile('Restaurant Share', formatRupees(summary.restaurantShare))}
             {tile('Refunded', formatRupees(summary.refundedAmount), 'warn')}
             {tile('Successful Payments', summary.successfulCount)}
-            <Card>
-              <div style={{ padding: 16 }}>
-              </div>
-            </Card>
           </div>
           <Card>
             <div style={{ padding: 16 }}>

@@ -43,6 +43,10 @@ import { PaymentConnectionsListPage } from '../pages/PaymentConnections/PaymentC
 import { PlatformPaymentsDashboardPage } from '../pages/PlatformPayments/PlatformPaymentsDashboardPage';
 import { PayoutsListPage } from '../pages/Payouts/PayoutsListPage';
 import { SaaSManagementPage } from '../pages/SaaSManagement/SaaSManagementPage';
+import { RestaurantHealthPage } from '../pages/RestaurantHealth/RestaurantHealthPage';
+import { AnnouncementsPage } from '../pages/Announcements/AnnouncementsPage';
+import { IncidentsPage } from '../pages/Incidents/IncidentsPage';
+import { MarginsPage } from '../pages/Margins/MarginsPage';
 
 /** Wraps a page element so a render crash on this one route can't blank the whole console. */
 function page(name: string, element: JSX.Element) {
@@ -66,6 +70,10 @@ export function App() {
                   habit/muscle-memory or an old bookmark would produce —
                   redirect it instead of 404ing. */}
               <Route path="/dashboard" element={<Navigate to="/" replace />} />
+              <Route path="/restaurant-health" element={page('RestaurantHealth', <RestaurantHealthPage />)} />
+              <Route path="/announcements" element={page('Announcements', <AnnouncementsPage />)} />
+              <Route path="/status-history" element={page('Incidents', <IncidentsPage />)} />
+              <Route path="/margins" element={page('Margins', <MarginsPage />)} />
               <Route path="/restaurants" element={page('RestaurantsList', <RestaurantsListPage />)} />
               <Route path="/restaurants/onboard" element={page('OnboardRestaurant', <OnboardRestaurantPage />)} />
               <Route path="/restaurants/:id" element={page('RestaurantDetail', <RestaurantDetailPage />)} />

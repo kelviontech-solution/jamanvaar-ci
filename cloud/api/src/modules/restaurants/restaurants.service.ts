@@ -294,7 +294,12 @@ export class RestaurantsService {
 
       // A restaurant created before it had a mobile number has no Restaurant ID; the first mobile given to it assigns one, once.
       // After that the code never follows the mobile (a changed phone must not change the ID printed on keys and QR codes).
-      const data = !existing.restaurantCode && dto.mobile ? { ...dto, restaurantCode: generateRestaurantCode(dto.mobile) } : dto;
+      const { branding, ...rest } = dto;
+      const data: Record<string, unknown> = !existing.restaurantCode && dto.mobile
+        ? { ...rest, restaurantCode: generateRestaurantCode(dto.mobile) }
+        : { ...rest };
+      // Merge, never replace wholesale -- see the schema comment on `branding` for why.
+      if (branding) data.brandingProfile = { ...((existing.brandingProfile as object) ?? {}), ...branding };
       let updated;
       try {
         updated = await tx.restaurant.update({ where: { id }, data });

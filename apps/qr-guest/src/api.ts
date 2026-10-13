@@ -1,4 +1,5 @@
 import { resolveMenuImage } from '../../../packages/utils/src/menu_image';
+import { guestErrorMessage } from './guestErrors';
 import { menuDishImage } from '../../../packages/utils/src/dish_photos';
 
 /**
@@ -70,7 +71,7 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
   }
   if (res.status === 304) return { data: null, status: 304, etag: res.headers.get('etag') };
   const body = (await res.json().catch(() => null)) as (T & { message?: string; code?: string }) | null;
-  if (!res.ok) throw new ApiError(body?.message ?? 'Something went wrong. Please try again.', res.status, body?.code);
+  if (!res.ok) throw new ApiError(guestErrorMessage(body?.message, body?.code), res.status, body?.code);
   if (!body || typeof body !== 'object') throw new ApiError('The ordering service returned an unreadable response. Please try again.', 502, 'BAD_RESPONSE');
   return { data: body as T, status: res.status, etag: res.headers.get('etag') };
 }

@@ -421,6 +421,44 @@ export class BackupsService {
     return { ...updated, verificationNote };
   }
 
+  /**
+   * Super Admin feature request: automated backup integrity checks. Every snapshot used to sit at
+   * "UNVERIFIED" forever unless someone opened Backups & Recovery and clicked "Verify SHA256
+   * checksum" on it by hand -- with 56+ snapshots in a normal fleet, that badge meant nothing
+   * because almost nothing had ever actually been checked. This job runs the exact same checksum
+   * inspection verifyBackup() does (same inspectStoredBackup helper, same VERIFIED/CORRUPT outcome
+   * and audit trail) but on a schedule, with a SYSTEM actor instead of a clicking human, so
+   * "UNVERIFIED" becomes a real, shrinking queue instead of the default resting state.
+   */
+  async verifyDueBackups() {
+    const due = await this.prisma.runAsPlatform((tx) =>
+      tx.backup.findMany({
+        where: { status: 'COMPLETED', verificationStatus: 'UNVERIFIED' },
+        orderBy: { createdAt: 'asc' },
+        take: 50
+      })
+    );
+    let verified = 0;
+    let corrupt = 0;
+    for (const backup of due) {
+      const inspected = await this.inspectStoredBackup(backup);
+      const verificationStatus = inspected.ok ? 'VERIFIED' : 'CORRUPT';
+      await this.prisma.runAsPlatform((tx) =>
+        tx.backup.update({ where: { id: backup.id }, data: { verificationStatus, verifiedAt: new Date() } })
+      );
+      await this.audit.log({
+        actorType: 'SYSTEM',
+        restaurantId: backup.restaurantId,
+        action: `BACKUP_VERIFY_${verificationStatus}`,
+        category: 'BACKUP',
+        details: { backupId: backup.id, checksum: backup.checksumSha256, sizeBytes: backup.sizeBytes, note: inspected.ok ? 'Checksum matches and the file parses.' : inspected.note, automated: true }
+      });
+      if (inspected.ok) verified++;
+      else corrupt++;
+    }
+    return { checked: due.length, verified, corrupt };
+  }
+
   async previewRestore(backupId: string, targetType: 'STAGING_PREVIEW' | 'PRODUCTION_RESTORE', actor: PlatformUser) {
     const backup = await this.prisma.runAsPlatform((tx) =>
       tx.backup.findUnique({ where: { id: backupId }, include: { restaurant: true } })

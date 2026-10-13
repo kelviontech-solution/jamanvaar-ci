@@ -5,6 +5,7 @@ import { ts } from '../../common/sql';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { BrandingService, SellerEntity } from '../platform-settings/branding.service';
+import { EmailService } from '../notifications/email.service';
 import { CreateInvoiceDto, RecordPaymentDto, TenantPaymentDto } from './dto/invoice.dto';
 
 export interface TaxBreakup {
@@ -26,7 +27,8 @@ export class InvoicesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly branding: BrandingService
+    private readonly branding: BrandingService,
+    private readonly email: EmailService
   ) {}
 
   /**
@@ -226,21 +228,45 @@ export class InvoicesService {
 
   /** Unpaid invoices whose due date has passed become PAST_DUE. Run by the scheduler; safe to repeat. */
   async markOverdueInvoices() {
-    return this.prisma.runAsPlatform(async (tx) => {
-      const due = await tx.invoice.findMany({
+    const due = await this.prisma.runAsPlatform(async (tx) => {
+      const rows = await tx.invoice.findMany({
         where: { status: 'ISSUED', dueDate: { lt: new Date() } },
-        select: { id: true, restaurantId: true, invoiceNumber: true }
+        select: {
+          id: true,
+          restaurantId: true,
+          invoiceNumber: true,
+          totalAmount: true,
+          restaurant: { select: { name: true, users: { where: { role: 'OWNER' }, select: { fullName: true, email: true } } } }
+        }
       });
-      if (!due.length) return { marked: 0 };
-      await tx.invoice.updateMany({ where: { id: { in: due.map((d) => d.id) } }, data: { status: 'PAST_DUE' } });
-      for (const inv of due) {
+      if (!rows.length) return [];
+      await tx.invoice.updateMany({ where: { id: { in: rows.map((d) => d.id) } }, data: { status: 'PAST_DUE' } });
+      for (const inv of rows) {
         await this.audit.log(
           { actorType: 'SYSTEM', restaurantId: inv.restaurantId, action: 'INVOICE_MARKED_OVERDUE', category: 'BILLING', details: { invoiceId: inv.id, invoiceNumber: inv.invoiceNumber } },
           tx
         );
       }
-      return { marked: due.length };
+      return rows;
     });
+
+    // Super Admin feature request: dunning -- the restaurant owner used to never hear about an
+    // overdue invoice directly (only the internal PlatformNotification feed knew). One email per
+    // owner per overdue invoice; EmailService itself no-ops gracefully when SMTP isn't configured.
+    for (const inv of due) {
+      const owner = inv.restaurant.users[0];
+      if (!owner?.email) continue;
+      await this.email.send(
+        owner.email,
+        `Invoice ${inv.invoiceNumber} is overdue`,
+        `<p>Hi ${owner.fullName || 'there'},</p>
+         <p>Invoice <strong>${inv.invoiceNumber}</strong> for <strong>${inv.restaurant.name}</strong>
+         (₹${(inv.totalAmount / 100).toLocaleString('en-IN')}) is now past its due date.
+         Please arrange payment to avoid any interruption to your JAMANVAAR subscription.</p>`
+      );
+    }
+
+    return { marked: due.length };
   }
 
   async getById(id: string) {

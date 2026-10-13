@@ -379,7 +379,11 @@ export function OwnersListPage() {
 
                   <div className="mgmt-card-header-right">
                     <Badge tone={statusTone(o.status)} pulse={isActive}>
-                      {o.status === 'PENDING_ACTIVATION' ? 'PENDING' : o.status}
+                      {o.status === 'PENDING_ACTIVATION'
+                        ? 'PENDING'
+                        : o.status === 'DISABLED'
+                          ? 'SUSPENDED'
+                          : o.status}
                     </Badge>
 
                     <div className="more-actions-menu-container">

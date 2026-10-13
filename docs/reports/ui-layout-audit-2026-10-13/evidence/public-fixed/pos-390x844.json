@@ -1,0 +1,63 @@
+{
+  "name": "pos",
+  "width": 390,
+  "height": 844,
+  "route": "/",
+  "text": "Local Core: Unreachable\nNetwork: Online\nSmart Billing.\nBetter Dining.\n\nFast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nPOS TERMINAL\nPOS Counter\n\nOne-time setup — activate this terminal to start billing.\n\nActivate This Terminal\n\nEnter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.\n\nActivation Key *\nActivate Terminal\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per terminal and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Smart Billing.\nBetter Dining.",
+      "font": "30px"
+    },
+    {
+      "text": "POS Counter",
+      "font": "24px"
+    },
+    {
+      "text": "Activate This Terminal",
+      "font": "20px"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:56546/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/butter-naan.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Network: Online",
+      "width": 128,
+      "height": 62
+    },
+    {
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "width": 308,
+      "height": 46
+    },
+    {
+      "text": "Activate Terminal",
+      "width": 308,
+      "height": 52
+    }
+  ],
+  "errors": [],
+  "screenshot": "pos-390x844.png"
+}

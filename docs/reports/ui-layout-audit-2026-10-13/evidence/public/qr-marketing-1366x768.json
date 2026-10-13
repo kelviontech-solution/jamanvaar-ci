@@ -1,0 +1,261 @@
+{
+  "name": "qr-marketing",
+  "width": 1366,
+  "height": 768,
+  "route": "/qr/",
+  "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nFROM YOUR TABLE TO THEIR PHONE\nEvery table.\nA delicious\nnew experience.\n\nGuests scan, explore your menu, make it their own and order from their phones. You manage the menu, payments and kitchen handoff in one clear workspace.\n\nExplore QR Ordering →\nLogin to QR Admin\n\nWorks as a standalone product. Connect POS, KDS and Captain when licensed.\n\nGood food begins here.\n▦\nIllustrative table card · not a live QR\nJAMANVAAR · DEMO TABLE\nA taste of home.\n\nFresh flavours. Your favourites.\n\nGujarati Thali\n₹299\nTry the sample menu\n✓ Clear totals\nSecure online checkout or pay at counter\nMORE TIME FOR HOSPITALITY\nSimple for your guests.\nUseful for your team.\n01\nA menu in every hand\n\nGuests browse food images, customise dishes and check their cart before ordering.\n\n02\nYour menu stays yours\n\nPublish prices deliberately and keep availability current across your branch.\n\n03\nA connected service\n\nSee QR orders in QR Admin and route them into licensed counter and kitchen workflows.\n\nTRY IT WITHOUT SIGNING IN\nMeet your next\ndigital menu.\n\nA sample guest experience. Explore a dish, choose extras and preview checkout. This demo cannot submit an order or collect money.\n\nDEMO · NO REAL ORDERS OR PAYMENTS\nGujarati Thali\n\nShaak, dal, rice, rotli and a sweet finish.\n\n₹299\nCustomise dish\nA COMPLETE ORDERING WORKSPACE\nFrom the first scan\nto the last plate.\nSmart digital menu\n\nCategories, search, variants, add-ons and published menu images.\n\nTables & QR\n\nMap codes to tables and download print-ready designs.\n\nOrders & payments\n\nPayment status stays separate from preparation and completion.\n\nInsights that matter\n\nUnderstand accepted orders, confirmed collections and outstanding cash.\n\nYour restaurant, your page\n\nReview branding and the customer page before saving changes.\n\nOptional advanced tools\n\nLanguages, loyalty, group ordering, feedback and promotions are available when licensed and enabled.\n\nLess waiting. More enjoying.\nDESIGNED AROUND YOUR GUESTS\nA menu that feels\nlike your restaurant.\n\nYour food, your photos, your welcome. Let guests find a favourite, choose their extras and see clear totals before checkout.\n\n01\nMake it personal\n\nKeep your logo, colours and welcome message in the customer experience.\n\n02\nMake ordering comfortable\n\nMobile-friendly menus, useful choices and table assistance when enabled.\n\n03\nKeep guests informed\n\nReal preparation, readiness and completion updates from your team.\n\nTry the guest experience →\nYOUR FIRST TABLE, STEP BY STEP\nSet up once. Serve every day.\nSign in and activate your licensed QR Admin access.\nConfirm your restaurant and branch.\nReview and publish the menu you already manage.\nChoose payment methods and ordering hours.\nMap, design and print your table QR codes.\nCheck your setup, then manage orders as guests arrive.\nActivate QR Ordering →\nPAYMENTS WITH CLARITY\nThe choice is yours.\nThe totals are clear.\nOnline, when configured\n\nSecure Razorpay checkout appears when your merchant integration is ready. A payment is confirmed after backend verification.\n\nCash at counter\n\nEnable counter collection independently. Staff record money received, while guests see the balance due.\n\nILLUSTRATIVE CHECKOUT\nOne meal. Clear choices.\nOnline checkout\nVerified by your payment provider\nPay at counter\nCollected and recorded by staff\n\nGuests see the methods you enable. Both use the same order record.\n\nFROM THE FLOOR TO THE PASS\nGood food deserves\na smooth handoff.\n\nBring QR orders into your branch’s workflow. Follow progress in QR Admin and connect your licensed POS, Captain and kitchen displays.\n\nGuest order\n→\nYour team\n→\nReady to serve\nExplore your workspace →\nOne branch. One connected team.\nONE RESTAURANT PLATFORM\nQR on its own.\nMore connected together.\nRestaurant Admin\nPOS\nKitchen / KDS\nCaptain\nVerified payment gateway\n\nQR Ordering can operate through its own admin workspace. Additional applications follow your subscription and branch configuration.\n\nA few things you might ask.\nDo my guests need an app?\nDo I need a POS subscription?\nWhere do I get an activation key?\nCan I recover my account?\nDoes the demo place real orders?\nA warm welcome.\nA simpler way to order.\nGet started\n\nQR Ordering · Built by Kelviontech\n\nQR Admin login\nAccount recovery\nRestaurant Admin",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Every table.\nA delicious\nnew experience.",
+      "font": "65.568px"
+    },
+    {
+      "text": "A taste of home.",
+      "font": "40.98px"
+    },
+    {
+      "text": "Simple for your guests.\nUseful for your team.",
+      "font": "40.98px"
+    },
+    {
+      "text": "A menu in every hand",
+      "font": "18px"
+    },
+    {
+      "text": "Your menu stays yours",
+      "font": "18px"
+    },
+    {
+      "text": "A connected service",
+      "font": "18px"
+    },
+    {
+      "text": "Meet your next\ndigital menu.",
+      "font": "40.98px"
+    },
+    {
+      "text": "Gujarati Thali",
+      "font": "18px"
+    },
+    {
+      "text": "From the first scan\nto the last plate.",
+      "font": "40.98px"
+    },
+    {
+      "text": "Smart digital menu",
+      "font": "18px"
+    },
+    {
+      "text": "Tables & QR",
+      "font": "18px"
+    },
+    {
+      "text": "Orders & payments",
+      "font": "18px"
+    },
+    {
+      "text": "Insights that matter",
+      "font": "18px"
+    },
+    {
+      "text": "Your restaurant, your page",
+      "font": "18px"
+    },
+    {
+      "text": "Optional advanced tools",
+      "font": "18px"
+    },
+    {
+      "text": "A menu that feels\nlike your restaurant.",
+      "font": "40.98px"
+    },
+    {
+      "text": "Make it personal",
+      "font": "15px"
+    },
+    {
+      "text": "Make ordering comfortable",
+      "font": "15px"
+    },
+    {
+      "text": "Keep guests informed",
+      "font": "15px"
+    },
+    {
+      "text": "Set up once. Serve every day.",
+      "font": "40.98px"
+    },
+    {
+      "text": "The choice is yours.\nThe totals are clear.",
+      "font": "40.98px"
+    },
+    {
+      "text": "Online, when configured",
+      "font": "18px"
+    },
+    {
+      "text": "Cash at counter",
+      "font": "18px"
+    },
+    {
+      "text": "One meal. Clear choices.",
+      "font": "18px"
+    },
+    {
+      "text": "Good food deserves\na smooth handoff.",
+      "font": "40.98px"
+    },
+    {
+      "text": "QR on its own.\nMore connected together.",
+      "font": "40.98px"
+    },
+    {
+      "text": "A few things you might ask.",
+      "font": "40.98px"
+    },
+    {
+      "text": "A warm welcome.\nA simpler way to order.",
+      "font": "40.98px"
+    }
+  ],
+  "images": [
+    {
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/menu/thali/gujarati-thali.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/qr/assets/qr-experience/dining.webp",
+      "loaded": false
+    },
+    {
+      "src": "/qr/assets/qr-experience/kitchen.webp",
+      "loaded": false
+    },
+    {
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "QR ORDERING\nA little scan. A better meal.",
+      "width": 263,
+      "height": 52
+    },
+    {
+      "text": "Menu",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "text": "Features",
+      "width": 45,
+      "height": 18
+    },
+    {
+      "text": "How it works",
+      "width": 69,
+      "height": 18
+    },
+    {
+      "text": "Benefits",
+      "width": 42,
+      "height": 18
+    },
+    {
+      "text": "Payments",
+      "width": 51,
+      "height": 18
+    },
+    {
+      "text": "Integrations",
+      "width": 64,
+      "height": 18
+    },
+    {
+      "text": "FAQ",
+      "width": 22,
+      "height": 18
+    },
+    {
+      "text": "Login",
+      "width": 34,
+      "height": 20
+    },
+    {
+      "text": "Get started",
+      "width": 112,
+      "height": 46
+    },
+    {
+      "text": "Explore QR Ordering →",
+      "width": 185,
+      "height": 46
+    },
+    {
+      "text": "Login to QR Admin",
+      "width": 161,
+      "height": 46
+    },
+    {
+      "text": "Try the sample menu",
+      "width": 219,
+      "height": 62
+    },
+    {
+      "text": "Customise dish",
+      "width": 136,
+      "height": 46
+    },
+    {
+      "text": "Try the guest experience →",
+      "width": 209,
+      "height": 46
+    },
+    {
+      "text": "Activate QR Ordering →",
+      "width": 189,
+      "height": 46
+    },
+    {
+      "text": "Explore your workspace →",
+      "width": 204,
+      "height": 46
+    },
+    {
+      "text": "Get started",
+      "width": 112,
+      "height": 46
+    },
+    {
+      "text": "QR Admin login",
+      "width": 84,
+      "height": 18
+    },
+    {
+      "text": "Account recovery",
+      "width": 92,
+      "height": 18
+    },
+    {
+      "text": "Restaurant Admin",
+      "width": 94,
+      "height": 18
+    }
+  ],
+  "errors": [],
+  "screenshot": "qr-marketing-1366x768.png"
+}

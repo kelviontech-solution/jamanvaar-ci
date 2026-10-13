@@ -24,6 +24,12 @@ export const changePlanSchema = z.object({
   planId: z.string().min(1)
 });
 
+export const bulkChangePlanSchema = z.object({
+  restaurantIds: z.array(z.string().uuid()).min(1).max(200),
+  planId: z.string().min(1)
+});
+export type BulkChangePlanDto = z.infer<typeof bulkChangePlanSchema>;
+
 export const extendSchema = z.object({
   days: z.number().int().min(1).max(365)
 });

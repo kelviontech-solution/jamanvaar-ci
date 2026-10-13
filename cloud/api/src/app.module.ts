@@ -9,6 +9,10 @@ import { PlatformAuthModule } from './modules/platform-auth/platform-auth.module
 import { TenantAuthModule } from './modules/tenant-auth/tenant-auth.module';
 import { RestaurantsModule } from './modules/restaurants/restaurants.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { RestaurantHealthModule } from './modules/restaurant-health/restaurant-health.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
+import { IncidentsModule } from './modules/incidents/incidents.module';
+import { DigestModule } from './modules/digest/digest.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ActivationKeysModule } from './modules/activation-keys/activation-keys.module';
@@ -91,6 +95,10 @@ import { validateEnv } from './config/env.validation';
     TenantAuthModule,
     RestaurantsModule,
     DashboardModule,
+    RestaurantHealthModule,
+    AnnouncementsModule,
+    IncidentsModule,
+    DigestModule,
     PlansModule,
     SubscriptionsModule,
     ActivationKeysModule,

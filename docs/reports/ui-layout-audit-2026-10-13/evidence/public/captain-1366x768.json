@@ -1,0 +1,68 @@
+{
+  "name": "captain",
+  "width": 1366,
+  "height": 768,
+  "route": "/",
+  "text": "Local Core: Unreachable\nPair\nNetwork: Online\nTue, 13 Oct 2026\nTouch-First Restaurant Floor Command\nInstant KOT\n\nReal-time table ordering, live KDS food ready alerts, and fast billing requests with zero cloud latency.\n\nFast Billing\nInstant KOT\nTable Management\nOffline First\nFull-Course Thali\nMain Course\nTable Beverages\nWELCOME TO\nCAPTAIN APP\nFloor Captain & Service\n\nHigh-Speed Table Orders & Service\n\nActivate this Tablet\n\nOne-time setup — enter the activation key from your Super Admin Welcome Kit. Nothing else is needed.\n\nActivation Key *\nActivate Tablet\n\nDON'T HAVE AN ACTIVATION KEY?\n\n1\nYour restaurant needs an active JAMANVAAR plan — set up once by our Super Admin team.\n2\nOnce the plan is active, your restaurant owner gets one key per tablet and shares it with you.\nRole-Based Security\n•\nInstant Offline Boot\n•\n100% Secure\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "horizontalOverflow": false,
+  "headings": [
+    {
+      "text": "Touch-First Restaurant Floor Command\nInstant KOT",
+      "font": "42px"
+    },
+    {
+      "text": "Floor Captain & Service",
+      "font": "30px"
+    },
+    {
+      "text": "Activate this Tablet",
+      "font": "24px"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:64746/assets/full-Dm5gQFLD.png",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/thali/gujarati-thali.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/main-course/DM-05.jpg",
+      "loaded": true
+    },
+    {
+      "src": "/assets/menu/beverages/mojito.jpg",
+      "loaded": true
+    }
+  ],
+  "controls": [
+    {
+      "text": "Pair",
+      "width": 34,
+      "height": 24
+    },
+    {
+      "text": "Network: Online",
+      "width": 146,
+      "height": 46
+    },
+    {
+      "text": "JMV-XXXX-XXXX-XXXX",
+      "width": 478,
+      "height": 46
+    },
+    {
+      "text": "Activate Tablet",
+      "width": 478,
+      "height": 52
+    }
+  ],
+  "errors": [],
+  "screenshot": "captain-1366x768.png"
+}

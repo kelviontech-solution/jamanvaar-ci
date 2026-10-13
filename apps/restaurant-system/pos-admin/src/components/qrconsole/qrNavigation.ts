@@ -20,7 +20,7 @@ export const QR_PAGES = [
   {
     id: "OVERVIEW",
     label: "Overview",
-    group: "Today & orders",
+    group: "Live operations",
     icon: LayoutDashboard,
     description:
       "Your branch at a glance. Keep orders moving and your guest experience ready.",
@@ -28,7 +28,7 @@ export const QR_PAGES = [
   {
     id: "ORDERS",
     label: "QR Orders",
-    group: "Today & orders",
+    group: "Live operations",
     icon: ReceiptText,
     description:
       "Follow every guest order, verify payments and manage kitchen progress.",
@@ -36,14 +36,14 @@ export const QR_PAGES = [
   {
     id: "SERVICE",
     label: "Service Requests",
-    group: "Today & orders",
+    group: "Live operations",
     icon: BellRing,
     description: "Respond to table requests and keep your floor team in sync.",
   },
   {
     id: "MENU",
     label: "Menu & Availability",
-    group: "Menu",
+    group: "Menu & guests",
     icon: UtensilsCrossed,
     description:
       "Create dishes, organise categories and publish the menu your guests see.",
@@ -51,21 +51,21 @@ export const QR_PAGES = [
   {
     id: "TABLES",
     label: "Tables & QR",
-    group: "Tables & guest experience",
+    group: "Launch setup",
     icon: QrCode,
     description: "Connect each table to the right menu and manage its QR code.",
   },
   {
     id: "DESIGN",
     label: "QR Design Studio",
-    group: "Tables & guest experience",
+    group: "Branding",
     icon: Palette,
     description: "Make table cards that feel at home in your restaurant.",
   },
   {
     id: "BRAND",
     label: "Customer Branding",
-    group: "Tables & guest experience",
+    group: "Branding",
     icon: Paintbrush,
     description:
       "Preview and personalise your customer menu before applying changes.",
@@ -73,7 +73,7 @@ export const QR_PAGES = [
   {
     id: "PAYMENTS",
     label: "Payment Settings",
-    group: "Payments",
+    group: "Launch setup",
     icon: CreditCard,
     description:
       "Control online checkout and counter payments with clear collection status.",
@@ -81,7 +81,7 @@ export const QR_PAGES = [
   {
     id: "RULES",
     label: "Ordering Rules",
-    group: "Settings",
+    group: "Launch setup",
     icon: Clock3,
     description:
       "Set opening hours, preparation time and the ordering modes you offer.",
@@ -89,7 +89,7 @@ export const QR_PAGES = [
   {
     id: "PICKUP",
     label: "Pickup Scheduling",
-    group: "Settings",
+    group: "Advanced configuration",
     icon: CalendarClock,
     description:
       "Offer takeaway slots that respect your branch hours and kitchen capacity.",
@@ -97,14 +97,14 @@ export const QR_PAGES = [
   {
     id: "SETTINGS",
     label: "QR Settings",
-    group: "Settings",
+    group: "Launch setup",
     icon: Settings2,
     description: "Manage core ordering settings and customer-facing messages.",
   },
   {
     id: "ADVANCED",
     label: "Advanced Features",
-    group: "Settings",
+    group: "Advanced configuration",
     icon: Sparkles,
     description:
       "Configure licensed languages, loyalty, promotions and operational tools.",

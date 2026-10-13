@@ -6,7 +6,7 @@ export const LoadingState: React.FC<{ message?: string; className?: string }> = 
   message = 'Loading...',
   className = ''
 }) => (
-  <div className={`flex flex-col items-center justify-center p-12 text-center select-none ${className}`}>
+  <div role="status" aria-live="polite" aria-busy="true" className={`jv-state flex flex-col items-center justify-center p-6 sm:p-12 text-center select-none ${className}`}>
     <div className="w-12 h-12 rounded-full border-4 border-[#EBE6DD] border-t-[#E66817] animate-spin"></div>
     <p className="mt-4 text-base font-semibold text-[#0B253A]">{message}</p>
   </div>
@@ -27,7 +27,7 @@ export const EmptyState: React.FC<{
   icon,
   className = ''
 }) => (
-  <div className={`flex flex-col items-center justify-center p-12 text-center bg-white rounded-2xl border border-[#EBE6DD] ${className}`}>
+  <div className={`jv-state flex flex-col items-center justify-center p-6 sm:p-12 text-center bg-white rounded-2xl border border-[#EBE6DD] ${className}`}>
     <div className="w-16 h-16 rounded-2xl bg-[#FBF9F5] border border-[#EBE6DD] flex items-center justify-center text-[#52677A] mb-4">
       {icon || <UtensilsCrossed className="w-8 h-8 text-[#E66817]" />}
     </div>
@@ -54,7 +54,7 @@ export const ErrorState: React.FC<{
   onRetry,
   className = ''
 }) => (
-  <div className={`flex flex-col items-center justify-center p-12 text-center bg-white rounded-2xl border border-rose-200 ${className}`}>
+  <div role="alert" className={`jv-state flex flex-col items-center justify-center p-6 sm:p-12 text-center bg-white rounded-2xl border border-rose-200 ${className}`}>
     <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mb-4">
       <AlertCircle className="w-8 h-8" />
     </div>

@@ -500,3 +500,13 @@ input[type='range']:focus-visible,
 :root[data-theme='dark'] .btn-primary,
 :root[data-theme='dark'] .ui-filter-pill.active { background: #d9e2ec; border-color: transparent; }
 :root[data-theme='dark'] .btn-primary:hover:not(:disabled) { background: #e8eef6; }
+
+/* Dark: .chart-bar-pillar-navy (dashboard.css) fills with --jv-primary, which is the right navy
+   in light mode but is redefined to near-white as a TEXT color in dark mode -- every "navy" bar
+   on the Executive Dashboard and Reports & Analytics charts rendered as a pale, barely-visible
+   sliver instead of a distinct color. --jv-teal stays a genuinely visible, distinct hue in both
+   themes, so it's used here instead of trying to keep --jv-primary dual-purpose. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .chart-bar-pillar-navy { background: var(--jv-teal); }
+}
+:root[data-theme='dark'] .chart-bar-pillar-navy { background: var(--jv-teal); }

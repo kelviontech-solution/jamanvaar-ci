@@ -62,22 +62,23 @@ export const Modal: React.FC<ModalProps> = ({
         ref={cardRef}
         tabIndex={-1}
         role="dialog"
+        data-jv-dialog
         aria-modal="true"
         {...(title ? { 'aria-labelledby': titleId } : { 'aria-label': 'Dialog' })}
-        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col focus:outline-none ${className}`}
+        className={`relative w-full ${widthClasses[maxWidth]} max-h-[90dvh] bg-white rounded-3xl shadow-2xl border border-[#EBE6DD] overflow-hidden z-10 animate-scaleUp flex flex-col focus:outline-none ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-[#F3EFE6] bg-[#FBF9F5] shrink-0">
-            <h2 id={titleId} className="text-xl font-bold text-[#0B253A]">{title}</h2>
+            <h2 id={titleId} className="text-lg sm:text-xl font-bold text-[#0B253A] min-w-0 break-words">{title}</h2>
             {showCloseButton && (
               <button
                 type="button"
                 data-modal-close
                 onClick={onClose}
                 aria-label={title ? `Close ${title}` : 'Close dialog'}
-                className="w-9 h-9 rounded-full bg-white border border-[#EBE6DD] text-[#4A5568] hover:text-[#0B253A] hover:bg-[#F8F6F0] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B253A]/60"
+                className="w-11 h-11 shrink-0 rounded-full bg-white border border-[#EBE6DD] text-[#4A5568] hover:text-[#0B253A] hover:bg-[#F8F6F0] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B253A]/60"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -86,11 +87,11 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className={`p-6 overflow-y-auto flex-1 ${bodyClassName}`}>{children}</div>
+        <div className={`jv-dialog-body p-4 sm:p-6 overflow-y-auto flex-1 ${bodyClassName}`}>{children}</div>
 
         {/* Sticky footer action bar */}
         {footer && (
-          <div className="px-6 py-4 border-t border-[#F3EFE6] bg-white shrink-0">{footer}</div>
+          <div className="jv-dialog-footer px-4 sm:px-6 py-4 border-t border-[#F3EFE6] bg-white shrink-0">{footer}</div>
         )}
       </div>
     </div>

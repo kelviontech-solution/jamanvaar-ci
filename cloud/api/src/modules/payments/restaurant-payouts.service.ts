@@ -288,9 +288,18 @@ export class RestaurantPayoutsService {
     const blockedBatch: Prisma.RestaurantPayoutWhereInput = { OR: [
       { status: { in: ['ON_HOLD', 'FAILED'] } }, { payments: { some: blockedPayment } }
     ] };
+    // Same eligibility runEodBatch() uses to decide who actually gets a payout row. Collections
+    // sitting on a restaurant that hasn't verified its bank yet cannot be claimed by the batch, so
+    // they must not inflate "Pending payout" either -- that number promises money the batch can
+    // claim today, not money collected in general (see pendingPayout below).
+    const verifiedConnections = await tx.restaurantPaymentConnection.findMany({
+      where: { status: 'ACTIVE', bankVerificationStatus: 'VERIFIED' },
+      select: { restaurantId: true }
+    });
+    const verifiedRestaurantIds = verifiedConnections.map((c) => c.restaurantId);
     const [collected, unbatched, heldUnbatched, pending, heldBatches, paid, refunds, unallocated, refundRows] = await Promise.all([
       tx.paymentTransaction.aggregate({ where: captured, _sum: { amount: true, platformAmount: true, restaurantAmount: true } }),
-      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, NOT: blockedPayment }, _sum: { restaurantAmount: true } }),
+      tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, NOT: blockedPayment, restaurantId: { in: verifiedRestaurantIds } }, _sum: { restaurantAmount: true } }),
       tx.paymentTransaction.aggregate({ where: { ...captured, payoutId: null, ...blockedPayment }, _sum: { restaurantAmount: true } }),
       tx.restaurantPayout.aggregate({ where: { ...tenant, status: { not: 'PAID' }, NOT: blockedBatch }, _sum: { netAmount: true } }),
       tx.restaurantPayout.aggregate({ where: { ...tenant, status: { not: 'PAID' }, ...blockedBatch }, _sum: { netAmount: true } }),
@@ -341,6 +350,69 @@ export class RestaurantPayoutsService {
 
   async restaurantSummary(restaurantId: string) {
     return this.prisma.runAsTenant(restaurantId, (tx) => this.collectionSummary(tx, restaurantId));
+  }
+
+  /**
+   * Super Admin feature request: settlement reconciliation view -- "why is this restaurant's money
+   * stuck" in one place, instead of having to cross-reference Payment Gateways' bank-verification
+   * column against Restaurant Payouts' totals by hand (exactly the gap that hid the "Pending payout"
+   * bug this same investigation found). Per restaurant with any money not yet paid out: how much is
+   * waiting on bank verification (BANK_NOT_VERIFIED -- the EOD batch skips these, see runEodBatch's
+   * own eligibility query), how much is excluded from ever batching because the underlying payment
+   * isn't a clean SUCCESS or has a refund in flight (blockedAmount), and how much is simply ready to
+   * be claimed on the next EOD run.
+   */
+  async reconciliationBoard() {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const connections = await tx.restaurantPaymentConnection.findMany({
+        where: { status: 'ACTIVE' },
+        select: { restaurantId: true, bankVerificationStatus: true, restaurant: { select: { name: true } } }
+      });
+      if (connections.length === 0) return { rows: [] };
+      const restaurantIds = connections.map((c) => c.restaurantId);
+      const capturedStatuses = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'] as const;
+      const blockedPayment: Prisma.PaymentTransactionWhereInput = {
+        OR: [{ status: { not: 'SUCCESS' } }, { refunds: { some: { status: { in: ['PENDING', 'SUCCESS'] } } } }]
+      };
+      const [claimable, blocked] = await Promise.all([
+        tx.paymentTransaction.groupBy({
+          by: ['restaurantId'],
+          where: { restaurantId: { in: restaurantIds }, status: { in: [...capturedStatuses] }, payoutId: null, NOT: blockedPayment },
+          _sum: { restaurantAmount: true }
+        }),
+        tx.paymentTransaction.groupBy({
+          by: ['restaurantId'],
+          where: { restaurantId: { in: restaurantIds }, status: { in: [...capturedStatuses] }, payoutId: null, ...blockedPayment },
+          _sum: { restaurantAmount: true }
+        })
+      ]);
+      const claimableMap = new Map(claimable.map((c) => [c.restaurantId, c._sum.restaurantAmount ?? 0]));
+      const blockedMap = new Map(blocked.map((b) => [b.restaurantId, b._sum.restaurantAmount ?? 0]));
+
+      const rows = connections
+        .map((c) => {
+          const claimableAmount = claimableMap.get(c.restaurantId) ?? 0;
+          const blockedAmount = blockedMap.get(c.restaurantId) ?? 0;
+          if (claimableAmount === 0 && blockedAmount === 0) return null;
+          const bankVerified = c.bankVerificationStatus === 'VERIFIED';
+          return {
+            restaurantId: c.restaurantId,
+            name: c.restaurant.name,
+            bankVerificationStatus: c.bankVerificationStatus,
+            claimableAmount,
+            blockedAmount,
+            reason: !bankVerified
+              ? 'BANK_NOT_VERIFIED'
+              : claimableAmount > 0
+                ? 'READY_FOR_NEXT_BATCH'
+                : 'ONLY_BLOCKED_TRANSACTIONS'
+          };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null)
+        .sort((a, b) => b.claimableAmount + b.blockedAmount - (a.claimableAmount + a.blockedAmount));
+
+      return { rows };
+    });
   }
 
   async restaurantPayoutHistory(restaurantId: string, page: number, limit: number) {
