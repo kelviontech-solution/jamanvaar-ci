@@ -1,0 +1,443 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\nEnabled\nAdvanced QR capabilities\n\nJAMANVAAR QR · 1 active codes · 2 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nFeatures for this branch\n\nOnly changed settings become local overrides. Settings follow restaurant defaults.\n\nCounted dish stock reservations\nUnavailable under current license\nVerified customer loyalty\nUnavailable under current license\nShared table sessions\nUnavailable under current license\nMultilingual menu\nUnavailable under current license\nPrivate order feedback\nUnavailable under current license\nBrowser order history\nUnavailable under current license\nOperational alerts\nUnavailable under current license\nShared kitchen workload\nUnavailable under current license\nMenu recommendations\nUnavailable under current license\nSave changes",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Features for this branch"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Save changes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 120,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 18,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Counted dish stock reservationsUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Verified customer loyaltyUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared table sessionsUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Multilingual menuUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Private order feedbackUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Browser order historyUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Operational alertsUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 7,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared kitchen workloadUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    },
+    {
+      "index": 8,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Menu recommendationsUnavailable under current license",
+      "placeholder": "",
+      "disabled": true,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": true
+    }
+  ]
+}

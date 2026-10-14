@@ -1,0 +1,112 @@
+{
+  "passed": 13,
+  "total": 13,
+  "tests": [
+    {
+      "name": "Guided setup imports selected categories, authors options/tax and publishes shared menu",
+      "passed": true,
+      "detail": {
+        "selectedTemplate": true,
+        "options": true,
+        "tax": true,
+        "publication": true
+      }
+    },
+    {
+      "name": "Payment wizard separates configuration from verified phone acceptance",
+      "passed": true,
+      "detail": {
+        "unverifiedSaveDisabled": true
+      }
+    },
+    {
+      "name": "Collection-date report exports full grouped totals and opens canonical timeline",
+      "passed": true,
+      "detail": {
+        "csv": true
+      }
+    },
+    {
+      "name": "Branded ZIP includes SVG cards, A4 sheets and replacement inventory",
+      "passed": true,
+      "detail": {
+        "zip": true,
+        "bytes": 334901
+      }
+    },
+    {
+      "name": "Shared service inbox supports assignment and supervisor escalation",
+      "passed": true,
+      "detail": {
+        "escalationPersisted": true
+      }
+    },
+    {
+      "name": "Pickup calendar displays booked slot and uses canonical completion on handover",
+      "passed": true,
+      "detail": {
+        "loaded": true,
+        "handoverCompleted": true
+      }
+    },
+    {
+      "name": "CRM consent, segmentation, audited export, follow-up and expiry are editable",
+      "passed": true,
+      "detail": {
+        "consent": true,
+        "segment": true,
+        "followup": true,
+        "csv": true,
+        "expirySaved": true
+      }
+    },
+    {
+      "name": "ONBOARDING phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    },
+    {
+      "name": "ACCEPTANCE phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    },
+    {
+      "name": "RECONCILIATION phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    },
+    {
+      "name": "PRINTPACK phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    },
+    {
+      "name": "CALENDAR phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    },
+    {
+      "name": "CRM phone layout",
+      "passed": true,
+      "detail": {
+        "overflow": false,
+        "unnamed": 0
+      }
+    }
+  ]
+}

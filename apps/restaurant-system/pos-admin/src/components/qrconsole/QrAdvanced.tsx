@@ -1,3 +1,5 @@
+import { QrOrderTimeline } from './QrWorkflows';
+import { Modal } from '@jamanvaar/ui';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { activeAdminBranch } from "../../adminBranchScope";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -133,6 +135,7 @@ export function QrDesignStudio({ showToast }: Props) {
   useEffect(() => {
     if (current.data) setDesign(current.data);
   }, [current.data]);
+  useQrUnsavedChanges(!!current.data&&JSON.stringify(design)!==JSON.stringify(current.data));
   const active = (tables.data ?? []).filter(
     (t) => t.qr?.status === "ACTIVE" && (!branch || t.branchId === branch),
   );
@@ -291,7 +294,7 @@ export function QrDesignStudio({ showToast }: Props) {
             disabled={busy || !design.instruction.trim()}
             onClick={() =>
               void run(async () => {
-                await QrAdminApi.savePrintDesign(design);
+                await QrAdminApi.savePrintDesign(design);current.reload();
                 showToast("QR design saved for future printing.");
               })
             }
@@ -422,7 +425,7 @@ export function QrOrderingRules({
     ready = useData(branch, () => QrAdminApi.paymentReadiness(branch));
   const [rules, setRules] = useState<QrRules | null>(null),
     [dirty, setDirty] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),[saveError,setSaveError]=useState('');
   useEffect(() => {
     if (settings.data?.rules) {
       setRules(settings.data.rules);
@@ -432,7 +435,7 @@ export function QrOrderingRules({
   useQrUnsavedChanges(dirty);
   const save = async (body: Parameters<typeof QrAdminApi.saveSettings>[0]) => {
     setBusy(true);
-    showToast('Saving settings…');
+    setSaveError('');showToast('Saving settings…');
     try {
       await QrAdminApi.saveSettings(body, branch);
       setDirty(false);
@@ -440,7 +443,7 @@ export function QrOrderingRules({
       ready.reload();
       showToast("Settings saved.");
     } catch (e) {
-      settings.reload();
+      setSaveError((e as Error).message);
       showToast((e as Error).message);
     } finally {
       setBusy(false);
@@ -496,7 +499,7 @@ export function QrOrderingRules({
           Restaurant defaults apply until a branch overrides a setting. Other
           branches keep their own configuration.
         </p>
-        <Failure error={settings.error || ready.error} />
+        <Failure error={saveError || settings.error || ready.error} />
         {branch && (
           <button
             disabled={busy}
@@ -623,6 +626,7 @@ export function QrOrderingRules({
                 <input
                   type="number"
                   min={key === "windowMinutes" ? 1 : 0}
+                  max={key==='minimumOrderPaise'?100000:key==='preparationMinutes'||key==='windowMinutes'?240:10000}
                   step={scale === 100 ? ".01" : "1"}
                   aria-label={label}
                   className={input}
@@ -792,6 +796,9 @@ export function QrOrderingRules({
 
 const QR_ORDER_SOUND_KEY = "qr_admin_new_order_sound";
 export function QrOperationalOrders({ showToast }: Props) {
+  const [timeline,setTimeline]=useState<string|null>(null);
+  const [view,setView]=useState('OPEN'),[cursor,setCursor]=useState(''),[previous,setPrevious]=useState<string[]>([]),[from,setFrom]=useState(''),[to,setTo]=useState('');
+  useEffect(()=>{setCursor('');setPrevious([]);},[view,from,to]);
   const { confirm, prompt, confirmDialog } = useConfirm();
   const [branch, setBranch] = useState(scopedBranch),
     [search, setSearch] = useState(""),
@@ -806,15 +813,15 @@ export function QrOperationalOrders({ showToast }: Props) {
       }
     });
   const branches = useData("branches", QrAdminApi.branches),
-    orders = useData(branch, () => QrAdminApi.orders(branch), 5000),
+    orders = useData([branch,status,search,view,cursor,from,to].join(":"), () => QrAdminApi.orderPage({branchId:branch,status,search,view,cursor,from,to}), 5000),
     seen = useRef<Set<string> | null>(null);
   useEffect(() => {
     if (!orders.data) return;
-    const ids = new Set(orders.data.map((o) => o.id));
+    const ids = new Set(orders.data.rows.map((o) => o.id));
     if (
       sound &&
       seen.current &&
-      orders.data.some((o) => o.status === "NEW" && !seen.current!.has(o.id))
+      orders.data.rows.some((o) => o.status === "NEW" && !seen.current!.has(o.id))
     ) {
       const audio = new AudioContext(),
         osc = audio.createOscillator(),
@@ -828,14 +835,7 @@ export function QrOperationalOrders({ showToast }: Props) {
     }
     seen.current = ids;
   }, [orders.data, sound]);
-  const list = (orders.data ?? []).filter(
-    (o) =>
-      (status === "ALL" || o.status === status) &&
-      [o.orderNumber, o.table, o.customerName]
-        .join(" ")
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-  );
+  const list = orders.data?.rows ?? [];
   const action = async (o: QrOrderRow, type: string) => {
     let reason: string | undefined;
     if (type === "CANCELLED") {
@@ -855,7 +855,7 @@ export function QrOperationalOrders({ showToast }: Props) {
       type === "COLLECT" &&
       !(await confirm({
         title: "Payment collected?",
-        message: `Confirm ${money(o.total)} was collected at the counter.`,
+        message: `Bill total ${money(o.total)}. Already collected ${money((o.balance?.collectedPaise??0)/100)}. Confirm ${money((o.balance?.outstandingPaise??Math.round(o.total*100))/100)} was received now.`,
         confirmLabel: "Yes, collected",
       }))
     )
@@ -881,7 +881,7 @@ export function QrOperationalOrders({ showToast }: Props) {
       <div className={box + " flex flex-wrap gap-4 items-end"}>
         <BranchSelect
           value={branch}
-          onChange={setBranch}
+          onChange={v=>{setBranch(v);setCursor('');setPrevious([]);}}
           branches={branches.data}
         />
         <label className="text-xs font-bold flex-1 min-w-40">
@@ -890,14 +890,14 @@ export function QrOperationalOrders({ showToast }: Props) {
             type="search"
             className={input}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {setSearch(e.target.value);setCursor('');setPrevious([]);}}
           />
         </label>
         <select
           aria-label="Order status"
           className={input + " !w-auto"}
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => {setStatus(e.target.value);setCursor('');setPrevious([]);}}
         >
           {[
             "ALL",
@@ -908,7 +908,7 @@ export function QrOperationalOrders({ showToast }: Props) {
             "COMPLETED",
             "CANCELLED",
           ].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{({ALL:'All orders',DRAFT:'Awaiting payment',NEW:'Awaiting acceptance',PREPARING:'In kitchen',READY:'Ready to serve',COMPLETED:'Closed',CANCELLED:'Cancelled'} as Record<string,string>)[s]||s}</option>
           ))}
         </select>
         <label className="text-sm flex gap-2">
@@ -934,6 +934,7 @@ export function QrOperationalOrders({ showToast }: Props) {
       </div>
       <Failure error={orders.error} />
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="flex flex-wrap gap-3 items-end rounded-2xl border bg-white p-4"><label>Order view<select aria-label="Order view" className={input} value={view} onChange={e=>setView(e.target.value)}><option value="OPEN">Actionable orders</option><option value="DUE">Unpaid accepted bills</option><option value="ALL">All order history</option></select></label><label>From (restaurant date)<input className={input} type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To (restaurant date)<input className={input} type="date" value={to} onChange={e=>setTo(e.target.value)}/></label><span>{orders.data?.total??0} matching orders. Includes older unpaid bills.</span><button disabled={!previous.length} className={button} onClick={()=>{setCursor(previous.at(-1)||'');setPrevious(p=>p.slice(0,-1));}}>Previous orders</button><button className={button} disabled={!orders.data?.nextCursor} onClick={()=>{setPrevious(p=>[...p,cursor]);setCursor(orders.data?.nextCursor||'');}}>Next orders</button></div>
         {list.map((o) => (
           <article key={o.id} className={box}>
             <div className="flex justify-between gap-3">
@@ -951,12 +952,12 @@ export function QrOperationalOrders({ showToast }: Props) {
                 )}
               </div>
               <span className="text-xs bg-jaman-ivory px-3 py-1 rounded-full h-fit">
-                {o.status === "DRAFT" ? "Awaiting payment" : o.status}
+                {o.status==='DRAFT'?'Awaiting payment':o.status.toLowerCase().replaceAll('_',' ')}
               </span>
             </div>
             <p className="text-sm text-slate-500 mt-2">
               {o.table ? "Table " + o.table : "Counter / takeaway"} ·{" "}
-              {new Date(o.placedAt).toLocaleTimeString()}
+              {new Date(o.placedAt).toLocaleString()}
             </p>
             <p className="text-sm mt-2">
               {o.paymentStatus === "SUCCESS"
@@ -979,7 +980,7 @@ export function QrOperationalOrders({ showToast }: Props) {
                 onClick={() => setDetail(o)}
               >
                 Details
-              </button>
+              </button><button className={button} onClick={()=>setTimeline(o.id)}>Timeline / payments</button>
               {o.status === "NEW" && (
                 <button
                   disabled={busy}
@@ -1027,21 +1028,8 @@ export function QrOperationalOrders({ showToast }: Props) {
           No matching QR orders. New orders appear here every five seconds.
         </p>
       )}
-      {detail && (
-        <div
-          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
-          role="dialog"
-          aria-label="QR order details"
-          aria-modal="true"
-        >
-          <div className={box + " w-full max-w-lg max-h-[85vh] overflow-auto"}>
-            <button
-              className="float-right text-sm"
-              onClick={() => setDetail(null)}
-            >
-              Close
-            </button>
-            <h2 className="text-xl font-bold">
+      <QrOrderTimeline id={timeline} onClose={()=>setTimeline(null)}/>
+      <Modal isOpen={!!detail} onClose={()=>setDetail(null)} title="QR order details">{detail && <div>            <h2 className="text-xl font-bold">
               {detail.orderNumber} · {detail.table}
             </h2>
             <ul className="my-4 space-y-3">
@@ -1081,9 +1069,7 @@ export function QrOperationalOrders({ showToast }: Props) {
             <p className="text-xs text-slate-500 mt-4">
               Paid cancellations require the existing Billing refund workflow.
             </p>
-          </div>
-        </div>
-      )}
+          </div>}</Modal>
     </div>
     {confirmDialog}
     </>
@@ -1283,7 +1269,8 @@ export function QrAnalyticsView({
 export function QrMenuAvailability({ showToast }: Props) {
   const [branch, setBranch] = useState(scopedBranch),
     [query, setQuery] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),[availabilityPage,setAvailabilityPage]=useState(0);
+  useEffect(()=>setAvailabilityPage(0),[query,branch]);
   const branches = useData("branches", QrAdminApi.branches),
     menu = useData(branch, () => QrAdminApi.menuPreview(branch));
   const run = async (
@@ -1348,7 +1335,7 @@ export function QrMenuAvailability({ showToast }: Props) {
       </div>
       <Failure error={menu.error} />
       {menu.data?.items
-        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase()))
+        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase())).slice(availabilityPage*24,(availabilityPage+1)*24)
         .map((i) => (
           <div
             className="flex flex-wrap gap-3 items-center justify-between border-t py-3 text-sm"
@@ -1372,7 +1359,7 @@ export function QrMenuAvailability({ showToast }: Props) {
           </div>
         ))}
       {menu.data?.hidden
-        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase()))
+        .filter((i) => i.name.toLowerCase().includes(query.toLowerCase())).slice(availabilityPage*24,(availabilityPage+1)*24)
         .map((i) => (
           <div
             key={i.itemId}
@@ -1396,6 +1383,7 @@ export function QrMenuAvailability({ showToast }: Props) {
             )}
           </div>
         ))}
+      <div className="flex gap-3 items-center"><button className={button} disabled={!availabilityPage} onClick={()=>setAvailabilityPage(p=>p-1)}>Previous dishes</button><span>Page {availabilityPage+1}</span><button className={button} disabled={Math.max(menu.data?.items.filter(i=>i.name.toLowerCase().includes(query.toLowerCase())).length??0,menu.data?.hidden.filter(i=>i.name.toLowerCase().includes(query.toLowerCase())).length??0)<=(availabilityPage+1)*24} onClick={()=>setAvailabilityPage(p=>p+1)}>Next dishes</button></div>
     </div>
   );
 }

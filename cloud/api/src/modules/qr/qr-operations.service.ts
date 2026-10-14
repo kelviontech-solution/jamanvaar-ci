@@ -1,3 +1,4 @@
+import {qrReportRange} from './qr-report-range';
 import {
   BadRequestException,
   ConflictException,
@@ -583,6 +584,7 @@ export class QrOperationsService {
         },
         select: { id: true, name: true, branchId: true },
       });
+      const responders=await this.serviceStaff(tx,device.restaurantId,device.branchId);
       return {
         requests: rows.map((r) => {
           const payload = r.payload as any,
@@ -603,6 +605,9 @@ export class QrOperationsService {
             ...this.view(r, settings),
             branchName: b?.name,
             assignedDeviceName: assigned?.name,
+            assignedStaffId: payload.assignedStaffId,
+            assignedStaffName: responders.find(u=>u.id===payload.assignedStaffId&&u.branchId===payload.branchId)?.fullName,
+            escalatedAt:payload.escalatedAt,escalationReason:payload.escalationReason,
             quietNow:
               !!q &&
               (q.start <= q.end
@@ -614,6 +619,39 @@ export class QrOperationsService {
         quietNow,
       };
     });
+  }
+  private async serviceStaff(tx:Tx,restaurantId:string,branchId:string|null){
+    const users=await tx.user.findMany({where:{restaurantId,status:'ACTIVE',...(branchId?{branchId}:{})},select:{id:true,fullName:true,branchId:true}});
+    const rows=await tx.syncedEntity.findMany({where:{restaurantId,entityType:'STAFF_USER',...(branchId?{payload:{path:['branchId'],equals:branchId}}:{})},select:{externalId:true,payload:true}});
+    const staff=rows.filter(r=>(r.payload as any).isActive!==false&&!(r.payload as any).deleted).map(r=>({id:r.externalId,fullName:(r.payload as any).fullName||(r.payload as any).name||'Staff',branchId:(r.payload as any).branchId as string|null}));
+    return [...new Map([...users,...staff].map(u=>[u.id,u])).values()];
+  }
+  async assignees(device: Device) {
+    if (!['POS_ADMIN','CAPTAIN','POS'].includes(device.type)) throw new ForbiddenException('Service staff access required');
+    return this.prisma.runAsTenant(device.restaurantId, async tx => {
+      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS');
+      return {devices:await tx.device.findMany({where:{restaurantId:device.restaurantId,status:'ACTIVE',type:{in:['CAPTAIN','POS','POS_ADMIN']},...(device.branchId?{branchId:device.branchId}:{})},select:{id:true,name:true,branchId:true}}),
+        staff:await this.serviceStaff(tx,device.restaurantId,device.branchId)};
+    });
+  }
+  async assign(device: Device,id:string,input:{version:number;assignedDeviceId?:string|null;assignedStaffId?:string|null;escalate?:boolean;reason:string}) {
+    if (!['POS_ADMIN','CAPTAIN','POS'].includes(device.type)) throw new ForbiddenException('Service staff access required');
+    const branchId=await this.prisma.runAsTenant(device.restaurantId,async tx=>{
+      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS');
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-service-action:'+device.restaurantId+':'+id}))`;
+      const where={restaurantId_entityType_externalId:{restaurantId:device.restaurantId,entityType:'QR_SERVICE_REQUEST',externalId:id}},row=await tx.syncedEntity.findUnique({where}),p=row?.payload as any;
+      if(!row||(device.branchId&&p.branchId!==device.branchId))throw new NotFoundException('Request not found');
+      if(row.syncVersion!==input.version)throw new ConflictException('Request changed; refresh before assigning');
+      if(['COMPLETED','CANCELLED','EXPIRED'].includes(p.status)||Date.parse(p.expiresAt)<Date.now())throw new ConflictException('This request is closed');
+      if(input.assignedDeviceId&&!await tx.device.findFirst({where:{id:input.assignedDeviceId,restaurantId:device.restaurantId,branchId:p.branchId,status:'ACTIVE',type:{in:['CAPTAIN','POS','POS_ADMIN']}}}))throw new BadRequestException('Device must belong to this branch');
+      if(input.assignedStaffId&&!(await this.serviceStaff(tx,device.restaurantId,p.branchId)).some(u=>u.id===input.assignedStaffId))throw new BadRequestException('Responder must belong to this branch');
+      const at=new Date().toISOString(),actorId=(device as Device&{adminActorId?:string}).adminActorId||device.id;
+      const payload={...p,...(input.assignedDeviceId!==undefined?{assignedDeviceId:input.assignedDeviceId}:{}),...(input.assignedStaffId!==undefined?{assignedStaffId:input.assignedStaffId}:{}),...(input.escalate?{escalatedAt:at,escalationReason:input.reason}:{}),updatedAt:at,
+        history:[...(p.history||[]),{status:input.escalate?'ESCALATED':'ASSIGNED',at,actorId,reason:input.reason}]};
+      await tx.syncedEntity.update({where,data:{payload,syncVersion:{increment:1}}});
+      await this.audit.log({actorType:'TENANT',actorId,restaurantId:device.restaurantId,action:input.escalate?'QR_SERVICE_ESCALATED':'QR_SERVICE_ASSIGNED',category:'QR_ORDERING',details:{id,branchId:p.branchId,...input}},tx);return p.branchId;
+    });
+    this.bus.publish({restaurantId:device.restaurantId,branchId,kind:'entities'});return {saved:true};
   }
   async act(
     device: Device,
@@ -835,21 +873,8 @@ export class QrOperationsService {
   }
   async analytics(device: Device, from?: string, to?: string) {
     this.console(device);
-    const valid = (v: string) =>
-      /^\d{4}-\d{2}-\d{2}$/.test(v) &&
-      Number.isFinite(Date.parse(v + "T00:00:00Z")) &&
-      new Date(v + "T00:00:00Z").toISOString().slice(0, 10) === v;
-    if ([from, to].some((v) => v && !valid(v)))
-      throw new BadRequestException("Choose valid calendar dates");
-    const start = from
-        ? new Date(from + "T00:00:00Z")
-        : new Date(Date.now() - 7 * 86400000),
-      end = to
-        ? new Date(Date.parse(to + "T00:00:00Z") + 86400000)
-        : new Date();
-    if (end <= start || end.getTime() - start.getTime() > 367 * 86400000)
-      throw new BadRequestException("Choose a date range of up to one year");
     return this.prisma.runAsTenant(device.restaurantId, async (tx) => {
+      const {start,end,timezone}=await qrReportRange(tx,device.restaurantId,device.branchId,from,to);
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
@@ -959,14 +984,14 @@ export class QrOperationsService {
       return {
         from: start.toISOString(),
         to: end.toISOString(),
-        dateBasis: "UTC calendar days; orders created in this range",
+        timezone,dateBasis: `${timezone} calendar days; orders created in this range`,
         items,
         byCategory: [...groupItems.values()],
         byMode: groupedOrders((o) => o.orderType),
         byBranch: groupedOrders((o) => o.branchId || "Unassigned"),
-        trend: groupedOrders((o) => o.createdAt.toISOString().slice(0, 10)),
+        trend: groupedOrders((o) => new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(o.createdAt)),
         byHour: groupedOrders(
-          (o) => String(o.createdAt.getUTCHours()).padStart(2, "0") + ":00 UTC",
+          (o) => new Intl.DateTimeFormat('en-GB',{timeZone:timezone,hour:'2-digit',hourCycle:'h23'}).format(o.createdAt) + ":00 " + timezone,
         ),
         conversion: {
           denominator: "Observed menu views",
@@ -1150,7 +1175,7 @@ export class QrOperationsService {
       checks,
       scope: device.branchId
         ? "Selected branch"
-        : "Restaurant defaults — check each branch separately",
+        : "Restaurant defaults â€” check each branch separately",
       ready: checks.filter((c) => c.required).every((c) => c.ready),
       completed: checks.filter((c) => c.ready).length,
       total: checks.length,

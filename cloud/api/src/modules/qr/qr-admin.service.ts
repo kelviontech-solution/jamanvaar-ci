@@ -1,3 +1,4 @@
+import { paymentBalance, COLLECTED_ORDER_STATUSES } from '../payments/order-payment-ledger';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -248,7 +249,11 @@ export class QrAdminService {
   }
 
   async listBranches(restaurantId: string, branchId?: string | null) {
-    return this.prisma.runAsTenant(restaurantId, (tx) => tx.branch.findMany({ where: { restaurantId, ...(branchId ? { id: branchId } : {}) }, select: { id: true, name: true, status: true }, orderBy: { name: 'asc' } }));
+    return this.prisma.runAsTenant(restaurantId, async (tx) => {
+      const restaurant = await tx.restaurant.findFirstOrThrow({ where: { id: restaurantId }, select: { timezone: true } });
+      const rows = await tx.branch.findMany({ where: { restaurantId, ...(branchId ? { id: branchId } : {}) }, select: { id: true, name: true, status: true, timezone: true }, orderBy: { name: 'asc' } });
+      return rows.map(row => ({ ...row, restaurantTimezone: restaurant.timezone }));
+    });
   }
 
   scopedBranch(device: Device, requested?: string): string | undefined {
@@ -387,14 +392,37 @@ export class QrAdminService {
 
   // ------------------------------------------------------------------ orders and dashboard (from real data)
 
-  async listOrders(restaurantId: string, opts: { branchId?: string; limit?: number }) {
-    const rows = await this.prisma.runAsTenant(restaurantId, (tx) =>
-      tx.syncedOrder.findMany({ where: { restaurantId, source: 'QR', ...(opts.branchId ? { branchId: opts.branchId } : {}) }, orderBy: { createdAt: 'desc' }, take: Math.min(Math.max(opts.limit ?? 50, 1), 200) })
-    );
-    return rows.map((o) => {
-      const meta = (o.meta ?? {}) as Record<string, unknown>;
-      return { id: o.externalOrderId, version: o.syncVersion, orderNumber: typeof meta.tokenNumber === 'string' ? meta.tokenNumber : null, table: o.tableLabel, branchId: o.branchId, status: o.status, paymentStatus: o.paymentStatus, paymentMethod: o.paymentMethod, total: o.totalAmount / 100, placedAt: o.createdAt.toISOString(), itemCount: Array.isArray(o.items) ? (o.items as unknown[]).length : 0,
-        pickupAt:meta.pickupAt??null,pickupTimezone:meta.pickupTimezone??null,pickupInstructions:meta.pickupInstructions??null,items: o.items, notes: o.notes, history: meta.qrStatusHistory ?? [], customerName: meta.customerName ?? null };
+  private async orderRows(tx: Prisma.TransactionClient, rows: any[]) {
+    const entries = await tx.orderPaymentEntry.findMany({where:{restaurantId:rows[0]?.restaurantId || '',orderId:{in:rows.map(o=>o.id)}},select:{orderId:true,kind:true,amount:true}});
+    return rows.map(o=>{
+      const meta=(o.meta ?? {}) as Record<string,any>, allocations=entries.filter(e=>e.orderId===o.id);
+      const balance=paymentBalance(o.totalAmount,allocations.length?allocations:COLLECTED_ORDER_STATUSES.has(o.paymentStatus || '')?[{kind:'COLLECTION',amount:o.totalAmount}]:[]);
+      return {id:o.externalOrderId,version:o.syncVersion,orderNumber:meta.tokenNumber ?? null,table:o.tableLabel,branchId:o.branchId,status:o.status,paymentStatus:o.paymentStatus,paymentMethod:o.paymentMethod,total:o.totalAmount/100,balance,placedAt:o.createdAt.toISOString(),itemCount:Array.isArray(o.items)?o.items.length:0,pickupAt:meta.pickupAt??null,pickupTimezone:meta.pickupTimezone??null,pickupInstructions:meta.pickupInstructions??null,items:o.items,notes:o.notes,history:meta.qrStatusHistory??[],customerName:meta.customerName??null};
+    });
+  }
+  async listOrders(restaurantId: string, opts: {branchId?:string;limit?:number}) {
+    return this.prisma.runAsTenant(restaurantId,async tx=>this.orderRows(tx,await tx.syncedOrder.findMany({where:{restaurantId,source:'QR',...(opts.branchId?{branchId:opts.branchId}:{})},orderBy:[{createdAt:'desc'},{id:'desc'}],take:Math.min(Math.max(opts.limit??50,1),200)})));
+  }
+  async ordersPage(device:Device, query:{branchId?:string;status?:string;search?:string;view?:string;cursor?:string;from?:string;to?:string}) {
+    await this.requireEnabled(device.restaurantId);const branchId=this.scopedBranch(device,query.branchId);
+    const known=['DRAFT','NEW','CONFIRMED','PREPARING','READY','SERVED','COMPLETED','CANCELLED','REFUNDED'];
+    if(query.status && query.status!=='ALL'&&!known.includes(query.status))throw new BadRequestException('Invalid order status');
+    let cursor:{at:string;id:string}|undefined;
+    if(query.cursor)try{cursor=JSON.parse(Buffer.from(query.cursor,'base64url').toString());if(!cursor||typeof cursor.id!=='string'||cursor.id.length>128||!Number.isFinite(Date.parse(cursor.at)))throw Error();}catch{throw new BadRequestException('Invalid order cursor');}
+    return this.prisma.runAsTenant(device.restaurantId,async tx=>{
+      const AND:Prisma.SyncedOrderWhereInput[]=[];
+      if(query.view==='OPEN')AND.push({status:{notIn:['CANCELLED','VOIDED','REFUNDED']},OR:[{status:{notIn:['COMPLETED','SERVED']}},{paymentStatus:{notIn:['SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING']}},{paymentStatus:null}]});
+      if(query.view==='DUE')AND.push({status:{notIn:['DRAFT','CANCELLED','VOIDED','REFUNDED']},OR:[{paymentStatus:{notIn:['SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING']}},{paymentStatus:null}]});
+      if(query.status&&query.status!=='ALL')AND.push({status:query.status});
+      const search=query.search?.trim().slice(0,160);if(search)AND.push({OR:[{externalOrderId:{contains:search,mode:'insensitive'}},{tableLabel:{contains:search,mode:'insensitive'}},{meta:{path:['tokenNumber'],string_contains:search}},{meta:{path:['customerName'],string_contains:search}}]});
+      for(const day of [query.from,query.to])if(day&&(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(Date.parse(day+'T00:00:00Z'))||new Date(day+'T00:00:00Z').toISOString().slice(0,10)!==day))throw new BadRequestException('Choose valid dates');
+      if(query.from&&query.to&&query.from>query.to)throw new BadRequestException('End date must follow start date');
+      if(query.from||query.to){const restaurant=await tx.restaurant.findFirstOrThrow({where:{id:device.restaurantId},select:{timezone:true}});const branch=branchId?await tx.branch.findFirst({where:{id:branchId},select:{timezone:true}}):null;const zone=branch?.timezone||restaurant.timezone;const [bounds]=await tx.$queryRaw<Array<{start:Date|null;end:Date|null}>>(Prisma.sql`SELECT (${query.from||null}::date::timestamp AT TIME ZONE ${zone}) AS start,((${query.to||null}::date+1)::timestamp AT TIME ZONE ${zone}) AS end`);AND.push({createdAt:{...(bounds.start?{gte:bounds.start}:{}),...(bounds.end?{lt:bounds.end}:{})}});}
+      const where:Prisma.SyncedOrderWhereInput={restaurantId:device.restaurantId,source:'QR',...(branchId?{branchId}:{}),AND};
+      const total=await tx.syncedOrder.count({where});
+      const rows=await tx.syncedOrder.findMany({where:{...where,AND:[...AND,...(cursor?[{OR:[{createdAt:{lt:new Date(cursor.at)}},{createdAt:new Date(cursor.at),id:{lt:cursor.id}}]}]:[])]},orderBy:[{createdAt:'desc'},{id:'desc'}],take:51});
+      const more=rows.length>50, page=rows.slice(0,50),last=page.at(-1);
+      return {rows:await this.orderRows(tx,page),total,nextCursor:more&&last?Buffer.from(JSON.stringify({at:last.createdAt.toISOString(),id:last.id})).toString('base64url'):null};
     });
   }
 

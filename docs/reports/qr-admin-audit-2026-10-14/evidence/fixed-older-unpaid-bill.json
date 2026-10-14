@@ -1,0 +1,382 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LIVE OPERATIONS\nQR Orders\n\nFollow every guest order, verify payments and manage kitchen progress.\n\nEnabled\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\nOrder / table / guest\nAll orders\nAwaiting payment\nAwaiting acceptance\nIn kitchen\nReady to serve\nClosed\nCancelled\nNew-order sound\nRefresh\nOrder view\nActionable orders\nUnpaid accepted bills\nAll order history\nFrom (restaurant date)\nTo (restaurant date)\n1 matching orders. Includes older unpaid bills.\nPrevious orders\nNext orders\nOLD-BILL-60\nready\n\nCounter / takeaway · 1/1/2024, 5:30:00 AM\n\nDue at counter · ₹100.00\n\n1 × Audit old counter bill\nDetails\nComplete\nCollect cash",
+  "headings": [
+    "QR Orders",
+    "OLD-BILL-60"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Previous orders",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 134,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Next orders",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 110,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Complete",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 87,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collect cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 102,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order status",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order view",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Order / table / guest",
+      "placeholder": "",
+      "disabled": false,
+      "value": "qr-list-fixed-1791971174658-60"
+    },
+    {
+      "index": 2,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order status",
+      "disabled": false,
+      "value": "READY",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All orders"
+        },
+        {
+          "value": "DRAFT",
+          "text": "Awaiting payment"
+        },
+        {
+          "value": "NEW",
+          "text": "Awaiting acceptance"
+        },
+        {
+          "value": "PREPARING",
+          "text": "In kitchen"
+        },
+        {
+          "value": "READY",
+          "text": "Ready to serve"
+        },
+        {
+          "value": "COMPLETED",
+          "text": "Closed"
+        },
+        {
+          "value": "CANCELLED",
+          "text": "Cancelled"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "New-order sound",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 4,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order view",
+      "disabled": false,
+      "value": "OPEN",
+      "options": [
+        {
+          "value": "OPEN",
+          "text": "Actionable orders"
+        },
+        {
+          "value": "DUE",
+          "text": "Unpaid accepted bills"
+        },
+        {
+          "value": "ALL",
+          "text": "All order history"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

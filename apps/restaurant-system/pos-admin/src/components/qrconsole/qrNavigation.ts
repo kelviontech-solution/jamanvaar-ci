@@ -1,4 +1,5 @@
 import {
+  Users,
   LayoutDashboard,
   UtensilsCrossed,
   QrCode,
@@ -17,6 +18,12 @@ import {
 } from "lucide-react";
 
 export const QR_PAGES = [
+ {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
+ {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Launch setup',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
+ {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Insights',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
+ {id:'CALENDAR',label:'Pickup Calendar',group:'Live operations',icon:CalendarClock,description:'Review booked pickup slots and complete guest handovers.'},
+ {id:'PRINTPACK',label:'QR Print Packs',group:'Branding',icon:QrCode,description:'Download branded cards, print sheets and replacement inventory together.'},
+  {id:"CRM",label:"Customers & Loyalty",group:"Menu & guests",icon:Users,description:"Manage shared customers, point balances, rewards and verified visit history."},
   {
     id: "OVERVIEW",
     label: "Overview",

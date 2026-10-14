@@ -61,6 +61,10 @@ export class QrOperationsController {
   @Get("requests") requests(@CurrentDevice() d: Device) {
     return this.ops.staffRequests(d);
   }
+  @Get('assignees') assignees(@CurrentDevice() d:Device){return this.ops.assignees(d);}
+  @Post('requests/:id/assign') @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(z.object({version:z.number().int().positive(),assignedDeviceId:z.string().uuid().nullable().optional(),assignedStaffId:z.string().min(1).max(128).nullable().optional(),escalate:z.boolean().optional(),reason:z.string().trim().min(3).max(300)}).strict()))
+  assign(@CurrentDevice() d:Device,@Param('id') id:string,@Body() b:{version:number;assignedDeviceId?:string|null;assignedStaffId?:string|null;escalate?:boolean;reason:string}){return this.ops.assign(d,id,b);}
   @Post("requests/:id/action")
   @HttpCode(200)
   @UsePipes(

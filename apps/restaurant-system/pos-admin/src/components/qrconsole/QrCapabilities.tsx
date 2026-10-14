@@ -1,3 +1,4 @@
+import { requestQrLeave, useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { QrCountedStock } from "./QrCountedStock";
 import { QrBranchPreferences } from "./QrBranchPreferences";
 import { QrPromotions } from "./QrPromotions";
@@ -84,10 +85,11 @@ export function QrCapabilities({
       ...(feedbackTo ? { to: feedbackTo } : {}),
       ...(feedbackRating ? { rating: feedbackRating } : {}),
     });
+  const [orderSearch,setOrderSearch]=useState(new URLSearchParams(location.search).get('order')||''),[orderCursor,setOrderCursor]=useState(''),[orderNext,setOrderNext]=useState<string|null>(null);
   const [feedback, setFeedback] = useState<any>(null),
     [alerts, setAlerts] = useState<any>(null),
     [orders, setOrders] = useState<QrOrderRow[]>([]),
-    [selected, setSelected] = useState(""),
+    [selected, setSelected] = useState(new URLSearchParams(location.search).get("order")||""),
     [ledger, setLedger] = useState<any>(null),
     [amount, setAmount] = useState(""),
     [refundAmount, setRefundAmount] = useState(""),
@@ -102,6 +104,8 @@ export function QrCapabilities({
       allocationAttempt.current = { identity, key: crypto.randomUUID() };
     return allocationAttempt.current.key;
   };
+  const [translationBaseline,setTranslationBaseline]=useState({name:'',description:''});
+  useQrUnsavedChanges(Object.keys(changes).length>0 || (section==='Translations'&&(name!==translationBaseline.name||description!==translationBaseline.description)));
   const reload = async () => {
     const c = await qrApi<Configuration>(base);
     setData(c);
@@ -113,6 +117,7 @@ export function QrCapabilities({
     ]?.[itemId];
     setName(t?.name ?? "");
     setDescription(t?.description ?? "");
+    setTranslationBaseline({name:t?.name??'',description:t?.description??''});
   }, [locale, entity, itemId]);
   useEffect(() => {
     let active = true;
@@ -159,8 +164,8 @@ export function QrCapabilities({
           if (active) setAlerts(r);
         }
         if (section === "Collections") {
-          const r = await QrAdminApi.orders();
-          if (active) setOrders(r);
+          const r = await QrAdminApi.orderPage({view:'ALL',search:orderSearch,cursor:orderCursor});
+          if (active){setOrders(r.rows);setOrderNext(r.nextCursor);}
         }
       } catch (e) {
         if (active) setError((e as Error).message);
@@ -177,7 +182,7 @@ export function QrCapabilities({
       active = false;
       clearInterval(t);
     };
-  }, [section, data]);
+  }, [section, data,orderSearch,orderCursor]);
   if (!data)
     return (
       <p role="status" className="p-5">
@@ -218,7 +223,11 @@ export function QrCapabilities({
                     ? button
                     : "rounded-xl border px-4 py-2.5 text-sm"
                 }
-                onClick={() => {
+                onClick={async () => {
+                  if (s === section || !(await requestQrLeave())) return;
+                  setChanges({});
+                  setName(translationBaseline.name);
+                  setDescription(translationBaseline.description);
                   setSection(s);
                   setError("");
                 }}
@@ -456,7 +465,10 @@ export function QrCapabilities({
                     aria-label="Language"
                     className={input}
                     value={locale}
-                    onChange={(e) => setLocale(e.target.value)}
+                    onChange={async (e) => {
+                      const value = e.target.value;
+                      if (await requestQrLeave()) setLocale(value);
+                    }}
                   >
                     {[
                       ...new Set([
@@ -476,8 +488,10 @@ export function QrCapabilities({
                     aria-label="Content"
                     className={input}
                     value={entity}
-                    onChange={(e) => {
-                      setEntity(e.target.value);
+                    onChange={async (e) => {
+                      const value = e.target.value;
+                      if (!(await requestQrLeave())) return;
+                      setEntity(value);
                       setItemId("");
                     }}
                   >
@@ -491,11 +505,13 @@ export function QrCapabilities({
                     aria-label="Menu record"
                     className={input}
                     value={itemId}
-                    onChange={(e) => {
-                      setItemId(e.target.value);
+                    onChange={async (e) => {
+                      const value = e.target.value;
+                      if (!(await requestQrLeave())) return;
+                      setItemId(value);
                       const t =
                         settings.translations?.[locale]?.[entity]?.[
-                          e.target.value
+                          value
                         ];
                       setName(t?.name ?? "");
                       setDescription(t?.description ?? "");
@@ -557,7 +573,7 @@ export function QrCapabilities({
                         version: data.version,
                       }),
                     });
-                    await reload();
+                    await reload();setTranslationBaseline({name,description});
                   }, "Translation saved")
                 }
               >
@@ -600,7 +616,7 @@ export function QrCapabilities({
           {licensed("QR_FEEDBACK") && (
             <div className="mt-3 flex flex-wrap gap-3 items-end">
               <label className="text-xs">
-                From date (UTC)
+                From (restaurant date)
                 <input
                   className={input}
                   type="date"
@@ -609,7 +625,7 @@ export function QrCapabilities({
                 />
               </label>
               <label className="text-xs">
-                To date (UTC)
+                To (restaurant date)
                 <input
                   className={input}
                   type="date"
@@ -754,6 +770,7 @@ export function QrCapabilities({
           <h3 className="font-bold">
             Payment attempts and confirmed collections
           </h3>
+          <label className="block text-sm">Find order, table or customer<input className={input} value={orderSearch} onChange={e=>{setOrderSearch(e.target.value);setOrderCursor('');}} /></label><div className="flex gap-3"><button className={button} disabled={!orderCursor} onClick={()=>setOrderCursor('')}>Newest orders</button><button className={button} disabled={!orderNext} onClick={()=>setOrderCursor(orderNext||'')}>Older orders</button></div>
           <label className="mt-3 block text-sm">
             QR order
             <select
@@ -777,7 +794,7 @@ export function QrCapabilities({
               <option value="">Select order...</option>
               {orders.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.orderNumber ?? o.id} · {o.paymentStatus}
+                  {o.orderNumber ?? o.id} / {o.table || 'Counter'} / {new Date(o.placedAt).toLocaleDateString()} / Remaining {((o.balance?.outstandingPaise??0)/100).toFixed(2)}
                 </option>
               ))}
             </select>
@@ -785,7 +802,7 @@ export function QrCapabilities({
           {ledger && (
             <>
               <div className="my-4 flex flex-wrap gap-5 text-sm">
-                <b>Due ₹{(ledger.totalPaise / 100).toFixed(2)}</b>
+                <b>Total bill ₹{(ledger.totalPaise / 100).toFixed(2)}</b>
                 <b>Collected ₹{(ledger.collectedPaise / 100).toFixed(2)}</b>
                 <b>Remaining ₹{(ledger.outstandingPaise / 100).toFixed(2)}</b>
                 <b>Refunded ₹{(ledger.refundedPaise / 100).toFixed(2)}</b>
@@ -842,7 +859,7 @@ export function QrCapabilities({
                       }
                       onClick={() =>
                         void run(async () => {
-                          const current = (await QrAdminApi.orders()).find(
+                          const current = (await QrAdminApi.orderPage({search:selected,view:'ALL'})).rows.find(
                             (o) => o.id === selected,
                           );
                           if (!current) throw Error("Order unavailable");
@@ -914,7 +931,7 @@ export function QrCapabilities({
                       disabled={busy || !(Number(amount) > 0)}
                       onClick={() =>
                         void run(async () => {
-                          const current = (await QrAdminApi.orders()).find(
+                          const current = (await QrAdminApi.orderPage({search:selected,view:'ALL'})).rows.find(
                             (o) => o.id === selected,
                           );
                           if (!current)

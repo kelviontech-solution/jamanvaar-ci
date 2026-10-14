@@ -1,3 +1,5 @@
+import { requestQrLeave } from '../components/qrconsole/useQrUnsavedChanges';
+import { configureRestaurantTimezone } from '@jamanvaar/utils';
 import { useEffect, useState } from "react";
 import { QrConsole } from "../components/qrconsole/QrConsole";
 import { QrAdminApi, type QrBranch } from "../cloud/qrAdminClient";
@@ -283,6 +285,8 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
       .then((r) => {
         if (active) {
           setBranches(r);
+          const timezone = r.find(b => b.id === storedAdminBranch())?.timezone || r[0]?.restaurantTimezone;
+          if (timezone) configureRestaurantTimezone(() => timezone);
           setReady(true);
         }
       })
@@ -309,8 +313,8 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
           <select
             aria-label="QR Admin branch"
             value={storedAdminBranch() ?? branches[0]?.id ?? ""}
-            onChange={(e) => {
-              saveAdminBranch(e.target.value);
+            onChange={async (e) => {
+              const branch=e.target.value;if(!(await requestQrLeave()))return;saveAdminBranch(branch);
               location.reload();
             }}
           >

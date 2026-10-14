@@ -1,3 +1,4 @@
+import {nextSyncSequence} from '../../common/sync-sequence';
 import { Prisma, SyncedOrder } from "@prisma/client";
 import {
   CustomerAccount,
@@ -117,6 +118,7 @@ export async function reconcileQrLoyalty(
       data: {
         payload: account as unknown as Prisma.InputJsonValue,
         syncVersion: { increment: 1 },
+        seq: await nextSyncSequence(tx,order.restaurantId),
       },
     });
   }

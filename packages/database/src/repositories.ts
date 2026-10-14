@@ -1803,6 +1803,7 @@ export class CustomerRepository {
   }
 
   public static rewardDiscount(reward: LoyaltyReward, items: Array<{ item: MenuItem; unitPrice: number; itemTotal: number }>, subtotal: number): number {
+    if (reward.expiresAt && !(Date.parse(reward.expiresAt) > Date.now())) return 0;
     const amount = reward.discountAmount ?? (reward.id === 'reward-100off' ? 100 : 0);
     if (!Number.isFinite(amount) || amount <= 0) return 0;
     // Cart.subtotal excludes embedded GST. Discounts use gross line prices, otherwise
@@ -1819,7 +1820,7 @@ export class CustomerRepository {
     const redemption = order.loyaltyRedemption;
     if (!redemption) return;
     const account = this.getByPhone(order.customerPhone ?? '');
-    const reward = this.getRewards().find(r => r.id === redemption.rewardId && r.isActive);
+    const reward = this.getRewards().find(r => r.id === redemption.rewardId && r.isActive && (!r.expiresAt || Date.parse(r.expiresAt) > Date.now()));
     if (this.getProgramSettings().enabled === false) throw new Error('Loyalty program is paused');
     if (!account || account.phone !== redemption.customerPhone || !reward || !Number.isSafeInteger(reward.pointsCost) || reward.pointsCost <= 0 || reward.pointsCost !== redemption.pointsCost) throw new Error('Loyalty reward has changed. Select the reward again.');
     if (account.loyaltyPoints < redemption.pointsCost) throw new Error('Not enough loyalty points for this reward');
@@ -1845,7 +1846,7 @@ export class CustomerRepository {
   public static redeemReward(phone: string, rewardId: string): { ok: boolean; reason?: string } {
     const account = db.customerAccounts.find((a) => a.phone === phone);
     if (!account) return { ok: false, reason: 'Customer not found' };
-    const reward = db.loyaltyRewards.find((r) => r.id === rewardId && r.isActive);
+    const reward = db.loyaltyRewards.find((r) => r.id === rewardId && r.isActive && (!r.expiresAt || Date.parse(r.expiresAt) > Date.now()));
     if (!reward) return { ok: false, reason: 'Reward not found or inactive' };
     if (account.loyaltyPoints < reward.pointsCost) return { ok: false, reason: 'Not enough points' };
 

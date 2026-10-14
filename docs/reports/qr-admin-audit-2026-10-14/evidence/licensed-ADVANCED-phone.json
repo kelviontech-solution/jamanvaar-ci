@@ -1,0 +1,1430 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\nEnabled\nAdvanced QR capabilities\n\nJAMANVAAR QR · 1 active codes · 2 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nFeatures for this branch\n\nOnly changed settings become local overrides. Local overrides: translations\n\nCounted dish stock reservations\nIncluded in your license\nVerified customer loyalty\nIncluded in your license\nShared table sessions\nIncluded in your license\nMultilingual menu\nIncluded in your license\nPrivate order feedback\nIncluded in your license\nBrowser order history\nIncluded in your license\nOperational alerts\nIncluded in your license\nShared kitchen workload\nIncluded in your license\nMenu recommendations\nIncluded in your license\nAdvanced workload estimates\n\nCounts unfinished dish quantities across POS, Captain, Kiosk and QR in this branch. No accepted order is automatically cancelled.\n\nStop new QR orders at units (0 = unlimited)\nBusy estimate threshold (0 = off)\nExtra minutes when busy\nRecommended menu items (customers choose whether to add)\nAudit QR Dish 1791966297209\nAudit QR Dish 1791966447575\nUI Audit Dish 001\nUI Audit Dish 002\nUI Audit Dish 003\nUI Audit Dish 004\nUI Audit Dish 005\nUI Audit Dish 006\nUI Audit Dish 007\nUI Audit Dish 008\nUI Audit Dish 009\nUI Audit Dish 010\nUI Audit Dish 011\nUI Audit Dish 012\nUI Audit Dish 013\nUI Audit Dish 014\nUI Audit Dish 015\nUI Audit Dish 016\nUI Audit Dish 017\nUI Audit Dish 018\nUI Audit Dish 019\nUI Audit Dish 020\nUI Audit Dish 021\nUI Audit Dish 022\nUI Audit Dish 023\nUI Audit Dish 024\nUI Audit Dish 025\nUI Audit Dish 026\nUI Audit Dish 027\nUI Audit Dish 028\nUI Audit Dish 029\nUI Audit Dish 030\nUI Audit Dish 031\nUI Audit Dish 032\nUI Audit Dish 033\nUI Audit Dish 034\nUI Audit Dish 035\nUI Audit Dish 036\nUI Audit Dish 037\nUI Audit Dish 038\nUI Audit Dish 039\nUI Audit Dish 040\nUI Audit Dish 041\nUI Audit Dish 042\nUI Audit Dish 043\nUI Audit Dish 044\nUI Audit Dish 045\nUI Audit Dish 046\nUI Audit Dish 047\nUI Audit Dish 048\nUI Audit Dish 049\nUI Audit Dish 050\nUI Audit Dish 051\nUI Audit Dish 052\nUI Audit Dish 053\nUI Audit Dish 054\nUI Audit Dish 055\nUI Audit Dish 056\nUI Audit Dish 057\nUI Audit Dish 058\nUI Audit Dish 059\nUI Audit Dish 060\nUI Audit Dish 061\nUI Audit Dish 062\nUI Audit Dish 063\nUI Audit Dish 064\nUI Audit Dish 065\nUI Audit Dish 066\nUI Audit Dish 067\nUI Audit Dish 068\nUI Audit Dish 069\nUI Audit Dish 070\nUI Audit Dish 071\nUI Audit Dish 072\nUI Audit Dish 073\nUI Audit Dish 074\nUI Audit Dish 075\nUI Audit Dish 076\nUI Audit Dish 077\nUI Audit Dish 078\nUI Audit Dish 079\nUI Audit Dish 080\nUI Audit Dish 081\nUI Audit Dish 082\nUI Audit Dish 083\nUI Audit Dish 084\nUI Audit Dish 085\nUI Audit Dish 086\nUI Audit Dish 087\nUI Audit Dish 088\nUI Audit Dish 089\nUI Audit Dish 090\nUI Audit Dish 091\nUI Audit Dish 092\nUI Audit Dish 093\nUI Audit Dish 094\nUI Audit Dish 095\nUI Audit Dish 096\nUI Audit Dish 097\nUI Audit Dish 098\nUI Audit Dish 099\nUI Audit Dish 100\nAlert types\n NEW ORDER\n CASH DUE\n PAYMENT COLLECTED\n PAYMENT PENDING\n CANCELLED\n REFUND\nSave changes\nCounted portions for this branch\n\nOptional exact counts for ready-to-sell dishes. Ingredient recipes continue through the existing inventory ledger. Enable counted stock reservations above to protect simultaneous QR checkouts.\n\nBranch\nChoose branch...\nUI Audit Restaurant A — Main Branch\nDish\nChoose dish...\nUI Audit Dish 001 · Manual availability\nUI Audit Dish 002 · Manual availability\nUI Audit Dish 003 · Manual availability\nUI Audit Dish 004 · Manual availability\nUI Audit Dish 005 · Manual availability\nUI Audit Dish 006 · Manual availability\nUI Audit Dish 007 · Manual availability\nUI Audit Dish 008 · Manual availability\nUI Audit Dish 009 · Manual availability\nUI Audit Dish 010 · Manual availability\nUI Audit Dish 011 · Manual availability\nUI Audit Dish 012 · Manual availability\nUI Audit Dish 013 · Manual availability\nUI Audit Dish 014 · Manual availability\nUI Audit Dish 015 · Manual availability\nUI Audit Dish 016 · Manual availability\nUI Audit Dish 017 · Manual availability\nUI Audit Dish 018 · Manual availability\nUI Audit Dish 019 · Manual availability\nUI Audit Dish 020 · Manual availability\nUI Audit Dish 021 · Manual availability\nUI Audit Dish 022 · Manual availability\nUI Audit Dish 023 · Manual availability\nUI Audit Dish 024 · Manual availability\nUI Audit Dish 025 · Manual availability\nUI Audit Dish 026 · Manual availability\nUI Audit Dish 027 · Manual availability\nUI Audit Dish 028 · Manual availability\nUI Audit Dish 029 · Manual availability\nUI Audit Dish 030 · Manual availability\nUI Audit Dish 031 · Manual availability\nUI Audit Dish 032 · Manual availability\nUI Audit Dish 033 · Manual availability\nUI Audit Dish 034 · Manual availability\nUI Audit Dish 035 · Manual availability\nUI Audit Dish 036 · Manual availability\nUI Audit Dish 037 · Manual availability\nUI Audit Dish 038 · Manual availability\nUI Audit Dish 039 · Manual availability\nUI Audit Dish 040 · Manual availability\nUI Audit Dish 041 · Manual availability\nUI Audit Dish 042 · Manual availability\nUI Audit Dish 043 · Manual availability\nUI Audit Dish 044 · Manual availability\nUI Audit Dish 045 · Manual availability\nUI Audit Dish 046 · Manual availability\nUI Audit Dish 047 · Manual availability\nUI Audit Dish 048 · Manual availability\nUI Audit Dish 049 · Manual availability\nUI Audit Dish 050 · Manual availability\nUI Audit Dish 051 · Manual availability\nUI Audit Dish 052 · Manual availability\nUI Audit Dish 053 · Manual availability\nUI Audit Dish 054 · Manual availability\nUI Audit Dish 055 · Manual availability\nUI Audit Dish 056 · Manual availability\nUI Audit Dish 057 · Manual availability\nUI Audit Dish 058 · Manual availability\nUI Audit Dish 059 · Manual availability\nUI Audit Dish 060 · Manual availability\nUI Audit Dish 061 · Manual availability\nUI Audit Dish 062 · Manual availability\nUI Audit Dish 063 · Manual availability\nUI Audit Dish 064 · Manual availability\nUI Audit Dish 065 · Manual availability\nUI Audit Dish 066 · Manual availability\nUI Audit Dish 067 · Manual availability\nUI Audit Dish 068 · Manual availability\nUI Audit Dish 069 · Manual availability\nUI Audit Dish 070 · Manual availability\nUI Audit Dish 071 · Manual availability\nUI Audit Dish 072 · Manual availability\nUI Audit Dish 073 · Manual availability\nUI Audit Dish 074 · Manual availability\nUI Audit Dish 075 · Manual availability\nUI Audit Dish 076 · Manual availability\nUI Audit Dish 077 · Manual availability\nUI Audit Dish 078 · Manual availability\nUI Audit Dish 079 · Manual availability\nUI Audit Dish 080 · Manual availability\nUI Audit Dish 081 · Manual availability\nUI Audit Dish 082 · Manual availability\nUI Audit Dish 083 · Manual availability\nUI Audit Dish 084 · Manual availability\nUI Audit Dish 085 · Manual availability\nUI Audit Dish 086 · Manual availability\nUI Audit Dish 087 · Manual availability\nUI Audit Dish 088 · Manual availability\nUI Audit Dish 089 · Manual availability\nUI Audit Dish 090 · Manual availability\nUI Audit Dish 091 · Manual availability\nUI Audit Dish 092 · Manual availability\nUI Audit Dish 093 · Manual availability\nUI Audit Dish 094 · Manual availability\nUI Audit Dish 095 · Manual availability\nUI Audit Dish 096 · Manual availability\nUI Audit Dish 097 · Manual availability\nUI Audit Dish 098 · Manual availability\nUI Audit Dish 099 · Manual availability\nUI Audit Dish 100 · Manual availability\nAudit QR Dish 1791966297209 · Manual availability\nAudit QR Dish 1791966447575 · Manual availability\nCurrent portions (blank = inherit/manual)\nSave counted portions\nBranch preferences and inheritance\n\nUse the branch selector in the app header. All-branch propagation requires the owner account. Existing local overrides are always preserved.\n\nRestoring defaults removes these local preferences: translations.\n\n I want this branch to follow restaurant defaults\nRestore inherited preferences",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Features for this branch"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 33,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Save changes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 120,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Save counted portions",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 180,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Restore inherited preferences",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 226,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Counted dish stock reservationsIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Verified customer loyaltyIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared table sessionsIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Multilingual menuIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Private order feedbackIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Browser order historyIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Operational alertsIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 7,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared kitchen workloadIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 8,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Menu recommendationsIncluded in your license",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 9,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Stop new QR orders at units (0 = unlimited)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "0"
+    },
+    {
+      "index": 10,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Busy estimate threshold (0 = off)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "0"
+    },
+    {
+      "index": 11,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Extra minutes when busy",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10"
+    },
+    {
+      "index": 12,
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": "Recommended menu items (customers choose whether to add)Audit QR Dish 1791966297209Audit QR Dish 1791966447575UI Audit Dish 001UI Audit Dish 002UI Audit Dish 003UI Audit Dish 004UI Audit Dish 005UI Audit Dish 006UI Audit Dish 007UI Audit Dish 008UI Audit Dish 009UI Audit Dish 010UI Audit Dish 011UI Audit Dish 012UI Audit Dish 013UI Audit Dish 014UI Audit Dish 015UI Audit Dish 016UI Audit Dish 017UI Audit Dish 018UI Audit Dish 019UI Audit Dish 020UI Audit Dish 021UI Audit Dish 022UI Audit Dish 023UI Audit Dish 024UI Audit Dish 025UI Audit Dish 026UI Audit Dish 027UI Audit Dish 028UI Audit Dish 029UI Audit Dish 030UI Audit Dish 031UI Audit Dish 032UI Audit Dish 033UI Audit Dish 034UI Audit Dish 035UI Audit Dish 036UI Audit Dish 037UI Audit Dish 038UI Audit Dish 039UI Audit Dish 040UI Audit Dish 041UI Audit Dish 042UI Audit Dish 043UI Audit Dish 044UI Audit Dish 045UI Audit Dish 046UI Audit Dish 047UI Audit Dish 048UI Audit Dish 049UI Audit Dish 050UI Audit Dish 051UI Audit Dish 052UI Audit Dish 053UI Audit Dish 054UI Audit Dish 055UI Audit Dish 056UI Audit Dish 057UI Audit Dish 058UI Audit Dish 059UI Audit Dish 060UI Audit Dish 061UI Audit Dish 062UI Audit Dish 063UI Audit Dish 064UI Audit Dish 065UI Audit Dish 066UI Audit Dish 067UI Audit Dish 068UI Audit Dish 069UI Audit Dish 070UI Audit Dish 071UI Audit Dish 072UI Audit Dish 073UI Audit Dish 074UI Audit Dish 075UI Audit Dish 076UI Audit Dish 077UI Audit Dish 078UI Audit Dish 079UI Audit Dish 080UI Audit Dish 081UI Audit Dish 082UI Audit Dish 083UI Audit Dish 084UI Audit Dish 085UI Audit Dish 086UI Audit Dish 087UI Audit Dish 088UI Audit Dish 089UI Audit Dish 090UI Audit Dish 091UI Audit Dish 092UI Audit Dish 093UI Audit Dish 094UI Audit Dish 095UI Audit Dish 096UI Audit Dish 097UI Audit Dish 098UI Audit Dish 099UI Audit Dish 100",
+      "disabled": false,
+      "value": "",
+      "options": [
+        {
+          "value": "ab2b6143-dab0-421f-aef7-92c92cb4babc",
+          "text": "Audit QR Dish 1791966297209"
+        },
+        {
+          "value": "caa31940-ab17-43bd-8d85-9bc511675a3a",
+          "text": "Audit QR Dish 1791966447575"
+        },
+        {
+          "value": "item-mv6ucw1l-1mv6ufa",
+          "text": "UI Audit Dish 001"
+        },
+        {
+          "value": "item-mv6ucw1l-hnz39a",
+          "text": "UI Audit Dish 002"
+        },
+        {
+          "value": "item-mv6ucw1m-e4zemm",
+          "text": "UI Audit Dish 003"
+        },
+        {
+          "value": "item-mv6ucw1m-4dkzx8",
+          "text": "UI Audit Dish 004"
+        },
+        {
+          "value": "item-mv6ucw1m-18miatp",
+          "text": "UI Audit Dish 005"
+        },
+        {
+          "value": "item-mv6ucw1m-9uvzt3",
+          "text": "UI Audit Dish 006"
+        },
+        {
+          "value": "item-mv6ucw1m-f0o239",
+          "text": "UI Audit Dish 007"
+        },
+        {
+          "value": "item-mv6ucw1m-195n4fu",
+          "text": "UI Audit Dish 008"
+        },
+        {
+          "value": "item-mv6ucw1m-wfls7u",
+          "text": "UI Audit Dish 009"
+        },
+        {
+          "value": "item-mv6ucw1m-eloh17",
+          "text": "UI Audit Dish 010"
+        },
+        {
+          "value": "item-mv6ucw1m-1azggur",
+          "text": "UI Audit Dish 011"
+        },
+        {
+          "value": "item-mv6ucw1m-2yih85",
+          "text": "UI Audit Dish 012"
+        },
+        {
+          "value": "item-mv6ucw1m-1pkkmc",
+          "text": "UI Audit Dish 013"
+        },
+        {
+          "value": "item-mv6ucw1m-alyewq",
+          "text": "UI Audit Dish 014"
+        },
+        {
+          "value": "item-mv6ucw1m-327uc3",
+          "text": "UI Audit Dish 015"
+        },
+        {
+          "value": "item-mv6ucw1m-q680ve",
+          "text": "UI Audit Dish 016"
+        },
+        {
+          "value": "item-mv6ucw1m-p0nl1r",
+          "text": "UI Audit Dish 017"
+        },
+        {
+          "value": "item-mv6ucw1m-ayy0ay",
+          "text": "UI Audit Dish 018"
+        },
+        {
+          "value": "item-mv6ucw1m-3b297y",
+          "text": "UI Audit Dish 019"
+        },
+        {
+          "value": "item-mv6ucw1n-iprfir",
+          "text": "UI Audit Dish 020"
+        },
+        {
+          "value": "item-mv6ucw1n-19f33ww",
+          "text": "UI Audit Dish 021"
+        },
+        {
+          "value": "item-mv6ucw1n-1uaz42d",
+          "text": "UI Audit Dish 022"
+        },
+        {
+          "value": "item-mv6ucw1n-1tg78k7",
+          "text": "UI Audit Dish 023"
+        },
+        {
+          "value": "item-mv6ucw1n-18ijgd",
+          "text": "UI Audit Dish 024"
+        },
+        {
+          "value": "item-mv6ucw1n-1fucyf9",
+          "text": "UI Audit Dish 025"
+        },
+        {
+          "value": "item-mv6ucw1n-17kmbk5",
+          "text": "UI Audit Dish 026"
+        },
+        {
+          "value": "item-mv6ucw1n-i2glf8",
+          "text": "UI Audit Dish 027"
+        },
+        {
+          "value": "item-mv6ucw1n-18y1c5m",
+          "text": "UI Audit Dish 028"
+        },
+        {
+          "value": "item-mv6ucw1n-czv14",
+          "text": "UI Audit Dish 029"
+        },
+        {
+          "value": "item-mv6ucw1n-ov58zr",
+          "text": "UI Audit Dish 030"
+        },
+        {
+          "value": "item-mv6ucw1n-1v0l8r",
+          "text": "UI Audit Dish 031"
+        },
+        {
+          "value": "item-mv6ucw1n-hta4gq",
+          "text": "UI Audit Dish 032"
+        },
+        {
+          "value": "item-mv6ucw1n-rh06vy",
+          "text": "UI Audit Dish 033"
+        },
+        {
+          "value": "item-mv6ucw1n-hy2sqo",
+          "text": "UI Audit Dish 034"
+        },
+        {
+          "value": "item-mv6ucw1n-14w93mf",
+          "text": "UI Audit Dish 035"
+        },
+        {
+          "value": "item-mv6ucw1n-y0t9kx",
+          "text": "UI Audit Dish 036"
+        },
+        {
+          "value": "item-mv6ucw1n-1wl60pa",
+          "text": "UI Audit Dish 037"
+        },
+        {
+          "value": "item-mv6ucw1n-emcxq1",
+          "text": "UI Audit Dish 038"
+        },
+        {
+          "value": "item-mv6ucw1n-1okkeu",
+          "text": "UI Audit Dish 039"
+        },
+        {
+          "value": "item-mv6ucw1o-mq2epk",
+          "text": "UI Audit Dish 040"
+        },
+        {
+          "value": "item-mv6ucw1o-1stwxdm",
+          "text": "UI Audit Dish 041"
+        },
+        {
+          "value": "item-mv6ucw1o-1d4djwm",
+          "text": "UI Audit Dish 042"
+        },
+        {
+          "value": "item-mv6ucw1o-q6wd9z",
+          "text": "UI Audit Dish 043"
+        },
+        {
+          "value": "item-mv6ucw1o-9z89wo",
+          "text": "UI Audit Dish 044"
+        },
+        {
+          "value": "item-mv6ucw1o-n99zgy",
+          "text": "UI Audit Dish 045"
+        },
+        {
+          "value": "item-mv6ucw1o-13xbcnn",
+          "text": "UI Audit Dish 046"
+        },
+        {
+          "value": "item-mv6ucw1o-7ndz6w",
+          "text": "UI Audit Dish 047"
+        },
+        {
+          "value": "item-mv6ucw1o-dxcgd",
+          "text": "UI Audit Dish 048"
+        },
+        {
+          "value": "item-mv6ucw1o-bpzkzg",
+          "text": "UI Audit Dish 049"
+        },
+        {
+          "value": "item-mv6ucw1o-1vzrzlv",
+          "text": "UI Audit Dish 050"
+        },
+        {
+          "value": "item-mv6ucw1o-1k4hlm8",
+          "text": "UI Audit Dish 051"
+        },
+        {
+          "value": "item-mv6ucw1o-xl6v0z",
+          "text": "UI Audit Dish 052"
+        },
+        {
+          "value": "item-mv6ucw1o-5o9o4j",
+          "text": "UI Audit Dish 053"
+        },
+        {
+          "value": "item-mv6ucw1p-1eh54vg",
+          "text": "UI Audit Dish 054"
+        },
+        {
+          "value": "item-mv6ucw1p-1rcovuw",
+          "text": "UI Audit Dish 055"
+        },
+        {
+          "value": "item-mv6ucw1p-1fm5bxs",
+          "text": "UI Audit Dish 056"
+        },
+        {
+          "value": "item-mv6ucw1p-tf4pk3",
+          "text": "UI Audit Dish 057"
+        },
+        {
+          "value": "item-mv6ucw1p-jtqh3e",
+          "text": "UI Audit Dish 058"
+        },
+        {
+          "value": "item-mv6ucw1p-1j9raz5",
+          "text": "UI Audit Dish 059"
+        },
+        {
+          "value": "item-mv6ucw1p-jijhqm",
+          "text": "UI Audit Dish 060"
+        },
+        {
+          "value": "item-mv6ucw1p-32hdww",
+          "text": "UI Audit Dish 061"
+        },
+        {
+          "value": "item-mv6ucw1p-1htrges",
+          "text": "UI Audit Dish 062"
+        },
+        {
+          "value": "item-mv6ucw1p-ygar37",
+          "text": "UI Audit Dish 063"
+        },
+        {
+          "value": "item-mv6ucw1p-1lzml95",
+          "text": "UI Audit Dish 064"
+        },
+        {
+          "value": "item-mv6ucw1p-2p1sm2",
+          "text": "UI Audit Dish 065"
+        },
+        {
+          "value": "item-mv6ucw1p-1ip1x43",
+          "text": "UI Audit Dish 066"
+        },
+        {
+          "value": "item-mv6ucw1p-xurxps",
+          "text": "UI Audit Dish 067"
+        },
+        {
+          "value": "item-mv6ucw1q-1jq61bv",
+          "text": "UI Audit Dish 068"
+        },
+        {
+          "value": "item-mv6ucw1q-137vswp",
+          "text": "UI Audit Dish 069"
+        },
+        {
+          "value": "item-mv6ucw1q-1r8mfwz",
+          "text": "UI Audit Dish 070"
+        },
+        {
+          "value": "item-mv6ucw1q-1cdmj1t",
+          "text": "UI Audit Dish 071"
+        },
+        {
+          "value": "item-mv6ucw1q-l0i4sd",
+          "text": "UI Audit Dish 072"
+        },
+        {
+          "value": "item-mv6ucw1q-12qcoos",
+          "text": "UI Audit Dish 073"
+        },
+        {
+          "value": "item-mv6ucw1q-1opy3md",
+          "text": "UI Audit Dish 074"
+        },
+        {
+          "value": "item-mv6ucw1q-hfqzm",
+          "text": "UI Audit Dish 075"
+        },
+        {
+          "value": "item-mv6ucw1q-1x69k2g",
+          "text": "UI Audit Dish 076"
+        },
+        {
+          "value": "item-mv6ucw1q-1h2rm02",
+          "text": "UI Audit Dish 077"
+        },
+        {
+          "value": "item-mv6ucw1q-z4d84i",
+          "text": "UI Audit Dish 078"
+        },
+        {
+          "value": "item-mv6ucw1q-7wm9s4",
+          "text": "UI Audit Dish 079"
+        },
+        {
+          "value": "item-mv6ucw1r-1r03q4f",
+          "text": "UI Audit Dish 080"
+        },
+        {
+          "value": "item-mv6ucw1r-8hlumz",
+          "text": "UI Audit Dish 081"
+        },
+        {
+          "value": "item-mv6ucw1r-1pd1ljb",
+          "text": "UI Audit Dish 082"
+        },
+        {
+          "value": "item-mv6ucw1r-xflpe1",
+          "text": "UI Audit Dish 083"
+        },
+        {
+          "value": "item-mv6ucw1r-jx3xyb",
+          "text": "UI Audit Dish 084"
+        },
+        {
+          "value": "item-mv6ucw1r-2gfn0b",
+          "text": "UI Audit Dish 085"
+        },
+        {
+          "value": "item-mv6ucw1r-1i35erh",
+          "text": "UI Audit Dish 086"
+        },
+        {
+          "value": "item-mv6ucw1r-t2nl3x",
+          "text": "UI Audit Dish 087"
+        },
+        {
+          "value": "item-mv6ucw1r-4h53fa",
+          "text": "UI Audit Dish 088"
+        },
+        {
+          "value": "item-mv6ucw1r-1jpzj4z",
+          "text": "UI Audit Dish 089"
+        },
+        {
+          "value": "item-mv6ucw1r-kxiaxf",
+          "text": "UI Audit Dish 090"
+        },
+        {
+          "value": "item-mv6ucw1s-dq2hyl",
+          "text": "UI Audit Dish 091"
+        },
+        {
+          "value": "item-mv6ucw1s-1wqt3zb",
+          "text": "UI Audit Dish 092"
+        },
+        {
+          "value": "item-mv6ucw1s-1vxkd6u",
+          "text": "UI Audit Dish 093"
+        },
+        {
+          "value": "item-mv6ucw1s-lu9dl2",
+          "text": "UI Audit Dish 094"
+        },
+        {
+          "value": "item-mv6ucw1s-1wopequ",
+          "text": "UI Audit Dish 095"
+        },
+        {
+          "value": "item-mv6ucw1s-k6orgn",
+          "text": "UI Audit Dish 096"
+        },
+        {
+          "value": "item-mv6ucw1s-wczpp6",
+          "text": "UI Audit Dish 097"
+        },
+        {
+          "value": "item-mv6ucw1s-djstpl",
+          "text": "UI Audit Dish 098"
+        },
+        {
+          "value": "item-mv6ucw1s-1uhlfzi",
+          "text": "UI Audit Dish 099"
+        },
+        {
+          "value": "item-mv6ucw1t-1sr5b0b",
+          "text": "UI Audit Dish 100"
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " NEW ORDER",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 14,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " CASH DUE",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 15,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " PAYMENT COLLECTED",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 16,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " PAYMENT PENDING",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 17,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " CANCELLED",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 18,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " REFUND",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 19,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "BranchChoose branch...UI Audit Restaurant A — Main Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose branch..."
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "DishChoose dish...UI Audit Dish 001 · Manual availabilityUI Audit Dish 002 · Manual availabilityUI Audit Dish 003 · Manual availabilityUI Audit Dish 004 · Manual availabilityUI Audit Dish 005 · Manual availabilityUI Audit Dish 006 · Manual availabilityUI Audit Dish 007 · Manual availabilityUI Audit Dish 008 · Manual availabilityUI Audit Dish 009 · Manual availabilityUI Audit Dish 010 · Manual availabilityUI Audit Dish 011 · Manual availabilityUI Audit Dish 012 · Manual availabilityUI Audit Dish 013 · Manual availabilityUI Audit Dish 014 · Manual availabilityUI Audit Dish 015 · Manual availabilityUI Audit Dish 016 · Manual availabilityUI Audit Dish 017 · Manual availabilityUI Audit Dish 018 · Manual availabilityUI Audit Dish 019 · Manual availabilityUI Audit Dish 020 · Manual availabilityUI Audit Dish 021 · Manual availabilityUI Audit Dish 022 · Manual availabilityUI Audit Dish 023 · Manual availabilityUI Audit Dish 024 · Manual availabilityUI Audit Dish 025 · Manual availabilityUI Audit Dish 026 · Manual availabilityUI Audit Dish 027 · Manual availabilityUI Audit Dish 028 · Manual availabilityUI Audit Dish 029 · Manual availabilityUI Audit Dish 030 · Manual availabilityUI Audit Dish 031 · Manual availabilityUI Audit Dish 032 · Manual availabilityUI Audit Dish 033 · Manual availabilityUI Audit Dish 034 · Manual availabilityUI Audit Dish 035 · Manual availabilityUI Audit Dish 036 · Manual availabilityUI Audit Dish 037 · Manual availabilityUI Audit Dish 038 · Manual availabilityUI Audit Dish 039 · Manual availabilityUI Audit Dish 040 · Manual availabilityUI Audit Dish 041 · Manual availabilityUI Audit Dish 042 · Manual availabilityUI Audit Dish 043 · Manual availabilityUI Audit Dish 044 · Manual availabilityUI Audit Dish 045 · Manual availabilityUI Audit Dish 046 · Manual availabilityUI Audit Dish 047 · Manual availabilityUI Audit Dish 048 · Manual availabilityUI Audit Dish 049 · Manual availabilityUI Audit Dish 050 · Manual availabilityUI Audit Dish 051 · Manual availabilityUI Audit Dish 052 · Manual availabilityUI Audit Dish 053 · Manual availabilityUI Audit Dish 054 · Manual availabilityUI Audit Dish 055 · Manual availabilityUI Audit Dish 056 · Manual availabilityUI Audit Dish 057 · Manual availabilityUI Audit Dish 058 · Manual availabilityUI Audit Dish 059 · Manual availabilityUI Audit Dish 060 · Manual availabilityUI Audit Dish 061 · Manual availabilityUI Audit Dish 062 · Manual availabilityUI Audit Dish 063 · Manual availabilityUI Audit Dish 064 · Manual availabilityUI Audit Dish 065 · Manual availabilityUI Audit Dish 066 · Manual availabilityUI Audit Dish 067 · Manual availabilityUI Audit Dish 068 · Manual availabilityUI Audit Dish 069 · Manual availabilityUI Audit Dish 070 · Manual availabilityUI Audit Dish 071 · Manual availabilityUI Audit Dish 072 · Manual availabilityUI Audit Dish 073 · Manual availabilityUI Audit Dish 074 · Manual availabilityUI Audit Dish 075 · Manual availabilityUI Audit Dish 076 · Manual availabilityUI Audit Dish 077 · Manual availabilityUI Audit Dish 078 · Manual availabilityUI Audit Dish 079 · Manual availabilityUI Audit Dish 080 · Manual availabilityUI Audit Dish 081 · Manual availabilityUI Audit Dish 082 · Manual availabilityUI Audit Dish 083 · Manual availabilityUI Audit Dish 084 · Manual availabilityUI Audit Dish 085 · Manual availabilityUI Audit Dish 086 · Manual availabilityUI Audit Dish 087 · Manual availabilityUI Audit Dish 088 · Manual availabilityUI Audit Dish 089 · Manual availabilityUI Audit Dish 090 · Manual availabilityUI Audit Dish 091 · Manual availabilityUI Audit Dish 092 · Manual availabilityUI Audit Dish 093 · Manual availabilityUI Audit Dish 094 · Manual availabilityUI Audit Dish 095 · Manual availabilityUI Audit Dish 096 · Manual availabilityUI Audit Dish 097 · Manual availabilityUI Audit Dish 098 · Manual availabilityUI Audit Dish 099 · Manual availabilityUI Audit Dish 100 · Manual availabilityAudit QR Dish 1791966297209 · Manual availabilityAudit QR Dish 1791966447575 · Manual availability",
+      "disabled": false,
+      "value": "",
+      "options": [
+        {
+          "value": "",
+          "text": "Choose dish..."
+        },
+        {
+          "value": "item-mv6ucw1l-1mv6ufa",
+          "text": "UI Audit Dish 001 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1l-hnz39a",
+          "text": "UI Audit Dish 002 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-e4zemm",
+          "text": "UI Audit Dish 003 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-4dkzx8",
+          "text": "UI Audit Dish 004 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-18miatp",
+          "text": "UI Audit Dish 005 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-9uvzt3",
+          "text": "UI Audit Dish 006 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-f0o239",
+          "text": "UI Audit Dish 007 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-195n4fu",
+          "text": "UI Audit Dish 008 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-wfls7u",
+          "text": "UI Audit Dish 009 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-eloh17",
+          "text": "UI Audit Dish 010 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-1azggur",
+          "text": "UI Audit Dish 011 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-2yih85",
+          "text": "UI Audit Dish 012 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-1pkkmc",
+          "text": "UI Audit Dish 013 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-alyewq",
+          "text": "UI Audit Dish 014 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-327uc3",
+          "text": "UI Audit Dish 015 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-q680ve",
+          "text": "UI Audit Dish 016 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-p0nl1r",
+          "text": "UI Audit Dish 017 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-ayy0ay",
+          "text": "UI Audit Dish 018 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1m-3b297y",
+          "text": "UI Audit Dish 019 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-iprfir",
+          "text": "UI Audit Dish 020 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-19f33ww",
+          "text": "UI Audit Dish 021 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1uaz42d",
+          "text": "UI Audit Dish 022 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1tg78k7",
+          "text": "UI Audit Dish 023 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-18ijgd",
+          "text": "UI Audit Dish 024 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1fucyf9",
+          "text": "UI Audit Dish 025 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-17kmbk5",
+          "text": "UI Audit Dish 026 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-i2glf8",
+          "text": "UI Audit Dish 027 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-18y1c5m",
+          "text": "UI Audit Dish 028 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-czv14",
+          "text": "UI Audit Dish 029 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-ov58zr",
+          "text": "UI Audit Dish 030 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1v0l8r",
+          "text": "UI Audit Dish 031 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-hta4gq",
+          "text": "UI Audit Dish 032 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-rh06vy",
+          "text": "UI Audit Dish 033 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-hy2sqo",
+          "text": "UI Audit Dish 034 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-14w93mf",
+          "text": "UI Audit Dish 035 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-y0t9kx",
+          "text": "UI Audit Dish 036 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1wl60pa",
+          "text": "UI Audit Dish 037 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-emcxq1",
+          "text": "UI Audit Dish 038 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1n-1okkeu",
+          "text": "UI Audit Dish 039 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-mq2epk",
+          "text": "UI Audit Dish 040 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-1stwxdm",
+          "text": "UI Audit Dish 041 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-1d4djwm",
+          "text": "UI Audit Dish 042 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-q6wd9z",
+          "text": "UI Audit Dish 043 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-9z89wo",
+          "text": "UI Audit Dish 044 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-n99zgy",
+          "text": "UI Audit Dish 045 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-13xbcnn",
+          "text": "UI Audit Dish 046 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-7ndz6w",
+          "text": "UI Audit Dish 047 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-dxcgd",
+          "text": "UI Audit Dish 048 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-bpzkzg",
+          "text": "UI Audit Dish 049 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-1vzrzlv",
+          "text": "UI Audit Dish 050 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-1k4hlm8",
+          "text": "UI Audit Dish 051 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-xl6v0z",
+          "text": "UI Audit Dish 052 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1o-5o9o4j",
+          "text": "UI Audit Dish 053 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1eh54vg",
+          "text": "UI Audit Dish 054 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1rcovuw",
+          "text": "UI Audit Dish 055 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1fm5bxs",
+          "text": "UI Audit Dish 056 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-tf4pk3",
+          "text": "UI Audit Dish 057 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-jtqh3e",
+          "text": "UI Audit Dish 058 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1j9raz5",
+          "text": "UI Audit Dish 059 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-jijhqm",
+          "text": "UI Audit Dish 060 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-32hdww",
+          "text": "UI Audit Dish 061 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1htrges",
+          "text": "UI Audit Dish 062 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-ygar37",
+          "text": "UI Audit Dish 063 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1lzml95",
+          "text": "UI Audit Dish 064 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-2p1sm2",
+          "text": "UI Audit Dish 065 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-1ip1x43",
+          "text": "UI Audit Dish 066 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1p-xurxps",
+          "text": "UI Audit Dish 067 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1jq61bv",
+          "text": "UI Audit Dish 068 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-137vswp",
+          "text": "UI Audit Dish 069 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1r8mfwz",
+          "text": "UI Audit Dish 070 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1cdmj1t",
+          "text": "UI Audit Dish 071 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-l0i4sd",
+          "text": "UI Audit Dish 072 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-12qcoos",
+          "text": "UI Audit Dish 073 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1opy3md",
+          "text": "UI Audit Dish 074 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-hfqzm",
+          "text": "UI Audit Dish 075 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1x69k2g",
+          "text": "UI Audit Dish 076 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-1h2rm02",
+          "text": "UI Audit Dish 077 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-z4d84i",
+          "text": "UI Audit Dish 078 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1q-7wm9s4",
+          "text": "UI Audit Dish 079 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-1r03q4f",
+          "text": "UI Audit Dish 080 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-8hlumz",
+          "text": "UI Audit Dish 081 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-1pd1ljb",
+          "text": "UI Audit Dish 082 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-xflpe1",
+          "text": "UI Audit Dish 083 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-jx3xyb",
+          "text": "UI Audit Dish 084 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-2gfn0b",
+          "text": "UI Audit Dish 085 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-1i35erh",
+          "text": "UI Audit Dish 086 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-t2nl3x",
+          "text": "UI Audit Dish 087 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-4h53fa",
+          "text": "UI Audit Dish 088 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-1jpzj4z",
+          "text": "UI Audit Dish 089 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1r-kxiaxf",
+          "text": "UI Audit Dish 090 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-dq2hyl",
+          "text": "UI Audit Dish 091 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-1wqt3zb",
+          "text": "UI Audit Dish 092 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-1vxkd6u",
+          "text": "UI Audit Dish 093 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-lu9dl2",
+          "text": "UI Audit Dish 094 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-1wopequ",
+          "text": "UI Audit Dish 095 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-k6orgn",
+          "text": "UI Audit Dish 096 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-wczpp6",
+          "text": "UI Audit Dish 097 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-djstpl",
+          "text": "UI Audit Dish 098 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1s-1uhlfzi",
+          "text": "UI Audit Dish 099 · Manual availability"
+        },
+        {
+          "value": "item-mv6ucw1t-1sr5b0b",
+          "text": "UI Audit Dish 100 · Manual availability"
+        },
+        {
+          "value": "ab2b6143-dab0-421f-aef7-92c92cb4babc",
+          "text": "Audit QR Dish 1791966297209 · Manual availability"
+        },
+        {
+          "value": "caa31940-ab17-43bd-8d85-9bc511675a3a",
+          "text": "Audit QR Dish 1791966447575 · Manual availability"
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Current portions (blank = inherit/manual)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 22,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " I want this branch to follow restaurant defaults",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

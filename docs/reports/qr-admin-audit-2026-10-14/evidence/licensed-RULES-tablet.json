@@ -1,0 +1,413 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / LAUNCH SETUP\nOrdering Rules\n\nSet opening hours, preparation time and the ordering modes you offer.\n\nEnabled\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nRestaurant defaults apply until a branch overrides a setting. Other branches keep their own configuration.\n\nUse restaurant defaults\nAccept QR orders\nSend accepted orders straight to the kitchen\nAllow menu / counter codes\nHours, capacity & guest instructions\n\nHours use the restaurant timezone. Empty hours mean always open. Equal opening and closing times mean 24 hours. Overnight intervals are supported. Zero capacity limits mean unlimited.\n\nMinimum order (INR)\nPreparation estimate (minutes)\nMaximum pending QR orders\nOrders per window\nWindow duration (minutes)\nPause until (your device timezone)\nCustomer instructions\nOrdering modes\nDINE IN\nTAKEAWAY\nOrdering hours\n+ Add hours\nSave ordering rules",
+  "headings": [
+    "Ordering Rules",
+    "Hours, capacity & guest instructions"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "+ Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Save ordering rules",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 183,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum order (INR)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Preparation estimate (minutes)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Maximum pending QR orders",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per window",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Window duration (minutes)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Accept QR orders",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Send accepted orders straight to the kitchen",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Allow menu / counter codes",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum order (INR)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "0"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Preparation estimate (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "27"
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Maximum pending QR orders",
+      "placeholder": "",
+      "disabled": false,
+      "value": "0"
+    },
+    {
+      "index": 7,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per window",
+      "placeholder": "",
+      "disabled": false,
+      "value": "0"
+    },
+    {
+      "index": 8,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Window duration (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "15"
+    },
+    {
+      "index": 9,
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Pause until (your device timezone)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 10,
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Customer instructions",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 11,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "DINE IN",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 12,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "TAKEAWAY",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "+ Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 20,
+      "visible": true
+    }
+  ],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

@@ -1,0 +1,14 @@
+{
+  "zipCrc": "PASS",
+  "cardCount": 1,
+  "pdfPages": 1,
+  "pageSize": "A4",
+  "embeddedImages": 1,
+  "files": [
+    "cards/Table-UI01-0624e176-9f38-42cb-9357-1695fe7de9ad.svg",
+    "print-sheets.html",
+    "print-sheets.pdf",
+    "inventory.csv",
+    "README.txt"
+  ]
+}

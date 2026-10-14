@@ -1,0 +1,302 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / INSIGHTS\nCollection Reconciliation\n\nClose the day using collection-date totals by collector, method and branch.\n\nEnabled\nQR cash & collection reconciliation\n\nMoney collected or refunded during these restaurant calendar dates, regardless of when the order was placed. All totals include every ledger entry in the period; the detailed list pages separately. Legacy bills without ledger entries require ledger review first.\n\nFrom (restaurant date)\nTo (restaurant date)\nRefresh collections\n\nAsia/Kolkata / 14 October 2026 at 12:00 am to 15 October 2026 at 12:00 am (exclusive)\n\nCollected\n\n₹125\n\nRefunded\n\n₹0\n\nNet collection\n\n₹125\nExport full summary CSV\nBranch\tCollector\tMethod\tType\tEntries\tAmount\nUI Audit Restaurant A — Main Branch\tUI Audit Owner A\tcash\tcollection\t1\t₹25\nUI Audit Restaurant A — Main Branch\tGateway\tcash at counter\tcollection\t1\t₹100\nCollection / refund entries\nQA-PICKUP / ₹100\n\ncollection / cash at counter / Gateway\n\n14 October 2026 at 05:13 pm\n\nOrder timeline\nQR-1 / ₹25\n\ncollection / cash / UI Audit Owner A\n\n14 October 2026 at 02:07 pm\n\nOrder timeline\nFirst entries Older entries",
+  "headings": [
+    "Collection Reconciliation",
+    "QR cash & collection reconciliation",
+    "Collection / refund entries"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": false
+    },
+    {
+      "text": "Refresh collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Export full summary CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 199,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Order timeline",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Order timeline",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "First entries",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 111,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Older entries",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 119,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

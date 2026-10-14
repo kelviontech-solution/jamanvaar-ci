@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Promotion navigation preserves an unsaved coupon",
+      "passed": true
+    },
+    {
+      "name": "Changing translation records asks before replacing text",
+      "passed": true
+    },
+    {
+      "name": "Closing a point adjustment preserves the draft until discarded",
+      "passed": true
+    },
+    {
+      "name": "Mobile leave confirmation stays above the sidebar",
+      "passed": true
+    }
+  ],
+  "passed": 4,
+  "total": 4
+}

@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-14T11:43:48.097Z",
+  "passed": 8,
+  "total": 8,
+  "tests": [
+    {
+      "name": "Browser Back keeps an unsaved branding draft until explicitly discarded",
+      "passed": true,
+      "detail": {
+        "backWarning": true
+      }
+    },
+    {
+      "name": "Translation navigation warns and Keep editing preserves draft",
+      "passed": true,
+      "detail": {
+        "preserved": true
+      }
+    },
+    {
+      "name": "Rejected rule save keeps the entered value",
+      "passed": true,
+      "detail": {
+        "retryDraftKept": true
+      }
+    },
+    {
+      "name": "Order details takes focus and closes with Escape",
+      "passed": true,
+      "detail": {
+        "focusAndEscape": true
+      }
+    },
+    {
+      "name": "Partial cash prompt names remaining amount",
+      "passed": true,
+      "detail": {
+        "amount174": true
+      }
+    },
+    {
+      "name": "Table QR dialog has name, focus and Escape",
+      "passed": true,
+      "detail": {
+        "accessible": true
+      }
+    },
+    {
+      "name": "Menu draft and guest availability are separate bounded views",
+      "passed": true,
+      "detail": {
+        "bounded24": true
+      }
+    },
+    {
+      "name": "CRM customer, program, reward and reasoned points work with shared POS records",
+      "passed": true,
+      "detail": {
+        "points200": true,
+        "reward150for100": true,
+        "posEntityShared": true
+      }
+    }
+  ]
+}

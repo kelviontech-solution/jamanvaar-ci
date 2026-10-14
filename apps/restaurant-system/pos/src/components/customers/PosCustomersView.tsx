@@ -116,7 +116,7 @@ export const PosCustomersView: React.FC = () => {
 
                 <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
                   <div>Recent Orders: <strong>{account.totalVisits ?? account.recentOrderIds?.length ?? 0} visits</strong></div>
-                  <div>Rewards available: <strong className="text-emerald-700">{CustomerRepository.getRewards().filter(r => r.isActive && r.pointsCost <= account.loyaltyPoints && (r.discountAmount || r.id === 'reward-100off')).length}</strong></div>
+                  <div>Rewards available: <strong className="text-emerald-700">{CustomerRepository.getRewards().filter(r => r.isActive && (!r.expiresAt || Date.parse(r.expiresAt)>Date.now()) && r.pointsCost <= account.loyaltyPoints && (r.discountAmount || r.id === 'reward-100off')).length}</strong></div>
                 </div>
               </div>
 

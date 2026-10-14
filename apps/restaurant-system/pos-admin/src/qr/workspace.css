@@ -657,3 +657,10 @@
     transition: none;
   }
 }
+
+/* Touch actions keep their full hit area, including text links in lists. */
+.qr-console button:not(.qr-sidebar-dismiss) { min-height:44px; }
+.qr-navigation-confirm { position:fixed; inset:0; z-index:90; pointer-events:none; }
+.qr-navigation-confirm > * { pointer-events:auto; }
+.qr-console article button,.qr-console details button {padding:8px 12px;}
+.qr-admin-app input[type="color"] {min-height:44px;width:100%;padding:4px;}

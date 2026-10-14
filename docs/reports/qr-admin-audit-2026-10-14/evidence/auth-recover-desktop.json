@@ -1,0 +1,63 @@
+{
+  "text": "QR ORDERING\nA little scan. A better meal.\nFeatures\nHow it works\nBenefits\nPayments\nIntegrations\nFAQ\nLogin\nGet started\nYOUR RESTAURANT, IN YOUR HANDS\nA fresh start.\n\nManage the menu, QR codes, guest orders and payments from your restaurant's own workspace.\n\nExplore the interactive demo →\nYour hospitality. A simpler way to order.\nRecover your account\n\nUse your Restaurant ID and the recovery code sent to your registered email.\n\nRestaurant ID\nSend recovery code\nLogin\nActivate QR Ordering\nForgot password?\nReturn to product website\n\nActivation connects this console to an existing licensed restaurant. Your platform administrator handles license assignment and device reassignment. Signing in does not buy or enable a product.",
+  "headings": [
+    "A fresh start.",
+    "Recover your account"
+  ],
+  "buttons": [
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Send recovery code",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 405,
+      "height": 46,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    },
+    {
+      "alt": "A warm restaurant table with a Gujarati meal",
+      "src": "/qr/assets/qr-experience/dining.webp",
+      "loaded": true,
+      "width": 477
+    },
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 145
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

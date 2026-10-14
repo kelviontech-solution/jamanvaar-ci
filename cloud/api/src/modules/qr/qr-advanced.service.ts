@@ -1,3 +1,4 @@
+import {qrReportRange} from './qr-report-range';
 import {
   BadRequestException,
   ConflictException,
@@ -736,11 +737,12 @@ export class QrAdvancedService {
         device.restaurantId,
         "QR_FEEDBACK",
       );
+      const range=await qrReportRange(tx,device.restaurantId,device.branchId,from,to);
       const rows = await tx.syncedEntity.findMany({
         where: {
           restaurantId: device.restaurantId,
           entityType: "QR_VERIFIED_FEEDBACK",
-          ...(from || end ? { createdAt: { ...(from ? { gte: new Date(from + "T00:00:00Z") } : {}), ...(end ? { lt: end } : {}) } } : {}),
+          ...(from || to ? {createdAt:{gte:range.start,lt:range.end}} : {}),
           ...(rating ? { AND: [{ payload: { path: ["rating"], equals: Number(rating) } }] } : {}),
           ...(device.branchId
             ? { payload: { path: ["branchId"], equals: device.branchId } }
@@ -756,6 +758,7 @@ export class QrAdvancedService {
       }));
       const ratings = rows.map((row) => (row.payload as any).rating as number);
       return {
+        timezone:range.timezone,from:range.start.toISOString(),to:range.end.toISOString(),
         total: rows.length,
         average: ratings.length
           ? ratings.reduce((a, b) => a + b, 0) / ratings.length

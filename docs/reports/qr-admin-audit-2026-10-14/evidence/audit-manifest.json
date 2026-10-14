@@ -1,0 +1,107 @@
+{
+  "recordedAt": "2026-10-14T08:58:06.502Z",
+  "commit": "543bd97492055f91a942be2091ce0d269c83d4a6",
+  "scope": "Current local working tree / isolated API",
+  "files": [
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/FeatureRequestButton.tsx",
+      "sha256": "52fc0e654e8a4b04a4f47a08d5c4c556fb24a4c028613de70ebe985cb5054801",
+      "modifiedAt": "2026-10-12T14:57:14.861Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/LegacyGuestRedirect.tsx",
+      "sha256": "38454a76c4a01071e5497f861ad9554f34005c2e0d47f3403a3f3ea60c8617c7",
+      "modifiedAt": "2026-09-26T08:13:41.545Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrAdvanced.tsx",
+      "sha256": "94ccee1b83de4382cd2b591aa3fd6946fba472d36e423adacf8a043de9a459ca",
+      "modifiedAt": "2026-10-14T04:21:42.557Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrBranchPreferences.tsx",
+      "sha256": "5b6432f67c7508b5f9146df592b33e18154f102a0abead7419b4892ce2d4b5aa",
+      "modifiedAt": "2026-10-10T06:54:57.853Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCapabilities.tsx",
+      "sha256": "c79a88e473d65aefd8175ea52bf9c5c0b66eeb134a85f55311cc1938ed7cdee6",
+      "modifiedAt": "2026-10-12T14:58:26.694Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCatalog.tsx",
+      "sha256": "730af1a4cce6134d2174d9bacc6667a1f45882da744f4520c69cfeb99daab69b",
+      "modifiedAt": "2026-10-12T12:46:59.220Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrConsole.tsx",
+      "sha256": "a3a9f8b070c2ac1fdbc608637da6fa6a8123c99f5635fbe4c79cbd959183d265",
+      "modifiedAt": "2026-10-13T06:14:45.584Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCountedStock.tsx",
+      "sha256": "ab6f15746fac0207e068d65d385d5999d62d9e4cfb1c5dd02b9644fcb9dd2f5e",
+      "modifiedAt": "2026-10-10T07:01:27.903Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/qrNavigation.ts",
+      "sha256": "8a3ad6dc080db00198acc5cd2024d5262878f91085625b0bed1339b12b660ab4",
+      "modifiedAt": "2026-10-13T06:13:47.615Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrOperations.tsx",
+      "sha256": "26f8ea598228aa213c4f362c97503cc45bb480cafeea8cf1c680c2be8c410dc5",
+      "modifiedAt": "2026-10-12T14:59:14.366Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/qrPrint.ts",
+      "sha256": "047ad32ce07ba02becb45ef760adc621f7cbe4476ee40c0e48ce8470f854ce52",
+      "modifiedAt": "2026-10-10T05:31:07.514Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrPromotions.tsx",
+      "sha256": "1aee16e56af35f2c9fa89fe0de8276af8bf745ddc82560ef2d5c0cff3e534382",
+      "modifiedAt": "2026-10-10T06:54:57.842Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/useQrEntitlement.ts",
+      "sha256": "541437729b9ae060c1fce61f950ede8967f1ae4b02d39d92f67222bb0094ddc6",
+      "modifiedAt": "2026-09-26T07:59:31.448Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/components/qrconsole/useQrUnsavedChanges.ts",
+      "sha256": "960575442a2cfab13c6c1d74416baa48a37109b66ace08b6eb1c79921d7944ea",
+      "modifiedAt": "2026-10-12T06:51:35.870Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/main.tsx",
+      "sha256": "9f0b536f8bbd4b34011d6dae84c98de3398cec444f9474acb23300d753d10acc",
+      "modifiedAt": "2026-10-10T17:42:36.159Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/product.css",
+      "sha256": "e6e8a66215e22fb287e81f68c590d98f6e7a319660d17ccdd4102088988634e9",
+      "modifiedAt": "2026-10-13T06:29:24.254Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/QrProduct.tsx",
+      "sha256": "65cf1c19cad750394750386299df1eb28b03e0651f918466cb2e282ae385d1db",
+      "modifiedAt": "2026-10-10T19:02:38.206Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/qrRoutes.ts",
+      "sha256": "04487f25ccafad8c351c36db9c8c1c22e1249bce5b5842d44fdb1dae0aef669a",
+      "modifiedAt": "2026-10-10T17:31:34.900Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/QrWorkspace.tsx",
+      "sha256": "bdbdcfa73887d78856c572156e760170200509212984f44488d30cc1e97ddfac",
+      "modifiedAt": "2026-10-10T18:48:37.994Z"
+    },
+    {
+      "path": "apps/restaurant-system/pos-admin/src/qr/workspace.css",
+      "sha256": "dd5319c15402854b795a209eed251bcb6e7121f366f8f5ec5414e1ee15d31d33",
+      "modifiedAt": "2026-10-12T13:28:49.927Z"
+    }
+  ]
+}

@@ -384,3 +384,19 @@ it('feedback reports filter real completed-order responses and reject invalid da
  const filtered=await auth('get',advancedPath+'/feedback?rating=5');expect(filtered.status).toBe(200);expect(filtered.body.feedback.every((r:any)=>r.rating===5)).toBe(true);
  expect((await auth('get',advancedPath+'/feedback?from=2020-01-01&to=2020-01-02')).body.total).toBe(0);
 });
+it('expired bill rewards are hidden and rejected by verified QR redemption',async()=>{
+ await push('LOYALTY_REWARD','expired-reward',{name:'Expired reward',description:'Expired',pointsCost:1,isActive:true,discountKind:'FIXED',discountAmount:10,expiresAt:'2020-01-01T00:00:00.000Z'});
+ const session=await browserSession();const available=await http().get(`/api/v1/public/qr/${qr}/loyalty`).set('x-qr-session',session);
+ expect(available.status,JSON.stringify(available.body)).toBe(200);expect(available.body.rewards.some((r:any)=>r.id==='expired-reward')).toBe(false);
+ let code='';vi.mocked((app.get(NotificationGatewayService) as NotificationGatewayService).sendQrLoyaltyOtp).mockImplementation(async(_phone:string,otp:string)=>{code=otp;return {success:true};});
+ expect((await http().post(`/api/v1/public/qr/${qr}/loyalty/send-code`).set('x-qr-session',session).send({phone:'9797979797'})).status).toBe(200);
+ expect((await http().post(`/api/v1/public/qr/${qr}/loyalty/verify`).set('x-qr-session',session).send({code})).status).toBe(200);
+ expect((await http().post(`/api/v1/public/qr/${qr}/quote`).set('x-qr-session',session).send({items:body('expiry-quote').items,loyaltyRewardId:'expired-reward'})).status).toBe(400);
+});
+it('publication review compares canonical dish values without JSON key-order false changes',async()=>{
+ expect((await auth('post','/api/v1/menu/publish').send({})).status).toBe(201);
+ const unchanged=await auth('get','/api/v1/menu/draft-status');expect(unchanged.status).toBe(200);expect(unchanged.body.changes).toMatchObject({added:[],updated:[],removed:[]});
+ const row=await prisma.runAsTenant(restaurantId,tx=>tx.syncedEntity.findFirstOrThrow({where:{restaurantId,entityType:'MENU_ITEM',externalId:'meal'}}));
+ const item={...(row.payload as any),description:'Menu review description change'};await push('MENU_ITEM','meal',item);
+ const changed=await auth('get','/api/v1/menu/draft-status');expect(changed.body.changes.updated.map((i:any)=>i.id)).toEqual(['meal']);
+});

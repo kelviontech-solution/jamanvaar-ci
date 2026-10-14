@@ -1,0 +1,264 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nOrdering Rules\n\nSet opening hours, preparation time and the ordering modes you offer.\n\nEnabled\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nRestaurant defaults apply until a branch overrides a setting. Other branches keep their own configuration.\n\nUse restaurant defaults\nAccept QR orders\nSend accepted orders straight to the kitchen\nAllow menu / counter codes\nHours, capacity & guest instructions\n\nHours use the restaurant timezone. Empty hours mean always open. Equal opening and closing times mean 24 hours. Overnight intervals are supported. Zero capacity limits mean unlimited.\n\nMinimum order (INR)\nPreparation estimate (minutes)\nMaximum pending QR orders\nOrders per window\nWindow duration (minutes)\nPause until (your device timezone)\nCustomer instructions\nOrdering modes\nDINE IN\nTAKEAWAY\nOrdering hours\n+ Add hours\nSave ordering rules",
+  "headings": [
+    "Ordering Rules",
+    "Hours, capacity & guest instructions"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "+ Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Save ordering rules",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 183,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum order (INR)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Preparation estimate (minutes)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Maximum pending QR orders",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per window",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Window duration (minutes)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

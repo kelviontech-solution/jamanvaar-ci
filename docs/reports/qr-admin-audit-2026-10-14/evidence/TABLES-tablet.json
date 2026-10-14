@@ -1,0 +1,402 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / LAUNCH SETUP\nTables & QR\n\nConnect each table to the right menu and manage its QR code.\n\nEnabled\nAdd table\nGenerate selected QR codes\nPrint selected (0)\nPrint All\nDownload All\nMenu-only code\nTable UI01 edit\nUI Audit Restaurant A — Main Branch\nActive\nView QR\nTurn off",
+  "headings": [
+    "Tables & QR"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Add table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Generate selected QR codes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 182,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Print selected (0)",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 142,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Print All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 92,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Download All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Menu-only code",
+      "aria": null,
+      "title": "A code with no table, for menu cards",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "edit",
+      "aria": "Rename table UI01",
+      "title": "",
+      "disabled": false,
+      "width": 24,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "View QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Print",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Regenerate",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Turn off",
+      "aria": null,
+      "title": "Switch this table on or off",
+      "disabled": false,
+      "width": 63,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Revoke",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Select table UI01",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 11,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Select table UI01",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Add table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Print All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 92,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Download All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Menu-only code",
+      "aria": null,
+      "title": "A code with no table, for menu cards",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "edit",
+      "aria": "Rename table UI01",
+      "title": "",
+      "disabled": false,
+      "width": 24,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "View QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Print",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Regenerate",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Turn off",
+      "aria": null,
+      "title": "Switch this table on or off",
+      "disabled": false,
+      "width": 63,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Revoke",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    }
+  ]
+}

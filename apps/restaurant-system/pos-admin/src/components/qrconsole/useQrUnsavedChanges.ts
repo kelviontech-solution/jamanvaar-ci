@@ -12,3 +12,5 @@ export function useQrUnsavedChanges(dirty: boolean) {
     return () => { window.removeEventListener('beforeunload', unload); window.removeEventListener(QR_BEFORE_NAVIGATE, navigate); };
   }, [dirty]);
 }
+
+export function requestQrLeave():Promise<boolean>{if(window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE,{cancelable:true})))return Promise.resolve(true);return new Promise(resolve=>window.dispatchEvent(new CustomEvent('jamanvaar-qr-request-leave',{detail:{resolve}})));}

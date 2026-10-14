@@ -934,6 +934,8 @@ export interface CustomerFeedback {
 }
 
 export interface CustomerAccount {
+  marketingConsent?: {email:boolean;whatsapp:boolean;source:string;at:string;actorId?:string};
+  followups?: Array<{id:string;note:string;at:string;actorId:string;branchId:string|null}>;
   phone: string;
   name?: string;
   email?: string;
@@ -973,6 +975,7 @@ export interface LoyaltyTier {
 
 /** A catalog entry a customer can redeem points against, instead of a flat 1pt = ₹1 assumption. */
 export interface LoyaltyReward {
+  expiresAt?: string | null;
   id: string;
   name: string;
   description: string;

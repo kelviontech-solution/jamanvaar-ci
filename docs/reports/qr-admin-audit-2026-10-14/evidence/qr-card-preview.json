@@ -1,0 +1,472 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nTables & QR\n\nConnect each table to the right menu and manage its QR code.\n\nEnabled\nAdd table\nGenerate selected QR codes\nPrint selected (0)\nPrint All\nDownload All\nMenu-only code\nTable UI01 edit\nUI Audit Restaurant A — Main Branch\nActive\nView QR\nTurn off\nTable UI01\nhttp://localhost:5390/q/XZM6eWfEN7LzBQzRsRbW6exOIbeyd0Ik\nCopy link\nPNG\nPrint / PDF\nClose",
+  "headings": [
+    "Tables & QR"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Add table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Generate selected QR codes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 182,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Print selected (0)",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 142,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Print All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 92,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Download All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Menu-only code",
+      "aria": null,
+      "title": "A code with no table, for menu cards",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "edit",
+      "aria": "Rename table UI01",
+      "title": "",
+      "disabled": false,
+      "width": 24,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "View QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Print",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Regenerate",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Turn off",
+      "aria": null,
+      "title": "Switch this table on or off",
+      "disabled": false,
+      "width": 63,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Revoke",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Copy link",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 97,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "PNG",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Print / PDF",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Close",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 29,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Select table UI01",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    },
+    {
+      "alt": "QR code for table UI01",
+      "src": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2041%2041%22%20width%3D%22260%22%20height%3D%22260%22%20shape-rendering%3D%22crispEdges%22%3E%0A%20%20%3Crect%20width%3D%2241%22%20height%3D%2241%22%20fill%3D%22%23FFFFFF%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22M4%2C4h1v1h-1z%20M5%2C4h1v1h-1z%20M6%2C4h1v1h-1z%20M7%2C4h1v1h-1z%20M8%2C4h1v1h-1z%20M9%2C4h1v1h-1z%20M10%2C4h1v1h-1z%20M13%2C4h1v1h-1z%20M14%2C4h1v1h-1z%20M17%2C4h1v1h-1z%20M18%2C4h1v1h-1z%20M19%2C4h1v1h-1z%20M20%2C4h1v1h-1z%20M22%2C4h1v1h-1z%20M23%2C4h1v1h-1z%20M25%2C4h1v1h-1z%20M27%2C4h1v1h-1z%20M30%2C4h1v1h-1z%20M31%2C4h1v1h-1z%20M32%2C4h1v1h-1z%20M33%2C4h1v1h-1z%20M34%2C4h1v1h-1z%20M35%2C4h1v1h-1z%20M36%2C4h1v1h-1z%20M4%2C5h1v1h-1z%20M10%2C5h1v1h-1z%20M13%2C5h1v1h-1z%20M14%2C5h1v1h-1z%20M15%2C5h1v1h-1z%20M17%2C5h1v1h-1z%20M18%2C5h1v1h-1z%20M19%2C5h1v1h-1z%20M20%2C5h1v1h-1z%20M26%2C5h1v1h-1z%20M28%2C5h1v1h-1z%20M30%2C5h1v1h-1z%20M36%2C5h1v1h-1z%20M4%2C6h1v1h-1z%20M6%2C6h1v1h-1z%20M7%2C6h1v1h-1z%20M8%2C6h1v1h-1z%20M10%2C6h1v1h-1z%20M12%2C6h1v1h-1z%20M13%2C6h1v1h-1z%20M15%2C6h1v1h-1z%20M17%2C6h1v1h-1z%20M19%2C6h1v1h-1z%20M20%2C6h1v1h-1z%20M22%2C6h1v1h-1z%20M25%2C6h1v1h-1z%20M28%2C6h1v1h-1z%20M30%2C6h1v1h-1z%20M32%2C6h1v1h-1z%20M33%2C6h1v1h-1z%20M34%2C6h1v1h-1z%20M36%2C6h1v1h-1z%20M4%2C7h1v1h-1z%20M6%2C7h1v1h-1z%20M7%2C7h1v1h-1z%20M8%2C7h1v1h-1z%20M10%2C7h1v1h-1z%20M12%2C7h1v1h-1z%20M15%2C7h1v1h-1z%20M18%2C7h1v1h-1z%20M19%2C7h1v1h-1z%20M20%2C7h1v1h-1z%20M21%2C7h1v1h-1z%20M22%2C7h1v1h-1z%20M26%2C7h1v1h-1z%20M27%2C7h1v1h-1z%20M30%2C7h1v1h-1z%20M32%2C7h1v1h-1z%20M33%2C7h1v1h-1z%20M34%2C7h1v1h-1z%20M36%2C7h1v1h-1z%20M4%2C8h1v1h-1z%20M6%2C8h1v1h-1z%20M7%2C8h1v1h-1z%20M8%2C8h1v1h-1z%20M10%2C8h1v1h-1z%20M12%2C8h1v1h-1z%20M13%2C8h1v1h-1z%20M14%2C8h1v1h-1z%20M15%2C8h1v1h-1z%20M19%2C8h1v1h-1z%20M21%2C8h1v1h-1z%20M23%2C8h1v1h-1z%20M24%2C8h1v1h-1z%20M27%2C8h1v1h-1z%20M28%2C8h1v1h-1z%20M30%2C8h1v1h-1z%20M32%2C8h1v1h-1z%20M33%2C8h1v1h-1z%20M34%2C8h1v1h-1z%20M36%2C8h1v1h-1z%20M4%2C9h1v1h-1z%20M10%2C9h1v1h-1z%20M12%2C9h1v1h-1z%20M13%2C9h1v1h-1z%20M14%2C9h1v1h-1z%20M15%2C9h1v1h-1z%20M17%2C9h1v1h-1z%20M18%2C9h1v1h-1z%20M19%2C9h1v1h-1z%20M20%2C9h1v1h-1z%20M21%2C9h1v1h-1z%20M24%2C9h1v1h-1z%20M26%2C9h1v1h-1z%20M30%2C9h1v1h-1z%20M36%2C9h1v1h-1z%20M4%2C10h1v1h-1z%20M5%2C10h1v1h-1z%20M6%2C10h1v1h-1z%20M7%2C10h1v1h-1z%20M8%2C10h1v1h-1z%20M9%2C10h1v1h-1z%20M10%2C10h1v1h-1z%20M12%2C10h1v1h-1z%20M14%2C10h1v1h-1z%20M16%2C10h1v1h-1z%20M18%2C10h1v1h-1z%20M20%2C10h1v1h-1z%20M22%2C10h1v1h-1z%20M24%2C10h1v1h-1z%20M26%2C10h1v1h-1z%20M28%2C10h1v1h-1z%20M30%2C10h1v1h-1z%20M31%2C10h1v1h-1z%20M32%2C10h1v1h-1z%20M33%2C10h1v1h-1z%20M34%2C10h1v1h-1z%20M35%2C10h1v1h-1z%20M36%2C10h1v1h-1z%20M12%2C11h1v1h-1z%20M16%2C11h1v1h-1z%20M18%2C11h1v1h-1z%20M19%2C11h1v1h-1z%20M25%2C11h1v1h-1z%20M26%2C11h1v1h-1z%20M27%2C11h1v1h-1z%20M4%2C12h1v1h-1z%20M6%2C12h1v1h-1z%20M7%2C12h1v1h-1z%20M8%2C12h1v1h-1z%20M9%2C12h1v1h-1z%20M10%2C12h1v1h-1z%20M14%2C12h1v1h-1z%20M15%2C12h1v1h-1z%20M17%2C12h1v1h-1z%20M18%2C12h1v1h-1z%20M19%2C12h1v1h-1z%20M21%2C12h1v1h-1z%20M23%2C12h1v1h-1z%20M24%2C12h1v1h-1z%20M26%2C12h1v1h-1z%20M28%2C12h1v1h-1z%20M30%2C12h1v1h-1z%20M31%2C12h1v1h-1z%20M32%2C12h1v1h-1z%20M33%2C12h1v1h-1z%20M34%2C12h1v1h-1z%20M5%2C13h1v1h-1z%20M6%2C13h1v1h-1z%20M8%2C13h1v1h-1z%20M11%2C13h1v1h-1z%20M12%2C13h1v1h-1z%20M15%2C13h1v1h-1z%20M20%2C13h1v1h-1z%20M23%2C13h1v1h-1z%20M25%2C13h1v1h-1z%20M26%2C13h1v1h-1z%20M27%2C13h1v1h-1z%20M30%2C13h1v1h-1z%20M33%2C13h1v1h-1z%20M34%2C13h1v1h-1z%20M35%2C13h1v1h-1z%20M36%2C13h1v1h-1z%20M7%2C14h1v1h-1z%20M9%2C14h1v1h-1z%20M10%2C14h1v1h-1z%20M11%2C14h1v1h-1z%20M13%2C14h1v1h-1z%20M14%2C14h1v1h-1z%20M19%2C14h1v1h-1z%20M22%2C14h1v1h-1z%20M24%2C14h1v1h-1z%20M25%2C14h1v1h-1z%20M26%2C14h1v1h-1z%20M28%2C14h1v1h-1z%20M30%2C14h1v1h-1z%20M32%2C14h1v1h-1z%20M34%2C14h1v1h-1z%20M4%2C15h1v1h-1z%20M5%2C15h1v1h-1z%20M7%2C15h1v1h-1z%20M8%2C15h1v1h-1z%20M9%2C15h1v1h-1z%20M18%2C15h1v1h-1z%20M20%2C15h1v1h-1z%20M22%2C15h1v1h-1z%20M25%2C15h1v1h-1z%20M26%2C15h1v1h-1z%20M30%2C15h1v1h-1z%20M32%2C15h1v1h-1z%20M33%2C15h1v1h-1z%20M34%2C15h1v1h-1z%20M36%2C15h1v1h-1z%20M4%2C16h1v1h-1z%20M6%2C16h1v1h-1z%20M7%2C16h1v1h-1z%20M9%2C16h1v1h-1z%20M10%2C16h1v1h-1z%20M12%2C16h1v1h-1z%20M13%2C16h1v1h-1z%20M14%2C16h1v1h-1z%20M16%2C16h1v1h-1z%20M19%2C16h1v1h-1z%20M23%2C16h1v1h-1z%20M24%2C16h1v1h-1z%20M26%2C16h1v1h-1z%20M27%2C16h1v1h-1z%20M29%2C16h1v1h-1z%20M32%2C16h1v1h-1z%20M33%2C16h1v1h-1z%20M35%2C16h1v1h-1z%20M36%2C16h1v1h-1z%20M5%2C17h1v1h-1z%20M8%2C17h1v1h-1z%20M11%2C17h1v1h-1z%20M14%2C17h1v1h-1z%20M15%2C17h1v1h-1z%20M16%2C17h1v1h-1z%20M18%2C17h1v1h-1z%20M19%2C17h1v1h-1z%20M20%2C17h1v1h-1z%20M22%2C17h1v1h-1z%20M23%2C17h1v1h-1z%20M24%2C17h1v1h-1z%20M25%2C17h1v1h-1z%20M26%2C17h1v1h-1z%20M29%2C17h1v1h-1z%20M33%2C17h1v1h-1z%20M34%2C17h1v1h-1z%20M35%2C17h1v1h-1z%20M36%2C17h1v1h-1z%20M7%2C18h1v1h-1z%20M8%2C18h1v1h-1z%20M10%2C18h1v1h-1z%20M11%2C18h1v1h-1z%20M12%2C18h1v1h-1z%20M13%2C18h1v1h-1z%20M14%2C18h1v1h-1z%20M18%2C18h1v1h-1z%20M22%2C18h1v1h-1z%20M24%2C18h1v1h-1z%20M28%2C18h1v1h-1z%20M29%2C18h1v1h-1z%20M30%2C18h1v1h-1z%20M33%2C18h1v1h-1z%20M35%2C18h1v1h-1z%20M5%2C19h1v1h-1z%20M6%2C19h1v1h-1z%20M7%2C19h1v1h-1z%20M9%2C19h1v1h-1z%20M11%2C19h1v1h-1z%20M12%2C19h1v1h-1z%20M13%2C19h1v1h-1z%20M15%2C19h1v1h-1z%20M20%2C19h1v1h-1z%20M24%2C19h1v1h-1z%20M25%2C19h1v1h-1z%20M26%2C19h1v1h-1z%20M27%2C19h1v1h-1z%20M28%2C19h1v1h-1z%20M31%2C19h1v1h-1z%20M33%2C19h1v1h-1z%20M34%2C19h1v1h-1z%20M4%2C20h1v1h-1z%20M8%2C20h1v1h-1z%20M9%2C20h1v1h-1z%20M10%2C20h1v1h-1z%20M11%2C20h1v1h-1z%20M12%2C20h1v1h-1z%20M14%2C20h1v1h-1z%20M16%2C20h1v1h-1z%20M20%2C20h1v1h-1z%20M21%2C20h1v1h-1z%20M22%2C20h1v1h-1z%20M24%2C20h1v1h-1z%20M26%2C20h1v1h-1z%20M28%2C20h1v1h-1z%20M29%2C20h1v1h-1z%20M31%2C20h1v1h-1z%20M32%2C20h1v1h-1z%20M34%2C20h1v1h-1z%20M36%2C20h1v1h-1z%20M4%2C21h1v1h-1z%20M6%2C21h1v1h-1z%20M8%2C21h1v1h-1z%20M9%2C21h1v1h-1z%20M13%2C21h1v1h-1z%20M14%2C21h1v1h-1z%20M15%2C21h1v1h-1z%20M16%2C21h1v1h-1z%20M17%2C21h1v1h-1z%20M18%2C21h1v1h-1z%20M21%2C21h1v1h-1z%20M22%2C21h1v1h-1z%20M23%2C21h1v1h-1z%20M26%2C21h1v1h-1z%20M27%2C21h1v1h-1z%20M30%2C21h1v1h-1z%20M31%2C21h1v1h-1z%20M33%2C21h1v1h-1z%20M34%2C21h1v1h-1z%20M5%2C22h1v1h-1z%20M6%2C22h1v1h-1z%20M8%2C22h1v1h-1z%20M10%2C22h1v1h-1z%20M11%2C22h1v1h-1z%20M17%2C22h1v1h-1z%20M19%2C22h1v1h-1z%20M20%2C22h1v1h-1z%20M22%2C22h1v1h-1z%20M24%2C22h1v1h-1z%20M25%2C22h1v1h-1z%20M32%2C22h1v1h-1z%20M34%2C22h1v1h-1z%20M35%2C22h1v1h-1z%20M5%2C23h1v1h-1z%20M6%2C23h1v1h-1z%20M8%2C23h1v1h-1z%20M9%2C23h1v1h-1z%20M12%2C23h1v1h-1z%20M17%2C23h1v1h-1z%20M19%2C23h1v1h-1z%20M20%2C23h1v1h-1z%20M23%2C23h1v1h-1z%20M25%2C23h1v1h-1z%20M28%2C23h1v1h-1z%20M30%2C23h1v1h-1z%20M32%2C23h1v1h-1z%20M33%2C23h1v1h-1z%20M34%2C23h1v1h-1z%20M35%2C23h1v1h-1z%20M8%2C24h1v1h-1z%20M9%2C24h1v1h-1z%20M10%2C24h1v1h-1z%20M12%2C24h1v1h-1z%20M15%2C24h1v1h-1z%20M17%2C24h1v1h-1z%20M20%2C24h1v1h-1z%20M21%2C24h1v1h-1z%20M25%2C24h1v1h-1z%20M26%2C24h1v1h-1z%20M28%2C24h1v1h-1z%20M29%2C24h1v1h-1z%20M33%2C24h1v1h-1z%20M35%2C24h1v1h-1z%20M4%2C25h1v1h-1z%20M6%2C25h1v1h-1z%20M9%2C25h1v1h-1z%20M13%2C25h1v1h-1z%20M14%2C25h1v1h-1z%20M16%2C25h1v1h-1z%20M17%2C25h1v1h-1z%20M19%2C25h1v1h-1z%20M21%2C25h1v1h-1z%20M22%2C25h1v1h-1z%20M23%2C25h1v1h-1z%20M24%2C25h1v1h-1z%20M25%2C25h1v1h-1z%20M27%2C25h1v1h-1z%20M29%2C25h1v1h-1z%20M30%2C25h1v1h-1z%20M33%2C25h1v1h-1z%20M36%2C25h1v1h-1z%20M4%2C26h1v1h-1z%20M9%2C26h1v1h-1z%20M10%2C26h1v1h-1z%20M13%2C26h1v1h-1z%20M16%2C26h1v1h-1z%20M18%2C26h1v1h-1z%20M19%2C26h1v1h-1z%20M20%2C26h1v1h-1z%20M21%2C26h1v1h-1z%20M25%2C26h1v1h-1z%20M26%2C26h1v1h-1z%20M28%2C26h1v1h-1z%20M29%2C26h1v1h-1z%20M30%2C26h1v1h-1z%20M31%2C26h1v1h-1z%20M32%2C26h1v1h-1z%20M34%2C26h1v1h-1z%20M35%2C26h1v1h-1z%20M4%2C27h1v1h-1z%20M9%2C27h1v1h-1z%20M11%2C27h1v1h-1z%20M15%2C27h1v1h-1z%20M16%2C27h1v1h-1z%20M19%2C27h1v1h-1z%20M23%2C27h1v1h-1z%20M25%2C27h1v1h-1z%20M27%2C27h1v1h-1z%20M28%2C27h1v1h-1z%20M29%2C27h1v1h-1z%20M30%2C27h1v1h-1z%20M31%2C27h1v1h-1z%20M33%2C27h1v1h-1z%20M34%2C27h1v1h-1z%20M4%2C28h1v1h-1z%20M6%2C28h1v1h-1z%20M8%2C28h1v1h-1z%20M10%2C28h1v1h-1z%20M12%2C28h1v1h-1z%20M14%2C28h1v1h-1z%20M16%2C28h1v1h-1z%20M17%2C28h1v1h-1z%20M18%2C28h1v1h-1z%20M19%2C28h1v1h-1z%20M24%2C28h1v1h-1z%20M28%2C28h1v1h-1z%20M29%2C28h1v1h-1z%20M30%2C28h1v1h-1z%20M31%2C28h1v1h-1z%20M32%2C28h1v1h-1z%20M33%2C28h1v1h-1z%20M36%2C28h1v1h-1z%20M12%2C29h1v1h-1z%20M14%2C29h1v1h-1z%20M18%2C29h1v1h-1z%20M19%2C29h1v1h-1z%20M20%2C29h1v1h-1z%20M21%2C29h1v1h-1z%20M23%2C29h1v1h-1z%20M26%2C29h1v1h-1z%20M28%2C29h1v1h-1z%20M32%2C29h1v1h-1z%20M34%2C29h1v1h-1z%20M4%2C30h1v1h-1z%20M5%2C30h1v1h-1z%20M6%2C30h1v1h-1z%20M7%2C30h1v1h-1z%20M8%2C30h1v1h-1z%20M9%2C30h1v1h-1z%20M10%2C30h1v1h-1z%20M13%2C30h1v1h-1z%20M14%2C30h1v1h-1z%20M19%2C30h1v1h-1z%20M21%2C30h1v1h-1z%20M22%2C30h1v1h-1z%20M24%2C30h1v1h-1z%20M26%2C30h1v1h-1z%20M27%2C30h1v1h-1z%20M28%2C30h1v1h-1z%20M30%2C30h1v1h-1z%20M32%2C30h1v1h-1z%20M34%2C30h1v1h-1z%20M35%2C30h1v1h-1z%20M4%2C31h1v1h-1z%20M10%2C31h1v1h-1z%20M12%2C31h1v1h-1z%20M13%2C31h1v1h-1z%20M14%2C31h1v1h-1z%20M15%2C31h1v1h-1z%20M16%2C31h1v1h-1z%20M17%2C31h1v1h-1z%20M18%2C31h1v1h-1z%20M24%2C31h1v1h-1z%20M25%2C31h1v1h-1z%20M26%2C31h1v1h-1z%20M27%2C31h1v1h-1z%20M28%2C31h1v1h-1z%20M32%2C31h1v1h-1z%20M34%2C31h1v1h-1z%20M36%2C31h1v1h-1z%20M4%2C32h1v1h-1z%20M6%2C32h1v1h-1z%20M7%2C32h1v1h-1z%20M8%2C32h1v1h-1z%20M10%2C32h1v1h-1z%20M12%2C32h1v1h-1z%20M14%2C32h1v1h-1z%20M15%2C32h1v1h-1z%20M16%2C32h1v1h-1z%20M22%2C32h1v1h-1z%20M25%2C32h1v1h-1z%20M26%2C32h1v1h-1z%20M28%2C32h1v1h-1z%20M29%2C32h1v1h-1z%20M30%2C32h1v1h-1z%20M31%2C32h1v1h-1z%20M32%2C32h1v1h-1z%20M33%2C32h1v1h-1z%20M35%2C32h1v1h-1z%20M4%2C33h1v1h-1z%20M6%2C33h1v1h-1z%20M7%2C33h1v1h-1z%20M8%2C33h1v1h-1z%20M10%2C33h1v1h-1z%20M12%2C33h1v1h-1z%20M14%2C33h1v1h-1z%20M16%2C33h1v1h-1z%20M19%2C33h1v1h-1z%20M20%2C33h1v1h-1z%20M21%2C33h1v1h-1z%20M22%2C33h1v1h-1z%20M23%2C33h1v1h-1z%20M24%2C33h1v1h-1z%20M27%2C33h1v1h-1z%20M29%2C33h1v1h-1z%20M31%2C33h1v1h-1z%20M32%2C33h1v1h-1z%20M35%2C33h1v1h-1z%20M36%2C33h1v1h-1z%20M4%2C34h1v1h-1z%20M6%2C34h1v1h-1z%20M7%2C34h1v1h-1z%20M8%2C34h1v1h-1z%20M10%2C34h1v1h-1z%20M12%2C34h1v1h-1z%20M14%2C34h1v1h-1z%20M22%2C34h1v1h-1z%20M24%2C34h1v1h-1z%20M28%2C34h1v1h-1z%20M30%2C34h1v1h-1z%20M31%2C34h1v1h-1z%20M4%2C35h1v1h-1z%20M10%2C35h1v1h-1z%20M14%2C35h1v1h-1z%20M16%2C35h1v1h-1z%20M18%2C35h1v1h-1z%20M20%2C35h1v1h-1z%20M22%2C35h1v1h-1z%20M25%2C35h1v1h-1z%20M27%2C35h1v1h-1z%20M28%2C35h1v1h-1z%20M31%2C35h1v1h-1z%20M32%2C35h1v1h-1z%20M33%2C35h1v1h-1z%20M34%2C35h1v1h-1z%20M4%2C36h1v1h-1z%20M5%2C36h1v1h-1z%20M6%2C36h1v1h-1z%20M7%2C36h1v1h-1z%20M8%2C36h1v1h-1z%20M9%2C36h1v1h-1z%20M10%2C36h1v1h-1z%20M12%2C36h1v1h-1z%20M14%2C36h1v1h-1z%20M20%2C36h1v1h-1z%20M23%2C36h1v1h-1z%20M24%2C36h1v1h-1z%20M27%2C36h1v1h-1z%20M28%2C36h1v1h-1z%20M29%2C36h1v1h-1z%20M30%2C36h1v1h-1z%20M31%2C36h1v1h-1z%20M32%2C36h1v1h-1z%20M34%2C36h1v1h-1z%20M35%2C36h1v1h-1z%22%20fill%3D%22%23000000%22%20%2F%3E%0A%3C%2Fsvg%3E",
+      "loaded": true,
+      "width": 260
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Select table UI01",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "Add table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Print All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 92,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Download All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Menu-only code",
+      "aria": null,
+      "title": "A code with no table, for menu cards",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "edit",
+      "aria": "Rename table UI01",
+      "title": "",
+      "disabled": false,
+      "width": 24,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "View QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Print",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Regenerate",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Turn off",
+      "aria": null,
+      "title": "Switch this table on or off",
+      "disabled": false,
+      "width": 63,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Revoke",
+      "disabled": false,
+      "width": 32,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Copy link",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 97,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "PNG",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Print / PDF",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Close",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 29,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

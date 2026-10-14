@@ -1,0 +1,412 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nFeature controls\nTranslations\nPromotions\nFeedback\nAlerts\nCollections\nLicense\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\nEnabled\nAdvanced QR capabilities\n\nJAMANVAAR QR · 1 active codes · 2 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nPayment attempts and confirmed collections\nQR order\nSelect order...\nQR-1 · PARTIALLY_PAID\nQR-4 · SUCCESS\nQR-3 · SUCCESS\nQR-2 · PENDING\nQR-1 · PENDING\nDue ₹199.00\nCollected ₹25.00\nRemaining ₹174.00\nRefunded ₹0.00\n\nCOLLECTION · CASH · ₹25.00 · 10/14/2026, 2:07:09 PM\n\nRecord cash returned to the customer\nAmount refunded (₹)\nReason\n\nRequires current owner or manager sign-in. This records physical cash returned; it does not call an online gateway.\n\nConfirm cash has been refunded\nCash physically received (₹)\n\nOnly confirm money you have received. Partial collection keeps the remaining balance open.\n\nRecord cash received\nCash collection recorded\n×",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Payment attempts and confirmed collections"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Confirm cash has been refunded",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 245,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Record cash received",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 169,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Dismiss notification",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR order",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR order",
+      "disabled": false,
+      "value": "qr_adbe77a37b1431f27161be805c9e5279f94de2e6",
+      "options": [
+        {
+          "value": "",
+          "text": "Select order..."
+        },
+        {
+          "value": "qr_adbe77a37b1431f27161be805c9e5279f94de2e6",
+          "text": "QR-1 · PARTIALLY_PAID"
+        },
+        {
+          "value": "qr_c42dbd89722e0141c05f02629169838a5f2245fc",
+          "text": "QR-4 · SUCCESS"
+        },
+        {
+          "value": "qr_c8bc3788e0a8bfda871b416e19f7e53f302259e0",
+          "text": "QR-3 · SUCCESS"
+        },
+        {
+          "value": "qr_9ee7256aab85c3252fedfb870feb07951584cba8",
+          "text": "QR-2 · PENDING"
+        },
+        {
+          "value": "qr_70960d1c9f30b25199cd03ccc2db7cecbefcee8f",
+          "text": "QR-1 · PENDING"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Amount refunded (₹)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Reason",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Cash physically received (₹)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Dismiss notification",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    }
+  ],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

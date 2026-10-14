@@ -1,0 +1,225 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / INSIGHTS\nMenu Performance\n\nSee which dishes turn browsing into orders using actual sales data.\n\nEnabled\nMenu performance\nFrom\nTo\nApply dates\nExport CSV\n\nUTC calendar days; orders created in this range. Uses the currently selected admin branch.\n\n0\n\nlanding Sessions\n\n0\n\nmenu Views\n\n0\n\nitem Views\n\n0\n\nitem Adds\n\n0\n\ncarts\n\n0\n\ncheckout Starts\n\n0\n\nplaced Orders\n\n0\n\ncompleted Orders\n\n0\n\npaid Orders\n\nMenu-view to accepted-order conversion: 0.0%. Denominator: Observed menu views. Repeated orders can exceed 100%.\n\nDish\tViews\tAdds\tQuantity\tOrders / discount\tNet collections\nSales by category\n\nNo activity yet.\n\nOrdering modes\n\nNo activity yet.\n\nDaily order trend (UTC)\n\nNo activity yet.\n\nOrders by hour (UTC)\n\nNo activity yet.\n\nHistorical ingredient costs are not stored on these orders. Profit is unavailable; net collections are not profit.\n\nViews and add taps are deduplicated per item, browser session and restaurant day. Landing sessions measure page opens, not physical camera scans. Collections and refunds follow the original order cohort; line allocations include tax and discount proportionally.\n\nService request activity\n\nOPEN: 0 · ACKNOWLEDGED: 0 · IN_PROGRESS: 0 · COMPLETED: 0 · CANCELLED: 0 · EXPIRED: 0\n\nNo item activity in this date range.",
+  "headings": [
+    "Menu Performance",
+    "Menu performance",
+    "Sales by category",
+    "Ordering modes",
+    "Daily order trend (UTC)",
+    "Orders by hour (UTC)",
+    "Service request activity"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu Performance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Apply dates",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 69,
+      "visible": true
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 69,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

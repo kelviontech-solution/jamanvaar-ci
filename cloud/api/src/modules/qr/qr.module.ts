@@ -1,3 +1,7 @@
+import { QrWorkflowsService } from './qr-workflows.service';
+import { QrWorkflowsController } from './qr-workflows.controller';
+import {QrCrmService} from './qr-crm.service';
+import {QrCrmController} from './qr-crm.controller';
 import {QrOperationsService} from './qr-operations.service';
 import {QrOperationsController,QrOperationsPublicController} from './qr-operations.controller';
 import { QrLoyaltyService } from './qr-loyalty.service';
@@ -36,8 +40,8 @@ import { PlatformNotificationsModule } from '../platform-notifications/platform-
  */
 @Module({
   imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
-  controllers: [QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
-  providers: [QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
+  controllers: [QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
+  providers: [QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

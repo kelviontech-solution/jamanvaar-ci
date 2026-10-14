@@ -1,0 +1,388 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nFeature controls\nTranslations\nPromotions\nFeedback\nAlerts\nCollections\nLicense\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\nEnabled\nAdvanced QR capabilities\n\nJAMANVAAR QR · 1 active codes · 2 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nFeatures for this branch\n\nOnly changed settings become local overrides. Local overrides: translations\n\nCounted dish stock reservations\nIncluded in your license\nVerified customer loyalty\nIncluded in your license\nShared table sessions\nIncluded in your license\nMultilingual menu\nIncluded in your license\nPrivate order feedback\nIncluded in your license\nBrowser order history\nIncluded in your license\nOperational alerts\nIncluded in your license\nShared kitchen workload\nIncluded in your license\nMenu recommendations\nIncluded in your license\nAdvanced workload estimates\n\nCounts unfinished dish quantities across POS, Captain, Kiosk and QR in this branch. No accepted order is automatically cancelled.\n\nStop new QR orders at units (0 = unlimited)\nBusy estimate threshold (0 = off)\nExtra minutes when busy\nRecommended menu items (customers choose whether to add)\nAudit QR Dish 1791966297209\nAudit QR Dish 1791966447575\nUI Audit Dish 001\nUI Audit Dish 002\nUI Audit Dish 003\nUI Audit Dish 004\nUI Audit Dish 005\nUI Audit Dish 006\nUI Audit Dish 007\nUI Audit Dish 008\nUI Audit Dish 009\nUI Audit Dish 010\nUI Audit Dish 011\nUI Audit Dish 012\nUI Audit Dish 013\nUI Audit Dish 014\nUI Audit Dish 015\nUI Audit Dish 016\nUI Audit Dish 017\nUI Audit Dish 018\nUI Audit Dish 019\nUI Audit Dish 020\nUI Audit Dish 021\nUI Audit Dish 022\nUI Audit Dish 023\nUI Audit Dish 024\nUI Audit Dish 025\nUI Audit Dish 026\nUI Audit Dish 027\nUI Audit Dish 028\nUI Audit Dish 029\nUI Audit Dish 030\nUI Audit Dish 031\nUI Audit Dish 032\nUI Audit Dish 033\nUI Audit Dish 034\nUI Audit Dish 035\nUI Audit Dish 036\nUI Audit Dish 037\nUI Audit Dish 038\nUI Audit Dish 039\nUI Audit Dish 040\nUI Audit Dish 041\nUI Audit Dish 042\nUI Audit Dish 043\nUI Audit Dish 044\nUI Audit Dish 045\nUI Audit Dish 046\nUI Audit Dish 047\nUI Audit Dish 048\nUI Audit Dish 049\nUI Audit Dish 050\nUI Audit Dish 051\nUI Audit Dish 052\nUI Audit Dish 053\nUI Audit Dish 054\nUI Audit Dish 055\nUI Audit Dish 056\nUI Audit Dish 057\nUI Audit Dish 058\nUI Audit Dish 059\nUI Audit Dish 060\nUI Audit Dish 061\nUI Audit Dish 062\nUI Audit Dish 063\nUI Audit Dish 064\nUI Audit Dish 065\nUI Audit Dish 066\nUI Audit Dish 067\nUI Audit Dish 068\nUI Audit Dish 069\nUI Audit Dish 070\nUI Audit Dish 071\nUI Audit Dish 072\nUI Audit Dish 073\nUI Audit Dish 074\nUI Audit Dish 075\nUI Audit Dish 076\nUI Audit Dish 077\nUI Audit Dish 078\nUI Audit Dish 079\nUI Audit Dish 080\nUI Audit Dish 081\nUI Audit Dish 082\nUI Audit Dish 083\nUI Audit Dish 084\nUI Audit Dish 085\nUI Audit Dish 086\nUI Audit Dish 087\nUI Audit Dish 088\nUI Audit Dish 089\nUI Audit Dish 090\nUI Audit Dish 091\nUI Audit Dish 092\nUI Audit Dish 093\nUI Audit Dish 094\nUI Audit Dish 095\nUI Audit Dish 096\nUI Audit Dish 097\nUI Audit Dish 098\nUI Audit Dish 099\nUI Audit Dish 100\nAlert types\n NEW ORDER\n CASH DUE\n PAYMENT COLLECTED\n PAYMENT PENDING\n CANCELLED\n REFUND\nSave changes\nCounted portions for this branch\n\nOptional exact counts for ready-to-sell dishes. Ingredient recipes continue through the existing inventory ledger. Enable counted stock reservations above to protect simultaneous QR checkouts.\n\nBranch\nChoose branch...\nUI Audit Restaurant A — Main Branch\nDish\nChoose dish...\nUI Audit Dish 001 · Manual availability\nUI Audit Dish 002 · Manual availability\nUI Audit Dish 003 · Manual availability\nUI Audit Dish 004 · Manual availability\nUI Audit Dish 005 · Manual availability\nUI Audit Dish 006 · Manual availability\nUI Audit Dish 007 · Manual availability\nUI Audit Dish 008 · Manual availability\nUI Audit Dish 009 · Manual availability\nUI Audit Dish 010 · Manual availability\nUI Audit Dish 011 · Manual availability\nUI Audit Dish 012 · Manual availability\nUI Audit Dish 013 · Manual availability\nUI Audit Dish 014 · Manual availability\nUI Audit Dish 015 · Manual availability\nUI Audit Dish 016 · Manual availability\nUI Audit Dish 017 · Manual availability\nUI Audit Dish 018 · Manual availability\nUI Audit Dish 019 · Manual availability\nUI Audit Dish 020 · Manual availability\nUI Audit Dish 021 · Manual availability\nUI Audit Dish 022 · Manual availability\nUI Audit Dish 023 · Manual availability\nUI Audit Dish 024 · Manual availability\nUI Audit Dish 025 · Manual availability\nUI Audit Dish 026 · Manual availability\nUI Audit Dish 027 · Manual availability\nUI Audit Dish 028 · Manual availability\nUI Audit Dish 029 · Manual availability\nUI Audit Dish 030 · Manual availability\nUI Audit Dish 031 · Manual availability\nUI Audit Dish 032 · Manual availability\nUI Audit Dish 033 · Manual availability\nUI Audit Dish 034 · Manual availability\nUI Audit Dish 035 · Manual availability\nUI Audit Dish 036 · Manual availability\nUI Audit Dish 037 · Manual availability\nUI Audit Dish 038 · Manual availability\nUI Audit Dish 039 · Manual availability\nUI Audit Dish 040 · Manual availability\nUI Audit Dish 041 · Manual availability\nUI Audit Dish 042 · Manual availability\nUI Audit Dish 043 · Manual availability\nUI Audit Dish 044 · Manual availability\nUI Audit Dish 045 · Manual availability\nUI Audit Dish 046 · Manual availability\nUI Audit Dish 047 · Manual availability\nUI Audit Dish 048 · Manual availability\nUI Audit Dish 049 · Manual availability\nUI Audit Dish 050 · Manual availability\nUI Audit Dish 051 · Manual availability\nUI Audit Dish 052 · Manual availability\nUI Audit Dish 053 · Manual availability\nUI Audit Dish 054 · Manual availability\nUI Audit Dish 055 · Manual availability\nUI Audit Dish 056 · Manual availability\nUI Audit Dish 057 · Manual availability\nUI Audit Dish 058 · Manual availability\nUI Audit Dish 059 · Manual availability\nUI Audit Dish 060 · Manual availability\nUI Audit Dish 061 · Manual availability\nUI Audit Dish 062 · Manual availability\nUI Audit Dish 063 · Manual availability\nUI Audit Dish 064 · Manual availability\nUI Audit Dish 065 · Manual availability\nUI Audit Dish 066 · Manual availability\nUI Audit Dish 067 · Manual availability\nUI Audit Dish 068 · Manual availability\nUI Audit Dish 069 · Manual availability\nUI Audit Dish 070 · Manual availability\nUI Audit Dish 071 · Manual availability\nUI Audit Dish 072 · Manual availability\nUI Audit Dish 073 · Manual availability\nUI Audit Dish 074 · Manual availability\nUI Audit Dish 075 · Manual availability\nUI Audit Dish 076 · Manual availability\nUI Audit Dish 077 · Manual availability\nUI Audit Dish 078 · Manual availability\nUI Audit Dish 079 · Manual availability\nUI Audit Dish 080 · Manual availability\nUI Audit Dish 081 · Manual availability\nUI Audit Dish 082 · Manual availability\nUI Audit Dish 083 · Manual availability\nUI Audit Dish 084 · Manual availability\nUI Audit Dish 085 · Manual availability\nUI Audit Dish 086 · Manual availability\nUI Audit Dish 087 · Manual availability\nUI Audit Dish 088 · Manual availability\nUI Audit Dish 089 · Manual availability\nUI Audit Dish 090 · Manual availability\nUI Audit Dish 091 · Manual availability\nUI Audit Dish 092 · Manual availability\nUI Audit Dish 093 · Manual availability\nUI Audit Dish 094 · Manual availability\nUI Audit Dish 095 · Manual availability\nUI Audit Dish 096 · Manual availability\nUI Audit Dish 097 · Manual availability\nUI Audit Dish 098 · Manual availability\nUI Audit Dish 099 · Manual availability\nUI Audit Dish 100 · Manual availability\nAudit QR Dish 1791966297209 · Manual availability\nAudit QR Dish 1791966447575 · Manual availability\nCurrent portions (blank = inherit/manual)\nSave counted portions\nBranch preferences and inheritance\n\nUse the branch selector in the app header. All-branch propagation requires the owner account. Existing local overrides are always preserved.\n\nRestoring defaults removes these local preferences: translations.\n\n I want this branch to follow restaurant defaults\nRestore inherited preferences",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Features for this branch"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Save changes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 120,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Save counted portions",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 180,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Restore inherited preferences",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 226,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

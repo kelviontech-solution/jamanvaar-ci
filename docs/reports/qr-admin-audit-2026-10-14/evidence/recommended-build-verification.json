@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-14",
+  "environment": "Local isolated database; gateway and communications transport simulated",
+  "backend": { "suitesPassed": 4, "testsPassed": 121, "testsFailed": 0 },
+  "sharedPosQr": { "suitesPassed": 2, "testsPassed": 30, "testsFailed": 0 },
+  "recommendedBrowser": { "checksPassed": 13, "checksFailed": 0, "includesPhoneLayouts": 6 },
+  "existingBrowserRegression": { "checksPassed": 8, "checksFailed": 0 },
+  "builds": { "cloudApi": "PASS", "restaurantAdminQrAdmin": "PASS", "existingViteLargeChunkWarning": true },
+  "typeChecks": { "cloudApi": "PASS", "restaurantAdminQrAdmin": "PASS", "pos": "PASS", "captain": "PASS" },
+  "archiveAndPdf": "PASS: ZIP checksums, A4 dimensions, page count and embedded card count",
+  "productionDeployment": false,
+  "physicalPrintScan": "Not performed",
+  "liveUpiSmsAcceptance": "Not performed"
+}

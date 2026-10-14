@@ -14,7 +14,7 @@ const input =
   "w-full mt-1 rounded-xl border border-jaman-border px-3 py-2 text-sm";
 const button =
   "rounded-xl bg-jaman-navy px-4 py-2 text-sm font-bold text-white disabled:opacity-40";
-async function records(type: string) {
+export async function records(type: string) {
   let cursor = 0,
     rows: any[] = [];
   for (let page = 0; page < 100; page++) {
@@ -33,7 +33,7 @@ async function records(type: string) {
 async function write(type: string, id: string, payload: any) {
   return writeMany(type, [{ ...payload, id }]);
 }
-async function writeMany(type: string, rows: any[]) {
+export async function writeMany(type: string, rows: any[]) {
   for (let start = 0; start < rows.length; start += 50) {
     const r = await pushEntitySync(
       type,

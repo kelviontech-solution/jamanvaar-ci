@@ -1,0 +1,322 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nGuided Menu Setup\n\nLoad cuisine templates, review pricing and publish your shared guest menu.\n\nEnabled\nSet up your guest menu\n\nChoose a cuisine, select whole categories, review your prices and options, then publish. Existing dishes stay intact. Menu changes are shared with your restaurant apps.\n\n1. Choose template\n2. Review dishes\n3. Options & taxes\n4. Publish review\n\nTax group saved; assign it to dishes before publication.\n\nGuest publication review\nChanges to the published menu: 0 added / 0 updated / 0 removed\n\nPublished version 6 / Changes waiting. Publishing changes the shared restaurant menu.\n\n114 visible dishes / 0 hidden dishes\n\nWhy dishes are hidden\nAudit QR Dish 1791966297209\n\n₹126\n\n0 option groups\nAudit QR Dish 1791966447575\n\n₹126\n\n0 option groups\nCheese Burst Farmhouse\n\n₹299\n\n2 option groups\nCheese Burst Margherita\n\n₹249\n\n2 option groups\nChicken Tikka Pizza\n\n₹279\n\n2 option groups\nFarmhouse Pizza\n\n₹199\n\n2 option groups\nJalapeno Corn Pizza\n\n₹199\n\n2 option groups\nMargherita Pizza\n\n₹149\n\n2 option groups\nMexican Green Wave Pizza\n\n₹229\n\n2 option groups\nMushroom Pizza\n\n₹219\n\n2 option groups\nPaneer Tikka Pizza\n\n₹229\n\n2 option groups\nPepper Chicken Pizza\n\n₹269\n\n2 option groups\nPublish reviewed menu",
+  "headings": [
+    "Guided Menu Setup",
+    "Set up your guest menu",
+    "Guest publication review"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "1. Choose template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 161,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "2. Review dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "3. Options & taxes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "4. Publish review",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 145,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Publish reviewed menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 187,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    },
+    {
+      "alt": "Cheese Burst Farmhouse",
+      "src": "/qr/assets/menu/template-photos-v1/dish-35192683c415ce.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Cheese Burst Margherita",
+      "src": "/qr/assets/menu/template-photos-v1/dish-e6fd759a7d08ec.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Chicken Tikka Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-bb33292f16a733.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Farmhouse Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-79544015debad7.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Jalapeno Corn Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-62f3efdf1a06e3.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Margherita Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Mexican Green Wave Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-a7b2b58b041edc.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Mushroom Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-bc4a46a29c61ed.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Paneer Tikka Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-37a7198da56bcc.webp",
+      "loaded": true,
+      "width": 322
+    },
+    {
+      "alt": "Pepper Chicken Pizza",
+      "src": "/qr/assets/menu/template-photos-v1/dish-f2ad5d33a28717.webp",
+      "loaded": true,
+      "width": 322
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

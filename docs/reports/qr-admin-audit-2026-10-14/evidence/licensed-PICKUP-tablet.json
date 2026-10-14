@@ -1,0 +1,907 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / ADVANCED CONFIGURATION\nPickup Scheduling\n\nOffer takeaway slots that respect your branch hours and kitchen capacity.\n\nEnabled\nPickup scheduling\nEnable scheduled takeaway pickup\nAllow ASAP takeaway\n\nAvailable on menu-only QR codes for takeaway. Table QR orders stay dine-in. Times use the restaurant timezone and also respect ordering hours. Pending online orders reserve capacity until safely cancelled; payment failures never free a slot while a payment could still succeed.\n\nMinimum preparation lead (minutes)\nBooking cutoff (minutes)\nSlot interval (minutes)\nOrders per slot\nBooking horizon (days)\nPickup hours\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nAdd hours\nClosed dates (one YYYY-MM-DD per line)\nPickup instructions\nSave settings",
+  "headings": [
+    "Pickup Scheduling",
+    "Pickup scheduling",
+    "Pickup hours"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Pickup Scheduling",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Save settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 118,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 0",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 0",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 1",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 1",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 2",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 2",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 3",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 3",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 4",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 4",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 5",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 5",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 6",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 6",
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable scheduled takeaway pickup",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Allow ASAP takeaway",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum preparation lead (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "30"
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Booking cutoff (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "15"
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Slot interval (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "30"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per slot",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10"
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Booking horizon (days)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "3"
+    },
+    {
+      "index": 7,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "0",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 0",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 9,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 0",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 10,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "1",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 1",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 12,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 1",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 13,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "2",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 2",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 15,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 2",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 16,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "3",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 3",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 18,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 3",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 19,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "4",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 4",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 21,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 4",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 22,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "5",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 23,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 5",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 24,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 5",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 25,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "disabled": false,
+      "value": "6",
+      "options": [
+        {
+          "value": "0",
+          "text": "Sun"
+        },
+        {
+          "value": "1",
+          "text": "Mon"
+        },
+        {
+          "value": "2",
+          "text": "Tue"
+        },
+        {
+          "value": "3",
+          "text": "Wed"
+        },
+        {
+          "value": "4",
+          "text": "Thu"
+        },
+        {
+          "value": "5",
+          "text": "Fri"
+        },
+        {
+          "value": "6",
+          "text": "Sat"
+        }
+      ]
+    },
+    {
+      "index": 26,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 6",
+      "placeholder": "",
+      "disabled": false,
+      "value": "10:00"
+    },
+    {
+      "index": 27,
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 6",
+      "placeholder": "",
+      "disabled": false,
+      "value": "22:00"
+    },
+    {
+      "index": 28,
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Closed dates (one YYYY-MM-DD per line)",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 29,
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Pickup instructions",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

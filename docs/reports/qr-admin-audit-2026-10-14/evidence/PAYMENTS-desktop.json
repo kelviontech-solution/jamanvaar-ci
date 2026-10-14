@@ -1,0 +1,314 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nPayment Settings\n\nControl online checkout and counter payments with clear collection status.\n\nEnabled\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nRestaurant defaults apply until a branch overrides a setting. Other branches keep their own configuration.\n\nUse restaurant defaults\nSecure payment collection\n\nPayment collection is active and server credentials are configured. Available methods are determined by your merchant account in Razorpay checkout.\n\nRAZORPAY\nUNKNOWN\nEnabled for guests\n\nUPI and other methods are offered by the secure provider according to merchant activation. Configure credentials and collection approval through Super Admin. Secrets are never shown here.\n\nOnline payment\nCash at Counter\nPayment instructionsSave payment instructions\nFrom (restaurant date)\nTo (restaurant date)\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nTimezone: Asia/Kolkata. Calendar days run midnight to midnight and include both selected dates. UTC export boundaries: 2026-10-07T18:30:00.000Z to 2026-10-14T18:30:00.000Z (exclusive).\n\n2\nOnline successes\n0\nFailed attempts\n1\nPending attempts\n₹206.00\nCollected payments\n₹102.00\nOutstanding at counter\n\nLanding sessions and menu views are deduplicated per code, signed browser session and restaurant day. Accepted orders exclude online drafts and cancellations. Gross paid sales include collected counter payments and verified online payments. Net sales subtract successful partial or full refunds for these orders. Conversion is an order-to-session ratio and may exceed 100% when a guest orders again.\n\nRecent online payment attempts\n10/13/2026, 9:42:34 PM\n₹103.00\nSUCCESS\npay_qa1791907955045\n10/13/2026, 9:41:29 PM\n₹103.00\nSUCCESS\npay_qa1791907890046\n10/13/2026, 9:39:43 PM\n₹103.00\nPENDING\nAwaiting provider",
+  "headings": [
+    "Payment Settings",
+    "Secure payment collection",
+    "Recent online payment attempts"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Save payment instructions",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 206,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Online payment",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Cash at Counter",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 3,
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Payment instructionsSave payment instructions",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-08"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    },
+    {
+      "index": 6,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 20,
+      "visible": true
+    }
+  ]
+}

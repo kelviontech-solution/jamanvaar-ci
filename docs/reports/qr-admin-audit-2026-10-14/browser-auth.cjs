@@ -1,0 +1,12 @@
+const q=require('./qa.cjs');const {admin,capture}=require('./browser-pages.cjs');const {result}=require('./browser-features.cjs');
+async function main(){const p=await admin();
+ await result(p,'Standalone sign out and owner sign in reuse the activated console',async()=>{await p.getByRole('button',{name:'Sign out',exact:true}).click();await p.getByRole('heading',{name:'Welcome to QR Admin',exact:true}).waitFor();await p.getByLabel('Restaurant ID or manager email',{exact:true}).fill(q.state.restaurantA.restaurantCode);await p.getByLabel('Password',{exact:true}).fill(q.state.ownerPassword);await p.getByRole('button',{name:'Sign in',exact:true}).click();await p.getByTestId('qr-console').waitFor();await capture(p,'sign-in-complete');return {noNewActivationKeyRequired:true};});
+ await q.close();
+ const publicPage=await q.open('admin','qr-audit-public');
+ for(const path of ['login','activate','recover']){await publicPage.goto('http://localhost:5316/qr/'+path+'/',{waitUntil:'domcontentloaded'});await publicPage.locator('form').waitFor();for(const [suffix,width,height] of [['desktop',1440,960],['phone',390,844]]){await publicPage.setViewportSize({width,height});const data=await q.snap(publicPage,'auth-'+path+'-'+suffix);q.append('auth-layout.jsonl',{path,viewport:suffix,overflow:data.overflow,headings:data.headings});}}
+ await result(publicPage,'Missing recovery identity is rejected before any request',async()=>{await publicPage.getByRole('button',{name:'Send recovery code',exact:true}).click();q.expect(await publicPage.locator('form input').first().evaluate(el=>el.validity.valueMissing)).toBe(true);return {requiredIdentity:true};});
+ await publicPage.goto('http://localhost:5316/qr/login/',{waitUntil:'domcontentloaded'});
+ await result(publicPage,'Wrong owner password is rejected with a visible error',async()=>{await publicPage.getByLabel('Restaurant ID or manager email',{exact:true}).fill(q.state.restaurantA.restaurantCode);await publicPage.getByLabel('Password',{exact:true}).fill('isolated-deliberately-wrong');await publicPage.getByRole('button',{name:'Sign in',exact:true}).click();await publicPage.getByRole('alert').waitFor();await capture(publicPage,'login-invalid-password');q.expect(publicPage.url()).toContain('/qr/login/');return {denied:true};});
+ await q.close();console.log('AUTH AUDIT FINISHED');
+}
+main().catch(async e=>{console.error(q.scrub(e.message));await q.close();process.exitCode=1});

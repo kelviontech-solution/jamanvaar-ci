@@ -1,0 +1,517 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / MENU & GUESTS\nMenu & Availability\n\nCreate dishes, organise categories and publish the menu your guests see.\n\nEnabled\nEdit shared draft\nPublished guest availability\nPublish & branch availability\n\nAdd, edit or remove dishes using the menu editor above. This list is separate: it controls which already-published dishes each branch shows guests, and when your edits actually go live.\n\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\nSearch dishes\nPublish current menu\nAudit QR Dish 1791966297209\nVisible in preview\nMark unavailable\nAudit QR Dish 1791966447575\nVisible in preview\nMark unavailable\nCheese Burst Farmhouse\nVisible in preview\nMark unavailable\nCheese Burst Margherita\nVisible in preview\nMark unavailable\nChicken Tikka Pizza\nVisible in preview\nMark unavailable\nFarmhouse Pizza\nVisible in preview\nMark unavailable\nJalapeno Corn Pizza\nVisible in preview\nMark unavailable\nMargherita Pizza\nVisible in preview\nMark unavailable\nMexican Green Wave Pizza\nVisible in preview\nMark unavailable\nMushroom Pizza\nVisible in preview\nMark unavailable\nPaneer Tikka Pizza\nVisible in preview\nMark unavailable\nPepper Chicken Pizza\nVisible in preview\nMark unavailable\nPeri Peri Paneer Pizza\nVisible in preview\nMark unavailable\nVeggie Supreme Pizza\nVisible in preview\nMark unavailable\nUI Audit Dish 001\nVisible in preview\nMark unavailable\nUI Audit Dish 002\nVisible in preview\nMark unavailable\nUI Audit Dish 003\nVisible in preview\nMark unavailable\nUI Audit Dish 004\nVisible in preview\nMark unavailable\nUI Audit Dish 005\nVisible in preview\nMark unavailable\nUI Audit Dish 006\nVisible in preview\nMark unavailable\nUI Audit Dish 007\nVisible in preview\nMark unavailable\nUI Audit Dish 008\nVisible in preview\nMark unavailable\nUI Audit Dish 009\nVisible in preview\nMark unavailable\nUI Audit Dish 010\nVisible in preview\nMark unavailable\nPrevious dishes\nPage 1\nNext dishes",
+  "headings": [
+    "Menu & Availability",
+    "Publish & branch availability"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit shared draft",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 144,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Published guest availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 214,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Publish current menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Mark unavailable",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Previous dishes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 133,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Next dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 109,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search dishes",
+      "placeholder": "",
+      "disabled": false,
+      "value": ""
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

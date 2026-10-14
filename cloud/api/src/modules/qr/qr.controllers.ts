@@ -215,6 +215,9 @@ export class QrRestaurantController {
     return this.qr.printData(device.restaurantId, id, device.branchId);
   }
 
+  @Get('order-list')
+  ordersPage(@CurrentDevice() device:Device,@Query() query:{branchId?:string;status?:string;search?:string;view?:string;cursor?:string;from?:string;to?:string}) {this.qr.assertConsole(device);return this.qr.ordersPage(device,query);}
+
   @Get('orders')
   orders(@CurrentDevice() device: Device, @Query('branchId') branchId?: string, @Query('limit') limit?: string) {
     this.qr.assertConsole(device);

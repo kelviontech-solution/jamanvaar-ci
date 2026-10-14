@@ -51,8 +51,21 @@ export class MenuPublicationsService {
     if (device.type !== 'POS_ADMIN') throw new ForbiddenException('Only Restaurant Admin can review the menu');
     return this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       const built = buildContent(await this.draftRows(tx, device.restaurantId));
-      const last = await tx.menuSnapshot.findFirst({ where: { restaurantId: device.restaurantId }, orderBy: { version: 'desc' }, select: { version: true, checksum: true } });
+      const last = await tx.menuSnapshot.findFirst({ where: { restaurantId: device.restaurantId }, orderBy: { version: 'desc' }, select: { version: true, checksum: true, content: true } });
+      const previous = last?.content as unknown as SnapshotContent | undefined;
+      const normalized=extractImages(built.content).content;
+      const stable=(value:unknown)=>JSON.stringify(value,(_key,current)=>current&&typeof current==='object'&&!Array.isArray(current)?Object.fromEntries(Object.keys(current).sort().map(key=>[key,current[key]])):current);
+      const normalizedItems=new Map(normalized.items.map(i=>[i.id,i]));
+      const oldItems = new Map((previous?.items || []).map(i => [i.id, i]));
+      const currentIds = new Set(built.content.items.map(i => i.id));
+      const changes = {
+        added: built.content.items.filter(i => !oldItems.has(i.id)).map(i => ({id:i.id,name:i.name})),
+        updated: built.content.items.filter(i => oldItems.has(i.id) && stable(oldItems.get(i.id)) !== stable(normalizedItems.get(i.id))).map(i => ({id:i.id,name:i.name})),
+        optionGroups: normalized.groups.filter(g=>stable(g)!==stable(previous?.groups.find(p=>p.id===g.id))).map(g=>({id:g.id,name:g.name})),
+        removed: (previous?.items || []).filter(i => !currentIds.has(i.id)).map(i => ({id:i.id,name:i.name}))
+      };
       return {
+        changes,
         publishedVersion: last?.version ?? 0,
         hasUnpublishedChanges: !last || last.checksum !== built.checksum,
         errors: built.errors,

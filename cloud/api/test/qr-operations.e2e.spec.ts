@@ -596,6 +596,21 @@ it("uses the configured branch timezone for pickup slots and stored confirmation
     );
   }
 });
+it("uses branch calendar dates across daylight-saving changes in QR reports", async () => {
+  const prior = await prisma.runAsTenant(restaurantId, tx => tx.branch.findUniqueOrThrow({ where: { id: branch } }));
+  try {
+    await prisma.runAsTenant(restaurantId, tx => tx.branch.update({ where: { id: branch }, data: { timezone: 'America/New_York' } }));
+    const spring = await auth('get', ops + '/analytics?from=2026-03-08&to=2026-03-08');
+    expect(spring.status, JSON.stringify(spring.body)).toBe(200);
+    expect(spring.body).toMatchObject({ timezone: 'America/New_York', from: '2026-03-08T05:00:00.000Z', to: '2026-03-09T04:00:00.000Z' });
+    const autumn = await auth('get', ops + '/analytics?from=2026-11-01&to=2026-11-01');
+    expect(autumn.status).toBe(200);
+    expect(autumn.body).toMatchObject({ from: '2026-11-01T04:00:00.000Z', to: '2026-11-02T05:00:00.000Z' });
+    expect((await auth('get', ops + '/analytics?from=2026-10-15&to=2026-10-14')).status).toBe(400);
+  } finally {
+    await prisma.runAsTenant(restaurantId, tx => tx.branch.update({ where: { id: branch }, data: { timezone: prior.timezone } }));
+  }
+});
 it("deduplicates observed item events, provides reporting without fabricated profit and enforces branch scope", async () => {
   const s = await session();
   for (let i = 0; i < 3; i++)
@@ -738,4 +753,18 @@ it("activates QR-only admin with existing owner credentials, rejects unrelated r
       })
     ).status,
   ).toBe(409);
+});
+it('named service assignment, escalation and pickup calendar remain branch-scoped',async()=>{
+ await prisma.runAsTenant(restaurantId,async tx=>{const rows=await tx.syncedEntity.findMany({where:{restaurantId,entityType:'QR_SERVICE_REQUEST',payload:{path:['branchId'],equals:branch}}});for(const row of rows)await tx.syncedEntity.update({where:{id:row.id},data:{createdAt:new Date(Date.now()-20*60000),payload:{...(row.payload as any),status:'COMPLETED'}}});});
+ const s=await session(),created=await guestRequest(qr,s,'assigned-service-test','ASSISTANCE');expect(created.status,JSON.stringify(created.body)).toBe(201);
+ await prisma.runAsTenant(restaurantId,tx=>tx.syncedEntity.create({data:{restaurantId,entityType:'STAFF_USER',externalId:'qa-assigned-captain',payload:{id:'qa-assigned-captain',fullName:'Assigned floor captain',branchId:branch,isActive:true}}}));
+ const responders=await auth('get',ops+'/assignees');expect(responders.status).toBe(200);
+ const dev=responders.body.devices.find((d:any)=>d.branchId===branch);
+ const version=created.body.version;
+ expect((await auth('post',ops+'/requests/'+created.body.id+'/assign').send({version,assignedDeviceId:dev.id,assignedStaffId:'qa-assigned-captain',escalate:true,reason:'Overdue guest request'})).status).toBe(200);
+ expect((await auth('post',ops+'/requests/'+created.body.id+'/assign').send({version,reason:'Stale retry'})).status).toBe(409);
+ const latest=(await auth('get',ops+'/requests')).body.requests.find((r:any)=>r.id===created.body.id);expect(latest).toMatchObject({assignedDeviceId:dev.id,assignedStaffName:'Assigned floor captain',escalationReason:'Overdue guest request'});
+ const other=(await auth('get',ops+'/assignees',adminB)).body.devices.find((d:any)=>d.branchId===branchB);
+ expect((await auth('post',ops+'/requests/'+created.body.id+'/assign').send({version:latest.version,assignedDeviceId:other.id,reason:'Wrong branch'})).status).toBe(400);
+ expect((await auth('post',ops+'/requests/'+created.body.id+'/assign',adminB).send({version:latest.version,reason:'Foreign branch'})).status).toBe(404);
 });

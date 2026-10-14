@@ -1,3 +1,4 @@
+import {formatRestaurantDate} from '@jamanvaar/utils';
 import { useQrUnsavedChanges } from './useQrUnsavedChanges';
 import { useEffect, useState } from "react";
 import {
@@ -530,7 +531,7 @@ function OperationsSettings({ mode }: { mode: "service" | "pickup" }) {
   );
 }
 export function QrMenuPerformance() {
-  const today = new Date().toISOString().slice(0, 10),
+  const today = formatRestaurantDate(new Date(),'ISO_DATE'),
     [from, setFrom] = useState(today),
     [to, setTo] = useState(today),
     [data, setData] = useState<any>(null),
@@ -711,14 +712,14 @@ export function QrMenuPerformance() {
                 })),
               ],
               [
-                "Daily order trend (UTC)",
+                "Daily order trend (restaurant time)",
                 data.trend.map((r: any) => ({
                   label: r.label,
                   detail: `${r.orders} orders · ₹${(r.valuePaise / 100).toLocaleString("en-IN")} order value`,
                 })),
               ],
               [
-                "Orders by hour (UTC)",
+                "Orders by hour (restaurant time)",
                 data.byHour.map((r: any) => ({
                   label: r.label,
                   detail: `${r.orders} orders`,

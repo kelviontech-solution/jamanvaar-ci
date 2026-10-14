@@ -10,6 +10,7 @@ import {PaymentsService} from '../src/modules/payments/payments.service';
 import {hashOpaqueToken} from '../src/common/security/token.util';
 import {writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
+import {randomUUID} from 'node:crypto';
 
 let app:any,prisma:PrismaService,rid:string,owner:any,platform:string,admin:any,ownerJwt:string,managerJwt:string;
 const stamp=Date.now(),email=`branch-matrix-${stamp}@test.example.com`,password='correct-horse-battery-staple';
@@ -265,4 +266,106 @@ it('new branch staff are assigned to the selected workspace and omission cannot 
   const update=await as('post',path).set('x-owner-authorization',ownerJwt).send({events:[{externalId:payload.id,payload:{...payload,fullName:'Renamed'}}]});expect(update.body.results[0].status).toBe('ok');
   const row=await prisma.runAsTenant(rid,tx=>tx.syncedEntity.findFirstOrThrow({where:{restaurantId:rid,entityType:'STAFF_USER',externalId:payload.id}}));expect((row.payload as any).branchId).toBe(branches[0].id);
   expect((await as('get',path+'?afterSeq=0',devices[1][0].token)).body.entities.some((e:any)=>e.externalId===payload.id)).toBe(false);
+});
+
+it('QR paginated filters find older unpaid bills and return the actual remaining collection',async()=>{
+  const prefix=`qr-page-${stamp}`;
+  try {
+    await prisma.runAsTenant(rid,tx=>tx.syncedOrder.createMany({data:Array.from({length:61},(_,i)=>({restaurantId:rid,branchId:branches[0].id,externalOrderId:prefix+'-'+i,source:'QR',orderType:'DINE_IN',status:i===60?'READY':'COMPLETED',paymentStatus:i===60?'PENDING':'SUCCESS',paymentMethod:'CASH_AT_COUNTER',items:[],subtotal:19900,taxAmount:0,totalAmount:19900,createdAt:new Date(i===60?'2020-01-01':'2021-01-01'),meta:{tokenNumber:'OLD-'+i}}))}));
+    const old=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.findFirstOrThrow({where:{restaurantId:rid,externalOrderId:prefix+'-60'}}));
+    await prisma.runAsTenant(rid,tx=>tx.orderPaymentEntry.create({data:{restaurantId:rid,orderId:old.id,kind:'COLLECTION',method:'CASH',amount:2500,reference:prefix+'-partial'}}));
+    const read=(query:string)=>as('get','/api/v1/restaurant/qr/order-list?'+query).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt);
+    const due=await read('view=DUE&status=READY');expect(due.status,JSON.stringify(due.body)).toBe(200);expect(due.body.rows.find((o:any)=>o.id===old.externalOrderId).balance).toMatchObject({collectedPaise:2500,outstandingPaise:17400});
+    const first=await read('view=ALL&search='+prefix);expect(first.body.rows).toHaveLength(50);expect(first.body.total).toBe(61);expect(first.body.nextCursor).toBeTruthy();
+    const second=await read('view=ALL&search='+prefix+'&cursor='+first.body.nextCursor);expect(second.body.rows).toHaveLength(11);expect(new Set([...first.body.rows,...second.body.rows].map(o=>o.id)).size).toBe(61);
+    const foreign=await as('get','/api/v1/restaurant/qr/order-list?search='+prefix+'&branchId='+branches[0].id,devices[1][0].token);expect([403,404]).toContain(foreign.status);
+    expect((await read('cursor=invalid')).status).toBe(400);
+    const collected=await as('post',`/api/v1/restaurant/qr/orders/${old.externalOrderId}/action`).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt).send({action:'COLLECT',version:old.syncVersion});expect(collected.status,JSON.stringify(collected.body)).toBe(200);
+    const saved=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.findUniqueOrThrow({where:{id:old.id}}));expect((saved.meta as any).counterCollection.amountPaise).toBe(17400);
+  } finally {await prisma.runAsTenant(rid,tx=>tx.syncedOrder.deleteMany({where:{restaurantId:rid,externalOrderId:{startsWith:prefix}}}));}
+});
+
+it('QR CRM shares POS entities, audits points and rejects retries, stale writers and unauthorized users safely',async()=>{
+ const crm='/api/v1/restaurant/qr/crm',phone='9870000123';
+ const original=await prisma.runAsTenant(rid,tx=>tx.applicationEntitlement.findMany({where:{restaurantId:rid,appCode:'QR_ORDERING'},select:{id:true,config:true}}));
+ const call=(method:'get'|'post'|'put',path:string)=>as(method,crm+path).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt);
+ try {
+  await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:{...row.config as object,qrLoyalty:true}}});});
+  expect((await as('get',crm)).status).toBe(403);
+  expect((await call('post','/customers').send({phone:'123',name:'Invalid'})).status).toBe(400);
+  const create=await call('post','/customers').send({phone,name:'Daksh QR',email:'',notes:'Test profile'});expect(create.status,JSON.stringify(create.body)).toBe(201);
+  const detail=await call('get','/customers/'+phone);expect(detail.body.loyaltyPoints).toBe(0);
+  const key=randomUUID(),adjust={points:200,reason:'Owner opening grant',idempotencyKey:key,version:detail.body.version};
+  expect((await call('post','/customers/'+phone+'/points').send(adjust)).body.points).toBe(200);
+  expect((await call('post','/customers/'+phone+'/points').send(adjust)).body).toMatchObject({points:200,duplicate:true});
+  expect((await call('post','/customers/'+phone+'/points').send({...adjust,points:201})).status).toBe(409);
+  const current=(await call('get','/customers/'+phone)).body;
+  expect((await call('post','/customers/'+phone+'/points').send({...adjust,points:-201,idempotencyKey:randomUUID(),version:current.version})).status).toBe(400);
+  const results=await Promise.all([1,2].map(i=>call('post','/customers/'+phone+'/points').send({...adjust,points:10,reason:'Concurrent grant '+i,idempotencyKey:randomUUID(),version:current.version})));expect(results.map(r=>r.status).sort()).toEqual([201,409]);
+  const final=(await call('get','/customers/'+phone)).body;expect(final.loyaltyPoints).toBe(210);
+  const synced=await as('get','/api/v1/entity-sync/CUSTOMER?afterSeq=0',devices[0][0].token);expect(synced.body.entities.find((e:any)=>e.externalId===phone).payload.loyaltyPoints).toBe(210);
+  const settings=(await call('get','/program')).body;expect(settings.canManageProgram).toBe(true);
+  const save=await call('put','/program').send({version:settings.program.version,enabled:true,earnPoints:1,perRupeesSpent:100});expect(save.status).toBe(200);
+  // A manager uses their branch-bound console, rather than the owner's branchless console.
+  const binding=await prisma.runAsTenant(rid,tx=>tx.device.findUniqueOrThrow({where:{id:admin.id},select:{branchId:true}}));
+  try {
+    await prisma.runAsTenant(rid,tx=>tx.device.update({where:{id:admin.id},data:{branchId:branches[1].id}}));
+    const managerRead=await as('get',crm+'/program').set('x-admin-branch',branches[1].id).set('x-owner-authorization',managerJwt);expect(managerRead.status,JSON.stringify(managerRead.body)).toBe(200);expect(managerRead.body.canManageProgram).toBe(false);
+    expect((await as('put',crm+'/program').set('x-admin-branch',branches[1].id).set('x-owner-authorization',managerJwt).send({version:managerRead.body.program.version,enabled:false,earnPoints:1,perRupeesSpent:100})).status).toBe(403);
+    expect((await as('get',crm).set('x-admin-branch',branches[0].id).set('x-owner-authorization',managerJwt)).status).toBe(403);
+  } finally {await prisma.runAsTenant(rid,tx=>tx.device.update({where:{id:admin.id},data:{branchId:binding.branchId}}));}
+  const reward=await call('put','/rewards').send({version:0,name:'100 off',description:'Bill reward',pointsCost:150,discountAmount:100,isActive:true});expect(reward.status).toBe(200);expect(reward.body.rewards.find((r:any)=>r.name==='100 off')).toMatchObject({pointsCost:150,discountAmount:100});
+  const unauthorized=await as('get',crm+'/customers/'+phone,devices[3].find(d=>d.type==='KIOSK').token);expect(unauthorized.status).toBe(403);
+  const audit=await prisma.runAsTenant(rid,tx=>tx.auditLog.findMany({where:{restaurantId:rid,action:'LOYALTY_POINTS_ADJUSTED'}}));expect(audit).toHaveLength(2);
+ } finally {await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});}
+});
+it('QR workflow reconciliation uses collection dates, verified acceptance and canonical branch scope',async()=>{
+ const base='/api/v1/restaurant/qr/workflows',call=(method:'get'|'post',path:string)=>as(method,base+path).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt);
+ const prefix='workflow-'+stamp;let a:any;
+ const original=await prisma.runAsTenant(rid,tx=>tx.applicationEntitlement.findMany({where:{restaurantId:rid,appCode:'QR_ORDERING'}}));
+ await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:{...(row.config as any),qrScheduledPickup:true}}});});
+ try{
+  a=await prisma.runAsTenant(rid,tx=>tx.syncedOrder.create({data:{restaurantId:rid,branchId:branches[0].id,externalOrderId:prefix,source:'QR',orderType:'TAKEAWAY',status:'READY',paymentMethod:'ONLINE',paymentStatus:'SUCCESS',createdAt:new Date('2022-01-01'),items:[],subtotal:3000,taxAmount:0,totalAmount:3000,meta:{tokenNumber:'WF-1',pickupAt:'2026-02-14T08:00:00.000Z',qrStatusHistory:[{action:'READY',at:'2026-02-14T07:00:00.000Z'}]}}}));
+  await prisma.runAsTenant(rid,async tx=>{
+   await tx.orderPaymentEntry.createMany({data:[{restaurantId:rid,orderId:a.id,branchId:null,kind:'COLLECTION',method:'UPI',amount:3000,reference:prefix+'-collection',actorId:owner.id,createdAt:new Date('2026-02-14T06:00:00Z')},{restaurantId:rid,orderId:a.id,branchId:branches[0].id,kind:'REFUND',method:'UPI',amount:500,reference:prefix+'-refund',createdAt:new Date('2026-02-14T07:00:00Z')}]});
+   const other=await tx.syncedOrder.create({data:{restaurantId:rid,branchId:branches[1].id,externalOrderId:prefix+'-foreign',source:'QR',orderType:'TAKEAWAY',status:'COMPLETED',paymentMethod:'CASH_AT_COUNTER',paymentStatus:'SUCCESS',items:[],subtotal:9900,taxAmount:0,totalAmount:9900}});
+   // Legacy payment entries can lack branchId; order identity still controls scope.
+   await tx.orderPaymentEntry.create({data:{restaurantId:rid,orderId:other.id,branchId:null,kind:'COLLECTION',method:'CASH',amount:9900,reference:prefix+'-foreign-cash',createdAt:new Date('2026-02-14T06:00:00Z')}});
+  });
+  const r=await call('get','/reconciliation?from=2026-02-14&to=2026-02-14');expect(r.status,JSON.stringify(r.body)).toBe(200);expect(r.body).toMatchObject({collectedPaise:3000,refundedPaise:500,netPaise:2500});expect(r.body.entries.every((e:any)=>e.orderId===prefix)).toBe(true);expect(r.body.groups.every((g:any)=>g.branch===branches[0].name)).toBe(true);
+  expect((await call('get','/reconciliation?cursor=invalid')).status).toBe(400);
+  const timeline=await call('get','/timeline/'+prefix);expect(timeline.status,JSON.stringify(timeline.body)).toBe(200);expect(timeline.body.events.map((e:any)=>e.type)).toContain('Confirmed refund');
+  expect((await call('get','/timeline/'+prefix+'-foreign')).status).toBe(404);
+  expect((await as('get',base+'/reconciliation')).status).toBe(403);
+  const check=(await call('get','/payment-acceptance')).body;
+  const b={version:check.version,orderId:prefix,mobileCheckout:true,appReturn:true,kitchenReceived:true,notes:'Isolated acceptance fixture'};
+  expect((await call('post','/payment-acceptance').send({...b,orderId:prefix+'-foreign'})).status).toBe(400);
+  expect((await call('post','/payment-acceptance').send({...b,appReturn:false})).status).toBe(400);
+  expect((await call('post','/payment-acceptance').send(b)).status).toBe(201);
+  expect((await call('post','/payment-acceptance').send(b)).status).toBe(409);
+  const inv=await call('get','/print-inventory');expect(inv.status).toBe(200);
+  const calendar=await call('get','/pickup-calendar?from=2026-02-14&to=2026-02-14');expect(calendar.status,JSON.stringify(calendar.body)).toBe(200);expect(calendar.body.orders.map((o:any)=>o.id)).toEqual([prefix]);
+ }finally{await prisma.runAsTenant(rid,async tx=>{await tx.syncedOrder.deleteMany({where:{restaurantId:rid,externalOrderId:{startsWith:prefix}}});for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});}
+});
+it('QR CRM consent exports and follow-ups retain permissions and retry safety',async()=>{
+ const original=await prisma.runAsTenant(rid,tx=>tx.applicationEntitlement.findMany({where:{restaurantId:rid,appCode:'QR_ORDERING'}}));
+ try{
+  await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:{...(row.config as any),qrLoyalty:true}}});});
+  const base='/api/v1/restaurant/qr/crm',phone='9981000001',call=(m:'get'|'post'|'put',p:string)=>as(m,base+p).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt);
+  expect((await call('post','/customers').send({phone,name:'Consent customer',consent:{email:true,whatsapp:false,source:'Written consent'}})).status).toBe(400);
+  const c=await call('post','/customers').send({phone,name:'Consent customer',email:'consent@test.example.com',consent:{email:true,whatsapp:false,source:'Written consent fixture'}});expect(c.status).toBe(201);
+  const detail=(await call('get','/customers/'+phone)).body;
+  const note={version:detail.version,note:'Guest prefers a quiet table',idempotencyKey:randomUUID()};
+  expect((await call('post','/customers/'+phone+'/followup').send(note)).status).toBe(201);
+  expect((await call('post','/customers/'+phone+'/followup').send(note)).body.followups).toHaveLength(1);
+  expect((await call('post','/customers/'+phone+'/followup').send({...note,note:'Changed'})).status).toBe(409);
+  const unchanged=(await call('get','/customers/'+phone)).body;await call('post','/customers').send({phone,name:'Consent renamed',email:unchanged.email,version:unchanged.version,consent:{email:true,whatsapp:false,source:'Written consent fixture'}});expect((await call('get','/customers/'+phone)).body.marketingConsent.at).toBe(detail.marketingConsent.at);
+  const contacts=await call('get','/export?segment=EMAIL');expect(contacts.status).toBe(200);expect(contacts.body.rows.find((r:any)=>r.email==='consent@test.example.com')).toMatchObject({phone:'',consentSource:'Written consent fixture'});
+  expect((await call('get','/export?segment=WHATSAPP')).body.rows.some((r:any)=>r.phone===phone)).toBe(false);
+  expect((await call('get','?segment=EMAIL')).body.rows.some((r:any)=>r.phone===phone)).toBe(true);
+  const current=(await call('get','/customers/'+phone)).body;
+  expect((await call('post','/customers').send({phone,name:'Consent customer',email:current.email,version:current.version,consent:{email:false,whatsapp:false,source:'Guest opted out'}})).status).toBe(201);
+  expect((await call('get','/export?segment=EMAIL')).body.rows.some((r:any)=>r.email===current.email)).toBe(false);
+  const audited=await prisma.runAsTenant(rid,tx=>tx.auditLog.count({where:{restaurantId:rid,action:'CUSTOMER_EXPORT'}}));expect(audited).toBeGreaterThanOrEqual(3);
+ }finally{await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});}
 });

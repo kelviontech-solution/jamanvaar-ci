@@ -1,0 +1,230 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / INSIGHTS\nAnalytics\n\nUnderstand real orders, verified collections and your ordering funnel.\n\nEnabled\nFrom (restaurant date)\nTo (restaurant date)\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nTimezone: Asia/Kolkata. Calendar days run midnight to midnight and include both selected dates. UTC export boundaries: 2026-10-07T18:30:00.000Z to 2026-10-14T18:30:00.000Z (exclusive).\n\n7\nCode landing sessions\n7\nMenu-view sessions\n4\nItem additions\n42.9%\nOrders / menu-view sessions\n4\nCart sessions\n4\nCheckout sessions\n3\nAccepted orders\n0\nCompleted\n0\nCancelled\n3\nPending orders\n0\nPreparing\n₹308.00\nAccepted order value\n₹206.00\nGross paid sales\n₹206.00\nNet sales\n₹206.00\nCollected payments\n₹102.00\nOutstanding at counter\n₹0.00\nSuccessful refunds\n₹102.67\nAverage order value\n2\nOnline successes\n0\nFailed attempts\n1\nPending attempts\n1\nCounter orders\n\nLanding sessions and menu views are deduplicated per code, signed browser session and restaurant day. Accepted orders exclude online drafts and cancellations. Gross paid sales include collected counter payments and verified online payments. Net sales subtract successful partial or full refunds for these orders. Conversion is an order-to-session ratio and may exceed 100% when a guest orders again.\n\nOrder-value trend\n2026-10-13 · 3 orders\n₹308.00\nPopular dishes\n\nUI Audit Dish 004\n2\n\nUI Audit Dish 003\n1\n\nBy table / QR version\n\nTable UI01 · v1: 7 visits · 3 orders · ₹308.00\n\nBy branch\n\nUI Audit Restaurant A — Main Branch: 3 orders · ₹308.00\n\nRecent online payment attempts\n10/13/2026, 9:42:34 PM\n₹103.00\nSUCCESS\npay_qa1791907955045\n10/13/2026, 9:41:29 PM\n₹103.00\nSUCCESS\npay_qa1791907890046\n10/13/2026, 9:39:43 PM\n₹103.00\nPENDING\nAwaiting provider",
+  "headings": [
+    "Analytics",
+    "Order-value trend",
+    "Popular dishes",
+    "By table / QR version",
+    "By branch",
+    "Recent online payment attempts"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 11,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-08"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To (restaurant date)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "2026-10-14"
+    },
+    {
+      "index": 2,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    }
+  ],
+  "smallTargets": [
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    }
+  ]
+}

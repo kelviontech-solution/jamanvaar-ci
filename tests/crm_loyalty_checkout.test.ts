@@ -145,3 +145,15 @@ describe('CRM point integrity and cross-device delivery', () => {
     CustomerRepository.earnPointsForOrder(phone, 500, 'repeat'); expect(customer().loyaltyPoints).toBe(250); expect(customer().totalVisits).toBe(1);
   });
 });
+it('expired POS rewards neither discount the cart nor spend customer points',()=>{
+ startCart();CustomerRepository.updateReward('reward-100off',{expiresAt:'2000-01-01T00:00:00.000Z'});
+ const reward=CustomerRepository.getRewards().find(r=>r.id==='reward-100off')!;
+ expect(CustomerRepository.rewardDiscount(reward,pos().cart.items,pos().cart.subtotal)).toBe(0);
+ expect(CustomerRepository.redeemReward(phone,reward.id).ok).toBe(false);
+ expect(customer().loyaltyPoints).toBe(200);
+});
+it('offline customer edits preserve consent revocation and immutable QR follow-ups on both sync sides',()=>{
+ const old:any={phone,loyaltyPoints:200,recentOrderIds:[],loyaltyBaseline:{points:200,spend:0,visits:0},loyaltyLedger:{},updatedAt:'2026-10-14T10:00:00Z',marketingConsent:{email:false,whatsapp:false,source:'Guest revoked',at:'2026-10-14T10:00:00Z'},followups:[{id:'note-1',note:'Retain this note',at:'2026-10-14T09:00:00Z',actorId:'owner',branchId:'a'}]};
+ const offline={...old,name:'Edited offline',updatedAt:'2026-10-14T11:00:00Z',marketingConsent:{email:true,whatsapp:false,source:'Old consent',at:'2026-10-14T08:00:00Z'},followups:[]};
+ const merged=mergeCustomerLoyalty(old,offline);expect(merged.marketingConsent?.email).toBe(false);expect(merged.followups).toHaveLength(1);expect(merged.name).toBe('Edited offline');expect(serverMerge(old,offline)).toEqual(merged);
+});

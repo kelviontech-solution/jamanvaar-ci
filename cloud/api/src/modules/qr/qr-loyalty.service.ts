@@ -1,3 +1,4 @@
+import {nextSyncSequence} from '../../common/sync-sequence';
 import { normalizeIndianPhone } from "../../common/validation/phone";
 import {
   BadRequestException,
@@ -105,7 +106,7 @@ export class QrLoyaltyService {
       });
       const active = rewards
         .map((r) => ({ id: r.externalId, ...(r.payload as any) }))
-        .filter((r) => r.isActive && !r.deleted && r.discountAmount > 0);
+        .filter((r) => r.isActive && !r.deleted && r.discountAmount > 0 && (!r.expiresAt || Date.parse(r.expiresAt)>Date.now()));
       return {
         verified: !!phone,
         verificationAvailable: this.notifications.isQrLoyaltyOtpConfigured(),
@@ -207,6 +208,7 @@ export class QrLoyaltyService {
               ...(sent ? {} : { hash: null }),
             },
             syncVersion: { increment: 1 },
+          seq: await nextSyncSequence(tx,restaurantId),
           },
         });
     });
@@ -253,6 +255,7 @@ export class QrLoyaltyService {
             ...(ok ? { hash: null } : {}),
           },
           syncVersion: { increment: 1 },
+          seq: await nextSyncSequence(tx,restaurantId),
         },
       });
       if (!ok) return false;
@@ -402,6 +405,7 @@ export class QrLoyaltyService {
     if (
       !program?.enabled ||
       !reward?.isActive ||
+      (reward?.expiresAt && !(Date.parse(reward.expiresAt)>Date.now())) ||
       reward.deleted ||
       !(reward.discountAmount > 0) ||
       !Number.isSafeInteger(reward.pointsCost) ||
@@ -441,6 +445,7 @@ export class QrLoyaltyService {
         data: {
           payload: customer as unknown as Prisma.InputJsonValue,
           syncVersion: { increment: 1 },
+          seq: await nextSyncSequence(tx,restaurantId),
         },
       });
     }

@@ -1,0 +1,425 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nMENU & GUESTS\nMenu & Availability\nLAUNCH SETUP\nTables & QR\nPayment Settings\nOrdering Rules\nBRANDING\nQR Design Studio\nCustomer Branding\nADVANCED CONFIGURATION\nAdvanced Features\nINSIGHTS\nAnalytics\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / BRANDING\nQR Design Studio\n\nMake table cards that feel at home in your restaurant.\n\nEnabled\nQR Design Studio\n\nChoose a design once; each card keeps its own table's active QR destination.\n\nMinimal white\nPremium restaurant\nSELECTED\nModern colorful\nCafe\nFine dining\nFamily restaurant\nCasual dining\nTakeaway\nTable number card\nInstruction\nFooter\nAccent\nPrint layout\nTable card\nFolded table tent\nSmall label\nRestaurant logo\nSave design\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\n\nSelect individual tables, or leave all unchecked to export this branch.\n\nTable UI01\nPrint / PDF selected\nDownload design set\nPrint preview\nUI Audit Restaurant A\nUI Audit Restaurant A — Main Branch\nScan to Order\nTable UI01\nFreshly prepared. Thoughtfully served.\nPNG\nSVG\n\n1920 × 2580 PNG. Black modules, white quiet zone. Tent printing repeats this card across the fold.",
+  "headings": [
+    "QR Design Studio",
+    "QR Design Studio",
+    "Print preview"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "QR Design Studio",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 43,
+      "visible": true
+    },
+    {
+      "text": "Minimal white",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 86,
+      "visible": true
+    },
+    {
+      "text": "Premium restaurant\nSELECTED",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 86,
+      "visible": true
+    },
+    {
+      "text": "Modern colorful",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 86,
+      "visible": true
+    },
+    {
+      "text": "Cafe",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Fine dining",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Family restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Casual dining",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Takeaway",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Table number card",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 221,
+      "height": 66,
+      "visible": true
+    },
+    {
+      "text": "Save design",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Print / PDF selected",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 186,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Download design set",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 194,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "PNG",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 62,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "SVG",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 40,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "QR instruction",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "QR accent",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "QR instruction",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Scan to Order"
+    },
+    {
+      "index": 1,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Footer",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Freshly prepared. Thoughtfully served."
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "color",
+      "label": "QR accent",
+      "placeholder": "",
+      "disabled": false,
+      "value": "#0b253a"
+    },
+    {
+      "index": 3,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Print layoutTable cardFolded table tentSmall label",
+      "disabled": false,
+      "value": "CARD",
+      "options": [
+        {
+          "value": "CARD",
+          "text": "Table card"
+        },
+        {
+          "value": "TENT",
+          "text": "Folded table tent"
+        },
+        {
+          "value": "LABEL",
+          "text": "Small label"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": " Restaurant logo",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 5,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "disabled": false,
+      "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+      "options": [
+        {
+          "value": "",
+          "text": "Current admin scope"
+        },
+        {
+          "value": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c",
+          "text": "UI Audit Restaurant A — Main Branch"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Table UI01",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": []
+}

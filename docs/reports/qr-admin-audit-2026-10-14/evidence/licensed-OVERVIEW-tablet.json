@@ -1,0 +1,224 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nBrowse workspace\nQR ORDERING / LIVE OPERATIONS\nOverview\n\nYour branch at a glance. Keep orders moving and your guest experience ready.\n\nEnabled\nMAKE EVERY TABLE FEEL WELCOME\nA better guest experience starts here.\n\nKeep your menu fresh, respond to guests and follow orders from the first scan to the last plate.\n\n1\nTables\n1\nActive QR codes\n0\nQR orders today\n₹0\nAccepted order value today\n0\nWaiting / in kitchen\n0\nCompleted\n0\nLanding sessions today\n₹0\nAverage order\nOrders by table today\nNo QR orders yet today.\nCounted by the server from real orders. Order value excludes unpaid online drafts and cancellations; paid sales include verified online payments and collected counter bills (₹0 so far).\nSet up guest ordering\n\nWork through the setup checks below, then open your live table QR to verify the guest experience.\n\n1. Publish menu\n2. Set up table QR\n3. Check payments\n4. Preview appearance\nShow advanced tools\nBefore your first guest\nYour branch setup checklist\nCheck setup again\n\nA setup check verifies configuration. Place a small test order and confirm staff receive it before opening service.\n\nSelected branch · 9/9 checks passed · Required setup is ready\n\nView completed checks (9)",
+  "headings": [
+    "Overview",
+    "A better guest experience starts here.",
+    "Set up guest ordering",
+    "Before your first guest"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": false
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 43,
+      "visible": false
+    },
+    {
+      "text": "1. Publish menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "2. Set up table QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "3. Check payments",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "4. Preview appearance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Check setup again",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    },
+    {
+      "alt": "A guest enjoying a Gujarati meal while ordering on their phone",
+      "src": "/qr/assets/qr-experience/dining.webp",
+      "loaded": true,
+      "width": 220
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

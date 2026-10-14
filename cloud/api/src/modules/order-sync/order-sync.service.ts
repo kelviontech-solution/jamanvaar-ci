@@ -704,8 +704,9 @@ export class OrderSyncService {
       const collected = action === 'COLLECT';
       if (collected) {
         if (order.paymentMethod !== 'CASH_AT_COUNTER' || order.paymentStatus === 'SUCCESS' || order.status === 'DRAFT') throw new BadRequestException('This order has no counter payment due');
-        meta.counterCollection = { deviceId: device.id, staffId: (device as Device & { adminActorId?: string }).adminActorId ?? device.id, at: new Date().toISOString(), amountPaise: order.totalAmount };
+        meta.counterCollection = { deviceId: device.id, staffId: (device as Device & { adminActorId?: string }).adminActorId ?? device.id, at: new Date().toISOString(), amountPaise: 0 };
         const ledger = await reconcileOrderPayments(tx, order, device.id);
+        meta.counterCollection.amountPaise = ledger.outstandingPaise;
         if (ledger.outstandingPaise) await allocateOrderPayment(tx, order, { kind: 'COLLECTION', amount: ledger.outstandingPaise, method: 'CASH', reference: 'counter:' + order.id, actorId: meta.counterCollection.staffId, evidence: { deviceId: device.id } });
         meta.paymentAllocationSummary = { collectedPaise: order.totalAmount, outstandingPaise: 0 };
       } else {
@@ -722,7 +723,7 @@ export class OrderSyncService {
       const result = await tx.syncedOrder.update({ where: { id: order.id }, data: { status: collected ? order.status : action, paymentStatus: collected ? 'SUCCESS' : order.paymentStatus, items: items as Prisma.InputJsonValue, meta: meta as Prisma.InputJsonValue, seq, syncVersion: { increment: 1 } } });
       await tx.syncEventLog.create({ data: { restaurantId: device.restaurantId, branchId: order.branchId, deviceId: device.id, entityType: 'ORDER', entityId: externalOrderId, action: 'UPDATE', status: 'SUCCESS' } });
       await reconcileOrderPayments(tx, result, device.id);
-      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: collected ? 'QR_COUNTER_COLLECTED' : 'QR_ORDER_STATUS_CHANGED', category: 'QR_ORDERING', details: { externalOrderId, action, reason: reason ?? null, amountPaise: collected ? order.totalAmount : null, branchId: order.branchId } }, tx);
+      await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action: collected ? 'QR_COUNTER_COLLECTED' : 'QR_ORDER_STATUS_CHANGED', category: 'QR_ORDERING', details: { externalOrderId, action, reason: reason ?? null, amountPaise: collected ? meta.counterCollection.amountPaise : null, branchId: order.branchId } }, tx);
       return result;
     });
     this.realtime.publish({ restaurantId: device.restaurantId, branchId: saved.branchId, kind: 'orders', seq: saved.seq ?? undefined, originDeviceId: device.id });

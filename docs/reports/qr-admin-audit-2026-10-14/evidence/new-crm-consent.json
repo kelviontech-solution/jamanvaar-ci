@@ -1,0 +1,429 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / MENU & GUESTS\nCustomers & Loyalty\n\nManage shared customers, point balances, rewards and verified visit history.\n\nEnabled\nCustomers & loyalty\n\nCustomer profiles and point balances are shared with your restaurant's POS and verified QR checkout. Customer order history below follows the selected branch. Points are earned only after confirmed collection; guests verify their phone before using rewards.\n\nAdd customer\nLoyalty program\nRefresh customers\n\nProgram active / Earn 1 points per ₹100 paid. You can manage the restaurant-wide program.\n\nGuest reward setup\n\nRestaurant program: Active\n\nQR rewards for this branch: Not enabled\n\nPhone verification: Ready\n\nOpen branch reward settings\n\nGuests can redeem when all three checks are ready and an active reward matches their balance.\n\nReward saved\n\nCustomer segment\nAll customers\nReturning guests (2+ visits)\nCustomers with points\nEmail consent recorded\nWhatsApp consent recorded\nOwner export scope\nCustomer records (no email marketing list)\nConsented email contacts\nConsented WhatsApp contacts\n\nExports are audited. Do not use a customer-record export for campaigns without channel-specific consent.\n\nExport customer CSV\nFind customer by name or phone\n\n1 matching customers\n\nLoading customers...\n\nFirst customers\nMore customers\nRewards guests can choose at checkout\n\nRedeeming is optional. Paused rewards cannot be redeemed; existing customer points are preserved.\n\nAdd bill reward\n₹100 off for 150 points\n\n150 points / Active\n\nEdit reward\n₹100 off for 150 points\n\n150 points / Active\n\nEdit reward\n₹100 off for 150 points\n\n150 points / Active\n\nEdit reward\n₹100 off for 150 points\n\n150 points / Active\n\nEdit reward\nExpired browser QA reward\n\n150 points / Expired\n\nEdit reward\nExpired browser QA reward\n\n150 points / Expired\n\nEdit reward",
+  "headings": [
+    "Customers & Loyalty",
+    "Customers & loyalty",
+    "Rewards guests can choose at checkout",
+    "₹100 off for 150 points",
+    "₹100 off for 150 points",
+    "₹100 off for 150 points",
+    "₹100 off for 150 points",
+    "Expired browser QA reward",
+    "Expired browser QA reward"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Add customer",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Loyalty program",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Refresh customers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Open branch reward settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 224,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Export customer CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "First customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 134,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "More customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 140,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Add bill reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Customer segment",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Owner export scope",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Find loyalty customer",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Customer segment",
+      "disabled": false,
+      "value": "EMAIL",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "All customers"
+        },
+        {
+          "value": "RETURNING",
+          "text": "Returning guests (2+ visits)"
+        },
+        {
+          "value": "POINTS",
+          "text": "Customers with points"
+        },
+        {
+          "value": "EMAIL",
+          "text": "Email consent recorded"
+        },
+        {
+          "value": "WHATSAPP",
+          "text": "WhatsApp consent recorded"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Owner export scope",
+      "disabled": false,
+      "value": "EMAIL",
+      "options": [
+        {
+          "value": "ALL",
+          "text": "Customer records (no email marketing list)"
+        },
+        {
+          "value": "EMAIL",
+          "text": "Consented email contacts"
+        },
+        {
+          "value": "WHATSAPP",
+          "text": "Consented WhatsApp contacts"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Find loyalty customer",
+      "placeholder": "",
+      "disabled": false,
+      "value": "9880087681"
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

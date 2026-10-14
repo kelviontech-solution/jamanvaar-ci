@@ -1,4 +1,7 @@
-import { QR_BEFORE_NAVIGATE } from './useQrUnsavedChanges';
+import { QrOnboarding } from './QrOnboarding';
+import { QrPaymentWizard, QrReconciliation, QrPickupCalendar } from './QrWorkflows';
+import { QrPrintPack } from './QrPrintPack';
+import { QR_BEFORE_NAVIGATE, requestQrLeave } from './useQrUnsavedChanges';
 import { QrCatalog } from "./QrCatalog";
 import {
   QrSetupHealth,
@@ -60,6 +63,8 @@ import {
   QrAnalyticsView,
   QrMenuAvailability,
 } from "./QrAdvanced";
+import { useDialogFocus } from '@jamanvaar/ui';
+import { QrCrm } from './QrCrm';
 import { useConfirm } from '@jamanvaar/ui';
 
 type Tab = QrTab;
@@ -107,15 +112,19 @@ export function QrConsole({
     setMenuOpen(false);
     if (workspace) window.scrollTo({ top: 0, behavior: "instant" });
   };
+  const lastLocation = useRef(location.href);
+  useEffect(()=>{lastLocation.current=location.href;},[tab,feature]);
   useEffect(() => {
-    const pop = () => {
-      setTab(currentQrTab());
-      setFeature(currentQrFeature());
-      setMenuOpen(false);
+    const canLeave=async()=>window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE,{cancelable:true})) || await confirmNavigation({title:'Leave without saving?',message:'Your changes have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'});
+    const external=(event:Event)=>{void canLeave().then((event as CustomEvent).detail.resolve);};
+    const pop = async () => {
+      const destination=location.href,previous=lastLocation.current;
+      if(!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE,{cancelable:true}))){history.pushState(null,'',previous);if(!(await confirmNavigation({title:'Leave without saving?',message:'Your changes have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'})))return;history.replaceState(null,'',destination);}
+      setTab(currentQrTab());setFeature(currentQrFeature());setMenuOpen(false);lastLocation.current=location.href;
     };
-    window.addEventListener("popstate", pop);
-    return () => window.removeEventListener("popstate", pop);
-  }, []);
+    window.addEventListener('popstate',pop);window.addEventListener('jamanvaar-qr-request-leave',external);
+    return()=>{window.removeEventListener('popstate',pop);window.removeEventListener('jamanvaar-qr-request-leave',external);};
+  }, [confirmNavigation]);
   useEffect(() => {
     if (!menuOpen) return;
     const previousOverflow = document.body.style.overflow;
@@ -183,7 +192,7 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','RULES','ADVANCED','ANALYTICS']);
+  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','CRM','ONBOARDING','ACCEPTANCE','RECONCILIATION','CALENDAR','PRINTPACK','RULES','ADVANCED','ANALYTICS']);
   const visiblePages = QR_PAGES.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (
@@ -194,7 +203,6 @@ export function QrConsole({
       data-testid="qr-console"
       data-jv-workspace="qr-admin"
     >
-      {navigationDialog}
       {workspace && (
         <>
           <button
@@ -355,29 +363,13 @@ export function QrConsole({
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
+        {tab === "CRM" && <QrCrm />}
         {tab === "SERVICE" && <QrServiceOperations />}
         {tab === "PICKUP" && <QrPickupOperations />}
         {tab === "PERFORMANCE" && <QrMenuPerformance />}
         {tab === "BRAND" && <QrBrandStudio />}
         {tab === "TABLES" && <TablesAndQr showToast={showToast} />}
-        {tab === "MENU" && (
-          <div className="space-y-5">
-            {/^\/qr\//.test(location.pathname) && <QrCatalog />}
-            {/* A visible break, not just spacing — without it, this reads as a second,
-                duplicate dish list rather than a separate tool (edit the catalog above;
-                this one toggles which already-published dishes each branch shows guests). */}
-            {/^\/qr\//.test(location.pathname) && (
-              <div className="flex items-center gap-3 pt-1" aria-hidden="true">
-                <div className="h-px flex-1 bg-jaman-border" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Guest availability
-                </span>
-                <div className="h-px flex-1 bg-jaman-border" />
-              </div>
-            )}
-            <QrMenuAvailability showToast={showToast} />
-          </div>
-        )}
+        {tab === "MENU" && <QrMenuWorkspace showToast={showToast} />}
         {tab === "ADVANCED" && (
           <QrCapabilities
             showToast={showToast}
@@ -385,6 +377,11 @@ export function QrConsole({
             hideNavigation={workspace}
           />
         )}
+        {tab === 'ONBOARDING' && <QrOnboarding/>}
+        {tab === 'ACCEPTANCE' && <QrPaymentWizard/>}
+        {tab === 'RECONCILIATION' && <QrReconciliation/>}
+        {tab === 'CALENDAR' && <QrPickupCalendar/>}
+        {tab === 'PRINTPACK' && <QrPrintPack/>}
         {tab === "DESIGN" && <QrDesignStudio showToast={showToast} />}
         {tab === "ORDERS" && <QrOperationalOrders showToast={showToast} />}
         {tab === "PAYMENTS" && (
@@ -420,6 +417,7 @@ export function QrConsole({
           </div>
         )}
       </div>
+      <div className="qr-navigation-confirm">{navigationDialog}</div>
     </div>
   );
 }
@@ -1137,24 +1135,17 @@ function QrDialog({
   showToast: (m: string) => void;
 }) {
   const url = row.qr!.url!;
-  // Escape closes this dialog like any other in the app.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  const {cardRef,dialogId}=useDialogFocus<HTMLDivElement>(true,onClose);
   return (
     <div
       className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl p-6 w-full max-w-sm text-center"
+        ref={cardRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={dialogId} className="bg-white rounded-2xl p-6 w-full max-w-sm text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="font-bold text-jaman-navy text-lg">
+        <div id={dialogId} className="font-bold text-jaman-navy text-lg">
           Table {row.displayNumber}
         </div>
         <img
@@ -1388,3 +1379,5 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
     </div>
   );
 }
+
+function QrMenuWorkspace({showToast}:{showToast:(message:string)=>void}){const [mode,setMode]=useState('EDIT');return <div className="space-y-4"><div className="sticky top-0 z-10 rounded-xl border bg-white p-3 flex flex-wrap gap-3">{['EDIT','AVAILABILITY'].map(value=><button type="button" key={value} aria-pressed={mode===value} className="min-h-11 rounded-xl border px-4 font-bold" onClick={async()=>{if(await requestQrLeave())setMode(value);}}>{value==='EDIT'?'Edit shared draft':'Published guest availability'}</button>)}</div>{mode==='EDIT'&&/^\/qr\//.test(location.pathname)?<QrCatalog/>:<QrMenuAvailability showToast={showToast}/>}</div>;}

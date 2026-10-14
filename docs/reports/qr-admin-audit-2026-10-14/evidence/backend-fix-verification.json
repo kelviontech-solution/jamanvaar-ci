@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-14",
+  "environment": "Isolated local test database; external provider transport simulated",
+  "passedSuites": 4,
+  "passedTests": 116,
+  "failedTests": 0,
+  "suites": [
+    "cloud/api/test/qr-module.e2e.spec.ts",
+    "cloud/api/test/qr-mobile-payments.e2e.spec.ts",
+    "cloud/api/test/qr-operations.e2e.spec.ts",
+    "cloud/api/test/multi-branch-dashboard.e2e.spec.ts"
+  ],
+  "typeChecks": { "cloudApi": "PASS", "restaurantAdminQrAdmin": "PASS" },
+  "builds": { "cloudApi": "PASS", "restaurantAdminQrAdmin": "PASS" },
+  "productionDeployment": false
+}

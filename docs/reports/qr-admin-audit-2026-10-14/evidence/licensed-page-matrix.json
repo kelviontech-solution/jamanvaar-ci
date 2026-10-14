@@ -1,0 +1,935 @@
+[
+  {
+    "page": "licensed-OVERVIEW",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Overview",
+      "A better guest experience starts here.",
+      "Set up guest ordering",
+      "Before your first guest"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-OVERVIEW",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Overview",
+      "A better guest experience starts here.",
+      "Set up guest ordering",
+      "Before your first guest"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-OVERVIEW",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Overview",
+      "A better guest experience starts here.",
+      "Set up guest ordering",
+      "Before your first guest"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ORDERS",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "QR Orders",
+      "QR-4",
+      "QR-3",
+      "QR-2",
+      "QR-1"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ORDERS",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "QR Orders",
+      "QR-4",
+      "QR-3",
+      "QR-2",
+      "QR-1"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ORDERS",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "QR Orders",
+      "QR-4",
+      "QR-3",
+      "QR-2",
+      "QR-1"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SERVICE",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Service Requests",
+      "QR table service requests",
+      "Service request settings",
+      "Request buttons"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SERVICE",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Service Requests",
+      "QR table service requests",
+      "Service request settings",
+      "Request buttons"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SERVICE",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Service Requests",
+      "QR table service requests",
+      "Service request settings",
+      "Request buttons"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-MENU",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 155,
+    "headings": [
+      "Menu & Availability",
+      "Shared menu editor",
+      "UI Audit Dish 001",
+      "UI Audit Dish 002",
+      "UI Audit Dish 003",
+      "UI Audit Dish 004",
+      "UI Audit Dish 005",
+      "UI Audit Dish 006",
+      "UI Audit Dish 007",
+      "UI Audit Dish 008",
+      "UI Audit Dish 009",
+      "UI Audit Dish 010",
+      "UI Audit Dish 011",
+      "UI Audit Dish 012",
+      "UI Audit Dish 013",
+      "UI Audit Dish 014",
+      "UI Audit Dish 015",
+      "UI Audit Dish 016",
+      "UI Audit Dish 017",
+      "UI Audit Dish 018",
+      "UI Audit Dish 019",
+      "UI Audit Dish 020",
+      "UI Audit Dish 021",
+      "UI Audit Dish 022",
+      "UI Audit Dish 023",
+      "UI Audit Dish 024",
+      "Publish & branch availability"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-MENU",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 155,
+    "headings": [
+      "Menu & Availability",
+      "Shared menu editor",
+      "UI Audit Dish 001",
+      "UI Audit Dish 002",
+      "UI Audit Dish 003",
+      "UI Audit Dish 004",
+      "UI Audit Dish 005",
+      "UI Audit Dish 006",
+      "UI Audit Dish 007",
+      "UI Audit Dish 008",
+      "UI Audit Dish 009",
+      "UI Audit Dish 010",
+      "UI Audit Dish 011",
+      "UI Audit Dish 012",
+      "UI Audit Dish 013",
+      "UI Audit Dish 014",
+      "UI Audit Dish 015",
+      "UI Audit Dish 016",
+      "UI Audit Dish 017",
+      "UI Audit Dish 018",
+      "UI Audit Dish 019",
+      "UI Audit Dish 020",
+      "UI Audit Dish 021",
+      "UI Audit Dish 022",
+      "UI Audit Dish 023",
+      "UI Audit Dish 024",
+      "Publish & branch availability"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-MENU",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 154,
+    "headings": [
+      "Menu & Availability",
+      "Shared menu editor",
+      "UI Audit Dish 001",
+      "UI Audit Dish 002",
+      "UI Audit Dish 003",
+      "UI Audit Dish 004",
+      "UI Audit Dish 005",
+      "UI Audit Dish 006",
+      "UI Audit Dish 007",
+      "UI Audit Dish 008",
+      "UI Audit Dish 009",
+      "UI Audit Dish 010",
+      "UI Audit Dish 011",
+      "UI Audit Dish 012",
+      "UI Audit Dish 013",
+      "UI Audit Dish 014",
+      "UI Audit Dish 015",
+      "UI Audit Dish 016",
+      "UI Audit Dish 017",
+      "UI Audit Dish 018",
+      "UI Audit Dish 019",
+      "UI Audit Dish 020",
+      "UI Audit Dish 021",
+      "UI Audit Dish 022",
+      "UI Audit Dish 023",
+      "UI Audit Dish 024",
+      "Publish & branch availability"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-TABLES",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 11,
+    "headings": [
+      "Tables & QR"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-TABLES",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 11,
+    "headings": [
+      "Tables & QR"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-TABLES",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 11,
+    "headings": [
+      "Tables & QR"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-DESIGN",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Design Studio",
+      "QR Design Studio",
+      "Print preview"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-DESIGN",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Design Studio",
+      "QR Design Studio",
+      "Print preview"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-DESIGN",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Design Studio",
+      "QR Design Studio",
+      "Print preview"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-BRAND",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 2,
+    "headings": [
+      "Customer Branding",
+      "Customer page branding",
+      "Audit welcome 1791966297209"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-BRAND",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 2,
+    "headings": [
+      "Customer Branding",
+      "Customer page branding",
+      "Audit welcome 1791966297209"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-BRAND",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 3,
+    "headings": [
+      "Customer Branding",
+      "Customer page branding",
+      "Audit welcome 1791966297209"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PAYMENTS",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "Payment Settings",
+      "Secure payment collection",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PAYMENTS",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "Payment Settings",
+      "Secure payment collection",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PAYMENTS",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "Payment Settings",
+      "Secure payment collection",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-RULES",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 2,
+    "headings": [
+      "Ordering Rules",
+      "Hours, capacity & guest instructions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-RULES",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 2,
+    "headings": [
+      "Ordering Rules",
+      "Hours, capacity & guest instructions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-RULES",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 2,
+    "headings": [
+      "Ordering Rules",
+      "Hours, capacity & guest instructions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PICKUP",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Pickup Scheduling",
+      "Pickup scheduling",
+      "Pickup hours"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PICKUP",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Pickup Scheduling",
+      "Pickup scheduling",
+      "Pickup hours"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PICKUP",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Pickup Scheduling",
+      "Pickup scheduling",
+      "Pickup hours"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SETTINGS",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Settings",
+      "Guest page: words, colour and logo"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SETTINGS",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Settings",
+      "Guest page: words, colour and logo"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-SETTINGS",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "QR Settings",
+      "Guest page: words, colour and logo"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ADVANCED",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Features for this branch"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ADVANCED",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Features for this branch"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ADVANCED",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Features for this branch"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ANALYTICS",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Analytics",
+      "Order-value trend",
+      "Popular dishes",
+      "By table / QR version",
+      "By branch",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ANALYTICS",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Analytics",
+      "Order-value trend",
+      "Popular dishes",
+      "By table / QR version",
+      "By branch",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-ANALYTICS",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Analytics",
+      "Order-value trend",
+      "Popular dishes",
+      "By table / QR version",
+      "By branch",
+      "Recent online payment attempts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PERFORMANCE",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Menu Performance",
+      "Menu performance",
+      "Sales by category",
+      "Ordering modes",
+      "Daily order trend (UTC)",
+      "Orders by hour (UTC)",
+      "Service request activity"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PERFORMANCE",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Menu Performance",
+      "Menu performance",
+      "Sales by category",
+      "Ordering modes",
+      "Daily order trend (UTC)",
+      "Orders by hour (UTC)",
+      "Service request activity"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-PERFORMANCE",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Menu Performance",
+      "Menu performance",
+      "Sales by category",
+      "Ordering modes",
+      "Daily order trend (UTC)",
+      "Orders by hour (UTC)",
+      "Service request activity"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Translations",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Menu translations"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Translations",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Menu translations"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Translations",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Menu translations"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Promotions",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 8,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Coupons and promotions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Promotions",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Coupons and promotions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Promotions",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 1,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Coupons and promotions"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Feedback",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Verified private feedback"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Feedback",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Verified private feedback"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Feedback",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Verified private feedback"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Alerts",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Recoverable operational alerts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Alerts",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Recoverable operational alerts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Alerts",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Recoverable operational alerts"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Collections",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Payment attempts and confirmed collections"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Collections",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Payment attempts and confirmed collections"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-Collections",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Payment attempts and confirmed collections"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-License",
+    "viewport": "desktop",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 7,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Licensed capabilities and limits"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-License",
+    "viewport": "tablet",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Licensed capabilities and limits"
+    ],
+    "alertText": []
+  },
+  {
+    "page": "licensed-License",
+    "viewport": "phone",
+    "overflow": false,
+    "unnamedButtons": 0,
+    "duplicateIds": [],
+    "smallTargets": 0,
+    "headings": [
+      "Advanced Features",
+      "Advanced QR capabilities",
+      "Licensed capabilities and limits"
+    ],
+    "alertText": []
+  }
+]

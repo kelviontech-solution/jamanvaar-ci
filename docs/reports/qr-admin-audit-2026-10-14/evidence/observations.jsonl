@@ -1,0 +1,15 @@
+{"name":"Unsaved branding browser Back","result":{"nativeDialogs":0,"themedDialogs":0,"draftLost":true}}
+{"name":"Unsaved branding browser Back","result":{"nativeDialogs":0,"themedDialogs":0,"draftLost":true}}
+{"name":"Table QR popup accessibility","result":{"dialogRoles":0}}
+{"name":"Unsaved translation sidebar navigation","result":{"warned":false,"draftLost":true}}
+{"name":"Unsaved promotion sidebar navigation","result":{"warned":false,"draftLost":true}}
+{"name":"Unsaved translation sidebar navigation","result":{"warned":false,"draftLost":true}}
+{"name":"Unsaved promotion sidebar navigation","result":{"warned":false,"draftLost":true}}
+{"name":"QR order details focus and Escape","result":{"focusInside":false,"escapeCloses":false}}
+{"name":"Failed rule save preserves attempted value","result":{"response":400,"initial":"27","attempted":"99999","afterError":"27","preserved":false}}
+{"name":"MENU phone content length","result":{"height":13954,"viewportHeight":844,"sections":["Shared menu editor","UI Audit Dish 001","UI Audit Dish 002","UI Audit Dish 003","UI Audit Dish 004","UI Audit Dish 005","UI Audit Dish 006","UI Audit Dish 007","UI Audit Dish 008","UI Audit Dish 009","UI Audit Dish 010","UI Audit Dish 011","UI Audit Dish 012","UI Audit Dish 013","UI Audit Dish 014","UI Audit Dish 015","UI Audit Dish 016","UI Audit Dish 017","UI Audit Dish 018","UI Audit Dish 019","UI Audit Dish 020","UI Audit Dish 021","UI Audit Dish 022","UI Audit Dish 023","UI Audit Dish 024","Publish & branch availability"]}}
+{"name":"ANALYTICS phone content length","result":{"height":2823,"viewportHeight":844,"sections":["Order-value trend","Popular dishes","By table / QR version","By branch","Recent online payment attempts"]}}
+{"name":"ADVANCED phone content length","result":{"height":2881,"viewportHeight":844,"sections":["Advanced QR capabilities","Features for this branch"]}}
+{"name":"Latest-order cap hides an older pending counter bill","result":{"normalStatus":200,"defaultRows":50,"explicitLimitRows":66,"oldPendingInDefault":false,"oldPendingInLarger":true,"uiShowsOldPending":false}}
+{"name":"Partial bill counter confirmation uses total rather than remaining balance","result":{"orderTotal":199,"collected":25,"outstanding":174,"confirmationText":"Payment collected?\nConfirm ₹199.00 was collected at the counter.\nCancel\nYes, collected"}}
+{"name":"Partial bill counter confirmation uses total rather than remaining balance","result":{"orderTotal":199,"collected":25,"outstanding":174,"confirmationText":"Payment collected?\nConfirm ₹199.00 was collected at the counter.\nCancel\nYes, collected"}}

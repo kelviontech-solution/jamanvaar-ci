@@ -1,0 +1,668 @@
+{
+  "text": "QR ADMIN\nYour restaurant workspace\nUI Audit Owner A\nBranch\nAll restaurant\nUI Audit Restaurant A — Main Branch\nUI Audit Second Branch A\nSign out\nRestaurant workspace\nShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nJAMANVAAR QR · 12/11/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LIVE OPERATIONS\nService Requests\n\nRespond to table requests and keep your floor team in sync.\n\nEnabled\nQR table service requests\nRefresh\n\nShared with this branch's QR Admin, POS and Captain. Status is recovered from the server every 5 seconds. All current requests and the latest 200 history entries are included.\n\nAssignment updated\n\nNeeds action\noverdue\nall\nNew request\nacknowledged\nin progress\ncompleted\ncancelled\nexpired\nTable QA-SERVICE · QA table assistance\n\n10/14/2026, 5:12:54 PM · OPEN\n\nIsolated UI fixture\n\nUI Audit Restaurant A — Main Branch\n\nEscalated: Supervisor review from QR Admin browser\n\nAssign / escalate\nAcknowledge\nStart\nComplete\nCancel\nActivity history\nService request settings\nEnable customer table requests\nTable cooldown (seconds)\nOverdue after (minutes)\nExpire after (minutes)\nRequest buttons\nRemove\nRemove\nRemove\nRemove\nRemove\nRemove\nAdd request type\n\nRequests remain in the inbox through quiet hours; staff can recover them after reconnecting. Alerts here are visual, with no external messages or alarm sounds.\n\nQuiet hours\nSave settings",
+  "headings": [
+    "Service Requests",
+    "QR table service requests",
+    "Table QA-SERVICE · QA table assistance",
+    "Service request settings",
+    "Request buttons"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 80,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Assign / escalate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Acknowledge",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Start",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 51,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Complete",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 61,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Add request type",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Save settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 118,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search service requests",
+      "placeholder": "Table, request or note"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Service request status",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Call waiter",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for WAITER",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Water",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for WATER",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Cutlery",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for CUTLERY",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Napkins",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for NAPKINS",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Request bill",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for BILL",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Assistance",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for ASSISTANCE",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 116
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0,
+  "formControls": [
+    {
+      "index": 0,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search service requests",
+      "placeholder": "Table, request or note",
+      "disabled": false,
+      "value": ""
+    },
+    {
+      "index": 1,
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Service request status",
+      "disabled": false,
+      "value": "PENDING",
+      "options": [
+        {
+          "value": "PENDING",
+          "text": "Needs action"
+        },
+        {
+          "value": "OVERDUE",
+          "text": "overdue"
+        },
+        {
+          "value": "ALL",
+          "text": "all"
+        },
+        {
+          "value": "OPEN",
+          "text": "New request"
+        },
+        {
+          "value": "ACKNOWLEDGED",
+          "text": "acknowledged"
+        },
+        {
+          "value": "IN_PROGRESS",
+          "text": "in progress"
+        },
+        {
+          "value": "COMPLETED",
+          "text": "completed"
+        },
+        {
+          "value": "CANCELLED",
+          "text": "cancelled"
+        },
+        {
+          "value": "EXPIRED",
+          "text": "expired"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable customer table requests",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 3,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Table cooldown (seconds)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "60"
+    },
+    {
+      "index": 4,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Overdue after (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "5"
+    },
+    {
+      "index": 5,
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Expire after (minutes)",
+      "placeholder": "",
+      "disabled": false,
+      "value": "120"
+    },
+    {
+      "index": 6,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Call waiter",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 7,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for WAITER",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Call waiter"
+    },
+    {
+      "index": 8,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Water",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 9,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for WATER",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Water"
+    },
+    {
+      "index": 10,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Cutlery",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 11,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for CUTLERY",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Cutlery"
+    },
+    {
+      "index": 12,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Napkins",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 13,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for NAPKINS",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Napkins"
+    },
+    {
+      "index": 14,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Request bill",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 15,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for BILL",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Request bill"
+    },
+    {
+      "index": 16,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable Assistance",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    },
+    {
+      "index": 17,
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Label for ASSISTANCE",
+      "placeholder": "",
+      "disabled": false,
+      "value": "Assistance"
+    },
+    {
+      "index": 18,
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Quiet hours",
+      "placeholder": "",
+      "disabled": false,
+      "value": "on"
+    }
+  ],
+  "smallTargets": [],
+  "branch": "d0f1a287-cf0e-4b43-a69f-aeea14b8547c"
+}

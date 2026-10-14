@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { requestQrLeave, useQrUnsavedChanges } from './useQrUnsavedChanges';
+import { formatINR } from '@jamanvaar/utils';
+import { useEffect, useRef, useState } from "react";
 import { qrApi } from "../../cloud/cloudClient";
 import { QrAdminApi } from "../../cloud/qrAdminClient";
 const base = "/api/v1/restaurant/qr/advanced/promotions";
@@ -62,6 +64,8 @@ export function QrPromotions({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
+  const baseline=useRef(form);
+  useQrUnsavedChanges(JSON.stringify(form)!==JSON.stringify(baseline.current));
   const load = async () => setRows(await qrApi<Promotion[]>(base));
   useEffect(() => {
     let active = true;
@@ -93,16 +97,17 @@ export function QrPromotions({
       showToast(edit ? "Promotion updated" : "Promotion created");
       await load();
       setEdit(null);
-      setForm(empty());
+      const next=empty();baseline.current=next;setForm(next);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
     }
   };
-  const pick = (row: Promotion) => {
+  const pick = async (row: Promotion) => {
+    if (!(await requestQrLeave())) return;
     setEdit(row);
-    setForm({
+    const next={
       code: row.code,
       description: row.description,
       discountType: row.discountType,
@@ -118,7 +123,7 @@ export function QrPromotions({
       branchIds: row.branchIds ?? [],
       itemIds: row.itemIds ?? [],
       categoryIds: row.categoryIds ?? [],
-    });
+    };baseline.current=next;setForm(next);
   };
   return (
     <section className="rounded-2xl border bg-white p-5">
@@ -298,9 +303,12 @@ export function QrPromotions({
         {edit && (
           <button
             className="rounded-xl border px-4 py-2.5 text-sm"
-            onClick={() => {
+            onClick={async () => {
+              if (!(await requestQrLeave())) return;
               setEdit(null);
-              setForm(empty());
+              const next = empty();
+              baseline.current = next;
+              setForm(next);
             }}
           >
             Cancel editing
@@ -328,9 +336,9 @@ export function QrPromotions({
             </p>
             {row.report && (
               <p className="text-xs text-slate-500">
-                {row.report.acceptedOrders} accepted QR orders ? ?
-                {row.report.discountValue.toFixed(2)} discounts ? ?
-                {row.report.settledSales.toFixed(2)} settled sales
+                {row.report.acceptedOrders} accepted QR orders /{' '}
+                {formatINR(row.report.discountValue)} discounts /{' '}
+                {formatINR(row.report.settledSales)} settled sales
               </p>
             )}
             <button

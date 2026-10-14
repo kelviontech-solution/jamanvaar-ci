@@ -34,6 +34,8 @@ export interface QrBranch {
   id: string;
   name: string;
   status: string;
+  timezone?: string;
+  restaurantTimezone?: string;
 }
 
 export interface QrOverview {
@@ -72,6 +74,7 @@ export interface QrOrderRow {
   paymentStatus: string | null;
   paymentMethod: string | null;
   total: number;
+  balance?: {collectedPaise:number;outstandingPaise:number;refundedPaise:number};
   placedAt: string;
   itemCount: number;
 }
@@ -118,6 +121,7 @@ export const QrAdminApi = {
   branches: () => qrApi<QrBranch[]>(`${base}/branches`),
   tables: () => qrApi<QrTableRow[]>(`${base}/tables`),
   orders: (branchId?: string) => qrApi<QrOrderRow[]>(`${base}/orders${branchId ? `?branchId=${encodeURIComponent(branchId)}` : ''}`),
+  orderPage: (query:Record<string,string>={}) => qrApi<{rows:QrOrderRow[];total:number;nextCursor:string|null}>(`${base}/order-list?${new URLSearchParams(query)}`),
   settings: (branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`),
   paymentReadiness: (branch?:string) => qrApi<{ available: boolean; enabled: boolean; guestAvailable: boolean; code: string; message: string; provider?:string; mode?:string; checkout?:string }>(`${base}/settings/payment-readiness${branchQuery(branch)}`),
   saveSettings: (changes: Partial<QrSettings>,branch?:string) => qrApi<QrSettings>(`${base}/settings${branchQuery(branch)}`, { method: 'PUT', body: JSON.stringify(changes) }),

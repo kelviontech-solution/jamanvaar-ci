@@ -29,10 +29,26 @@ export function refreshLoyaltyBalance(account: CustomerAccount): void {
   account.totalVisits = account.loyaltyBaseline!.visits + entries.reduce((sum, e) => sum + e.visits, 0);
 }
 
+function mergeCustomerHistory(existing: CustomerAccount, incoming: CustomerAccount, result: CustomerAccount): CustomerAccount {
+  const oldConsent = existing.marketingConsent as any,
+    newConsent = incoming.marketingConsent as any;
+  const consent = oldConsent && (!newConsent || Date.parse(oldConsent.at) >= Date.parse(newConsent.at)) ? oldConsent : newConsent;
+  if (consent) result.marketingConsent = structuredClone(consent);
+  const oldNotes = Array.isArray(existing.followups) ? existing.followups : [],
+    newNotes = Array.isArray(incoming.followups) ? incoming.followups : [];
+  if (oldNotes.length || newNotes.length)
+    result.followups = [...new Map([...newNotes, ...oldNotes].map((n) => [n.id, n])).values()].sort((a, b) => Date.parse(a.at) - Date.parse(b.at)).slice(-200);
+  return result;
+}
+
 /** Used on both sides of the sync bridge; old snapshots cannot erase a purchase or adjustment. */
 export function mergeCustomerLoyalty(existing: CustomerAccount, incoming: CustomerAccount): CustomerAccount {
   if (!existing.loyaltyBaseline && !incoming.loyaltyBaseline) {
-    return Date.parse(incoming.updatedAt ?? '') < Date.parse(existing.updatedAt ?? '') ? existing : incoming;
+    return mergeCustomerHistory(
+      existing,
+      incoming,
+      structuredClone(Date.parse(incoming.updatedAt ?? '') < Date.parse(existing.updatedAt ?? '') ? existing : incoming)
+    );
   }
   const old = structuredClone(existing);
   const next = structuredClone(incoming);
@@ -46,5 +62,5 @@ export function mergeCustomerLoyalty(existing: CustomerAccount, incoming: Custom
     recentOrderIds: Array.from(new Set([...(next.recentOrderIds ?? []), ...(old.recentOrderIds ?? [])])).slice(0, 20)
   };
   refreshLoyaltyBalance(merged);
-  return merged;
+  return mergeCustomerHistory(existing, incoming, merged);
 }
