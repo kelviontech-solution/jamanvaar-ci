@@ -13,6 +13,8 @@ export * from './KpiCard';
 export * from './Modal';
 export * from './ConfirmDialog';
 export * from './useDialogFocus';
+export * from './GuestAssistanceStrip';
+export * from './OrderActivityView';
 export * from './Settings';
 export * from './FormControls';
 export * from './StateFeedback';

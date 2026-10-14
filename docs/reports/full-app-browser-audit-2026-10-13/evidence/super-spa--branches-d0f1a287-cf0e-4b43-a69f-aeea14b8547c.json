@@ -1,0 +1,196 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nBack to Branches\nUA\nUI Audit Restaurant A — Main Branch\nACTIVE\nUI Audit Restaurant A\nMAIN\nd0f1a287…\nDeactivate Branch\nTERMINALS\n5\nregistered devices\nSTAFF USERS\n1\nassociated staff\nTIMEZONE\nAsia/Kolkata\nlocal timezone\nSTATUS\nACTIVE\noperational status\nOverview\nRestaurant\nStaff Users\nDevices & Terminals\nActivation Keys\nAudit Logs\nBranch Information\nBRANCH NAME\nUI Audit Restaurant A — Main Branch\nBRANCH CODE\nMAIN\nSTATUS\nACTIVE\nTIMEZONE\nAsia/Kolkata\nBRANCH ID\nd0f1a287-cf0e-4b43-a69f-aeea14b8547c\nCREATED\n13 October 2026\nParent Restaurant\nOpen Restaurant\nU\nUI Audit Restaurant A\nRestaurant ID: bf3838b0-287…\nOpen Workspace\n5\nRegistered Terminals\n1\nStaff Users",
+  "headings": [
+    "UI Audit Restaurant A — Main Branch",
+    "Branch Information",
+    "Parent Restaurant"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "d0f1a287…",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 23,
+      "visible": true
+    },
+    {
+      "text": "Deactivate Branch",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 130,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 116,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Staff Users",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 117,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Devices & Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 172,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Activation Keys",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 145,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Audit Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 42,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

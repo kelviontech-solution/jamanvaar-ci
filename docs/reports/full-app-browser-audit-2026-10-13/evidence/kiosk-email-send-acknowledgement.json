@@ -1,0 +1,668 @@
+{
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nOrder Confirmed!\n\nMAIN-20261013-204 · TAKEAWAY\n\nSent to the kitchen\nTOKEN\n#K-104\nEstimated Prep Time\n15 Minutes\nPickup at\nCounter 1\nYOUR BILL\n₹104\nUI AUDIT RESTAURANT A\nBILL / RECEIPT\nTOKEN #K-104\nInvoice No:\nMAIN-20261013-204\nOrder Type:\nTAKEAWAY\nDate: 13 Oct 2026\nTime: 09:46 pm\nPOS: Self-Order Kiosk\nITEM\nQTY\nRATE\nAMT\nUI Audit Dish 005\n1\n₹104\n₹104\nSubtotal\n₹104\nCGST\n₹0.00\nSGST\n₹0.00\nTOTAL\n₹104\nPAID VIA:\nCASH\nThank you for dining at UI Audit Restaurant A! Please visit again.\nFreshly Prepared • Zero Preservatives • Pure Heritage Taste\nPowered by JAMANVAAR\nKITCHEN TICKETS\n1 ticket · 1 station\n\nMAIN KITCHEN\n\nKOT KOT-MAIN-20261013-204\n\nNot printed\nUI Audit Dish 005\n× 1\nPrint this ticket again\nGET YOUR BILL\nPrint Receipt\nEmail Bill\nWhatsApp Bill\nQR Invoice\n\nReceipt: No printer is configured. Add one in Restaurant Admin → Printers.\n\nHOW WAS YOUR ORDERING EXPERIENCE?\nSubmit Rating\n\nKeep your token and wait near Counter 1. The kiosk resets for the next guest.\n\n← Place New Order\nEmail Your Bill\n\nEnter your email using the touch keyboard below to receive your PDF bill.\n\nEmail Address\n\nUse @ and . for your address. Tap inside the field to correct a character.\n\nInvoice email not sent — Internal server error\n\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\nq\nw\ne\nr\nt\ny\nu\ni\no\np\na\ns\nd\nf\ng\nh\nj\nk\nl\nz\nx\nc\nv\nb\nn\nm\n⇧\n?123\n@\n.\n-\n_\n+\n@gmail.com\n@outlook.com\n@yahoo.com\nClear address\n\nYour contact details clear when this popup closes.\n\nCancel\nEmail My Bill",
+  "headings": [
+    "Order Confirmed!",
+    "YOUR BILL",
+    "UI AUDIT RESTAURANT A",
+    "KITCHEN TICKETS",
+    "GET YOUR BILL",
+    "HOW WAS YOUR ORDERING EXPERIENCE?",
+    "Email Your Bill"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 137,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Print this ticket again",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 418,
+      "height": 52,
+      "visible": true
+    },
+    {
+      "text": "Print Receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "Email Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "WhatsApp Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "QR Invoice",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "1 star",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "2 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "3 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "4 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "5 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "Submit Rating",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 121,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "← Place New Order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 232,
+      "height": 64,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close Email Your Bill",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "1",
+      "aria": "Type 1",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "2",
+      "aria": "Type 2",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "3",
+      "aria": "Type 3",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "4",
+      "aria": "Type 4",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "5",
+      "aria": "Type 5",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "6",
+      "aria": "Type 6",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "7",
+      "aria": "Type 7",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "8",
+      "aria": "Type 8",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "9",
+      "aria": "Type 9",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "0",
+      "aria": "Type 0",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "q",
+      "aria": "Type q",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "w",
+      "aria": "Type w",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "e",
+      "aria": "Type e",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "r",
+      "aria": "Type r",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "t",
+      "aria": "Type t",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "y",
+      "aria": "Type y",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "u",
+      "aria": "Type u",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "i",
+      "aria": "Type i",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "o",
+      "aria": "Type o",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "p",
+      "aria": "Type p",
+      "title": "",
+      "disabled": false,
+      "width": 63,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "a",
+      "aria": "Type a",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "s",
+      "aria": "Type s",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "d",
+      "aria": "Type d",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "f",
+      "aria": "Type f",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "g",
+      "aria": "Type g",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "h",
+      "aria": "Type h",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "j",
+      "aria": "Type j",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "k",
+      "aria": "Type k",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "l",
+      "aria": "Type l",
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "z",
+      "aria": "Type z",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "x",
+      "aria": "Type x",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "c",
+      "aria": "Type c",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "v",
+      "aria": "Type v",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "b",
+      "aria": "Type b",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "n",
+      "aria": "Type n",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "m",
+      "aria": "Type m",
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "⇧",
+      "aria": "Shift",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "?123",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "@",
+      "aria": "Type @",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": ".",
+      "aria": "Type .",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "-",
+      "aria": "Type -",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "_",
+      "aria": "Type _",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "+",
+      "aria": "Type +",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Backspace",
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "@gmail.com",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 228,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "@outlook.com",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 228,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "@yahoo.com",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 228,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Clear address",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 700,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 52,
+      "visible": true
+    },
+    {
+      "text": "Email My Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 617,
+      "height": 52,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "you@example.com"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

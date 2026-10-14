@@ -14,8 +14,8 @@ describe('POS/Captain/KDS staff sign-in passes the activated restaurant\'s own n
     expect(src).toMatch(/restaurantName=\{db\.restaurant\.name\}/);
   });
 
-  it('Captain: the PIN sign-in JamanvaarAuthLayout (not the activation one) passes restaurantName', () => {
-    const src = readFileSync(join(__dirname, '../apps/restaurant-system/captain/src/App.tsx'), 'utf8');
+  it('Captain: the PIN sign-in screen\'s JamanvaarAuthLayout passes restaurantName', () => {
+    const src = readFileSync(join(__dirname, '../apps/restaurant-system/captain/src/components/auth/CaptainSignInScreen.tsx'), 'utf8');
     const signInIdx = src.indexOf('Floor Captain Sign In');
     expect(signInIdx).toBeGreaterThan(-1);
     const layoutIdx = src.lastIndexOf('<JamanvaarAuthLayout', signInIdx);
@@ -23,8 +23,8 @@ describe('POS/Captain/KDS staff sign-in passes the activated restaurant\'s own n
     expect(block).toMatch(/restaurantName=\{captainDb\.restaurant(\?\.|\.)name\}/);
   });
 
-  it('KDS: the PIN sign-in JamanvaarAuthLayout (not the activation one) passes restaurantName', () => {
-    const src = readFileSync(join(__dirname, '../apps/restaurant-system/kds/src/App.tsx'), 'utf8');
+  it('KDS: the PIN sign-in screen\'s JamanvaarAuthLayout passes restaurantName', () => {
+    const src = readFileSync(join(__dirname, '../apps/restaurant-system/kds/src/components/auth/KdsSignInScreen.tsx'), 'utf8');
     const signInIdx = src.indexOf('Kitchen Staff Sign In');
     expect(signInIdx).toBeGreaterThan(-1);
     const layoutIdx = src.lastIndexOf('<JamanvaarAuthLayout', signInIdx);

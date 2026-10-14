@@ -1,0 +1,189 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nPayment Gateways\n\nReview restaurants' settlement connections. Razorpay Route is still pending, so approved restaurants collect through Jamanvaar's account and are paid out manually — see the Payouts page, and verify bank details below first.\n\nDefault kiosk QR fee\n%\nSave\nAll\n0\nPending Review\nActive\nSuspended\nDisconnected\n0 of 0\nNo payment connections yet\n\nRestaurants submit bank details and direct settlement requests in Restaurant Admin kiosk payment settings.",
+  "headings": [
+    "Payment Gateways",
+    "No payment connections yet"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Save",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 54,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "All\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Pending Review",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Active",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Suspended",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Disconnected",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 34,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search by restaurant or contact email…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

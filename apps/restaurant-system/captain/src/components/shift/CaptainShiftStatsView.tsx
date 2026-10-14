@@ -24,8 +24,9 @@ export const CaptainShiftStatsView: React.FC = () => {
   const hours = Math.floor(elapsedMinutes / 60);
   const mins = elapsedMinutes % 60;
 
-  const assignedCount = selectMyTables(tables,currentCaptain).length;
-  const activeOccupied = tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILL_REQUESTED').length;
+  const assignedTables = selectMyTables(tables,currentCaptain);
+  const assignedCount = assignedTables.length;
+  const activeOccupied = assignedTables.filter((t) => t.status === 'OCCUPIED' || t.status === 'BILL_REQUESTED').length;
 
   return (
     <>
@@ -115,7 +116,7 @@ export const CaptainShiftStatsView: React.FC = () => {
           <span className="text-2xl sm:text-3xl font-bold font-mono text-jaman-navy block">
             {assignedCount}
           </span>
-          <span className="text-[11px] text-slate-400 font-semibold">Tables 1-6, 12, 14 in Zone A</span>
+          <span className="text-[11px] text-slate-400 font-semibold">{assignedTables.length ? assignedTables.map(table => `Table ${table.tableNumber}${table.zone ? ` (${table.zone})` : ''}`).join(', ') : 'No tables assigned. Ask your manager to assign your floor.'}</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-jaman-border shadow-2xs space-y-1">

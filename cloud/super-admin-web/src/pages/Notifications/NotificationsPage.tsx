@@ -23,9 +23,9 @@ const TYPE_LABELS: Record<string, string> = {
   SYNC_FAILING: 'Sync',
   RESTAURANT_SUSPENDED: 'Suspended',
   WHATSAPP_CONNECTION_LOCKED: 'WhatsApp connector',
-  TICKET_CREATED: 'Ticket',
-  TICKET_ASSIGNED: 'Ticket',
-  TICKET_COMMENT: 'Ticket'
+  TICKET_CREATED: 'New ticket',
+  TICKET_ASSIGNED: 'Ticket assigned',
+  TICKET_COMMENT: 'Ticket reply'
 };
 const SEVERITY_TONE: Record<NotificationSeverity, BadgeTone> = { CRITICAL: 'error', WARNING: 'warning', INFO: 'neutral' };
 

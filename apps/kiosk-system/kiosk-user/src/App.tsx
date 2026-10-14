@@ -1,3 +1,4 @@
+import { KioskSearchKeyboard } from './KioskSearchKeyboard';
 import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
 import { KioskWelcomeScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
@@ -382,6 +383,8 @@ export default function KioskUserApp() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Modifier Customization Modal State
+  const [optionSearch, setOptionSearch] = useState('');
+  const [searchTarget, setSearchTarget] = useState<'menu'|'options'|null>(null);
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [activeItemQuantity, setActiveItemQuantity] = useState<number>(1);
   const [selectedModifiers, setSelectedModifiers] = useState<SelectedModifier[]>([]);
@@ -788,6 +791,9 @@ export default function KioskUserApp() {
       window.speechSynthesis.cancel();
     }
     setSessionId(generateUUID());
+    setSearchTarget(null);
+    setSearchQuery('');
+    setOptionSearch('');
     setStep('WELCOME');
     setLang(currentDisplay.defaultLanguage as SupportedLanguage);
     applyCart([]);
@@ -958,7 +964,7 @@ export default function KioskUserApp() {
     SoundService.playTap();
     resetIdleTimer();
     setCustomizationError(null);
-    setCustomizingItem(item);
+    setOptionSearch('');setCustomizingItem(item);
     setActiveItemQuantity(1);
     setSpecialInstructions('');
     setSelectedModifiers(defaultModifiersFor(item));
@@ -1940,7 +1946,7 @@ export default function KioskUserApp() {
             <ActivationHelpNote deviceNoun="kiosk" />
           </div>
         </JamanvaarKioskAuthLayout>
-      </JAMANVAARStartup>
+    </JAMANVAARStartup>
     );
   }
 
@@ -2109,7 +2115,7 @@ export default function KioskUserApp() {
         {/* Left: Real JAMANVAAR Brand Identity */}
         <div className="flex items-center gap-4">
           {(
-            <button
+            <button aria-label="Go back"
               onClick={() => {
                 SoundService.playTap();
                 if (step === 'MENU') setStep(allowedOrderTypes.length > 1 ? 'ORDER_TYPE' : kioskSettings.enabledLanguages.length > 1 ? 'LANGUAGE_SELECT' : 'WELCOME');
@@ -2345,7 +2351,7 @@ export default function KioskUserApp() {
               for guaranteed 100% screen coverage. */}
           <div className="absolute inset-0 -z-10 bg-white/50" />
 
-          <button
+          <button aria-label="Go back"
             onClick={() => {
               SoundService.playTap();
               setStep('WELCOME');
@@ -2546,6 +2552,8 @@ export default function KioskUserApp() {
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('ALL');
+                setDietaryFilter('ALL');
+                setSearchQuery('');
               }}
               className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-2xl border text-center transition-colors active:scale-95 ${
                 selectedCategoryId === 'ALL'
@@ -2618,6 +2626,7 @@ export default function KioskUserApp() {
                 <Search className="w-4 h-4 text-[#52677A] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
+                  aria-label="Search dishes" inputMode="none" readOnly onClick={()=>setSearchTarget('menu')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('searchDishPlaceholder')}
@@ -2768,7 +2777,7 @@ export default function KioskUserApp() {
 
                 {/* One continuous grid: dishes fill the space beside combos. */}
                 {filteredCombos.length === 0 && (selectedCategoryId === 'cat-combos' || filteredItems.length === 0) ? (
-                  <EmptyState title="No dishes found" description="Try another search term or filter category." actionText="View All Dishes" onAction={() => { setSelectedCategoryId('ALL'); setDietaryFilter('ALL'); setSearchQuery(''); }} />
+                  <EmptyState title={selectedCategoryId === 'cat-combos' ? "No deals available" : "No dishes found"} description={selectedCategoryId === 'cat-combos' ? "There are no deals matching your filters right now. Browse the full menu to choose individual dishes." : "Try another search term or clear your filters."} actionText="Browse dishes" onAction={() => { setSelectedCategoryId('ALL'); setDietaryFilter('ALL'); setSearchQuery(''); }} />
                 ) : (
                   <div data-testid="kiosk-menu-grid" className="grid gap-4 sm:gap-5 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 230px), 1fr))' }}>
                       {filteredCombos.map((combo) => (
@@ -3541,6 +3550,7 @@ export default function KioskUserApp() {
               </div>
             </div>
 
+            {customizingItem.modifierGroups?.some(group=>group.options.length>8) && <button type="button" className="min-h-12 rounded-xl border px-4 w-full text-left" onClick={()=>setSearchTarget('options')}>{optionSearch ? `Option search: ${optionSearch}` : 'Search dish options'}</button>}
             {customizingItem.modifierGroups?.map((group) => (
               <div key={group.id} className="border-t border-[#F3EFE6] pt-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -3554,7 +3564,7 @@ export default function KioskUserApp() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {group.options.filter(opt => opt.isAvailable !== false).map((opt) => {
+                  {group.options.filter(opt => opt.isAvailable !== false && (selectedModifiers.some(m=>m.groupId===group.id&&m.optionId===opt.id) || localizedName(opt,lang).toLowerCase().includes(optionSearch.toLowerCase()))).map((opt) => {
                     const isSelected = selectedModifiers.some(
                       (m) => m.groupId === group.id && m.optionId === opt.id
                     );
@@ -4235,6 +4245,7 @@ export default function KioskUserApp() {
         </div>
       )}
     </div>
+      {searchTarget && <KioskSearchKeyboard title={searchTarget === 'menu' ? 'Search dishes' : 'Search dish options'} value={searchTarget==='menu' ? searchQuery : optionSearch} onChange={searchTarget==='menu' ? setSearchQuery : setOptionSearch} onClose={()=>setSearchTarget(null)} />}
     </JAMANVAARStartup>
   );
 }

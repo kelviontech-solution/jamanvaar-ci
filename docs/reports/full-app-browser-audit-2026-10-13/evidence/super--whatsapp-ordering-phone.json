@@ -1,0 +1,138 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nWhatsApp Ordering Connector\nPILOT\n\nWhich restaurants have connected their WhatsApp ordering key, and whether it's healthy. Entitlement (who's allowed to connect at all) is managed per-restaurant on its own Applications tab — this is read-only visibility into who actually has, not a duplicate toggle.\n\nRefresh\nConnected\n0\nRestaurants live on WhatsApp ordering\nWaiting to connect\n0\nKey generated, not yet pasted into product/whatsapp\nTotal orders\n0\nPaid WhatsApp orders, all time\nTotal revenue\n₹0\nSettled WhatsApp order value\nNo restaurant has connected yet\n\nA restaurant connects from pos-admin → Settings → WhatsApp Ordering, once WHATSAPP_ORDERING is enabled on its plan.",
+  "headings": [
+    "WhatsApp Ordering Connector",
+    "No restaurant has connected yet"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search restaurants…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -12,7 +12,8 @@ import { QrOrdersInbox } from './QrOrdersInbox';
 import { outstandingBillAmount } from '@jamanvaar/utils';
 import { LicenseRepository } from '@jamanvaar/database';
 import { ShoppingBag, Search, CheckCircle2, Clock, Printer, CreditCard, ChefHat, Eye, Sparkles, History, Flame, Undo2, Ban, QrCode, Smartphone, Monitor } from 'lucide-react';
-import { useConfirm } from '@jamanvaar/ui';
+import { useConfirm, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
+const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => { const response = await deviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`); if (!response.ok) throw new Error('Order activity unavailable'); return response.json(); };
 
 export const PosOrdersView: React.FC = () => {
   const { notify, confirmDialog } = useConfirm();
@@ -512,6 +513,7 @@ export const PosOrdersView: React.FC = () => {
 
               {/* Delivery Dispatch — previously a DELIVERY order had an
                   orderType and nothing else: no rider, no status tracking. */}
+              <OrderActivityView order={selectedOrder} loadActivity={loadOrderActivity} />
               {selectedOrder.orderType === 'DELIVERY' && (
                 <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs space-y-2">
                   <div className="flex items-center justify-between">

@@ -1,0 +1,173 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Reports & Analytics\n\nComprehensive SaaS telemetry, financial reconciliation, restaurant cohort growth, and device fleet operations.\n\nLast 7 Days\nLast 30 Days\nLast Quarter (90d)\nAll-Time Cohort\nExport REVENUE CSV\nMONTHLY RECURRING REVENUE\n₹4,500\nARR: ₹54,000\nACTIVE RESTAURANTS\n2\n2 total · 0 suspended\nACTIVE SUBSCRIPTIONS\n6\n6 total issued\nHARDWARE TERMINALS\n5\n0 offline · 5 registered\nRevenue Analytics\nRestaurant Cohorts\nDevice Telemetry\nPlan Distribution\nRevenue by Plan\nInvoiced revenue generated per subscription plan\n₹0\nJAMANVAAR CORE\n₹42k\nJAMANVAAR PRO\nJAMANVAAR CORE\nCORE\n₹0\n0 Invoices generated\n₹5,000/mo\nJAMANVAAR PRO\nPRO\n₹42,480\n4 Invoices generated\n₹7,000/mo\nFinancial Reconciliation Status\nCollected Collections\n₹0\nOutstanding Invoiced Receivables\n₹63,720\n* Automated payment gateway reconciliations reflect verified bank and card settlements.\nRecent Tax Invoices\nINVOICE #\tRESTAURANT\tPLAN\tTOTAL AMOUNT\tSTATUS\tDATE ISSUED\nINV-2026-27-0006\tUI Audit Restaurant B\t\nJAMANVAAR QR\t₹10,620\t\nISSUED\t10/13/2026\nINV-2026-27-0005\tUI Audit Restaurant B\t\nKIOSK PRO\t₹12,980\t\nISSUED\t10/13/2026\nINV-2026-27-0004\tUI Audit Restaurant B\t\nJAMANVAAR PRO\t₹8,260\t\nISSUED\t10/13/2026\nINV-2026-27-0003\tUI Audit Restaurant A\t\nKIOSK PRO\t₹12,980\t\nISSUED\t10/13/2026\nINV-2026-27-0002\tUI Audit Restaurant A\t\nJAMANVAAR PRO\t₹8,260\t\nISSUED\t10/13/2026\nINV-2026-27-0001\tUI Audit Restaurant A\t\nJAMANVAAR QR\t₹10,620\t\nISSUED\t10/13/2026",
+  "headings": [
+    "Platform Reports & Analytics"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Export REVENUE CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 189,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Revenue Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 140,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Cohorts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 147,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Device Telemetry",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Plan Distribution",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 34,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

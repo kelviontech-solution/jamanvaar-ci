@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { db, OrderRepository } from '@jamanvaar/database';
+import { db, ShiftRepository, OrderRepository } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 import { ReportGeneratorService } from '@jamanvaar/business';
@@ -12,6 +12,7 @@ describe('JAMANVAAR POS ➔ POS ADMIN Real-Time Order & Sales Reflection', () =>
     vi.setSystemTime(new Date('2026-08-31T08:30:00.000Z'));
 
     db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     usePosStore.getState().clearCart();
     lanMeshSync.registerDevice('POS_ADMIN', 'ADMIN-01', 'Restaurant Admin HQ');
   });

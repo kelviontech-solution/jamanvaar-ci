@@ -83,7 +83,6 @@ export function useEntitlements(refreshKey?: unknown, enabled = true): { enabled
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshKey, revision, enabled]);
 
   const hasApp = useCallback((app: AppCode) => enabled && loadedKey === refreshKey && (enabledApps ?? []).includes(app), [enabledApps, loadedKey, refreshKey, enabled]);

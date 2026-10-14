@@ -91,7 +91,7 @@ export interface QrSettings {
   rules?: QrRules;
 }
 export interface QrRules { hours: Array<{day:number;open:string;close:string}>; pausedUntil:string|null; minimumOrderPaise:number; preparationMinutes:number; maxPendingOrders:number; maxOrdersPerWindow:number; windowMinutes:number; customerInstructions:string; paymentInstructions:string; orderingModes:Array<'DINE_IN'|'TAKEAWAY'> }
-export interface QrAnalytics { byCode:Array<{codeId:string;table:string;branchId:string|null;version:number;status:string;scans:number;orders:number;sales:number}>; metrics: Record<string,number>; byBranch:Array<{branchId:string;orders:number;sales:number}>; trend:Array<{date:string;orders:number;sales:number}>; popular:Array<{name:string;quantity:number}>; payments:Array<{status:string;amount:number;createdAt:string;failureReason?:string;providerPaymentId?:string}> }
+export interface QrAnalytics { timezone: string; from: string; to: string; byCode:Array<{codeId:string;table:string;branchId:string|null;version:number;status:string;scans:number;orders:number;sales:number}>; metrics: Record<string,number>; byBranch:Array<{branchId:string;orders:number;sales:number}>; trend:Array<{date:string;orders:number;sales:number}>; popular:Array<{name:string;quantity:number}>; payments:Array<{status:string;amount:number;createdAt:string;failureReason?:string;providerPaymentId?:string}> }
 export interface QrPrintDesign { template: 'minimal'|'premium'|'colorful'|'cafe'|'fine-dining'|'family'|'casual'|'takeaway'|'table'; accent:string; instruction:string; footer:string; showLogo:boolean; layout:'CARD'|'TENT'|'LABEL' }
 
 export interface QrPrintData {

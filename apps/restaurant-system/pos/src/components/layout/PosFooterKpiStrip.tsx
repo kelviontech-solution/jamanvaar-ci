@@ -83,7 +83,7 @@ export const PosFooterKpiStrip: React.FC = () => {
       <div className="flex items-center gap-2 shrink-0 text-[11px] text-slate-500">
         <div className="flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-lg font-bold shadow-2xs">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Local Engine Active</span>
+          <span>Local-first billing</span>
         </div>
       </div>
     </footer>

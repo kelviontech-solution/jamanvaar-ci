@@ -63,9 +63,21 @@ jobs:
       - run: npm run seed --workspace=@jamanvaar/cloud-api
       - run: npm run typecheck --workspace=@jamanvaar/cloud-api
       - run: npx tsc --noEmit
+      # New gate (2026-10-13): the codebase predates this config, so there's a real existing
+      # baseline -- 637 lint problems, 913 files not matching the new Prettier config. Informational
+      # for now (continue-on-error) so this surfaces drift in every PR without blocking unrelated
+      # work on a backlog nobody has triaged yet. Flip to blocking once that backlog is cleared.
+      - name: Lint (informational -- see comment above)
+        run: npm run lint
+        continue-on-error: true
+      - name: Format check (informational -- see comment above)
+        run: npm run format:check
+        continue-on-error: true
       - run: npm test -- --maxWorkers=2
       - run: npm run test:cloud-api
       - run: npm run build --workspace=@jamanvaar/cloud-api
+      - name: Receipt and backup PDF packaging smoke
+        run: node tooling/qa/receipt-pdf-smoke.cjs
       - run: npm run build --workspace=@jamanvaar/super-admin-web
       - run: npm run build --workspace=@jamanvaar/pos-admin
       - run: npm run build --workspace=@jamanvaar/pos

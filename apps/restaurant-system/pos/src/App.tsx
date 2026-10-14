@@ -1,13 +1,14 @@
-import { syncStaffUsers, startLocalChangeSync, syncInventoryMasters, InventoryLedgerSync } from '@jamanvaar/sync';
 import React, { useEffect, useState } from 'react';
-import { activatePosDevice, isPosDeviceConnected, pushOrderSync, pullOrderSync, pushEntitySync, pullEntitySync, reportHeartbeat, syncRestaurantIdentity, CloudApiError, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements } from './cloud/cloudClient';
+import { activatePosDevice, isPosDeviceConnected, CloudApiError } from './cloud/cloudClient';
 import { usePosStore } from './store/posStore';
 import { db, BILL_REQUESTED_EVENT, getTerminalId } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
 
-import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, syncKioskConfiguration, onAppResume } from '@jamanvaar/sync';
+import { lanMeshSync } from '@jamanvaar/sync';
 import { sound, registerNativeUpdateGuard } from '@jamanvaar/ui';
+import { usePosDeviceSync } from './hooks/usePosDeviceSync';
+import { PosActivationScreen } from './components/auth/PosActivationScreen';
 import { PosLogin } from './components/auth/PosLogin';
 import { PosHeader } from './components/layout/PosHeader';
 import { PosSidebar } from './components/layout/PosSidebar';
@@ -36,9 +37,10 @@ import { PosChatbot } from './components/assistant/PosChatbot';
 import { ManagerOverrideModal } from './components/common/ManagerOverrideModal';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { CrashRecoveryBanner } from './components/common/CrashRecoveryBanner';
-import { NotificationToastContainer, UrgentGuestAlertModal, JAMANVAARStartup, JamanvaarAuthLayout, APP_HERO_IMAGES, ActivationWelcomeScreen, ActivationNoticeBanner, ActivationHelpNote } from '@jamanvaar/ui';
+import { NotificationToastContainer, UrgentGuestAlertModal, JAMANVAARStartup, ActivationWelcomeScreen } from '@jamanvaar/ui';
 import { Modal } from '@jamanvaar/ui';
-import { UtensilsCrossed, ArrowRight, AlertCircle, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { ErrorBoundary } from './ErrorBoundary';
 
 export const App: React.FC = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
@@ -143,104 +145,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener(BILL_REQUESTED_EVENT, onBillRequested);
   }, [isDeviceActivated]);
 
-  // Wire the real cloud sync bridge once this terminal is activated — without
-  // this, orders would sit at SAVED_LOCALLY forever and no other device
-  // (KDS, Captain) would ever see them via the cloud catch-up path.
-  useEffect(() => {
-    if (!isDeviceActivated) {
-      SyncOutboxEngine.configureTransport(null);
-      InventoryLedgerSync.configureTransport(null);
-      return;
-    }
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_pos_device_id') });
-    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
-    InventoryLedgerSync.configureTransport({ push: pushInventoryMovements, pull: pullInventoryMovements });
-    void syncInventoryMasters({ push: false }).then(() => InventoryLedgerSync.sync());
-
-    // Guests registered here reach Restaurant Admin's CRM and back (BUG-159): only what changed is sent, and the
-    // newer change wins, so a stale copy cannot overwrite loyalty points changed elsewhere.
-    const syncCrm = () => syncCustomers({ push: true });
-
-    // Database-layer gap: the menu previously lived only in this device's
-    // own browser storage — clearing it, or a brand-new terminal, meant
-    // starting from the seed menu with no way to recover a restaurant's
-    // real one. Every device now pushes its full current menu and merges
-    // in whatever other devices have pushed, so the menu has a real,
-    // durable copy in Postgres instead of existing on exactly one screen.
-
-    // BUG-016: MENU_CATEGORY was defined in the entity-sync bridge's DTO but no app
-    // ever actually used it, so categories never synced (even though the dishes did).
-
-    // BUG-019/034/035: a staff PIN issued in Restaurant Admin used to work only on the device that
-    // created it — nothing synced staff records here, despite the create/reset screen's own promise
-    // that the PIN would work on POS too. Restaurant Admin is the only place staff are created, so
-    // this terminal only pulls.
-    const syncStaff = () => syncStaffUsers({ push: false });
-
-    void SyncOutboxEngine.catchUpFromCloud();
-    void SyncOutboxEngine.processOutbox();
-    void syncCrm();
-    const stopLocalChanges = startLocalChangeSync({ customers: true, menu: true, tables: true, staff: false });
-    void syncMenuCatalog({ push: true });
-    void syncStaff();
-    // Restaurant Admin is the only place the Loyalty Program (tier multipliers, rewards catalog) is
-    // edited — this terminal only ever reads it, so a real reward can actually be redeemed at the till.
-    void syncLoyaltyTiers({ push: false });
-    void syncLoyaltyRewards({ push: false });
-    void syncLoyaltyProgramSettings({ push: false });
-    void syncDiningTables();
-    // B2-056: this POS's own cash-drawer shift and its cash movements, so Restaurant Admin's
-    // Shift & Cash Drawer Ledger/Reconciliation/EOD Z-Report can see them. Only POS edits its own
-    // shift, so this terminal always pushes.
-    void syncShifts({ push: true });
-    void syncReservations({ push: true });
-    void reportHeartbeat();
-    void syncRestaurantIdentity();
-    // BUG: despite its name this also carries ReceiptConfig (thank-you message, footer, logo, and
-    // the UPI "scan to pay" QR settings) -- Restaurant Admin pushes it, but POS never pulled it at
-    // all, so a UPI QR enabled in Settings showed correctly in Admin's own receipt preview and on
-    // Kiosk (which does call this), yet never reached the actual bill printed at the counter.
-    void syncKioskConfiguration().catch(() => {});
-
-    // Orders, kitchen tickets and table states are time-critical: every few seconds. The
-    // heavier snapshots (CRM, menu) and the heartbeat keep the slower cadence.
-    const orderInterval = setInterval(() => {
-      void SyncOutboxEngine.processOutbox();
-      void SyncOutboxEngine.catchUpFromCloud();
-      void syncDiningTables();
-      void InventoryLedgerSync.sync();
-      // BUG-099/100: bill requests and messages from Captain arrive as notifications.
-      void syncServiceMessages('POS');
-    }, 4000);
-    const interval = setInterval(() => {
-      void syncCrm();
-      void syncMenuCatalog({ push: true });
-      void syncStaff();
-      void syncLoyaltyTiers({ push: false });
-      void syncLoyaltyRewards({ push: false });
-      void syncLoyaltyProgramSettings({ push: false });
-      void syncShifts({ push: true });
-      void syncReservations({ push: true });
-      void reportHeartbeat();
-      void syncRestaurantIdentity();
-      void syncKioskConfiguration().catch(() => {});
-    }, 15000);
-
-    // Waking the terminal (screen unlocked, network back, tab visible again) catches up at once: no refresh needed.
-    const stopResume = onAppResume(() => {
-      void SyncOutboxEngine.processOutbox({ ignoreBackoff: true });
-      void SyncOutboxEngine.catchUpFromCloud();
-      void syncDiningTables();
-      void InventoryLedgerSync.sync();
-    });
-
-    return () => {
-      stopLocalChanges();
-      clearInterval(orderInterval);
-      clearInterval(interval);
-      stopResume();
-    };
-  }, [isDeviceActivated]);
+  usePosDeviceSync(isDeviceActivated);
 
   // Global Keyboard Shortcuts (F1 - F10, Ctrl+K, Escape)
   useEffect(() => {
@@ -311,64 +216,13 @@ export const App: React.FC = () => {
   // device identity comes before staff login.
   if (!isDeviceActivated) {
     return (
-      <JAMANVAARStartup appName="POS Terminal" appType="POS" subtitle="Restaurant Operations Platform">
-        <JamanvaarAuthLayout
-          appIdentity="POS"
-          appTitle="POS Counter"
-          appSubtitle="One-time setup — activate this terminal to start billing."
-          isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
-          isLocalCoreConnected={db.isLocalCoreConnected()}
-          healthCheckUrl={db.localCoreHealthUrl()}
-          heroHeadline="Smart Billing."
-          heroHighlightWord="Better Dining."
-          heroDescription="Fast, reliable and easy-to-use restaurant POS software built for modern Indian restaurants."
-          capabilities={[
-            { label: 'Fast Billing', icon: 'zap' },
-            { label: 'Instant KOT', icon: 'printer' },
-            { label: 'Table Management', icon: 'table' },
-            { label: 'Offline First', icon: 'cloud' }
-          ]}
-          heroImages={APP_HERO_IMAGES.POS}
-          footerNote="Role-Based Security • Instant Offline Boot • Role-based access"
-        >
-          <ActivationNoticeBanner />
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black text-jaman-navy tracking-tight">Activate This Terminal</h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-              Enter the activation key from your Super Admin Welcome Kit to connect this terminal to your restaurant.
-            </p>
-          </div>
-          <form onSubmit={handleActivate} className="space-y-3.5">
-            <div>
-              <label htmlFor="pos-activation-key" className="text-xs font-bold text-slate-700 block mb-1.5">Activation Key *</label>
-              <input id="pos-activation-key"
-                type="text"
-                value={activationCode}
-                onChange={(e) => setActivationCode(e.target.value)}
-                placeholder="JMV-XXXX-XXXX-XXXX"
-                required
-                autoFocus
-                className="w-full bg-jaman-cream border border-jaman-border focus:border-jaman-saffron focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors uppercase"
-              />
-            </div>
-            {activationError && (
-              <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{activationError}</span>
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={isActivating || !activationCode.trim()}
-              className="w-full py-4 rounded-2xl bg-jaman-navy hover:bg-[#163E5E] disabled:opacity-100 disabled:bg-[#5F6F80] disabled:shadow-none disabled:cursor-not-allowed text-white font-black text-sm shadow-md transition-all active:scale-98 cursor-pointer flex items-center justify-center gap-2"
-            >
-              <span>{isActivating ? 'Activating…' : 'Activate Terminal'}</span>
-              {!isActivating && <ArrowRight className="w-4 h-4 text-jaman-saffron" />}
-            </button>
-          </form>
-          <ActivationHelpNote deviceNoun="terminal" />
-        </JamanvaarAuthLayout>
-      </JAMANVAARStartup>
+      <PosActivationScreen
+        activationCode={activationCode}
+        setActivationCode={setActivationCode}
+        activationError={activationError}
+        isActivating={isActivating}
+        onSubmit={handleActivate}
+      />
     );
   }
 
@@ -483,61 +337,6 @@ export const App: React.FC = () => {
   );
 };
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error?: Error;
-}
-
-export class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('POS Runtime Caught Exception:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-jaman-cream p-6 text-center select-none">
-          <div className="bg-white p-8 rounded-3xl border border-jaman-border shadow-2xl max-w-md w-full space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFF4ED] text-jaman-saffron flex items-center justify-center mx-auto shadow-sm">
-              <UtensilsCrossed className="w-7 h-7" />
-            </div>
-            <h2 className="text-xl font-black text-jaman-navy">JAMANVAAR POS Recovered</h2>
-            <p className="text-xs text-slate-500">
-              An unexpected UI exception was safely intercepted. Your database, cart items, and shift transactions are completely safe.
-            </p>
-            {this.state.error && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-left text-xs font-mono text-rose-800 max-h-32 overflow-auto whitespace-pre-wrap select-text">
-                <strong className="block font-bold">{this.state.error.name}: {this.state.error.message}</strong>
-              </div>
-            )}
-            <div className="pt-2 flex gap-2 justify-center">
-              <button
-                onClick={() => {
-                  this.setState({ hasError: false, error: undefined });
-                  window.location.reload();
-                }}
-                className="px-5 py-2.5 bg-jaman-saffron hover:bg-[#EA580C] text-white text-xs font-black rounded-xl shadow-lg shadow-jaman-saffron/30 transition-all cursor-pointer"
-              >
-                Restore POS Workspace
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export const PosAppWithBoundary: React.FC = () => (
   <ErrorBoundary>
     <App />
@@ -545,4 +344,3 @@ export const PosAppWithBoundary: React.FC = () => (
 );
 
 export default PosAppWithBoundary;
-

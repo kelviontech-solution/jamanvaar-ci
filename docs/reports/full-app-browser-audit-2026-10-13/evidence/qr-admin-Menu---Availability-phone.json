@@ -1,0 +1,588 @@
+{
+  "text": "UI Audit Restaurant A\nRESTAURANT ADMIN\nAhmedabad Flagship Store\nAPP\nRestaurant Admin\nKiosk Admin\nWorkspace\nChoose branch\nAll restaurant · overview\nUI Audit Restaurant A — Main Branch · MAIN\nUI Audit Second Branch A · UIA2\nOrders, tables, inventory and devices belong to this branch.\nTODAY\nToday\nOrders\nBilling / Invoices\nPayments & Split\nRegister shifts & cash\nKITCHEN\nKitchen progress\nKitchen tickets\nMENU\nMenu & Categories\nCustomisations & Tax\nOffers & Coupons\nInventory & Recipes\nPurchasing & Stock Control\nTABLES\nFloor / Tables\nReservations\nQR Table Ordering\nON\nGUESTS & TEAM\nCustomers & loyalty\nTeam & permissions\nREPORTS\nReports & Analytics\nActivity history\nDEVICES\nPrinters & Devices\nConnections & sync\nApp Downloads\nSETUP\nReceipt & E-Bill\nRestaurant Settings\nSubscription Plans\nBackup & Restore\nHelp & Support\nEOD Report\nReconciliation\nAssistant\nLog out\n\nQR Ordering license active · JAMANVAAR QR · Valid through 12/11/2026. Your platform administrator manages licenses and device reassignment.\n\nQR Ordering\n\nGuests scan the code on their table, order from your menu, and the order reaches your counter and kitchen.\n\nEnabled\nOverview\nQR Orders\nService Requests\nMenu & Availability\nTables & QR\nCustomer Branding\nPayment Settings\nOrdering Rules\nAdvanced Features\nAnalytics\nPublish & branch availability\n\nUses the same catalog, modifiers, taxes and branch availability as your restaurant. Publishing makes the current catalog available to guests.\n\nOpen Menu & Categories →\nBranch\nCurrent admin scope\nUI Audit Restaurant A — Main Branch\nSearch dishes\nPublish current menu\nUI Audit Dish 001\nVisible in preview\nUI Audit Dish 002\nVisible in preview\nUI Audit Dish 003\nVisible in preview\nUI Audit Dish 004\nVisible in preview\nUI Audit Dish 005\nVisible in preview\nUI Audit Dish 006\nVisible in preview\nUI Audit Dish 007\nVisible in preview\nUI Audit Dish 008\nVisible in preview\nUI Audit Dish 009\nVisible in preview\nUI Audit Dish 010\nVisible in preview\nUI Audit Dish 011\nVisible in preview\nUI Audit Dish 012\nVisible in preview\nUI Audit Dish 013\nVisible in preview\nUI Audit Dish 014\nVisible in preview\nUI Audit Dish 015\nVisible in preview\nUI Audit Dish 016\nVisible in preview\nUI Audit Dish 017\nVisible in preview\nUI Audit Dish 018\nVisible in preview\nUI Audit Dish 019\nVisible in preview\nUI Audit Dish 020\nVisible in preview\nUI Audit Dish 021\nVisible in preview\nUI Audit Dish 022\nVisible in preview\nUI Audit Dish 023\nVisible in preview\nUI Audit Dish 024\nVisible in preview\nUI Audit Dish 025\nVisible in preview\nUI Audit Dish 026\nVisible in preview\nUI Audit Dish 027\nVisible in preview\nUI Audit Dish 028\nVisible in preview\nUI Audit Dish 029\nVisible in preview\nUI Audit Dish 030\nVisible in preview\nUI Audit Dish 031\nVisible in preview\nUI Audit Dish 032\nVisible in preview\nUI Audit Dish 033\nVisible in preview\nUI Audit Dish 034\nVisible in preview\nUI Audit Dish 035\nVisible in preview\nUI Audit Dish 036\nVisible in preview\nUI Audit Dish 037\nVisible in preview\nUI Audit Dish 038\nVisible in preview\nUI Audit Dish 039\nVisible in preview\nUI Audit Dish 040\nVisible in preview\nUI Audit Dish 041\nVisible in preview\nUI Audit Dish 042\nVisible in preview\nUI Audit Dish 043\nVisible in preview\nUI Audit Dish 044\nVisible in preview\nUI Audit Dish 045\nVisible in preview\nUI Audit Dish 046\nVisible in preview\nUI Audit Dish 047\nVisible in preview\nUI Audit Dish 048\nVisible in preview\nUI Audit Dish 049\nVisible in preview\nUI Audit Dish 050\nVisible in preview\nUI Audit Dish 051\nVisible in preview\nUI Audit Dish 052\nVisible in preview\nUI Audit Dish 053\nVisible in preview\nUI Audit Dish 054\nVisible in preview\nUI Audit Dish 055\nVisible in preview\nUI Audit Dish 056\nVisible in preview\nUI Audit Dish 057\nVisible in preview\nUI Audit Dish 058\nVisible in preview\nUI Audit Dish 059\nVisible in preview\nUI Audit Dish 060\nVisible in preview\nUI Audit Dish 061\nVisible in preview\nUI Audit Dish 062\nVisible in preview\nUI Audit Dish 063\nVisible in preview\nUI Audit Dish 064\nVisible in preview\nUI Audit Dish 065\nVisible in preview\nUI Audit Dish 066\nVisible in preview\nUI Audit Dish 067\nVisible in preview\nUI Audit Dish 068\nVisible in preview\nUI Audit Dish 069\nVisible in preview\nUI Audit Dish 070\nVisible in preview\nUI Audit Dish 071\nVisible in preview\nUI Audit Dish 072\nVisible in preview\nUI Audit Dish 073\nVisible in preview\nUI Audit Dish 074\nVisible in preview\nUI Audit Dish 075\nVisible in preview\nUI Audit Dish 076\nVisible in preview\nUI Audit Dish 077\nVisible in preview\nUI Audit Dish 078\nVisible in preview\nUI Audit Dish 079\nVisible in preview\nUI Audit Dish 080\nVisible in preview\nUI Audit Dish 081\nVisible in preview\nUI Audit Dish 082\nVisible in preview\nUI Audit Dish 083\nVisible in preview\nUI Audit Dish 084\nVisible in preview\nUI Audit Dish 085\nVisible in preview\nUI Audit Dish 086\nVisible in preview\nUI Audit Dish 087\nVisible in preview\nUI Audit Dish 088\nVisible in preview\nUI Audit Dish 089\nVisible in preview\nUI Audit Dish 090\nVisible in preview\nUI Audit Dish 091\nVisible in preview\nUI Audit Dish 092\nVisible in preview\nUI Audit Dish 093\nVisible in preview\nUI Audit Dish 094\nVisible in preview\nUI Audit Dish 095\nVisible in preview\nUI Audit Dish 096\nVisible in preview\nUI Audit Dish 097\nVisible in preview\nUI Audit Dish 098\nVisible in preview\nUI Audit Dish 099\nVisible in preview\nUI Audit Dish 100\nVisible in preview\nJAMAN AI",
+  "headings": [
+    "QR Ordering",
+    "Publish & branch availability"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ahmedabad Flagship Store",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 0,
+      "height": 16,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "TODAY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "KITCHEN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "MENU",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "TABLES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "GUESTS & TEAM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Team & permissions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Activity history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "DEVICES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Connections & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "App Downloads",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 85,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 90,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 138,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 131,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 116,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 83,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Publish current menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 127,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Switch application",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 50
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

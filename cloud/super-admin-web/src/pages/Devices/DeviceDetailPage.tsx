@@ -217,7 +217,7 @@ export function DeviceDetailPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
               <span style={{ color: 'var(--jv-text-muted)' }}>App Version</span>
-              <strong style={{ color: 'var(--jv-info-text)' }}>{device.appVersion || 'v1.0.0 (Stable)'}</strong>
+              <strong style={{ color: 'var(--jv-info-text)' }}>{device.appVersion || 'Version not reported'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 8 }}>
               <span style={{ color: 'var(--jv-text-muted)' }}>IP Address</span>

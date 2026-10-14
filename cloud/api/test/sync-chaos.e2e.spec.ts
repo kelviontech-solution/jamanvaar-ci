@@ -31,7 +31,7 @@ describe(`Sync chaos (seed ${SEED})`, () => {
   let platformToken: string;
   let restaurantId: string;
   let planId: string;
-  let pos: string[] = [];
+  const pos: string[] = [];
   let kds: string;
   let admin: string;
 

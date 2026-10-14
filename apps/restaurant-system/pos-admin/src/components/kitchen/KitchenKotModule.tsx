@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { KitchenStationsPanel } from './KitchenStationsPanel';
 import { KOTRecord, KOTStatus } from '@jamanvaar/types';
-import { db, KOTRepository, AuditRepository, KitchenStationRepository } from '@jamanvaar/database';
+import { db, KOTRepository, AuditRepository, BusinessDayRepository, KitchenStationRepository } from '@jamanvaar/database';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { formatTime } from '@jamanvaar/utils';
 import { printThermalKotTicket, EmptyState } from '@jamanvaar/ui';
@@ -59,15 +59,20 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
 
   // Statistics
   const stats = useMemo(() => {
-    const active = kots.filter((k) => k.status === 'PREPARING' || (k.status as any) === 'NEW').length;
-    const ready = kots.filter((k) => k.status === 'READY').length;
-    const served = kots.filter((k) => k.status === 'SERVED').length;
-    const totalItems = kots
+    const today = BusinessDayRepository.getCanonicalBusinessDate().dateKey;
+    const stationKots = kots.filter(k => stationFilter === 'ALL' || KitchenStationRepository.matches(k.stationId || k.station, stationFilter));
+    const active = stationKots.filter((k) => k.status === 'PREPARING' || (k.status as any) === 'NEW').length;
+    const ready = stationKots.filter((k) => k.status === 'READY').length;
+    const served = stationKots.filter(k => k.status === 'SERVED' && BusinessDayRepository.getCanonicalBusinessDate(new Date(k.servedAt || k.createdAt)).dateKey === today).length;
+    const totalItems = stationKots
       .filter((k) => k.status === 'PREPARING')
       .reduce((acc, k) => acc + k.items.reduce((s, it) => s + it.quantity, 0), 0);
 
-    return { active, ready, served, totalItems };
-  }, [kots]);
+    const durations = kots.filter(k => (stationFilter === 'ALL' || KitchenStationRepository.matches(k.stationId || k.station, stationFilter)) && k.readyAt && ['READY', 'SERVED'].includes(k.status) && BusinessDayRepository.getCanonicalBusinessDate(new Date(k.readyAt!)).dateKey === today)
+      .map(k => (Date.parse(k.readyAt!) - Date.parse(k.createdAt)) / 60000).filter(n => Number.isFinite(n) && n >= 0);
+    const cookMinutes = durations.length ? Math.round(durations.reduce((sum, n) => sum + n, 0) / durations.length) : null;
+    return { active, ready, served, totalItems, cookMinutes, samples: durations.length };
+  }, [kots, stationFilter]);
 
   const handleUpdateStatus = (kotId: string, newStatus: KOTStatus) => {
     const updated = KOTRepository.updateKOTStatus(kotId, newStatus);
@@ -152,10 +157,10 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
         <div className="bg-white p-4 rounded-2xl border border-jaman-border shadow-xs space-y-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Avg Cook Time</span>
           <div className="text-2xl font-bold text-blue-700 font-mono">
-            14 Min
+            {stats.cookMinutes === null ? '--' : `${stats.cookMinutes} min`}
           </div>
           <span className="text-[11px] text-blue-600 font-bold block">
-            Optimal kitchen pacing
+            {stats.samples ? `Based on ${stats.samples} tickets ready today` : 'No completed tickets today'}
           </span>
         </div>
       </div>

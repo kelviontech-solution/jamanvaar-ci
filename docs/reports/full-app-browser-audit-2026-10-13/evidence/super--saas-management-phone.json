@@ -1,0 +1,133 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nSaaS Management\n\nThe productized side of the platform — pricing, licensable features, add-on ordering channels, and the master data restaurants are provisioned from. Open any area below.\n\nPlans & Entitlements\n\nPricing tiers and what each subscription plan unlocks for a restaurant.\n\nFeature Catalog\n\nThe master list of every licensable feature and which plans include it.\n\nQR Ordering Suite\n\nTable QR menus, service requests, scheduled pickup, and solo QR restaurants.\n\nWhatsApp Ordering\n\nWhatsApp-based ordering channel setup and connector status per restaurant.\n\nJAMAN AI Engine\n\nConfiguration and rollout of the JAMAN AI assistant across restaurants.\n\nMaster Menu Catalog\n\nThe shared library of dishes, categories, and templates restaurants onboard from.\n\nActivation Keys\n\nGenerate and track device activation keys for every terminal type.\n\nPayment Gateways\n\nRazorpay, UPI, and bank gateway connections available to restaurants.\n\nPlatform Payments\n\nPlatform-wide payment volume, commission, and revenue dashboard.\n\nRestaurant Payouts\n\nManual payout routing, settlement, and EOD reconciliation to restaurants.\n\nApplications & Releases\n\nApp version releases, installers, and update rollout across all terminals.",
+  "headings": [
+    "SaaS Management",
+    "Plans & Entitlements",
+    "Feature Catalog",
+    "QR Ordering Suite",
+    "WhatsApp Ordering",
+    "JAMAN AI Engine",
+    "Master Menu Catalog",
+    "Activation Keys",
+    "Payment Gateways",
+    "Platform Payments",
+    "Restaurant Payouts",
+    "Applications & Releases"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

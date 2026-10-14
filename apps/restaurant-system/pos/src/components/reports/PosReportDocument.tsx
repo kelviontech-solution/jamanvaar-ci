@@ -22,6 +22,10 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
   const identityLine = [address, gstin && `GSTIN: ${gstin}`, phone && `Phone: ${phone}`].filter(Boolean).join(' • ');
 
   const s = data.summary;
+  const shifts = db.shifts.filter(shift => Date.parse(shift.openedAt) >= Date.parse(data.startDate) && Date.parse(shift.openedAt) <= Date.parse(data.endDate));
+  const counted = shifts.filter(shift => shift.status === 'CLOSED' && typeof shift.actualCash === 'number');
+  const variance = counted.reduce((sum, shift) => sum + (shift.actualCash! - shift.expectedCash), 0);
+  const reconciliation = !shifts.length ? 'No register counts' : counted.length !== shifts.length ? `${counted.length}/${shifts.length} registers counted` : Math.abs(variance) < 0.005 ? 'Cash drawers reconciled' : `Cash variance ${formatINR(variance)}`;
 
   return (
     <div className={`w-full bg-white text-jaman-navy select-text font-sans ${
@@ -131,7 +135,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
 
         <div className="p-4 rounded-2xl bg-[#FFFDFB] border border-jaman-border shadow-2xs space-y-1">
           <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
-            GST & Taxes (5%)
+            GST & Taxes
           </span>
           <div className="text-xl sm:text-2xl font-black font-mono text-blue-700">
             {formatINR(s.totalTax)}
@@ -187,7 +191,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
             <span className="font-black text-xs uppercase tracking-wider text-jaman-navy">
               Settlement Mix & Tender Allocation
             </span>
-            <span className="text-[10px] font-mono text-slate-400">100% RECONCILED</span>
+            <span className="text-[10px] font-mono text-slate-400">{reconciliation}</span>
           </div>
 
           <div className="space-y-2 text-xs">
@@ -212,7 +216,7 @@ export const PosReportDocument: React.FC<PosReportDocumentProps> = ({
               <strong className="font-mono text-jaman-navy">{formatINR(s.paymentBreakdown.wallet + s.paymentBreakdown.other)}</strong>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200 font-extrabold text-sm text-jaman-navy">
-              <span>Total Payment Reconciled:</span>
+              <span>Total Payment Collected:</span>
               <span className="font-mono text-jaman-navy">{formatINR(s.totalCollected)}</span>
             </div>
           </div>

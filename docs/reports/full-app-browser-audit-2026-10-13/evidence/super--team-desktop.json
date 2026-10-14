@@ -1,0 +1,191 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Team & RBAC\n\nManage administrators, operators, and platform roles across the JAMANVAAR control plane\n\nInvite Teammate\nTOTAL TEAMMATES\n1\nPlatform accounts\nACTIVE ADMINS\n1\nEnabled accounts\nPENDING ACTIVATION\n0\nAwaiting first login\nSUPER ADMINISTRATORS\n1\nRoot & Super Admin tier\nAll (1)\nSuper Admins\nOperations\nSupport\nFinance\nAuditors\nTEAMMATE\tROLE\tSTATUS\tLAST LOGIN\tINVITED / CREATED\tACTIONS\n\nJ\nJAMANVAAR Super Admin (You)\nqa-platform@example.invalid\n\t\nPLATFORM OWNER\nUltimate platform authority & root management\n\t\nACTIVE\t10/13/2026, 9:25:24 PM\t10/13/2026\t",
+  "headings": [
+    "Platform Team & RBAC"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Invite Teammate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 159,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 61,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Super Admins",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 113,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Operations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 80,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Finance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 77,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Auditors",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 34,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search teammate by name or email…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

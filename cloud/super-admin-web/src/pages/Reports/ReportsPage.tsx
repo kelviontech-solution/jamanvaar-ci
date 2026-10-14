@@ -556,7 +556,7 @@ export function ReportsPage() {
                             <td>
                               <Badge tone="accent">{d.type}</Badge>
                             </td>
-                            <td className="font-mono text-xs">{d.appVersion ?? 'v1.0.0'}</td>
+                            <td className="font-mono text-xs">{d.appVersion ?? 'Not reported'}</td>
                             <td>
                               <Badge tone={d.status === 'ACTIVE' ? 'success' : 'neutral'}>
                                 {d.status}

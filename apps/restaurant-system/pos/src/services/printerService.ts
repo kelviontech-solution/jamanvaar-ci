@@ -1,6 +1,7 @@
 import { db, PrintQueueRepository, ReceiptRepository, AuditRepository, PrinterRepository } from '@jamanvaar/database';
 import { detectPrinters, describeDiscovered, isAlreadyConfigured, sendRawToPrinter, type DetectionResult, type DiscoveredPrinter } from '@jamanvaar/api';
 import { Order, KOTRecord, PrintJob, ReceiptPaperSize, PrinterDevice, PrinterRole } from '@jamanvaar/types';
+import { receiptPaymentSummary, paymentLabelFor } from '@jamanvaar/ui';
 import { stripControlCharsForPrint, buildUpiPaymentUri, escPosQrBitmapBytes } from '@jamanvaar/utils';
 
 export class PosPrinterService {
@@ -154,7 +155,11 @@ export class PosPrinterService {
     lines.push(doubleDivider);
     lines.push(pad('GRAND TOTAL:', `₹${order.totalAmount}`));
     lines.push(doubleDivider);
-    lines.push(pad('Payment Method:', `${order.paymentMethod}`));
+    const payment = receiptPaymentSummary(order);
+    lines.push(payment.label);
+    lines.push(pad('Payment Method:', paymentLabelFor(order.paymentMethod)));
+    lines.push(pad('Amount collected:', payment.collected.toFixed(2)));
+    lines.push(pad('Balance due:', payment.outstanding.toFixed(2)));
     lines.push(divider);
     lines.push(center(config.thankYouMessage));
     lines.push(center(config.footerMessage));

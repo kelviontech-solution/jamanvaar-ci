@@ -7,7 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
 import { mergeOrderItems } from './order-merge';
 import { decideStatus, integrityFlags, validateQrOrderAction } from './order-rules';
-import { allocateOrderPayment, paymentBalance, reconcileOrderPayments } from '../payments/order-payment-ledger';
+import { allocateOrderPayment, paymentBalance, reconcileOrderPayments, COLLECTED_ORDER_STATUSES } from '../payments/order-payment-ledger';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { ConfigService } from '@nestjs/config';
 import { AuditService } from '../audit/audit.service';
@@ -862,5 +862,37 @@ export class OrderSyncService {
     );
     const latestSeq = orders.reduce((max, o) => Math.max(max, o.seq ?? 0), 0);
     return { orders, latestSeq, serverTime: new Date().toISOString() };
+  }
+
+  /** Read-only provenance from the canonical branch order, with no gateway credentials or guest identifiers. */
+  async activity(device: Device, externalOrderId: string) {
+    if (!['POS', 'POS_ADMIN', 'KIOSK_ADMIN', 'CAPTAIN', 'KDS'].includes(device.type)) throw new NotFoundException('Order activity unavailable');
+    if (!externalOrderId || externalOrderId.length > 128) throw new BadRequestException('Invalid order reference');
+    return this.prisma.runAsTenant(device.restaurantId, async tx => {
+      const singleBranch = device.branchId && await tx.branch.count({where:{restaurantId:device.restaurantId}}) === 1;
+      const branchFilter = device.branchId ? singleBranch ? {OR:[{branchId:device.branchId},{branchId:null}]} : {branchId:device.branchId} : {};
+      const order = await tx.syncedOrder.findFirst({where:{restaurantId:device.restaurantId,externalOrderId,...branchFilter}});
+      if (!order) throw new NotFoundException('Order not found');
+      const [branch, entries, attempts] = await Promise.all([
+        order.branchId ? tx.branch.findFirst({where:{id:order.branchId,restaurantId:device.restaurantId},select:{name:true}}) : null,
+        tx.orderPaymentEntry.findMany({where:{restaurantId:device.restaurantId,orderId:order.id},select:{kind:true,amount:true,method:true,createdAt:true},orderBy:{createdAt:'asc'}}),
+        tx.paymentTransaction.findMany({where:{restaurantId:device.restaurantId,order:{externalOrderId}},select:{amount:true,status:true,method:true,createdAt:true,paidAt:true},orderBy:{createdAt:'asc'}})
+      ]);
+      const events: Array<{at: string; label: string; amountPaise?:number}> = [{at:order.createdAt.toISOString(),label:`Order created · ${order.source}`}];
+      for (const item of Array.isArray(order.items) ? order.items : []) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+        for (const [field,label] of [['sentAt','Sent to kitchen'],['readyAt','Ready'],['servedAt','Served']] as const) {
+          const at = item[field]; if (typeof at === 'string' && Number.isFinite(Date.parse(at))) events.push({at,label:`${String(item.name || 'Dish')} · ${label}`});
+        }
+      }
+      for (const attempt of attempts) events.push({at:attempt.createdAt.toISOString(),label:`Online attempt · ${attempt.status.toLowerCase().replaceAll('_',' ')}`,amountPaise:attempt.amount});
+      for (const entry of entries) events.push({at:entry.createdAt.toISOString(),label:`${entry.kind === 'REFUND' ? 'Refund recorded' : 'Collection confirmed'} · ${entry.method.replaceAll('_',' ')}`,amountPaise:entry.amount});
+      const meta = order.meta && typeof order.meta === 'object' && !Array.isArray(order.meta) ? order.meta : {};
+      if (Array.isArray(meta.qrStatusHistory)) for (const value of meta.qrStatusHistory) {
+        if (value && typeof value === 'object' && !Array.isArray(value) && typeof value.at === 'string' && Number.isFinite(Date.parse(value.at))) events.push({at:value.at,label:`Order action · ${String(value.action || 'updated').toLowerCase().replaceAll('_',' ')}`});
+      }
+      const balance = paymentBalance(order.totalAmount, entries.length ? entries : COLLECTED_ORDER_STATUSES.has(order.paymentStatus || '') ? [{kind:'COLLECTION',amount:order.totalAmount}] : []);
+      return {externalOrderId,source:order.source,branch:branch?.name || 'Unassigned branch',status:order.status,paymentStatus:order.paymentStatus,version:order.syncVersion,balance,events:events.sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)),generatedAt:new Date().toISOString()};
+    });
   }
 }

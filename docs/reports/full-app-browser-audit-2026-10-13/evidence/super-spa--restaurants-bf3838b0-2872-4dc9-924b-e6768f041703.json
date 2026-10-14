@@ -1,0 +1,402 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\n← Back to restaurants\nUI Audit Restaurant A\nACTIVE\nJAMANVAAR PRO (₹580/MO)\n1 ACTIVE KEY\n\nAhmedabad, India • 2 Branches • 6 Registered Terminals\n\nRestaurant ID:\nJM9891900001\nCopy\nGenerate Key\nEdit Restaurant\nSuspend Restaurant\nOverview\nOwner & Users\nBranches\nSubscription\nApplications\nPlan Quotas\nFeature Entitlements\nDevices & Keys\nBilling & Invoices\nPayments\nReports & Analytics\nAudit Logs\nSupport & Diagnostics\nBackup & Recovery\nMenu\nCommercial & Legal Profile\nRestaurant ID\nJM9891900001\nRegistered Mobile\n9891900001\nLegal Name\n—\nGSTIN\n—\nFSSAI\n—\nAddress\n—\nCity / State\nAhmedabad\nTimezone\nAsia/Kolkata\nCurrency\nINR\nOnboarded\n13/10/2026\nAdvanced / Internal IDs\nAt a Glance Summary\nActive Plan\nJAMANVAAR PRO (PRO)\nSubscription Status\nACTIVE\nBranches\n2\nRegistered Terminals\n6\nMaster Owner\nUI Audit Owner A (ui-owner-a@example.invalid)\nPlatform Authority\nSAAS MANAGED\nHardware & Terminal Activation Keys (7)\n1 AVAILABLE TO REDEEM\nRestaurant ID\nJM9891900001\nCopy ID\n\nKiosk Admin asks for this Restaurant ID together with the restaurant owner's login before it takes a key. Captain, POS and Kitchen Display need only their key. Relay these keys to the restaurant owner. On first login at Restaurant Admin (http://localhost:5176), POS, or Captain, entering this key registers and binds the device. A KIOSK_ADMIN key is also entered at the merged Restaurant Admin (http://localhost:5176).\n\nGenerate Activation Key\n● BILLING COUNTER POS\nREDEEMED\nUI branch A2 audit\n•••• 8C7B\nExpires: 14/10/2026\n✓ Redeemed 13/10/2026\nRevoke\n● KITCHEN DISPLAY (KDS)\nREDEEMED\nUI Audit KDS\n•••• 7BCD\nExpires: 20/10/2026\n✓ Redeemed 13/10/2026\nRevoke\n● CAPTAIN ORDER TABLET\nREDEEMED\nUI Audit CAPTAIN\n•••• D099\nExpires: 20/10/2026\n✓ Redeemed 13/10/2026\nRevoke\n● SELF-ORDER KIOSK\nREDEEMED\nUI Audit KIOSK\n•••• 1018\nExpires: 20/10/2026\n✓ Redeemed 13/10/2026\nRevoke\n● BILLING COUNTER POS\nREDEEMED\nUI Audit POS\n•••• B921\nExpires: 20/10/2026\n✓ Redeemed 13/10/2026\nRevoke\n● KIOSK ADMIN CONSOLE\nACTIVE\nUI Audit KIOSK_ADMIN\n[ACTIVATION KEY]\nCopy\nExpires: 20/10/2026\nRevoke\nDelete\n● RESTAURANT ADMIN CONSOLE\nREDEEMED\nUI Audit POS_ADMIN\n•••• 9672\nExpires: 20/10/2026\n✓ Redeemed 13/10/2026\nRevoke",
+  "headings": [
+    "UI Audit Restaurant A",
+    "Hardware & Terminal Activation Keys (7)"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy the Restaurant ID",
+      "disabled": false,
+      "width": 86,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Generate Key",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Edit Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 127,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Suspend Restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 158,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Owner & Users",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 148,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Branches",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 113,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Subscription",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 135,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Applications",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Plan Quotas",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 131,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Feature Entitlements",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 187,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Devices & Keys",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 151,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Billing & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 161,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Payments",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 117,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 179,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Audit Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Support & Diagnostics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 199,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Backup & Recovery",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 179,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Copy the internal UUID",
+      "disabled": false,
+      "width": 86,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Copy ID",
+      "aria": null,
+      "title": "Copy the Restaurant ID",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Generate Activation Key",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 191,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Copy",
+      "aria": null,
+      "title": "Copy",
+      "disabled": false,
+      "width": 86,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Delete",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 64,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Revoke",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 68,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

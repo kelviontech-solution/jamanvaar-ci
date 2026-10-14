@@ -1,4 +1,6 @@
 import { db } from '@jamanvaar/database';
+import { deviceFetch } from '../../cloud/cloudClient';
+const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => {const r=await deviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`);if(!r.ok)throw new Error('Activity unavailable');return r.json();};
 import React, { useState, useMemo } from 'react';
 import { useEscapeToClose } from '../useEscapeToClose';
 import { useCaptainStore, CartItemEntry, COURSES, type Course } from '../../store/captainStore';
@@ -6,7 +8,7 @@ import { DiningTable, MenuItem, SelectedModifier } from '@jamanvaar/types';
 import { formatINR, restaurantGstRate, taxLabels, outstandingBillAmount } from '@jamanvaar/utils';
 import { priceOrderLines } from '@jamanvaar/business';
 import { captainDb, isBillWaiting } from '@jamanvaar/database';
-import { CachedImg, EmptyState, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
+import { CachedImg, EmptyState, useConfirm, ModalBackdrop, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
 import { CaptainModifierModal } from '../modals/CaptainModifierModal';
 import { CaptainCancelDishModal } from '../modals/CaptainCancelDishModal';
 import { CaptainCustomerModal } from '../customers/CaptainCustomerModal';
@@ -331,6 +333,7 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
               {/* Dishes */}
               <div className="flex-1 p-3 sm:p-5 overflow-y-auto space-y-3 min-h-0">
+                {liveOrder && <details className="rounded-xl border p-3"><summary className="cursor-pointer font-bold text-sm">Order history & payment</summary><OrderActivityView order={liveOrder} loadActivity={loadOrderActivity}/></details>}
                 {billWaiting && (
                   <div role="status" className="p-3 rounded-2xl bg-purple-50 border border-purple-300 text-purple-900 text-xs font-bold flex items-start gap-2">
                     <Receipt className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />

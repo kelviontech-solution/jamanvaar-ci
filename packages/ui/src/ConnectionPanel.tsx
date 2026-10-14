@@ -48,6 +48,7 @@ export const ConnectionBadge: React.FC<{ className?: string }> = ({ className = 
 export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: string) => void }> = ({ appVersion, showToast }) => {
   const { confirm, confirmDialog } = useConfirm();
   const d = useLive(() => collectDiagnostics(appVersion));
+  const [showSetup, setShowSetup] = useState(false);
   const [address, setAddress] = useState(d.coreUrl ?? '');
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -73,12 +74,14 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         </button>
       </div>
 
+      <div className="rounded-2xl border p-4 space-y-3"><h2 className="font-bold">Connect your devices</h2><p className="text-sm text-slate-600">1. Activate each app for this restaurant and branch. 2. Sign in to sync through the cloud. 3. If you use an on-site server for offline device sharing, pair it below.</p><p className="text-sm">{d.coreUrl ? `Detected configured server: ${d.coreUrl}` : 'No on-site server configured. Cloud-only operation does not require pairing.'}</p><button type="button" className="rounded-xl border px-4 py-3 font-bold" onClick={() => setShowSetup(v => !v)}>{showSetup ? 'Hide server setup' : 'Set up an on-site server'}</button></div>
+      {showSetup && <>
       <LocalCorePairing serverUrl={db.getSyncServerUrl()} paired={db.isLocalCorePaired()} onPair={(pin, url) => db.pairLocalCore(pin, url)} />
       <div className="rounded-2xl border border-slate-200 p-4">
         <div className="font-bold text-slate-800">Branch Core (restaurant server)</div>
         <p className="text-xs text-slate-500 mt-1">The always-on machine that lets every device work together without internet. Enter its address, e.g. 192.168.1.10. Leave empty to use the cloud only.</p>
         <div className="flex gap-2 mt-3">
-          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="192.168.1.10:5178" className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+          <input aria-label="On-site server address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="192.168.1.10:5178" className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm" />
           <button
             type="button"
             disabled={busy}
@@ -91,6 +94,9 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
         {message && <div className="text-xs mt-2 text-slate-600">{message}</div>}
       </div>
 
+      </>}
+      {message && <p role="status" className="text-sm">{message}</p>}
+      <details className="rounded-2xl border p-4"><summary className="cursor-pointer font-bold">Advanced diagnostics and recovery</summary>
       <div className="rounded-2xl border border-slate-200 p-4">
         <Row k="Connection" v={d.mode === 'ONLINE' ? 'Cloud' : d.mode === 'LOCAL' ? 'Branch Core (no internet)' : 'None (working on this device)'} />
         <Row k="Internet verified" v={d.internetVerified ? 'Yes' : 'No: UPI is unavailable'} />
@@ -122,6 +128,7 @@ export const ConnectionPanel: React.FC<{ appVersion: string; showToast?: (msg: s
           Clear and re-download
         </button>
       </div>
+      </details>
     </div>
     {confirmDialog}
     </>

@@ -84,7 +84,6 @@ async function bootstrap() {
 
   const port = config.get<number>('PORT') ?? 4000;
   await app.listen(port);
-  // eslint-disable-next-line no-console
   console.log(`JAMANVAAR cloud API listening on :${port}`);
 }
 

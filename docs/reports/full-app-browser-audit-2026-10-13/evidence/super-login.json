@@ -1,0 +1,96 @@
+{
+  "text": "Cloud API: Connected\nNetwork: Online\nTue, 13 Oct 2026\nPlatform Control.\nUnified Cloud Engine.\n\nCentralized enterprise management suite for restaurant fleets, automated branch provisioning, license activation, and real-time operational analytics.\n\nTenant Fleet Control\nLicense Provisioning\nEnterprise Analytics\nRole-Based Security\nTandoori Breads\nRoyal Curries\nTandoor Starters\nWELCOME TO\nSUPER ADMIN\nJAMANVAAR\n\nEnterprise Platform Control & SaaS Management\n\nSuper Admin Email *\nPassword *\nShow Password\nRemember session\nLive cloud API\nCONTINUE\nRole-Based Security\n•\nInstant Offline Boot\n•\nRole-based access\n© 2026 JAMANVAAR by KELVIONTECH — All rights reserved.",
+  "headings": [
+    "Platform Control.\nUnified Cloud Engine.",
+    "JAMANVAAR"
+  ],
+  "buttons": [
+    {
+      "text": "Network: Online",
+      "aria": null,
+      "title": "Click to toggle simulated network mode",
+      "disabled": false,
+      "width": 146,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Show Password",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 96,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "CONTINUE",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 478,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "email",
+      "label": null,
+      "placeholder": "e.g. superadmin@jamanvaar.app"
+    },
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "label": null,
+      "placeholder": "Enter your password"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 0
+    },
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 216
+    },
+    {
+      "alt": "Tandoori Naan",
+      "src": "/assets/menu/north-indian/butter-naan.jpg",
+      "loaded": true,
+      "width": 138
+    },
+    {
+      "alt": "Paneer Butter Masala",
+      "src": "/assets/menu/north-indian/paneer-butter-masala.jpg",
+      "loaded": true,
+      "width": 138
+    },
+    {
+      "alt": "Tandoori Angaar",
+      "src": "/assets/menu/north-indian/paneer-tikka.jpg",
+      "loaded": true,
+      "width": 138
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

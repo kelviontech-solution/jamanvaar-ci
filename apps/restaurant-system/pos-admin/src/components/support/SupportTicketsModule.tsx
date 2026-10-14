@@ -1,3 +1,6 @@
+import { db, getTerminalId } from '@jamanvaar/database';
+import { collectDiagnostics } from '@jamanvaar/sync';
+import { activeAdminBranch } from '../../adminBranchScope';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LifeBuoy, Paperclip, Plus, ArrowLeft, Send } from 'lucide-react';
 import {
@@ -180,7 +183,8 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<SupportTicketCategory>('HARDWARE');
   const [priority, setPriority] = useState<SupportTicketPriority>('MEDIUM');
-  const [branchId, setBranchId] = useState('');
+  const [branchId, setBranchId] = useState(activeAdminBranch && activeAdminBranch !== 'all' ? activeAdminBranch : '');
+  const [includeDiagnostics, setIncludeDiagnostics] = useState(true);
   const [branches, setBranches] = useState<CloudBranch[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -196,7 +200,7 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
     setError(null);
     setSaving(true);
     try {
-      await onCreated(await createSupportTicket({ subject: subject.trim(), description: description.trim(), category, priority, branchId: branchId || undefined }));
+      await onCreated(await createSupportTicket({ subject: subject.trim(), description: description.trim() + (includeDiagnostics ? (() => {const d = collectDiagnostics(typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'unknown');return `\n\nDevice context\nBranch: ${branches.find(b=>b.id===branchId)?.name || 'Restaurant overview'}\nDevice: ${getTerminalId('POS_ADMIN')}\nApp version: ${d.appVersion}\nConnection: ${d.mode}\nQueued changes: ${d.pending}\nFailed changes: ${d.failed + d.deadLetter}\nStorage: ${d.storage.ok ? 'Ready' : 'Needs attention'}`;})() : ''), category, priority, branchId: branchId || undefined }));
     } catch (err) {
       setError(errorText(err, 'Could not send the ticket. Check your connection and try again.'));
       setSaving(false);
@@ -205,6 +209,7 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
 
   return (
     <form onSubmit={submit} className="max-w-2xl mx-auto space-y-4" noValidate>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={includeDiagnostics} onChange={e=>setIncludeDiagnostics(e.target.checked)} /> Include branch, device, app version and sync counts (no credentials or customer data)</label>
       <button type="button" onClick={onCancel} className="inline-flex items-center gap-1 text-xs font-bold text-slate-600">
         <ArrowLeft className="w-3.5 h-3.5" /> Back to tickets
       </button>
@@ -245,7 +250,8 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
       <p className="text-xs text-slate-500">Your restaurant, name and this device are sent with the ticket automatically. You can add screenshots after sending.</p>
       <div className="flex gap-2">
         <button type="submit" disabled={saving} className="rounded-xl bg-jaman-navy px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60">{saving ? 'Sending…' : 'Send to support'}</button>
-        <button type="button" onClick={onCancel} disabled={saving} className="rounded-xl border border-jaman-border px-5 py-2.5 text-sm font-bold text-slate-700">Cancel</button>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={includeDiagnostics} onChange={e=>setIncludeDiagnostics(e.target.checked)} /> Include branch, device, app version and sync counts (no credentials or customer data)</label>
+      <button type="button" onClick={onCancel} disabled={saving} className="rounded-xl border border-jaman-border px-5 py-2.5 text-sm font-bold text-slate-700">Cancel</button>
       </div>
     </form>
   );

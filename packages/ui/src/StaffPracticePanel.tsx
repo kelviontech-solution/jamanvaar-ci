@@ -10,7 +10,7 @@ export function StaffPracticePanel() {
   const actions = ['Add practice dish', 'Send practice KOT', 'Mark practice ready', 'Mark practice served', 'Confirm practice collection'];
   const reset = () => {setStage(0); setCount(0); setTender('Cash');};
   return <section className="rounded-2xl border border-amber-200 bg-amber-50 text-jaman-navy p-3">
-    <button type="button" className="min-h-11 w-full text-left font-bold" onClick={() => {setOpen(!open); reset();}}>{t('Staff practice')} {open ? '−' : '+'}</button>
+    <button type="button" aria-label={t('Staff practice')} aria-expanded={open} className="min-h-11 w-full text-left font-bold" onClick={() => {setOpen(!open); reset();}}>{t('Staff practice')} {open ? '−' : '+'}</button>
     {open && <div className="space-y-3">
       <p className="text-sm">{t('Practice only: no real order, payment, stock change or printing.')}</p>
       <ol className="flex flex-wrap gap-2 text-xs" aria-label={t('Practice progress')}>{['Menu', 'Orders', 'Cooking', 'Served', 'Collect', 'Done'].map((label, index) => <li key={label} aria-current={stage === index ? 'step' : undefined} className={`rounded-full px-2 py-1 ${stage === index ? 'bg-jaman-navy text-white' : 'bg-white'}`}>{index + 1}. {t(label)}</li>)}</ol>

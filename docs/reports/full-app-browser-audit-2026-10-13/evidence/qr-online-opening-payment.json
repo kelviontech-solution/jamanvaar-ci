@@ -1,0 +1,24 @@
+{
+  "text": "Opening secure payment\n\nChoose your preferred method in secure Razorpay checkout. Your order is confirmed only after payment is verified.",
+  "headings": [
+    "Opening secure payment"
+  ],
+  "buttons": [],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 180
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

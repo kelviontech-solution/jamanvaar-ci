@@ -10,15 +10,19 @@ import { join } from 'node:path';
  * (GitHub, Linear, Jira, Zendesk) solve this two ways: a distinct icon shape per status (not
  * just color) and muting rows that are already resolved/closed so open work visually leads.
  */
-const SRC = join(__dirname, '../cloud/super-admin-web/src/pages/Tickets/TicketsPage.tsx');
+// STATUS_ICON/TicketStatusBadge live in ticketShared.tsx (shared with CreateTicketModal and
+// TicketDetailModal after TicketsPage.tsx was split up); the row-muting logic stays inline here.
+const SHARED_SRC = join(__dirname, '../cloud/super-admin-web/src/pages/Tickets/ticketShared.tsx');
+const PAGE_SRC = join(__dirname, '../cloud/super-admin-web/src/pages/Tickets/TicketsPage.tsx');
 
 describe('Super Admin Support Tickets: open vs. closed is obvious at a glance', () => {
-  const src = readFileSync(SRC, 'utf8');
+  const sharedSrc = readFileSync(SHARED_SRC, 'utf8');
+  const pageSrc = readFileSync(PAGE_SRC, 'utf8');
 
   it('gives each ticket status its own icon, not just a color dot shared with every other badge', () => {
-    expect(src).toMatch(/STATUS_ICON/);
+    expect(sharedSrc).toMatch(/STATUS_ICON/);
     // four distinct statuses need four distinct icon references, not the same icon reused
-    const match = src.match(/STATUS_ICON\s*[:=][^}]*?OPEN:\s*(\w+)[\s\S]*?IN_PROGRESS:\s*(\w+)[\s\S]*?RESOLVED:\s*(\w+)[\s\S]*?CLOSED:\s*(\w+)/);
+    const match = sharedSrc.match(/STATUS_ICON\s*[:=][^}]*?OPEN:\s*(\w+)[\s\S]*?IN_PROGRESS:\s*(\w+)[\s\S]*?RESOLVED:\s*(\w+)[\s\S]*?CLOSED:\s*(\w+)/);
     expect(match).not.toBeNull();
     const [, openIcon, inProgressIcon, resolvedIcon, closedIcon] = match!;
     const icons = [openIcon, inProgressIcon, resolvedIcon, closedIcon];
@@ -26,9 +30,9 @@ describe('Super Admin Support Tickets: open vs. closed is obvious at a glance', 
   });
 
   it('visually mutes rows that are already resolved or closed so open work leads', () => {
-    const rowIdx = src.indexOf("onClick={() => openTicket(t.id)}");
+    const rowIdx = pageSrc.indexOf("onClick={() => openTicket(t.id)}");
     expect(rowIdx).toBeGreaterThan(-1);
-    const block = src.slice(rowIdx - 400, rowIdx + 50);
+    const block = pageSrc.slice(rowIdx - 400, rowIdx + 50);
     expect(block).toMatch(/RESOLVED|CLOSED/);
     expect(block).toMatch(/opacity/);
   });

@@ -21,6 +21,6 @@ describe('cash bill watermark', () => {
     expect(paymentLabelFor('UPI_QR')).toBe('UPI');
     expect(paymentLabelFor('CARD_TERMINAL')).toBe('CARD');
     expect(paymentLabelFor('NET_BANKING')).toBe('NET BANKING');
-    expect(paymentLabelFor(undefined)).toBe('PAID');
+    expect(paymentLabelFor(undefined)).toBe('NOT SPECIFIED');
   });
 });

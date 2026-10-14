@@ -136,7 +136,7 @@ export function RestaurantsListPage() {
 
   const filteredRestaurants = useMemo(() => {
     if (!restaurants) return [];
-    let list = restaurants.filter((r) => {
+    const list = restaurants.filter((r) => {
       const sub = r.subscriptions?.[0];
       // Status filter
       if (statusFilter === 'ACTIVE' && r.status !== 'ACTIVE') return false;

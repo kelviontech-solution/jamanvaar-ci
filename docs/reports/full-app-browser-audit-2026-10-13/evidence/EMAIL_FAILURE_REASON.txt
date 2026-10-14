@@ -1,0 +1,4 @@
+node : [Nest] 31344  - 13/10/2026, 9:46:25 pm   ERROR [ExceptionsHandler] Error: Cannot find module 'C:\Users\OM 
+Sanjhira\OneDrive\Desktop\k2\node_modules\pdfkit\js\standard-fonts\Helvetica.cjs'
+    + CategoryInfo          : NotSpecified: ([Nest] 31344  -...\Helvetica.cjs':String) [], RemoteException
+  code: 'MODULE_NOT_FOUND',

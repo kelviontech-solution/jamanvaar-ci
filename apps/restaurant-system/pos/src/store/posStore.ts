@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Cart, CartItem, CustomerAccount, DiningTable, DraftCartSession, InstantBillConfig, KOTRecord, ManagerOverrideAction, MenuItem, Order, OrderType, PaymentMethod, SelectedModifier, User, PaymentSplit } from '@jamanvaar/types';
-import { CustomerRepository, AuditRepository, db, HeldOrderRepository, KOTRepository, OrderRepository, ReceiptRepository, StaffRepository, InventoryRepository } from '@jamanvaar/database';
+import { CustomerRepository, AuditRepository, db, HeldOrderRepository, KOTRepository, OrderRepository, ReceiptRepository, StaffRepository, InventoryRepository, ShiftRepository } from '@jamanvaar/database';
 import { getTerminalId } from '@jamanvaar/database';
 import { PosPrinterService } from '../services/printerService';
 import { Platform } from '@jamanvaar/api';
@@ -1214,6 +1214,7 @@ export const usePosStore = create<PosState>((set, get) => {
     completePayment: (method: PaymentMethod, tenderedAmount?: number, transactionId?: string, splits?: PaymentSplit[]) => {
       const state = get();
       if (state.cart.items.length === 0) return null;
+      if (state.cart.totalPayable > 0 && (method === 'CASH' || method === 'CASH_AT_COUNTER' || splits?.some(split => split.method === 'CASH' && split.amount > 0)) && !ShiftRepository.getActiveShift()) throw new Error('Open a cash shift in Shift & Cash before collecting cash. Your order is preserved.');
       const boundId = state.runningOrderId ?? state.selectedTable?.currentOrderId;
       const boundOrder = boundId ? OrderRepository.getOrderById(boundId) : undefined;
       if (boundOrder && (boundOrder.paymentStatus === 'SUCCESS' || ['CANCELLED','REFUNDED'].includes(boundOrder.orderStatus))) throw new Error('This bill is already paid or closed. Refresh the order and open its receipt; do not collect payment again.');
@@ -1683,6 +1684,7 @@ export const usePosStore = create<PosState>((set, get) => {
       // the full payment modal does, instead of saving an untyped, unrecognized string on the order.
       const isHouseAccount = (rawMethod as string) === 'HOUSE_ACCOUNT';
       const method: PaymentMethod = isHouseAccount ? 'CREDIT' : rawMethod;
+      if (state.cart.totalPayable > 0 && (method === 'CASH' || method === 'CASH_AT_COUNTER') && !ShiftRepository.getActiveShift()) { set({activeTab: 'SHIFTS', isInstantBillConfirmationOpen: false}); return null; }
 
       // B2-062: House Account defers real payment to a customer's own ledger. Instant Bill is a
       // single-tap, no-review checkout — settling a House Account sale through it with no

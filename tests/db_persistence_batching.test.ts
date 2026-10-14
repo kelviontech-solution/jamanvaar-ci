@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { db } from '@jamanvaar/database';
+import { db, ShiftRepository } from '@jamanvaar/database';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 
 /**
@@ -41,6 +41,7 @@ describe('Local database persistence (BUG-033)', () => {
     storage = new CountingStorage();
     (globalThis as unknown as { localStorage: unknown }).localStorage = storage;
     db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     if (db.orders.length === 0) {
       db.orders.push({ id: 'seed-o1', orderNumber: 'ORD-1', updatedAt: new Date().toISOString(), items: [] } as never);
     }

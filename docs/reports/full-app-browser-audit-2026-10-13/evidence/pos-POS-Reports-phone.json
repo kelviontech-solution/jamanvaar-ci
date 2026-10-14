@@ -1,0 +1,419 @@
+{
+  "text": "POS TERMINAL\nUI Audit Restaurant A\n\nUI Audit Restaurant A\n•\nde318c70-1a23-446d-a44b-485ec7efbb1b\n\nSearch dishes, SKU, tables, bills, customers...\nU\nPages & categories\nPOS Operational Reports\n\nSales, payments, taxes, orders and dish performance.\n\nPreview Report\nPrint Report\nDownload PDF\nExport CSV\nToday\nYesterday\n7 Days\n30 Days\nThis Month\nThis Year\nCustom Date\nReport Design:\nClassic Accounting\nModern Dashboard\nCompact A4\nFinancial Statement\nRestaurant Branded\nUI AUDIT RESTAURANT A\nPOS DAILY SALES REPORT\nToday (13 Oct 2026)\nGenerated: 13/10/2026, 9:16:11 pm\nTOTAL BILLED (INCL. GST)\n₹0\n● 0 Total Orders\nAVERAGE ORDER VALUE\n₹0\nPer bill average\nCASH COLLECTIONS\n₹0\nDrawer cash collected\nGST & TAXES (5%)\n₹0\nCGST + SGST\nFINANCIAL & TAX BREAKDOWN\nAUDIT\nGross Food & Beverage Sales:\n₹0\nDiscounts Granted:\n- ₹0\nCGST:\n₹0\nSGST:\n₹0\nTotal Tax Collected:\n₹0\nTotal Collected (incl. GST):\n₹0\nSETTLEMENT MIX & TENDER ALLOCATION\n100% RECONCILED\nCash at Counter:\n₹0\nUPI / Bharat QR:\n₹0\nCredit / Debit Cards:\n₹0\nSplit Tender Payments:\n₹0\nDigital Wallets / Other:\n₹0\nTotal Payment Reconciled:\n₹0\nTOP SELLING DISHES & MENU VELOCITY\n0 items ranked\n#\tDish Name\tCategory\tQty Sold\tAvg Rate\tGross Revenue\nNo completed dish sales recorded for this business period.\nUI Audit Restaurant A • JAMANVAAR POS Operational Audit System\nFreshly Prepared • Zero Preservatives • Pure Heritage Taste\nToday Sales:\n₹0\nOrders:\n0\nLocal Engine Active",
+  "headings": [
+    "POS Operational Reports",
+    "UI AUDIT RESTAURANT A",
+    "POS DAILY SALES REPORT",
+    "TOP SELLING DISHES & MENU VELOCITY"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false,
+      "width": 52,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false,
+      "width": 150,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "DAY OPEN•No Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false,
+      "width": 32,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "U",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false,
+      "width": 60,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 193,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Live Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Kitchen & KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Fewer tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "JAMAN AI AssistantAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Preview Report",
+      "aria": null,
+      "title": "Preview full report document",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Print Report",
+      "aria": null,
+      "title": "Send report directly to configured POS report printer",
+      "disabled": false,
+      "width": 118,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Download PDF",
+      "aria": null,
+      "title": "Download direct PDF file without browser print dialogs",
+      "disabled": false,
+      "width": 137,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 133,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 60,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 85,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 64,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 73,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 77,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Custom Date",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 102,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false,
+      "width": 90,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false,
+      "width": 93,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Tables:0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Pending KOT:0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5315/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

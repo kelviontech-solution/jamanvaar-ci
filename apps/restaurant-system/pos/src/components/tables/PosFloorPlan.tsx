@@ -227,7 +227,6 @@ export const PosFloorPlan: React.FC = () => {
       }
       return true;
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, selectedZone, statusFilter]);
 
   const stats = useMemo(() => computeStats(tables), [tables]);

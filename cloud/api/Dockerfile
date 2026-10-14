@@ -17,6 +17,8 @@ COPY cloud/api/package.json ./cloud/api/package.json
 # Tests, compilers, frontend packages and TS source stay out of the runtime image.
 RUN npm ci --workspace=@jamanvaar/cloud-api --include-workspace-root=false --omit=dev --ignore-scripts
 COPY --from=builder /repo/cloud/api/dist ./cloud/api/dist
+COPY tooling/qa/receipt-pdf-smoke.cjs ./tooling/qa/receipt-pdf-smoke.cjs
+RUN node tooling/qa/receipt-pdf-smoke.cjs
 COPY --from=builder /repo/cloud/api/prisma/schema.prisma ./cloud/api/prisma/schema.prisma
 COPY --from=builder /repo/cloud/api/prisma/migrations ./cloud/api/prisma/migrations
 COPY --from=builder /repo/node_modules/.prisma ./node_modules/.prisma

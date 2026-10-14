@@ -3,9 +3,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { refundBillingOrder, voidBillingOrder } from './billing/billingCommands';
 import { Order, OrderStatus } from '@jamanvaar/types';
 import { formatDate, formatINR, formatTime, formatSplitTax, restaurantGstRate, taxLabels } from '@jamanvaar/utils';
-import { Modal, Button, printThermalReceipt } from '@jamanvaar/ui';
+import { Modal, Button, printThermalReceipt, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+import { signedDeviceFetch } from '../cloud/cloudClient';
+const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => { const response = await signedDeviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`); if (!response.ok) throw new Error('Order activity unavailable'); return response.json(); };
 // The restaurant's configured GST (Customisations & Tax), read when shown.
 const gstLabels = () => taxLabels(restaurantGstRate(db.taxGroups));
 import { Printer, CheckCircle, Clock, Check } from 'lucide-react';
@@ -218,56 +220,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Order Service Timeline */}
-        <div className="p-4 bg-jaman-cream border border-jaman-border rounded-2xl space-y-2.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-jaman-navy flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-            <span>ORDER SERVICE TIMELINE</span>
-          </span>
-
-          <div className="space-y-2 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 text-xs">
-            <div className="flex items-start gap-3 relative pl-6">
-              <div className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                <Check className="w-3 h-3" />
-              </div>
-              <div className="flex-1 flex items-center justify-between">
-                <div>
-                  <strong className="text-jaman-navy block">Order Created ({order.orderType})</strong>
-                  <span className="text-[11px] text-slate-500">Token #{order.tokenNumber} initialized</span>
-                </div>
-                <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 relative pl-6">
-              <div className="w-4 h-4 rounded-full bg-brand text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                <Check className="w-3 h-3" />
-              </div>
-              <div className="flex-1 flex items-center justify-between">
-                <div>
-                  <strong className="text-jaman-navy block">KOT Dispatched to Kitchen Stations</strong>
-                  <span className="text-[11px] text-slate-500">Tandoor & Main Kitchen active</span>
-                </div>
-                <span className="font-mono text-slate-500 font-bold">
-                  {formatTime(new Date(new Date(order.createdAt).getTime() + 60000))}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 relative pl-6">
-              <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[8px] absolute left-0 top-0.5">
-                <Check className="w-3 h-3" />
-              </div>
-              <div className="flex-1 flex items-center justify-between">
-                <div>
-                  <strong className="text-jaman-navy block">Payment Received & Bill Settled</strong>
-                  <span className="text-[11px] text-slate-500">{order.paymentMethod} verified</span>
-                </div>
-                <span className="font-mono text-slate-500 font-bold">{formatTime(order.createdAt)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <OrderActivityView order={order} loadActivity={loadOrderActivity} />
 
         {/* Status Actions */}
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">

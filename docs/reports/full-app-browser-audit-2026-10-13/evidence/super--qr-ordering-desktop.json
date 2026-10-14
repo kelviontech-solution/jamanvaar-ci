@@ -1,0 +1,266 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nQR Ordering Suite Control\nSAAS FLEET\n\nPlatform control for QR table ordering entitlements, quotas and fleet health. Usage figures are reported by each restaurant's POS; the platform never estimates them.\n\nRefresh fleet\nRestaurants\n2\n2 active · 0 disabled or unentitled\nReporting usage\n2\n0 have never reported QR usage\nActive QR tables\n0\n2 of 2 restaurants reporting\nQR orders today\n0\n2 of 2 restaurants reporting\nQR revenue today\n₹0\n2 of 2 restaurants reporting\nApproaching quota\n0\nCandidates for a table quota or plan upgrade\nReading this page: a — means the restaurant has not reported that measurement yet, not that it is zero. Active tables, orders, revenue and last activity appear once the restaurant's POS reports QR usage to the platform. Entitlements and quotas below are platform configuration and are always accurate.\nAll\n2\nActive\n2\nDisabled\n0\nLimit reached\n0\nNot entitled\n0\nAll plan tiers\nPRO\nQR\nAny usage state\nReporting usage\nNo usage reported\n2 of 2 restaurants\nRESTAURANT & BRANCH\tPLAN\tENTITLEMENT\tACTIVE TABLES\tREPORTED TODAY\tSTATUS\tLAST ACTIVITY\tACTIONS\n\nU\nUI Audit Restaurant A\nUI Audit Restaurant A — Main Branch\n+1\n·\nAhmedabad\n\t\nJAMANVAAR PRO\nPRO\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nU\nUI Audit Restaurant B\nUI Audit Restaurant B — Main Branch\n+1\n·\nAhmedabad\n\t\nJAMANVAAR QR\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage",
+  "headings": [
+    "QR Ordering Suite Control"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Refresh fleet",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Active\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 93,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Disabled\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 109,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Limit reached\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Not entitled\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 128,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "UI Audit Restaurant A",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "UI Audit Restaurant B",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search restaurant, branch, city or plan..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Filter by plan tier",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Filter by usage reporting",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

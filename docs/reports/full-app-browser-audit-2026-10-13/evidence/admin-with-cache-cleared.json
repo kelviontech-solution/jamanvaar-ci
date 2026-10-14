@@ -1,0 +1,31 @@
+{
+  "text": "JAMANVAAR RESTAURANT\n\nYour cloud session has expired. Sign in again to restore your restaurant modules.\n\nSign in again\nLog out",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "Sign in again",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 366,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0
+}

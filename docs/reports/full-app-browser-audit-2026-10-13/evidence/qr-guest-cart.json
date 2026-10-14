@@ -1,0 +1,85 @@
+{
+  "text": "UI Audit Restaurant A\nUI Audit Restaurant A — Main Branch · Table UI01\nTable UI01\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Menu\nYOUR PICKS, PREPARED FRESH\nYour cart\nUI Audit Dish 003\nChecking price...\nEdit choices / note\n−\n1\n+\nRemove\nCheckout\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Your cart"
+  ],
+  "buttons": [
+    {
+      "text": "← Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Edit choices / note",
+      "aria": "Edit UI Audit Dish 003",
+      "title": "",
+      "disabled": false,
+      "width": 113,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "title": "",
+      "disabled": true,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 47,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Checkout",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 316,
+      "height": 53,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 105
+    },
+    {
+      "alt": "UI Audit Dish 003",
+      "src": "/q/assets/menu/common/menu-placeholder-v2.svg",
+      "loaded": true,
+      "width": 60
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

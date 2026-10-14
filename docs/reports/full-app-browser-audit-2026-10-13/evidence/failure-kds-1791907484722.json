@@ -1,0 +1,198 @@
+{
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nJAMAN AI\nAll stations\nMain Kitchen\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice\nLIVE\n|\n09:34:44 PM\n1\nCooking\n0\nReady\nSwitch Station\nDisplay & station timing\nACTIVE\n1\nCOOKING\n1\nREADY\n0\nSERVED\n1\nEXPO (PASS)\n1\nPriority, then oldest\nOldest first\nTO COOK\n1×\nUI Audit Dish 003\n#QR-1\nKOT-QR-1\nTable UI01\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n00:02\n1×\nUI Audit Dish 003\n#8f-r1\nALL DISHES READY\nReprint opened for #QR-1. Choose your kitchen printer.\n×",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Kitchen Intelligence",
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All stations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 294,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false,
+      "width": 127,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "ACTIVE\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 145,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "COOKING\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 165,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "READY\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "SERVED\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EXPO (PASS)\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 187,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Reprint KOT KOT-QR-1",
+      "title": "Reprint this ticket without creating another order",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "1×\nUI Audit Dish 003",
+      "aria": "1 UI Audit Dish 003: cooking, tap when ready",
+      "title": "",
+      "disabled": false,
+      "width": 293,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "ALL DISHES READY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 302,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Dismiss",
+      "title": "",
+      "disabled": false,
+      "width": 10,
+      "height": 20,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen screen layout",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "minimumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "fallbackMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "maximumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search kitchen tickets",
+      "placeholder": "Search token, table, KOT or dish…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen ticket ordering",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Priority for token QR-1",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5319/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 83
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

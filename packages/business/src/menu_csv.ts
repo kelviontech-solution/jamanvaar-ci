@@ -4,7 +4,7 @@ export interface CsvIssue { row: number; message: string }
 export interface MenuCsvRow { row: number; sku: string; name: string; description: string; category: string; subcategory?: string; price: number; dietaryType: MenuItem['dietaryType']; spiceLevel: MenuItem['spiceLevel']; imageUrl?: string; taxRate?: number; isAvailable: boolean; sortOrder?: number; tags: string[]; variantName?: string; variantPrice?: number; addonName?: string; addonPrice?: number; existingItemId?: string }
 export interface MenuCsvPreview { tenantId: string | null; rowsDetected: number; rows: MenuCsvRow[]; errors: CsvIssue[]; warnings: CsvIssue[] }
 export const MENU_CSV_SAMPLE = '\uFEFFsku,name,description,category,subcategory,price,food_type,image_url,tax_rate,is_available,display_order,tags,variant_name,variant_price,addon_name,addon_price\r\nPIZ001,Margherita Pizza,"Classic tomato, basil and mozzarella",Pizzas,Veg Pizza,149,VEG,,5,true,1,bestseller,Regular,149,Extra Cheese,40\r\nGUJ001,ખમણ,"નરમ ખમણ, ચટણી સાથે",Farsan,,80,VEG,,5,true,2,Gujarati,,,,\r\n';
-const alias: Record<string, string> = { itemname: 'name', dietarytype: 'foodtype', imageurl: 'imageurl', spicylevel: 'spicelevel' };
+const alias: Record<string, string> = { gstrate: 'taxrate', itemname: 'name', dietarytype: 'foodtype', imageurl: 'imageurl', spicylevel: 'spicelevel' };
 const headerKey = (s: string) => { const n = s.toLowerCase().replace(/[\s_-]/g, ''); return alias[n] || n; };
 function parseCsv(text: string): Array<{ row: number; fields: string[] }> {
   const records: Array<{ row: number; fields: string[] }> = []; let fields: string[] = []; let value = ''; let quoted = false; let closed = false; let line = 1; let row = 1;
@@ -39,6 +39,8 @@ export function previewMenuCsv(text: string): MenuCsvPreview {
   if (!records.length) { preview.errors.push({ row: 1, message: 'The file is empty.' }); return preview; }
   const headers = records.shift()!.fields.map(headerKey);
   if (new Set(headers).size !== headers.length || !['name', 'category', 'price'].every(key => headers.includes(key))) { preview.errors.push({ row: 1, message: 'Invalid column headers. Required: name (or Item Name), category, price. Download the CSV template.' }); return preview; }
+  const supported = new Set(MENU_CSV_SAMPLE.replace(/^\uFEFF/, '').split('\r\n')[0].split(',').map(headerKey).concat('spicelevel'));
+  headers.forEach(key => { if (!supported.has(key)) preview.warnings.push({ row: 1, message: `Unknown column '${key}' will be ignored. Check the CSV template before importing.` }); });
   preview.rowsDetected = records.length;
   if (records.length > 5000) { preview.errors.push({ row: 1, message: 'Import at most 5,000 rows per file.' }); return preview; }
   const seen = new Map<string, MenuCsvRow>();

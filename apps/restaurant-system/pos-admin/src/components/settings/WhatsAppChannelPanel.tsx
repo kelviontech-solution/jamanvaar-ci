@@ -55,7 +55,6 @@ export const WhatsAppChannelPanel: React.FC<{ showToast: (msg: string) => void }
 
   useEffect(() => {
     if (connected && loggedIn) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, loggedIn]);
 
   if (!connected) return null;

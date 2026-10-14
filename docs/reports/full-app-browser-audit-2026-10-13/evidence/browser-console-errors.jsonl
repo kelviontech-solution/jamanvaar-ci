@@ -1,0 +1,89 @@
+{"app":"super","role":"super","message":"Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML spec.","page":"http://localhost:5380/restaurants/bf3838b0-2872-4dc9-924b-e6768f041703"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"qr","role":"qr-online","message":"Failed to load resource: the server responded with a status of 400 (Bad Request)","page":"http://localhost:5390/q/XZM6eWfEN7LzBQzRsRbW6exOIbeyd0Ik#checkout"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/staff"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/staff"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/staff"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/staff"}
+{"app":"kiosk","role":"kiosk","message":"Failed to load resource: the server responded with a status of 500 (Internal Server Error)","page":"http://localhost:5314/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/kitchen"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/inventory?returnTo=purchasing"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/kiosk-admin/appearance"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}

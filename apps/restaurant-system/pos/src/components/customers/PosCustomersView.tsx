@@ -11,7 +11,7 @@ export const PosCustomersView: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newPoints, setNewPoints] = useState(50);
+  const [newPoints, setNewPoints] = useState(0);
 
   const accounts = db.customerAccounts;
 
@@ -80,6 +80,12 @@ export const PosCustomersView: React.FC = () => {
         </div>
       </div>
 
+      {filteredAccounts.length === 0 && <div className="rounded-2xl border border-jaman-border bg-white p-6 mb-4 text-center space-y-3">
+        <h2 className="text-lg font-bold text-jaman-navy">{search ? 'No matching customers' : 'Welcome your first regular guest'}</h2>
+        <p className="text-sm text-slate-500">{search ? 'Try another name or phone number.' : 'Create a customer, then attach them to an order. Available loyalty rewards appear at checkout when your restaurant enables the program.'}</p>
+        <button className="rounded-xl bg-jaman-saffron text-white px-4 py-3 font-bold" onClick={() => search ? setSearch('') : setShowCreateModal(true)}>{search ? 'Clear search' : 'Create customer'}</button>
+        <button className="rounded-xl border px-4 py-3 ml-2" onClick={() => {setSelectedCustomer(null); setActiveTab('MENU');}}>Continue as guest</button>
+      </div>}
       {/* Customers Grid */}
       <div className="flex-1 overflow-y-auto pr-1">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -134,7 +140,7 @@ export const PosCustomersView: React.FC = () => {
           <div className="bg-white border border-jaman-border rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-jaman-navy">Register New Customer</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600">
+              <button aria-label="Close customer registration" onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-4 h-4" />
               </button>
             </div>

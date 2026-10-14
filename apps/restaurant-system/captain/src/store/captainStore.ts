@@ -1283,7 +1283,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
           message: m.customNote || m.presetText,
           tableNumber: m.tableNumber,
           timestamp: m.createdAt,
-          isRead: false
+          isRead: m.status === 'ACCEPTED' || m.status === 'RESOLVED'
         })),
         ...s.notifications
       ]
@@ -1329,7 +1329,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   acknowledgeCustomerRequest: (id) => {
-    if (id.startsWith('svc-svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'ACCEPTED'); void pushServiceMessages(); }
+    if (id.startsWith('svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'ACCEPTED'); void pushServiceMessages(); }
     set((s) => ({
       customerRequests: s.customerRequests.map((cr) =>
         cr.id === id ? { ...cr, isAcknowledged: true } : cr
@@ -1340,7 +1340,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
   },
 
   resolveCustomerRequest: (id) => {
-    if (id.startsWith('svc-svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'RESOLVED'); void pushServiceMessages(); }
+    if (id.startsWith('svc-') && ServiceMessages.getRequest(id.slice(4))) { ServiceMessages.acknowledgeRequest(id.slice(4), 'RESOLVED'); void pushServiceMessages(); }
     set((s) => ({
       customerRequests: s.customerRequests.map((cr) =>
         cr.id === id ? { ...cr, isResolved: true } : cr

@@ -1,0 +1,1 @@
+const q=require('./qa.cjs');(async()=>{const p=await q.open('admin','fresh-diagnostic');p.on('console',m=>console.log('CONSOLE',q.scrub(m.text()).slice(0,250)));p.on('requestfailed',r=>console.log('RESOURCE',r.url(),r.failure()));console.log('FRESH',JSON.stringify(await q.snap(p,'fresh-admin-diagnostic')));await q.close();})().catch(e=>console.log(e.message));

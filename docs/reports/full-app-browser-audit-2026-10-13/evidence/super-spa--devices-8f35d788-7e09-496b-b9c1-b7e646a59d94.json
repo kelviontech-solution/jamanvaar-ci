@@ -1,0 +1,161 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nBack to Registered Devices\nUI Audit POS_ADMIN\nACTIVE\nONLINE\n\nTerminal ID: 8f35d788-7e09-496b-b9c1-b7e646a59d94 • Organization: UI Audit Restaurant A • Branch: UI Audit Restaurant A — Main Branch\n\nRequest Sync\nLock Device\nDispatch Command\nRemote Wipe\nHardware & Operational Identity\nRole / Type\nPOS_ADMIN\nApp Version\n1.0.7\nIP Address\n127.0.0.1\nRegistered On\n10/13/2026\nActivated At\n10/13/2026, 8:41:53 PM\nConnectivity & Sync Telemetry\nLast Heartbeat\n9:36:23 PM\nLast Successful Sync\nUp to date\nPending Sync Queue\n0 items\nLast Backup Created\nNone reported\nReported Sync Status\nOK\nRemote Command History (0)\nNo remote commands have been dispatched to this terminal yet.",
+  "headings": [
+    "UI Audit POS_ADMIN",
+    "Hardware & Operational Identity",
+    "Connectivity & Sync Telemetry",
+    "Remote Command History (0)"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Request Sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 148,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Lock Device",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Dispatch Command",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 187,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Remote Wipe",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 147,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

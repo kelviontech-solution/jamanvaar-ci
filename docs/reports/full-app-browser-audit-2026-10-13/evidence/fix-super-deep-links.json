@@ -1,0 +1,1058 @@
+[
+  {
+    "prefix": "/",
+    "route": "/",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/dashboard",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/dashboard",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurant-health",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurant-health",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/announcements",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/announcements",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/status-history",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/status-history",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/margins",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/margins",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants/onboard",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants/onboard",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/restaurants/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/owners",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/owners",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/owners/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/owners/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/branches",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/branches",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/branches/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/branches/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/saas-management",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/saas-management",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/plans",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/plans",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/plans/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/plans/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/qr-ordering",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/qr-ordering",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/whatsapp-ordering",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/whatsapp-ordering",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/ai-assistant",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/ai-assistant",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/catalog",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/catalog",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/subscriptions",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/subscriptions",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/billing",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/billing",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/entitlements",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/entitlements",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/feature-catalog",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/feature-catalog",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/reports",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/reports",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/applications",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/applications",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/activation-keys",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/activation-keys",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/payment-connections",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/payment-connections",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/platform-payments",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/platform-payments",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/payouts",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/payouts",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/devices",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/devices",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/devices/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/devices/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/sync-monitor",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/sync-monitor",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/backups",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/backups",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/sandboxes",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/sandboxes",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/offline-policy",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/offline-policy",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/team",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/team",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/support",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/support",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/tickets",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/tickets",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/notifications",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/notifications",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/audit-logs",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/audit-logs",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/system-health",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/system-health",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/settings/platform",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/settings/platform",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/profile",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/",
+    "route": "/profile",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/dashboard",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/dashboard",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurant-health",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurant-health",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/announcements",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/announcements",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/status-history",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/status-history",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/margins",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/margins",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants/onboard",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants/onboard",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/restaurants/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/owners",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/owners",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/owners/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/owners/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/branches",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/branches",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/branches/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/branches/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/saas-management",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/saas-management",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/plans",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/plans",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/plans/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/plans/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/qr-ordering",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/qr-ordering",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/whatsapp-ordering",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/whatsapp-ordering",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/ai-assistant",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/ai-assistant",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/catalog",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/catalog",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/subscriptions",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/subscriptions",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/billing",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/billing",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/entitlements",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/entitlements",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/feature-catalog",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/feature-catalog",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/reports",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/reports",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/applications",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/applications",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/activation-keys",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/activation-keys",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/payment-connections",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/payment-connections",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/platform-payments",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/platform-payments",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/payouts",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/payouts",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/devices",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/devices",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/devices/example",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/devices/example",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/sync-monitor",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/sync-monitor",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/backups",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/backups",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/sandboxes",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/sandboxes",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/offline-policy",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/offline-policy",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/team",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/team",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/support",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/support",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/tickets",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/tickets",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/notifications",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/notifications",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/audit-logs",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/audit-logs",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/system-health",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/system-health",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/settings/platform",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/settings/platform",
+    "action": "refresh",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/profile",
+    "action": "direct",
+    "result": "PASS"
+  },
+  {
+    "prefix": "/admin",
+    "route": "/profile",
+    "action": "refresh",
+    "result": "PASS"
+  }
+]

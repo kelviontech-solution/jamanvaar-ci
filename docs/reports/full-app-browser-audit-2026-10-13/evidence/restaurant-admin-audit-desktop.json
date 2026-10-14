@@ -1,0 +1,494 @@
+{
+  "text": "UI Audit Restaurant A\nRESTAURANT ADMIN\nAhmedabad Flagship Store\nAPP\nRestaurant Admin\nKiosk Admin\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nWorkspace\nChoose branch\nAll restaurant · overview\nUI Audit Restaurant A — Main Branch · MAIN\nUI Audit Second Branch A · UIA2\nOrders, tables, inventory and devices belong to this branch.\nTODAY\nToday\nOrders\nBilling / Invoices\nPayments & Split\nRegister shifts & cash\nKITCHEN\nKitchen progress\nKitchen tickets\nMENU\nMenu & Categories\nCustomisations & Tax\nOffers & Coupons\nInventory & Recipes\nPurchasing & Stock Control\nTABLES\nFloor / Tables\nReservations\nQR Table Ordering\nON\nGUESTS & TEAM\nCustomers & loyalty\nTeam & permissions\nREPORTS\nReports & Analytics\nActivity history\nDEVICES\nPrinters & Devices\nConnections & sync\nApp Downloads\nSETUP\nReceipt & E-Bill\nRestaurant Settings\nSubscription Plans\nBackup & Restore\nHelp & Support\nSecurity & Operational Audit Trail\nIMMUTABLE LOG\n\nImmutable log of all user actions, price adjustments, voids, discounts, and inventory movements.\n\n6 Events Recorded\nAudit Trail Events (6)\nAll Categories\nSTAFF\nSETTINGS\nMENU\nTIMESTAMP\tOPERATOR\tACTION\tCATEGORY\tOPERATIONAL DETAILS\n09:04 pm\t@Manager\tSTAFF_CREATED\tSTAFF\tCreated staff member UI Manager (@uimanager, Role: role-manager)\n09:04 pm\t@Manager\tSTAFF_CREATED\tSTAFF\tCreated staff member UI Kitchen (@uikitchen, Role: role-chef)\n09:04 pm\t@Manager\tSTAFF_CREATED\tSTAFF\tCreated staff member UI Captain (@uicaptain, Role: role-captain)\n09:04 pm\t@Manager\tSTAFF_CREATED\tSTAFF\tCreated staff member UI Cashier (@uicashier, Role: role-cashier)\n09:04 pm\t@Manager\tTABLE_CREATED\tSETTINGS\tCreated table T-UI01 (4 Pax, Zone: UI Dining Hall)\n09:04 pm\t@Manager\tMENU_CSV_IMPORTED\tMENU\t100 imported, 0 existing skipped, 0 invalid rows omitted.\nJAMAN AI\nACTIVE\nKELVIONTECH ENTERPRISE\nLocal Engine Active\nOFFLINE-FIRST INDIAN RESTAURANT SYSTEM\nv2.0 • POWERED BY KELVIONTECH\n\nYOUR RESTAURANT WORKSPACE\n\nRESTAURANT ADMIN\nCore Engine Ready\n•\nDatabase Initialized\n•\nLocal-First Mode",
+  "headings": [
+    "Security & Operational Audit Trail"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Ahmedabad Flagship Store",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 112,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 126,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "TODAY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "KITCHEN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "MENU",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "TABLES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "GUESTS & TEAM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Team & permissions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Activity history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "DEVICES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Connections & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "App Downloads",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 190,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Switch application",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search user, action, details..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    },
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 380
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

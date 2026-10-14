@@ -84,7 +84,7 @@ export function AppDownloadsModule() {
                         hasRelease ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                       }`}
                     >
-                      {app.currentVersion ? `v${app.currentVersion}` : 'Not released'}
+                      {hasRelease && app.currentVersion ? `v${app.currentVersion}` : 'No published release'}
                     </span>
                   )}
                 </div>
@@ -147,7 +147,7 @@ export function AppDownloadsModule() {
                     className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 text-slate-400 font-bold text-sm py-2.5 cursor-not-allowed"
                   >
                     <Clock className="w-4 h-4" />
-                    Not yet available
+                    No published release
                   </button>
                 )}
 

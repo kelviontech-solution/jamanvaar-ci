@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { DeviceSyncThrottle } from '../../common/throttle';
 import { Device } from '@prisma/client';
 import { OrderSyncService } from './order-sync.service';
@@ -36,6 +36,11 @@ export class OrderSyncController {
       throw new BadRequestException('afterSeq must be a non-negative integer');
     }
     return this.orderSync.catchUp(device, since, parsed);
+  }
+
+  @Get(':externalId/activity')
+  activity(@Param('externalId') externalId: string, @CurrentDevice() device: Device) {
+    return this.orderSync.activity(device, externalId);
   }
 }
 

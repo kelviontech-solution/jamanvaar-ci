@@ -1,0 +1,365 @@
+{
+  "text": "POS TERMINAL\nUI Audit Restaurant A\n\nUI Audit Restaurant A\n•\nde318c70-1a23-446d-a44b-485ec7efbb1b\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nU\nUI Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nAll pages\nCATEGORIES\nAll Menu\n100\nUI CATEGORY 1\n10\nUI CATEGORY 2\n10\nUI CATEGORY 3\n10\nUI CATEGORY 4\n10\nUI CATEGORY 5\n10\nUI CATEGORY 6\n10\nUI CATEGORY 7\n10\nUI CATEGORY 8\n10\nUI CATEGORY 9\n10\nUI CATEGORY 10\n10\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nSelect a table\n\nPick the table first, then add dishes. Running tables continue their open order.\n\nNot dine-in?\nTakeaway\nDelivery\nToken\nFull floor plan\nAll zones\nUI Dining Hall\nT-UI01\n4 seats\nFREE\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n0% (0/1)\nPending KOT:\n0\nLocal Engine Active",
+  "headings": [
+    "Select a table"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false,
+      "width": 136,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false,
+      "width": 128,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false,
+      "width": 187,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false,
+      "width": 95,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "U\nUI Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false,
+      "width": 124,
+      "height": 45,
+      "visible": true
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "All pages",
+      "aria": null,
+      "title": "Back to the main menu",
+      "disabled": false,
+      "width": 202,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "All Menu\n100",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 1\n10",
+      "aria": null,
+      "title": "UI Category 1",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 2\n10",
+      "aria": null,
+      "title": "UI Category 2",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 3\n10",
+      "aria": null,
+      "title": "UI Category 3",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 4\n10",
+      "aria": null,
+      "title": "UI Category 4",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 5\n10",
+      "aria": null,
+      "title": "UI Category 5",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 6\n10",
+      "aria": null,
+      "title": "UI Category 6",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 7\n10",
+      "aria": null,
+      "title": "UI Category 7",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 8\n10",
+      "aria": null,
+      "title": "UI Category 8",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 9\n10",
+      "aria": null,
+      "title": "UI Category 9",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "UI CATEGORY 10\n10",
+      "aria": null,
+      "title": "UI Category 10",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false,
+      "width": 202,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Takeaway",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Delivery",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 96,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Token",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 83,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Full floor plan",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 102,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "All zones",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "UI Dining Hall",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "T-UI01\n4 seats\nFREE",
+      "aria": "Table UI01, UI Dining Hall, 4 seats, Free",
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 120,
+      "visible": true
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false,
+      "width": 129,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false,
+      "width": 93,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false,
+      "width": 135,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Pending KOT:\n0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false,
+      "width": 116,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5315/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

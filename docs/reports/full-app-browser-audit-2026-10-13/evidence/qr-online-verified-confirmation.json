@@ -1,0 +1,52 @@
+{
+  "text": "UI Audit Restaurant A\nUI Audit Restaurant A — Main Branch · Table UI01\nTable UI01\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\nOrder confirmed\n\nQR-4\n\nReference JQ-JZCRZEDE7M5Q3JV9BEHFWXP7RA · Table UI01 · ₹103\n\nUsually ready in about 20 minutes.\n\nOrder received\nPreparing\nReady\nCompleted\n\nPayment received\n\nRefresh order & payment\n\nCollected: ₹103 · Remaining: ₹0\n\nOrder details / receipt\nOrder more\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Order confirmed"
+  ],
+  "buttons": [
+    {
+      "text": "Refresh order & payment",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Order more",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 53,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 105
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

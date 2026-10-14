@@ -1,0 +1,16 @@
+# Normalize line endings on checkin; let Git render them as LF in the repo and as the
+# platform's native ending on checkout. Fixes the "LF will be replaced by CRLF" warnings
+# that showed up on every `git add` from editors/OSes mixing endings with no enforced rule.
+* text=auto eol=lf
+
+# Binary assets: never touch line endings, never run through a text diff.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary

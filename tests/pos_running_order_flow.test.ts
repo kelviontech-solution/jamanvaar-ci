@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db } from '@jamanvaar/database';
+import { db, ShiftRepository } from '@jamanvaar/database';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 
 /**
@@ -15,6 +15,7 @@ import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 describe('POS running order — Send KOT then Pay (BUG-032)', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     usePosStore.getState().clearCart();
     usePosStore.setState({ selectedTable: null, orderType: 'TAKEAWAY' });
   });

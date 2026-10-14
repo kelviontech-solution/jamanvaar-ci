@@ -1,0 +1,1808 @@
+{
+  "text": "UI Audit Restaurant A\nKIOSK ADMIN\nAhmedabad Flagship Store\nAPP\nRestaurant Admin\nKiosk Admin\nCtrl+K\nAssistant\nLogout\nWorkspace\nChoose branch\nAll restaurant · overview\nUI Audit Restaurant A — Main Branch · MAIN\nUI Audit Second Branch A · UIA2\nOrders, tables, inventory and devices belong to this branch.\nKIOSK OPERATIONS\nDashboard\nKiosk Terminals\nOrders\nLive Orders / KDS\nFloor / Tables\nCUSTOMER EXPERIENCE\nMenu & Categories\nMenu Templates\nCustomisations & Tax\nKiosk Welcome Screen\nKiosk Appearance & Content\nKiosk Combos & Deals\nOffers & Coupons\nPAYMENTS & SERVICE\nPayments & Payouts\nReceipt & E-Bill\nPrinters & Devices\nCustomer Feedback\nStaff & Roles (RBAC)\nReports & Analytics\nSYSTEM\nKiosk Settings\nSync & Devices\nSubscription Plans\nAudit Trail Logs\nBackup & Restore\nHelp & Support\nApp Downloads\nKiosk Appearance & Content\n\nCustomize this branch's customer kiosk. Menu images, prices, availability and modifiers are managed in Menu & Categories and Customisations & Tax. Receipt content and layout are managed in Receipt & E-Bill.\n\nBranding\n\nThe logo and accent color shown on this kiosk's screens.\n\nRestaurant logo URL\nUpload kiosk logo\n\nPNG, JPEG or WebP, under 2MB.\n\nAccent color\nPreview\nNo logo set\nIdle & Session Timing\n\nWhen an untouched kiosk warns the guest, and how long before it resets to the welcome screen.\n\nIdle warning after (seconds)\n\n5–3600 seconds of no touch before the warning appears.\n\nIdle reset countdown (seconds)\n\n3–120 seconds the warning counts down before the session resets.\n\nChoose backgrounds, preview the welcome screen and edit its message in Kiosk Welcome Screen.\n\nCustomer Screen Wording by Language\n\nEdit welcome, menu, cart, checkout, payment, confirmation and help labels. Empty values use the default wording. Values containing placeholders should retain those placeholders.\n\nEnglish\nHindi\nGujarati\nMarathi\nTamil\nTelugu\nKannada\nShowing 228 of 228 labels\n0 customized in English\nWelcome to JAMANVAAR\nwelcome\nWelcome to\nwelcomeLine1\n{{name}}\nwelcomeLine2\nAuthentic Indian Heritage Flavors • Freshly Prepared\nheritageBadge\nAuthentic Flavors, Seamless Dining\ntagline\nStart Order\nstartOrder\nTouch screen to begin your order\ntouchToBegin\nDine-In\ndineIn\nEnjoy your meal freshly served at your table\ndineInDesc\nTakeaway\ntakeaway\nPick up fresh packed food at Counter 1\ntakeawayDesc\nDelivery\ndelivery\nToken / QR\ntokenQr\nHow would you like to enjoy your meal?\nselectOrderType\nSelect whether you are dining in our restaurant or packing your feast for takeaway.\nselectOrderTypeSub\n👑 1-Tap Combo Add\nbannerBiryaniTag\nRoyal Veg Biryani Feast\nbannerBiryaniTitle\nFree Shahi Gulab Jamun & Raita • Save ₹111\nbannerBiryaniSub\n+ Add Combo @ ₹449 ➔\nbannerBiryaniCta\n✨ Chef Signature\nbannerThaliTag\nGujarati Heritage Thali\nbannerThaliTitle\n12 Authentic Items Special Gujarati Feast\nbannerThaliSub\n+ Add Thali @ ₹280 ➔\nbannerThaliCta\n☕ Cold Beverage\nbannerCoffeeTag\nCold Coffee with Ice Cream\nbannerCoffeeTitle\nVelvety Ice Cream Scoop • 100% Arabica\nbannerCoffeeSub\n+ Add Coffee @ ₹120 ➔\nbannerCoffeeCta\nChef's Special Combo Meals\nchefSpecialCombos\nSave up to\nsaveUpTo\nPure Veg Combo\npureVegCombo\n+ Add Combo\naddCombo\nSelect Your Table\nselectTable\nGuests\nguests\nTable\ntable\nSearch dish (e.g. Paneer, Biryani, Cold Coffee...)\nsearchDishPlaceholder\nAll Menu\nallMenu\nPure Veg\npureVeg\nNon-Veg\nnonVeg\nJain\njain\nPopular\npopular\nNew\nnew\nChef Special\nchefSpecial\nSpicy\nspicy\nMild\nmild\nMedium\nmedium\nADD\nadd\nADDED\nadded\nView Cart\nviewCart\nCart\ncart\nOrder Summary\norderSummary\nClear Cart\nclearCart\nYour cart is empty\nemptyCart\nExplore our delicious menu items and add them to your feast!\nemptyCartSub\nSubtotal\nsubtotal\nDiscount\ndiscount\nCGST\ncgst\nSGST\nsgst\nTax (GST)\ntax\nRound Off\nroundOff\nTotal Payable\ntotalPayable\nProceed to Payment\nproceedToPayment\nAdd More Items\ncontinueShopping\nCustomize\ncustomize\nSelect Options & Customizations\nselectModifiers\nRequired\nrequired\nOptional\noptional\nSpecial Kitchen Instructions\nspecialInstructions\nE.g., Less spicy, no onion/garlic, extra chutney...\nnotesPlaceholder\nApply Coupon\napplyCoupon\nEnter Promo Code\ncouponPlaceholder\nApply\napply\nCoupon Applied Successfully!\ncouponApplied\nInvalid or Expired Coupon Code\ninvalidCoupon\nCall Staff\ncallStaff\nStaff Assistance Requested\nstaffAssistance\nThe counter has been notified and will assist you shortly.\nstaffOnTheWay\nCancel\ncancel\nConfirm\nconfirm\nBack\nback\nChoose Payment Method\npaymentTitle\nUPI QR Payment\nupiQr\nScan & Pay via GPay, PhonePe, Paytm, BHIM\nupiSubtitle\nCard / POS Terminal\ncardTerminal\nInsert, swipe or tap debit/credit card\ncardSubtitle\nCash at Counter\ncashAtCounter\nPay at billing counter when collecting order\ncashSubtitle\nScan QR Code with any UPI App to Pay\nscanQrToPay\nPayment window closes in\npaymentExpiresIn\nVerifying your payment transaction...\nverifyingPayment\nPayment Received Successfully!\npaymentSuccess\nPayment Failed or Timed Out\npaymentFailed\nRetry Payment\nretryPayment\nTry Another Method\nchangePaymentMethod\nOrder Confirmed!\norderConfirmed\nOrder\norderNumber\nTOKEN\ntoken\nEstimated Prep Time\nestimatedWait\nMinutes\nminutes\nTrack Order\ntrackOrder\nPrint Receipt\nprintReceipt\nPlease collect your order at Pickup Counter 1 when your token is displayed.\ncollectAtCounter\nPlace New Order\nnewOrder\nLive Kitchen Tracking\norderStatus\nOrder Received\nstatusConfirmed\nAccepted by Chef\nstatusKitchen\nPreparing in Kitchen\nstatusPreparing\nReady for Pickup / Serving\nstatusReady\nOrder Collected\nstatusCollected\nAre You Still Ordering?\nidleWarningTitle\nFor your security, this session will reset automatically in\nidleWarningText\nseconds\nseconds\nContinue Ordering\nkeepOrdering\nPlease enter a valid 10-digit mobile number.\nvalidationPhoneInvalid\nThat code has expired. Tap Send OTP for a new one.\notpExpired\nToo many wrong attempts. Tap Send OTP for a new code.\notpTooManyAttempts\nIncorrect code. {{count}} attempt(s) left.\notpIncorrectLeft\nIncorrect code. No attempts left — tap Send OTP again.\notpIncorrectNone\nPlease complete the required choices:\nfixCustomization\nHigh Contrast\nhighContrast\nLarge Text\nlargeText\nOffline Mode Active - Orders queued locally\nofflineNotice\nNamaste! How can I help you choose your meal today?\nchatWelcome\nNon-Vegetarian Combo\nnonVegCombo\nWhat should I order?\nchatSuggestionOrder\nShow vegetarian dishes\nchatSuggestionVeg\nShow Jain food\nchatSuggestionJain\nShow today's offers\nchatSuggestionOffers\nHow do I pay?\nchatSuggestionPay\nPts (₹\nscreen_pts__f501d5\nNeed Help?\nscreen_need_help__5c799f\nNetwork:\nscreen_network__760113\nsimulate\nscreen_simulate_b9efe3\nOrder on Phone\nscreen_order_on_phone_a6b0af\nLoyalty Points\nscreen_loyalty_points_d9d154\nLoyalty / Login\nscreen_loyalty_login_eceb65\nChoose your language\nscreen_choose_your_language_8e2d06\nYou can change this anytime from the header\nscreen_you_can_change_this_anytime_from_the_header_d8f222\nTerminal\nscreen_terminal_e0926f\nStaff Mode\nscreen_staff_mode_35c0cd\nTap the table number where you are seated.\nscreen_tap_the_table_number_where_you_are_seated__5e0202\nNo dining tables are set up for this kiosk yet. Continue without a table, or ask staff to add tables.\nscreen_no_dining_tables_are_set_up_for_this_kiosk_yet_continue_5dc39c\nSkip Table Selection (Pick up at counter)\nscreen_skip_table_selection_pick_up_at_counter__b68635\nCombos & Deals\nscreen_combos_deals_e531d6\n🌱 Pure Jain\nscreen__pure_jain_521c29\n· Chef Signature\nscreen__chef_signature_093f51\n· Cold Beverage\nscreen__cold_beverage_f926d2\nSave ₹\nscreen_save__2eaea5\nClear All\nscreen_clear_all_ddceb7\nAdd-ons (Suggested)\nscreen_add_ons_suggested__fa91bb\nAdd\nscreen_add_9fd728\nCoupon Applied:\nscreen_coupon_applied__194992\nRemove\nscreen_remove_c3812f\nApply\nscreen_apply_31e392\nRedeem Loyalty Points\nscreen_redeem_loyalty_points_8591d3\nBalance:\nscreen_balance__e03512\nPts\nscreen_pts_52ee19\nRemove (₹\nscreen_remove__4a816f\nRedeem ₹\nscreen_redeem__324583\nLoyalty Reward Points\nscreen_loyalty_reward_points_fe7dc0\nStaff Manager Discount (10%)\nscreen_staff_manager_discount_10__c08554\nTotal Payable:\nscreen_total_payable__6577c8\nOffline & Online\nscreen_offline_online_99d685\nPayment Session Expired\nscreen_payment_session_expired_4c8564\nThis QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code.\nscreen_this_qr_timed_out_if_you_already_paid_please_wait_a_few_4226ae\nTry Again\nscreen_try_again_df0fe9\nCancel\nscreen_cancel_19766e\nScan with any UPI app to pay\nscreen_scan_with_any_upi_app_to_pay_ca123c\nWaiting for your payment… your token prints automatically once it is received.\nscreen_waiting_for_your_payment_your_token_prints_automaticall_2a6f9b\nPay at Pickup Counter\nscreen_pay_at_pickup_counter_c8a1db\nYou will receive your token now. Please pay at Counter 1.\nscreen_you_will_receive_your_token_now_please_pay_at_counter_1_df2bd4\nConfirm & Get Token\nscreen_confirm_get_token_a40e2d\nPickup at:\nscreen_pickup_at__e0c9b2\nDigital Delivery & E-Bill Options\nscreen_digital_delivery_e_bill_options_91fcfc\nPrint Receipt\nscreen_print_receipt_98bad4\nEmail Bill\nscreen_email_bill_64ee94\nQR Invoice\nscreen_qr_invoice_39afac\nHow was your ordering experience?\nscreen_how_was_your_ordering_experience__ae5150\nSubmit Rating\nscreen_submit_rating_79a8aa\n✓ Feedback recorded. Thank you!\nscreen__feedback_recorded_thank_you__632564\nReceipt\nscreen_receipt_dad5a9\nKitchen Order Ticket\nscreen_kitchen_order_ticket_a68e9c\n(KOT)\nscreen__kot__58647b\nLive updates from JAMANVAAR Kitchen for Token\nscreen_live_updates_from_jamanvaar_kitchen_for_token_e65167\nOrder Items:\nscreen_order_items__cc32cc\nx\nscreen_x_2d7116\nEnter your email address to receive your official JAMANVAAR tax invoice as a PDF.\nscreen_enter_your_email_address_to_receive_your_official_jaman_350fe2\nEmail Address\nscreen_email_address_09bf25\nEmail My Bill\nscreen_email_my_bill_dd97a2\nAdd to Cart •\nscreen_add_to_cart__7aa3dd\nIncluded\nscreen_included_ba829a\nJAMAN AI\nscreen_jaman_ai_8a6f7b\nLive AI\nscreen_live_ai_a0e6e8\nComplete conversational food ordering & dietary guide\nscreen_complete_conversational_food_ordering_dietary_guide_22ba6d\n★ Popular\nscreen__popular_74fe96\n+ Add to Cart\nscreen__add_to_cart_927657\nDeal\nscreen_deal_ae642d\n+ Add Combo\nscreen__add_combo_618900\nitems added to order\nscreen_items_added_to_order_e5a5e3\nTotal:\nscreen_total__18e872\nView Cart\nscreen_view_cart_708640\n⚡ Checkout Now\nscreen__checkout_now_c53cf8\nTap Any Preloaded Option Below:\nscreen_tap_any_preloaded_option_below__a407c3\n1-Tap Instant Response\nscreen_1_tap_instant_response_55bf08\nBest Sellers\nscreen_best_sellers_f4b25b\nValue Combos\nscreen_value_combos_e99d11\nPure Jain Food\nscreen_pure_jain_food_e0750a\nGujarati Thali\nscreen_gujarati_thali_4acbef\nDum Biryani\nscreen_dum_biryani_04dea4\nDrinks & Sweets\nscreen_drinks_sweets_c3d7d4\nOffers & Coupons\nscreen_offers_coupons_9520f2\nPayment Help\nscreen_payment_help_c652c4\nScan this QR code with your phone camera to browse the menu and order directly from your mobile browser.\nscreen_scan_this_qr_code_with_your_phone_camera_to_browse_the__fb1a74\nhttps://kiosk.jamanvaar.com/m/\nscreen_https_kiosk_jamanvaar_com_m__ef0f32\nClose\nscreen_close_7d9eb7\nEnter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards.\nscreen_enter_your_mobile_number_to_check_loyalty_points_re_ord_08e4ca\nMobile Number\nscreen_mobile_number_34975e\nSend OTP\nscreen_send_otp_9c4566\nEnter the 4-digit code for +91\nscreen_enter_the_4_digit_code_for_91_cea004\n. No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes.\nscreen__no_sms_gateway_is_configured_on_this_kiosk_so_the_code_efb4a3\nVerify & Login\nscreen_verify_login_91ef55\nEnter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel.\nscreen_enter_4_digit_staff_authorization_pin_to_unlock_manager_b6b3eb\nVerify PIN\nscreen_verify_pin_d4d945\nCalling a team member…\nscreen_calling_a_team_member__484ef0\nPlease wait a moment.\nscreen_please_wait_a_moment__11ee54\nTeam Member Notified\nscreen_team_member_notified_0a21d5\nPlease ask at the counter\nscreen_please_ask_at_the_counter_73be27\nWe could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you.\nscreen_we_could_not_reach_our_team_from_this_kiosk_right_now_p_92b60f\nCancel & Reset Screen\nscreen_cancel_reset_screen_a5c397\nSave & Publish Kiosk Settings\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Kiosk Appearance & Content",
+    "Branding",
+    "Idle & Session Timing",
+    "Customer Screen Wording by Language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Ahmedabad Flagship Store",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "KIOSK OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Dashboard",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Live Orders / KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "CUSTOMER EXPERIENCE",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Menu Templates",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Welcome Screen",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "PAYMENTS & SERVICE",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Payments & Payouts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customer Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Staff & Roles (RBAC)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "SYSTEM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Sync & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Audit Trail Logs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "App Downloads",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Save & Publish Kiosk Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 190,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Switch application",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk logo URL",
+      "placeholder": "https://… or /assets/…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Upload kiosk logo",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "Kiosk accent color",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Idle warning after (seconds)",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Idle reset countdown (seconds)",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kiosk content language",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search kiosk wording",
+      "placeholder": "Search text or screen label"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording welcome",
+      "placeholder": "Welcome to JAMANVAAR"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording welcomeLine1",
+      "placeholder": "Welcome to"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording welcomeLine2",
+      "placeholder": "{{name}}"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording heritageBadge",
+      "placeholder": "Authentic Indian Heritage Flavors • Freshly Prepared"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording tagline",
+      "placeholder": "Authentic Flavors, Seamless Dining"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording startOrder",
+      "placeholder": "Start Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording touchToBegin",
+      "placeholder": "Touch screen to begin your order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording dineIn",
+      "placeholder": "Dine-In"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording dineInDesc",
+      "placeholder": "Enjoy your meal freshly served at your table"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording takeaway",
+      "placeholder": "Takeaway"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording takeawayDesc",
+      "placeholder": "Pick up fresh packed food at Counter 1"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording delivery",
+      "placeholder": "Delivery"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording tokenQr",
+      "placeholder": "Token / QR"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording selectOrderType",
+      "placeholder": "How would you like to enjoy your meal?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording selectOrderTypeSub",
+      "placeholder": "Select whether you are dining in our restaurant or packing your feast for takeaway."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerBiryaniTag",
+      "placeholder": "👑 1-Tap Combo Add"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerBiryaniTitle",
+      "placeholder": "Royal Veg Biryani Feast"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerBiryaniSub",
+      "placeholder": "Free Shahi Gulab Jamun & Raita • Save ₹111"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerBiryaniCta",
+      "placeholder": "+ Add Combo @ ₹449 ➔"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerThaliTag",
+      "placeholder": "✨ Chef Signature"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerThaliTitle",
+      "placeholder": "Gujarati Heritage Thali"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerThaliSub",
+      "placeholder": "12 Authentic Items Special Gujarati Feast"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerThaliCta",
+      "placeholder": "+ Add Thali @ ₹280 ➔"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerCoffeeTag",
+      "placeholder": "☕ Cold Beverage"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerCoffeeTitle",
+      "placeholder": "Cold Coffee with Ice Cream"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerCoffeeSub",
+      "placeholder": "Velvety Ice Cream Scoop • 100% Arabica"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording bannerCoffeeCta",
+      "placeholder": "+ Add Coffee @ ₹120 ➔"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chefSpecialCombos",
+      "placeholder": "Chef's Special Combo Meals"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording saveUpTo",
+      "placeholder": "Save up to"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording pureVegCombo",
+      "placeholder": "Pure Veg Combo"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording addCombo",
+      "placeholder": "+ Add Combo"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording selectTable",
+      "placeholder": "Select Your Table"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording guests",
+      "placeholder": "Guests"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording table",
+      "placeholder": "Table"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording searchDishPlaceholder",
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording allMenu",
+      "placeholder": "All Menu"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording pureVeg",
+      "placeholder": "Pure Veg"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording nonVeg",
+      "placeholder": "Non-Veg"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording jain",
+      "placeholder": "Jain"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording popular",
+      "placeholder": "Popular"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording new",
+      "placeholder": "New"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chefSpecial",
+      "placeholder": "Chef Special"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording spicy",
+      "placeholder": "Spicy"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording mild",
+      "placeholder": "Mild"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording medium",
+      "placeholder": "Medium"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording add",
+      "placeholder": "ADD"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording added",
+      "placeholder": "ADDED"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording viewCart",
+      "placeholder": "View Cart"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cart",
+      "placeholder": "Cart"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording orderSummary",
+      "placeholder": "Order Summary"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording clearCart",
+      "placeholder": "Clear Cart"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording emptyCart",
+      "placeholder": "Your cart is empty"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording emptyCartSub",
+      "placeholder": "Explore our delicious menu items and add them to your feast!"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording subtotal",
+      "placeholder": "Subtotal"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording discount",
+      "placeholder": "Discount"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cgst",
+      "placeholder": "CGST"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording sgst",
+      "placeholder": "SGST"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording tax",
+      "placeholder": "Tax (GST)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording roundOff",
+      "placeholder": "Round Off"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording totalPayable",
+      "placeholder": "Total Payable"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording proceedToPayment",
+      "placeholder": "Proceed to Payment"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording continueShopping",
+      "placeholder": "Add More Items"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording customize",
+      "placeholder": "Customize"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording selectModifiers",
+      "placeholder": "Select Options & Customizations"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording required",
+      "placeholder": "Required"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording optional",
+      "placeholder": "Optional"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording specialInstructions",
+      "placeholder": "Special Kitchen Instructions"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording notesPlaceholder",
+      "placeholder": "E.g., Less spicy, no onion/garlic, extra chutney..."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording applyCoupon",
+      "placeholder": "Apply Coupon"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording couponPlaceholder",
+      "placeholder": "Enter Promo Code"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording apply",
+      "placeholder": "Apply"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording couponApplied",
+      "placeholder": "Coupon Applied Successfully!"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording invalidCoupon",
+      "placeholder": "Invalid or Expired Coupon Code"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording callStaff",
+      "placeholder": "Call Staff"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording staffAssistance",
+      "placeholder": "Staff Assistance Requested"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording staffOnTheWay",
+      "placeholder": "The counter has been notified and will assist you shortly."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cancel",
+      "placeholder": "Cancel"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording confirm",
+      "placeholder": "Confirm"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording back",
+      "placeholder": "Back"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording paymentTitle",
+      "placeholder": "Choose Payment Method"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording upiQr",
+      "placeholder": "UPI QR Payment"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording upiSubtitle",
+      "placeholder": "Scan & Pay via GPay, PhonePe, Paytm, BHIM"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cardTerminal",
+      "placeholder": "Card / POS Terminal"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cardSubtitle",
+      "placeholder": "Insert, swipe or tap debit/credit card"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cashAtCounter",
+      "placeholder": "Cash at Counter"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording cashSubtitle",
+      "placeholder": "Pay at billing counter when collecting order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording scanQrToPay",
+      "placeholder": "Scan QR Code with any UPI App to Pay"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording paymentExpiresIn",
+      "placeholder": "Payment window closes in"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording verifyingPayment",
+      "placeholder": "Verifying your payment transaction..."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording paymentSuccess",
+      "placeholder": "Payment Received Successfully!"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording paymentFailed",
+      "placeholder": "Payment Failed or Timed Out"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording retryPayment",
+      "placeholder": "Retry Payment"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording changePaymentMethod",
+      "placeholder": "Try Another Method"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording orderConfirmed",
+      "placeholder": "Order Confirmed!"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording orderNumber",
+      "placeholder": "Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording token",
+      "placeholder": "TOKEN"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording estimatedWait",
+      "placeholder": "Estimated Prep Time"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording minutes",
+      "placeholder": "Minutes"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording trackOrder",
+      "placeholder": "Track Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording printReceipt",
+      "placeholder": "Print Receipt"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording collectAtCounter",
+      "placeholder": "Please collect your order at Pickup Counter 1 when your token is displayed."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording newOrder",
+      "placeholder": "Place New Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording orderStatus",
+      "placeholder": "Live Kitchen Tracking"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording statusConfirmed",
+      "placeholder": "Order Received"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording statusKitchen",
+      "placeholder": "Accepted by Chef"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording statusPreparing",
+      "placeholder": "Preparing in Kitchen"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording statusReady",
+      "placeholder": "Ready for Pickup / Serving"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording statusCollected",
+      "placeholder": "Order Collected"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording idleWarningTitle",
+      "placeholder": "Are You Still Ordering?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording idleWarningText",
+      "placeholder": "For your security, this session will reset automatically in"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording seconds",
+      "placeholder": "seconds"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording keepOrdering",
+      "placeholder": "Continue Ordering"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording validationPhoneInvalid",
+      "placeholder": "Please enter a valid 10-digit mobile number."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording otpExpired",
+      "placeholder": "That code has expired. Tap Send OTP for a new one."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording otpTooManyAttempts",
+      "placeholder": "Too many wrong attempts. Tap Send OTP for a new code."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording otpIncorrectLeft",
+      "placeholder": "Incorrect code. {{count}} attempt(s) left."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording otpIncorrectNone",
+      "placeholder": "Incorrect code. No attempts left — tap Send OTP again."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording fixCustomization",
+      "placeholder": "Please complete the required choices:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording highContrast",
+      "placeholder": "High Contrast"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording largeText",
+      "placeholder": "Large Text"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording offlineNotice",
+      "placeholder": "Offline Mode Active - Orders queued locally"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatWelcome",
+      "placeholder": "Namaste! How can I help you choose your meal today?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording nonVegCombo",
+      "placeholder": "Non-Vegetarian Combo"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatSuggestionOrder",
+      "placeholder": "What should I order?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatSuggestionVeg",
+      "placeholder": "Show vegetarian dishes"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatSuggestionJain",
+      "placeholder": "Show Jain food"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatSuggestionOffers",
+      "placeholder": "Show today's offers"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording chatSuggestionPay",
+      "placeholder": "How do I pay?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_pts__f501d5",
+      "placeholder": "Pts (₹"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_need_help__5c799f",
+      "placeholder": "Need Help?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_network__760113",
+      "placeholder": "Network:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_simulate_b9efe3",
+      "placeholder": "simulate"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_order_on_phone_a6b0af",
+      "placeholder": "Order on Phone"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_loyalty_points_d9d154",
+      "placeholder": "Loyalty Points"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_loyalty_login_eceb65",
+      "placeholder": "Loyalty / Login"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_choose_your_language_8e2d06",
+      "placeholder": "Choose your language"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_you_can_change_this_anytime_from_the_header_d8f222",
+      "placeholder": "You can change this anytime from the header"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_terminal_e0926f",
+      "placeholder": "Terminal"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_staff_mode_35c0cd",
+      "placeholder": "Staff Mode"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_tap_the_table_number_where_you_are_seated__5e0202",
+      "placeholder": "Tap the table number where you are seated."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_no_dining_tables_are_set_up_for_this_kiosk_yet_continue_5dc39c",
+      "placeholder": "No dining tables are set up for this kiosk yet. Continue without a table, or ask staff to add tables."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_skip_table_selection_pick_up_at_counter__b68635",
+      "placeholder": "Skip Table Selection (Pick up at counter)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_combos_deals_e531d6",
+      "placeholder": "Combos & Deals"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__pure_jain_521c29",
+      "placeholder": "🌱 Pure Jain"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__chef_signature_093f51",
+      "placeholder": "· Chef Signature"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__cold_beverage_f926d2",
+      "placeholder": "· Cold Beverage"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_save__2eaea5",
+      "placeholder": "Save ₹"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_clear_all_ddceb7",
+      "placeholder": "Clear All"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_add_ons_suggested__fa91bb",
+      "placeholder": "Add-ons (Suggested)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_add_9fd728",
+      "placeholder": "Add"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_coupon_applied__194992",
+      "placeholder": "Coupon Applied:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_remove_c3812f",
+      "placeholder": "Remove"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_apply_31e392",
+      "placeholder": "Apply"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_redeem_loyalty_points_8591d3",
+      "placeholder": "Redeem Loyalty Points"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_balance__e03512",
+      "placeholder": "Balance:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_pts_52ee19",
+      "placeholder": "Pts"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_remove__4a816f",
+      "placeholder": "Remove (₹"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_redeem__324583",
+      "placeholder": "Redeem ₹"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_loyalty_reward_points_fe7dc0",
+      "placeholder": "Loyalty Reward Points"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_staff_manager_discount_10__c08554",
+      "placeholder": "Staff Manager Discount (10%)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_total_payable__6577c8",
+      "placeholder": "Total Payable:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_offline_online_99d685",
+      "placeholder": "Offline & Online"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_payment_session_expired_4c8564",
+      "placeholder": "Payment Session Expired"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_this_qr_timed_out_if_you_already_paid_please_wait_a_few_4226ae",
+      "placeholder": "This QR timed out. If you already paid, please wait a few seconds — your token will still print. Otherwise get a fresh code."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_try_again_df0fe9",
+      "placeholder": "Try Again"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_cancel_19766e",
+      "placeholder": "Cancel"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_scan_with_any_upi_app_to_pay_ca123c",
+      "placeholder": "Scan with any UPI app to pay"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_waiting_for_your_payment_your_token_prints_automaticall_2a6f9b",
+      "placeholder": "Waiting for your payment… your token prints automatically once it is received."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_pay_at_pickup_counter_c8a1db",
+      "placeholder": "Pay at Pickup Counter"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_you_will_receive_your_token_now_please_pay_at_counter_1_df2bd4",
+      "placeholder": "You will receive your token now. Please pay at Counter 1."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_confirm_get_token_a40e2d",
+      "placeholder": "Confirm & Get Token"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_pickup_at__e0c9b2",
+      "placeholder": "Pickup at:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_digital_delivery_e_bill_options_91fcfc",
+      "placeholder": "Digital Delivery & E-Bill Options"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_print_receipt_98bad4",
+      "placeholder": "Print Receipt"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_email_bill_64ee94",
+      "placeholder": "Email Bill"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_qr_invoice_39afac",
+      "placeholder": "QR Invoice"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_how_was_your_ordering_experience__ae5150",
+      "placeholder": "How was your ordering experience?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_submit_rating_79a8aa",
+      "placeholder": "Submit Rating"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__feedback_recorded_thank_you__632564",
+      "placeholder": "✓ Feedback recorded. Thank you!"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_receipt_dad5a9",
+      "placeholder": "Receipt"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_kitchen_order_ticket_a68e9c",
+      "placeholder": "Kitchen Order Ticket"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__kot__58647b",
+      "placeholder": "(KOT)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_live_updates_from_jamanvaar_kitchen_for_token_e65167",
+      "placeholder": "Live updates from JAMANVAAR Kitchen for Token"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_order_items__cc32cc",
+      "placeholder": "Order Items:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_x_2d7116",
+      "placeholder": "x"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_enter_your_email_address_to_receive_your_official_jaman_350fe2",
+      "placeholder": "Enter your email address to receive your official JAMANVAAR tax invoice as a PDF."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_email_address_09bf25",
+      "placeholder": "Email Address"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_email_my_bill_dd97a2",
+      "placeholder": "Email My Bill"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_add_to_cart__7aa3dd",
+      "placeholder": "Add to Cart •"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_included_ba829a",
+      "placeholder": "Included"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_jaman_ai_8a6f7b",
+      "placeholder": "JAMAN AI"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_live_ai_a0e6e8",
+      "placeholder": "Live AI"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_complete_conversational_food_ordering_dietary_guide_22ba6d",
+      "placeholder": "Complete conversational food ordering & dietary guide"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__popular_74fe96",
+      "placeholder": "★ Popular"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__add_to_cart_927657",
+      "placeholder": "+ Add to Cart"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_deal_ae642d",
+      "placeholder": "Deal"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__add_combo_618900",
+      "placeholder": "+ Add Combo"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_items_added_to_order_e5a5e3",
+      "placeholder": "items added to order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_total__18e872",
+      "placeholder": "Total:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_view_cart_708640",
+      "placeholder": "View Cart"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__checkout_now_c53cf8",
+      "placeholder": "⚡ Checkout Now"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_tap_any_preloaded_option_below__a407c3",
+      "placeholder": "Tap Any Preloaded Option Below:"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_1_tap_instant_response_55bf08",
+      "placeholder": "1-Tap Instant Response"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_best_sellers_f4b25b",
+      "placeholder": "Best Sellers"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_value_combos_e99d11",
+      "placeholder": "Value Combos"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_pure_jain_food_e0750a",
+      "placeholder": "Pure Jain Food"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_gujarati_thali_4acbef",
+      "placeholder": "Gujarati Thali"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_dum_biryani_04dea4",
+      "placeholder": "Dum Biryani"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_drinks_sweets_c3d7d4",
+      "placeholder": "Drinks & Sweets"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_offers_coupons_9520f2",
+      "placeholder": "Offers & Coupons"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_payment_help_c652c4",
+      "placeholder": "Payment Help"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_scan_this_qr_code_with_your_phone_camera_to_browse_the__fb1a74",
+      "placeholder": "Scan this QR code with your phone camera to browse the menu and order directly from your mobile browser."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_https_kiosk_jamanvaar_com_m__ef0f32",
+      "placeholder": "https://kiosk.jamanvaar.com/m/"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_close_7d9eb7",
+      "placeholder": "Close"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_enter_your_mobile_number_to_check_loyalty_points_re_ord_08e4ca",
+      "placeholder": "Enter your mobile number to check loyalty points, re-order favorites, and get exclusive rewards."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_mobile_number_34975e",
+      "placeholder": "Mobile Number"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_send_otp_9c4566",
+      "placeholder": "Send OTP"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_enter_the_4_digit_code_for_91_cea004",
+      "placeholder": "Enter the 4-digit code for +91"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen__no_sms_gateway_is_configured_on_this_kiosk_so_the_code_efb4a3",
+      "placeholder": ". No SMS gateway is configured on this kiosk, so the code was shown on screen instead of texted — it expires in 2 minutes."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_verify_login_91ef55",
+      "placeholder": "Verify & Login"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_enter_4_digit_staff_authorization_pin_to_unlock_manager_b6b3eb",
+      "placeholder": "Enter 4-digit staff authorization PIN to unlock manager assistance, discounts, or session cancel."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_verify_pin_d4d945",
+      "placeholder": "Verify PIN"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_calling_a_team_member__484ef0",
+      "placeholder": "Calling a team member…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_please_wait_a_moment__11ee54",
+      "placeholder": "Please wait a moment."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_team_member_notified_0a21d5",
+      "placeholder": "Team Member Notified"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_please_ask_at_the_counter_73be27",
+      "placeholder": "Please ask at the counter"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_we_could_not_reach_our_team_from_this_kiosk_right_now_p_92b60f",
+      "placeholder": "We could not reach our team from this kiosk right now. Please walk to the counter and a team member will help you."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Kiosk wording screen_cancel_reset_screen_a5c397",
+      "placeholder": "Cancel & Reset Screen"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/kiosk-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

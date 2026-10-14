@@ -93,7 +93,7 @@ function ReceiveGoods({ showToast }: Props) {
     }
   }
 
-  if (items.length === 0) return <div className={card}>Add your stock items first in Inventory &amp; Recipes, then come back to record deliveries.</div>;
+  if (items.length === 0) return <div className={card}>Add your stock items first, then record deliveries here.<a className="mt-3 block w-fit rounded-xl bg-jaman-navy px-4 py-3 text-white font-bold" href={`${location.pathname.startsWith('/kiosk-admin') ? '/kiosk-admin' : '/restaurant-admin'}/inventory?returnTo=purchasing`}>Add stock items</a></div>;
   if (suppliers.length === 0) return <div className={card}>Add a supplier first (Suppliers tab), then record what they delivered.</div>;
 
   return (

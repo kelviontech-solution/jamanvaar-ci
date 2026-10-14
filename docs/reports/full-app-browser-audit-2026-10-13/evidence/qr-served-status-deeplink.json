@@ -1,0 +1,43 @@
+{
+  "text": "UI Audit Restaurant A\nUI Audit Restaurant A — Main Branch · Table UI01\nTable UI01\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\nOrder completed\n\nQR-1\n\nReference JQ-7U6RKEMHK5E9W37PH2DZPPU9YU · Table UI01 · ₹102\n\nOrder received\nPreparing\nReady\nCompleted\n\nPayment due at counter: ₹102. Please pay our team.\n\nRefresh order & payment\n\nCollected: ₹0 · Remaining: ₹102\n\nOrder details / receipt\nOrder more\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Order completed"
+  ],
+  "buttons": [
+    {
+      "text": "Refresh order & payment",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Order more",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 53,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 105
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

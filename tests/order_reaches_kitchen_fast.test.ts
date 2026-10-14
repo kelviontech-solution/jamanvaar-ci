@@ -70,12 +70,16 @@ describe('Captain pushes to the cloud immediately', () => {
 
 describe('KDS reacts at once', () => {
   const kds = readFileSync(join(__dirname, '../apps/restaurant-system/kds/src/App.tsx'), 'utf8');
+  // The LAN-mesh listeners (including the "message to the kitchen" beep) live in their own hook
+  // since App.tsx was split up -- the "once per new ticket" count below spans both files.
+  const kdsLanMesh = readFileSync(join(__dirname, '../apps/restaurant-system/kds/src/hooks/useKdsLanMesh.ts'), 'utf8');
 
   it('plays the new-ticket sound for any ticket that appears, wherever it came from', () => {
     expect(kds).toMatch(/seenKotIds/);
     expect(kds).toMatch(/!seen\.has\(k\.id\)[\s\S]{0,200}sound\.play\('kot'\)/);
     // Once per new ticket: the same-browser mesh listener must not also beep.
-    expect(kds.match(/sound\.play\('kot'\)/g)?.length).toBe(2); // new ticket + message to the kitchen
+    const totalBeeps = (kds.match(/sound\.play\('kot'\)/g)?.length ?? 0) + (kdsLanMesh.match(/sound\.play\('kot'\)/g)?.length ?? 0);
+    expect(totalBeeps).toBe(2); // new ticket (App.tsx) + message to the kitchen (useKdsLanMesh)
   });
 
   it('pushes every change (start, one dish, all dishes, served, undo) immediately', () => {

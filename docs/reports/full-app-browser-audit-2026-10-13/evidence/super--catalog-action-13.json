@@ -1,0 +1,295 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nMaster Menu Catalog & Franchise Syndication\n\nCentral repository of standardized recipes, authentic Indian culinary items, GST tax profiles, and safe push syndication to franchise outlets.\n\nUpdated just now\nRefresh\nImport Starter Library\nManage Categories\nAdd Master Dish\nAll Categories\n0\nAll Dietary Classifications\nVegetarian (VEG)\nJain Friendly\nSwaminarayan\nNon-Vegetarian\n100% Vegan\nCards\nTable\nNo master dishes match your search\n\nTry clearing search keywords, or click \"Import Starter Library\" to automatically load 30+ authentic Indian culinary recipes.\n\nImport Starter Library\nAdd New Master Catalog Dish\n×\nDish Name *\nCategory *\nDietary Classification\nVegetarian (VEG)\nJain (No Root Vegetables)\nSwaminarayan (No Onion/Garlic)\nNon-Vegetarian\n100% Vegan\nSuggested Base Price (₹) *\nKitchen Prep Time (Min)\nHSN Tax Code\nDescription\nIngredients & Formulation (1 per line)\nPreparation Method & Kitchen Notes\nDish Photography & Visual Asset\nClick to upload dish photo\nPNG, JPG, WEBP or GIF (Max 5MB)\nCancel\nCreate Master Dish",
+  "headings": [
+    "Master Menu Catalog & Franchise Syndication",
+    "No master dishes match your search",
+    "Add New Master Catalog Dish"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "Last updated just now",
+      "disabled": false,
+      "width": 111,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Import Starter Library",
+      "aria": null,
+      "title": "Import authentic preloaded Indian starter dishes and recipes",
+      "disabled": false,
+      "width": 195,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Manage Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 185,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Add Master Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 163,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All Categories\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 144,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Cards",
+      "aria": null,
+      "title": "SaaS Cards View",
+      "disabled": false,
+      "width": 79,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Table",
+      "aria": null,
+      "title": "Compact Table View",
+      "disabled": false,
+      "width": 75,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Import Starter Library",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 195,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Close Add New Master Catalog Dish",
+      "title": "",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 77,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Create Master Dish",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 150,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search master dishes by name or ingredients…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "e.g. Amritsari Kulcha Platter"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "996331"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": "Culinary background, flavor notes, and presentation style…"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": "Paneer malai (200g)\nHung curd (50g)\nKashmiri degi mirch (15g)"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": "Step-by-step chef method and tandoor/pan execution guide…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -33,9 +33,10 @@ describe('Captain screens (BUG-104/105/107/108/114)', () => {
   });
 
   it('the keypad shows the wrong-PIN error through the same path as typed entry', () => {
-    const app = read('App.tsx');
-    expect(app).not.toMatch(/setTimeout\(\(\) => login\(/);
-    expect(app.match(/attemptLogin\(next\)/g)?.length).toBe(2);
+    // The PIN keypad + its login logic live in their own screen since App.tsx was split up.
+    const signIn = read('components/auth/CaptainSignInScreen.tsx');
+    expect(signIn).not.toMatch(/setTimeout\(\(\) => login\(/);
+    expect(signIn.match(/attemptLogin\(next\)/g)?.length).toBe(2);
   });
 
   it('there is no pre-assigned table list and no hard-coded zone names', () => {

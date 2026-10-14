@@ -34,9 +34,10 @@ describe('The Restaurant ID can be found and copied (BUG-127)', () => {
 
   // Kiosk Admin's own connect screen is retired (Phase 2 Task 11) -- its Restaurant Admin
   // merge console (pos-admin) is now the one login screen a Kiosk-only or Restaurant-only
-  // subscriber alike uses, so this is the only "connect screen" left to check.
+  // subscriber alike uses, so this is the only "connect screen" left to check. Lives in its own
+  // component (PosAdminLoginScreen) since App.tsx was split up.
   it('the Restaurant Admin (pos-admin) login screen says where to find the Restaurant ID', () => {
-    const source = read('apps/restaurant-system/pos-admin/src/App.tsx');
+    const source = read('apps/restaurant-system/pos-admin/src/components/auth/PosAdminLoginScreen.tsx');
     expect(source).not.toContain("From your restaurant's admin dashboard");
     expect(source).toContain('Find your Restaurant ID in your Welcome Kit or activation email.');
   });
@@ -45,7 +46,7 @@ describe('The Restaurant ID can be found and copied (BUG-127)', () => {
   // (like POS and KDS), the same way this file's own BUG-127 fix asks every OTHER screen to make an
   // awkward manual field easy to find — the better fix here was removing the field.
   it('the Captain connect screen asks only for the activation key, not a Restaurant ID', () => {
-    const source = read('apps/restaurant-system/captain/src/App.tsx');
+    const source = read('apps/restaurant-system/captain/src/components/auth/CaptainActivationScreen.tsx');
     expect(source).not.toMatch(/Restaurant ID/);
     expect(source).toMatch(/Activation Key/);
   });

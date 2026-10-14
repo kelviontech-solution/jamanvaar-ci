@@ -11,6 +11,9 @@ export const PosLoyaltyRewards: React.FC = () => {
   useEffect(() => db.subscribe(refresh), []);
   const customer = CustomerRepository.getByPhone(selectedCustomer?.phone ?? '');
   if (!customer) return null;
+  const rate = CustomerRepository.getProgramSettings();
+  const pointsCost = cart.loyaltyRedemption?.pointsCost || 0;
+  const estimatedEarn = rate.enabled !== false && rate.perRupeesSpent > 0 ? Math.max(0, Math.floor(Math.floor(cart.totalPayable / rate.perRupeesSpent) * rate.earnPoints * (CustomerRepository.getTierForAccount(customer)?.pointsMultiplier ?? 1))) : 0;
   const enabled = CustomerRepository.getProgramSettings().enabled !== false;
   const eligible = enabled ? CustomerRepository.getRewards().filter(reward => reward.isActive && customer.loyaltyPoints >= reward.pointsCost && CustomerRepository.rewardDiscount(reward, cart.items, cart.subtotal) > 0).sort((a,b) => CustomerRepository.rewardDiscount(b, cart.items, cart.subtotal) - CustomerRepository.rewardDiscount(a, cart.items, cart.subtotal))[0] : undefined;
   return (
@@ -23,6 +26,7 @@ export const PosLoyaltyRewards: React.FC = () => {
         <span className="ml-auto whitespace-nowrap">{customer.loyaltyPoints} pts</span>
       </summary>
       <p className="mt-2 text-slate-600">{enabled ? 'Optional: choose a reward or keep your points. Points are deducted only after payment.' : 'The loyalty program is paused. Your points are kept.'}</p>
+      <p className="mt-2 text-slate-600">Points after redemption: {Math.max(0, customer.loyaltyPoints - pointsCost)}. Estimated points earned after payment: {estimatedEarn}. Final points follow the verified bill and your tier.</p>
       {cart.loyaltyRedemption && (
         <div className="mt-3 flex items-center justify-between gap-2 font-bold text-emerald-800">
           <span>Save {formatINR(cart.discountAmount)} · {cart.loyaltyRedemption.pointsCost} points</span>

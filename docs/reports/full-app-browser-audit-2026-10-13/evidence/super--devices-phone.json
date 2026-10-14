@@ -1,0 +1,254 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nDevice Fleet / MDM Control Center\n\nTerminal health, remote locking and fleet commands. Online means it checked in within the last 2 minutes; degraded within 15.\n\nRefresh\nExport CSV\nONLINE\n1\nDEGRADED\n4\nOFFLINE\n0\nNEVER SEEN\n0\nREVOKED\n0\nMDM LOCKED\n—\nBy restaurant\nNeeds attention\nAll devices\n1 restaurant\nUI Audit Restaurant A\n4 NEED ATTENTION\nPOS ×1\nRestaurant Admin ×1\nCaptain ×1\nKDS ×1\nKiosk ×1\n1 online\n4 degraded\n0 offline\nView 5 terminals\n1-1 of 1\nPrev\nPage 1 of 1\nNext",
+  "headings": [
+    "Device Fleet / MDM Control Center"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 111,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 132,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "ONLINE\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "DEGRADED\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "OFFLINE\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "NEVER SEEN\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "REVOKED\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "MDM LOCKED\n—",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 91,
+      "visible": true
+    },
+    {
+      "text": "By restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Needs attention",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 127,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "View 5 terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 310,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Prev",
+      "aria": "Previous page",
+      "title": "",
+      "disabled": true,
+      "width": 75,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Next",
+      "aria": "Next page",
+      "title": "",
+      "disabled": true,
+      "width": 77,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search restaurants…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

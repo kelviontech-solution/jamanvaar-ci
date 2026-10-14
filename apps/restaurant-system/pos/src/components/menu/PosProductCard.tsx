@@ -1,3 +1,4 @@
+import { resolveModifierGroups } from '@jamanvaar/business';
 import React, { useRef } from 'react';
 import { MenuItem } from '@jamanvaar/types';
 import { usePosStore } from '../../store/posStore';
@@ -18,9 +19,7 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
     .reduce((sum, it) => sum + it.quantity, 0);
 
   // Check if item has mandatory required modifier choices
-  const itemModifierGroups = (item.modifierGroupIds || [])
-    .map((gid) => db.modifierGroups.find((g) => g.id === gid))
-    .filter(Boolean);
+  const itemModifierGroups = resolveModifierGroups(item, db.modifierGroups);
 
   const hasRequiredModifiers = itemModifierGroups.some(
     (g) => g && (g.isRequired || g.minSelections > 0)

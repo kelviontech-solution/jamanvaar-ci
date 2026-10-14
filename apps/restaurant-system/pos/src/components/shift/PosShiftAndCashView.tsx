@@ -82,6 +82,7 @@ export const PosShiftAndCashView: React.FC = () => {
     return shiftOrders.filter((o) => o.orderStatus === 'COMPLETED');
   }, [shiftOrders]);
 
+  const unassignedCash = db.orders.filter(order => !order.shiftId && order.paymentStatus === 'SUCCESS' && !['CANCELLED','REFUNDED','VOID','VOIDED'].includes(order.orderStatus)).map(order=>({order,cash:order.paymentSplits?.length ? order.paymentSplits.filter(split=>split.method==='CASH').reduce((sum,split)=>sum+split.amount,0) : ['CASH','CASH_AT_COUNTER'].includes(order.paymentMethod) ? order.totalAmount : 0})).filter(row=>row.cash>0);
   const totalShiftSales = shiftSummary.netCollected;
   const shiftCashSales = shiftSummary.paymentBreakdown.cash;
   const shiftUpiSales = shiftSummary.paymentBreakdown.upi;
@@ -327,6 +328,7 @@ VARIANCE:      Rs. ${shift.cashVariance || 0}
   return (
     <div className="flex-1 flex flex-col h-full bg-jaman-cream p-4 sm:p-6 overflow-y-auto select-none space-y-6">
       
+      {unassignedCash.length > 0 && <section aria-label="Cash outside register shifts" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 space-y-3"><h2 className="font-bold">Cash without a register shift</h2><p className="text-sm">{unassignedCash.length} older collections total {formatINR(unassignedCash.reduce((sum,row)=>sum+row.cash,0))}. These collections are already in revenue, but were not assigned to a cash drawer. Review the bills with your manager and reconcile the physical cash through Shift & Cash. Do not collect these bills again.</p><ul className="max-h-40 overflow-auto text-sm">{unassignedCash.map(row=><li key={row.order.id}>#{row.order.tokenNumber} / {formatINR(row.cash)} / {row.order.cashierName || 'Cashier not recorded'}</li>)}</ul><button type="button" className="min-h-11 rounded-xl border px-4 font-bold" onClick={()=>setActiveTab('BILLS')}>Review collected bills</button></section>}
       {/* 1. Page Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
         <div>

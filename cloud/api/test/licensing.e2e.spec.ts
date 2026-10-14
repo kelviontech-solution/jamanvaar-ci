@@ -16,7 +16,6 @@ import { PrismaService } from '../src/prisma/prisma.service';
 // apps' verifier (packages/business, packages/sync) relies on, without needing the real key.
 // ConfigModule validates the environment at import time, so this must be hoisted.
 const { LICENSE_PUBLIC_KEY_JWK } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { generateKeyPairSync } = require('crypto');
   const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
   process.env.LICENSE_SIGNING_PRIVATE_KEY_B64 = Buffer.from(privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()).toString('base64');

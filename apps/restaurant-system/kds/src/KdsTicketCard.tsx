@@ -22,11 +22,12 @@ interface Props {
   priority: 'NORMAL' | 'URGENT';
   onPriority: (kot: KOTRecord, priority: 'NORMAL' | 'URGENT') => void;
   onReprint: (kot: KOTRecord) => void;
+  onActivity?: (kot: KOTRecord) => void;
 }
 
 const BTN = 'w-full min-w-0 min-h-[48px] rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer';
 
-export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, captainHandlesService, onRecall, onDismiss, priority, onPriority, onReprint }) => {
+export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLabel, takenBy, onToggleDish, onStart, onAllReady, onServe, captainHandlesService, onRecall, onDismiss, priority, onPriority, onReprint, onActivity }) => {
   const {t} = useStaffLanguage();
   const cancelled = kot.status === 'CANCELLED';
   const isReady = kot.status === 'READY';
@@ -203,6 +204,7 @@ export const KdsTicketCard: React.FC<Props> = ({ kot, age, progress, orderTypeLa
         )}
       </div>
 
+      {onActivity && <button type="button" aria-label={`Order activity for token ${kot.tokenNumber}`} onClick={()=>onActivity(kot)} className="min-h-11 px-3 text-sm font-bold underline">Order history</button>}
       <div className="kds-ticket-footer p-3 sm:p-4 bg-jaman-cream border-t border-jaman-border space-y-2.5">
         <div className="flex items-center justify-between text-xs text-slate-600 font-bold gap-2">
           <span className="truncate">{takenBy ?? ''}</span>

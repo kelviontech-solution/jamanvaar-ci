@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { db, BusinessDayRepository, BusinessDayAccountingService, InventoryItemSync, InventoryRepository, KOTRepository, OrderRepository } from '@jamanvaar/database';
+import { db, ShiftRepository, BusinessDayRepository, BusinessDayAccountingService, InventoryItemSync, InventoryRepository, KOTRepository, OrderRepository } from '@jamanvaar/database';
 import { calculateCart, CentralReportingService, priceOrderLines } from '@jamanvaar/business';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 import { priceCart } from '../cloud/api/src/modules/payments/pricing.util';
@@ -15,7 +15,8 @@ function line(price: number, taxGroupId?: string, quantity = 1): CartItem {
   return { cartItemId: item.id, menuItemId: item.id, item, quantity, unitPrice: price, itemTotal: price * quantity, selectedModifiers: [] };
 }
 beforeEach(() => {
-  db.resetToDefaultSeed(); db.orders = []; db.kots = []; db.stockMovements = []; db.inventoryItems = [];
+  db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0); db.orders = []; db.kots = []; db.stockMovements = []; db.inventoryItems = [];
   InventoryItemSync.reset(); usePosStore.getState().clearCart();
   usePosStore.setState({ runningOrderId: null, selectedTable: null, currentUser: { id: 'qa-cashier', roleId: 'role-cashier', fullName: 'QA Cashier' } as never });
   db.restaurant.instantBillConfig = { enabled: true, paymentMethod: 'CASH', autoPrint: false, askConfirmation: false, defaultOrderType: 'TAKEAWAY', sendKotBeforeBill: false, allowedRoles: ['role-cashier'] };

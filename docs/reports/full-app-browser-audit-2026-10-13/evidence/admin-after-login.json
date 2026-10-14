@@ -1,0 +1,504 @@
+{
+  "text": "JAMANVAAR RESTAURANT\nRESTAURANT ADMIN\nAhmedabad Flagship Store\nAPP\nRestaurant Admin\nKiosk Admin\nCtrl+K\nAssistant\nLogout\nWorkspace\nChoose branch\nAll restaurant · overview\nUI Audit Restaurant A — Main Branch · MAIN\nUI Audit Second Branch A · UIA2\nChoose a branch to manage orders, tables and devices.\nTODAY\nToday\nOrders\nBilling / Invoices\nPayments & Split\nRegister shifts & cash\nKITCHEN\nKitchen progress\nKitchen tickets\nMENU\nMenu & Categories\nCustomisations & Tax\nOffers & Coupons\nInventory & Recipes\nPurchasing & Stock Control\nTABLES\nFloor / Tables\nReservations\nQR Table Ordering\nON\nGUESTS & TEAM\nCustomers & loyalty\nTeam & permissions\nREPORTS\nReports & Analytics\nActivity history\nDEVICES\nPrinters & Devices\nConnections & sync\nApp Downloads\nSETUP\nReceipt & E-Bill\nRestaurant Settings\nSubscription Plans\nBackup & Restore\nHelp & Support\nBusiness overview\n\nAll branches · Confirmed sales, open payments and device health\n\nToday\nYesterday\nLast 7 days\nLast 30 days\nThis month\nThis year\nCustom dates\nAll sources\nPOS\nCAPTAIN\nKIOSK\nQR\nWHATSAPP\nONLINE\nRefresh\nWhat needs attention\n0 unpaid bills · ₹0 → View bills\nCheck device connections\nReview guest menu\nReview register shifts\nReview stock alerts\n\nChoose a branch in the Workspace selector before acting on its bills, devices or registers.\n\nNET SALES\n\n₹0\n\nORDERS\n\n0\n\nAVERAGE PAID ORDER\n\n₹0\n\nAWAITING PAYMENT\n\n₹0\n\nGross paid sales ₹0 · Refunds ₹0 · 0 unpaid orders · 2026-10-13 to 2026-10-13 (Asia/Kolkata) · Updated 8:41:55 PM\n\nSales trend\n\nNo sales in this period.\n\nSales by source\n\nNo sales in this period.\n\nSales by branch\nBranch\tNet sales\tOrders\tAOV\tOnline devices\tActivated setup\nUI Audit Restaurant A — Main Branch\nMAIN · ACTIVE\n\t₹0\t0\t₹0\t1/1\tPOS_ADMIN\nUI Audit Second Branch A\nUIA2 · ACTIVE\n\t₹0\t0\t₹0\t0/0\tNo devices activated\n\nSubscriptions apply to the restaurant. Activated devices and QR codes determine each branch’s setup.\n\nTop items\n\nNo paid items in this period.\n\nDevice health\nPOS_ADMIN\n\n1/1 online\n\nOnline requires a recent heartbeat. Registered devices are not assumed connected.\n\nAlerts\n\nNo device or stock alerts.\n\nRecent orders\nOrder\tBranch\tSource\tStatus\tPayment\tAmount\tBill\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Business overview",
+    "What needs attention",
+    "Sales trend",
+    "Sales by source",
+    "Sales by branch",
+    "Top items",
+    "Device health",
+    "Alerts",
+    "Recent orders"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Ahmedabad Flagship Store",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "TODAY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "KITCHEN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "MENU",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "TABLES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "QR Table Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "GUESTS & TEAM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Team & permissions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Activity history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "DEVICES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Connections & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "App Downloads",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "0 unpaid bills · ₹0 → View bills",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 232,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Check device connections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Review guest menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Review register shifts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 175,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Review stock alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 160,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 190,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Switch application",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Dashboard period",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order source",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0
+}

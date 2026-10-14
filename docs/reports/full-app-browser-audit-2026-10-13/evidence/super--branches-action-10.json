@@ -1,0 +1,294 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nBranches\n\nSearch and audit every branch across all restaurants. Day-to-day branch management lives inside each restaurant.\n\nAdd Branch\nAll\n4\nActive\n4\nInactive\n0\n4 branches\nMAIN\nACTIVE\nUA\n\nUI Audit Restaurant A — Main Branch\n\nUI Audit Restaurant A\n\nTerminals\n5\nStaff\n1\nAsia/Kolkata\nManage Branch\nMAIN\nUIA2\nACTIVE\nUA\n\nUI Audit Second Branch A\n\nUI Audit Restaurant A\n\nTerminals\n0\nStaff\n0\nAsia/Kolkata\nManage Branch\nUIA2\nMAIN\nACTIVE\nUA\n\nUI Audit Restaurant B — Main Branch\n\nUI Audit Restaurant B\n\nTerminals\n0\nStaff\n1\nAsia/Kolkata\nManage Branch\nMAIN\nUIB2\nACTIVE\nUA\n\nUI Audit Second Branch B\n\nUI Audit Restaurant B\n\nTerminals\n0\nStaff\n0\nAsia/Kolkata\nManage Branch\nUIB2\n1-4 of 4\nPrev\nPage 1 of 1\nNext\nAdd branch\n×\nRestaurant\nSelect a restaurant…\nUI Audit Restaurant B\nUI Audit Restaurant A\nBranch name\nBranch code\nAddress\nCancel\nAdd branch",
+  "headings": [
+    "Branches",
+    "Add branch"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Add Branch",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Active\n4",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "Inactive\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 33,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false,
+      "width": 26,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false,
+      "width": 26,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false,
+      "width": 26,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More actions",
+      "disabled": false,
+      "width": 26,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "Prev",
+      "aria": "Previous page",
+      "title": "",
+      "disabled": true,
+      "width": 75,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Next",
+      "aria": "Next page",
+      "title": "",
+      "disabled": true,
+      "width": 77,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Close",
+      "title": "",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 77,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Add branch",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 105,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search name, code, restaurant…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "e.g. NORTH"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

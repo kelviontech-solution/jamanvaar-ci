@@ -1,0 +1,68 @@
+{
+  "text": "UI Audit Restaurant A\nUI Audit Restaurant A — Main Branch · Table UI01\nTable UI01\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Cart\nONE LAST THING\nCheckout\n\nUI Audit Restaurant A · Table UI01\n\nUI Audit Dish 003 × 1\nYour name (optional)\nMobile number (optional)\nNote for the kitchen (optional)\nHow would you like to pay?\nPay at counter\nSettle your bill with our team.\n\nYou pay at the counter when you are done.\n\nPlace order\nConfirmed prices. Secure checkout.\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "headings": [
+    "Checkout"
+  ],
+  "buttons": [
+    {
+      "text": "← Cart",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 41,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Place order",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 316,
+      "height": 53,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "How should we call you?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Your mobile number"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": "Any special requests?"
+    },
+    {
+      "tag": "INPUT",
+      "type": "radio",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 105
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

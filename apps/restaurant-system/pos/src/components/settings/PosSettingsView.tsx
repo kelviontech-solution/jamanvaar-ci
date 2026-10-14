@@ -226,7 +226,7 @@ ESC/POS Command Engine Verified OK
               </div>
               <button
                 type="button"
-                id="sound-enabled-toggle"
+                id="sound-enabled-toggle" aria-label="Enable sound feedback" aria-pressed={soundEnabled}
                 onClick={() => {
                   const next = !soundEnabled;
                   setSoundEnabled(next);
@@ -396,7 +396,7 @@ ESC/POS Command Engine Verified OK
                   <span className="font-bold text-jaman-navy">{opt.label}</span>
                   <button
                     type="button"
-                    onClick={() => opt.set(!opt.state)}
+                    aria-label={opt.label} aria-pressed={opt.state} onClick={() => opt.set(!opt.state)}
                     className={`w-10 h-5 rounded-full p-0.5 transition-colors cursor-pointer ${
                       opt.state ? 'bg-emerald-500' : 'bg-slate-300'
                     }`}
@@ -456,7 +456,7 @@ ESC/POS Command Engine Verified OK
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  aria-label="Enable Instant Bill" aria-pressed={!!instantBillCfg.enabled} onClick={() => {
                     updateInstantBillConfig({ enabled: !instantBillCfg.enabled });
                     setInstantBillFeedback(`Instant Bill ${!instantBillCfg.enabled ? 'Enabled' : 'Disabled'}`);
                     setTimeout(() => setInstantBillFeedback(''), 3000);
@@ -514,7 +514,7 @@ ESC/POS Command Engine Verified OK
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  aria-label="Automatically print Instant Bills" aria-pressed={!!instantBillCfg.autoPrint} onClick={() => {
                     updateInstantBillConfig({ autoPrint: !instantBillCfg.autoPrint });
                     setInstantBillFeedback(`Auto-Print ${!instantBillCfg.autoPrint ? 'Enabled' : 'Disabled'}`);
                     setTimeout(() => setInstantBillFeedback(''), 3000);
@@ -541,7 +541,7 @@ ESC/POS Command Engine Verified OK
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  aria-label="Confirm before Instant Bill" aria-pressed={!!instantBillCfg.askConfirmation} onClick={() => {
                     updateInstantBillConfig({ askConfirmation: !instantBillCfg.askConfirmation });
                     setInstantBillFeedback(`Confirmation prompt ${!instantBillCfg.askConfirmation ? 'Enabled' : 'Disabled'}`);
                     setTimeout(() => setInstantBillFeedback(''), 3000);
@@ -568,7 +568,7 @@ ESC/POS Command Engine Verified OK
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  aria-label="Send Instant Bill dishes to kitchen" aria-pressed={!!instantBillCfg.sendKotBeforeBill} onClick={() => {
                     updateInstantBillConfig({ sendKotBeforeBill: !instantBillCfg.sendKotBeforeBill });
                     setInstantBillFeedback(`Kitchen KOT ${!instantBillCfg.sendKotBeforeBill ? 'Enabled' : 'Disabled'}`);
                     setTimeout(() => setInstantBillFeedback(''), 3000);

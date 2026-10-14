@@ -950,7 +950,7 @@ async function deviceFetch(path: string, init: RequestInit = {}): Promise<Respon
 }
 
 /** Like deviceFetch, but also signs the request with this terminal's device-bound key, for payment routes. */
-async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
+export async function signedDeviceFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const token = getStoredDeviceToken();
   if (!token) return Promise.reject(new CloudApiError('Device not activated', 401));
   const method = (init.method ?? 'GET').toUpperCase();

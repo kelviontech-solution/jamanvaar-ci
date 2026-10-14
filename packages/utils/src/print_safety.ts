@@ -54,6 +54,5 @@ export function stripControlCharsForPrint(text: string): string {
     // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
     .replace(/[₹–—''""…]/g, (ch) => PRINT_SAFE_REPLACEMENTS[ch] ?? ch);
-  // eslint-disable-next-line no-control-regex
   return withoutControlChars.replace(/[^\n\t\x20-\x7E]/g, '?');
 }

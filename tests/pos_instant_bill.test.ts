@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, OrderRepository, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
+import { db, ShiftRepository, OrderRepository, ReceiptRepository, PrintQueueRepository } from '@jamanvaar/database';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 
 describe('JAMANVAAR POS — ⚡ Instant Bill / Fast-Track Counter Billing Mode', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     usePosStore.getState().clearCart();
   });
 

@@ -1,0 +1,418 @@
+{
+  "text": "POS TERMINAL\nUI Audit Restaurant A\n\nUI Audit Restaurant A\n•\nde318c70-1a23-446d-a44b-485ec7efbb1b\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nU\nUI Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nKitchen & KOT\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nFewer tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nBusiness Days & Day History\n\nPermanent daily audit archives, cash reconciliations, and historical order records.\n\nClose Business Day\nCURRENT ACTIVE DAY\n(BD-20261013)\n13 October 2026\nOpened at 9:09:21 pm by System (business-date rollover)\nToday's Orders (0)\nDay Details\nClose Day\nTOTAL BILLED (INCL. GST)\n₹0\n● 0 of 0 Orders Billed\nCASH COLLECTED\n₹0\nIn Drawer\nUPI / QR SALES\n₹0\nSettled to Bank\nCARD TERMINAL\n₹0\nCards\nAll Days\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nPERMANENT DAY ARCHIVES (1)\nAUTHORITATIVE\n13 October 2026\nBD-20261013\nACTIVE\nTOTAL BILLED (INCL. GST)\n₹0\n● 0 of 0 Orders Billed\nCASH\n₹0\nUPI\n₹0\nCARD\n₹0\nActive\nView Day\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n0% (0/1)\nPending KOT:\n0\nLocal Engine Active",
+  "headings": [
+    "Business Days & Day History",
+    "13 October 2026",
+    "PERMANENT DAY ARCHIVES (1)"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false,
+      "width": 136,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false,
+      "width": 128,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false,
+      "width": 187,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false,
+      "width": 95,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "U\nUI Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false,
+      "width": 124,
+      "height": 45,
+      "visible": true
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Live Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Kitchen & KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Fewer tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false,
+      "width": 202,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Close Business Day",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 167,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Today's Orders (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 158,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Day Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Close Day",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 111,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "All Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 70,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 62,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 85,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 91,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "View Day",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false,
+      "width": 129,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false,
+      "width": 93,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false,
+      "width": 135,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Pending KOT:\n0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false,
+      "width": 116,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search by date (e.g. 31 Aug) or Day ID..."
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5315/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

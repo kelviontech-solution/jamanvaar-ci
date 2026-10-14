@@ -20,6 +20,7 @@ import {
   printCards,
   withLogo,
 } from "./qrPrint";
+import { formatRestaurantDate } from '@jamanvaar/utils';
 import { useConfirm } from '@jamanvaar/ui';
 
 const scopedBranch = () =>
@@ -1094,9 +1095,9 @@ export function QrAnalyticsView({
 }: {
   paymentsOnly?: boolean;
 }) {
-  const today = new Date().toISOString().slice(0, 10),
+  const today = formatRestaurantDate(new Date(), 'ISO_DATE'),
     [from, setFrom] = useState(
-      new Date(Date.now() - 6 * 86400000).toISOString().slice(0, 10),
+      formatRestaurantDate(new Date(Date.now() - 6 * 86400000), 'ISO_DATE'),
     ),
     [to, setTo] = useState(today),
     [branch, setBranch] = useState(scopedBranch);
@@ -1143,7 +1144,7 @@ export function QrAnalyticsView({
     <div className="space-y-5">
       <div className={box + " flex flex-wrap gap-4"}>
         <label className="text-xs font-bold">
-          From (UTC)
+          From (restaurant date)
           <input
             type="date"
             className={input}
@@ -1152,7 +1153,7 @@ export function QrAnalyticsView({
           />
         </label>
         <label className="text-xs font-bold">
-          To (UTC)
+          To (restaurant date)
           <input
             type="date"
             className={input}
@@ -1166,6 +1167,7 @@ export function QrAnalyticsView({
           branches={branches.data}
         />
       </div>
+      {stats.data && <p className="text-xs text-slate-500">Timezone: {stats.data.timezone}. Calendar days run midnight to midnight and include both selected dates. UTC export boundaries: {stats.data.from} to {stats.data.to} (exclusive).</p>}
       <Failure error={stats.error} />
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
         {metricKeys.map((key) => (

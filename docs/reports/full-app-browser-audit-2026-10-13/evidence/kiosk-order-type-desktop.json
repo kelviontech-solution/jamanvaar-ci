@@ -1,0 +1,117 @@
+{
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nHow would you like to enjoy your meal?\n\nSelect whether you are dining in our restaurant or packing your feast for takeaway.\n\nDine-In\n\nEnjoy your meal freshly served at your table\n\nTakeaway\n\nPick up fresh packed food at Counter 1",
+  "headings": [
+    "How would you like to enjoy your meal?",
+    "Dine-In",
+    "Takeaway"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 137,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Dine-In\n\nEnjoy your meal freshly served at your table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 320,
+      "height": 256,
+      "visible": true
+    },
+    {
+      "text": "Takeaway\n\nPick up fresh packed food at Counter 1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 320,
+      "height": 256,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

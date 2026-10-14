@@ -1,0 +1,40 @@
+{
+  "text": "UI Audit Restaurant A\n\nThis page was not found. Choose an application below.\n\nRestaurant Admin\n\nRestaurant operations, floor, inventory and billing\n\nKiosk Admin\n\nCustomer kiosks, menu, appearance and payments\n\nLog out",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "Restaurant Admin\n\nRestaurant operations, floor, inventory and billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 276,
+      "height": 92,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Admin\n\nCustomer kiosks, menu, appearance and payments",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 276,
+      "height": 92,
+      "visible": true
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 276,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0
+}

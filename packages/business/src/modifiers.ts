@@ -59,7 +59,7 @@ export function resolveModifierGroups(item: MenuItem, allGroups: ModifierGroup[]
     .map((id) => allGroups.find((g) => g.id === id))
     .filter((g): g is ModifierGroup => !!g)
     .map((g) => ({ ...g, options: g.options.filter((o) => o.isAvailable).sort((a, b) => a.sortOrder - b.sortOrder) }))
-    .filter((g) => g.options.length > 0)
+    .filter((g) => g.options.length > 0 || g.isRequired || g.minSelections > 0)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
@@ -89,6 +89,6 @@ export function selectionToModifiers(groups: ModifierGroup[], selection: Modifie
 /** Names of required groups that have fewer choices than they need. */
 export function missingRequiredGroups(groups: ModifierGroup[], selection: ModifierSelection): string[] {
   return groups
-    .filter((g) => g.isRequired && (selection[g.id]?.length ?? 0) < Math.max(1, g.minSelections))
+    .filter((g) => (g.isRequired || g.minSelections > 0) && (selection[g.id]?.length ?? 0) < Math.max(1, g.minSelections))
     .map((g) => g.name);
 }

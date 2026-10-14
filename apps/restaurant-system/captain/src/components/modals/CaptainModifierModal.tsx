@@ -34,6 +34,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
 }) => {
   useEscapeToClose(isOpen, onClose);
   const [quantity, setQuantity] = useState(1);
+  const [query, setQuery] = useState('');
   const [notes, setNotes] = useState('');
   const [course, setCourse] = useState<'COURSE_1' | 'COURSE_2' | 'COURSE_3'>('COURSE_1');
   const [selection, setSelection] = useState<ModifierSelection>({});
@@ -43,7 +44,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
 
   useEffect(() => {
     if (isOpen && item) {
-      setQuantity(1);
+      setQuery('');setQuantity(1);
       setNotes('');
       setCourse('COURSE_1');
       setSelection(defaultModifierSelection(groups));
@@ -87,8 +88,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           </div>
           <button
             type="button"
-            onClick={onClose}
-            aria-label="Close"
+            aria-label="Close dish customization" onClick={onClose}
             className="p-1 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -96,6 +96,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
         </div>
 
         {/* The dish's own modifier groups */}
+        {groups.some(g=>g.options.length>8) && <input aria-label="Search dish options" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search options; selected options stay visible" className="w-full rounded-xl border p-3" />}
         {groups.map((g) => {
           const max = Math.max(1, g.maxSelections);
           const chosen = selection[g.id] ?? [];
@@ -106,7 +107,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
                 {max > 1 && <span className="text-[11px] normal-case font-semibold text-slate-400">choose up to {max}</span>}
               </label>
               <div className="space-y-1.5">
-                {g.options.map((o) => {
+                {g.options.filter(o=>chosen.includes(o.id) || o.name.toLowerCase().includes(query.toLowerCase())).map((o) => {
                   const on = chosen.includes(o.id);
                   return (
                     <button
@@ -173,7 +174,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              aria-label="Decrease dish quantity" onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
             >
               <Minus className="w-4 h-4" />
@@ -181,7 +182,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <span className="w-8 text-center text-lg font-bold font-mono text-jaman-navy">{quantity}</span>
             <button
               type="button"
-              onClick={() => setQuantity((q) => q + 1)}
+              aria-label="Increase dish quantity" onClick={() => setQuantity((q) => q + 1)}
               className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-jaman-navy font-bold flex items-center justify-center cursor-pointer"
             >
               <Plus className="w-4 h-4" />

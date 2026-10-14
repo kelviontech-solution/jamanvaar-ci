@@ -76,7 +76,7 @@ const runtimeBootedApps = new Set<string>();
  *     2. Master high-DPI JAMANVAAR by KELVIONTECH logo
  *     3. Tracked RESTAURANT OPERATIONS PLATFORM descriptor
  *     4. Clean, understated role badge ([ RESTAURANT ADMIN ], [ POS TERMINAL ], etc.)
- *     5. Minimal status indicators (● Core Engine Ready • ● Database Initialized • ● Local-First Mode)
+ *     5. Minimal status indicators (● Preparing application • ● Database Initialized • ● Local-First Mode)
  *     6. Micro-shimmer progress line
  * - Decoupled, quiet top brand header and single-line system footer.
  */
@@ -255,7 +255,7 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50/85 border border-emerald-200/70 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide shadow-2xs backdrop-blur-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{isSuperAdmin ? 'Cloud Control Active' : 'Local Engine Active'}</span>
+            <span>{isSuperAdmin ? 'Opening platform console' : 'Opening workspace'}</span>
           </div>
         </div>
       </header>
@@ -338,12 +338,12 @@ export const JAMANVAARStartup: React.FC<JAMANVAARStartupProps> = ({
           <div className="flex items-center justify-center flex-wrap gap-2 text-[10px] sm:text-[11px] font-medium text-slate-600">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/70 text-emerald-800 font-semibold shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Core Engine Ready
+              Preparing application
             </span>
             <span className="text-slate-300">•</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/70 text-emerald-800 font-semibold shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              {isSuperAdmin ? 'Cloud Database Connected' : 'Database Initialized'}
+              {isSuperAdmin ? 'Cloud workspace' : 'Local-first workspace'}
             </span>
             <span className="text-slate-300">•</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/70 text-amber-800 font-semibold shadow-2xs">

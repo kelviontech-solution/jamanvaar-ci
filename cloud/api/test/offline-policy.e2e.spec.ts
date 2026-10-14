@@ -6,7 +6,6 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 // A throwaway signing key so the grant path can run without the real private key. It has to be in
 // place before AppModule is imported: ConfigModule validates the environment at import time.
 vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { generateKeyPairSync } = require('crypto');
   const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
   process.env.LICENSE_SIGNING_PRIVATE_KEY_B64 = Buffer.from(privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()).toString('base64');

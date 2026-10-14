@@ -1,0 +1,448 @@
+{
+  "text": "CUSTOMER KIOSK\nEN\nहिन्दी\nગુજરાતી\nCart\n0\n₹0\nAll Menu\nCombos & Deals\nUI Category 1\nUI Category 2\nUI Category 3\nUI Category 4\nUI Category 5\nUI Category 6\nUI Category 7\nUI Category 8\nUI Category 9\nUI Category 10\nAll Menu\nPure Veg\n🌱 Pure Jain\nCombos & Deals\nNo dishes found\n\nTry another search term or filter category.\n\nView All Dishes\nJAMAN AI\nMENU GUIDE\n\nSuggestions from this restaurant?s current menu\n\n🔥 Popular\n🎁 Combos\n🍛 Starters\n🍲 Mains\n🍚 Biryani\n🥬 Pure Jain\n🌱 Pure Veg\n🏷️ Coupons\nNamaste! How can I help you choose your meal today?\n💬 What should I order?\n💬 Show vegetarian dishes\n💬 Show Jain food\n💬 Show today's offers\n💬 How do I pay?\nTAP ANY PRELOADED OPTION BELOW:\n1-Tap Instant Response\n🔥\nBest Sellers\n👑\nValue Combos\n🌱\nPure Jain Food\n🥘\nGujarati Thali\n🍛\nDum Biryani\n☕\nDrinks & Sweets\n🎁\nOffers & Coupons\n💳\nPayment Help",
+  "headings": [
+    "Combos & Deals",
+    "No dishes found",
+    "JAMAN AI\nMENU GUIDE"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cart\n0\n₹0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 161,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 3",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 4",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 6",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 7",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 8",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 9",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "UI Category 10",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 118,
+      "visible": true
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 91,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "View All Dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 132,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close JAMAN AI",
+      "title": "",
+      "disabled": false,
+      "width": 35,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "🔥 Popular",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 95,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🎁 Combos",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🍛 Starters",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 97,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🍲 Mains",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 83,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🍚 Biryani",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🥬 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🌱 Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 102,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "🏷️ Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "💬 What should I order?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 174,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "💬 Show vegetarian dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 194,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "💬 Show Jain food",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 140,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "💬 Show today's offers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 172,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "💬 How do I pay?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "🔥\nBest Sellers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "👑\nValue Combos",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "🌱\nPure Jain Food",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "🥘\nGujarati Thali",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "🍛\nDum Biryani",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "☕\nDrinks & Sweets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "🎁\nOffers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "💳\nPayment Help",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 3
+}

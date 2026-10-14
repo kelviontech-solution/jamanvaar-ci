@@ -32,7 +32,7 @@ ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 # Empty on production (this console owns the domain root there); set to e.g. "/admin" on
 # a dedicated testing box serving every app by path under one origin -- see
-# nginx/oracle-testing-proxy.conf and vite.config.ts's own comment on the relative base
+# nginx/oracle-testing-proxy.conf. Assets and router share this deployment prefix
 # this pairs with.
 ARG VITE_ROUTER_BASENAME=""
 ENV VITE_ROUTER_BASENAME=$VITE_ROUTER_BASENAME

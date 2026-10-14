@@ -1,0 +1,70 @@
+{
+  "text": "Choose your language\n\nभाषा चुनें • ભાષા પસંદ કરો\n\nEnglish\nENGLISH\nहिन्दी\nHINDI\nગુજરાતી\nGUJARATI\n\nYOU CAN CHANGE THIS ANYTIME FROM THE HEADER",
+  "headings": [
+    "Choose your language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "English\nENGLISH",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 243,
+      "height": 128,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी\nHINDI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 243,
+      "height": 128,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી\nGUJARATI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 243,
+      "height": 128,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": true,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 173
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

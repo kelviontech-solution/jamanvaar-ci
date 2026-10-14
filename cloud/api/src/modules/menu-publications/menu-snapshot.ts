@@ -159,7 +159,7 @@ export function viewForBranch(content: SnapshotContent, branchId: string | null)
       if (i.salesChannels ? !i.salesChannels.includes('QR') : !i.qrEnabled) return false;
       if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) return false;
       if (!categoryIds.has(i.categoryId)) return false;
-      return !!i.taxGroupId ? !!content.taxGroups[i.taxGroupId] : true;
+      return i.taxGroupId ? !!content.taxGroups[i.taxGroupId] : true;
     })
     .map((i) => ({ ...i, effectivePricePaise: itemOverride(i.id)?.pricePaise ?? i.pricePaise }))
     .sort(byOrder);

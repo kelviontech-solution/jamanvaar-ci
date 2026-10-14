@@ -1,6 +1,7 @@
-import { CachedImg, ModalBackdrop } from '@jamanvaar/ui';
-import React, { useState } from 'react';
+import { CachedImg, ModalBackdrop, useDialogFocus } from '@jamanvaar/ui';
+import React, { useState, useEffect, useMemo } from 'react';
 import { usePosStore } from '../../store/posStore';
+import { resolveModifierGroups, defaultModifierSelection, selectionToModifiers, missingRequiredGroups } from '@jamanvaar/business';
 import { db } from '@jamanvaar/database';
 import { ModifierGroup, ModifierOption, SelectedModifier } from '@jamanvaar/types';
 import { X, Plus, Minus, Check, Sparkles } from 'lucide-react';
@@ -22,12 +23,15 @@ export const PosCustomizationModal: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [specialInstructions, setSpecialInstructions] = useState('');
 
+  const [query, setQuery] = useState('');
+  const groups = useMemo(() => customizingItem ? resolveModifierGroups(customizingItem, db.modifierGroups) : [], [customizingItem]);
+  const {cardRef} = useDialogFocus<HTMLDivElement>(!!customizingItem, () => setCustomizingItem(null));
+  useEffect(() => {setSelectedOptions(selectionToModifiers(groups, defaultModifierSelection(groups)));setQuantity(1);setSpecialInstructions('');setQuery('');}, [customizingItem]);
   if (!customizingItem) return null;
 
   // Retrieve modifier groups for this item
-  const modifierGroups: ModifierGroup[] = (customizingItem.modifierGroupIds || [])
-    .map((gId) => db.modifierGroups.find((g) => g.id === gId))
-    .filter(Boolean) as ModifierGroup[];
+  const modifierGroups = groups;
+  const missing = missingRequiredGroups(groups, Object.fromEntries(groups.map(group=>[group.id,selectedOptions.filter(option=>option.groupId===group.id).map(option=>option.optionId)])));
 
   const handleToggleOption = (group: ModifierGroup, option: ModifierOption) => {
     const isMulti = group.maxSelections > 1;
@@ -77,6 +81,7 @@ export const PosCustomizationModal: React.FC = () => {
   const totalPrice = unitPrice * quantity;
 
   const handleAddToCart = () => {
+    if (missing.length) return;
     addItemToCart(customizingItem, selectedOptions, specialInstructions, quantity);
     setCustomizingItem(null);
   };
@@ -97,7 +102,7 @@ export const PosCustomizationModal: React.FC = () => {
 
   return (
     <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div ref={cardRef} role="dialog" aria-modal="true" aria-label="Customize dish" tabIndex={-1} className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -121,7 +126,7 @@ export const PosCustomizationModal: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setCustomizingItem(null)}
+            aria-label="Close dish customization" onClick={() => setCustomizingItem(null)}
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
@@ -130,6 +135,7 @@ export const PosCustomizationModal: React.FC = () => {
 
         {/* Scrollable Customization Content */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
+          {modifierGroups.some(group=>group.options.length>8) && <input aria-label="Search dish options" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search options; selected options stay visible" className="w-full rounded-xl border p-3" />}
           {/* Modifier Groups */}
           {modifierGroups.map((group) => (
             <div key={group.id} className="bg-white border border-jaman-border rounded-2xl p-4 shadow-2xs">
@@ -137,7 +143,8 @@ export const PosCustomizationModal: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-sm text-jaman-navy">{group.name}</h3>
                   <span className="text-[11px] text-slate-400">
-                    {group.isRequired ? 'Required • Choose 1' : `Optional • Max ${group.maxSelections}`}
+                    {group.isRequired || group.minSelections > 0 ? `Required: choose ${Math.max(1, group.minSelections)} to ${Math.max(1, group.maxSelections)}` : `Optional: up to ${Math.max(1, group.maxSelections)}`}
+                    {group.options.length === 0 && ' — no options available; ask staff'}
                   </span>
                 </div>
                 {group.isRequired && (
@@ -148,7 +155,7 @@ export const PosCustomizationModal: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {group.options.map((opt) => {
+                {group.options.filter(opt=>isOptionSelected(opt.id) || opt.name.toLowerCase().includes(query.toLowerCase())).map((opt) => {
                   const selected = isOptionSelected(opt.id);
                   return (
                     <button
@@ -228,7 +235,7 @@ export const PosCustomizationModal: React.FC = () => {
           {/* Quantity Controls */}
           <div className="flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-2xl p-1">
             <button
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              aria-label="Decrease dish quantity" onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs"
             >
               <Minus className="w-4 h-4" />
@@ -237,7 +244,7 @@ export const PosCustomizationModal: React.FC = () => {
               {quantity}
             </span>
             <button
-              onClick={() => setQuantity((q) => q + 1)}
+              aria-label="Increase dish quantity" onClick={() => setQuantity((q) => q + 1)}
               className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs"
             >
               <Plus className="w-4 h-4" />
@@ -246,7 +253,7 @@ export const PosCustomizationModal: React.FC = () => {
 
           {/* Add to Order Button */}
           <button
-            onClick={handleAddToCart}
+            disabled={missing.length>0} title={missing.length ? `Choose: ${missing.join(', ')}` : undefined} onClick={handleAddToCart}
             className="flex-1 bg-jaman-saffron hover:bg-jaman-orange text-white py-3.5 px-6 rounded-2xl font-extrabold text-sm uppercase tracking-wider flex items-center justify-between shadow-lg shadow-jaman-saffron/25 active:scale-[0.99] transition-transform cursor-pointer"
           >
             <span>Add to Order</span>

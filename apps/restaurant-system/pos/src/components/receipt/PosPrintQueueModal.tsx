@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePosStore } from '../../store/posStore';
 import { db, PrintQueueRepository } from '@jamanvaar/database';
 import { PrintJob, PrintJobStatus } from '@jamanvaar/types';
-import { sound, ModalBackdrop } from '@jamanvaar/ui';
+import { sound, ModalBackdrop, useDialogFocus } from '@jamanvaar/ui';
 import { PosPrinterService } from '../../services/printerService';
 import { Printer, X, RotateCcw, CheckCircle2, AlertTriangle, Clock, FileText, Sparkles } from 'lucide-react';
 
@@ -11,6 +11,7 @@ export const PosPrintQueueModal: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<PrintJob | null>(null);
   const [retryFeedback, setRetryFeedback] = useState('');
 
+  const { cardRef } = useDialogFocus<HTMLDivElement>(isPrintQueueOpen, () => selectedJob ? setSelectedJob(null) : setIsPrintQueueOpen(false));
   if (!isPrintQueueOpen) return null;
 
   const jobs = PrintQueueRepository.getAllJobs();
@@ -33,7 +34,8 @@ export const PosPrintQueueModal: React.FC = () => {
 
   const handleTestPrint = () => {
     sound.play('order');
-    const defaultPrinter = db.configuredPrinters[0]?.id || 'printer-receipt-01';
+    const defaultPrinter = db.configuredPrinters[0]?.id;
+    if (!defaultPrinter) { setRetryFeedback('No printer configured. Add a receipt printer in Settings before testing.'); return; }
     PosPrinterService.printTestSlip(defaultPrinter, '80mm');
     setRetryFeedback(`Dispatched diagnostic test slip to ${db.configuredPrinters[0]?.name || 'Receipt Printer'}!`);
     setTimeout(() => setRetryFeedback(''), 3000);
@@ -41,6 +43,7 @@ export const PosPrintQueueModal: React.FC = () => {
 
   const getStatusBadge = (status: PrintJobStatus) => {
     switch (status) {
+      case 'PRINTED':
       case 'SUCCESS':
         return (
           <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -73,7 +76,7 @@ export const PosPrintQueueModal: React.FC = () => {
 
   return (
     <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div ref={cardRef} role="dialog" aria-modal="true" aria-label="Hardware print queue" tabIndex={-1} className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-jaman-navy text-white p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
@@ -96,7 +99,7 @@ export const PosPrintQueueModal: React.FC = () => {
               <span>Test Print</span>
             </button>
 
-            {jobs.some((j) => j.status === 'SUCCESS') && (
+            {jobs.some((j) => j.status === 'SUCCESS' || j.status === 'PRINTED') && (
               <button
                 onClick={handleClearCompleted}
                 className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-200"
@@ -106,7 +109,7 @@ export const PosPrintQueueModal: React.FC = () => {
             )}
 
             <button
-              onClick={() => setIsPrintQueueOpen(false)}
+              aria-label="Close print queue" data-modal-close onClick={() => setIsPrintQueueOpen(false)}
               className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200"
             >
               <X className="w-5 h-5" />

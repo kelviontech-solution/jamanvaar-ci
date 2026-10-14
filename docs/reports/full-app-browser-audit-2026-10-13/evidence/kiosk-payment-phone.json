@@ -1,0 +1,125 @@
+{
+  "text": "CUSTOMER KIOSK\nEN\nहिन्दी\nગુજરાતી\nChoose Payment Method\n\nTotal Payable:₹100\n\nBeing set up\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM\n\nOffline & Online\nCash at Counter\n\nPay at billing counter when collecting order\n\nPay at Pickup Counter\n\nYou will receive your token now. Please pay at Counter 1.\n\nConfirm & Get Token",
+  "headings": [
+    "Choose Payment Method",
+    "Pay at Pickup Counter"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Being set up\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 342,
+      "height": 172,
+      "visible": true
+    },
+    {
+      "text": "Offline & Online\nCash at Counter\n\nPay at billing counter when collecting order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 342,
+      "height": 172,
+      "visible": true
+    },
+    {
+      "text": "Confirm & Get Token",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 276,
+      "height": 68,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 3
+}

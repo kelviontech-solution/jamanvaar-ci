@@ -1,0 +1,258 @@
+{
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nCart\n0\n₹0\nAll Menu\nCombos & Deals\nUI Category 1\nUI Category 2\nUI Category 3\nUI Category 4\nUI Category 5\nUI Category 6\nUI Category 7\nUI Category 8\nUI Category 9\nUI Category 10\nAll Menu\nPure Veg\n🌱 Pure Jain\nCombos & Deals\nNo dishes found\n\nTry another search term or filter category.\n\nView All Dishes",
+  "headings": [
+    "Combos & Deals",
+    "No dishes found"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 137,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cart\n0\n₹0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 161,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 3",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 4",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 6",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 7",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 8",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 9",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "UI Category 10",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 103,
+      "visible": true
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 91,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "View All Dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 132,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "title": "JAMANVAAR Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

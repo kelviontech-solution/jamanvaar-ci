@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, OrderRepository, HeldOrderRepository } from '@jamanvaar/database';
+import { db, ShiftRepository, OrderRepository, HeldOrderRepository } from '@jamanvaar/database';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 
 describe('JAMANVAAR POS — Cashier UX Polish & Workflows', () => {
   beforeEach(() => {
     db.resetToDefaultSeed();
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     // This scenario explicitly exercises tax-exclusive listed prices; inclusive pricing has separate regressions.
     db.taxGroups.forEach(group => { group.isInclusive = false; });
     usePosStore.getState().clearCart();

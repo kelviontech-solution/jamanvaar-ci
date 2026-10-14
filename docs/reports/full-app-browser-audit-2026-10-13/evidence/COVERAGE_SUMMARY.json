@@ -1,0 +1,20 @@
+{
+  "rawButtonObservations": 3717,
+  "distinctAppPageButtonLabels": 2159,
+  "latestButtonStatuses": {
+    "ACTIVATED": 85,
+    "NOT_EXERCISED": 272,
+    "REPEATED_INSTANCE": 8,
+    "DISABLED": 38,
+    "HARNESS_OR_UI_FAILURE": 1,
+    "INVENTORIED": 1755
+  },
+  "rawWorkflowRuns": 126,
+  "rawWorkflowStatuses": {
+    "PASS": 104,
+    "FAIL": 22
+  },
+  "settledAdminCaptureRows": 106,
+  "baselineCommit": "857b80018ef92db78b43fa63e281b90f2ec8dbe9",
+  "notEveryStateVerified": true
+}

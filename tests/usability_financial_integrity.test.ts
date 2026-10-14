@@ -65,6 +65,7 @@ describe('Cash, table release and multi-register integrity', () => {
     expect(() => OrderRepository.settleOrder(order.id,'CASH',150,'counter-twice')).toThrow(/already paid/);
   });
   it('counter settlement loads a released kiosk bill by ID and settles that exact bill once', () => {
+    ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     const item=db.menuItems[0];
     const order=OrderRepository.createOrder({source_type:'KIOSK',orderType:'TAKEAWAY',items:[{id:'original-line',orderId:'',menuItemId:item.id,sku:item.sku,name:item.name,quantity:1,unitPrice:250,totalPrice:250,modifiers:[],kitchenStatus:'SERVED'}],totalAmount:250,paymentStatus:'PENDING',orderStatus:'COMPLETED',paymentMethod:'CASH_AT_COUNTER'});
     const pos=usePosStore.getState();pos.clearCart();

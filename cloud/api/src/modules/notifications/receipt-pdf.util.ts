@@ -20,6 +20,8 @@ export interface ReceiptPdfInput {
   subtotal: number; // paise
   taxAmount: number; // paise
   totalAmount: number; // paise
+  collectedAmount?: number; // confirmed collections, paise
+  outstandingAmount?: number; // remaining balance, paise
   thankYouMessage?: string;
   footerMessage?: string;
   logoDataUrl?: string;
@@ -130,7 +132,12 @@ export function buildReceiptPdfBuffer(input: ReceiptPdfInput): Promise<Buffer> {
     doc.moveDown(0.2);
     doc.strokeColor(saffron).lineWidth(1).moveTo(330, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.3);
-    totalsRow('TOTAL PAID', rupees(input.totalAmount), true);
+    totalsRow('TOTAL AMOUNT', rupees(input.totalAmount), true);
+    const collected = input.collectedAmount ?? (input.paidAt ? input.totalAmount : 0);
+    const due = input.outstandingAmount ?? Math.max(0, input.totalAmount - collected);
+    totalsRow('Collected', rupees(collected));
+    totalsRow('Balance due', rupees(due), true);
+    if (due > 0) doc.font('Helvetica-Bold').fontSize(10).text(input.method === 'CASH_AT_COUNTER' || input.method === 'CASH' ? 'PAYMENT DUE AT COUNTER' : 'PAYMENT PENDING', 50, doc.y, {width: 495, align: 'center'});
 
     doc.moveDown(1.5);
     doc.font('Helvetica-Oblique').fontSize(9).fillColor(muted).text(input.thankYouMessage ?? 'Thank you for dining with us!', 50, doc.y, { width: 495, align: 'center' });

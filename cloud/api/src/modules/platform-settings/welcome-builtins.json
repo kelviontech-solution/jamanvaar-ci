@@ -2,7 +2,7 @@
   {
     "id": "royal-indian-dining",
     "name": "Royal Indian Dining",
-    "category": "Indian Dining",
+    "category": "Ivory palace & brass",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/royal-indian-dining-landscape-thumb.webp"
@@ -10,7 +10,7 @@
   {
     "id": "modern-indian-dining",
     "name": "Modern Indian Dining",
-    "category": "Indian Dining",
+    "category": "Sage contemporary bistro",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/modern-indian-dining-landscape-thumb.webp"
@@ -18,7 +18,7 @@
   {
     "id": "gujarati-thali",
     "name": "Gujarati Thali",
-    "category": "Indian Dining",
+    "category": "Gujarati thali & warm gold",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/gujarati-thali-landscape-thumb.webp"
@@ -26,7 +26,7 @@
   {
     "id": "north-indian-cuisine",
     "name": "North Indian Cuisine",
-    "category": "Indian Dining",
+    "category": "North Indian copper & spice",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/north-indian-cuisine-landscape-thumb.webp"
@@ -34,7 +34,7 @@
   {
     "id": "south-indian-cuisine",
     "name": "South Indian Cuisine",
-    "category": "Indian Dining",
+    "category": "South Indian banana leaf",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/south-indian-cuisine-landscape-thumb.webp"
@@ -42,7 +42,7 @@
   {
     "id": "indian-street-food",
     "name": "Indian Street Food",
-    "category": "Indian Dining",
+    "category": "Street food & cheerful color",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/indian-street-food-landscape-thumb.webp"
@@ -50,7 +50,7 @@
   {
     "id": "premium-biryani",
     "name": "Premium Biryani",
-    "category": "Indian Dining",
+    "category": "Biryani & amber clay",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/premium-biryani-landscape-thumb.webp"
@@ -58,7 +58,7 @@
   {
     "id": "vegetarian-garden",
     "name": "Vegetarian Garden",
-    "category": "Indian Dining",
+    "category": "Vegetarian botanical green",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/vegetarian-garden-landscape-thumb.webp"
@@ -66,7 +66,7 @@
   {
     "id": "cafe-casual-dining",
     "name": "Café & Casual Dining",
-    "category": "Indian Dining",
+    "category": "Cafe oak & cream",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/cafe-casual-dining-landscape-thumb.webp"
@@ -74,7 +74,7 @@
   {
     "id": "heritage-desserts",
     "name": "Heritage Sweets",
-    "category": "Indian Dining",
+    "category": "Sweets & heritage gold",
     "imageUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts.webp",
     "landscapeImageUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts-landscape.webp",
     "thumbnailUrl": "/assets/branding/kiosk-welcome-v1/heritage-desserts-landscape-thumb.webp"

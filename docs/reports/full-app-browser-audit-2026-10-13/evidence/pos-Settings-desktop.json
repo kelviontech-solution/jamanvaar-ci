@@ -1,0 +1,557 @@
+{
+  "text": "POS TERMINAL\nUI Audit Restaurant A\n\nUI Audit Restaurant A\n•\nde318c70-1a23-446d-a44b-485ec7efbb1b\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nU\nUI Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\nLive Orders\nBills & Invoices\nKitchen & KOT\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nFewer tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nStaff practice +\nPOS System & License Settings\n\nConfigure hardware stations, thermal receipt print queues, and restaurant subscription licenses.\n\nHardware & Printers\nReports & Design\nInstant Bill\nLocal DB & Sync\nSubscription & License\nConnection & diagnostics\nONLINE ● Connected\nConnected to the cloud. Everything is up to date.\nSync now\nLocal Core setup\n\nActivate this device first. Enter the six-digit pairing PIN shown in the Local Core server console. Pair each app once for this restaurant and branch. Cloud login and cloud sync work independently.\n\nLocal Core address\nPairing PIN\nPair Local Core\nBranch Core (restaurant server)\n\nThe always-on machine that lets every device work together without internet. Enter its address, e.g. 192.168.1.10. Leave empty to use the cloud only.\n\nConnect\nConnection\nCloud\nInternet verified\nYes\nWaiting to send\n0\nCould not send\n0\nOrders on this device\n0\nLocal storage\nHealthy\nApp version\n1.0.4\nStart this device fresh\n\nRemoves the staff list, orders and other data stored on this device and downloads this restaurant's own data again. Use it if you see staff, orders or items that are not yours. Orders not yet sent are set aside, not deleted.\n\nClear and re-download\nScreen size\n100%\n\nMakes everything on this screen bigger or smaller. Your restaurant default is 100% (set in Restaurant Admin). This terminal is using it.\n\n70%\n150%\nUse the restaurant default\nReset to 100%\nSound Effects\nAUDIO FEEDBACK\nEnable Sound Feedback\nClick, add, remove, payment, KOT, and notification sounds\nVolume Level\nLow\nMedium\nHigh\nPlay Test Sound\nPrinting & Automation Rules\nAUTO-PRINT\nAuto-Print Receipt on Settlement\nAutomatically queue thermal receipt upon successful payment\nAuto-Print KOT on Order Dispatch\nSend kitchen tickets to station printers automatically\nDefault Paper Width\nStandard counter roll dimension\n80mm\n58mm\nFind printers\nLooks for USB / Windows printers, network printers and serial ports\nScan\nPrinters & Hardware Devices\nAuto-detected Windows, USB & LAN Thermal Printers\nScan for Printers\nPrint Queue\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n0% (0/1)\nPending KOT:\n0\nLocal Engine Active",
+  "headings": [
+    "POS System & License Settings",
+    "Connection & diagnostics",
+    "Screen size",
+    "Sound Effects",
+    "Printing & Automation Rules",
+    "Find printers",
+    "Printers & Hardware Devices"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false,
+      "width": 136,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false,
+      "width": 128,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false,
+      "width": 187,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false,
+      "width": 95,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "U\nUI Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — All Systems OK",
+      "disabled": false,
+      "width": 124,
+      "height": 45,
+      "visible": true
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Floor & Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Live Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Kitchen & KOT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Fewer tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false,
+      "width": 202,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Staff practice +",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 1110,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Hardware & Printers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 145,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Reports & Design",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 149,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Instant Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Local DB & Sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Subscription & License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Pair Local Core",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 133,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Connect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 91,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Clear and re-download",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 191,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Use the restaurant default",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 177,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Reset to 100%",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 111,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Low",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 359,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Medium",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 359,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "High",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 359,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Play Test Sound",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 144,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "80mm",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "58mm",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "Scan",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 69,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "Scan for Printers",
+      "aria": null,
+      "title": "Scan for connected physical & network printers",
+      "disabled": false,
+      "width": 121,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 65,
+      "height": 39,
+      "visible": true
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false,
+      "width": 129,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false,
+      "width": 93,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Tables:\n0% (0/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false,
+      "width": 135,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Pending KOT:\n0",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false,
+      "width": 116,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Local Core address",
+      "placeholder": "http://localhost:5178"
+    },
+    {
+      "tag": "INPUT",
+      "type": "password",
+      "label": "Local Core pairing PIN",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "192.168.1.10:5178"
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Screen size",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5315/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 3
+}

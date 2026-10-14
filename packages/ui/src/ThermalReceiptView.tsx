@@ -50,8 +50,18 @@ export function paymentLabelFor(method: string | undefined): string {
     case 'WALLET':
       return 'WALLET';
     default:
-      return method ? method.replace(/_/g, ' ') : 'PAID';
+      return method ? method.replace(/_/g, ' ') : 'NOT SPECIFIED';
   }
+}
+
+/** Amounts come from confirmed allocations; choosing a tender is not a collection. */
+export function receiptPaymentSummary(order: Pick<Order, 'totalAmount' | 'paymentStatus' | 'paymentMethod' | 'paymentAllocationSummary'>) {
+  const total = Math.max(0, Math.round((order.totalAmount || 0) * 100));
+  const confirmed = ['SUCCESS', 'PAID', 'REFUNDED', 'PARTIALLY_REFUNDED', 'REFUND_PENDING'].includes(order.paymentStatus || '');
+  const collected = Math.max(0, order.paymentAllocationSummary?.collectedPaise ?? (confirmed ? total : 0));
+  const outstanding = Math.max(0, order.paymentAllocationSummary?.outstandingPaise ?? (confirmed ? 0 : total - collected));
+  const label = outstanding > 0 ? (order.paymentMethod === 'CASH_AT_COUNTER' || order.paymentMethod === 'CASH' ? 'PAYMENT DUE AT COUNTER' : 'PAYMENT PENDING') : confirmed || collected > 0 ? 'PAID VIA' : 'PAYMENT STATUS';
+  return { collected: collected / 100, outstanding: outstanding / 100, label };
 }
 
 /** Four slanted rows of the word, light enough to read the bill through it. */
@@ -280,7 +290,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
             cash drawer at a glance (on-screen/WhatsApp only; the printed slip is monochrome). */}
         <div className="py-2 border-b border-dashed border-[#A0AEC0] space-y-1 text-[11px]">
           <div className="flex justify-between items-center">
-            <span className="font-bold text-[#4A5568]">PAID VIA:</span>
+            <span className="font-bold text-[#4A5568]">{receiptPaymentSummary(order).label}:</span>
             <span className="font-black uppercase px-2 py-0.5 rounded border-2 border-black text-black bg-white">
               {paymentLabelFor(order.paymentMethod)}
             </span>
@@ -291,6 +301,8 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
               <span className="font-mono break-all text-right">{order.paymentTransactionId}</span>
             </div>
           )}
+          <div className="flex justify-between"><span>Amount collected:</span><span>₹{receiptPaymentSummary(order).collected.toFixed(2)}</span></div>
+          <div className="flex justify-between font-bold"><span>Balance due:</span><span>₹{receiptPaymentSummary(order).outstanding.toFixed(2)}</span></div>
         </div>
 
         {upiQrDataUrl && (
@@ -499,9 +511,11 @@ export function printThermalReceipt(
         <div class="divider"></div>
 
         <div class="row">
-          <span>PAID VIA:</span>
+          <span>${receiptPaymentSummary(order).label}:</span>
           <span class="bold">${paymentLabelFor(order.paymentMethod)}</span>
         </div>
+        <div class="row"><span>Amount collected:</span><span>${receiptPaymentSummary(order).collected.toFixed(2)}</span></div>
+        <div class="row"><span>Balance due:</span><span>${receiptPaymentSummary(order).outstanding.toFixed(2)}</span></div>
         ${order.paymentTransactionId ? `<div class="row" style="font-size: 9px;"><span>Payment ref:</span><span>${order.paymentTransactionId}</span></div>` : ''}
         ${upiQrHtml}
         <div class="divider"></div>

@@ -1,0 +1,617 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Audit Logs\n\nImmutable, cryptographically anchored operational event trail — tracking every platform action across all tenants.\n\nExport CSV\nAll Categories\nACTIVATION\nAUTH\nBRANCH\nMENU\nRESTAURANT\nSUBSCRIPTION\nSYNC\nAll Actors\nPlatform Admin\nTenant Staff\nSystem Process\n55 recorded events\nEVENT & OPERATIONAL ACTIVITY\tCATEGORY\tACTOR\tTENANT CONTEXT\tTIMESTAMP\tINSPECT\n\nPlatform Login\nPLATFORM_LOGIN\nPlatform operational event: PLATFORM_LOGIN\n\tAUTH\tPLATFORM\t—\t13 Oct 2026, 09:25:24 pm\t\nDetails\n\n\nPlatform Login Otp Sent\nPLATFORM_LOGIN_OTP_SENT\nPlatform operational event: PLATFORM_LOGIN_OTP_SENT\n\tAUTH\tPLATFORM\t—\t13 Oct 2026, 09:25:24 pm\t\nDetails\n\n\nActivation Key Redeemed\nACTIVATION_KEY_REDEEMED\nPlatform operational event: ACTIVATION_KEY_REDEEMED\n\tACTIVATION\tSYSTEM\tbf3838b0-2…\t13 Oct 2026, 09:24:17 pm\t\nDetails\n\n\nStaff Signin\nSTAFF_SIGNIN\nPlatform operational event: STAFF_SIGNIN\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:23:32 pm\t\nDetails\n\n\nStaff Signin\nSTAFF_SIGNIN\nPlatform operational event: STAFF_SIGNIN\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:22:26 pm\t\nDetails\n\n\nActivation Key Redeemed\nACTIVATION_KEY_REDEEMED\nPlatform operational event: ACTIVATION_KEY_REDEEMED\n\tACTIVATION\tSYSTEM\tbf3838b0-2…\t13 Oct 2026, 09:22:23 pm\t\nDetails\n\n\nActivation Key Redeemed\nACTIVATION_KEY_REDEEMED\nPlatform operational event: ACTIVATION_KEY_REDEEMED\n\tACTIVATION\tSYSTEM\tbf3838b0-2…\t13 Oct 2026, 09:17:00 pm\t\nDetails\n\n\nStaff Signin\nSTAFF_SIGNIN\nPlatform operational event: STAFF_SIGNIN\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:09:21 pm\t\nDetails\n\n\nStaff Signin\nSTAFF_SIGNIN\nPlatform operational event: STAFF_SIGNIN\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:09:21 pm\t\nDetails\n\n\nActivation Key Redeemed\nACTIVATION_KEY_REDEEMED\nPlatform operational event: ACTIVATION_KEY_REDEEMED\n\tACTIVATION\tSYSTEM\tbf3838b0-2…\t13 Oct 2026, 09:09:17 pm\t\nDetails\n\n\nRestaurant Admin Sign In\nTENANT_LOGIN\nRestaurant owner or authorized staff signed in to the Restaurant Admin console.\n\tAUTHENTICATION\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:05:44 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:05:35 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:05:35 pm\t\nDetails\n\n\nSync Staff User Changed\nSYNC_STAFF_USER_CHANGED\nPlatform operational event: SYNC_STAFF_USER_CHANGED\n\tSYNC\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:30 pm\t\nDetails\n\n\nSync Staff User Changed\nSYNC_STAFF_USER_CHANGED\nPlatform operational event: SYNC_STAFF_USER_CHANGED\n\tSYNC\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:30 pm\t\nDetails\n\n\nSync Staff User Changed\nSYNC_STAFF_USER_CHANGED\nPlatform operational event: SYNC_STAFF_USER_CHANGED\n\tSYNC\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:29 pm\t\nDetails\n\n\nSync Staff User Changed\nSYNC_STAFF_USER_CHANGED\nPlatform operational event: SYNC_STAFF_USER_CHANGED\n\tSYNC\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:27 pm\t\nDetails\n\n\nMenu Published\nMENU_PUBLISHED\nPlatform operational event: MENU_PUBLISHED\n\tMENU\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:17 pm\t\nDetails\n\n\nRestaurant Admin Sign In\nTENANT_LOGIN\nRestaurant owner or authorized staff signed in to the Restaurant Admin console.\n\tAUTHENTICATION\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:04:00 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:49 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:49 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:32 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:32 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:31 pm\t\nDetails\n\n\nTenant Refresh Token Reuse\nTENANT_REFRESH_TOKEN_REUSE\nPlatform operational event: TENANT_REFRESH_TOKEN_REUSE\n\tAUTH\tTENANT\tbf3838b0-2…\t13 Oct 2026, 09:03:31 pm\t\nDetails\nPrevious\nPage 1 of 3 (55 events)\nNext",
+  "headings": [
+    "Platform Audit Logs"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 128,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Platform Login",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 96,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Platform Login Otp Sent",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 158,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Activation Key Redeemed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Staff Signin",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Staff Signin",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Activation Key Redeemed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Activation Key Redeemed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Staff Signin",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Staff Signin",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Activation Key Redeemed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Admin Sign In",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Sync Staff User Changed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 163,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Sync Staff User Changed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 163,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Sync Staff User Changed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 163,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Sync Staff User Changed",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 163,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Menu Published",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Admin Sign In",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Tenant Refresh Token Reuse",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Previous",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 75,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Next",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 53,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search by action keyword…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

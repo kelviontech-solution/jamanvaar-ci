@@ -1,0 +1,122 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nPlatform Control Center\n\nExecutive control plane across restaurant tenants, recurring subscriptions, device licensing, and infrastructure operations.\n\nOnboard Restaurant\nBilling Hub\nPlatform Overview\nLive Financials & Scale\nMONTHLY RECURRING REVENUE\nACTIVE BILLING\n₹\n4,500\nAnnual Run Rate (ARR): ₹54,000\nCalculated across all active subscriptions\nTotal Restaurants\n2\n2 Active\nManage all restaurants →\nActive Subscriptions\n6\nAcross Core, Pro & Enterprise tiers\nView subscription plans →\nInvoice Collections & Receivables Watch\n6 Pending Invoices • 0 Past Due • Outstanding Total: ₹63,720\nView Invoices →\nOperations & Fleet Telemetry\nLive System Metrics\nCloud API Gateway\n● UP\n100%\nHealthy\nUptime: 48m • Port 4000\nPostgreSQL Cluster\nHEALTHY\n6ms\nLatency\n16 active pool connection(s)\nSync Engine\n100%\n0\nEvents (24h)\n0 unresolved conflict(s)\nBackup Fleet\nACTIVE\n0\nCompleted\n0 failed • SHA-256 Verified\nPlatform Trends & Analytics\n6-Month Historical Data\nRestaurant Tenant Onboarding Growth\nNew restaurant accounts onboarded per month\n+2 this month\n0\nMay\n0\nJun\n0\nJul\n0\nAug\n0\nSept\n2\nOct\nMonthly SaaS Revenue Run Rate\nMonthly recurring billings from active tiers\n₹0\nMay\n₹0\nJun\n₹0\nJul\n₹0\nAug\n₹0\nSept\n₹0\nOct\nSubscription Tier Distribution\nManage plans →\nKIOSK PRO\n2 active\nJAMANVAAR PRO\n2 active\nJAMANVAAR QR\n2 active\nHardware Fleet & Activity Stream\nDevices & Operational Audit\nHardware & Connected Terminals\nView all devices\n3 / 5\nOnline Active Terminals\n4\nTotal Outlets / Branches\nTerminal Fleet Connectivity\n60% Active\nGenerate Activation Key\nMaster Menu Catalog\nPlatform Infrastructure Cluster\nAPI Gateway, PostgreSQL & Sync engine operational\nHealth Check\nRecent Platform Activity\nFull Audit Logs →\nPlatform Login\nAUTH\nPlatform Admin\n•\n13 Oct 2026, 09:25 pm\nPlatform Login Otp Sent\nAUTH\nPlatform Admin\n•\n13 Oct 2026, 09:25 pm\nActivation Key Redeemed\nACTIVATION\nSystem Service\n•\n13 Oct 2026, 09:24 pm\nStaff Signin\nAUTH\nRestaurant Tenant\n•\n13 Oct 2026, 09:23 pm\nStaff Signin\nAUTH\nRestaurant Tenant\n•\n13 Oct 2026, 09:22 pm\nActivation Key Redeemed\nACTIVATION\nSystem Service\n•\n13 Oct 2026, 09:22 pm\nActivation Key Redeemed\nACTIVATION\nSystem Service\n•\n13 Oct 2026, 09:17 pm",
+  "headings": [
+    "Platform Control Center"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -1,0 +1,122 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\n← Back to plans\nJAMANVAAR PRO\nPRO\n\nEverything in Core, plus KDS and the Captain wireless service workflow.\n\nACTIVE\nCommercial Terms & Quotas\nMonthly Fee\n₹580\nYearly Fee\n₹7,000\nMax Branches\n5 outlets\nMax Terminals\n20 devices (POS/Captain/KDS)\nMax Staff Users\n50 user accounts\nGranular Features\n364 Capabilities\nModular Entitlements (16 Categories Active)\n✓\n1. POS & Fast Billing\n28 Features\n✓ POS Terminal\n✓ Dine-in / Takeaway / Delivery / Token\n✓\n2. Payments & Cash Drawer\n19 Features\n✓ Multi-Payment Tenders\n✓ Shift & Cash Drawer\n✓\n3. Table & Floor Management\n20 Features\n✓ Table Management\n✓\n4. Kitchen, KOT & KDS\n45 Features\n✓ KOT / KDS Routing\n✓\n5. Menu & Inventory Management\n21 Features\n✓ Menu Management\n✓ Food Customization\n✓ Inventory Management\n✓\n6. Reports, GST & Administration\n76 Features\n✓ Sales & GST Reports\n✓ Discounts & GST\n✓ Offline Billing\n✓ Receipt Printing\n✓ Customer Management\n✓ Restaurant Admin\n✓\n7. Connected Restaurant Ecosystem\n155 Features\n✓ Captain App\n✓ Advanced Captain Reports\n✓ Advanced Service Workflow\n✓ QR Table Ordering & Standees\n✓ POS Assistant (JAMAN AI)\n✓ Self-Order Kiosk & Kiosk Admin\n— QR Service Requests (call waiter, water, bill...)\n— QR Scheduled Pickup\nRestaurants on this plan (2)\nRESTAURANT\tSTATUS\tEXPIRES\nUI Audit Restaurant B\t\nACTIVE\t11/12/2026\nUI Audit Restaurant A\t\nACTIVE\t11/12/2026",
+  "headings": [
+    "JAMANVAAR PRO"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

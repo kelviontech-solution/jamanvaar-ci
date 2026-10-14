@@ -136,7 +136,7 @@ export class ReportExportService {
    * Export to Clean Excel Format (.xls format with XML spreadsheet)
    */
   public static exportExcelXml(title: string, headers: string[], rows: (string | number)[][]): void {
-    let xml = `<?xml version="1.0"?>
+    const xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:o="urn:schemas-microsoft-com:office:office"

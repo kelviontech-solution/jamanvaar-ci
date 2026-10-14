@@ -272,7 +272,6 @@ export function OnboardRestaurantPage() {
       // Corrupt/unreadable draft — treat as no draft rather than crash the page.
     }
     setDraftResolved(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function resumeDraft() {

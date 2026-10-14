@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
 import { readSavedBillNumber } from './whatsapp-bill-settings.service';
+import { paymentBalance, COLLECTED_ORDER_STATUSES } from '../payments/order-payment-ledger';
 
 const SEND_BILL_PATH = '/api/v1/webhooks/jamanvaar/send-bill';
 const PAID_STATUSES = ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED', 'REFUND_PENDING'];
@@ -21,6 +22,8 @@ interface BillSource {
   subtotal: number;
   taxAmount: number;
   totalAmount: number;
+  collectedAmount: number;
+  outstandingAmount: number;
 }
 
 /** Order rows store money in paise. */
@@ -108,7 +111,9 @@ export class ReceiptWhatsAppService {
       `Tax  -  ${inr(b.taxAmount)}`,
       `_Total  -  ${inr(b.totalAmount)}_`,
       rule,
-      b.method ? `Paid via ${b.method}` : null,
+      `Collected  -  ${inr(b.collectedAmount)}`,
+      `Balance due  -  ${inr(b.outstandingAmount)}`,
+      b.outstandingAmount > 0 ? (b.method === 'CASH_AT_COUNTER' || b.method === 'CASH' ? 'Payment due at counter' : 'Payment pending') : b.method ? `Paid via ${b.method.replace(/_/g, ' ')}` : 'Payment settled',
       '_Thank you, visit again_'
     ];
     return lines.filter((l): l is string => l !== null && l !== undefined && l !== '').join('\n');
@@ -142,7 +147,7 @@ export class ReceiptWhatsAppService {
         const payment = order.paymentTransactions[0];
         if (payment && PAID_STATUSES.includes(payment.status)) {
           await assertEnabled(order.branchId);
-          return this.toSource(order.restaurant, order.externalOrderId, payment.method, order);
+          return this.toSource(order.restaurant, order.externalOrderId, payment.method, order, order.totalAmount, 0);
         }
         unpaid = `Cannot send a bill for an order with no successful payment (status: ${payment?.status ?? 'none'})`;
       }
@@ -159,7 +164,9 @@ export class ReceiptWhatsAppService {
         throw new BadRequestException(`Cannot send a bill for an order with status ${synced.status}`);
       }
       await assertEnabled(synced.branchId);
-      return this.toSource(synced.restaurant, synced.externalOrderId, synced.paymentMethod, synced);
+      const entries = await tx.orderPaymentEntry.findMany({where:{restaurantId,orderId:synced.id},select:{kind:true,amount:true}});
+      const balance = paymentBalance(synced.totalAmount, entries.length ? entries : COLLECTED_ORDER_STATUSES.has(synced.paymentStatus || '') ? [{kind:'COLLECTION',amount:synced.totalAmount}] : []);
+      return this.toSource(synced.restaurant, synced.externalOrderId, synced.paymentMethod, synced, balance.collectedPaise, balance.outstandingPaise);
     });
     if (!built) {
       throw new NotFoundException('Order not found — if you just placed this order, wait a few seconds for it to sync and try again');
@@ -171,7 +178,9 @@ export class ReceiptWhatsAppService {
     restaurant: { name: string; legalName: string | null; gstin: string | null; address: string | null },
     externalOrderId: string,
     method: string | null,
-    o: { items: unknown; subtotal: number; taxAmount: number; totalAmount: number }
+    o: { items: unknown; subtotal: number; taxAmount: number; totalAmount: number },
+    collectedAmount: number,
+    outstandingAmount: number
   ): BillSource {
     return {
       restaurantName: restaurant.legalName || restaurant.name,
@@ -182,7 +191,8 @@ export class ReceiptWhatsAppService {
       items: (o.items as RawLine[]) ?? [],
       subtotal: o.subtotal,
       taxAmount: o.taxAmount,
-      totalAmount: o.totalAmount
+      totalAmount: o.totalAmount,
+      collectedAmount, outstandingAmount
     };
   }
 }

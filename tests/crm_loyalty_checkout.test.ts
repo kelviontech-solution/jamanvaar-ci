@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { db, CustomerRepository, CustomerSync, OrderRepository } from '@jamanvaar/database';
+import { db, CustomerRepository, CustomerSync, OrderRepository, ShiftRepository } from '@jamanvaar/database';
 import { mergeCustomerLoyalty } from '@jamanvaar/types';
 import { mergeCustomerLoyalty as serverMerge } from '../cloud/api/src/modules/entity-sync/customer-loyalty-merge';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
@@ -19,6 +19,7 @@ beforeEach(() => {
   CustomerSync.reset();
   pos().clearCart(); pos().closeOverrideModal();
   usePosStore.setState({ currentUser: { id: 'cashier', fullName: 'Cashier', roleId: 'role-cashier' } as any, selectedCustomer: null, selectedTable: null, deliveryDetails: { name: '', phone: '', address: '', deliveryCharge: 0 } });
+  db.shifts = []; ShiftRepository.openShift('cashier', 'Cashier', 0);
   CustomerRepository.createCustomer({ phone, name: 'Daksh', loyaltyPoints: 200 });
   CustomerRepository.updateProgramSettings({ earnPoints: 1, perRupeesSpent: 10, enabled: true });
   CustomerRepository.updateReward('reward-100off', { discountAmount: 100, pointsCost: 150, isActive: true });

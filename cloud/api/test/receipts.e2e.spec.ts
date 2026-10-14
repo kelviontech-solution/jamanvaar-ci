@@ -340,6 +340,9 @@ describe('Receipt e-bill delivery', () => {
       expect(body.billText).toContain('Masala Dosa');
       expect(body.billText).toContain('₹157.50'); // 15750 paise
       expect(body.templateParams[2]).toBe('₹157.50');
+      expect(body.billText).toContain('Balance due');
+      expect(body.billText).toContain('Payment due at counter');
+      expect(body.billText).not.toContain('Paid via');
       const headers = init.headers as Record<string, string>;
       const { createHash, createHmac } = await import('crypto');
       const expected = createHmac('sha256', waSecret)

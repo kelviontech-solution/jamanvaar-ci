@@ -1,0 +1,201 @@
+{
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nOrder Confirmed!\n\nMAIN-20261013-202 · TAKEAWAY\n\nSent to the kitchen\nTOKEN\n#K-102\nEstimated Prep Time\n15 Minutes\nPickup at\nCounter 1\nYOUR BILL\n₹101\nUI AUDIT RESTAURANT A\nBILL / RECEIPT\nTOKEN #K-102\nInvoice No:\nMAIN-20261013-202\nOrder Type:\nTAKEAWAY\nDate: 13 Oct 2026\nTime: 09:29 pm\nPOS: Self-Order Kiosk\nITEM\nQTY\nRATE\nAMT\nUI Audit Dish 002\n1\n₹101\n₹101\nSubtotal\n₹101\nCGST\n₹0.00\nSGST\n₹0.00\nTOTAL\n₹101\nPAID VIA:\nCASH\nThank you for dining at UI Audit Restaurant A! Please visit again.\nFreshly Prepared • Zero Preservatives • Pure Heritage Taste\nPowered by JAMANVAAR\nKITCHEN TICKETS\n1 ticket · 1 station\n\nMAIN KITCHEN\n\nKOT KOT-MAIN-20261013-202\n\nNot printed\nUI Audit Dish 002\n× 1\nPrint this ticket again\nGET YOUR BILL\nPrint Receipt\nEmail Bill\nWhatsApp Bill\nQR Invoice\n\nReceipt: No printer is configured. Add one in Restaurant Admin → Printers.\n\nHOW WAS YOUR ORDERING EXPERIENCE?\nSubmit Rating\n\nKeep your token and wait near Counter 1. The kiosk resets for the next guest.\n\n← Place New Order",
+  "headings": [
+    "Order Confirmed!",
+    "YOUR BILL",
+    "UI AUDIT RESTAURANT A",
+    "KITCHEN TICKETS",
+    "GET YOUR BILL",
+    "HOW WAS YOUR ORDERING EXPERIENCE?"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 48,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Need Help?",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 137,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 52,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "More options",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Print this ticket again",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 418,
+      "height": 52,
+      "visible": true
+    },
+    {
+      "text": "Print Receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "Email Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "WhatsApp Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "QR Invoice",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 233,
+      "height": 96,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "1 star",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "2 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "3 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "4 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "5 stars",
+      "title": "",
+      "disabled": false,
+      "width": 56,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "Submit Rating",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 121,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "← Place New Order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 232,
+      "height": 64,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 1
+}

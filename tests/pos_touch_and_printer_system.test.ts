@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { db, OrderRepository, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
+import { db, ShiftRepository, OrderRepository, PrintQueueRepository, ReceiptRepository } from '@jamanvaar/database';
 import { PosPrinterService } from '../apps/restaurant-system/pos/src/services/printerService';
 import { usePosStore } from '../apps/restaurant-system/pos/src/store/posStore';
 import { Order, MenuItem, KOTRecord } from '@jamanvaar/types';
 
 describe('JAMANVAAR POS — Touchscreen & Automatic Printer System Suite', () => {
   beforeEach(() => {
+    db.shifts = []; ShiftRepository.openShift("qa-cashier", "QA Cashier", 0);
     db.orders = [];
     db.printJobs = [];
     db.receiptRecords = [];

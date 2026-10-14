@@ -1,3 +1,4 @@
+import { useConfirm } from '@jamanvaar/ui';
 import { useState } from 'react';
 import { db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
@@ -41,19 +42,24 @@ function BoundedNumberField({
 }
 
 export function KioskContentPanel({ showToast }: { showToast: (message: string) => void }) {
+  const {confirm, confirmDialog} = useConfirm();
   const [display, setDisplay] = useState(() => structuredClone(db.kioskDisplaySettings));
   const [language, setLanguage] = useState<SupportedLanguage>('en');
   const [query, setQuery] = useState('');
+  const [screen, setScreen] = useState('Menu');
+  const [advanced, setAdvanced] = useState(false);
+  const screenFor = (key: string) => /receipt|invoice|bill|email|whatsapp/i.test(key) ? 'Receipt' : /pay|upi|cash|card|transaction/i.test(key) ? 'Payment' : /cart|checkout|quantity|total|discount/i.test(key) ? 'Cart & checkout' : /welcome|start_order|language|restaurant/i.test(key) ? 'Welcome & language' : /help|staff|chat|assistant/i.test(key) ? 'Help & assistance' : /confirm|success|token|thank|order_status/i.test(key) ? 'Confirmation' : 'Menu';
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const catalog: Record<string, string> = {
     ...Object.fromEntries(Object.entries(getTranslation(language)).filter((entry): entry is [string, string] => typeof entry[1] === 'string')),
     ...KIOSK_CONTENT_CATALOG
   };
-  const entries = Object.entries(catalog).filter(([key, value]) => `${key} ${value}`.toLowerCase().includes(query.toLowerCase()));
+  const entries = Object.entries(catalog).filter(([key]) => screen === 'All screens' || screenFor(key) === screen).filter(([key, value]) => `${key} ${value}`.toLowerCase().includes(query.toLowerCase()));
   const overriddenCount = Object.keys(display.texts?.[language] ?? {}).filter((k) => (display.texts?.[language]?.[k] ?? '').trim() !== '').length;
 
   const save = async () => {
+    if (!await confirm({title: 'Publish customer kiosk settings?', message: `Apply appearance, timing and wording to the kiosks in ${db.outlet.name || 'this branch'}? Per-device welcome overrides remain available in Welcome Screen. Review the previews before publishing.`, confirmLabel: 'Publish to this branch'})) return;
     setBusy(true); setMessage('');
     try {
       // Defensive, not redundant: BoundedNumberField only ever commits a validated value for an
@@ -77,6 +83,8 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
   };
 
   return (
+    <>
+    {confirmDialog}
     <div className="space-y-6" data-testid="kiosk-content-panel">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Appearance & Content</h1>
@@ -213,6 +221,7 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
           </div>
         </div>
 
+        <div className="flex flex-wrap gap-3 items-center"><label className="text-sm font-bold">Customer screen <select aria-label="Customer screen" className="rounded-xl border p-3 ml-2" value={screen} onChange={e => setScreen(e.target.value)}>{['Welcome & language', 'Menu', 'Cart & checkout', 'Payment', 'Confirmation', 'Receipt', 'Help & assistance', 'All screens'].map(name => <option key={name}>{name}</option>)}</select></label><label className="text-xs"><input type="checkbox" checked={advanced} onChange={e => setAdvanced(e.target.checked)} /> Show technical keys</label></div>
         <div className="flex flex-col sm:flex-row gap-3">
           <select
             aria-label="Kiosk content language"
@@ -252,14 +261,15 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
                 <div key={key} className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 hover:bg-jaman-cream/60">
                   <div className="sm:w-[42%] min-w-0">
                     <div className="text-sm text-jaman-navy font-semibold leading-snug">{defaultValue}</div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5 truncate" title={key}>{key}</div>
+                    {advanced && <div className="text-[10px] text-slate-400 font-mono mt-0.5 truncate" title={key}>{key}</div>}
+                    {isOverridden && <p className="text-xs mt-1 text-brand">Preview: {overrideValue}</p>}
                   </div>
                   <div className="flex-1 relative">
                     {isOverridden && (
                       <Pencil className="w-3 h-3 text-jaman-saffron absolute left-2.5 top-1/2 -translate-y-1/2" />
                     )}
                     <input
-                      aria-label={`Kiosk wording ${key}`}
+                      aria-label={`Kiosk wording: ${defaultValue}`}
                       maxLength={2000}
                       className={`w-full bg-white border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy ${isOverridden ? 'border-jaman-saffron/60 pl-7' : 'border-jaman-border'}`}
                       placeholder={defaultValue}
@@ -288,5 +298,6 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
         {message && <p role="status" className="text-sm text-slate-600">{message}</p>}
       </div>
     </div>
+    </>
   );
 }

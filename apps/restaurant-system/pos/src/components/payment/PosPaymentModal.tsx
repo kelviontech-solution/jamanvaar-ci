@@ -2,7 +2,7 @@ import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { PaymentMethod, PaymentSplit } from '@jamanvaar/types';
-import { AuditRepository, OrderRepository } from '@jamanvaar/database';
+import { AuditRepository, OrderRepository, ShiftRepository } from '@jamanvaar/database';
 import { formatINR, generateUUID } from '@jamanvaar/utils';
 import { sound, useDialogFocus } from '@jamanvaar/ui';
 import { useStaffLanguage } from '@jamanvaar/ui';
@@ -71,7 +71,8 @@ export const PosPaymentModal: React.FC = () => {
     setIsDiscountModalOpen,
     removeDiscount,
     currentUser,
-    requestManagerOverride
+    requestManagerOverride,
+    setActiveTab
   } = usePosStore();
 
   const runningPaymentOrder = runningOrderId ? OrderRepository.getOrderById(runningOrderId) : null;
@@ -562,6 +563,7 @@ export const PosPaymentModal: React.FC = () => {
             </div>
           </div>
 
+          {totalPayable > 0 && !ShiftRepository.getActiveShift() && <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm"><p>Open a shift before collecting cash. Your current order will stay saved in the cart.</p><button type="button" className="min-h-11 font-bold underline" onClick={() => {setIsPaymentOpen(false); setActiveTab('SHIFTS');}}>Open Shift & Cash</button></div>}
           {/* Allocation Status Pill */}
           <div className="flex items-center gap-3">
             <div

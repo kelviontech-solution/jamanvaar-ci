@@ -1,0 +1,24 @@
+{
+  "text": "Setting your table\n\nYour restaurant’s fresh menu is on its way…",
+  "headings": [
+    "Setting your table"
+  ],
+  "buttons": [],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar by Kelviontech",
+      "src": "/q/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 180
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

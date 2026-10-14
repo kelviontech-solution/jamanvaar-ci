@@ -1,0 +1,206 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nJ\nSaaS Feature Entitlements & Matrix\n\nCentral comparison matrix dynamically calculated from database Plan.entitlements. Plan allotments govern customer terminal access authoritatively.\n\nActive Plans Only\nAll Plans (Including Inactive)\nManage Plans →\nAll Modules\n1. POS & Fast Billing\n2. Payments & Cash Drawer\n3. Table & Floor Management\n4. Kitchen, KOT & KDS\n5. Menu & Inventory Management\n6. Reports, GST & Administration\n7. Connected Restaurant Ecosystem\nSOFTWARE MODULE & CAPABILITY\n\t\nCORE\nJAMANVAAR CORE\n₹420/MO\n252 CAPABILITIES ACTIVE\n\t\nPRO\nJAMANVAAR PRO\n₹580/MO\n364 CAPABILITIES ACTIVE\n\t\nQR\nJAMANVAAR QR\n₹750/MO\n364 CAPABILITIES ACTIVE\n\t\nCORE\nKIOSK STANDARD\n₹750/MO\n28 CAPABILITIES ACTIVE\n\t\nPRO\nKIOSK PRO\n₹920/MO\n28 CAPABILITIES ACTIVE\n\n\n📦\n1. POS & Fast Billing\n28 Capabilities\n\n\n•\nPOS Terminal\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nDine-in / Takeaway / Delivery / Token\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n2. Payments & Cash Drawer\n19 Capabilities\n\n\n•\nMulti-Payment Tenders\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nShift & Cash Drawer\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n3. Table & Floor Management\n20 Capabilities\n\n\n•\nTable Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n4. Kitchen, KOT & KDS\n45 Capabilities\n\n\n•\nKOT / KDS Routing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n5. Menu & Inventory Management\n21 Capabilities\n\n\n•\nMenu Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nFood Customization\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nInventory Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n📦\n6. Reports, GST & Administration\n76 Capabilities\n\n\n•\nSales & GST Reports\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nDiscounts & GST\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nOffline Billing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nReceipt Printing\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nCustomer Management\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nRestaurant Admin\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n⭐\n7. Connected Restaurant Ecosystem\nPRO EXCLUSIVE\n155 Capabilities\n\n\n•\nCaptain App\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nAdvanced Captain Reports\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nAdvanced Service Workflow\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nQR Table Ordering & Standees\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nPOS Assistant (JAMAN AI)\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nSelf-Order Kiosk & Kiosk Admin\n\t—\t✓ Included\t✓ Included\t✓ Included\t✓ Included\n\n•\nQR Service Requests (call waiter, water, bill...)\n\t—\t—\t—\t—\t—\n\n•\nQR Scheduled Pickup\n\t—\t—\t—\t—\t—\n\n🔌\nConnected Applications\n\n\n•\nPOS\n\t✓ Included\t✓ Included\t✓ Included\t—\t—\n\n•\nKitchen Display (KDS)\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nCaptain App\n\t—\t✓ Included\t✓ Included\t—\t—\n\n•\nQR Table Ordering\n\t—\t—\t✓ Included\t—\t—\n\n•\nWhatsApp Ordering\n\t—\t—\t—\t—\t—\n\n•\nSelf-Ordering Kiosk\n\t—\t—\t—\t✓ Included\t✓ Included\n\n•\nKiosk Admin\n\t—\t—\t—\t✓ Included\t✓ Included\n\n•\nRestaurant Admin\n\t✓ Included\t✓ Included\t✓ Included\t—\t—",
+  "headings": [
+    "SaaS Feature Entitlements & Matrix"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 34,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 30,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "All Modules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 91,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "1. POS & Fast Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "2. Payments & Cash Drawer",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "3. Table & Floor Management",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 190,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "4. Kitchen, KOT & KDS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 150,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "5. Menu & Inventory Management",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 215,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "6. Reports, GST & Administration",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 210,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "7. Connected Restaurant Ecosystem",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 232,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search feature or module (e.g. QR, KOT, Captain)…"
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

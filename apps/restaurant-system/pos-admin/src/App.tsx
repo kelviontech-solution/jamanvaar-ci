@@ -7,18 +7,18 @@ import { MenuLaunchCheck } from './components/dashboard/MenuLaunchCheck';
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
 import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
 import { KioskComboPanel } from './components/settings/KioskComboPanel';
-import { syncKioskConfiguration } from '@jamanvaar/sync';
-import { syncStaffUsers, startLocalChangeSync, syncPromotions, syncInventoryMasters } from '@jamanvaar/sync';
 import React, { useEffect, useState, useMemo } from 'react';
-import { AuditRepository, CouponRepository, db, NotificationRepository, RestaurantIdentityRepository, ReservationRepository } from '@jamanvaar/database';
+import { AuditRepository, CouponRepository, db, NotificationRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
 import { NetworkStatusService } from '@jamanvaar/api';
 import { ImageCache, collectMenuImageUrls } from '@jamanvaar/utils';
-import { ForgotPasswordPanel } from './components/auth/ForgotPasswordPanel';
-import { ActivateOwnerPanel } from './components/auth/ActivateOwnerPanel';
+import { PosAdminLoginScreen } from './components/auth/PosAdminLoginScreen';
+import { ProductPickerScreen } from './components/auth/ProductPickerScreen';
+import { ProUpgradeModal } from './components/ProUpgradeModal';
+import { usePosAdminDeviceSync } from './hooks/usePosAdminDeviceSync';
+import { useKioskFleetPolling } from './hooks/useKioskFleetPolling';
 import type { CloudRestaurantProfile } from './cloud/cloudClient';
 import { SyncHealthPanel } from './components/sync/SyncHealthPanel';
-import { isCloudConnected, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, pushEntitySync, pullEntitySync, pushOrderSync, pullOrderSync, reportDeviceHeartbeat, getStoredDeviceToken, refreshCloudEntitlementsIntoLicense, syncRestaurantIdentity, leaseNumberBlock, pushInventoryMovements, pullInventoryMovements, fetchCloudKiosks, sendKioskCommand, type CloudKiosk } from './cloud/cloudClient';
-import { EntitySyncEngine, SyncOutboxEngine, InventoryLedgerSync, syncDiningTables, syncServiceMessages, syncMenuCatalog, syncCustomers, syncShifts, syncReservations, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings } from '@jamanvaar/sync';
+import { isCloudConnected, cloudLoginOwner, cloudActivateDevice, cloudLogout, CloudApiError, reportAiQueryNow, sendKioskCommand } from './cloud/cloudClient';
 import {
   Category,
   Coupon,
@@ -36,21 +36,17 @@ import {
   JamanAiAssistantModal,
   JamanAiFloatingButton,
   JAMANVAARStartup,
-  JamanvaarAuthLayout,
   SettingsPageHeader,
-  APP_HERO_IMAGES,
   Modal,
   NotificationDrawerModal,
   NotificationToastContainer,
   UrgentGuestAlertModal,
-  useAiAccess,
-  ActivationNoticeBanner,
-  Logo
+  useAiAccess
 } from '@jamanvaar/ui';
 import { lanMeshSync } from '@jamanvaar/sync';
 import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
 import { productNavSections } from './navSections';
-import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts, type AdminProduct } from './adminProducts';
+import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts } from './adminProducts';
 import { useAdminProduct } from './hooks/useAdminProduct';
 import { KioskDashboard } from './components/kiosk/KioskDashboard';
 import { OnlinePaymentsPanel } from './components/payments/OnlinePaymentsPanel';
@@ -59,7 +55,7 @@ import {
   ReportGeneratorService,
   SessionPersistence
 } from '@jamanvaar/business';
-import { AlertCircle, CheckCircle2, QrCode, Lock, ChevronDown, Settings, ShieldCheck, UtensilsCrossed, Users, Sparkles, ArrowRight, RefreshCw, Tablet, Unlock } from 'lucide-react';
+import { CheckCircle2, Lock, ChevronDown, Settings, Unlock } from 'lucide-react';
 
 // Reusable Feature Modules
 // Reusable Feature Modules
@@ -133,7 +129,6 @@ export default function PosAdminApp() {
     return <LegacyGuestRedirect />;
   }
 
-  const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
   const coupons = CouponRepository.getAllCoupons();
   const [isAddCouponModalOpen, setIsAddCouponModalOpen] = useState(false);
   const [newCouponCode, setNewCouponCode] = useState('');
@@ -218,6 +213,7 @@ export default function PosAdminApp() {
   // own initial mount-time fetch already 401'd) re-fetches instead of staying wrong until reload.
   const tenantId = localStorage.getItem('jamanvaar_cloud_restaurant_id');
   const { enabledApps, hasApp, loading: entitlementsLoading, refetch: refetchEntitlements, error: entitlementError, authRequired } = useEntitlements(`${isAdminLoggedIn}:${cloudConnected}:${tenantId}`, isAdminLoggedIn);
+  const kiosks = useKioskFleetPolling(isAdminLoggedIn, hasApp);
   const availableProducts = availableAdminProducts(enabledApps);
   const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
   const context = useAdminProduct(tenantId, availableProducts, contextReady);
@@ -483,126 +479,7 @@ export default function PosAdminApp() {
     return () => { unsubNet(); unsubDb2(); };
   }, []);
 
-  // Database-layer gap: the menu previously lived only in whichever device's
-  // browser created it — Restaurant Admin is the actual menu-editing
-  // surface, so its edits are what most needs a durable cloud copy. Gated on
-  // the device token specifically (not cloudConnected/the user session),
-  // since entity-sync is a DeviceAuthGuard endpoint.
-  useEffect(() => {
-    if (!branchScopeReady || activeAdminBranch === 'all' || !isAdminLoggedIn || entitlementsLoading || entitlementError || !getStoredDeviceToken()) return;
-    const restaurantAccess = hasApp('POS_ADMIN');
-    const kioskAccess = hasApp('KIOSK_ADMIN');
-    if (!restaurantAccess && !kioskAccess) return;
-    EntitySyncEngine.configureTransport({ push: pushEntitySync, pull: pullEntitySync });
-    // Restaurant Admin is the owner's live window onto the restaurant: it must
-    // receive every order, payment and kitchen ticket the other devices create.
-    // It used to have no order-sync client at all (BUG-034).
-    SyncOutboxEngine.configureTransport({ push: pushOrderSync, pull: pullOrderSync, leaseNumbers: leaseNumberBlock, deviceId: () => localStorage.getItem('jamanvaar_cloud_device_id') });
-    InventoryLedgerSync.configureTransport(restaurantAccess ? { push: pushInventoryMovements, pull: pullInventoryMovements } : null);
-    void SyncOutboxEngine.catchUpFromCloud();
-    void SyncOutboxEngine.processOutbox();
-    if (restaurantAccess) void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
-    void syncDiningTables();
-    const orderInterval = setInterval(() => {
-      void SyncOutboxEngine.processOutbox();
-      if (restaurantAccess) void syncInventoryMasters({ push: true }).then(() => InventoryLedgerSync.sync());
-      void SyncOutboxEngine.catchUpFromCloud();
-      // BUG-096/097: the floor plan built here, and each table's live state, are shared with POS and Captain.
-      void syncDiningTables();
-      void syncServiceMessages('POS_ADMIN');
-    }, 4000);
-
-
-    // BUG-016: same gap as POS — categories were never synced, only dishes.
-
-    // BUG-019/034/035: staff PINs created here previously worked only on this one device — nothing
-    // synced them to POS, Captain, KDS or Kiosk, despite the create/reset screen's own promise that
-    // they would. Restaurant Admin is the sole place staff are created, so this is push-heavy, but it
-    // still applies whatever it pulls back in case another admin device edited a record first.
-    const syncStaff = () => syncStaffUsers({ push: true });
-
-    const stopLocalChanges = startLocalChangeSync({ customers: true, menu: true, tables: true, staff: true, promotions: true, inventory: restaurantAccess });
-    void syncMenuCatalog({ push: true });
-    void syncPromotions({ pushCombos: true, pushCoupons: true });
-    if (restaurantAccess) void syncCustomers({ push: true }); // BUG-159: guests registered at the counter show up in the CRM
-    void syncStaff();
-    // B2-056: POS's own cash-drawer shift and its cash movements, so the Shift & Cash Drawer
-    // Ledger, Reconciliation and EOD Z-Report pages here actually see them. Restaurant Admin never
-    // opens or edits a shift itself, so this device only ever pulls.
-    if (restaurantAccess) void syncShifts({ push: false });
-    // The Customer Experience & Feedback tab only ever reads ratings; the kiosk is the only place
-    // they're ever submitted, so this device only ever pulls, never pushes.
-    if (restaurantAccess) void syncFeedback({ push: false });
-    // The Loyalty Program modal (tiers, rewards catalog) is edited only here — POS and Captain only read it.
-    if (restaurantAccess) void syncLoyaltyTiers({ push: true });
-    if (restaurantAccess) void syncLoyaltyRewards({ push: true });
-    if (restaurantAccess) void syncLoyaltyProgramSettings({ push: true });
-    if (restaurantAccess) void syncReservations({ push: true });
-    // B2-055: keeps LicenseRepository (plan tier, sidebar badges, JAMAN AI button) in step with a
-    // Super Admin plan change regardless of which screen is open — was only ever refreshed when
-    // the Subscription Plans screen itself happened to be mounted.
-    void refreshCloudEntitlementsIntoLicense();
-    void reportDeviceHeartbeat();
-    void syncRestaurantIdentity();
-    void syncKioskConfiguration({ push: true }).catch(() => {});
-    const interval = setInterval(() => {
-      void syncMenuCatalog({ push: true });
-      void syncPromotions({ pushCombos: true, pushCoupons: true });
-    if (restaurantAccess) void syncCustomers({ push: true });
-      void syncStaff();
-      if (restaurantAccess) void syncShifts({ push: false });
-      if (restaurantAccess) void syncFeedback({ push: false });
-      if (restaurantAccess) void syncLoyaltyTiers({ push: true });
-      if (restaurantAccess) void syncLoyaltyRewards({ push: true });
-      if (restaurantAccess) void syncLoyaltyProgramSettings({ push: true });
-      // Guests who did not come free their table, then the change goes out with the rest.
-      ReservationRepository.releaseOverdue();
-      if (restaurantAccess) void syncReservations({ push: true });
-      void refreshCloudEntitlementsIntoLicense();
-      // Same self-healing reason: picks up a Super Admin entitlement change made while this
-      // console is already open, not just the fresh-activation case the cloudConnected key covers.
-      refetchEntitlements();
-      void reportDeviceHeartbeat();
-      void syncRestaurantIdentity();
-    void syncKioskConfiguration({ push: true }).catch(() => {});
-    }, 15000);
-    return () => {
-      stopLocalChanges();
-      clearInterval(interval);
-      clearInterval(orderInterval);
-      SyncOutboxEngine.configureTransport(null);
-      InventoryLedgerSync.configureTransport(null);
-    };
-  }, [branchScopeReady, cloudConnected, isAdminLoggedIn, entitlementsLoading, entitlementError, hasApp]);
-
-  // Kiosk fleet polling for the Kiosk Terminals tab. Deliberately its own effect, not merged into
-  // the sync effect above: that effect already calls SyncOutboxEngine/EntitySyncEngine
-  // .configureTransport once for this console's own order/menu sync -- calling it again here (as
-  // kiosk-admin's original fleet-polling code did, for ITS OWN sync needs) would silently
-  // overwrite this console's already-configured transport.
-  useEffect(() => {
-    if (!isAdminLoggedIn || !hasApp('KIOSK_ADMIN')) { setKiosks([]); return; }
-    let cancelled = false;
-    let inFlight = false;
-    const refresh = async () => {
-      if (cancelled || inFlight) return;
-      inFlight = true;
-      try {
-        const fleet = await fetchCloudKiosks();
-        if (!cancelled) setKiosks(fleet);
-      } catch {
-        // Fleet view just stays on its last-known data; this is a background refresh, not a user action.
-      } finally {
-        inFlight = false;
-      }
-    };
-    void refresh();
-    const kioskInterval = setInterval(refresh, 30000);
-    return () => {
-      cancelled = true;
-      clearInterval(kioskInterval);
-    };
-  }, [hasApp, isAdminLoggedIn]);
+  usePosAdminDeviceSync(branchScopeReady, cloudConnected, isAdminLoggedIn, entitlementsLoading, entitlementError, hasApp, refetchEntitlements);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -702,315 +579,49 @@ export default function PosAdminApp() {
 
   if (!isAdminLoggedIn) {
     return (
-      <JAMANVAARStartup appName="Owner Sign-in" appType="OWNER" subtitle="Your restaurant account">
-        <JamanvaarAuthLayout
-          appIdentity="ADMIN"
-          applicationLabel="Owner Sign-in"
-          appTitle="JAMANVAAR"
-          appSubtitle="One account for your restaurant and kiosk apps"
-          isOnline={isOnline}
-          onToggleNetwork={() => setIsOnline((prev) => !prev)}
-          isLocalCoreUnauthorized={db.isLocalCoreUnauthorized()}
-          isLocalCoreConnected={db.isLocalCoreConnected()}
-          localCoreUrl={db.getSyncServerUrl()}
-          onPairLocalCore={(pin, url) => db.pairLocalCore(pin, url)}
-          healthCheckUrl={db.localCoreHealthUrl()}
-          heroHeadline="Restaurant Control."
-          heroHighlightWord="Live Intelligence."
-          heroDescription="Sign in once. Open the apps included in your plan, with a separate workspace for each."
-          heroImages={APP_HERO_IMAGES.ADMIN}
-          capabilities={[
-            { label: 'Restaurant Management', icon: 'dashboard' },
-            { label: 'Reports & Analytics', icon: 'chart' },
-            { label: 'Menu Management', icon: 'table' },
-            { label: 'Inventory & Staff', icon: 'package' }
-          ]}
-          footerNote="Plan-Based Access • Instant Offline Boot • Role-based access"
-        >
-          <ActivationNoticeBanner />
-          {authScreenState === 'ACTIVATE' ? (
-            <ActivateOwnerPanel
-              defaultRestaurantCode={activatePrefill?.code ?? authRestaurantCode}
-              defaultEmail={activatePrefill?.email ?? ''}
-              defaultToken={activatePrefill?.token ?? ''}
-              onBack={() => setAuthScreenState('LOGIN')}
-              onDone={(code) => {
-                setAuthRestaurantCode(code);
-                setAuthPassword('');
-                setActivatePrefill(null);
-                setAuthError('');
-                setPasswordResetNotice(true);
-                setAuthScreenState('LOGIN');
-              }}
-            />
-          ) : authScreenState === 'FORGOT' ? (
-            <ForgotPasswordPanel
-              defaultRestaurantCode={authRestaurantCode}
-              onBack={() => setAuthScreenState('LOGIN')}
-              onActivate={() => {
-                setAuthError('');
-                setAuthScreenState('ACTIVATE');
-              }}
-              onDone={() => {
-                setAuthPassword('');
-                setAuthScreenState('LOGIN');
-                setAuthError('');
-                setPasswordResetNotice(true);
-              }}
-            />
-          ) : authScreenState === 'LOGIN' ? (
-            <>
-              <form onSubmit={handleAdminLogin} className="space-y-3.5 pt-2">
-                <div>
-                  <label htmlFor="admin-restaurant-id" className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-                    Restaurant ID *
-                  </label>
-                  <input
-                    id="admin-restaurant-id"
-                    type="text"
-                    autoComplete="off"
-                    value={authRestaurantCode}
-                    onChange={(e) => {
-                      setAuthRestaurantCode(e.target.value);
-                      setAuthError('');
-                    }}
-                    placeholder="e.g. JM9876543210"
-                    className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm font-mono text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1.5">
-                    Find your Restaurant ID in your Welcome Kit or activation email. If you cannot find it, ask your JAMANVAAR setup contact. Never share your password or activation key.
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="admin-password" className="text-xs font-bold text-slate-700">Owner Password *</label>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((p) => !p)}
-                      aria-controls="admin-password"
-                      className="text-xs text-[#B8500C] hover:underline font-semibold inline-flex items-center min-h-11 -my-3.5 px-2 -mx-2"
-                    >
-                      {showPassword ? 'Hide Password' : 'Show Password'}
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <input
-                      id="admin-password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      value={authPassword}
-                      onChange={(e) => {
-                        setAuthPassword(e.target.value);
-                        setAuthError('');
-                      }}
-                      placeholder="Enter owner password"
-                      className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-jaman-navy font-semibold focus:outline-hidden transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {passwordResetNotice && !authError && (
-                  <div className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-xl text-center" role="status">
-                    Your password was changed. Sign in with the new one.
-                  </div>
-                )}
-
-                {authError && (
-                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2 rounded-xl text-center flex items-center justify-center gap-1.5" role="alert">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{authError}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
-                  <span>Your owner account</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthError('');
-                      setPasswordResetNotice(false);
-                      setAuthScreenState('FORGOT');
-                    }}
-                    className="font-semibold text-[#B8500C] hover:underline cursor-pointer inline-flex items-center min-h-11 -my-3.5 px-2 -mx-2"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-
-                <details className="text-sm text-slate-600"><summary className="cursor-pointer">Connecting a new device? Add your admin key</summary><label className="block mt-3">Admin activation key (first connection only)<input aria-label="Admin activation key (optional)" type="text" value={activationKeyInput} onChange={e => setActivationKeyInput(e.target.value.toUpperCase())} placeholder="JMV-XXXX-XXXX-XXXX" className="block w-full mt-1 rounded-xl border border-jaman-border p-3 font-mono" /></label><p className="text-xs mt-2">Use your Restaurant Admin or Kiosk Admin key. Customer kiosks still use their own kiosk activation screen.</p></details>
-
-                <button
-                  type="submit"
-                  disabled={loginBusy}
-                  className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-50 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
-                >
-                  {loginBusy ? 'Signing In…' : 'Sign In'}
-                </button>
-
-                <div className="text-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthError('');
-                      setPasswordResetNotice(false);
-                      setActivatePrefill(null);
-                      setAuthScreenState('ACTIVATE');
-                    }}
-                    className="text-xs font-bold text-slate-500 hover:text-jaman-navy underline cursor-pointer inline-flex items-center min-h-11 -my-3.5 px-2"
-                  >
-                    Set your password from the welcome email
-                  </button>
-                </div>
-              </form>
-            </>
-          ) : (
-            <div className="space-y-4 pt-1">
-              <div className="text-center space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                  <span>FIRST-TIME DEVICE ACTIVATION</span>
-                </div>
-                <h3 className="text-base font-bold text-jaman-navy pt-1">
-                  Connect this admin device
-                </h3>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  Enter your admin activation key once on this device. Your plan determines which apps open after sign-in.
-                </p>
-              </div>
-
-              {pendingTenant && (
-                <div className="p-3.5 bg-jaman-cream border border-jaman-border rounded-2xl space-y-1 text-left text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Restaurant:</span>
-                    <span className="font-bold text-jaman-navy">{pendingTenant.restaurantName}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Owner Account:</span>
-                    <span className="font-mono text-jaman-navy text-[11px]">{pendingTenant.ownerEmail}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Apps:</span>
-                    <span className="font-bold text-brand">Restaurant Admin / Kiosk Admin</span>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleActivateSubmit} className="space-y-3">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5 text-left">
-                    Admin Activation Key *
-                  </label>
-                  <input
-                    type="text"
-                    value={activationKeyInput}
-                    onChange={(e) => {
-                      setActivationKeyInput(e.target.value.toUpperCase());
-                      setActivationError('');
-                    }}
-                    placeholder="JMV-XXXX-XXXX-XXXX"
-                    autoFocus
-                    required
-                    className="w-full bg-jaman-cream border border-jaman-border focus:border-brand focus:bg-white rounded-2xl px-4 py-3 text-sm text-center font-mono font-bold tracking-wider text-jaman-navy focus:outline-hidden transition-colors"
-                  />
-                </div>
-
-                {activationError && (
-                  <div className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-2.5 rounded-xl text-center flex items-center justify-center gap-1.5">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{activationError}</span>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={activationBusy || !activationKeyInput.trim()}
-                  className="w-full h-12 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press disabled:opacity-40 text-white font-semibold text-sm transition-colors shadow-sm active:scale-[0.99] cursor-pointer mt-2"
-                >
-                  {activationBusy ? 'Activating Terminal…' : 'Connect & Continue'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthScreenState('LOGIN');
-                    setActivationError('');
-                  }}
-                  className="w-full py-2.5 text-center text-xs font-bold text-slate-500 hover:text-jaman-navy transition-colors cursor-pointer"
-                >
-                  ← Back to Sign In
-                </button>
-              </form>
-            </div>
-          )}
-        </JamanvaarAuthLayout>
-      </JAMANVAARStartup>
+      <PosAdminLoginScreen
+        isOnline={isOnline}
+        onToggleNetwork={() => setIsOnline((prev) => !prev)}
+        authScreenState={authScreenState}
+        setAuthScreenState={setAuthScreenState}
+        activatePrefill={activatePrefill}
+        setActivatePrefill={setActivatePrefill}
+        authRestaurantCode={authRestaurantCode}
+        setAuthRestaurantCode={setAuthRestaurantCode}
+        authPassword={authPassword}
+        setAuthPassword={setAuthPassword}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+        authError={authError}
+        setAuthError={setAuthError}
+        passwordResetNotice={passwordResetNotice}
+        setPasswordResetNotice={setPasswordResetNotice}
+        activationKeyInput={activationKeyInput}
+        setActivationKeyInput={setActivationKeyInput}
+        loginBusy={loginBusy}
+        handleAdminLogin={handleAdminLogin}
+        pendingTenant={pendingTenant}
+        activationError={activationError}
+        setActivationError={setActivationError}
+        activationBusy={activationBusy}
+        handleActivateSubmit={handleActivateSubmit}
+      />
     );
   }
 
   if (!contextReady || !product) {
-    const PRODUCT_ICONS: Record<AdminProduct, React.ComponentType<{ className?: string }>> = { POS_ADMIN: UtensilsCrossed, KIOSK_ADMIN: Tablet };
-    return <div className="min-h-screen bg-jaman-cream flex items-center justify-center p-6">
-      <section className="bg-white border border-jaman-border rounded-3xl shadow-xl p-8 sm:p-10 max-w-md w-full space-y-6">
-        <div className="flex flex-col items-center text-center gap-3">
-          <Logo variant="horizontal" size="sm" />
-          <p className="text-sm font-bold text-jaman-navy">{db.restaurant.name}</p>
-        </div>
-
-        {entitlementsLoading && (
-          <div className="flex items-center justify-center gap-2.5 py-6 text-slate-500" role="status">
-            <RefreshCw className="w-4 h-4 animate-spin" />
-            <span className="text-sm font-medium">Loading your applications…</span>
-          </div>
-        )}
-
-        {entitlementError && (
-          <div className={`rounded-2xl border p-4 space-y-3 text-center ${authRequired ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200'}`} role="alert">
-            <div className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center ${authRequired ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'}`}>
-              {authRequired ? <Lock className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-            </div>
-            <p className={`text-sm font-semibold ${authRequired ? 'text-rose-800' : 'text-amber-800'}`}>{entitlementError}</p>
-            <button
-              type="button"
-              onClick={authRequired ? handleAdminLogout : refetchEntitlements}
-              className={`w-full py-2.5 rounded-xl font-bold text-sm transition-colors cursor-pointer ${authRequired ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-600 hover:bg-amber-700 text-white'}`}
-            >
-              {authRequired ? 'Sign in again' : 'Retry'}
-            </button>
-          </div>
-        )}
-
-        {contextReady && <div className="space-y-3">
-          {context.denied && <p className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center" role="alert">This application is not enabled in your restaurant's current plan.</p>}
-          {context.invalid && <p className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 text-center" role="alert">This page was not found. Choose an application below.</p>}
-          {!context.denied && !context.invalid && <p className="text-sm font-bold text-slate-500 uppercase tracking-wider text-center">Choose what you want to manage</p>}
-          {availableProducts.map(app => {
-            const Icon = PRODUCT_ICONS[app];
-            return (
-              <button
-                key={app}
-                onClick={() => context.navigate(app)}
-                className="w-full flex items-center gap-3.5 text-left rounded-2xl border border-jaman-border p-4 hover:border-jaman-saffron hover:bg-[#FFF8F2] transition-colors cursor-pointer group"
-              >
-                <div className="w-11 h-11 rounded-xl bg-jaman-cream text-jaman-navy flex items-center justify-center shrink-0 group-hover:bg-jaman-saffron group-hover:text-white transition-colors">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <strong className="text-sm font-bold text-jaman-navy">{ADMIN_PRODUCTS[app].name}</strong>
-                  <p className="text-xs text-slate-500 mt-0.5">{ADMIN_PRODUCTS[app].description}</p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-jaman-saffron transition-colors shrink-0" />
-              </button>
-            );
-          })}
-          {!availableProducts.length && <p className="text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 text-center" role="alert">No admin application is enabled. Ask your platform administrator to check your subscription.</p>}
-        </div>}
-
-        <button type="button" onClick={handleAdminLogout} className="w-full text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-          Log out
-        </button>
-      </section>
-    </div>;
+    return (
+      <ProductPickerScreen
+        entitlementsLoading={entitlementsLoading}
+        entitlementError={entitlementError}
+        authRequired={authRequired}
+        contextReady={contextReady}
+        context={context}
+        availableProducts={availableProducts}
+        onRefetchEntitlements={refetchEntitlements}
+        onAdminLogout={handleAdminLogout}
+      />
+    );
   }
 
   return (
@@ -1032,7 +643,7 @@ export default function PosAdminApp() {
           onSwitchProduct={app => context.navigate(app)}
           showRestaurantActions={!isKioskAdmin && activeAdminBranch !== 'all' && branchScopeReady}
           restaurantName={db.restaurant.name}
-          outletName={db.outlet.name}
+          outletName={!branchScopeReady ? 'Loading branch' : activeAdminBranch === 'all' ? 'All branches' : db.outlet.name}
           isCloudConnected={cloudConnected}
           onOpenBranchDirectory={() => setIsBranchDirectoryOpen(true)}
           globalSearch={globalSearch}
@@ -1270,7 +881,9 @@ export default function PosAdminApp() {
             )}
 
             {/* TAB 8: INVENTORY & RECIPES */}
-            {activeTab === 'INVENTORY' && (
+            {activeTab === 'INVENTORY' && (<>
+              {new URLSearchParams(location.search).get('returnTo') === 'purchasing' && <a href={`${location.pathname.startsWith('/kiosk-admin') ? '/kiosk-admin' : '/restaurant-admin'}/purchasing`} className="inline-block mb-3 rounded-xl border px-4 py-3 font-bold">Return to receiving goods</a>}
+
               <InventoryRecipesModule
                 inventoryItems={inventoryItems}
                 recipes={recipes}
@@ -1294,6 +907,7 @@ export default function PosAdminApp() {
                 showToast={showToast}
                 onRequestConfirm={setConfirmDialog}
               />
+              </>
             )}
 
             {/* TAB 9: CUSTOMERS CRM */}
@@ -1425,6 +1039,7 @@ export default function PosAdminApp() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {coupons.length === 0 && <div className="col-span-full rounded-2xl border border-jaman-border bg-white p-6 space-y-3"><h2 className="text-lg font-bold">Create your first promotion</h2><p className="text-sm text-slate-600">Offer a percentage discount or a fixed amount off with a minimum order. For example, LUNCH10 can give 10% off qualifying lunch orders. Set the eligible channels and validity when creating the coupon, then verify it at checkout before sharing it.</p><Button variant="accent" onClick={() => setIsAddCouponModalOpen(true)}>Create coupon</Button></div>}
                   {coupons.map((c) => (
                     <div key={c.id} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm flex flex-col justify-between">
                       <div>
@@ -1516,6 +1131,7 @@ export default function PosAdminApp() {
                     : 'Screen size, channels and the identity printed on reports and bills.'}
                   icon={<Settings className="w-6 h-6 text-slate-500" aria-hidden="true" />}
                 />
+                <section aria-label="Settings scope and shortcuts" className="rounded-2xl border border-blue-200 bg-blue-50 p-4 space-y-3"><h2 className="font-bold">{db.restaurant.name} / {db.outlet.name}</h2><p className="text-sm text-slate-600">Restaurant identity and legal information are shared across your restaurant. Menu, operating rules and kiosk defaults use the selected branch. Screen size preferences affect this device; individual kiosk overrides are managed in Welcome Screen and Kiosk Settings.</p><div className="flex flex-wrap gap-2">{([{tab:'MENU_OPTIONS',label:'Tax & customisations'},{tab:product === 'KIOSK_ADMIN' ? 'KIOSK_PAYMENTS' : 'PAYMENTS',label:'Payments'},{tab:'RECEIPTS',label:'Receipts'},{tab:'SYNC',label:'Devices & connections'},{tab:'LICENSE',label:'Licensed products'}] as const).filter(entry=>product && Object.hasOwn(PRODUCT_PAGES[product],entry.tab)).map(entry=><button type="button" key={entry.tab} className="min-h-11 rounded-xl border bg-white px-4 text-sm font-bold" onClick={()=>setActiveTab(entry.tab)}>{entry.label}</button>)}</div></section>
                 <TerminalDisplaySettings showToast={showToast} />
                 {!isKioskAdmin && hasApp('WHATSAPP_ORDERING') && <WhatsAppChannelPanel showToast={showToast} />}
                 <ReportBrandingSettings
@@ -1892,112 +1508,15 @@ export default function PosAdminApp() {
           }}
         />
 
-        {/* PRO FEATURE LOCKED MODAL (₹7,000 Plan Gate) */}
-        {isProUpgradeModalOpen && (
-          <Modal
-            isOpen={isProUpgradeModalOpen}
-            onClose={() => setIsProUpgradeModalOpen(false)}
-            title="JAMAN AI Operations Assistant"
-            maxWidth="md"
-          >
-            <div className="space-y-4 py-2">
-              {/* Feature Hero Card */}
-              <div className="p-4 rounded-2xl bg-jaman-navy text-white shadow-md relative overflow-hidden">
-                                <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-brand text-white">
-                    <Sparkles className="w-3 h-3" /> PRO Exclusive Feature
-                  </span>
-                  <span className="text-[11px] tabular-nums text-slate-300">₹7,000 / month</span>
-                </div>
-                <h3 className="text-lg font-bold text-white tracking-tight">
-                  Unlock Intelligent Restaurant Operations
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  JAMAN AI connects directly to your restaurant's local device data to deliver instant operational answers, revenue projections, delayed kitchen alerts, and cash drawer auditing.
-                </p>
-              </div>
-
-              {/* Benefits Checklist */}
-              <div className="space-y-2">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  What you get with PRO Plan
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-brand">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-jaman-navy">JAMAN AI Engine</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">Real-time revenue, delayed KOT & cash discrepancy detection.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-emerald-600">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-jaman-navy">Captain Ordering App</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">Handheld digital ordering for waitstaff & captains on any mobile.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-indigo-600">
-                      <QrCode className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-jaman-navy">Table QR Ordering</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">Instant guest scanning, digital menu browsing & self-ordering.</div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D6] flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-white border border-jaman-border flex items-center justify-center shrink-0 text-amber-600">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-jaman-navy">Super Admin Synced</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">Centralized audit, cloud invoices & real-time telemetry control.</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Current plan notice */}
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Currently on <strong>JAMANVAAR CORE (₹5,000/mo)</strong>. Upgrade to PRO to unlock.</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#EAE3D6]">
-                <button
-                  type="button"
-                  onClick={() => setIsProUpgradeModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-600 transition-all cursor-pointer"
-                >
-                  Maybe Later
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsProUpgradeModalOpen(false);
-                    setActiveTab('SETTINGS');
-                    setToastMessage('Navigate to Subscription Plans to upgrade to JAMANVAAR PRO.');
-                  }}
-                  className="px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <span>Upgrade to PRO (₹7,000)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </Modal>
-        )}
+        <ProUpgradeModal
+          isOpen={isProUpgradeModalOpen}
+          onClose={() => setIsProUpgradeModalOpen(false)}
+          onUpgradeClick={() => {
+            setIsProUpgradeModalOpen(false);
+            setActiveTab('SETTINGS');
+            setToastMessage('Navigate to Subscription Plans to upgrade to JAMANVAAR PRO.');
+          }}
+        />
       </div>
     </JAMANVAARStartup>
   );

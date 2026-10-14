@@ -473,9 +473,17 @@ export class QrAdminService {
     await this.requireEnabled(device.restaurantId);
     const branch = this.scopedBranch(device, branchId);
     for (const date of [from, to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date)) throw new BadRequestException('Use valid calendar dates');
-    const start = from ? new Date(from + 'T00:00:00Z') : new Date(Date.now() - 7 * 86400000);
-    const end = to ? new Date(to + 'T00:00:00Z') : new Date();
-    if (to) end.setUTCDate(end.getUTCDate() + 1);
+    const { start, end, timezone } = await this.prisma.runAsTenant(device.restaurantId, async tx => {
+      const restaurant = await tx.restaurant.findFirstOrThrow({where: {id: device.restaurantId}, select: {timezone: true}});
+      const selected = branch ? await tx.branch.findFirst({where: {id: branch, restaurantId: device.restaurantId}, select: {timezone: true}}) : null;
+      const timezone = selected?.timezone || restaurant.timezone;
+      const today = new Intl.DateTimeFormat('en-CA', {timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
+      const first = from || new Date(Date.parse(today + 'T12:00:00Z') - 6 * 86400000).toISOString().slice(0, 10);
+      const last = to || today;
+      // PostgreSQL converts each calendar boundary separately, including daylight-saving changes.
+      const [range] = await tx.$queryRaw<Array<{start: Date; end: Date}>>(Prisma.sql`SELECT (${first}::date::timestamp AT TIME ZONE ${timezone}) AS start, ((${last}::date + 1)::timestamp AT TIME ZONE ${timezone}) AS end`);
+      return {...range, timezone};
+    });
     if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start || end.getTime() - start.getTime() > 367 * 86400000) throw new BadRequestException('Choose a valid date range of up to one year');
     const where = { restaurantId: device.restaurantId, ...(branch ? { branchId: branch } : {}), createdAt: { gte: start, lt: end } };
     const [orders, events, payments, codeEvents, codes, refunds, allocations] = await this.prisma.runAsTenant(device.restaurantId, tx => Promise.all([
@@ -513,14 +521,14 @@ export class QrAdminService {
     const outstanding=live.filter(o=>o.paymentMethod==='CASH_AT_COUNTER').reduce((n,o)=>n+Math.max(0,o.totalAmount-(byOrder.get(o.id)?.collected??(paid.some(p=>p.id===o.id)?o.totalAmount:0))),0)/100;
     const byBranch = new Map<string, { orders: number; sales: number }>(), trend = new Map<string, { orders: number; sales: number }>(), popular = new Map<string, { name: string; quantity: number }>();
     for (const o of live) {
-      for (const [map, key] of [[byBranch, o.branchId ?? 'Unassigned'], [trend, o.createdAt.toISOString().slice(0, 10)]] as const) { const row = map.get(key) ?? { orders: 0, sales: 0 }; row.orders++; row.sales += o.totalAmount; map.set(key, row); }
+      for (const [map, key] of [[byBranch, o.branchId ?? 'Unassigned'], [trend, new Intl.DateTimeFormat('en-CA', {timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit'}).format(o.createdAt)]] as const) { const row = map.get(key) ?? { orders: 0, sales: 0 }; row.orders++; row.sales += o.totalAmount; map.set(key, row); }
       for (const i of Array.isArray(o.items) ? o.items : []) { const item = i as Record<string, any>; const key = String(item.menuItemId ?? item.name); const row = popular.get(key) ?? { name: String(item.name), quantity: 0 }; row.quantity += Number(item.quantity) || 0; popular.set(key, row); }
     }
     const byCode = codes.map(code => {
       const own = live.filter(order => order.qrCodeId === code.id);
       return { codeId: code.id, table: code.tableNumber ?? 'Counter / takeaway', branchId: code.branchId, version: code.version, status: code.status, scans: codeEvents.find(event => event.qrCodeId === code.id && event.type === QR_EVENT.SCANNED)?._count._all ?? 0, orders: own.length, sales: sum(own) };
     }).filter(code => code.scans || code.orders);
-    return { from: start.toISOString(), to: end.toISOString(), metrics: { scans: count(QR_EVENT.SCANNED), menuViews: count(QR_EVENT.MENU_VIEWED), itemAdds: count('QR_ITEM_ADDED'), carts: count(QR_EVENT.CART_CREATED), checkoutStarts: count('QR_CHECKOUT_STARTED'), orders: live.length, preparing: live.filter(o => o.status === 'PREPARING').length, pending: live.filter(o => ['NEW', 'CONFIRMED', 'READY'].includes(o.status)).length, completed: live.filter(o => ['COMPLETED', 'SERVED'].includes(o.status)).length, cancelled: orders.filter(o => o.status === 'CANCELLED').length, grossOrderValue: sum(live), grossSales, netSales, collected: grossSales, outstandingCounter: outstanding, refunded: refundsTotal / 100, averageOrderValue: live.length ? sum(live) / live.length : 0, conversion: count(QR_EVENT.MENU_VIEWED) ? live.length / count(QR_EVENT.MENU_VIEWED) : 0, onlineSuccess: payments.filter(p => ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED'].includes(p.status)).length, onlineFailed: payments.filter(p => p.status === 'FAILED').length, onlinePending: payments.filter(p => ['PENDING', 'CREATED', 'AUTHORIZED'].includes(p.status)).length, cashOrders: live.filter(o => o.paymentMethod === 'CASH_AT_COUNTER').length }, byCode, byBranch: [...byBranch].map(([branchId, v]) => ({ branchId, orders: v.orders, sales: v.sales / 100 })), trend: [...trend].map(([date, v]) => ({ date, orders: v.orders, sales: v.sales / 100 })).sort((a,b) => a.date.localeCompare(b.date)), popular: [...popular.values()].sort((a,b) => b.quantity - a.quantity).slice(0, 10), payments: payments.slice(0, 50) };
+    return { timezone, from: start.toISOString(), to: end.toISOString(), metrics: { scans: count(QR_EVENT.SCANNED), menuViews: count(QR_EVENT.MENU_VIEWED), itemAdds: count('QR_ITEM_ADDED'), carts: count(QR_EVENT.CART_CREATED), checkoutStarts: count('QR_CHECKOUT_STARTED'), orders: live.length, preparing: live.filter(o => o.status === 'PREPARING').length, pending: live.filter(o => ['NEW', 'CONFIRMED', 'READY'].includes(o.status)).length, completed: live.filter(o => ['COMPLETED', 'SERVED'].includes(o.status)).length, cancelled: orders.filter(o => o.status === 'CANCELLED').length, grossOrderValue: sum(live), grossSales, netSales, collected: grossSales, outstandingCounter: outstanding, refunded: refundsTotal / 100, averageOrderValue: live.length ? sum(live) / live.length : 0, conversion: count(QR_EVENT.MENU_VIEWED) ? live.length / count(QR_EVENT.MENU_VIEWED) : 0, onlineSuccess: payments.filter(p => ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUND_PENDING', 'REFUNDED'].includes(p.status)).length, onlineFailed: payments.filter(p => p.status === 'FAILED').length, onlinePending: payments.filter(p => ['PENDING', 'CREATED', 'AUTHORIZED'].includes(p.status)).length, cashOrders: live.filter(o => o.paymentMethod === 'CASH_AT_COUNTER').length }, byCode, byBranch: [...byBranch].map(([branchId, v]) => ({ branchId, orders: v.orders, sales: v.sales / 100 })), trend: [...trend].map(([date, v]) => ({ date, orders: v.orders, sales: v.sales / 100 })).sort((a,b) => a.date.localeCompare(b.date)), popular: [...popular.values()].sort((a,b) => b.quantity - a.quantity).slice(0, 10), payments: payments.slice(0, 50) };
   }
 
   getBranding(restaurantId: string) {

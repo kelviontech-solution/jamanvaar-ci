@@ -135,6 +135,44 @@ it('dashboard sums exactly once, separates unpaid orders, excludes cancellations
   const branch=await dashboard(`?branchId=${branches[0].id}`);expect(branch.body.summary.sales).toBe(100);expect(branch.body.devices.every((d:any)=>d.branchId===branches[0].id)).toBe(true);
   const kiosk=await dashboard('?source=KIOSK');expect(kiosk.body.summary.sales).toBe(100);
 });
+it('unconfirmed drafts never become collectible dashboard debt', async () => {
+  const before = await dashboard(`?branchId=${branches[0].id}`);
+  const draft = `dashboard-draft-${stamp}`;
+  await prisma.runAsTenant(rid, tx => tx.syncedOrder.create({data:{restaurantId:rid,branchId:branches[0].id,externalOrderId:draft,orderType:'DINE_IN',status:'DRAFT',paymentStatus:'PENDING',source:'KIOSK',items:[],subtotal:10000,taxAmount:0,totalAmount:10000}}));
+  const after = await dashboard(`?branchId=${branches[0].id}`);
+  expect(after.status).toBe(200);
+  expect(after.body.summary.pendingAmount).toBe(before.body.summary.pendingAmount);
+  expect(after.body.summary.pendingPayments).toBe(before.body.summary.pendingPayments);
+  expect(after.body.summary.orders).toBe(before.body.summary.orders);
+});
+it('order activity reads one canonical branch record and rejects foreign branches and customer kiosks', async () => {
+  const orderId = 'unpaid';
+  const own = await as('get', `/api/v1/orders/sync/${orderId}/activity`, devices[0][0].token);
+  expect(own.status).toBe(200);
+  expect(own.body.source).toBe('KIOSK');
+  expect(own.body.balance.outstandingPaise).toBe(25000);
+  expect(own.body.events.some((event:any) => event.label.includes('Collection confirmed'))).toBe(false);
+  expect(JSON.stringify(own.body)).not.toContain('providerResponse');
+  const other = await as('get', `/api/v1/orders/sync/${orderId}/activity?branchId=${branches[0].id}`, devices[1][0].token);
+  expect(other.status).toBe(404);
+  const kiosk = devices[3].find(device=>device.type==='KIOSK');
+  expect((await as('get', `/api/v1/orders/sync/${orderId}/activity`, kiosk.token)).status).toBe(404);
+});
+it('QR calendar analytics uses local midnight and separately converts daylight-saving boundaries', async () => {
+  const endpoint = '/api/v1/restaurant/qr/analytics?from=2026-03-08&to=2026-03-08';
+  const original = branches[0].timezone;
+  try {
+    await prisma.runAsTenant(rid, tx => tx.branch.update({where:{id:branches[0].id},data:{timezone:'America/New_York'}}));
+    const result = await as('get', endpoint).set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt);
+    expect(result.status,JSON.stringify(result.body)).toBe(200);
+    expect(result.body.timezone).toBe('America/New_York');
+    expect(result.body.from).toBe('2026-03-08T05:00:00.000Z');
+    expect(result.body.to).toBe('2026-03-09T04:00:00.000Z');
+    expect((await as('get','/api/v1/restaurant/qr/analytics?from=2026-02-30&to=2026-03-08').set('x-admin-branch',branches[0].id).set('x-owner-authorization',ownerJwt)).status).toBe(400);
+  } finally {
+    await prisma.runAsTenant(rid, tx => tx.branch.update({where:{id:branches[0].id},data:{timezone:original || 'Asia/Kolkata'}}));
+  }
+});
 it('device health uses heartbeats rather than registration status and shows pending sync alerts',async()=>{
   await prisma.runAsTenant(rid,tx=>tx.device.update({where:{id:devices[0][0].id},data:{lastSeenAt:new Date(Date.now()-3600000),pendingSyncCount:3}}));const r=await dashboard(`?branchId=${branches[0].id}`);expect(r.body.byBranch[0].online).toBe(0);expect(r.body.alerts.some((a:any)=>a.detail==='3 pending changes')).toBe(true);
 });

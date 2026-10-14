@@ -1,0 +1,774 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nJAMAN AI Engine\nPRO CONTROL CENTER\n\nPlatform-wide operations intelligence, tier entitlement gating (₹580 PRO vs ₹420 CORE), question templates, and edge query telemetry.\n\nAdd Custom Query\nAI-ENABLED TENANTS\n4 / 6\n67% on JAMANVAAR PRO (₹580)\nTOTAL QUERIES HANDLED\n0\n+0 queries processed today\nTOP INQUIRED INTENT\n—\nLeading operational metric requested\nEDGE QUERY LATENCY\nNo data yet\nAverage per answer, measured on the terminals\nPlan Entitlement & Tier Access Control\n\nJAMAN AI Assistant is strictly restricted as a flagship PRO feature to drive SaaS plan upgrades.\n\nJAMANVAAR CORE\n₹420 / month (Foundation)\nGATED / LOCKED\nJAMAN AI is LOCKED by default (a teaser), or hidden if the teaser is off\nNo KOT delayed bottleneck detection\nNo proactive cash drawer discrepancy alerts\nStaff tap the AI button ➔ see a locked panel with a few example questions. Nothing is answered. Switch it on for one restaurant below.\nJAMANVAAR PRO\n₹580 / month (Growth Edition)\n100% UNLOCKED\nFull access to all 11 Intelligence Modules\nReal-time Financial Pulse & Tax breakdowns\nProactive Delayed KOT & Low Stock alerts\nNatural Language Search & Executive EOD Briefing\nIncluded alongside Captain App & Table QR Standee Ordering.\nAnomaly Thresholds & AI Alert Engine Tuning\n\nTuned values are pushed down to restaurant instances to trigger proactive assistant banners and urgent cards.\n\nDelayed KOT Alert Threshold (Minutes) *\nTriggers urgent alert when ticket prep > X mins\nCritical Low Stock Threshold (Units) *\nFlags ingredient in assistant when qty ≤ X\nCash Drawer Discrepancy Variance (₹) *\nAlerts manager when active shift variance > ₹X\nEnable Proactive Anomaly Alerts in Restaurant POS/Admin\nShow PRO Teaser Preview to CORE (₹5,000) users\nSave Global Thresholds\nJAMAN AI for one restaurant\n\nBy default a restaurant follows its plan: PRO is ON, CORE is LOCKED (a teaser) or OFF (hidden), depending on the teaser setting above. Change it here for a single restaurant.\n\nRestaurant\nChoose a restaurant…\nUI Audit Restaurant B\nUI Audit Restaurant A\nQuery Template & Category Registry (32 Questions)\n\nEnable, disable, reprioritize, or configure minimum tier requirements for assistant questions.\n\nAll Categories (32)\nToday's Pulse (7)\nSales & Finance (4)\nPayment Split (3)\nOrder Pipeline (4)\nKitchen & KOT (3)\nDining Tables (2)\nMenu Analytics (3)\nStock & Inventory (2)\nCustomer CRM (1)\nStaff & Shift (2)\n✨ Business Insights (1)\nQUESTION LABEL\tCATEGORY\tINTERNAL INTENT\tMIN TIER\tPRIORITY\tSTATUS\tACTIONS\n\nExecutive EOD Closing Brief\n\t✨ BUSINESS INSIGHTS\tEND_OF_DAY\t\nPRO ONLY\t100\t\n\t\n\n\nCritical Low Stock Ingredients\n\tSTOCK & INVENTORY\tLOW_STOCK\t\nPRO ONLY\t100\t\n\t\n\n\nDelayed KOTs (> 15 mins)\n\tKITCHEN & KOT\tDELAYED_KOT\t\nPRO ONLY\t100\t\n\t\n\n\nToday's Gross Sales\n\tTODAY'S PULSE\tTODAY_SALES\t\nPRO ONLY\t100\t\n\t\n\n\nTop Selling Dishes by Volume\n\tMENU ANALYTICS\tTOP_ITEMS\t\nPRO ONLY\t95\t\n\t\n\n\nToday's Total Orders\n\tTODAY'S PULSE\tTODAY_ORDERS\t\nPRO ONLY\t95\t\n\t\n\n\nOut of Stock Dishes (86 List)\n\tSTOCK & INVENTORY\tOUT_OF_STOCK\t\nPRO ONLY\t90\t\n\t\n\n\nActive Live KOT Queue\n\tKITCHEN & KOT\tPENDING_KOT\t\nPRO ONLY\t90\t\n\t\n\n\nComplete Tender Breakdown\n\tPAYMENT SPLIT\tPAYMENT_SUMMARY\t\nPRO ONLY\t90\t\n\t\n\n\nAverage Order Value (AOV)\n\tTODAY'S PULSE\tAOV\t\nPRO ONLY\t90\t\n\t\n\n\nSlow Moving / Least Ordered Items\n\tMENU ANALYTICS\tLEAST_ITEMS\t\nPRO ONLY\t85\t\n\t\n\n\nDine-In Revenue Today\n\tORDER PIPELINE\tDINE_IN_REVENUE\t\nPRO ONLY\t85\t\n\t\n\n\nBusiest Trading Hour\n\tSALES & FINANCE\tBUSIEST_HOUR\t\nPRO ONLY\t85\t\n\t\n\n\nDining Floor Occupancy %\n\tDINING TABLES\tTABLE_OCCUPANCY\t\nPRO ONLY\t85\t\n\t\n\n\nCash in Drawer & Float\n\tTODAY'S PULSE\tCASH_COLLECTION\t\nPRO ONLY\t85\t\n\t\n\n\nTakeaway / Parcel Revenue Today\n\tORDER PIPELINE\tTAKEAWAY_REVENUE\t\nPRO ONLY\t82\t\n\t\n\n\nKitchen Station Turnaround\n\tKITCHEN & KOT\tKITCHEN_PERFORMANCE\t\nPRO ONLY\t80\t\n\t\n\n\nRevenue by Menu Category\n\tMENU ANALYTICS\tBEST_CATEGORY\t\nPRO ONLY\t80\t\n\t\n\n\nCurrent In-Progress Orders\n\tORDER PIPELINE\tACTIVE_ORDERS\t\nPRO ONLY\t80\t\n\t\n\n\nCard Swipes & POS Machine\n\tPAYMENT SPLIT\tCARD_COLLECTION\t\nPRO ONLY\t80\t\n\t\n\n\nPopular Order Combos\n\tSALES & FINANCE\tPOPULAR_COMBOS\t\nPRO ONLY\t80\t\n\t\n\n\nActive Logged-in Staff\n\tSTAFF & SHIFT\tACTIVE_STAFF\t\nPRO ONLY\t80\t\n\t\n\n\nAvailable Clean Tables\n\tDINING TABLES\tAVAILABLE_TABLES\t\nPRO ONLY\t80\t\n\t\n\n\nUPI QR Collections\n\tTODAY'S PULSE\tUPI_COLLECTION\t\nPRO ONLY\t80\t\n\t\n\n\nFootfall: Parties Served Today\n\tCUSTOMER CRM\tFOOTFALL\t\nPRO ONLY\t75\t\n\t\n\n\nCash vs Digital Payment Share\n\tPAYMENT SPLIT\tPAYMENT_SHARE\t\nPRO ONLY\t75\t\n\t\n\n\nRefunds & Voids Summary\n\tSALES & FINANCE\tTODAY_REFUNDS\t\nPRO ONLY\t75\t\n\t\n\n\nCashier Shift Cash Variance\n\tSTAFF & SHIFT\tCASH_VARIANCE\t\nPRO ONLY\t75\t\n\t\n\n\nToday's GST Tax Breakdown\n\tTODAY'S PULSE\tTAX_SUMMARY\t\nPRO ONLY\t75\t\n\t\n\n\nCompleted & Settled Orders\n\tORDER PIPELINE\tCOMPLETED_ORDERS\t\nPRO ONLY\t70\t\n\t\n\n\nCancelled Bills & Voids\n\tSALES & FINANCE\tTODAY_CANCELLED\t\nPRO ONLY\t70\t\n\t\n\n\nDiscounts & Offers Given\n\tTODAY'S PULSE\tTODAY_DISCOUNTS\t\nPRO ONLY\t70\t\n\t",
+  "headings": [
+    "JAMAN AI Engine",
+    "Plan Entitlement & Tier Access Control",
+    "Anomaly Thresholds & AI Alert Engine Tuning",
+    "JAMAN AI for one restaurant",
+    "Query Template & Category Registry (32 Questions)"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Add Custom Query",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 176,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Save Global Thresholds",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All Categories (32)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 130,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Today's Pulse (7)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 119,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Sales & Finance (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 132,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Payment Split (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Order Pipeline (4)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 125,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Kitchen & KOT (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 124,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Dining Tables (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 118,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Menu Analytics (3)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Stock & Inventory (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 144,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Customer CRM (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 127,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Staff & Shift (2)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 112,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "✨ Business Insights (1)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 156,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Edit Question",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search query label or intent code…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

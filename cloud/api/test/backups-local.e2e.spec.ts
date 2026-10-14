@@ -8,7 +8,6 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 // ConfigModule validates the environment when AppModule is first imported, so this must be hoisted:
 // no S3 at all (backups fall back to the server's own disk) and an encryption key.
 const { LOCAL_DIR } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { mkdtempSync: mk } = require('fs');
   const { tmpdir: tmp } = require('os');
   const { join: j } = require('path');

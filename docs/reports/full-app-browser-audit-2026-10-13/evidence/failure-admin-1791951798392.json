@@ -1,0 +1,32 @@
+{
+  "text": "UI Audit Restaurant A\n\nLoading your applications…\nLog out",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 366,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 65
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

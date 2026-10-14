@@ -95,7 +95,7 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         <div className="hidden sm:block h-8 w-px bg-[#E2D9C8] shrink-0" aria-hidden="true" />
 
         {/* Secondary Restaurant Identity & Context */}
-        <div className="flex flex-col justify-center min-w-0">
+        <div className="hidden sm:flex flex-col justify-center min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <span
               title={restaurantName || 'Restaurant'}
@@ -128,11 +128,11 @@ export const PosAdminHeader: React.FC<PosAdminHeaderProps> = ({
         </div>
       </div>
 
-      {availableProducts.length > 1 && onSwitchProduct && <label className="text-xs shrink-0 flex flex-col gap-0.5">
-        <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">App</span>
+      {availableProducts.length > 1 && onSwitchProduct && <label className="text-xs min-w-0 flex flex-col gap-0.5">
+        <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-wide text-slate-400">App</span>
         <span className="flex items-center gap-1.5 rounded-xl border-2 border-brand/30 bg-brand/[0.04] px-1">
           <LayoutGrid className="w-3.5 h-3.5 text-brand shrink-0 ml-1.5" aria-hidden="true" />
-          <select aria-label="Switch application" value={selectedProduct} onChange={e => onSwitchProduct(e.target.value as AdminProduct)} className="bg-transparent p-2 text-jaman-navy font-semibold max-w-40 cursor-pointer">
+          <select aria-label="Switch application" value={selectedProduct} onChange={e => onSwitchProduct(e.target.value as AdminProduct)} className="bg-transparent p-2 text-jaman-navy font-semibold w-full max-w-28 sm:max-w-40 cursor-pointer">
             {availableProducts.map(app => <option key={app} value={app}>{ADMIN_PRODUCTS[app].name}</option>)}
           </select>
         </span>

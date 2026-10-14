@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from './email.service';
+import { paymentBalance, COLLECTED_ORDER_STATUSES } from '../payments/order-payment-ledger';
 import { buildReceiptPdfBuffer, ReceiptPdfOrderLine } from './receipt-pdf.util';
 import { kioskConfigurationSchema } from '../entity-sync/kiosk-configuration-schema';
 
@@ -81,6 +82,7 @@ export class ReceiptEmailService {
         return this.buildPdf(order.restaurant, {
           externalOrderId: order.externalOrderId,
           paidAt: payment.paidAt,
+          collectedAmount: order.totalAmount, outstandingAmount: 0,
           method: payment.method,
           items: order.items as unknown as RawLine[],
           subtotal: order.subtotal,
@@ -102,9 +104,12 @@ export class ReceiptEmailService {
       if (CLOSED_ORDER_STATUSES.includes(synced.status)) {
         throw new BadRequestException(`Cannot email an invoice for an order with status ${synced.status}`);
       }
+      const entries = await tx.orderPaymentEntry.findMany({where: {restaurantId, orderId: synced.id}, select: {kind: true, amount: true}});
+      const balance = paymentBalance(synced.totalAmount, entries.length ? entries : COLLECTED_ORDER_STATUSES.has(synced.paymentStatus || '') ? [{kind: 'COLLECTION', amount: synced.totalAmount}] : []);
       return this.buildPdf(synced.restaurant, {
         externalOrderId: synced.externalOrderId,
-        paidAt: synced.createdAt,
+        paidAt: balance.outstandingPaise ? null : synced.createdAt,
+        collectedAmount: balance.collectedPaise, outstandingAmount: balance.outstandingPaise,
         method: synced.paymentMethod,
         items: synced.items as unknown as RawLine[],
         subtotal: synced.subtotal,
@@ -128,7 +133,7 @@ export class ReceiptEmailService {
 
   private async buildPdf(
     restaurant: RestaurantBranding,
-    order: { externalOrderId: string; paidAt: Date | null; method: string | null; items: RawLine[]; subtotal: number; taxAmount: number; totalAmount: number },
+    order: { externalOrderId: string; paidAt: Date | null; method: string | null; items: RawLine[]; subtotal: number; taxAmount: number; totalAmount: number; collectedAmount: number; outstandingAmount: number },
     presentation?: { thankYouMessage: string; footerMessage: string; logoUrl?: string; showTaxBreakup: boolean }
   ) {
     const items = order.items ?? [];
@@ -147,6 +152,7 @@ export class ReceiptEmailService {
       subtotal: order.subtotal,
       taxAmount: order.taxAmount,
       totalAmount: order.totalAmount,
+      collectedAmount: order.collectedAmount, outstandingAmount: order.outstandingAmount,
       thankYouMessage: presentation?.thankYouMessage, footerMessage: presentation?.footerMessage, logoDataUrl: presentation?.logoUrl, showTaxBreakup: presentation?.showTaxBreakup
     });
 
@@ -156,6 +162,7 @@ export class ReceiptEmailService {
       restaurantName: restaurant.name,
       lines,
       totalAmount: order.totalAmount,
+      collectedAmount: order.collectedAmount, outstandingAmount: order.outstandingAmount,
       thankYouMessage: presentation?.thankYouMessage
     };
   }

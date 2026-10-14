@@ -4,6 +4,7 @@ import type { SystemHealth } from '../../api/types';
 import { Badge, Button, Card, SkeletonCard } from '../../components/ui';
 import { RefreshCw, Server, Database, CheckCircle2, AlertTriangle } from 'lucide-react';
 import '../../components/shared.css';
+import { DeploymentHealthPanel } from './DeploymentHealthPanel';
 
 export function SystemHealthPage() {
   const [health, setHealth] = useState<SystemHealth | null>(null);
@@ -90,11 +91,11 @@ export function SystemHealthPage() {
           )}
           <div>
             <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'var(--jv-text)' }}>
-              {health?.database === 'UP' ? 'All Platform Core Services Operational' : 'Infrastructure Degraded'}
+              {health?.database === 'UP' ? 'API and database are reachable' : 'Database check needs attention'}
             </h3>
             <p style={{ margin: '2px 0 0 0', fontSize: 13, color: 'var(--jv-text-secondary)' }}>
               {health?.database === 'UP'
-                ? 'Cloud API NestJS runtime and PostgreSQL connection pool are operating within nominal latency thresholds.'
+                ? 'The API answered and the database ping succeeded. Review the measured latency below and check frontend/release readiness separately.'
                 : 'The database ping failed on the last check — the API process itself is still responding, but requests that touch the database will fail.'}
             </p>
           </div>
@@ -102,7 +103,7 @@ export function SystemHealthPage() {
 
         <div style={{ display: 'flex', gap: 8 }}>
           <Badge tone={health?.database === 'UP' ? 'success' : 'error'} pulse={health?.database === 'UP'}>
-            {health?.database === 'UP' ? 'ALL SYSTEMS NORMAL' : 'INCIDENT DETECTED'}
+            {health?.database === 'UP' ? 'API / DB REACHABLE' : 'DATABASE CHECK FAILED'}
           </Badge>
         </div>
       </div>
@@ -168,6 +169,7 @@ export function SystemHealthPage() {
         </div>
       ) : null}
 
+      <DeploymentHealthPanel />
       {checkedAt && (
         <p className="muted" style={{ marginTop: 20, fontSize: 12 }}>
           Diagnostic snapshot taken at {checkedAt.toLocaleTimeString('en-IN')} (auto-checks every 30 seconds)
