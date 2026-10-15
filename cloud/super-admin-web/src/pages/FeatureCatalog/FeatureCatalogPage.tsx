@@ -108,7 +108,7 @@ export function FeatureCatalogPage() {
           categories.map((cat) => {
             const catFeatures = features.filter((f) => f.categoryId === cat.id);
             return (
-              <Card key={cat.id} style={{ padding: 0, overflow: 'hidden' }}>
+              <Card key={cat.id} style={{ padding: 0, overflowX: 'auto' }}>
                 <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--jv-surface-subtle)', borderBottom: '1px solid var(--jv-border)' }}>
                   <div>
                     <div style={{ fontWeight: 900, fontSize: 14, color: 'var(--jv-text)' }}>{cat.name}</div>

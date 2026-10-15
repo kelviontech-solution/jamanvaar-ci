@@ -1,0 +1,1062 @@
+{
+  "phase": "after",
+  "checks": [
+    {
+      "name": "order 390: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 349,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "CONFIRMED",
+            "disabled": true,
+            "right": 138.484375,
+            "width": 92.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "PREPARING",
+            "disabled": false,
+            "right": 238.828125,
+            "width": 92.34375,
+            "withinDialog": true
+          },
+          {
+            "text": "READY",
+            "disabled": false,
+            "right": 311.796875,
+            "width": 64.96875,
+            "withinDialog": true
+          },
+          {
+            "text": "COMPLETED",
+            "disabled": false,
+            "right": 142.203125,
+            "width": 96.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Void Order",
+            "disabled": true,
+            "right": 96.84375,
+            "width": 63.84375,
+            "withinDialog": true
+          },
+          {
+            "text": "Refund Order",
+            "disabled": false,
+            "right": 178.046875,
+            "width": 73.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Close",
+            "disabled": false,
+            "right": 240.234375,
+            "width": 62.1875,
+            "withinDialog": true
+          },
+          {
+            "text": "Reprint Receipt",
+            "disabled": false,
+            "right": 351,
+            "width": 102.765625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "restore 390: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 349,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "Cancel",
+            "disabled": false,
+            "right": 144.09375,
+            "width": 69.859375,
+            "withinDialog": true
+          },
+          {
+            "text": "Apply & Restore Snapshot",
+            "disabled": true,
+            "right": 357,
+            "width": 204.90625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "order 424: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 383,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "CONFIRMED",
+            "disabled": true,
+            "right": 138.484375,
+            "width": 92.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "PREPARING",
+            "disabled": false,
+            "right": 238.828125,
+            "width": 92.34375,
+            "withinDialog": true
+          },
+          {
+            "text": "READY",
+            "disabled": false,
+            "right": 311.796875,
+            "width": 64.96875,
+            "withinDialog": true
+          },
+          {
+            "text": "COMPLETED",
+            "disabled": false,
+            "right": 142.203125,
+            "width": 96.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Void Order",
+            "disabled": true,
+            "right": 105.484375,
+            "width": 72.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "Refund Order",
+            "disabled": false,
+            "right": 197.46875,
+            "width": 83.984375,
+            "withinDialog": true
+          },
+          {
+            "text": "Close",
+            "disabled": false,
+            "right": 259.65625,
+            "width": 62.1875,
+            "withinDialog": true
+          },
+          {
+            "text": "Reprint Receipt",
+            "disabled": false,
+            "right": 385,
+            "width": 117.34375,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "restore 424: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 383,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "Cancel",
+            "disabled": false,
+            "right": 178.09375,
+            "width": 69.859375,
+            "withinDialog": true
+          },
+          {
+            "text": "Apply & Restore Snapshot",
+            "disabled": true,
+            "right": 391,
+            "width": 204.90625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "order 768: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 695,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "CONFIRMED",
+            "disabled": true,
+            "right": 178.484375,
+            "width": 92.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "PREPARING",
+            "disabled": false,
+            "right": 278.828125,
+            "width": 92.34375,
+            "withinDialog": true
+          },
+          {
+            "text": "READY",
+            "disabled": false,
+            "right": 351.796875,
+            "width": 64.96875,
+            "withinDialog": true
+          },
+          {
+            "text": "COMPLETED",
+            "disabled": false,
+            "right": 456,
+            "width": 96.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Void Order",
+            "disabled": true,
+            "right": 160.25,
+            "width": 87.25,
+            "withinDialog": true
+          },
+          {
+            "text": "Refund Order",
+            "disabled": false,
+            "right": 270.671875,
+            "width": 102.421875,
+            "withinDialog": true
+          },
+          {
+            "text": "Close",
+            "disabled": false,
+            "right": 525.796875,
+            "width": 62.1875,
+            "withinDialog": true
+          },
+          {
+            "text": "Reprint Receipt",
+            "disabled": false,
+            "right": 689,
+            "width": 155.203125,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "restore 768: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 615,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "Cancel",
+            "disabled": false,
+            "right": 402.09375,
+            "width": 69.859375,
+            "withinDialog": true
+          },
+          {
+            "text": "Apply & Restore Snapshot",
+            "disabled": true,
+            "right": 615,
+            "width": 204.90625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "order 1366: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 994,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "CONFIRMED",
+            "disabled": true,
+            "right": 477.484375,
+            "width": 92.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "PREPARING",
+            "disabled": false,
+            "right": 577.828125,
+            "width": 92.34375,
+            "withinDialog": true
+          },
+          {
+            "text": "READY",
+            "disabled": false,
+            "right": 650.796875,
+            "width": 64.96875,
+            "withinDialog": true
+          },
+          {
+            "text": "COMPLETED",
+            "disabled": false,
+            "right": 755,
+            "width": 96.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Void Order",
+            "disabled": true,
+            "right": 459.25,
+            "width": 87.25,
+            "withinDialog": true
+          },
+          {
+            "text": "Refund Order",
+            "disabled": false,
+            "right": 569.671875,
+            "width": 102.421875,
+            "withinDialog": true
+          },
+          {
+            "text": "Close",
+            "disabled": false,
+            "right": 824.796875,
+            "width": 62.1875,
+            "withinDialog": true
+          },
+          {
+            "text": "Reprint Receipt",
+            "disabled": false,
+            "right": 988,
+            "width": 155.203125,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "restore 1366: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 914,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "Cancel",
+            "disabled": false,
+            "right": 701.09375,
+            "width": 69.859375,
+            "withinDialog": true
+          },
+          {
+            "text": "Apply & Restore Snapshot",
+            "disabled": true,
+            "right": 914,
+            "width": 204.90625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "order 1440: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 1031,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "CONFIRMED",
+            "disabled": true,
+            "right": 514.484375,
+            "width": 92.484375,
+            "withinDialog": true
+          },
+          {
+            "text": "PREPARING",
+            "disabled": false,
+            "right": 614.828125,
+            "width": 92.34375,
+            "withinDialog": true
+          },
+          {
+            "text": "READY",
+            "disabled": false,
+            "right": 687.796875,
+            "width": 64.96875,
+            "withinDialog": true
+          },
+          {
+            "text": "COMPLETED",
+            "disabled": false,
+            "right": 792,
+            "width": 96.203125,
+            "withinDialog": true
+          },
+          {
+            "text": "Void Order",
+            "disabled": true,
+            "right": 496.25,
+            "width": 87.25,
+            "withinDialog": true
+          },
+          {
+            "text": "Refund Order",
+            "disabled": false,
+            "right": 606.671875,
+            "width": 102.421875,
+            "withinDialog": true
+          },
+          {
+            "text": "Close",
+            "disabled": false,
+            "right": 861.796875,
+            "width": 62.1875,
+            "withinDialog": true
+          },
+          {
+            "text": "Reprint Receipt",
+            "disabled": false,
+            "right": 1025,
+            "width": 155.203125,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "restore 1440: every action remains inside dialog",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "buttons": [
+          {
+            "text": "",
+            "disabled": false,
+            "right": 951,
+            "width": 44,
+            "withinDialog": true
+          },
+          {
+            "text": "Cancel",
+            "disabled": false,
+            "right": 738.09375,
+            "width": 69.859375,
+            "withinDialog": true
+          },
+          {
+            "text": "Apply & Restore Snapshot",
+            "disabled": true,
+            "right": 951,
+            "width": 204.90625,
+            "withinDialog": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "Onboarding card uses dark surface token",
+      "pass": true,
+      "evidence": {
+        "card": "rgb(20, 32, 46)",
+        "title": "rgb(232, 238, 246)",
+        "plan": "rgb(232, 238, 246)"
+      }
+    },
+    {
+      "name": "Onboarding text uses dark foreground tokens",
+      "pass": true,
+      "evidence": {
+        "card": "rgb(20, 32, 46)",
+        "title": "rgb(232, 238, 246)",
+        "plan": "rgb(232, 238, 246)"
+      }
+    },
+    {
+      "name": "Feature modal receives focus",
+      "pass": true
+    },
+    {
+      "name": "Dependency checkbox remains interactive",
+      "pass": true
+    },
+    {
+      "name": "Keyboard focus remains visible",
+      "pass": true,
+      "evidence": {
+        "focused": true,
+        "outline": "solid",
+        "width": "2px"
+      }
+    },
+    {
+      "name": "Tab remains inside feature dialog",
+      "pass": true
+    },
+    {
+      "name": "Extra components: no uncaught exceptions",
+      "pass": true,
+      "evidence": []
+    }
+  ],
+  "results": [
+    {
+      "mode": "order",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 349,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "CONFIRMED",
+          "disabled": true,
+          "right": 138.484375,
+          "width": 92.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "PREPARING",
+          "disabled": false,
+          "right": 238.828125,
+          "width": 92.34375,
+          "withinDialog": true
+        },
+        {
+          "text": "READY",
+          "disabled": false,
+          "right": 311.796875,
+          "width": 64.96875,
+          "withinDialog": true
+        },
+        {
+          "text": "COMPLETED",
+          "disabled": false,
+          "right": 142.203125,
+          "width": 96.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Void Order",
+          "disabled": true,
+          "right": 96.84375,
+          "width": 63.84375,
+          "withinDialog": true
+        },
+        {
+          "text": "Refund Order",
+          "disabled": false,
+          "right": 178.046875,
+          "width": 73.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Close",
+          "disabled": false,
+          "right": 240.234375,
+          "width": 62.1875,
+          "withinDialog": true
+        },
+        {
+          "text": "Reprint Receipt",
+          "disabled": false,
+          "right": 351,
+          "width": 102.765625,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 349,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "Cancel",
+          "disabled": false,
+          "right": 144.09375,
+          "width": 69.859375,
+          "withinDialog": true
+        },
+        {
+          "text": "Apply & Restore Snapshot",
+          "disabled": true,
+          "right": 357,
+          "width": 204.90625,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "order",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 383,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "CONFIRMED",
+          "disabled": true,
+          "right": 138.484375,
+          "width": 92.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "PREPARING",
+          "disabled": false,
+          "right": 238.828125,
+          "width": 92.34375,
+          "withinDialog": true
+        },
+        {
+          "text": "READY",
+          "disabled": false,
+          "right": 311.796875,
+          "width": 64.96875,
+          "withinDialog": true
+        },
+        {
+          "text": "COMPLETED",
+          "disabled": false,
+          "right": 142.203125,
+          "width": 96.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Void Order",
+          "disabled": true,
+          "right": 105.484375,
+          "width": 72.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "Refund Order",
+          "disabled": false,
+          "right": 197.46875,
+          "width": 83.984375,
+          "withinDialog": true
+        },
+        {
+          "text": "Close",
+          "disabled": false,
+          "right": 259.65625,
+          "width": 62.1875,
+          "withinDialog": true
+        },
+        {
+          "text": "Reprint Receipt",
+          "disabled": false,
+          "right": 385,
+          "width": 117.34375,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 383,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "Cancel",
+          "disabled": false,
+          "right": 178.09375,
+          "width": 69.859375,
+          "withinDialog": true
+        },
+        {
+          "text": "Apply & Restore Snapshot",
+          "disabled": true,
+          "right": 391,
+          "width": 204.90625,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "order",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 695,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "CONFIRMED",
+          "disabled": true,
+          "right": 178.484375,
+          "width": 92.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "PREPARING",
+          "disabled": false,
+          "right": 278.828125,
+          "width": 92.34375,
+          "withinDialog": true
+        },
+        {
+          "text": "READY",
+          "disabled": false,
+          "right": 351.796875,
+          "width": 64.96875,
+          "withinDialog": true
+        },
+        {
+          "text": "COMPLETED",
+          "disabled": false,
+          "right": 456,
+          "width": 96.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Void Order",
+          "disabled": true,
+          "right": 160.25,
+          "width": 87.25,
+          "withinDialog": true
+        },
+        {
+          "text": "Refund Order",
+          "disabled": false,
+          "right": 270.671875,
+          "width": 102.421875,
+          "withinDialog": true
+        },
+        {
+          "text": "Close",
+          "disabled": false,
+          "right": 525.796875,
+          "width": 62.1875,
+          "withinDialog": true
+        },
+        {
+          "text": "Reprint Receipt",
+          "disabled": false,
+          "right": 689,
+          "width": 155.203125,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 615,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "Cancel",
+          "disabled": false,
+          "right": 402.09375,
+          "width": 69.859375,
+          "withinDialog": true
+        },
+        {
+          "text": "Apply & Restore Snapshot",
+          "disabled": true,
+          "right": 615,
+          "width": 204.90625,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "order",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 994,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "CONFIRMED",
+          "disabled": true,
+          "right": 477.484375,
+          "width": 92.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "PREPARING",
+          "disabled": false,
+          "right": 577.828125,
+          "width": 92.34375,
+          "withinDialog": true
+        },
+        {
+          "text": "READY",
+          "disabled": false,
+          "right": 650.796875,
+          "width": 64.96875,
+          "withinDialog": true
+        },
+        {
+          "text": "COMPLETED",
+          "disabled": false,
+          "right": 755,
+          "width": 96.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Void Order",
+          "disabled": true,
+          "right": 459.25,
+          "width": 87.25,
+          "withinDialog": true
+        },
+        {
+          "text": "Refund Order",
+          "disabled": false,
+          "right": 569.671875,
+          "width": 102.421875,
+          "withinDialog": true
+        },
+        {
+          "text": "Close",
+          "disabled": false,
+          "right": 824.796875,
+          "width": 62.1875,
+          "withinDialog": true
+        },
+        {
+          "text": "Reprint Receipt",
+          "disabled": false,
+          "right": 988,
+          "width": 155.203125,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 914,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "Cancel",
+          "disabled": false,
+          "right": 701.09375,
+          "width": 69.859375,
+          "withinDialog": true
+        },
+        {
+          "text": "Apply & Restore Snapshot",
+          "disabled": true,
+          "right": 914,
+          "width": 204.90625,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "order",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 1031,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "CONFIRMED",
+          "disabled": true,
+          "right": 514.484375,
+          "width": 92.484375,
+          "withinDialog": true
+        },
+        {
+          "text": "PREPARING",
+          "disabled": false,
+          "right": 614.828125,
+          "width": 92.34375,
+          "withinDialog": true
+        },
+        {
+          "text": "READY",
+          "disabled": false,
+          "right": 687.796875,
+          "width": 64.96875,
+          "withinDialog": true
+        },
+        {
+          "text": "COMPLETED",
+          "disabled": false,
+          "right": 792,
+          "width": 96.203125,
+          "withinDialog": true
+        },
+        {
+          "text": "Void Order",
+          "disabled": true,
+          "right": 496.25,
+          "width": 87.25,
+          "withinDialog": true
+        },
+        {
+          "text": "Refund Order",
+          "disabled": false,
+          "right": 606.671875,
+          "width": 102.421875,
+          "withinDialog": true
+        },
+        {
+          "text": "Close",
+          "disabled": false,
+          "right": 861.796875,
+          "width": 62.1875,
+          "withinDialog": true
+        },
+        {
+          "text": "Reprint Receipt",
+          "disabled": false,
+          "right": 1025,
+          "width": 155.203125,
+          "withinDialog": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "buttons": [
+        {
+          "text": "",
+          "disabled": false,
+          "right": 951,
+          "width": 44,
+          "withinDialog": true
+        },
+        {
+          "text": "Cancel",
+          "disabled": false,
+          "right": 738.09375,
+          "width": 69.859375,
+          "withinDialog": true
+        },
+        {
+          "text": "Apply & Restore Snapshot",
+          "disabled": true,
+          "right": 951,
+          "width": 204.90625,
+          "withinDialog": true
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

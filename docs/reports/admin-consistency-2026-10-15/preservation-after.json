@@ -1,0 +1,98 @@
+[
+  {
+    "file": "cloud/super-admin-web/src/components/ui.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "cloud/super-admin-web/src/pages/FeatureCatalog/FeatureCatalogPage.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/CashDropModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/CategoryModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/ConfirmModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/CustomerModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/inventory/WastageLogModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/InventoryModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/ItemModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/OrderDetailModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/PrinterModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/RecipeModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/RestoreModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/StaffModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/StockAdjustModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  },
+  {
+    "file": "apps/restaurant-system/pos-admin/src/components/TableModal.tsx",
+    "structurePreserved": true,
+    "behaviorPropsPreserved": true,
+    "nonPresentationProgramPreserved": true
+  }
+]

@@ -105,12 +105,12 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="empty-state" style={{ borderColor: 'rgba(239, 68, 68, 0.2)', background: '#fffcfc' }}>
+    <div className="empty-state" style={{ borderColor: 'var(--jv-err-line)', background: 'var(--jv-error-soft)' }}>
       <div className="empty-state-icon-box" style={{ background: 'var(--jv-error-soft)', color: 'var(--jv-error-text)' }}>
         <AlertCircle className="w-6 h-6" />
       </div>
       <h3 style={{ color: 'var(--jv-error-text)' }}>Unable to load data</h3>
-      <p style={{ color: '#7f1d1d' }}>{message}</p>
+      <p style={{ color: 'var(--jv-error-text)' }}>{message}</p>
       {onRetry && (
         <div className="empty-state-action">
           <Button variant="accent" size="sm" onClick={onRetry}>
@@ -146,7 +146,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="modal"
+        className="modal modal-standard"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">

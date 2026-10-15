@@ -258,6 +258,7 @@ a:focus-visible,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-pulse-subtle,
   .animate-in,
   .jv-page-enter,
   .jv-stagger > *,

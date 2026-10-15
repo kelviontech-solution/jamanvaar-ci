@@ -228,18 +228,9 @@ export const PosCart: React.FC = () => {
             {cart.items.map((ci) => (
               <div
                 key={ci.cartItemId}
-                className="py-1 border-b border-[#ECE8E2] last:border-b-0"
+                className="py-0.5 border-b border-[#ECE8E2] last:border-b-0"
               >
                 <div className="flex items-start gap-2.5">
-                  <CachedImg
-                    src={ci.item.imageUrl || '/assets/menu/common/fallback-dish.svg'}
-                    alt=""
-                    className="w-10 h-10 rounded-lg object-cover bg-jaman-cream border border-jaman-border shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/assets/menu/common/fallback-dish.svg';
-                    }}
-                  />
-
                   <div className="flex-1 min-w-0">
                     {/* Line 1: dietary mark, name, line total, delete */}
                     <div className="flex items-start gap-2">
@@ -250,14 +241,14 @@ export const PosCart: React.FC = () => {
                       >
                         <div className={`w-2 h-2 rounded-full ${ci.item.dietaryType === 'NON_VEG' ? 'bg-rose-600' : 'bg-emerald-600'}`} />
                       </div>
-                      <h4 className="flex-1 min-w-0 font-semibold text-sm text-jaman-deepNavy leading-tight line-clamp-2">
+                      <h4 title={ci.item.name} className="flex-1 min-w-0 font-semibold text-sm text-jaman-deepNavy leading-tight line-clamp-1">
                         {ci.item.name}
                       </h4>
                       <span className="font-bold text-base text-jaman-deepNavy leading-tight shrink-0 tabular-nums">₹{ci.itemTotal}</span>
                       <button
                         type="button"
                         onClick={() => { sound.play('remove'); removeItemFromCart(ci.cartItemId); }}
-                        className="w-8 h-8 -mt-1.5 -mr-1.5 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                        className="w-7 h-7 -mt-1 -mr-1 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0"
                         title="Remove item"
                         aria-label={`Remove ${ci.item.name}`}
                       >
@@ -265,40 +256,39 @@ export const PosCart: React.FC = () => {
                       </button>
                     </div>
 
-                    {/* Line 2: secondary info */}
-                    <span className="block text-[11px] text-slate-400 leading-tight mt-px">
-                      {ci.item.sku ? `${ci.item.sku} • ` : ''}@ ₹{ci.unitPrice}
-                    </span>
-
-                    {/* Line 3: quantity stepper + inline Add note */}
-                    <div className="flex items-center gap-3 mt-0.5">
+                    {/* Line 2: quantity stepper, SKU / unit price, inline Add note (kept on one line so ~5 rows fit) */}
+                    <div className="flex items-center gap-2">
                       <div className="inline-flex items-center bg-jaman-cream border border-jaman-border rounded-xl shrink-0">
                         <button
                           type="button"
                           onClick={() => { sound.play('remove'); updateItemQuantity(ci.cartItemId, -1); }}
-                          className="w-8 h-9 rounded-l-xl hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-95 cursor-pointer"
+                          className="w-7 h-8 rounded-l-xl hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-95 cursor-pointer"
                           title="Decrease quantity"
                         >
                           <Minus className="w-4 h-4 stroke-[2.5]" />
                         </button>
-                        <span className="font-bold text-sm text-jaman-deepNavy min-w-[30px] h-9 leading-9 text-center bg-white border-x border-jaman-border">
+                        <span className="font-bold text-sm text-jaman-deepNavy min-w-[28px] h-8 leading-8 text-center bg-white border-x border-jaman-border">
                           {ci.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => { sound.play('click'); updateItemQuantity(ci.cartItemId, 1); }}
-                          className="w-8 h-9 rounded-r-xl hover:bg-orange-100 text-jaman-saffron flex items-center justify-center active:scale-95 cursor-pointer"
+                          className="w-7 h-8 rounded-r-xl hover:bg-orange-100 text-jaman-saffron flex items-center justify-center active:scale-95 cursor-pointer"
                           title="Increase quantity"
                         >
                           <Plus className="w-4 h-4 stroke-[3]" />
                         </button>
                       </div>
 
+                      <span className="flex-1 min-w-0 truncate text-[11px] text-slate-500 leading-tight">
+                        {ci.item.sku ? `${ci.item.sku} • ` : ''}@ ₹{ci.unitPrice}
+                      </span>
+
                       {/* Quick Note toggle (same state + handlers as before) */}
                       <button
                         type="button"
                         onClick={() => toggleNotesFor(ci.cartItemId)}
-                        className="text-[11px] font-semibold text-slate-500 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer min-h-9"
+                        className="text-[11px] font-semibold text-slate-500 hover:text-jaman-saffron flex items-center gap-1 cursor-pointer min-h-8 shrink-0"
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-jaman-saffron" />
                         <span>{notesExpandedFor.has(ci.cartItemId) ? 'Done' : 'Add note'}</span>

@@ -909,12 +909,12 @@ export default function KioskUserApp() {
   const kioskSurfaceClass = 'rounded-xl border border-jaman-border bg-white shadow-sm';
   const kioskAmountClass = 'text-right tabular-nums whitespace-nowrap';
   const kioskCategoryTileClass = (active: boolean) =>
-    `w-full flex flex-col items-center gap-1.5 p-2 rounded-xl border text-center transition-colors active:scale-95 ${
+    `kiosk-category-tile w-full min-w-0 flex-none flex flex-col items-center gap-1.5 p-1.5 rounded-xl border text-center transition-colors ${
       active
         ? 'bg-white border-jaman-saffron text-jaman-navy shadow-sm'
         : 'bg-white/90 border-jaman-border text-[#4A5568] hover:bg-white hover:border-jaman-saffron/30'
     }`;
-  const kioskCategoryMediaClass = 'w-full h-[68px] rounded-lg bg-jaman-ivory flex items-center justify-center text-jaman-saffron';
+  const kioskCategoryMediaClass = 'kiosk-category-media rounded-lg bg-jaman-ivory flex items-center justify-center text-jaman-saffron';
 
   // Read live so a Kiosk Admin toggling a language takes effect on the next
   // render without requiring the terminal to be restarted.
@@ -2241,6 +2241,7 @@ export default function KioskUserApp() {
           {showCustomerAi && (<>
           {/* Customer Chatbot Assistant Trigger ("Need Help?") */}
           <button
+            aria-label={kioskCopy("screen_need_help__5c799f", "Need Help?")}
             onClick={() => {
               SoundService.playTap();
               setIsChatbotOpen(true);
@@ -2559,11 +2560,12 @@ export default function KioskUserApp() {
           // to work against, independent of the ambiguous parent sizing —
           // this is what makes the three-panel independent scroll actually
           // hold, not just the panels' own overflow classes.
-          className="relative h-[calc(100dvh-var(--kiosk-header-h,96px))] min-h-0 grid overflow-hidden"
+          data-testid="kiosk-menu-shell"
+          className="kiosk-menu-shell relative h-[calc(100dvh-var(--kiosk-header-h,96px))] min-h-0 grid overflow-hidden"
           style={{
             // The cart is now an overlay drawer, so the category rail and menu
             // keep their normal width whether the cart is empty, filled or open.
-            gridTemplateColumns: 'clamp(96px, 9vw, 132px) minmax(0, 1fr)',
+            gridTemplateColumns: 'var(--kiosk-rail-width) minmax(0, 1fr)',
             boxSizing: 'border-box'
           }}
         >
@@ -2572,8 +2574,11 @@ export default function KioskUserApp() {
               active tile is marked with an orange border and tint. Images
               are existing dish photos from each category (categories carry
               no photo of their own). */}
-          <div className="min-w-0 h-full overflow-y-auto overflow-x-hidden bg-jaman-ivory border-r border-jaman-border flex flex-col gap-2.5 p-3">
+          <div data-testid="kiosk-category-rail" className="kiosk-category-rail min-w-0 min-h-0 h-full overflow-y-auto overflow-x-hidden bg-jaman-ivory border-r border-jaman-border flex flex-col gap-2 p-2">
             <button
+              aria-label={t('allMenu')}
+              aria-pressed={selectedCategoryId === 'ALL'}
+              title={t('allMenu')}
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('ALL');
@@ -2585,10 +2590,13 @@ export default function KioskUserApp() {
               <div className={kioskCategoryMediaClass}>
                 <Grid className="w-6 h-6" />
               </div>
-              <span className="text-xs font-semibold leading-tight line-clamp-2">{t('allMenu')}</span>
+              <span className="kiosk-category-label font-semibold">{t('allMenu')}</span>
             </button>
 
             <button
+              aria-label={kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}
+              aria-pressed={selectedCategoryId === 'cat-combos'}
+              title={kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}
               onClick={() => {
                 SoundService.playTap();
                 setSelectedCategoryId('cat-combos');
@@ -2598,7 +2606,7 @@ export default function KioskUserApp() {
               <div className={kioskCategoryMediaClass}>
                 <Flame className="w-6 h-6" />
               </div>
-              <span className="text-xs font-semibold leading-tight line-clamp-2">{kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}</span>
+              <span className="kiosk-category-label font-semibold">{kioskCopy("screen_combos_deals_e531d6", "Combos & Deals")}</span>
             </button>
 
             {categories.filter((cat) => menuItems.some((m) => m.categoryId === cat.id && m.isAvailable)).map((cat) => {
@@ -2609,6 +2617,9 @@ export default function KioskUserApp() {
               return (
                 <button
                   key={cat.id}
+                  aria-label={localizedName(cat, lang)}
+                  aria-pressed={active}
+                  title={localizedName(cat, lang)}
                   onClick={() => {
                     SoundService.playTap();
                     setSelectedCategoryId(cat.id);
@@ -2621,9 +2632,9 @@ export default function KioskUserApp() {
                     ) : (
                       <MenuCategoryIcon name={cat.name} iconName={cat.iconName} size="md" />
                     )}
-                    {photo && <MenuCategoryIcon name={cat.name} iconName={cat.iconName} className="absolute bottom-1 right-1 shadow-sm" />}
+                    {photo && <MenuCategoryIcon name={cat.name} iconName={cat.iconName} className="kiosk-category-overlay absolute bottom-1 right-1 shadow-sm" />}
                   </div>
-                  <span className="text-xs font-semibold leading-tight line-clamp-2">{localizedName(cat, lang)}</span>
+                  <span className="kiosk-category-label font-semibold">{localizedName(cat, lang)}</span>
                 </button>
               );
             })}
@@ -2691,7 +2702,7 @@ export default function KioskUserApp() {
             </div>
 
             {/* Scrollable: hero banners + category title + grid */}
-            <div className={`flex-1 overflow-y-auto ${cartItems.length > 0 ? 'pb-32' : 'pb-8'}`}>
+            <div data-testid="kiosk-menu-scroll" className={`kiosk-menu-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden ${cartItems.length > 0 ? 'kiosk-menu-scroll-with-cart' : ''}`}>
               {/* Featured deals — a compact horizontally-scrolling strip
                   (small thumbnail + two lines of text) instead of three
                   full-width hero cards, so the actual food menu below is
@@ -2792,14 +2803,14 @@ export default function KioskUserApp() {
                 {filteredCombos.length === 0 && (selectedCategoryId === 'cat-combos' || filteredItems.length === 0) ? (
                   <EmptyState title={selectedCategoryId === 'cat-combos' ? "No deals available" : "No dishes found"} description={selectedCategoryId === 'cat-combos' ? "There are no deals matching your filters right now. Browse the full menu to choose individual dishes." : "Try another search term or clear your filters."} actionText="Browse dishes" onAction={() => { setSelectedCategoryId('ALL'); setDietaryFilter('ALL'); setSearchQuery(''); }} />
                 ) : (
-                  <div data-testid="kiosk-menu-grid" className="grid gap-4 sm:gap-5 items-stretch" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))' }}>
+                  <div data-testid="kiosk-menu-grid" className="kiosk-menu-grid grid items-stretch">
                       {filteredCombos.map((combo) => (
                         <div
                           key={combo.id}
                           data-testid="kiosk-menu-card"
-                          className="flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm hover:border-jaman-saffron/60 hover:shadow-md transition-all"
+                          className="kiosk-product-card flex flex-col h-full min-w-0 bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-sm hover:border-jaman-saffron/60 hover:shadow-md transition-shadow"
                         >
-                          <div className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden">
+                          <div className="kiosk-product-media relative w-full shrink-0 bg-jaman-ivory overflow-hidden">
                             <CachedImg
                               src={combo.imageUrl}
                               dishName={combo.name}
@@ -2813,20 +2824,21 @@ export default function KioskUserApp() {
                               {isNonVegCombo(combo) ? kioskCopy('nonVegCombo', 'Non-Vegetarian Combo') : t('pureVegCombo')}
                             </span>
                           </div>
-                          <div className="flex flex-col flex-1 p-3.5 gap-1.5">
-                            <h4 className="font-black text-base text-jaman-navy leading-snug line-clamp-2 min-h-[2.75rem]">{localizedName(combo, lang)}</h4>
-                            <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{localizedDescription(combo, lang)}</p>
-                            <div className="mt-auto pt-2 flex items-end justify-between gap-2">
-                              <div className="min-w-0">
-                                <div className="text-xl font-black text-jaman-saffron leading-none">
-                                  ₹{combo.basePrice}
-                                  <span className="text-sm line-through text-[#52677A] font-medium ml-1">₹{combo.originalPrice}</span>
-                                </div>
-                                <span className="block mt-1 text-[11px] font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
+                          <div className="kiosk-product-body">
+                            <h4 className="kiosk-product-name font-bold text-base text-jaman-navy line-clamp-2">{localizedName(combo, lang)}</h4>
+                            <span className="kiosk-product-subcategory" aria-hidden="true" />
+                            <p className="kiosk-product-description text-[#4A5568] line-clamp-2">{localizedDescription(combo, lang)}</p>
+                            <div className="kiosk-product-price mt-auto min-w-0">
+                              <div data-kiosk-price className="flex flex-wrap items-baseline gap-x-1 text-xl font-black text-jaman-saffron leading-tight tabular-nums">
+                                ₹{combo.basePrice}
+                                <span className="text-sm line-through text-[#52677A] font-medium">₹{combo.originalPrice}</span>
                               </div>
+                              <span className="kiosk-product-note block text-xs font-bold text-emerald-600">{kioskCopy("screen_save__2eaea5", "Save ₹")}{combo.savingsAmount}</span>
+                            </div>
+                            <div className="kiosk-product-actions flex items-center justify-end gap-2 shrink-0">
                               <button
                                 onClick={() => handleSelectCombo(combo)}
-                                className="w-12 h-12 rounded-full bg-jaman-saffron text-white flex items-center justify-center shadow-sm active:scale-90 active:bg-[#D1560D] transition-transform shrink-0"
+                                className="kiosk-product-action kiosk-product-add bg-jaman-saffron text-white"
                                 title="Add Combo to Cart"
                                 aria-label={`Add ${localizedName(combo, lang)} combo to cart`}
                               >
@@ -3125,8 +3137,8 @@ export default function KioskUserApp() {
 
           {cartItems.length > 0 && !isCartOpen && (
             <div
-              className="pointer-events-none fixed z-40 bottom-[calc(env(safe-area-inset-bottom)+28px)] right-4 sm:right-6 flex justify-center"
-              style={{ left: 'calc(clamp(96px, 9vw, 132px) + 1rem)' }}
+              data-testid="kiosk-cart-dock"
+              className="kiosk-cart-dock pointer-events-none absolute z-40 flex justify-center"
             >
               <button
                 type="button"
@@ -3134,23 +3146,23 @@ export default function KioskUserApp() {
                   SoundService.playTap();
                   setIsCartOpen(true);
                 }}
-                className="pointer-events-auto w-full max-w-[760px] min-h-[64px] rounded-xl overflow-hidden bg-jaman-saffron/90 text-white shadow-[0_14px_30px_rgba(230,104,23,0.24)] border border-white/30 backdrop-blur-sm flex items-stretch justify-between active:scale-[0.99] transition-transform"
+                className="kiosk-cart-summary pointer-events-auto w-full max-w-[760px] min-w-0 rounded-2xl overflow-hidden bg-jaman-saffron text-white shadow-[0_8px_24px_rgba(11,37,58,0.16)] flex items-stretch justify-between active:scale-[0.99] transition-transform"
               >
-                <span className="flex items-center gap-3 px-4 sm:px-5 min-w-0">
-                  <span className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                <span className="kiosk-cart-info flex items-center gap-2.5 px-3 min-w-0">
+                  <span className="kiosk-cart-icon w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
                     <ShoppingBag className="w-5 h-5 text-white" />
                   </span>
                   <span className="text-left min-w-0">
-                    <span className="block text-[11px] sm:text-xs font-bold uppercase tracking-wide text-white/85">
+                    <span className="kiosk-cart-count block font-semibold text-white/90">
                       {cartItemQuantity} {cartItemQuantity === 1 ? kioskCopy("screen_item_in_cart_9f91ad", "item in cart") : kioskCopy("screen_items_in_cart_07b69e", "items in cart")}
                     </span>
-                    <span className="block text-lg sm:text-xl font-black leading-tight tabular-nums">{formatINR(netTotalPayable)}</span>
+                    <span className="kiosk-cart-total block font-black leading-tight tabular-nums whitespace-nowrap">{formatINR(netTotalPayable)}</span>
                   </span>
                 </span>
-                <span className="bg-white/95 text-jaman-saffron px-4 sm:px-6 flex items-center gap-2 text-sm sm:text-base font-black whitespace-nowrap border-l border-white/20">
-                  <span className="hidden sm:inline">{kioskCopy("screen_view_cart_checkout_2d62d4", "View Cart & Checkout")}</span>
-                  <span className="sm:hidden">{kioskCopy("screen_checkout_8b785d", "Checkout")}</span>
-                  <ArrowRight className="w-5 h-5" />
+                <span className="kiosk-cart-checkout bg-white/95 text-jaman-saffron px-3 flex items-center gap-2 text-sm font-bold whitespace-nowrap border-l border-jaman-saffron/15 shrink-0">
+                  <span className="kiosk-cart-checkout-full">{kioskCopy("screen_view_cart_checkout_2d62d4", "View Cart & Checkout")}</span>
+                  <span className="kiosk-cart-checkout-short">{kioskCopy("screen_checkout_8b785d", "Checkout")}</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
                 </span>
               </button>
             </div>
@@ -4319,12 +4331,9 @@ export default function KioskUserApp() {
         </div>
       )}
 
-      {/* FLOATING CORNER CHATBOT AI ASSISTANT TRIGGER (Bottom Right) — hidden
-          while the cart sidebar is open since both are anchored to the same
-          bottom-right corner; without this the AI button physically sat on
-          top of the cart's "Proceed to Payment" button, blocking checkout.
-          Also hidden on WELCOME, which has its own clean layout. */}
-      {showCustomerAi && !isChatbotOpen && !isCartOpen && step !== 'CONFIRMATION' && step !== 'WELCOME' && (
+      {/* Keep the duplicate floating help launcher clear of both cart controls
+          and the final product row. The header's Need Help action remains available. */}
+      {showCustomerAi && !isChatbotOpen && !isCartOpen && !(step === 'MENU' && cartItems.length > 0) && step !== 'CONFIRMATION' && step !== 'WELCOME' && (
         <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3 animate-fadeIn">
           {/* Floating Action Button */}
           <button

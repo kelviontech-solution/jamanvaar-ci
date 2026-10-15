@@ -1,0 +1,1675 @@
+{
+  "phase": "after",
+  "checks": [
+    {
+      "name": "super public 390: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 3,
+        "dialogs": 0,
+        "url": "/login"
+      }
+    },
+    {
+      "name": "restaurant public 390: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 6,
+        "dialogs": 0,
+        "url": "/"
+      }
+    },
+    {
+      "name": "Settings grid light 390 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step light 390 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state light 390 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 390",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Settings grid dark 390 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step dark 390 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state dark 390 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 350,
+        "cardWidth": 350,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 390",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Feature checkbox 390: native size",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 780.1875,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal footer 390: padded",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 780.1875,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal close 390: target >=44",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 780.1875,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Restaurant confirm 390: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 390: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Non-destructive confirmation 390: warning palette",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 390: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant category 390: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 390: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 390: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "super public 424: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 3,
+        "dialogs": 0,
+        "url": "/login"
+      }
+    },
+    {
+      "name": "restaurant public 424: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 6,
+        "dialogs": 0,
+        "url": "/"
+      }
+    },
+    {
+      "name": "Settings grid light 424 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step light 424 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state light 424 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 424",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Settings grid dark 424 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step dark 424 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state dark 424 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 384,
+        "cardWidth": 384,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 424",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Feature checkbox 424: native size",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 709,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal footer 424: padded",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 709,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal close 424: target >=44",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 709,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Restaurant confirm 424: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 424: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Non-destructive confirmation 424: warning palette",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 424: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant category 424: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 424: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 424: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "super public 768: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 3,
+        "dialogs": 0,
+        "url": "/login"
+      }
+    },
+    {
+      "name": "restaurant public 768: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 6,
+        "dialogs": 0,
+        "url": "/"
+      }
+    },
+    {
+      "name": "Settings grid light 768 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step light 768 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state light 768 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 768",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Settings grid dark 768 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step dark 768 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state dark 768 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 728,
+        "cardWidth": 728,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 768",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Feature checkbox 768: native size",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 887.75,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal footer 768: padded",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 887.75,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal close 768: target >=44",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 887.75,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Restaurant confirm 768: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 768: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Non-destructive confirmation 768: warning palette",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 768: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant category 768: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 768: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 768: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "super public 1366: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 3,
+        "dialogs": 0,
+        "url": "/login"
+      }
+    },
+    {
+      "name": "restaurant public 1366: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 6,
+        "dialogs": 0,
+        "url": "/"
+      }
+    },
+    {
+      "name": "Settings grid light 1366 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step light 1366 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state light 1366 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 1366",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Settings grid dark 1366 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step dark 1366 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state dark 1366 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1326,
+        "cardWidth": 1326,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 1366",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Feature checkbox 1366: native size",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 719.390625,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal footer 1366: padded",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 719.390625,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal close 1366: target >=44",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 719.390625,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Restaurant confirm 1366: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 1366: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Non-destructive confirmation 1366: warning palette",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 1366: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant category 1366: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 1366: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 1366: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "super public 1440: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 3,
+        "dialogs": 0,
+        "url": "/login"
+      }
+    },
+    {
+      "name": "restaurant public 1440: no horizontal overflow",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "inputs": 3,
+        "buttons": 6,
+        "dialogs": 0,
+        "url": "/"
+      }
+    },
+    {
+      "name": "Settings grid light 1440 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step light 1440 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state light 1440 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(255, 255, 255)",
+        "pillBg": "rgb(11, 37, 58)",
+        "errorBg": "rgb(254, 242, 242)",
+        "expectedErrorBg": "rgb(254, 242, 242)",
+        "errorText": "rgb(153, 27, 27)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 1440",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Settings grid dark 1440 fits",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Active onboarding step dark 1440 contrast >=4.5",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Error state dark 1440 uses theme token",
+      "pass": true,
+      "evidence": {
+        "overflow": false,
+        "gridWidth": 1400,
+        "cardWidth": 1400,
+        "pillColor": "rgb(11, 17, 24)",
+        "pillBg": "rgb(241, 245, 249)",
+        "errorBg": "rgba(248, 113, 113, 0.14)",
+        "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+        "errorText": "rgb(248, 113, 113)",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Super font 1440",
+      "pass": true,
+      "evidence": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "name": "Feature checkbox 1440: native size",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 825,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal footer 1440: padded",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 825,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Modal close 1440: target >=44",
+      "pass": true,
+      "evidence": {
+        "checkboxHeight": 13,
+        "footerBottom": 825,
+        "footerPadding": "24px",
+        "closeWidth": 44
+      }
+    },
+    {
+      "name": "Restaurant confirm 1440: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 1440: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Non-destructive confirmation 1440: warning palette",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant confirm 1440: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": "rgb(255, 251, 235)"
+      }
+    },
+    {
+      "name": "Restaurant category 1440: aligned 44px actions",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 1440: matching action typography",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant category 1440: fits dialog",
+      "pass": true,
+      "evidence": {
+        "cancelHeight": 44,
+        "primaryHeight": 44,
+        "cancelFont": "14px",
+        "primaryFont": "14px",
+        "overflow": false,
+        "warningBg": null
+      }
+    },
+    {
+      "name": "Restaurant pulse respects reduced motion",
+      "pass": true,
+      "evidence": {
+        "animation": "none",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Restaurant font matches root token",
+      "pass": true,
+      "evidence": {
+        "animation": "none",
+        "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+      }
+    },
+    {
+      "name": "Tall modal: body scrolls while actions remain visible",
+      "pass": true,
+      "evidence": {
+        "bodyScrolls": true,
+        "footerStable": true,
+        "footerVisible": true
+      }
+    },
+    {
+      "name": "Escape handler preserved",
+      "pass": true
+    },
+    {
+      "name": "No uncaught browser exceptions",
+      "pass": true,
+      "evidence": []
+    }
+  ],
+  "results": [
+    {
+      "kind": "public",
+      "name": "super",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 3,
+      "dialogs": 0,
+      "url": "/login"
+    },
+    {
+      "kind": "public",
+      "name": "restaurant",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 6,
+      "dialogs": 0,
+      "url": "/"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "light",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "gridWidth": 350,
+      "cardWidth": 350,
+      "pillColor": "rgb(255, 255, 255)",
+      "pillBg": "rgb(11, 37, 58)",
+      "errorBg": "rgb(254, 242, 242)",
+      "expectedErrorBg": "rgb(254, 242, 242)",
+      "errorText": "rgb(153, 27, 27)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "dark",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "gridWidth": 350,
+      "cardWidth": 350,
+      "pillColor": "rgb(11, 17, 24)",
+      "pillBg": "rgb(241, 245, 249)",
+      "errorBg": "rgba(248, 113, 113, 0.14)",
+      "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+      "errorText": "rgb(248, 113, 113)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "feature-modal",
+      "width": 390,
+      "height": 844,
+      "checkboxHeight": 13,
+      "footerBottom": 780.1875,
+      "footerPadding": "24px",
+      "closeWidth": 44
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-confirm",
+      "width": 390,
+      "height": 844,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": "rgb(255, 251, 235)"
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-category",
+      "width": 390,
+      "height": 844,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": null
+    },
+    {
+      "kind": "public",
+      "name": "super",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 3,
+      "dialogs": 0,
+      "url": "/login"
+    },
+    {
+      "kind": "public",
+      "name": "restaurant",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 6,
+      "dialogs": 0,
+      "url": "/"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "light",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "gridWidth": 384,
+      "cardWidth": 384,
+      "pillColor": "rgb(255, 255, 255)",
+      "pillBg": "rgb(11, 37, 58)",
+      "errorBg": "rgb(254, 242, 242)",
+      "expectedErrorBg": "rgb(254, 242, 242)",
+      "errorText": "rgb(153, 27, 27)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "dark",
+      "width": 424,
+      "height": 755,
+      "overflow": false,
+      "gridWidth": 384,
+      "cardWidth": 384,
+      "pillColor": "rgb(11, 17, 24)",
+      "pillBg": "rgb(241, 245, 249)",
+      "errorBg": "rgba(248, 113, 113, 0.14)",
+      "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+      "errorText": "rgb(248, 113, 113)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "feature-modal",
+      "width": 424,
+      "height": 755,
+      "checkboxHeight": 13,
+      "footerBottom": 709,
+      "footerPadding": "24px",
+      "closeWidth": 44
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-confirm",
+      "width": 424,
+      "height": 755,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": "rgb(255, 251, 235)"
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-category",
+      "width": 424,
+      "height": 755,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": null
+    },
+    {
+      "kind": "public",
+      "name": "super",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 3,
+      "dialogs": 0,
+      "url": "/login"
+    },
+    {
+      "kind": "public",
+      "name": "restaurant",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 6,
+      "dialogs": 0,
+      "url": "/"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "light",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "gridWidth": 728,
+      "cardWidth": 728,
+      "pillColor": "rgb(255, 255, 255)",
+      "pillBg": "rgb(11, 37, 58)",
+      "errorBg": "rgb(254, 242, 242)",
+      "expectedErrorBg": "rgb(254, 242, 242)",
+      "errorText": "rgb(153, 27, 27)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "dark",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "gridWidth": 728,
+      "cardWidth": 728,
+      "pillColor": "rgb(11, 17, 24)",
+      "pillBg": "rgb(241, 245, 249)",
+      "errorBg": "rgba(248, 113, 113, 0.14)",
+      "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+      "errorText": "rgb(248, 113, 113)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "feature-modal",
+      "width": 768,
+      "height": 1024,
+      "checkboxHeight": 13,
+      "footerBottom": 887.75,
+      "footerPadding": "24px",
+      "closeWidth": 44
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-confirm",
+      "width": 768,
+      "height": 1024,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": "rgb(255, 251, 235)"
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-category",
+      "width": 768,
+      "height": 1024,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": null
+    },
+    {
+      "kind": "public",
+      "name": "super",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 3,
+      "dialogs": 0,
+      "url": "/login"
+    },
+    {
+      "kind": "public",
+      "name": "restaurant",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 6,
+      "dialogs": 0,
+      "url": "/"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "light",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "gridWidth": 1326,
+      "cardWidth": 1326,
+      "pillColor": "rgb(255, 255, 255)",
+      "pillBg": "rgb(11, 37, 58)",
+      "errorBg": "rgb(254, 242, 242)",
+      "expectedErrorBg": "rgb(254, 242, 242)",
+      "errorText": "rgb(153, 27, 27)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "dark",
+      "width": 1366,
+      "height": 768,
+      "overflow": false,
+      "gridWidth": 1326,
+      "cardWidth": 1326,
+      "pillColor": "rgb(11, 17, 24)",
+      "pillBg": "rgb(241, 245, 249)",
+      "errorBg": "rgba(248, 113, 113, 0.14)",
+      "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+      "errorText": "rgb(248, 113, 113)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "feature-modal",
+      "width": 1366,
+      "height": 768,
+      "checkboxHeight": 13,
+      "footerBottom": 719.390625,
+      "footerPadding": "24px",
+      "closeWidth": 44
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-confirm",
+      "width": 1366,
+      "height": 768,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": "rgb(255, 251, 235)"
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-category",
+      "width": 1366,
+      "height": 768,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": null
+    },
+    {
+      "kind": "public",
+      "name": "super",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 3,
+      "dialogs": 0,
+      "url": "/login"
+    },
+    {
+      "kind": "public",
+      "name": "restaurant",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputs": 3,
+      "buttons": 6,
+      "dialogs": 0,
+      "url": "/"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "gridWidth": 1400,
+      "cardWidth": 1400,
+      "pillColor": "rgb(255, 255, 255)",
+      "pillBg": "rgb(11, 37, 58)",
+      "errorBg": "rgb(254, 242, 242)",
+      "expectedErrorBg": "rgb(254, 242, 242)",
+      "errorText": "rgb(153, 27, 27)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "style-probe",
+      "name": "super",
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "gridWidth": 1400,
+      "cardWidth": 1400,
+      "pillColor": "rgb(11, 17, 24)",
+      "pillBg": "rgb(241, 245, 249)",
+      "errorBg": "rgba(248, 113, 113, 0.14)",
+      "expectedErrorBg": "rgba(248, 113, 113, 0.14)",
+      "errorText": "rgb(248, 113, 113)",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "feature-modal",
+      "width": 1440,
+      "height": 900,
+      "checkboxHeight": 13,
+      "footerBottom": 825,
+      "footerPadding": "24px",
+      "closeWidth": 44
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-confirm",
+      "width": 1440,
+      "height": 900,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": "rgb(255, 251, 235)"
+    },
+    {
+      "kind": "component",
+      "name": "restaurant-category",
+      "width": 1440,
+      "height": 900,
+      "cancelHeight": 44,
+      "primaryHeight": 44,
+      "cancelFont": "14px",
+      "primaryFont": "14px",
+      "overflow": false,
+      "warningBg": null
+    },
+    {
+      "kind": "style-probe",
+      "name": "restaurant-motion",
+      "animation": "none",
+      "font": "\"Plus Jakarta Sans\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif"
+    },
+    {
+      "kind": "component",
+      "name": "tall-modal",
+      "bodyScrolls": true,
+      "footerStable": true,
+      "footerVisible": true
+    }
+  ],
+  "errors": []
+}
