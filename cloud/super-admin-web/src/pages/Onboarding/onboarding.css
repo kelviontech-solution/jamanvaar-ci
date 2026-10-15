@@ -49,7 +49,7 @@
 
 .onboard-step-pill.active {
   background: var(--jv-primary, #0b253a);
-  color: #fff;
+  color: var(--jv-on-primary, #fff);
   border-color: var(--jv-primary, #0b253a);
   box-shadow: 0 4px 12px rgba(11, 37, 58, 0.15);
 }
@@ -62,7 +62,7 @@
 
 .onboard-card {
   padding: 32px;
-  background: #ffffff;
+  background: var(--jv-surface);
   border-radius: 16px;
   border: 1px solid var(--jv-border, #ebe6dd);
   box-shadow: 0 4px 20px rgba(11, 37, 58, 0.04);
@@ -71,11 +71,11 @@
 .form-section-title {
   font-size: 15px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--jv-text);
   letter-spacing: -0.01em;
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--jv-border-subtle);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -83,7 +83,7 @@
 
 .form-subtext {
   font-size: 12px;
-  color: #64748b;
+  color: var(--jv-slate-500);
   margin-top: -10px;
   margin-bottom: 16px;
 }
@@ -97,11 +97,11 @@
 }
 
 .plan-select-card {
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--jv-line);
   border-radius: 14px;
   padding: 20px;
   cursor: pointer;
-  background: #ffffff;
+  background: var(--jv-surface);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
@@ -109,14 +109,14 @@
 }
 
 .plan-select-card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--jv-line-strong);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(11, 37, 58, 0.06);
 }
 
 .plan-select-card.selected {
-  border-color: #e66817;
-  background: #fffcf9;
+  border-color: var(--jv-accent);
+  background: var(--jv-accent-soft);
   box-shadow: 0 8px 28px rgba(230, 104, 23, 0.12);
 }
 
@@ -138,14 +138,14 @@
 .plan-card-title {
   font-size: 16px;
   font-weight: 800;
-  color: #0b253a;
+  color: var(--jv-ink);
   margin-bottom: 6px;
 }
 
 .plan-card-price {
   font-size: 26px;
   font-weight: 900;
-  color: #0f172a;
+  color: var(--jv-text);
   display: flex;
   align-items: baseline;
   gap: 4px;
@@ -155,12 +155,12 @@
 .plan-card-price span {
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--jv-slate-500);
 }
 
 .plan-card-desc {
   font-size: 12px;
-  color: #475569;
+  color: var(--jv-slate-600);
   margin-bottom: 16px;
   min-height: 36px;
 }
@@ -169,10 +169,10 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px dashed var(--jv-line);
   padding-top: 14px;
   font-size: 12px;
-  color: #334155;
+  color: var(--jv-slate-700);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -198,32 +198,32 @@
   gap: 10px;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid var(--jv-line);
+  background: var(--jv-paper-soft);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .device-key-option:hover {
-  background: #f1f5f9;
+  background: var(--jv-bg-muted);
 }
 
 .device-key-option input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #e66817;
+  accent-color: var(--jv-accent);
   cursor: pointer;
 }
 
 .device-key-option-label {
   font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--jv-text);
 }
 
 .device-key-option-desc {
   font-size: 11px;
-  color: #64748b;
+  color: var(--jv-slate-500);
 }
 
 /* Official Welcome Kit & Handover Styling */

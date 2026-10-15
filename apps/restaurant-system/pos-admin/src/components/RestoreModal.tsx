@@ -166,7 +166,7 @@ export const RestoreModal: React.FC<RestoreModalProps> = ({
           <button
             disabled={!parsedData}
             onClick={handleApplyRestore}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="min-h-11 px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white font-bold text-sm rounded-xl shadow-xs transition-all active:scale-95"
           >
             Apply & Restore Snapshot
           </button>

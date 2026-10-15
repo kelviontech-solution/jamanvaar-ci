@@ -1,0 +1,2961 @@
+{
+  "phase": "after",
+  "environment": "Real kiosk App; isolated seeded menu and device fixture; all API/external traffic blocked",
+  "results": [
+    {
+      "name": "sidebar 424x755",
+      "viewport": {
+        "width": 424,
+        "height": 755
+      },
+      "rail": {
+        "x": 0,
+        "y": 131,
+        "width": 96,
+        "height": 624,
+        "right": 96,
+        "bottom": 755
+      },
+      "railScrollTop": 0,
+      "railScrollHeight": 1118,
+      "railClientHeight": 624,
+      "railScrollWidth": 95,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 112,
+        "y": 334,
+        "width": 296,
+        "height": 5021,
+        "right": 408,
+        "bottom": 5355
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": 139,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 263.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 146,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 202
+          },
+          "label": {
+            "x": 15,
+            "y": 208,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 256.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": 271.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 396.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 278.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 334.75
+          },
+          "label": {
+            "x": 15,
+            "y": 340.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 389.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": 404.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 529.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 411.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 467.5
+          },
+          "label": {
+            "x": 15,
+            "y": 473.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 522.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 411.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 467.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 537.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 662
+          },
+          "media": {
+            "x": 19.5,
+            "y": 544.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 600.25
+          },
+          "label": {
+            "x": 15,
+            "y": 606.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 655
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 544.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 600.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 670,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 794.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 677,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 733
+          },
+          "label": {
+            "x": 15,
+            "y": 739,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 787.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 677,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 733
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 802.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 927.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 809.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 865.75
+          },
+          "label": {
+            "x": 15,
+            "y": 871.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 920.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 809.75,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 865.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 935.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1060.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 942.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 998.5
+          },
+          "label": {
+            "x": 15,
+            "y": 1004.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1053.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 942.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 998.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 1068.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1193
+          },
+          "media": {
+            "x": 19.5,
+            "y": 1075.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 1131.25
+          },
+          "label": {
+            "x": 15,
+            "y": 1137.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1186
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 1075.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 1131.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "name": "sidebar 480x854",
+      "viewport": {
+        "width": 480,
+        "height": 854
+      },
+      "rail": {
+        "x": 0,
+        "y": 131,
+        "width": 96,
+        "height": 723,
+        "right": 96,
+        "bottom": 854
+      },
+      "railScrollTop": 0,
+      "railScrollHeight": 1118,
+      "railClientHeight": 723,
+      "railScrollWidth": 95,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 112,
+        "y": 334,
+        "width": 352,
+        "height": 5441,
+        "right": 464,
+        "bottom": 5775
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": 139,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 263.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 146,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 202
+          },
+          "label": {
+            "x": 15,
+            "y": 208,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 256.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": 271.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 396.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 278.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 334.75
+          },
+          "label": {
+            "x": 15,
+            "y": 340.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 389.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": 404.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 529.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 411.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 467.5
+          },
+          "label": {
+            "x": 15,
+            "y": 473.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 522.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 411.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 467.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 537.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 662
+          },
+          "media": {
+            "x": 19.5,
+            "y": 544.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 600.25
+          },
+          "label": {
+            "x": 15,
+            "y": 606.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 655
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 544.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 600.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 670,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 794.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 677,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 733
+          },
+          "label": {
+            "x": 15,
+            "y": 739,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 787.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 677,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 733
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 802.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 927.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 809.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 865.75
+          },
+          "label": {
+            "x": 15,
+            "y": 871.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 920.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 809.75,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 865.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 935.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1060.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 942.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 998.5
+          },
+          "label": {
+            "x": 15,
+            "y": 1004.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1053.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 942.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 998.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 1068.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1193
+          },
+          "media": {
+            "x": 19.5,
+            "y": 1075.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 1131.25
+          },
+          "label": {
+            "x": 15,
+            "y": 1137.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1186
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 1075.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 1131.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "name": "sidebar 768x1024",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "rail": {
+        "x": 0,
+        "y": 131,
+        "width": 96,
+        "height": 893,
+        "right": 96,
+        "bottom": 1024
+      },
+      "railScrollTop": 0,
+      "railScrollHeight": 1118,
+      "railClientHeight": 893,
+      "railScrollWidth": 95,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 128,
+        "y": 338,
+        "width": 608,
+        "height": 2502.5,
+        "right": 736,
+        "bottom": 2840.5
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": 139,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 263.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 146,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 202
+          },
+          "label": {
+            "x": 15,
+            "y": 208,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 256.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": 271.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 396.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 278.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 334.75
+          },
+          "label": {
+            "x": 15,
+            "y": 340.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 389.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": 404.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 529.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 411.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 467.5
+          },
+          "label": {
+            "x": 15,
+            "y": 473.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 522.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 411.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 467.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 537.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 662
+          },
+          "media": {
+            "x": 19.5,
+            "y": 544.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 600.25
+          },
+          "label": {
+            "x": 15,
+            "y": 606.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 655
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 544.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 600.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 670,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 794.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 677,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 733
+          },
+          "label": {
+            "x": 15,
+            "y": 739,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 787.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 677,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 733
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 802.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 927.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 809.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 865.75
+          },
+          "label": {
+            "x": 15,
+            "y": 871.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 920.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 809.75,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 865.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 935.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1060.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 942.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 998.5
+          },
+          "label": {
+            "x": 15,
+            "y": 1004.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1053.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 942.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 998.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 1068.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 1193
+          },
+          "media": {
+            "x": 19.5,
+            "y": 1075.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 1131.25
+          },
+          "label": {
+            "x": 15,
+            "y": 1137.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 1186
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 1075.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 1131.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "name": "sidebar 1080x1920",
+      "viewport": {
+        "width": 1080,
+        "height": 1920
+      },
+      "rail": {
+        "x": 0,
+        "y": 96,
+        "width": 97.1875,
+        "height": 1824,
+        "right": 97.1875,
+        "bottom": 1920
+      },
+      "railScrollTop": 0,
+      "railScrollHeight": 1824,
+      "railClientHeight": 1824,
+      "railScrollWidth": 96,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 129.1875,
+        "y": 303,
+        "width": 918.8125,
+        "height": 1662.25,
+        "right": 1048,
+        "bottom": 1965.25
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": 104,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 228.75
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 111,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 167
+          },
+          "label": {
+            "x": 15,
+            "y": 173,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 221.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": 236.75,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 361.5
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 243.75,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 299.75
+          },
+          "label": {
+            "x": 15,
+            "y": 305.75,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 354.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": 369.5,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 494.25
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 376.5,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 432.5
+          },
+          "label": {
+            "x": 15,
+            "y": 438.5,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 487.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 376.5,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 432.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 502.25,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 627
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 509.25,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 565.25
+          },
+          "label": {
+            "x": 15,
+            "y": 571.25,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 620
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 509.25,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 565.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 635,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 759.75
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 642,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 698
+          },
+          "label": {
+            "x": 15,
+            "y": 704,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 752.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 642,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 698
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 767.75,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 892.5
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 774.75,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 830.75
+          },
+          "label": {
+            "x": 15,
+            "y": 836.75,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 885.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 774.75,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 830.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 900.5,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 1025.25
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 907.5,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 963.5
+          },
+          "label": {
+            "x": 15,
+            "y": 969.5,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 1018.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 907.5,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 963.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 1033.25,
+            "width": 80.1875,
+            "height": 124.75,
+            "right": 88.1875,
+            "bottom": 1158
+          },
+          "media": {
+            "x": 20.09375,
+            "y": 1040.25,
+            "width": 56,
+            "height": 56,
+            "right": 76.09375,
+            "bottom": 1096.25
+          },
+          "label": {
+            "x": 15,
+            "y": 1102.25,
+            "width": 66.1875,
+            "height": 48.75,
+            "right": 81.1875,
+            "bottom": 1151
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 20.09375,
+              "y": 1040.25,
+              "width": 56,
+              "height": 56,
+              "right": 76.09375,
+              "bottom": 1096.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "sidebar 1366x768",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "rail": {
+        "x": 0,
+        "y": 96,
+        "width": 122.9375,
+        "height": 672,
+        "right": 122.9375,
+        "bottom": 768
+      },
+      "railScrollTop": 0,
+      "railScrollHeight": 1118,
+      "railClientHeight": 672,
+      "railScrollWidth": 122,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 154.9375,
+        "y": 303,
+        "width": 1179.0625,
+        "height": 1220.78125,
+        "right": 1334,
+        "bottom": 1523.78125
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": 104,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 228.75
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 111,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 167
+          },
+          "label": {
+            "x": 15,
+            "y": 173,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 221.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": 236.75,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 361.5
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 243.75,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 299.75
+          },
+          "label": {
+            "x": 15,
+            "y": 305.75,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 354.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": 369.5,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 494.25
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 376.5,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 432.5
+          },
+          "label": {
+            "x": 15,
+            "y": 438.5,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 487.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 376.5,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 432.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 502.25,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 627
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 509.25,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 565.25
+          },
+          "label": {
+            "x": 15,
+            "y": 571.25,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 620
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 509.25,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 565.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 635,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 759.75
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 642,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 698
+          },
+          "label": {
+            "x": 15,
+            "y": 704,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 752.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 642,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 698
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 767.75,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 892.5
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 774.75,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 830.75
+          },
+          "label": {
+            "x": 15,
+            "y": 836.75,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 885.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 774.75,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 830.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 900.5,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 1025.25
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 907.5,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 963.5
+          },
+          "label": {
+            "x": 15,
+            "y": 969.5,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 1018.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 907.5,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 963.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 1033.25,
+            "width": 105.9375,
+            "height": 124.75,
+            "right": 113.9375,
+            "bottom": 1158
+          },
+          "media": {
+            "x": 32.96875,
+            "y": 1040.25,
+            "width": 56,
+            "height": 56,
+            "right": 88.96875,
+            "bottom": 1096.25
+          },
+          "label": {
+            "x": 15,
+            "y": 1102.25,
+            "width": 91.9375,
+            "height": 48.75,
+            "right": 106.9375,
+            "bottom": 1151
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 32.96875,
+              "y": 1040.25,
+              "width": 56,
+              "height": 56,
+              "right": 88.96875,
+              "bottom": 1096.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "name": "sidebar bottom 424x755",
+      "viewport": {
+        "width": 424,
+        "height": 755
+      },
+      "rail": {
+        "x": 0,
+        "y": 131,
+        "width": 96,
+        "height": 624,
+        "right": 96,
+        "bottom": 755
+      },
+      "railScrollTop": 494,
+      "railScrollHeight": 1118,
+      "railClientHeight": 624,
+      "railScrollWidth": 95,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 112,
+        "y": 358,
+        "width": 296,
+        "height": 1243.25,
+        "right": 408,
+        "bottom": 1601.25
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 8,
+            "y": -355,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": -230.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": -348,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": -292
+          },
+          "label": {
+            "x": 15,
+            "y": -286,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": -237.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 8,
+            "y": -222.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": -97.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": -215.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": -159.25
+          },
+          "label": {
+            "x": 15,
+            "y": -153.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": -104.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 8,
+            "y": -89.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 35.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": -82.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": -26.5
+          },
+          "label": {
+            "x": 15,
+            "y": -20.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 28.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": -82.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": -26.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 8,
+            "y": 43.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 168
+          },
+          "media": {
+            "x": 19.5,
+            "y": 50.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 106.25
+          },
+          "label": {
+            "x": 15,
+            "y": 112.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 161
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 50.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 106.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 8,
+            "y": 176,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 300.75
+          },
+          "media": {
+            "x": 19.5,
+            "y": 183,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 239
+          },
+          "label": {
+            "x": 15,
+            "y": 245,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 293.75
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 183,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 239
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 8,
+            "y": 308.75,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 433.5
+          },
+          "media": {
+            "x": 19.5,
+            "y": 315.75,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 371.75
+          },
+          "label": {
+            "x": 15,
+            "y": 377.75,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 426.5
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 315.75,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 371.75
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 8,
+            "y": 441.5,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 566.25
+          },
+          "media": {
+            "x": 19.5,
+            "y": 448.5,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 504.5
+          },
+          "label": {
+            "x": 15,
+            "y": 510.5,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 559.25
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 448.5,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 504.5
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 8,
+            "y": 574.25,
+            "width": 79,
+            "height": 124.75,
+            "right": 87,
+            "bottom": 699
+          },
+          "media": {
+            "x": 19.5,
+            "y": 581.25,
+            "width": 56,
+            "height": 56,
+            "right": 75.5,
+            "bottom": 637.25
+          },
+          "label": {
+            "x": 15,
+            "y": 643.25,
+            "width": 65,
+            "height": 48.75,
+            "right": 80,
+            "bottom": 692
+          },
+          "labelScrollHeight": 49,
+          "labelClientHeight": 49,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 19.5,
+              "y": 581.25,
+              "width": 56,
+              "height": 56,
+              "right": 75.5,
+              "bottom": 637.25
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "large text 424x755",
+      "viewport": {
+        "width": 424,
+        "height": 755
+      },
+      "rail": {
+        "x": 0,
+        "y": 150.25,
+        "width": 96,
+        "height": 604,
+        "right": 96,
+        "bottom": 754.25
+      },
+      "railScrollTop": 8,
+      "railScrollHeight": 1271,
+      "railClientHeight": 604,
+      "railScrollWidth": 95,
+      "menuScrollTop": 0,
+      "pageScrollTop": 0,
+      "grid": {
+        "x": 115,
+        "y": 397.5,
+        "width": 290,
+        "height": 5613.5,
+        "right": 405,
+        "bottom": 6011
+      },
+      "items": [
+        {
+          "name": "All Menu",
+          "rect": {
+            "x": 9.5,
+            "y": 151.75,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 292.765625
+          },
+          "media": {
+            "x": 17.625,
+            "y": 159.875,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 219.625
+          },
+          "label": {
+            "x": 17.625,
+            "y": 226.75,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 284.640625
+          },
+          "labelScrollHeight": 58,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "true",
+          "border": "rgb(230, 104, 23)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Combos & Deals",
+          "rect": {
+            "x": 9.5,
+            "y": 302.265625,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 443.28125
+          },
+          "media": {
+            "x": 17.625,
+            "y": 310.390625,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 370.140625
+          },
+          "label": {
+            "x": 17.625,
+            "y": 377.265625,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 435.15625
+          },
+          "labelScrollHeight": 58,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": null,
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Starters & Quick Bites",
+          "rect": {
+            "x": 9.5,
+            "y": 452.78125,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 593.796875
+          },
+          "media": {
+            "x": 17.625,
+            "y": 460.90625,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 520.65625
+          },
+          "label": {
+            "x": 17.625,
+            "y": 527.78125,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 585.671875
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 460.90625,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 520.65625
+            },
+            "fit": "cover",
+            "src": "/assets/menu/template-photos-v1/dish-ca8fb5cbb18153.webp"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Tandoor & Kebabs",
+          "rect": {
+            "x": 9.5,
+            "y": 603.296875,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 744.3125
+          },
+          "media": {
+            "x": 17.625,
+            "y": 611.421875,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 671.171875
+          },
+          "label": {
+            "x": 17.625,
+            "y": 678.296875,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 736.1875
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 611.421875,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 671.171875
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/paneer-tikka.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": true
+        },
+        {
+          "name": "Main Course (Curries)",
+          "rect": {
+            "x": 9.5,
+            "y": 753.8125,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 894.828125
+          },
+          "media": {
+            "x": 17.625,
+            "y": 761.9375,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 821.6875
+          },
+          "label": {
+            "x": 17.625,
+            "y": 828.8125,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 886.703125
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 761.9375,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 821.6875
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/dal-makhani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Naan, Roti & Breads",
+          "rect": {
+            "x": 9.5,
+            "y": 904.328125,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 1045.34375
+          },
+          "media": {
+            "x": 17.625,
+            "y": 912.453125,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 972.203125
+          },
+          "label": {
+            "x": 17.625,
+            "y": 979.328125,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 1037.21875
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 912.453125,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 972.203125
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/butter-naan.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Biryani & Rice Bowls",
+          "rect": {
+            "x": 9.5,
+            "y": 1054.84375,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 1195.859375
+          },
+          "media": {
+            "x": 17.625,
+            "y": 1062.96875,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 1122.71875
+          },
+          "label": {
+            "x": 17.625,
+            "y": 1129.84375,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 1187.734375
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 1062.96875,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 1122.71875
+            },
+            "fit": "cover",
+            "src": "/assets/menu/north-indian/biryani.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        },
+        {
+          "name": "Beverages & Desserts",
+          "rect": {
+            "x": 9.5,
+            "y": 1205.359375,
+            "width": 76,
+            "height": 141.015625,
+            "right": 85.5,
+            "bottom": 1346.375
+          },
+          "media": {
+            "x": 17.625,
+            "y": 1213.484375,
+            "width": 59.75,
+            "height": 59.75,
+            "right": 77.375,
+            "bottom": 1273.234375
+          },
+          "label": {
+            "x": 17.625,
+            "y": 1280.359375,
+            "width": 59.75,
+            "height": 57.890625,
+            "right": 77.375,
+            "bottom": 1338.25
+          },
+          "labelScrollHeight": 59,
+          "labelClientHeight": 58,
+          "shrink": "0",
+          "mediaShrink": "0",
+          "image": {
+            "rect": {
+              "x": 17.625,
+              "y": 1213.484375,
+              "width": 59.75,
+              "height": 59.75,
+              "right": 77.375,
+              "bottom": 1273.234375
+            },
+            "fit": "cover",
+            "src": "/assets/menu/cafe/cold-coffee.jpg"
+          },
+          "selected": "false",
+          "border": "rgb(235, 230, 221)",
+          "contentFits": true,
+          "visible": false
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "424: uniform category heights",
+      "status": "PASS"
+    },
+    {
+      "name": "424: square thumbnails",
+      "status": "PASS"
+    },
+    {
+      "name": "424: no compressed or overflowing tile content",
+      "status": "PASS"
+    },
+    {
+      "name": "424: original images use cover",
+      "status": "PASS"
+    },
+    {
+      "name": "424: tiles stay inside rail",
+      "status": "PASS"
+    },
+    {
+      "name": "424: no horizontal rail overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "424: at least four full categories visible",
+      "status": "PASS"
+    },
+    {
+      "name": "424: rail does not overlap product grid",
+      "status": "PASS"
+    },
+    {
+      "name": "424: readable thumbnail size",
+      "status": "PASS"
+    },
+    {
+      "name": "424: category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "480: uniform category heights",
+      "status": "PASS"
+    },
+    {
+      "name": "480: square thumbnails",
+      "status": "PASS"
+    },
+    {
+      "name": "480: no compressed or overflowing tile content",
+      "status": "PASS"
+    },
+    {
+      "name": "480: original images use cover",
+      "status": "PASS"
+    },
+    {
+      "name": "480: tiles stay inside rail",
+      "status": "PASS"
+    },
+    {
+      "name": "480: no horizontal rail overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "480: at least four full categories visible",
+      "status": "PASS"
+    },
+    {
+      "name": "480: rail does not overlap product grid",
+      "status": "PASS"
+    },
+    {
+      "name": "480: readable thumbnail size",
+      "status": "PASS"
+    },
+    {
+      "name": "480: category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "768: uniform category heights",
+      "status": "PASS"
+    },
+    {
+      "name": "768: square thumbnails",
+      "status": "PASS"
+    },
+    {
+      "name": "768: no compressed or overflowing tile content",
+      "status": "PASS"
+    },
+    {
+      "name": "768: original images use cover",
+      "status": "PASS"
+    },
+    {
+      "name": "768: tiles stay inside rail",
+      "status": "PASS"
+    },
+    {
+      "name": "768: no horizontal rail overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "768: at least four full categories visible",
+      "status": "PASS"
+    },
+    {
+      "name": "768: rail does not overlap product grid",
+      "status": "PASS"
+    },
+    {
+      "name": "768: readable thumbnail size",
+      "status": "PASS"
+    },
+    {
+      "name": "768: category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: uniform category heights",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: square thumbnails",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: no compressed or overflowing tile content",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: original images use cover",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: tiles stay inside rail",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: no horizontal rail overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: at least four full categories visible",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: rail does not overlap product grid",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: readable thumbnail size",
+      "status": "PASS"
+    },
+    {
+      "name": "1080: category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: uniform category heights",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: square thumbnails",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: no compressed or overflowing tile content",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: original images use cover",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: tiles stay inside rail",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: no horizontal rail overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: at least four full categories visible",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: rail does not overlap product grid",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: readable thumbnail size",
+      "status": "PASS"
+    },
+    {
+      "name": "1366: category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "Category touch changes active selection",
+      "status": "PASS"
+    },
+    {
+      "name": "Active selection preserves every tile dimension",
+      "status": "PASS"
+    },
+    {
+      "name": "Selecting a category filters the existing menu",
+      "status": "PASS"
+    },
+    {
+      "name": "A touchscreen swipe scrolls the category rail",
+      "status": "PASS"
+    },
+    {
+      "name": "Last category is accessible through independent rail scrolling",
+      "status": "PASS"
+    },
+    {
+      "name": "Scrolling the category rail leaves menu and page scroll positions unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Final category label is clear of the existing Display control",
+      "status": "PASS"
+    },
+    {
+      "name": "Last category can be selected by touch",
+      "status": "PASS"
+    },
+    {
+      "name": "All Menu restores existing selection",
+      "status": "PASS"
+    },
+    {
+      "name": "Large-text thumbnails and labels fit without compression",
+      "status": "PASS"
+    },
+    {
+      "name": "Large-text content stays inside unchanged rail width",
+      "status": "PASS"
+    },
+    {
+      "name": "Large-text category labels fit without clipping",
+      "status": "PASS"
+    },
+    {
+      "name": "No uncaught browser exceptions",
+      "status": "PASS",
+      "evidence": []
+    },
+    {
+      "name": "Baseline reproduces distorted thumbnail proportions or clipped content",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

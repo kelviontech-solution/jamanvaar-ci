@@ -118,7 +118,7 @@ export const CashDropModal: React.FC<CashDropModalProps> = ({
           </Button>
           <button
             type="submit"
-            className={`px-4 py-2 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 ${
+            className={`min-h-11 px-4 py-2 text-white font-bold text-sm rounded-xl shadow-xs transition-all active:scale-95 ${
               type === 'CASH_OUT' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >

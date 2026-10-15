@@ -1,0 +1,32 @@
+[
+  {
+    "name": "sidebar 424x755",
+    "unchangedRailAndGridWidth": true,
+    "railWidth": 96,
+    "gridWidth": 296
+  },
+  {
+    "name": "sidebar 480x854",
+    "unchangedRailAndGridWidth": true,
+    "railWidth": 96,
+    "gridWidth": 352
+  },
+  {
+    "name": "sidebar 768x1024",
+    "unchangedRailAndGridWidth": true,
+    "railWidth": 96,
+    "gridWidth": 608
+  },
+  {
+    "name": "sidebar 1080x1920",
+    "unchangedRailAndGridWidth": true,
+    "railWidth": 97.1875,
+    "gridWidth": 918.8125
+  },
+  {
+    "name": "sidebar 1366x768",
+    "unchangedRailAndGridWidth": true,
+    "railWidth": 122.9375,
+    "gridWidth": 1179.0625
+  }
+]

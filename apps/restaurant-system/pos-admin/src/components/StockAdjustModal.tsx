@@ -118,7 +118,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
           </Button>
           <button
             type="submit"
-            className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+            className="min-h-11 px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-sm rounded-xl shadow-xs transition-all active:scale-95"
           >
             Record Movement
           </button>

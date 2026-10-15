@@ -218,10 +218,33 @@
 .modal.modal-wide {
   max-width: 760px;
 }
+/* Standard Modal owns its header/body/footer. ModalShell keeps each page's custom flow. */
+.modal-standard {
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+  overflow: hidden;
+}
+.modal-standard > .modal-header,
+.modal-standard > .modal-actions {
+  flex-shrink: 0;
+}
+.modal-standard > .modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.modal-standard > .modal-actions {
+  flex-wrap: wrap;
+  margin-top: 0;
+  padding: 16px 24px;
+  border-top: 1px solid var(--jv-border);
+}
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 20px 24px;
   border-bottom: 1px solid var(--jv-border);
   position: sticky;
@@ -231,6 +254,8 @@
 .modal-header h2 {
   margin: 0;
   font-size: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .modal-close {
   background: none;
@@ -239,8 +264,9 @@
   line-height: 1;
   cursor: pointer;
   color: var(--jv-text-muted);
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -262,7 +262,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </Button>
               <button
                 type="submit" disabled={operationBusy || !voidReason.trim()}
-                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs"
+                className="min-h-11 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-xs"
               >
                 {operationBusy ? 'Cancelling...' : 'Confirm Void Order'}
               </button>
@@ -301,7 +301,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </Button>
               <button
                 type="submit" disabled={operationBusy || !moneyReturned || !refundReason.trim()}
-                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs"
+                className="min-h-11 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow-xs"
               >
                 {operationBusy ? 'Recording...' : 'Record returned payment'}
               </button>
@@ -340,7 +340,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </Button>
               <button
                 onClick={handlePrint}
-                className="px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
+                className="min-h-11 px-4 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-sm rounded-xl flex items-center gap-1.5 shadow-xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>Reprint Receipt</span>

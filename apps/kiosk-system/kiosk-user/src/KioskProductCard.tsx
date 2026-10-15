@@ -30,9 +30,9 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
   return (
     <div
       data-testid="kiosk-menu-card"
-      className="group flex flex-col h-full bg-white rounded-2xl border border-jaman-border overflow-hidden cursor-pointer select-none shadow-sm transition-all hover:border-jaman-saffron/60 hover:shadow-md active:scale-[0.99]"
+      className="kiosk-product-card group flex flex-col h-full min-w-0 bg-white rounded-2xl border border-jaman-border overflow-hidden select-none shadow-sm transition-shadow hover:border-jaman-saffron/60 hover:shadow-md"
     >
-      <button type="button" disabled={!onSelectDetails} aria-label={`View details for ${displayName || item.name}`} onClick={() => onSelectDetails?.(item)} className="relative w-full aspect-[4/3] bg-jaman-ivory overflow-hidden text-left focus-visible:outline focus-visible:outline-4 focus-visible:outline-jaman-navy focus-visible:-outline-offset-4">
+      <button type="button" disabled={!onSelectDetails} aria-label={`View details for ${displayName || item.name}`} onClick={() => onSelectDetails?.(item)} className="kiosk-product-media relative w-full shrink-0 bg-jaman-ivory overflow-hidden text-left focus-visible:outline focus-visible:outline-4 focus-visible:outline-jaman-navy focus-visible:-outline-offset-4">
         <CachedImg
           src={item.imageUrl || '/assets/menu/common/menu-placeholder-v2.svg'}
           dishName={item.name}
@@ -45,55 +45,49 @@ export const KioskProductCard: React.FC<KioskProductCardProps> = ({
         </div>
       </button>
 
-      <div className="flex flex-col flex-1 p-3.5 gap-1.5">
-        <h3 className="text-base font-bold text-jaman-navy leading-snug min-h-[2.75rem]">
+      <div className="kiosk-product-body">
+        <h3 className="kiosk-product-name text-base font-bold text-jaman-navy">
           <button type="button" disabled={!onSelectDetails} onClick={() => onSelectDetails?.(item)} className="text-left w-full line-clamp-2" title={displayName || item.name}>{displayName || item.name}</button>
         </h3>
-        {item.subcategory && <span className="text-xs font-semibold text-slate-600">{item.subcategory}</span>}
-        {description && (
-          <p className="text-xs text-[#4A5568] leading-relaxed line-clamp-2">{description}</p>
-        )}
+        <span className="kiosk-product-subcategory text-xs font-semibold text-slate-600 truncate" title={item.subcategory} aria-hidden={!item.subcategory || undefined}>{item.subcategory}</span>
+        <p className="kiosk-product-description text-[#4A5568] line-clamp-2" aria-hidden={!description || undefined}>{description}</p>
 
-        <div className="mt-auto pt-2 flex flex-wrap items-end justify-between gap-2">
-          <div className="min-w-0">
-            <div className="text-xl font-black text-jaman-saffron leading-none">
-              {formatINR(item.price)}
-              {hasModifiers && <span className="text-xs font-semibold text-[#4A5568] ml-1">+</span>}
-            </div>
-            {hasModifiers && (
-              <span className={`block mt-1 text-xs ${hasRequiredModifiers ? 'font-bold text-[#0B253A]' : 'font-semibold text-[#52677A]'}`}>
-                {hasRequiredModifiers ? 'Customization required' : 'Customizable'}
-              </span>
-            )}
+        <div className="kiosk-product-price mt-auto min-w-0">
+          <div data-kiosk-price className="text-xl font-black text-jaman-saffron leading-tight tabular-nums">
+            {formatINR(item.price)}
+            {hasModifiers && <span className="text-xs font-semibold text-[#4A5568] ml-1">+</span>}
           </div>
+          <span className={`kiosk-product-note block text-xs ${hasRequiredModifiers ? 'font-bold text-[#0B253A]' : 'font-semibold text-[#52677A]'}`} aria-hidden={!hasModifiers || undefined}>
+            {hasModifiers ? (hasRequiredModifiers ? 'Customization required' : 'Customizable') : null}
+          </span>
+        </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {hasModifiers && onCustomize && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCustomize(item);
-                }}
-                className="h-11 px-3.5 rounded-xl border border-jaman-saffron text-jaman-saffron bg-white text-sm font-bold whitespace-nowrap active:bg-jaman-saffron/10 transition-colors"
-                title="Customize"
-              >
-                Customize
-              </button>
-            )}
+        <div className="kiosk-product-actions flex items-center justify-end gap-2 shrink-0">
+          {hasModifiers && onCustomize && (
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onAdd(item);
+                onCustomize(item);
               }}
-              className="w-12 h-12 rounded-xl bg-jaman-saffron text-white flex items-center justify-center shadow-sm active:scale-90 active:bg-[#D1560D] transition-transform"
-              title="Add to Cart"
-              aria-label={`Add ${displayName || item.name} to cart`}
+              className="kiosk-product-action kiosk-product-customize text-sm font-bold whitespace-nowrap"
+              title="Customize"
             >
-              <Plus className="w-6 h-6 stroke-[2.5]" />
+              Customize
             </button>
-          </div>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAdd(item);
+            }}
+            className="kiosk-product-action kiosk-product-add bg-jaman-saffron text-white"
+            title="Add to Cart"
+            aria-label={`Add ${displayName || item.name} to cart`}
+          >
+            <Plus className="w-6 h-6 stroke-[2.5]" />
+          </button>
         </div>
       </div>
     </div>

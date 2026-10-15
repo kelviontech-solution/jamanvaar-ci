@@ -167,7 +167,7 @@
   font-weight: 600;
   color: var(--jv-text-secondary);
 }
-.field input,
+.field input:not([type='checkbox']):not([type='radio']),
 .field select,
 .field textarea {
   height: 40px;
@@ -183,14 +183,14 @@
   height: auto;
   padding: 10px 14px;
 }
-.field input:focus,
+.field input:not([type='checkbox']):not([type='radio']):focus,
 .field select:focus,
 .field textarea:focus {
   outline: none;
   border-color: var(--jv-accent);
   box-shadow: 0 0 0 3px var(--jv-accent-ring);
 }
-.field input:disabled,
+.field input:not([type='checkbox']):not([type='radio']):disabled,
 .field select:disabled,
 .field textarea:disabled {
   background: var(--jv-bg-muted);

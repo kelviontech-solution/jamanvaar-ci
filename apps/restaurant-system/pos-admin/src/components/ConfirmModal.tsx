@@ -26,7 +26,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="sm">
       <div className="space-y-4 py-2">
-        <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl">
+        <div className={`flex items-start gap-3 p-3.5 border rounded-2xl ${isDanger ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200'}`}>
           <AlertTriangle className={`w-5 h-5 shrink-0 ${isDanger ? 'text-rose-600' : 'text-amber-600'}`} />
           <p className="text-xs font-semibold text-jaman-navy leading-relaxed whitespace-pre-line">
             {message}
@@ -42,7 +42,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               onConfirm();
               onClose();
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 ${
+            className={`min-h-11 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all shadow-xs active:scale-95 ${
               isDanger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-brand hover:bg-brand-hover active:bg-brand-press'
             }`}
           >
