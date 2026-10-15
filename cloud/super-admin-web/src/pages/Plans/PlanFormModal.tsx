@@ -15,12 +15,11 @@ import {
 import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 import './plans.css';
+import { QrLandingPagePlanSection } from './QrLandingPagePlanSection';
 
 interface FormState {
   productFamily: 'RESTAURANT' | 'KIOSK';
-  // QR/ENTERPRISE plans are created via seed/API today, not this form — 'QR' is accepted here so
-  // opening an *existing* QR-tier plan for edit doesn't type-error or crash; the tier picker below
-  // only offers CORE/PRO/ENTERPRISE, unchanged from before this phase.
+  // QR is a standalone product tier in the existing Restaurant commercial family.
   tier: 'CORE' | 'PRO' | 'QR' | 'ENTERPRISE';
   name: string;
   description: string;
@@ -76,7 +75,8 @@ export function PlanFormModal({
   const [form, setForm] = useState<FormState>(() => toFormState(plan));
   const [qrFeatures, setQrFeatures] = useState<FeatureRecord[]>([]);
   const [catalogError, setCatalogError] = useState('');
-  useEffect(() => {let live=true;void api.get<FeatureRecord[]>('/api/v1/features').then(rows=>{if(live)setQrFeatures(rows.filter(f=>f.code.startsWith('QR_') && !!f.legacyEntitlementKey));}).catch(()=>{if(live)setCatalogError('QR feature catalogue could not be loaded. Reload this form before editing QR capabilities.');});return()=>{live=false;};},[]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  useEffect(() => {let live=true;void api.get<FeatureRecord[]>('/api/v1/features').then(rows=>{if(live)setQrFeatures(rows.filter(f=>f.code.startsWith('QR_') && !!f.legacyEntitlementKey));}).catch(()=>{if(live)setCatalogError('QR feature catalogue could not be loaded. Reload this form before editing QR capabilities.');}).finally(()=>{if(live)setCatalogLoading(false);});return()=>{live=false;};},[]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
@@ -90,13 +90,11 @@ export function PlanFormModal({
   }
 
   function handleTierChange(tier: FormState['tier']) {
-    // When tier changes in creation mode or user requests it, apply canonical tier inheritance.
-    // resolveTierEntitlements (from @jamanvaar/types, shared with the local runtime) only knows
-    // CORE/PRO/ENTERPRISE — 'QR' plans aren't created/edited via this tier-switcher (the picker
-    // below only offers those three), so QR falls back to CORE's entitlement defaults here.
+    // Apply canonical defaults, with a dedicated standalone QR selection.
     const resolved = tier === 'QR' ? {...EMPTY_ENTITLEMENTS,menuManagement:true,tableManagement:true,foodCustomization:true,qrTableOrdering:true} : resolveTierEntitlements(tier, form.entitlements);
     let defaultPrice = form.priceMonthly;
     let defaultName = form.name;
+    let defaultDescription = form.description;
     if (!plan) {
       if (tier === 'CORE') {
         defaultPrice = '5000';
@@ -106,6 +104,7 @@ export function PlanFormModal({
         defaultName = 'JAMANVAAR PRO';
       } else if (tier === 'QR') {
         defaultName = 'JAMANVAAR QR';
+        defaultDescription = 'Standalone QR ordering with optional restaurant landing page and guest-experience capabilities.';
       } else {
         defaultPrice = '15000';
         defaultName = 'JAMANVAAR ENTERPRISE';
@@ -114,7 +113,9 @@ export function PlanFormModal({
     setForm((f) => ({
       ...f,
       tier,
+      productFamily: tier === 'QR' ? 'RESTAURANT' : f.productFamily,
       name: defaultName,
+      description: defaultDescription,
       priceMonthly: defaultPrice,
       entitlements: { ...resolved } as Entitlements
     }));
@@ -173,6 +174,9 @@ export function PlanFormModal({
   // Dependency validation
   const dependencyWarnings = useMemo(() => {
     const warnings: string[] = [];
+    if (form.entitlements.qrRestaurantPage && !form.entitlements.qrTableOrdering) {
+      warnings.push('Restaurant landing page requires QR Table Ordering in this plan.');
+    }
     if (form.entitlements.qrTableOrdering && (!form.entitlements.tableManagement || !form.entitlements.menuManagement)) {
       warnings.push('QR Table Ordering requires both Table Management and Menu Management to be active.');
     }
@@ -269,6 +273,7 @@ export function PlanFormModal({
           {/* TAB 1: FEATURE ENTITLEMENTS MATRIX */}
           {activeSubTab === 'matrix' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <QrLandingPagePlanSection feature={qrFeatures.find(f => f.code === 'QR_RESTAURANT_PAGE')} loading={catalogLoading} error={catalogError} included={form.entitlements.qrRestaurantPage === true} onChange={included => setForm(f => ({...f, entitlements: {...f.entitlements, qrRestaurantPage: included, ...(included ? {qrTableOrdering:true,menuManagement:true,tableManagement:true} : {})}}))} />
               {/* Tier Selection & Inheritance Banner */}
               <div className="plan-tier-selector">
                 <button type="button" className={`tier-option-card ${form.tier === 'QR' ? 'selected' : ''}`} onClick={() => handleTierChange('QR')}>
@@ -512,7 +517,7 @@ export function PlanFormModal({
             <h3>QR module capabilities</h3><p className="form-note">These flags apply to QR inside any plan. Platform feature activation and rollout still control availability.</p>
             {catalogError && <p role="alert">{catalogError}</p>}
             <button type="button" disabled={!qrFeatures.length} onClick={()=>setForm(f=>({...f,entitlements:{...f.entitlements,qrTableOrdering:true,...Object.fromEntries(qrFeatures.map(feature=>[feature.legacyEntitlementKey!,true]))}}))}>Include all QR capabilities</button>
-            <div className="module-entitlement-grid">{qrFeatures.map(feature=><label key={feature.id} className="entitlement-checkbox-label"><input type="checkbox" checked={form.entitlements[feature.legacyEntitlementKey!] === true} onChange={e=>setForm(f=>({...f,entitlements:{...f.entitlements,[feature.legacyEntitlementKey!]:e.target.checked}}))}/><span>{feature.name}{!feature.isActive?' · platform inactive':feature.rolloutPercent < 100?` · ${feature.rolloutPercent}% rollout`:''}</span></label>)}</div>
+            <div className="module-entitlement-grid">{qrFeatures.filter(feature=>feature.code!=='QR_RESTAURANT_PAGE').map(feature=><label key={feature.id} className="entitlement-checkbox-label"><input type="checkbox" checked={form.entitlements[feature.legacyEntitlementKey!] === true} onChange={e=>setForm(f=>({...f,entitlements:{...f.entitlements,[feature.legacyEntitlementKey!]:e.target.checked}}))}/><span>{feature.name}{!feature.isActive?' · platform inactive':feature.rolloutPercent < 100?` · ${feature.rolloutPercent}% rollout`:''}</span></label>)}</div>
           </section>}
           {activeSubTab === 'details' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -535,6 +540,7 @@ export function PlanFormModal({
                   >
                     <option value="CORE">CORE (Foundation)</option>
                     <option value="PRO">PRO (Flagship Connected)</option>
+                    <option value="QR">QR (Standalone QR ordering)</option>
                     <option value="ENTERPRISE">ENTERPRISE (Custom)</option>
                   </select>
                 </div>
@@ -648,13 +654,13 @@ export function PlanFormModal({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--jv-border-subtle)', paddingBottom: 16, marginBottom: 16 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', color: form.tier === 'PRO' ? 'var(--jv-accent-text)' : 'var(--jv-text-muted)' }}>
-                      {form.tier === 'PRO' ? 'FLAGSHIP CONNECTED ECOSYSTEM' : 'FOUNDATION EDITION'}
+                      {form.tier === 'QR' ? 'QR GUEST EXPERIENCE' : form.tier === 'PRO' ? 'FLAGSHIP CONNECTED ECOSYSTEM' : 'FOUNDATION EDITION'}
                     </span>
                     <h3 style={{ margin: '2px 0 0 0', fontSize: 22, fontWeight: 900, color: 'var(--jv-text)' }}>
                       {form.name || 'Untitled Plan'}
                     </h3>
                     <span style={{ fontSize: 11, color: 'var(--jv-text-muted)', fontWeight: 600 }}>
-                      {form.tier === 'PRO' ? 'POS + Complete Management + Connected Floor' : 'POS + Complete Restaurant Management'}
+                      {form.tier === 'QR' ? `QR ordering${form.entitlements.qrRestaurantPage ? ' + Restaurant landing page' : ''}` : form.tier === 'PRO' ? 'POS + Complete Management + Connected Floor' : 'POS + Complete Restaurant Management'}
                     </span>
                   </div>
 

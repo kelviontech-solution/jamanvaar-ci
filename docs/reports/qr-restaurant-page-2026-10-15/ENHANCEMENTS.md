@@ -2,6 +2,8 @@
 
 Implemented locally on 15 October 2026. No production deployment or GitHub push was performed.
 
+**Plan/navigation follow-up:** the landing-page option is now prominent in Create/Edit Plan, and Restaurant Page appears in normal QR Admin navigation. A catalog-repair migration is included. See [access fix and deployment steps](../qr-page-access-fix-2026-10-15/REPORT.md).
+
 ## What changed
 
 | Improvement | Available behaviour |

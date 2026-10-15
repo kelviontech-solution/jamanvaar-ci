@@ -125,6 +125,18 @@
   padding: 0;
   min-width: 0;
 }
+/* The whole design-picker/live-preview editor below already renders (and is natively
+   disabled) even when this restaurant's plan doesn't include the Restaurant Page feature at
+   all -- showing what you'd get once it's enabled, not a broken half-usable screen. At full
+   opacity it looked indistinguishable from a working editor, which read as broken rather than
+   as a preview. */
+.qpb-editor fieldset:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.qpb-editor fieldset:disabled * {
+  cursor: not-allowed;
+}
 .qpb-editor details {
   background: #fff;
   border: 1px solid #e1e5df;

@@ -501,14 +501,11 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
     { code: 'posAssistant', name: 'JAMAN AI Assistant', description: 'Offline, local-data-based natural-language restaurant queries.', categoryCode: 'ai', legacyEntitlementKey: 'posAssistant' },
     { code: 'advancedCaptainReports', name: 'Advanced Analytics & CRM', description: 'Advanced sales analytics, channel performance and staff attribution.', categoryCode: 'analytics', legacyEntitlementKey: 'advancedCaptainReports' },
     { code: 'kioskRemoteManagement', name: 'Kiosk Remote Fleet Management', description: 'Remote restart, cache clear, diagnostics, sync and update commands for kiosks (Kiosk Pro).', categoryCode: 'kiosk' },
-    // QR_CAPABILITIES (application-entitlements/qr-capabilities.ts) defines 17 fine-grained QR
-    // add-ons, each requiring a matching, isActive Feature row before resolveQrCapability will
-    // ever check a plan's limits — with no row, a capability stays disabled for every restaurant
-    // regardless of plan, with no admin page able to grant it. Only these two (gated in the
-    // identical way by the same component, QrOperations.tsx) are seeded here; the other 15 remain
-    // the same unfinished rollout, not a regression introduced by seeding just these.
+    // Optional QR operations are also registered by migrations. Keep the page builder
+    // in the seed so a fresh catalog exposes its plan option without a manual feature.
     { code: 'QR_SERVICE_REQUESTS', name: 'QR Service Requests', description: "Lets a guest ask their table for water, cutlery, napkins, assistance or the bill directly from the QR menu, routed to the floor team's live request inbox.", categoryCode: 'qr_ordering' },
-    { code: 'QR_SCHEDULED_PICKUP', name: 'QR Scheduled Pickup', description: 'Lets a guest schedule a QR order for pickup at a chosen time instead of immediate preparation.', categoryCode: 'qr_ordering' }
+    { code: 'QR_SCHEDULED_PICKUP', name: 'QR Scheduled Pickup', description: 'Lets a guest schedule a QR order for pickup at a chosen time instead of immediate preparation.', categoryCode: 'qr_ordering' },
+    { code: 'QR_RESTAURANT_PAGE', name: 'Restaurant landing page & page builder', description: 'Published restaurant website, mobile designs, branch contacts and live preview.', categoryCode: 'qr_ordering', legacyEntitlementKey: 'qrRestaurantPage' }
   ];
 
   const featureIdByCode = new Map<string, string>();
@@ -523,12 +520,17 @@ async function seedFeatureCatalog(tx: Prisma.TransactionClient) {
         appCode: f.appCode ?? null,
         legacyEntitlementKey: f.legacyEntitlementKey ?? null
       },
-      update: { name: f.name, description: f.description, categoryId: categoryIdByCode.get(f.categoryCode)! }
+      update: { name: f.name, description: f.description, categoryId: categoryIdByCode.get(f.categoryCode)!,
+        ...(f.code === 'QR_RESTAURANT_PAGE' ? {legacyEntitlementKey:f.legacyEntitlementKey} : {}) }
     });
     featureIdByCode.set(f.code, row.id);
   }
 
   // KIOSK_ADMIN depends on selfOrderKiosk (the KIOSK app) — set once both rows exist.
+  await tx.feature.update({
+    where: { code: 'QR_RESTAURANT_PAGE' },
+    data: { dependsOnFeatureIds: [featureIdByCode.get('qrTableOrdering')!] }
+  });
   await tx.feature.update({
     where: { code: 'KIOSK_ADMIN' },
     data: { dependsOnFeatureIds: [featureIdByCode.get('selfOrderKiosk')!] }

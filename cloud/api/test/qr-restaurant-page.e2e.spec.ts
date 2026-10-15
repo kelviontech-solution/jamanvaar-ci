@@ -129,6 +129,33 @@ afterAll(async () => {
   }
   await app?.close();
 });
+it('inherits landing-page access from a purchased plan without a restaurant override and rejects a plan missing base QR', async () => {
+  const body={tier:'QR',name:'TEST Page Plan Access '+stamp,priceMonthly:10000,maxBranches:1,maxDevices:5,maxUsers:5,entitlements:{qrRestaurantPage:true}};
+  expect((await platformPost('plans',body)).status).toBe(400);
+  const plan=await platformPost('plans',{...body,entitlements:{qrRestaurantPage:true,qrTableOrdering:true,menuManagement:true,tableManagement:true}});
+  expect(plan.status,JSON.stringify(plan.body)).toBe(201);
+  try {
+    const r=await platformPost('restaurants',{name:'TEST Page Plan Owner '+stamp,ownerName:'Plan Owner',ownerEmail:`page-plan-${stamp}@example.invalid`,ownerPassword:password,skipInviteEmail:true});
+    expect(r.status).toBe(201);created.push(r.body.restaurant.id);
+    const sub=await platformPost('subscriptions',{restaurantId:r.body.restaurant.id,planId:plan.body.id,status:'ACTIVE',expiresAt:new Date(Date.now()+86400000).toISOString()});
+    expect(sub.status,JSON.stringify(sub.body)).toBe(201);
+    const key=await platformPost('activation-keys',{restaurantId:r.body.restaurant.id,branchId:r.body.branch.id,allowedDeviceType:'POS_ADMIN',expiresAt:new Date(Date.now()+86400000).toISOString()});
+    const activated=await http().post('/api/v1/activation/redeem').send({code:key.body.code,deviceType:'POS_ADMIN'});
+    expect(activated.status).toBe(201);
+    const account=await ownerDeviceSession(prisma,activated.body.deviceToken);
+    const page=await http().get('/api/v1/tenant/qr-page?scope=restaurant').set('Authorization','Bearer '+account);
+    expect(page.status).toBe(200);expect(page.body.capability.enabled).toBe(true);
+    const row=await prisma.runAsPlatform(tx=>tx.applicationEntitlement.findFirstOrThrow({where:{subscriptionId:sub.body.id,appCode:'QR_ORDERING'}}));
+    expect(row.config).toBeNull();
+    const removed=await http().patch('/api/v1/plans/'+plan.body.id).set('Authorization','Bearer '+platform).send({entitlements:{qrTableOrdering:true,qrRestaurantPage:false}});
+    expect(removed.status).toBe(200);
+    const locked=await http().get('/api/v1/tenant/qr-page?scope=restaurant').set('Authorization','Bearer '+account);
+    expect(locked.body.capability.enabled).toBe(false);expect(locked.body.capability.reason).toBe('NOT_INCLUDED');
+  } finally {
+    // Subscriptions must be removed before their plan during fixture cleanup.
+    await prisma.runAsPlatform(async tx=>{await tx.subscription.deleteMany({where:{planId:plan.body.id}});await tx.plan.delete({where:{id:plan.body.id}});});
+  }
+});
 it('requires a current tenant account and refuses foreign or manager global scopes', async () => {
   expect((await http().get('/api/v1/tenant/qr-page')).status).toBe(401);
   expect((await api('get', other)).status).toBe(403);

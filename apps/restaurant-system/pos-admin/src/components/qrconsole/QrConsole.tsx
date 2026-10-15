@@ -200,7 +200,7 @@ export function QrConsole({
     );
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
-  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','CRM','ONBOARDING','ACCEPTANCE','RECONCILIATION','CALENDAR','PRINTPACK','RULES','ADVANCED','ANALYTICS']);
+  const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','RESTAURANT_PAGE','CRM','ONBOARDING','ACCEPTANCE','RECONCILIATION','CALENDAR','PRINTPACK','RULES','ADVANCED','ANALYTICS']);
   const visiblePages = QR_NAVIGATION.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (

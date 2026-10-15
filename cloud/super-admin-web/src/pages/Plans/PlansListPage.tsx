@@ -250,6 +250,7 @@ export function PlansListPage() {
                                 added, since it never changed to match. */}
                             {activeEntCount}/{ENTITLEMENT_KEYS.length} Active
                           </span>
+                          {p.entitlements.qrRestaurantPage && <div style={{ marginTop: 6 }}><Badge tone="success">Landing page included</Badge></div>}
                         </td>
                         <td style={{ fontWeight: 700 }}>{p._count?.subscriptions ?? 0}</td>
                         <td>

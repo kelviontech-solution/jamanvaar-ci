@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-15T16:38:56.668Z",
+  "passed": 7,
+  "total": 7,
+  "tests": [
+    {
+      "name": "Existing installations retain the original language background until configured",
+      "passed": true
+    },
+    {
+      "name": "Kiosk Admin previews and publishes matching welcome and language backgrounds",
+      "passed": true
+    },
+    {
+      "name": "A separate library background and crop leave the welcome screen unchanged",
+      "passed": true
+    },
+    {
+      "name": "Uploaded language photo appears in preview and on the actual terminal",
+      "passed": true
+    },
+    {
+      "name": "A terminal override applies only to that kiosk while branch defaults remain separate",
+      "passed": true
+    },
+    {
+      "name": "Choosing a language continues ordering and portrait/landscape layouts fit",
+      "passed": true
+    },
+    {
+      "name": "Published backgrounds remain available offline",
+      "passed": true
+    }
+  ]
+}

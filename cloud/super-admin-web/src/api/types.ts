@@ -65,7 +65,7 @@ export interface Plan {
   maxBranches: number;
   maxDevices: number;
   maxUsers: number;
-  entitlements: Entitlements;
+  entitlements: Entitlements & Record<string, boolean>;
   /** Computed server-side from productFamily+tier: which AppCodes this plan turns on by default. */
   defaultApps?: AppCode[];
   status: 'ACTIVE' | 'INACTIVE';

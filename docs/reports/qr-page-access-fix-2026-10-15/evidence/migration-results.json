@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Missing feature repaired idempotently",
+    "passed": true
+  },
+  {
+    "name": "Missing category repaired idempotently",
+    "passed": true
+  },
+  {
+    "name": "Existing activation and rollout preserved while bridge repaired",
+    "passed": true
+  }
+]

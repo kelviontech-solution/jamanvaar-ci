@@ -1,13 +1,28 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { DEFAULT_KIOSK_WELCOME_BACKGROUND, DEFAULT_WELCOME_PRESENTATION, KIOSK_WELCOME_BACKGROUNDS, optimizeWelcomeUpload, welcomeBackgroundUrl, welcomeLandscapeUrl, welcomePresentation, WelcomeImageCache } from '@jamanvaar/utils';
+import { DEFAULT_KIOSK_WELCOME_BACKGROUND, DEFAULT_WELCOME_PRESENTATION, KIOSK_WELCOME_BACKGROUNDS, optimizeWelcomeUpload, welcomeBackgroundUrl, welcomeLandscapeUrl, welcomePresentation, WelcomeImageCache,languageScreenPresentation,kioskScreenBackgroundSources } from '@jamanvaar/utils';
 import { db, KioskConfigurationRepository, WelcomeScreenSettingsRepository } from '@jamanvaar/database';
 import { kioskConfigurationSchema } from '../cloud/api/src/modules/entity-sync/kiosk-configuration-schema';
 import { kioskActivationError } from '../apps/kiosk-system/kiosk-user/src/activationErrors';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('kiosk welcome configuration', () => {
+  it('keeps the old language scene by default and follows each terminal welcome when requested',()=>{
+    const branch={...DEFAULT_WELCOME_PRESENTATION,backgroundId:'midnight-spice',languageBackgroundMode:'WELCOME' as const,deviceOverrides:{a:{...DEFAULT_WELCOME_PRESENTATION,backgroundId:'botanical-bistro'}}};
+    expect(languageScreenPresentation(DEFAULT_WELCOME_PRESENTATION)).toMatchObject({backgroundId:'modern-indian-dining',overlayOpacity:.5,backgroundPositionY:100});
+    expect(languageScreenPresentation(welcomePresentation(branch,'a')).backgroundId).toBe('botanical-bistro');
+    expect(languageScreenPresentation(welcomePresentation(branch,'b')).backgroundId).toBe('midnight-spice');
+  });
+  it('keeps separate language images, uploaded images and offline retained companions independent of welcome',()=>{
+    const settings={...DEFAULT_WELCOME_PRESENTATION,backgroundId:'midnight-spice',languageBackgroundMode:'CUSTOM' as const,languageBackground:{backgroundId:'custom-language',backgroundPositionX:20,backgroundFit:'contain' as const},customBackgrounds:[{id:'custom-language',name:'Photo',imageUrl:'data:image/webp;base64,AAAA',width:1080,height:1920}]};
+    const second=languageScreenPresentation(settings);expect(second.backgroundFit).toBe('contain');expect(welcomeBackgroundUrl(second,settings.customBackgrounds)).toBe('data:image/webp;base64,AAAA');
+    const retained=kioskScreenBackgroundSources(settings,settings.customBackgrounds);expect(retained).toContain('data:image/webp;base64,AAAA');expect(retained).toContain('/assets/branding/kiosk-welcome-v1/midnight-spice-landscape.webp');expect(settings.backgroundId).toBe('midnight-spice');
+    db.resetKioskConfiguration();const config=KioskConfigurationRepository.snapshot();expect(kioskConfigurationSchema.safeParse({...config,welcome:settings}).success).toBe(true);
+    expect(kioskConfigurationSchema.safeParse({...config,welcome:{...settings,languageBackground:{backgroundImageUrl:'javascript:bad'}}}).success).toBe(false);
+    expect(kioskConfigurationSchema.safeParse({...config,welcome:{...settings,languageBackgroundMode:'OTHER'}}).success).toBe(false);
+    expect(kioskConfigurationSchema.safeParse({...config,welcome:{...settings,languageBackground:{overlayOpacity:2}}}).success).toBe(false);
+  });
   it('ships sixteen distinct portrait masters while preserving the original collection', () => {
     const manifest = JSON.parse(readFileSync('packages/assets/branding/kiosk-welcome-v1/manifest.json', 'utf8'));
     expect(manifest.backgrounds).toHaveLength(16);

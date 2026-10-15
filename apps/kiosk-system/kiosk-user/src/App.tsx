@@ -3,9 +3,9 @@ const loadKitchenWait = async () => { const r = await deviceFetch('/api/v1/opera
 import { KioskSearchKeyboard } from './KioskSearchKeyboard';
 import {checkBranchService} from './branchService';
 import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
-import { KioskWelcomeScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
+import { KioskWelcomeScreen, KioskLanguageScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
-import { welcomePresentation, welcomeBackgroundUrl, welcomeLandscapeUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
+import { welcomePresentation, languageScreenPresentation, kioskScreenBackgroundSources, welcomeBackgroundUrl, WelcomeImageCache, resolveMenuImage } from '@jamanvaar/utils';
 import { kioskActivationError } from './activationErrors';
 import { resetTerminal, deviceFetch } from './cloud/cloudClient';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
@@ -32,7 +32,7 @@ import {
 } from '@jamanvaar/business';
 import { Button, EmptyState, JamanvaarLogo, BrandHeader, Modal, StatusBadge, ThermalReceiptView, JAMANVAARStartup, JamanvaarKioskAuthLayout, ActivationNoticeBanner, ActivationHelpNote, CachedImg, MenuCategoryIcon, LocalCorePairing, useAiAccess, JamanAiAccessNotice } from '@jamanvaar/ui';
 import { formatINR, formatSplitTax, splitTaxPaise, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
-import { SupportedLanguage, translate, TranslationKey } from '@jamanvaar/i18n';
+import { SupportedLanguage, translate, TranslationKey, LANGUAGE_OPTIONS } from '@jamanvaar/i18n';
 import { EBillService, NetworkStatusService, PrinterService, VoiceService, Platform, isOrderStillSyncingMessage } from '@jamanvaar/api';
 import { SyncOutboxEngine, EntitySyncEngine, lanMeshSync, syncMenuCatalog, syncDiningTables, syncPromotions, syncFeedback, syncLoyaltyTiers, syncLoyaltyRewards, syncLoyaltyProgramSettings, pushServiceMessages } from '@jamanvaar/sync';
 import { APP_CONSTANTS } from '@jamanvaar/config';
@@ -54,15 +54,7 @@ type KioskStep =
 /** Display labels for every language the kiosk *could* offer — which of
  *  these actually show up is decided by KioskDisplaySettings.enabledLanguages,
  *  not by this list, so Kiosk Admin can turn one off without a code change. */
-const LANGUAGE_OPTIONS: Array<{ code: SupportedLanguage; label: string; native: string }> = [
-  { code: 'en', label: 'English', native: 'English' },
-  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' },
-  { code: 'mr', label: 'Marathi', native: 'मराठी' },
-  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
-  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' }
-];
+
 
 /**
  * VoiceService only has verified browser speech-synthesis support for en/hi/gu (its own
@@ -200,7 +192,7 @@ export default function KioskUserApp() {
         if (!payload.configVersion || Date.parse(configuration.updatedAt) < Date.parse(payload.configVersion)) throw Error('Welcome configuration has not arrived yet. Retry sync after the connection is restored.');
         const presentation = welcomePresentation(configuration.welcome, kioskId);
         const image = welcomeBackgroundUrl(presentation, configuration.welcome.customBackgrounds);
-        for (const source of new Set([image, welcomeLandscapeUrl(image, presentation.backgroundLandscapeImageUrl)])) {
+        for (const source of kioskScreenBackgroundSources(presentation,configuration.welcome.customBackgrounds)) {
           const cached = await WelcomeImageCache.source(source);
           if (!cached.startsWith('blob:') && !cached.startsWith('data:')) throw Error('Welcome background could not be cached. Check the asset and connection, then retry sync.');
           if (cached.startsWith('blob:')) URL.revokeObjectURL(cached);
@@ -2413,73 +2405,23 @@ export default function KioskUserApp() {
       {/* STEP 0: LANGUAGE SELECTION — the very first thing a freshly-booted
           kiosk asks. The header's own language switcher only handles
           changing it later; this is the dedicated first choice. */}
-      {step === 'LANGUAGE_SELECT' && (
-        <div className={`kiosk-lang-page w-full h-full flex-1 flex flex-col items-center justify-center p-8 relative isolate bg-jaman-ivory text-center space-y-10 ${langEntered ? 'kiosk-lang-entered' : ''}`}>
-          <style>{`
-            /* This photo's real detail (furniture, plants, marble floor,
-               signboard) sits in its bottom third at full width; the rest
-               is mostly open sky, so bg-bottom keeps the crop on that
-               detail instead of the blank middle/top. */
-            .kiosk-lang-bg { background-image: url(${JSON.stringify(resolveMenuImage('/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp'))}); }
-          `}</style>
-
-          {/* Photo as its own layer (not the page's own background) so it
-              gets a visibly distinct fade-in of its own, instead of just
-              silently inheriting whatever opacity the page container ends
-              up at. */}
-          <div className="kiosk-lang-photo kiosk-lang-bg absolute inset-0 -z-20 bg-cover bg-bottom bg-no-repeat" />
-
-          {/* Light legibility wash — same treatment as the Welcome page's
-              own overlay: flat opacity (no gradient stops, so no possible
-              boundary line), inset-0 over the full w-full h-full container
-              for guaranteed 100% screen coverage. */}
-          <div className="absolute inset-0 -z-10 bg-white/50" />
-
-          <button aria-label="Go back"
-            onClick={() => {
-              SoundService.playTap();
-              setStep('WELCOME');
-            }}
-            className="absolute top-6 left-6 w-11 h-11 rounded-2xl bg-white/80 hover:bg-white border border-jaman-border text-jaman-navy flex items-center justify-center transition-transform active:scale-95 z-10"
-          >
-            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
-          </button>
-          <div className="kiosk-lang-logo relative z-10 flex justify-center">
-            {kioskSettings.logoUrl ? <img src={kioskSettings.logoUrl} alt="Restaurant logo" style={{height: 96, maxWidth: '100%', objectFit: 'contain'}} /> : <JamanvaarLogo variant="horizontal" size="2xl" imgStyle={{ height: '96px', width: 'auto' }} className="drop-shadow-sm" />}
-          </div>
-
-          <div className="kiosk-lang-heading relative z-10 space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-black text-jaman-navy tracking-tight font-serif">{kioskCopy("screen_choose_your_language_8e2d06", "Choose your language")}</h1>
-            <p className="text-base text-[#4A5568] font-medium">भाषा चुनें • ભાષા પસંદ કરો</p>
-          </div>
-
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl">
-            {LANGUAGE_OPTIONS.filter((l) => kioskSettings.enabledLanguages.includes(l.code)).map((l) => (
-              <button
-                key={l.code}
-                onClick={() => {
-                  SoundService.playTap();
-                  setLang(l.code);
-                  setStep('ORDER_TYPE');
-                }}
-                className="kiosk-lang-card bg-white p-8 rounded-3xl border-2 border-jaman-border hover:border-jaman-saffron shadow-lg hover:shadow-xl flex flex-col items-center gap-2 transition-all duration-200 active:scale-95 group"
-              >
-                <span className="text-3xl font-black text-jaman-navy group-hover:text-jaman-saffron transition-colors">
-                  {l.native}
-                </span>
-                <span className="text-xs font-bold text-[#52677A] uppercase tracking-wider">{l.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <p className="relative z-10 text-xs font-semibold text-[#52677A] tracking-wide uppercase">{kioskCopy("screen_you_can_change_this_anytime_from_the_header_d8f222", "You can change this anytime from the header")}</p>
-        </div>
-      )}
+      {step === 'LANGUAGE_SELECT' && <KioskLanguageScreen
+        settings={languageScreenPresentation(welcomeSettings)}
+        backgroundUrl={welcomeBackgroundUrl(languageScreenPresentation(welcomeSettings),WelcomeScreenSettingsRepository.getSettings().customBackgrounds)}
+        retainSources={kioskScreenBackgroundSources(welcomeSettings,WelcomeScreenSettingsRepository.getSettings().customBackgrounds)}
+        logoUrl={welcomeSettings.logoUrl||kioskSettings.logoUrl}
+        languages={LANGUAGE_OPTIONS.filter(l=>kioskSettings.enabledLanguages.includes(l.code))}
+        heading={kioskCopy("screen_choose_your_language_8e2d06","Choose your language")}
+        instruction={kioskCopy("screen_you_can_change_this_anytime_from_the_header_d8f222","You can change this anytime from the header")}
+        onBack={()=>{SoundService.playTap();setStep('WELCOME');}}
+        onChoose={code=>{SoundService.playTap();setLang(code as typeof lang);setStep('ORDER_TYPE');}}
+      />}
 
       {step === 'WELCOME' && recoveredCartPending && cartItems.length > 0 && <section role="region" aria-label="Recover unfinished order" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white text-jaman-navy shadow-xl rounded-2xl border border-orange-200 p-5 w-[min(92vw,640px)]"><h2 className="text-lg font-bold">Your unfinished cart is saved</h2><p className="text-sm mt-1">Resume your dishes, then confirm your order type and table. Start fresh if this is a new customer.</p><div className="flex gap-3 mt-4"><button className="min-h-12 flex-1 rounded-xl bg-jaman-saffron text-white font-bold px-4" onClick={()=>{setRecoveredCartPending(false);setStep('ORDER_TYPE');}}>Resume saved cart</button><button className="min-h-12 flex-1 rounded-xl border border-jaman-border px-4 font-bold" onClick={()=>{applyCart([]);setRecoveredCartPending(false);}}>Start fresh</button></div></section>}
       {/* One renderer for the real kiosk and the owner's preview. */}
       {step === 'WELCOME' && <KioskWelcomeScreen
         settings={welcomeSettings}
+        retainSources={kioskScreenBackgroundSources(welcomeSettings,WelcomeScreenSettingsRepository.getSettings().customBackgrounds)}
         backgroundUrl={welcomeBackgroundUrl(welcomeSettings, WelcomeScreenSettingsRepository.getSettings().customBackgrounds)}
         restaurantName={db.restaurant.name}
         logoUrl={kioskSettings.logoUrl}

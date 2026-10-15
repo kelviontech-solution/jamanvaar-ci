@@ -74,6 +74,9 @@ describe('Platform welcome collection and restaurant access', () => {
     expect((await push({ ...welcome('premium-biryani'), backgroundId: undefined, backgroundImageUrl: '/assets/branding/kiosk-welcome-v1/premium-biryani-landscape.webp' })).body.results[0].status).toBe('error');
   });
   it('preserves a previously selected design after revocation while rejecting new use on another terminal', async () => {
+    expect((await push({...welcome('midnight-spice'),languageBackgroundMode:'CUSTOM',languageBackground:{backgroundId:'premium-biryani'}})).body.results[0].status).toBe('error');
+    expect((await push({...welcome('midnight-spice'),languageBackgroundMode:'CUSTOM',languageBackground:{backgroundId:'botanical-bistro'},deviceOverrides:{[kioskA.id]:{...welcome('midnight-spice'),languageBackgroundMode:'WELCOME'},[kioskB.id]:{...welcome('botanical-bistro'),languageBackgroundMode:'CUSTOM',languageBackground:{backgroundId:'botanical-bistro'}}}})).body.results[0].status).toBe('ok');
+    const languageSaved=await http('get','/api/v1/entity-sync/KIOSK_CONFIGURATION?afterSeq=0',kioskA.token);expect(languageSaved.body.entities[0].payload.welcome.languageBackground).toMatchObject({backgroundId:'botanical-bistro'});expect(languageSaved.body.entities[0].payload.welcome.deviceOverrides[kioskA.id].languageBackgroundMode).toBe('WELCOME');
     await policy({ ...DEFAULT_WELCOME_POLICY, enabledIds: ['botanical-bistro'] });
     expect((await push({ ...welcome('midnight-spice'), subtitleText: 'Edited after restriction', deviceOverrides: { [kioskA.id]: welcome('midnight-spice'), [kioskB.id]: welcome('botanical-bistro') } })).body.results[0].status).toBe('ok');
     expect((await push({ ...welcome('midnight-spice'), deviceOverrides: { [kioskB.id]: welcome('midnight-spice') } })).body.results[0].status).toBe('error');

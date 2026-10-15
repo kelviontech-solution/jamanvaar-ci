@@ -792,6 +792,13 @@ export interface KioskDisplaySettings {
  * customize this screen without building a full per-language CMS for it.
  */
 export interface WelcomeScreenPresentation {
+  /** Missing means the existing language-screen design, preserving older installs. */
+  languageBackgroundMode?: 'DEFAULT' | 'WELCOME' | 'CUSTOM';
+  languageBackground?: {
+    backgroundId?: string; backgroundImageUrl?: string; backgroundLandscapeImageUrl?: string;
+    backgroundFit?: 'cover' | 'contain'; backgroundPositionX?: number; backgroundPositionY?: number;
+    backgroundZoom?: number; overlayOpacity?: number;
+  };
   headingText?: string;
   subtitleText?: string;
   startOrderButtonText?: string;

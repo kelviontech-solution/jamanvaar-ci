@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-15T17:00:11.042Z",
+  "passed": 7,
+  "total": 7,
+  "tests": [
+    {
+      "name": "Missing catalog feature stays visible with an actionable migration error",
+      "passed": true
+    },
+    {
+      "name": "Catalog request failure explains why the option is disabled",
+      "passed": true
+    },
+    {
+      "name": "Plan builder prominently includes the page and required base QR features",
+      "passed": true
+    },
+    {
+      "name": "Saved plan visibly includes the landing page in list and detail",
+      "passed": true
+    },
+    {
+      "name": "QR-only owner sees Restaurant Page in normal navigation and inherits plan access",
+      "passed": true
+    },
+    {
+      "name": "Mobile workspace exposes Restaurant Page without enabling advanced tools",
+      "passed": true
+    },
+    {
+      "name": "Removing only the page plan flag locks editing while QR ordering remains available",
+      "passed": true
+    }
+  ]
+}

@@ -80,6 +80,9 @@ export class PlansService {
     if (unknown.length > 0) {
       throw new BadRequestException(`Unknown entitlement key${unknown.length === 1 ? '' : 's'}: ${unknown.join(', ')}`);
     }
+    if (incoming.qrRestaurantPage === true && incoming.qrTableOrdering !== true) {
+      throw new BadRequestException('Restaurant landing page requires QR ordering in the same plan. Enable qrTableOrdering before including qrRestaurantPage.');
+    }
     const dense: Record<string, boolean> = {};
     for (const key of validKeys) dense[key] = incoming[key] ?? false;
     return dense;

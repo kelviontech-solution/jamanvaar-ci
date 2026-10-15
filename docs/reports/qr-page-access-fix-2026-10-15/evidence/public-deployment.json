@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-15T16:59:39.934Z",
+  "routes": [
+    {
+      "route": "/",
+      "entry": "/assets/index-DZMOku5E.js",
+      "matchedAssets": [
+        {
+          "asset": "/assets/index-DZMOku5E.js",
+          "pageCapability": true,
+          "pageStudio": true,
+          "newPlanOption": false
+        }
+      ]
+    },
+    {
+      "route": "/qr/admin/",
+      "entry": "/qr/assets/qr-BMEoPGgn.js",
+      "matchedAssets": [
+        {
+          "asset": "/qr/assets/QrConsole-CZ-l2JNy.js",
+          "pageCapability": true,
+          "pageStudio": true,
+          "newPlanOption": false
+        }
+      ]
+    },
+    {
+      "route": "/restaurant-admin/",
+      "entry": "/restaurant-admin/assets/admin-B9fA1e7l.js",
+      "matchedAssets": [
+        {
+          "asset": "/restaurant-admin/assets/QrConsole-CZ-l2JNy.js",
+          "pageCapability": true,
+          "pageStudio": true,
+          "newPlanOption": false
+        }
+      ]
+    }
+  ]
+}

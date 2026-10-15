@@ -234,9 +234,11 @@ function AuthPage({
           </button>
         )}
         <div className="qr-auth-links">
-          <a href="/qr/login/">Login</a>
-          <a href="/qr/activate/">Activate QR Ordering</a>
-          <a href="/qr/recover/">Forgot password?</a>
+          {/* Each auth page used to link to itself alongside the other two -- "Forgot
+              password?" showing up on the Forgot Password page reads as broken, not helpful. */}
+          {!(activate || recover) ? null : <a href="/qr/login/">Login</a>}
+          {activate ? null : <a href="/qr/activate/">Activate QR Ordering</a>}
+          {recover ? null : <a href="/qr/recover/">Forgot password?</a>}
           <a href="/qr/">Return to product website</a>
         </div>
         <p className="qr-fine">
@@ -288,7 +290,17 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
         }
       })
       .catch((e) => {
-        if (active) setError(e.message);
+        if (!active) return;
+        // Raw server strings like "Missing bearer token" / "Invalid or expired token" leaked
+        // straight through here -- a restaurant owner reading "Missing bearer token" has no way
+        // to know that just means "you're not signed in", and the page's own "Sign in again"
+        // link right below it made the technical phrase read like a second, separate problem.
+        const message = String(e?.message ?? '');
+        if (/bearer token|invalid or expired token|session.*(expired|revoked)/i.test(message)) {
+          setError("You're not signed in. Sign in to continue.");
+        } else {
+          setError(message);
+        }
       });
     return () => {
       active = false;
@@ -334,14 +346,18 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
       </header>
       <main className="qr-admin-content">
         {error ? (
-          <div className="qr-error" role="alert">
-            <h1>Sign in to manage QR Ordering</h1>
-            <p>{error}</p>
-            <a href="/qr/login/">Sign in again</a>
-            <p>
-              Access and reassignment are controlled by your platform
-              administrator.
-            </p>
+          <div className="qr-admin-empty-state" role="alert">
+            <div>
+              <h1>Sign in to manage QR Ordering</h1>
+              <p>{error}</p>
+              <a className="qr-btn" href="/qr/login/">
+                Sign in
+              </a>
+              <p className="qr-admin-empty-note">
+                Access and reassignment are controlled by your platform
+                administrator.
+              </p>
+            </div>
           </div>
         ) : ready ? (
           <QrConsole

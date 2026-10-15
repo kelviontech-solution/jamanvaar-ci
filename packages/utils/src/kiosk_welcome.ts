@@ -45,6 +45,16 @@ export function welcomeBackgroundUrl(settings: WelcomeScreenPresentation, custom
   }
   return settings.backgroundImageUrl || DEFAULT_KIOSK_WELCOME_BACKGROUND.imageUrl;
 }
+/** Resolve after per-terminal welcome inheritance, so “same” always follows that terminal. */
+export function languageScreenPresentation(settings: WelcomeScreenPresentation): WelcomeScreenPresentation {
+  if(settings.languageBackgroundMode==='WELCOME')return {...settings,showHeritageArtwork:false,showPromoBanner:false};
+  const original:WelcomeScreenPresentation={backgroundId:'modern-indian-dining',backgroundFit:'cover',backgroundPositionX:50,backgroundPositionY:100,backgroundZoom:1,overlayOpacity:.5,showHeritageArtwork:false,showPromoBanner:false};
+  return settings.languageBackgroundMode==='CUSTOM'?{...original,...settings.languageBackground,backgroundId:settings.languageBackground?.backgroundId||(settings.languageBackground?.backgroundImageUrl?undefined:original.backgroundId)}:original;
+}
+export function kioskScreenBackgroundSources(settings:WelcomeScreenPresentation,custom:WelcomeScreenSettings['customBackgrounds']=[]) {
+  const language=languageScreenPresentation(settings),welcome=welcomeBackgroundUrl(settings,custom),second=welcomeBackgroundUrl(language,custom);
+  return [...new Set([welcome,welcomeLandscapeUrl(welcome,settings.backgroundLandscapeImageUrl),second,welcomeLandscapeUrl(second,language.backgroundLandscapeImageUrl)])];
+}
 /** Built-in scenes have a wide companion; custom photos retain the owner's chosen fit and focal point. */
 export function welcomeLandscapeUrl(portraitUrl: string, configuredLandscape?: string): string {
   return configuredLandscape || KIOSK_WELCOME_BACKGROUNDS.find(background => background.imageUrl === portraitUrl)?.landscapeImageUrl || portraitUrl;

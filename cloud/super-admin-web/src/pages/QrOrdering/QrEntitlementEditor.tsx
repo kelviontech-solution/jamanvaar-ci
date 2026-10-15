@@ -162,7 +162,7 @@ export function QrEntitlementEditor({
           aria-label="Restaurant page access"
           style={{ padding: 18, border: '1px solid var(--jv-border)', borderRadius: 14, background: 'var(--jv-bg-muted)', scrollMarginTop: 20 }}
         >
-          <SectionLabel>Restaurant page setup</SectionLabel>
+          <SectionLabel>Restaurant landing page setup</SectionLabel>
           <p className="form-note" style={{ margin: '8px 0 12px' }}>
             Give this restaurant the page builder. The owner then chooses a design, adds their details and publishes from QR Admin → Restaurant Page.
           </p>

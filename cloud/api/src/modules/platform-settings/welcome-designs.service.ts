@@ -105,6 +105,10 @@ export class WelcomeDesignsService {
       else { next.backgroundId = id; delete next.backgroundImageUrl; delete next.backgroundLandscapeImageUrl; }
     };
     check(welcome, previous);
-    for (const [id, value] of Object.entries(welcome.deviceOverrides || {})) check(value, previous?.deviceOverrides?.[id]);
+    if(welcome.languageBackground)check(welcome.languageBackground,previous?.languageBackground);
+    for (const [id, value] of Object.entries(welcome.deviceOverrides || {})) {
+      check(value, previous?.deviceOverrides?.[id]);
+      if((value as any).languageBackground)check((value as any).languageBackground,previous?.deviceOverrides?.[id]?.languageBackground);
+    }
   }
 }

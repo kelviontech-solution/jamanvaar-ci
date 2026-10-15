@@ -13,6 +13,8 @@ const display = z.object({
   texts: z.record(language, z.record(z.string().max(100), text).refine(v => Object.keys(v).length <= 500)).optional()
 }).strict().refine(v => v.enabledLanguages.includes(v.defaultLanguage), 'Default language must be enabled.');
 const welcomePresentation = z.object({
+  languageBackgroundMode:z.enum(['DEFAULT','WELCOME','CUSTOM']).optional(),
+  languageBackground:z.object({backgroundId:z.string().max(100).optional(),backgroundImageUrl:image.optional(),backgroundLandscapeImageUrl:image.optional(),backgroundFit:z.enum(['cover','contain']).optional(),backgroundPositionX:z.number().min(0).max(100).optional(),backgroundPositionY:z.number().min(0).max(100).optional(),backgroundZoom:z.number().min(1).max(1.8).optional(),overlayOpacity:z.number().min(0).max(.85).optional()}).strict().optional(),
   headingText: z.string().max(200).optional(), subtitleText: z.string().max(300).optional(),
   startOrderButtonText: z.string().max(60).optional(), supportingText: z.string().max(180).optional(),
   showHeritageArtwork: z.boolean(), showPromoBanner: z.boolean(), promoBannerText: z.string().max(200).optional(),

@@ -2,7 +2,7 @@
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { ApplicationEntitlement, Branch, RestaurantDetail, RestaurantListItem } from '../../api/types';
+import { APP_CODE_LABELS, type AppCode, type ApplicationEntitlement, type Branch, type RestaurantDetail, type RestaurantListItem } from '../../api/types';
 import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 
@@ -35,6 +35,12 @@ export function GenerateActivationKeyModal({
   const [copied, setCopied] = useState(false);
   const [quotaPreview, setQuotaPreview] = useState<{ current: number; quota: number } | null>(null);
   const [quotaLoading, setQuotaLoading] = useState(false);
+  // Reported live: a key generated for an app this restaurant's plan never had enabled was
+  // handed to the owner, who redeemed it and hit a dead end at login ("No admin application is
+  // enabled") with no way to connect that back to anything fixable -- the one person who could
+  // fix it (the Super Admin) had already moved on believing the key worked. null = not checked
+  // yet / not applicable (e.g. deviceType 'ANY' has no single app to check).
+  const [appEnabled, setAppEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!fixedRestaurantId) {
@@ -53,7 +59,8 @@ export function GenerateActivationKeyModal({
 
   useEffect(() => {
     setQuotaPreview(null);
-    // 'ANY' isn't a single AppCode — no per-app quota applies to it.
+    setAppEnabled(null);
+    // 'ANY' isn't a single AppCode — no per-app quota or entitlement check applies to it.
     if (!restaurantId || deviceType === 'ANY') return;
     setQuotaLoading(true);
     Promise.all([
@@ -70,8 +77,11 @@ export function GenerateActivationKeyModal({
         // No entitlement row yet (a pre-Phase-2 subscription) — fall back to the plan's overall cap.
         const quota = row?.deviceQuota ?? activeSub?.plan.maxDevices ?? 0;
         setQuotaPreview({ current, quota });
+        // No row at all means this restaurant has never had the app touched — treat that as not
+        // enabled rather than assuming yes, so a brand-new restaurant doesn't slip through.
+        setAppEnabled(row?.enabled ?? false);
       })
-      .catch(() => setQuotaPreview(null))
+      .catch(() => { setQuotaPreview(null); setAppEnabled(null); })
       .finally(() => setQuotaLoading(false));
   }, [restaurantId, deviceType]);
 
@@ -188,6 +198,18 @@ export function GenerateActivationKeyModal({
                 ) : null}
               </div>
             )}
+            {deviceType !== 'ANY' && restaurantId && !quotaLoading && appEnabled === false && (
+              <div
+                role="alert"
+                style={{ fontSize: 13, color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 12px', margin: '-4px 0 8px' }}
+              >
+                <strong>{APP_CODE_LABELS[deviceType as AppCode]}</strong>{' '}
+                isn't enabled on this restaurant's plan yet — a key generated now would let the
+                owner redeem it, but they'd hit a dead end logging in ("No admin application is
+                enabled"). Enable it on the Applications tab first, then come back and generate
+                the key.
+              </div>
+            )}
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="key-branch">Branch</label>
@@ -223,7 +245,7 @@ export function GenerateActivationKeyModal({
               <Button type="button" variant="ghost" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" disabled={submitting || !restaurantId}>
+              <Button type="submit" variant="primary" disabled={submitting || !restaurantId || appEnabled === false}>
                 {submitting ? 'Generating…' : 'Generate key'}
               </Button>
             </div>

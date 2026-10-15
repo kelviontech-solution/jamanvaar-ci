@@ -91,6 +91,11 @@ export function PlanDetailPage() {
 
         {/* CARD 2: MODULAR CAPABILITIES BREAKDOWN */}
         <Card className="detail-card">
+          <div style={{ padding: 12, marginBottom: 16, border: '1px solid var(--jv-border)', borderRadius: 12 }}>
+            <strong>Restaurant landing page</strong>{' '}
+            <Badge tone={plan.entitlements.qrRestaurantPage ? 'success' : 'neutral'}>{plan.entitlements.qrRestaurantPage ? 'Included' : 'Not included'}</Badge>
+            <p className="form-note">After assigning this plan, edit and publish from QR Ordering → Restaurant Page. Platform availability and branch restrictions still apply.</p>
+          </div>
           <div className="detail-card-title">
             <span>Modular Entitlements ({featureMetrics.enabledModules} Categories Active)</span>
           </div>

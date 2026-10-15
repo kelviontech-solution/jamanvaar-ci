@@ -112,6 +112,34 @@
   max-width: none;
   padding: 0;
 }
+/* The "you're not signed in" state used to reuse the generic inline .qr-error banner -- full
+   width, pinned to the top-left corner of an otherwise-empty page, reading as broken rather than
+   as a deliberate screen. This gives it its own centered, bounded treatment. */
+.qr-admin-empty-state {
+  display: flex;
+  min-height: calc(100dvh - 80px);
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+.qr-admin-empty-state > div {
+  max-width: 380px;
+  text-align: center;
+}
+.qr-admin-empty-state h1 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.qr-admin-empty-state p {
+  margin: 0 0 20px;
+  color: var(--qr-ink);
+  opacity: 0.75;
+}
+.qr-admin-empty-state .qr-admin-empty-note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  opacity: 0.6;
+}
 .qr-console--workspace {
   display: grid;
   grid-template-columns: 252px minmax(0, 1fr);
@@ -122,7 +150,12 @@
 .qr-admin-sidebar {
   position: sticky;
   top: 80px;
-  height: calc(100dvh - 80px);
+  /* The fixed Display (accessibility) control sits at bottom:8px/left:8px over every page.
+     Since the sidebar is border-box, padding-bottom alone only cramps its own content -- the
+     box itself still extended into that same corner, so the control covered whatever nav item
+     happened to be scrolled there (not just "the last one"). Shortening the box's own height
+     is what actually clears that corner -- not hiding or restyling the shared control itself. */
+  height: calc(100dvh - 80px - 52px);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
