@@ -1,0 +1,1081 @@
+{
+  "text": "QA Owner full 1792004605417\nRESTAURANT ADMIN\nQA Owner full 1792004605417 — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA Owner full 1792004605417 — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nTODAY\nToday\nOrders\nBilling / Invoices\nPayments & Split\nRegister shifts & cash\nKITCHEN\nKitchen progress\nKitchen tickets\nMENU\nMenu & Categories\nMenu templates\nCustomisations & Tax\nOffers & Coupons\nInventory & Recipes\nPurchasing & Stock Control\nTABLES\nFloor / Tables\nReservations\nKIOSK MANAGEMENT\nKiosk Terminals\nWelcome screens\nKiosk Appearance & Content\nKiosk Combos & Deals\nKiosk payment settings\nKiosk feedback\nQR ORDERING\nQR Ordering\nON\nGUESTS & TEAM\nCustomers & loyalty\nTeam & permissions\nREPORTS\nReports & Analytics\nActivity history\nDEVICES\nPrinters & Devices\nConnections & sync\nApp Downloads\nSETUP\nReceipt & E-Bill\nRestaurant Settings\nSubscription Plans\nBackup & Restore\nHelp & Support\n\nKIOSK · APPEARANCE\n\nWelcome Screen\n\nCustomize the experience guests see before they start ordering.\n\nReset to Default\nApply to Kiosk\nBranch default · QA Owner full 1792004605417 — Main Branch\n\nApplies to 0 kiosk(s) in this branch. Kiosks with their own saved override keep their design.\n\nShowing the saved configuration.\n\nApply to\nAll kiosks in this branch\n\nQA Owner full 1792004605417 — Main Branch\n\nBranch settings stay within this branch. Individual kiosks can use their own design. Switch branch before configuring another location.\n\nHotel name & welcome message\n\n1. Enter the hotel or restaurant name. 2. Add a greeting and personal message. These appear immediately in the preview. Leave a field empty to use the restaurant or language default.\n\nHotel / restaurant name\nWelcome greeting\nCustom welcome message\nStart Order button\nTouch instruction\nRestaurant logo URL\n\nUpload your restaurant logo in Appearance & Content. Names and messages are live UI, never printed into a background.\n\nShow freshly prepared note\nShow promotion\nBackground collection\n\n16 available platform designs ? Selection limit: 100. Live text always stays editable.\n\nUpload Custom Background\n\nRecommended: 1080 × 1920 portrait. PNG, JPG or WebP, up to 12 MB. Uploads are optimized before saving. Three custom designs per branch.\n\nRefresh available designs\nDefault\nActive\nSelected\nRoyal Indian Dining\n\nIvory palace & brass\n\nPreview\nDefault\nModern Indian Dining\n\nSage contemporary bistro\n\nPreview\nDefault\nGujarati Thali\n\nGujarati thali & warm gold\n\nPreview\nDefault\nNorth Indian Cuisine\n\nNorth Indian copper & spice\n\nPreview\nDefault\nSouth Indian Cuisine\n\nSouth Indian banana leaf\n\nPreview\nDefault\nIndian Street Food\n\nStreet food & cheerful color\n\nPreview\nDefault\nPremium Biryani\n\nBiryani & amber clay\n\nPreview\nDefault\nVegetarian Garden\n\nVegetarian botanical green\n\nPreview\nDefault\nCafé & Casual Dining\n\nCafe oak & cream\n\nPreview\nDefault\nHeritage Sweets\n\nSweets & heritage gold\n\nPreview\nDefault\nMidnight Spice\n\nDark & Dramatic\n\nPreview\nDefault\nTerracotta Table\n\nRustic & Earthy\n\nPreview\nDefault\nTeal Pop Kitchen\n\nModern & Playful\n\nPreview\nDefault\nBotanical Bistro\n\nBotanical & Fresh\n\nPreview\nDefault\nPastel Patisserie\n\nCafé & Pastel\n\nPreview\nDefault\nUrban Street Kitchen\n\nBold & Urban\n\nPreview\nKiosk Preview\nSaved configuration\nPortrait\nLandscape\n768 × 1024\n800 × 1280\n820 × 1180\n1024 × 768\n1280 × 800\n1366 × 768\n1920 × 1080\nFreshly prepared · Served with care\n\nWelcome to\n\nQA Owner full 1792004605417\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nSame renderer as the customer kiosk · English preview · 800 × 1280\n\nImage fit & position\nFit\nFill screen · Cover\nShow full photo · Soft backdrop\nHorizontal position · 50\nVertical position · 50\nZoom · 1\nReadability overlay · 0.2\nConfiguration delivery\n\nVersion: 1970-01-01T00:00:00.000Z\n\nBundled default - no custom configuration published\n\nOnline kiosks receive configuration events. Offline kiosks keep their last saved design and catch up after reconnecting.\n\nJAMAN AI\nACTIVE",
+  "headings": [
+    "Welcome Screen",
+    "Branch default · QA Owner full 1792004605417 — Main Branch",
+    "Hotel name & welcome message",
+    "Background collection",
+    "Royal Indian Dining",
+    "Modern Indian Dining",
+    "Gujarati Thali",
+    "North Indian Cuisine",
+    "South Indian Cuisine",
+    "Indian Street Food",
+    "Premium Biryani",
+    "Vegetarian Garden",
+    "Café & Casual Dining",
+    "Heritage Sweets",
+    "Midnight Spice",
+    "Terracotta Table",
+    "Teal Pop Kitchen",
+    "Botanical Bistro",
+    "Pastel Patisserie",
+    "Urban Street Kitchen",
+    "Kiosk Preview",
+    "QA Owner full 1792004605417",
+    "Image fit & position",
+    "Configuration delivery"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "QA Owner full 1792004605417 — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 112,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 126,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "TODAY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Payments & Split",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "KITCHEN",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "MENU",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Menu & Categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Menu templates",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Customisations & Tax",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Offers & Coupons",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "TABLES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Welcome screens",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Appearance & Content",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk payment settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Kiosk feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "QR Ordering\nON",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "GUESTS & TEAM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Team & permissions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Reports & Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Activity history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "DEVICES",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Printers & Devices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Connections & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "App Downloads",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Receipt & E-Bill",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Restaurant Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Subscription Plans",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Backup & Restore",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Help & Support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Reset to Default",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 164,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Apply to Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 160,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Upload Custom Background",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 234,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Refresh available designs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 165,
+      "height": 20,
+      "visible": true
+    },
+    {
+      "text": "Default\nActive\nSelected\nRoyal Indian Dining\n\nIvory palace & brass\n\nPreview",
+      "aria": "Preview Royal Indian Dining",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 272,
+      "visible": true
+    },
+    {
+      "text": "Default\nModern Indian Dining\n\nSage contemporary bistro\n\nPreview",
+      "aria": "Preview Modern Indian Dining",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nGujarati Thali\n\nGujarati thali & warm gold\n\nPreview",
+      "aria": "Preview Gujarati Thali",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nNorth Indian Cuisine\n\nNorth Indian copper & spice\n\nPreview",
+      "aria": "Preview North Indian Cuisine",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nSouth Indian Cuisine\n\nSouth Indian banana leaf\n\nPreview",
+      "aria": "Preview South Indian Cuisine",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nIndian Street Food\n\nStreet food & cheerful color\n\nPreview",
+      "aria": "Preview Indian Street Food",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nPremium Biryani\n\nBiryani & amber clay\n\nPreview",
+      "aria": "Preview Premium Biryani",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nVegetarian Garden\n\nVegetarian botanical green\n\nPreview",
+      "aria": "Preview Vegetarian Garden",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nCafé & Casual Dining\n\nCafe oak & cream\n\nPreview",
+      "aria": "Preview Café & Casual Dining",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nHeritage Sweets\n\nSweets & heritage gold\n\nPreview",
+      "aria": "Preview Heritage Sweets",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nMidnight Spice\n\nDark & Dramatic\n\nPreview",
+      "aria": "Preview Midnight Spice",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nTerracotta Table\n\nRustic & Earthy\n\nPreview",
+      "aria": "Preview Terracotta Table",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nTeal Pop Kitchen\n\nModern & Playful\n\nPreview",
+      "aria": "Preview Teal Pop Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nBotanical Bistro\n\nBotanical & Fresh\n\nPreview",
+      "aria": "Preview Botanical Bistro",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nPastel Patisserie\n\nCafé & Pastel\n\nPreview",
+      "aria": "Preview Pastel Patisserie",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Default\nUrban Street Kitchen\n\nBold & Urban\n\nPreview",
+      "aria": "Preview Urban Street Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 184,
+      "height": 240,
+      "visible": true
+    },
+    {
+      "text": "Portrait",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Landscape",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 103,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false,
+      "width": 252,
+      "height": 45,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI\nACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 190,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Welcome screen scope",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Hotel / restaurant name",
+      "placeholder": "QA Owner full 1792004605417"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Welcome greeting",
+      "placeholder": "Welcome to"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Custom welcome message",
+      "placeholder": "Authentic flavors. A little moment of happiness."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Start Order button",
+      "placeholder": "Start Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Touch instruction",
+      "placeholder": "Touch the screen to begin your order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Restaurant logo URL",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Upload custom welcome background",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kiosk preview resolution",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Welcome background fit",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Horizontal position",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Vertical position",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Zoom",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Readability overlay",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/kiosk-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    },
+    {
+      "alt": "Royal Indian Dining portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/royal-indian-dining.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Royal Indian Dining landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/royal-indian-dining-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Modern Indian Dining portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/modern-indian-dining.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Modern Indian Dining landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/modern-indian-dining-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Gujarati Thali portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/gujarati-thali.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Gujarati Thali landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/gujarati-thali-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "North Indian Cuisine portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/north-indian-cuisine.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "North Indian Cuisine landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/north-indian-cuisine-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "South Indian Cuisine portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/south-indian-cuisine.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "South Indian Cuisine landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/south-indian-cuisine-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Indian Street Food portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/indian-street-food.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Indian Street Food landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/indian-street-food-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Premium Biryani portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/premium-biryani.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Premium Biryani landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/premium-biryani-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Vegetarian Garden portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/vegetarian-garden.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Vegetarian Garden landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/vegetarian-garden-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Café & Casual Dining portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/cafe-casual-dining.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Café & Casual Dining landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/cafe-casual-dining-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Heritage Sweets portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/heritage-desserts.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Heritage Sweets landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/heritage-desserts-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Midnight Spice portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/midnight-spice.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Midnight Spice landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/midnight-spice-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Terracotta Table portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/terracotta-table.webp",
+      "loaded": true,
+      "width": 55
+    },
+    {
+      "alt": "Terracotta Table landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/terracotta-table-landscape-thumb.webp",
+      "loaded": true,
+      "width": 109
+    },
+    {
+      "alt": "Teal Pop Kitchen portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/teal-pop-kitchen.webp",
+      "loaded": false,
+      "width": 55
+    },
+    {
+      "alt": "Teal Pop Kitchen landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/teal-pop-kitchen-landscape-thumb.webp",
+      "loaded": false,
+      "width": 109
+    },
+    {
+      "alt": "Botanical Bistro portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/botanical-bistro.webp",
+      "loaded": false,
+      "width": 55
+    },
+    {
+      "alt": "Botanical Bistro landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/botanical-bistro-landscape-thumb.webp",
+      "loaded": false,
+      "width": 109
+    },
+    {
+      "alt": "Pastel Patisserie portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/pastel-patisserie.webp",
+      "loaded": false,
+      "width": 55
+    },
+    {
+      "alt": "Pastel Patisserie landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/pastel-patisserie-landscape-thumb.webp",
+      "loaded": false,
+      "width": 109
+    },
+    {
+      "alt": "Urban Street Kitchen portrait",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/urban-street-kitchen.webp",
+      "loaded": false,
+      "width": 55
+    },
+    {
+      "alt": "Urban Street Kitchen landscape",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/urban-street-kitchen-landscape-thumb.webp",
+      "loaded": false,
+      "width": 109
+    },
+    {
+      "alt": "",
+      "src": "/restaurant-admin/assets/branding/kiosk-welcome-v1/royal-indian-dining.webp",
+      "loaded": true,
+      "width": 324
+    },
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5316/kiosk-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 104
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -1,0 +1,14 @@
+{
+  "passed": 2,
+  "total": 2,
+  "tests": [
+    {
+      "name": "Super Admin AI exposes restaurant-list failures even without a loaded profile",
+      "passed": true
+    },
+    {
+      "name": "AI save keeps the chosen restaurant fixed until its response returns",
+      "passed": true
+    }
+  ]
+}

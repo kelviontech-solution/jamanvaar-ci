@@ -1,0 +1,90 @@
+{
+  "passed": 21,
+  "total": 21,
+  "tests": [
+    {
+      "name": "Rush view loads real branch records and fits desktop",
+      "passed": true
+    },
+    {
+      "name": "Task search finds pause ordering and pinned shortcuts persist",
+      "passed": true
+    },
+    {
+      "name": "Menu review shows exact changes and publishes after explicit review",
+      "passed": true
+    },
+    {
+      "name": "Opening checklist persists verified confirmations",
+      "passed": true
+    },
+    {
+      "name": "Closing checklist records reviewed outstanding work separately",
+      "passed": true
+    },
+    {
+      "name": "Service hours, capacity and temporary pause persist on the server",
+      "passed": true
+    },
+    {
+      "name": "Contextual help explains the scope and retry behavior",
+      "passed": true
+    },
+    {
+      "name": "Menu scheduling creates a future change and supports cancellation",
+      "passed": true
+    },
+    {
+      "name": "Branch comparison copies only selected service settings",
+      "passed": true
+    },
+    {
+      "name": "Food margin reports missing costs without pretending profit",
+      "passed": true
+    },
+    {
+      "name": "Guest complaint is assigned, persists and can be resolved",
+      "passed": true
+    },
+    {
+      "name": "Branch handover records the intended recipient and pending acknowledgement",
+      "passed": true
+    },
+    {
+      "name": "POS signed request reaches manager console and the exact decision returns",
+      "passed": true
+    },
+    {
+      "name": "Unified history shows canonical progress for a POS order",
+      "passed": true
+    },
+    {
+      "name": "Channel acceptance records separate POS evidence and persists",
+      "passed": true
+    },
+    {
+      "name": "Customer pickup display shows live token states without customer details",
+      "passed": true
+    },
+    {
+      "name": "Staff transfer previews then moves an idle staff member to the selected branch",
+      "passed": true
+    },
+    {
+      "name": "Sanitized support diagnostics download contains no contacts or credentials",
+      "passed": true
+    },
+    {
+      "name": "Display presets change controls and survive reload",
+      "passed": true
+    },
+    {
+      "name": "Training simulates order, kitchen, failed payment retry and receipt without real sales",
+      "passed": true
+    },
+    {
+      "name": "All operations pages fit a phone and have no runtime errors",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "text": "KITCHEN DISPLAY (KDS)\nJAMAN AI\nAll stations\nMain Kitchen\nPizza Station\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice\n5\n0\nDisplay & station timing\nActive\n5\nCooking\n5\nReady\n0\nServed\n2\nPass\n5\nPriority, then oldest\nOldest first\nToken K-104\n\n#MAIN-20261013-204 · Takeaway\n\n2091:18\n0 OF 1 READY\n0%\n1×UI Audit Dish 005\nMAIN KITCHEN\n\nWaiting on Main Kitchen (UI Audit Dish 005)\n\nNot everything is ready yet\nTable UI01\n\n#QR-4 · Dine In\n\n2091:18\n0 OF 1 READY\n0%\n1×UI Audit Dish 004\nMAIN KITCHEN\n\nWaiting on Main Kitchen (UI Audit Dish 004)\n\nNot everything is ready yet\nTable UI01\n\n#QR-3 · Dine In\n\n2091:18\n0 OF 1 READY\n0%\n1×UI Audit Dish 004\nMAIN KITCHEN\n\nWaiting on Main Kitchen (UI Audit Dish 004)\n\nNot everything is ready yet\nToken K-103\n\n#MAIN-20261013-203 · Takeaway\n\n2091:18\n0 OF 1 READY\n0%\n1×UI Audit Dish 005\nMAIN KITCHEN\n\nWaiting on Main Kitchen (UI Audit Dish 005)\n\nNot everything is ready yet\nTable UI01\n\n#QR-1 · Dine In\n\n528:39\n0 OF 1 READY\n0%\n1×UI Audit Dish 100\nMAIN KITCHEN\n\nWaiting on Main Kitchen (UI Audit Dish 100)\n\nNot everything is ready yet\nDisplay",
+  "headings": [
+    "Token K-104",
+    "Table UI01",
+    "Table UI01",
+    "Token K-103",
+    "Table UI01"
+  ],
+  "buttons": [
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Kitchen Intelligence",
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All stations",
+      "aria": "Kitchen station All stations",
+      "title": "",
+      "disabled": false,
+      "width": 97,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": "Kitchen station Main Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Pizza Station",
+      "aria": "Kitchen station Pizza Station",
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Staff practice",
+      "title": "",
+      "disabled": false,
+      "width": 294,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false,
+      "width": 39,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Active\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 114,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cooking\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 127,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ready\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 113,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Served\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 117,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pass\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 97,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Not everything is ready yet",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 330,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Not everything is ready yet",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 330,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen screen layout",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "minimumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "fallbackMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "maximumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search kitchen tickets",
+      "placeholder": "Search token, table, KOT or dish…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen ticket ordering",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Display size and contrast",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5319/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 58
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -1,4 +1,7 @@
+import { BranchWaitEstimate } from '@jamanvaar/ui';
+const loadKitchenWait = async () => { const r = await deviceFetch('/api/v1/operations/device/wait-estimate'); if(!r.ok) throw new Error('Wait estimate unavailable'); return r.json(); };
 import { KioskSearchKeyboard } from './KioskSearchKeyboard';
+import {checkBranchService} from './branchService';
 import { DeviceCommandRunner, AppUpdate, type AppUpdateOffer } from '@jamanvaar/sync';
 import { KioskWelcomeScreen, registerNativeUpdateGuard } from '@jamanvaar/ui';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
@@ -391,10 +394,14 @@ export default function KioskUserApp() {
   const [specialInstructions, setSpecialInstructions] = useState<string>('');
 
   // Cart State
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const kioskDraftKey = 'jamanvaar-kiosk-draft:' + (localStorage.getItem('jamanvaar_kiosk_user_device_id') ?? 'unpaired');
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {try{const draft=JSON.parse(sessionStorage.getItem(kioskDraftKey)??'null');return draft&&Date.now()-draft.at<10*60000&&Array.isArray(draft.items)?draft.items.filter((i:CartItem)=>i&&typeof i.menuItemId==='string'&&i.quantity>0):[];}catch{return [];}});
+  const [recoveredCartPending,setRecoveredCartPending] = useState(() => cartItems.length > 0);
+  useEffect(()=>{if(!cartItems.length)setRecoveredCartPending(false);},[cartItems.length]);
+  useEffect(()=>{try{if(cartItems.length)sessionStorage.setItem(kioskDraftKey,JSON.stringify({at:Date.now(),items:cartItems}));else sessionStorage.removeItem(kioskDraftKey);}catch{/* Continue ordering if session storage is unavailable. */}},[cartItems,kioskDraftKey]);
   useEffect(() => registerNativeUpdateGuard(() => cartItems.length
     ? 'Finish the customer order before updating this kiosk.' : null), [cartItems]);
-  const cartRef = useRef<CartItem[]>([]);
+  const cartRef = useRef<CartItem[]>(cartItems);
   // Opening or emptying the cart changes the whole layout, so that one change is wrapped in a
   // View Transition: the browser animates it from CSS instead of re-laying out every frame.
   const applyCart = (update: CartItem[] | ((prev: CartItem[]) => CartItem[])) => {
@@ -500,6 +507,14 @@ export default function KioskUserApp() {
   // staff member configuring the printer saw instead of what they came for).
   const [isStaffActionMenuOpen, setIsStaffActionMenuOpen] = useState(false);
   const [verifiedStaffName, setVerifiedStaffName] = useState<string | null>(null);
+  // security-audit HIGH kiosk-loyalty-03: "logging in" at this kiosk is just a self-displayed
+  // 4-digit code (no SMS gateway exists anywhere in this build -- see handleSendOtp), so it
+  // proves nothing about who's actually standing at the screen. Earning points for a typed-in
+  // phone number is harmless (it only credits a stranger's account), but redeeming real points
+  // let anyone drain any customer's balance just by typing their number. Redemption now needs
+  // the same real, server-verified staff PIN already used for a manager discount -- a human who
+  // can ask the guest to confirm their identity -- before the Redeem button will do anything.
+  const [loyaltyRedemptionApproved, setLoyaltyRedemptionApproved] = useState(false);
   const [isKioskPrinterSettingsOpen, setIsKioskPrinterSettingsOpen] = useState(false);
   // Software update: the "Version X is available" banner never shows to a guest (see
   // PlatformNoticeBanner's guest-audience check) -- it's reached from here instead, inside Staff
@@ -843,6 +858,7 @@ export default function KioskUserApp() {
     setLoggedInAccount(null);
     setRedeemedPoints(0);
     setStaffOverrideActive(false);
+    setLoyaltyRedemptionApproved(false);
     setFeedbackSubmitted(false);
     setFeedbackRating(0);
     setFeedbackTags([]);
@@ -923,7 +939,11 @@ export default function KioskUserApp() {
   const allCombos = ComboRepository.getAllCombos();
   const combos = allCombos.filter(combo => combo.isAvailable !== false && menuItems.some(item => item.id === `combo-${combo.id}`)).map(combo => ({ ...combo, imageUrl: menuDishImage(combo.imageUrl, combo.name) }));
   const isNonVegCombo = (combo: ComboDeal) => MenuRepository.getMenuItemById(`combo-${combo.id}`)?.dietaryType === 'NON_VEG' || [...combo.mainItemIds, ...combo.sideItemIds, ...combo.drinkItemIds, ...combo.dessertItemIds].some(id => MenuRepository.getMenuItemById(id)?.dietaryType === 'NON_VEG');
-  const tables = TableRepository.getAllTables();
+  // security-audit MEDIUM kiosk-table-01: this used to list every synced dining table with no
+  // regard for who, if anyone, was already seated there -- a guest could tap a table another
+  // party was actively dining at, mixing two parties' orders onto Captain/KDS's one view of that
+  // table and confusing who the bill belongs to. Only a table nobody is currently using is offered.
+  const tables = TableRepository.getAllTables().filter(t => t.isActive !== false && t.status === 'AVAILABLE');
   const allowedOrderTypes = availableKioskModes(kioskSettings);
   useEffect(() => {
     if (!kioskSettings.enabledLanguages.includes(lang)) setLang(kioskSettings.defaultLanguage);
@@ -1225,6 +1245,7 @@ export default function KioskUserApp() {
   // Start Payment Process
   const handleProceedToPayment = async () => {
     if (remoteLogoutInProgressRef.current) return;
+    try {const service=await checkBranchService(networkState==='ONLINE');if(!service.available){showToast(service.message);return;}}catch(e){showToast(e instanceof Error?e.message:'Please check with a team member.');return;}
     SoundService.playTap();
     resetIdleTimer();
     if (cartItems.length === 0) return;
@@ -1278,6 +1299,12 @@ export default function KioskUserApp() {
       })),
       subtotal: rawCalculated.subtotal,
       discountAmount: rawCalculated.discountAmount + redeemedPoints + staffDiscount,
+      // security-audit HIGH kiosk-loyalty-02: this used to only live in the redeemedPoints React
+      // state, never on the order itself -- settleOrder() (the real, payment-confirmed moment
+      // for a cash order) had no way to find out how many points to deduct later, and nothing
+      // else ever did either (see the fix in proceedToConfirmation below). Stamped here so it
+      // survives to settlement the same way customerPhone already does.
+      loyaltyPointsRedeemed: redeemedPoints > 0 ? redeemedPoints : undefined,
       couponCode: appliedCoupon?.code,
       cgstAmount: rawCalculated.cgstAmount,
       sgstAmount: rawCalculated.sgstAmount,
@@ -1359,7 +1386,7 @@ export default function KioskUserApp() {
       }
       // The online quote currently has no coupon/points discount contract. Never consume a benefit the gateway did not apply.
       if (appliedCoupon || redeemedPoints > 0 || staffDiscount > 0) {
-        setAppliedCoupon(null); setRedeemedPoints(0); setStaffOverrideActive(false);
+        setAppliedCoupon(null); setRedeemedPoints(0); setStaffOverrideActive(false); setLoyaltyRedemptionApproved(false);
         showToast('Discounts were not applied to this online payment. No coupon or points will be used; check the updated total before paying.');
       } else if (result.amount !== localAmountPaise) {
         showToast('Your order total was updated to match the latest price.');
@@ -1500,7 +1527,17 @@ export default function KioskUserApp() {
     // applied to a kiosk purchase. Guarded by loyaltyPointsEarned the same way settleOrder is, so a kiosk
     // order (which, unlike POS, can legitimately re-run this confirmation tail on a crash-recovery retry)
     // can never be credited twice for one purchase.
-    if (loggedInAccount && order.loyaltyPointsEarned === undefined) {
+    //
+    // security-audit HIGH kiosk-loyalty-02: this used to run unconditionally, including for a
+    // cash-at-counter order that confirmKioskCashOrder leaves at paymentStatus 'PENDING' -- a
+    // guest got real loyalty points (and had real points deducted for a redemption) for an order
+    // nobody had paid for yet, with nothing reversing either if the order was later cancelled
+    // unpaid. This now only runs for an order that is ALREADY paid (the online/UPI path, which
+    // reaches here only after a server-confirmed success). A cash order earns and redeems points
+    // through the exact same mechanism POS does: settleOrder(), once a cashier actually collects
+    // the money -- see loyaltyPointsRedeemed being stamped onto the order above, and the matching
+    // deduction added to settleOrder() in repositories.ts.
+    if (loggedInAccount && order.loyaltyPointsEarned === undefined && order.paymentStatus === 'SUCCESS') {
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(loggedInAccount.phone, order.totalAmount, order.id);
       if (redeemedPoints > 0) {
         CustomerRepository.redeemPoints(loggedInAccount.phone, redeemedPoints);
@@ -1561,6 +1598,7 @@ export default function KioskUserApp() {
   // Cash-at-counter confirmation: the order was already created PENDING in
   // handleProceedToPayment — this just fetches it and runs the shared tail.
   const handleGetToken = async () => {
+    try {const service=await checkBranchService(networkState==='ONLINE');if(!service.available){showToast(service.message);return;}}catch(e){showToast(e instanceof Error?e.message:'Please check with a team member.');return;}
     resetIdleTimer();
     setIsProcessingPayment(true);
     if (!localOrderIdForPayment) {
@@ -1755,6 +1793,18 @@ export default function KioskUserApp() {
       action: 'STAFF_OVERRIDE_PIN_SUCCESS',
       category: 'STAFF_OVERRIDE',
       details: `Manager discount applied for customer assistance by ${verifiedStaffName ?? 'staff'}`
+    });
+  };
+
+  const handleApproveLoyaltyRedemption = () => {
+    setLoyaltyRedemptionApproved(true);
+    setIsStaffActionMenuOpen(false);
+    showToast('Staff Mode: Loyalty redemption approved for this guest');
+    AuditRepository.log({
+      kioskId,
+      action: 'STAFF_OVERRIDE_PIN_SUCCESS',
+      category: 'STAFF_OVERRIDE',
+      details: `Loyalty redemption approved for customer${loggedInAccount?.phone ? ` (${loggedInAccount.phone})` : ''} by ${verifiedStaffName ?? 'staff'}`
     });
   };
 
@@ -2426,6 +2476,7 @@ export default function KioskUserApp() {
         </div>
       )}
 
+      {step === 'WELCOME' && recoveredCartPending && cartItems.length > 0 && <section role="region" aria-label="Recover unfinished order" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white text-jaman-navy shadow-xl rounded-2xl border border-orange-200 p-5 w-[min(92vw,640px)]"><h2 className="text-lg font-bold">Your unfinished cart is saved</h2><p className="text-sm mt-1">Resume your dishes, then confirm your order type and table. Start fresh if this is a new customer.</p><div className="flex gap-3 mt-4"><button className="min-h-12 flex-1 rounded-xl bg-jaman-saffron text-white font-bold px-4" onClick={()=>{setRecoveredCartPending(false);setStep('ORDER_TYPE');}}>Resume saved cart</button><button className="min-h-12 flex-1 rounded-xl border border-jaman-border px-4 font-bold" onClick={()=>{applyCart([]);setRecoveredCartPending(false);}}>Start fresh</button></div></section>}
       {/* One renderer for the real kiosk and the owner's preview. */}
       {step === 'WELCOME' && <KioskWelcomeScreen
         settings={welcomeSettings}
@@ -2438,7 +2489,7 @@ export default function KioskUserApp() {
         buttonText={(lang === 'en' && welcomeSettings.startOrderButtonText) || t('startOrder')}
         instruction={(lang === 'en' && welcomeSettings.supportingText) || t('touchToBegin')}
         terminalId={kioskId} busy={startOrderTapped}
-        onStart={handleStartOrder} onStaff={() => setIsStaffPinModalOpen(true)}
+        onStart={()=>{if(recoveredCartPending){showToast('Resume your saved cart or choose Start fresh.');return;}handleStartOrder();}} onStaff={() => setIsStaffPinModalOpen(true)}
       />}
 
       {/* STEP 2: ORDER TYPE SELECTION */}
@@ -3050,8 +3101,19 @@ export default function KioskUserApp() {
                       <div>
                         <span className="font-bold text-emerald-900">{kioskCopy("screen_redeem_loyalty_points_8591d3", "Redeem Loyalty Points")}</span>
                         <p className="text-[10px] text-emerald-700">{kioskCopy("screen_balance__e03512", "Balance:")}{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts_52ee19", "Pts")}</p>
+                        {/* security-audit HIGH kiosk-loyalty-03: the phone "verification" above is just
+                            a self-displayed code (no SMS gateway exists), so it proves nothing about
+                            whose points these actually are. A staff member must approve a redemption
+                            with their own real, server-verified PIN first. */}
+                        {!loyaltyRedemptionApproved && <p className="text-[10px] text-emerald-700">{kioskCopy("screen_ask_staff_to_redeem_1a2b3c", "Ask a staff member to redeem for you")}</p>}
                       </div>
-                      {redeemedPoints > 0 ? (
+                      {!loyaltyRedemptionApproved ? (
+                        <button
+                          onClick={() => setIsStaffPinModalOpen(true)}
+                          className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
+                        >{kioskCopy("screen_call_staff_3c4d5e", "Call Staff")}
+                        </button>
+                      ) : redeemedPoints > 0 ? (
                         <button
                           onClick={() => setRedeemedPoints(0)}
                           className="text-xs font-bold text-rose-600"
@@ -3382,7 +3444,7 @@ export default function KioskUserApp() {
               <section className="rounded-[28px] bg-white border border-jaman-border shadow-md p-6 sm:p-8 flex flex-col justify-center gap-4">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-bold text-[#4A5568]">{t('estimatedWait')}</span>
-                  <span className="text-2xl font-black text-jaman-navy">{placedOrder.estimatedWaitMinutes} {t('minutes')}</span>
+                  <BranchWaitEstimate load={loadKitchenWait} />
                 </div>
                 <div className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3">
                   <span className="text-sm font-bold text-emerald-800">Pickup at</span>
@@ -3632,6 +3694,7 @@ export default function KioskUserApp() {
               {/* Name already shows in the Modal's own title bar above —
                   no need to repeat it here. */}
               <p className="text-xs text-[#4A5568]">{localizedDescription(customizingItem, lang)}</p>
+              {!!customizingItem.allergens?.length && <p className="text-sm font-semibold text-amber-900 mt-2">Declared allergens: {customizingItem.allergens.join(', ')}. Ask staff about cross-contact.</p>}
               <div className="text-lg font-black text-jaman-saffron mt-1.5">
                 {formatINR(calculateItemUnitPrice(customizingItem.price, selectedModifiers))}
               </div>
@@ -4159,6 +4222,11 @@ export default function KioskUserApp() {
           <Button variant="accent" className="w-full justify-center" onClick={handleApplyManagerDiscount}>
             Apply 10% Manager Discount
           </Button>
+          {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && !loyaltyRedemptionApproved && (
+            <Button variant="accent" className="w-full justify-center" onClick={handleApproveLoyaltyRedemption}>
+              Approve Loyalty Redemption
+            </Button>
+          )}
           <Button variant="ghost" className="w-full justify-center" onClick={handleOpenPrinterSettings}>
             Configure Kiosk Printer
           </Button>

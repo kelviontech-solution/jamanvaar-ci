@@ -1,10 +1,11 @@
+import { assertBranchProduct } from '../security/branch-license';
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Device } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 import { hashOpaqueToken } from '../security/token.util';
 import { RealtimeBus } from '../realtime/realtime-bus';
-import { requiredConsoleApps } from '../security/admin-product-access';
+import { requiredConsoleApps, enabledConsoleApps } from '../security/admin-product-access';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { TENANT_JWT_AUDIENCE, TENANT_JWT_ISSUER, TenantAccessTokenPayload } from '../../modules/tenant-auth/tenant-auth.service';
@@ -246,6 +247,14 @@ export class DeviceAuthGuard implements CanActivate {
       // Request scope only: never move the registered terminal or rewrite its historical orders.
       if (typeof requestedBranch === 'string') scopedDevice = { ...device, branchId: restaurantQrScope ? null : requestedBranch };
       scopedDevice = { ...scopedDevice, adminActorId: claims.sub } as Device;
+    }
+    if (scopedDevice.branchId && !ALLOWED_WHILE_LOCKED.test(authorizationPath)) {
+      await this.prisma.runAsTenant(device.restaurantId, async tx => {
+        if (['POS_ADMIN','KIOSK_ADMIN'].includes(device.type)) {
+          const allowed = await enabledConsoleApps(tx, device.restaurantId, scopedDevice.branchId);
+          if (!requiredConsoleApps(authorizationPath).some(app => allowed.includes(app))) throw new ForbiddenException({code:'BRANCH_PRODUCT_DISABLED',message:'This application resource is not active in the selected branch.'});
+        } else await assertBranchProduct(tx, device.restaurantId, scopedDevice.branchId, device.type);
+      });
     }
     (request as Request & { device: Device }).device = scopedDevice as Device;
     return true;

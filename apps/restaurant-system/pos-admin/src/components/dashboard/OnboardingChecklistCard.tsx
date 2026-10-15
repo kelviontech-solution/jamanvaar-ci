@@ -14,6 +14,7 @@ export interface OnboardingChecklistItem {
 
 interface OnboardingChecklistCardProps {
   items: OnboardingChecklistItem[];
+  progressKey?: string;
 }
 
 /**
@@ -24,17 +25,18 @@ interface OnboardingChecklistCardProps {
  * canned tutorial, and disappears for good once every item is complete or
  * the owner dismisses it.
  */
-export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = ({ items }) => {
+export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = ({ items, progressKey = '' }) => {
+  const storageKey = `${DISMISS_KEY()}:${progressKey}`;
   const [dismissed, setDismissed] = useState(() => {
     try {
-      return localStorage.getItem(DISMISS_KEY()) === '1';
+      return localStorage.getItem(storageKey) === '1';
     } catch {
       return false;
     }
   });
 
   const allDone = items.every((i) => i.done);
-  if (dismissed || allDone) return null;
+  if (dismissed || allDone) return <div className="rounded-xl border bg-white p-3 flex flex-wrap gap-3 justify-between text-sm"><span>{allDone ? 'Your setup checklist is complete.' : 'Setup checklist is paused.'}</span>{!allDone&&<button type="button" className="font-bold underline min-h-11" onClick={()=>{setDismissed(false);try{localStorage.removeItem(storageKey);}catch{}}}>Resume setup</button>}</div>;
 
   const doneCount = items.filter((i) => i.done).length;
   const next = items.find((i) => !i.done);
@@ -42,7 +44,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
   const dismiss = () => {
     setDismissed(true);
     try {
-      localStorage.setItem(DISMISS_KEY(), '1');
+      localStorage.setItem(storageKey, '1');
     } catch {
       // localStorage unavailable — checklist just reappears next session, harmless.
     }

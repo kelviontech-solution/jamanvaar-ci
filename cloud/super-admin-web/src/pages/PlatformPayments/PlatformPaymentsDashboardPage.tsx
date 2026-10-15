@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import { Badge, Button, Card } from '../../components/ui';
+import { escapeCsvCell } from '../../lib/csvExport';
 import '../../components/shared.css';
 
 interface PlatformSummary {
@@ -56,7 +57,10 @@ function statementCsv(s: DayStatement, restaurantId: string) {
     ['Historical collection needing split review', (s.unallocatedCollection / 100).toFixed(2)],
     ['Net payable to restaurant', (s.netPayableToRestaurant / 100).toFixed(2)]
   ];
-  const csv = lines.map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  // security-audit: this used to quote-escape cells inline but never neutralized a leading
+  // formula-trigger character (=, +, -, @), unlike every other CSV export in this app -- reuse
+  // the shared sanitizer instead of reimplementing (and under-implementing) it here.
+  const csv = lines.map((l) => l.map((c) => escapeCsvCell(c)).join(',')).join('\r\n');
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;

@@ -606,29 +606,30 @@ export class TenantAuthService {
       // or Receipt settings (found via live Playwright verification). A POS_ADMIN console
       // request is now allowed through on EITHER entitlement; the device itself is still
       // recorded as type POS_ADMIN either way (one console, one device record).
+      const branchId = key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId));
       const appCodeForEntitlementCheck = dto.deviceType as AppCode;
       if (appCodeForEntitlementCheck === 'POS_ADMIN') {
         const [posAdminEnabled, kioskAdminEnabled] = await Promise.all([
-          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'POS_ADMIN'),
-          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'KIOSK_ADMIN')
+          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'POS_ADMIN', branchId),
+          this.appEntitlements.isAppEnabled(tx, key.restaurantId, 'KIOSK_ADMIN', branchId)
         ]);
-        const qrEnabled = decoded.requestedProduct === 'QR_ORDERING' && await this.appEntitlements.isAppEnabled(tx,key.restaurantId,'QR_ORDERING');
+        const qrEnabled = await this.appEntitlements.isAppEnabled(tx,key.restaurantId,'QR_ORDERING',branchId);
         if (!posAdminEnabled && !kioskAdminEnabled && !qrEnabled) {
           throw new ForbiddenException(
-            "Neither POS_ADMIN nor KIOSK_ADMIN is enabled on this restaurant's current subscription. Enable one under Applications before provisioning a device."
+            "No owner management module is enabled. Enable Restaurant Admin, Kiosk Admin or QR Ordering before provisioning a management device."
           );
         }
         // Quota is counted against whichever app actually grants access (POS_ADMIN takes
         // priority when a restaurant holds both, matching ApplicationEntitlementsService's
         // own "normally exactly one granting row" assumption elsewhere).
-        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, posAdminEnabled ? 'POS_ADMIN' : kioskAdminEnabled ? 'KIOSK_ADMIN' : 'QR_ORDERING');
+        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, posAdminEnabled ? 'POS_ADMIN' : kioskAdminEnabled ? 'KIOSK_ADMIN' : 'QR_ORDERING', branchId);
       } else {
-        await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, appCodeForEntitlementCheck);
+        await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, appCodeForEntitlementCheck, branchId);
 
         // security-audit MED-02 (F-013) / Phase 2: per-app quota, not one global cap shared
         // across every device type and every subscription the restaurant holds (see
         // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
-        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, appCodeForEntitlementCheck);
+        await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, appCodeForEntitlementCheck, branchId);
       }
 
       const deviceToken = generateOpaqueToken();
@@ -637,7 +638,7 @@ export class TenantAuthService {
       // The terminal belongs to the branch its key was issued for, and carries the name the key was given
       // (BUG-155): this path used to leave both empty, so Restaurant Admin, Captain and Kiosk Admin showed as
       // "Unnamed terminal" with "No branch assigned", and a deactivated branch could never lock them.
-      const branchId = key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId));
+
       const device = await tx.device.create({
         data: {
           restaurantId: key.restaurantId,

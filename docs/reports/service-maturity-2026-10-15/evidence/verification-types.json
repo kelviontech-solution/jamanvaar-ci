@@ -1,0 +1,30 @@
+[
+  {
+    "name": "types-cloud-super-admin-web",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-restaurant-system-pos-admin",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-qr-guest",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-restaurant-system-pos",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-restaurant-system-captain",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-restaurant-system-kds",
+    "exitCode": 0
+  },
+  {
+    "name": "types-apps-kiosk-system-kiosk-user",
+    "exitCode": 0
+  }
+]

@@ -158,8 +158,8 @@ export class QrAdminService {
 
   // ------------------------------------------------------------------ entitlement, for display
 
-  async entitlement(restaurantId: string) {
-    const result = await this.prisma.runAsPlatform((tx) => this.entitlements.resolve(tx, restaurantId, QR_APP_CODE));
+  async entitlement(restaurantId: string, branchId?:string|null) {
+    const result = await this.prisma.runAsPlatform((tx) => this.entitlements.resolve(tx, restaurantId, QR_APP_CODE, branchId));
     return { ...result, lockedMessage: result.enabled ? null : lockMessage(result.reason) };
   }
 
@@ -438,7 +438,7 @@ export class QrAdminService {
   }
 
   async overview(restaurantId: string, branchId?: string | null) {
-    const entitlement = await this.entitlement(restaurantId);
+    const entitlement = await this.entitlement(restaurantId, branchId);
     const data = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const restaurant = await tx.restaurant.findFirstOrThrow({ where: { id: restaurantId }, select: { timezone: true } });
       const dayStart = startOfDayIn(restaurant.timezone);
@@ -498,7 +498,8 @@ export class QrAdminService {
   }
 
   async analytics(device: Device, from?: string, to?: string, branchId?: string) {
-    await this.requireEnabled(device.restaurantId);
+    const access = await this.requireEnabled(device.restaurantId);
+    if (access.limits.qrAnalytics === false) throw new ForbiddenException('QR analytics is disabled by your platform administrator. Use order history and collection reconciliation for payments.');
     const branch = this.scopedBranch(device, branchId);
     for (const date of [from, to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date)) throw new BadRequestException('Use valid calendar dates');
     const { start, end, timezone } = await this.prisma.runAsTenant(device.restaurantId, async tx => {

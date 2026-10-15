@@ -1,0 +1,8 @@
+{
+  "checks": [
+    {
+      "name": "backend",
+      "exitCode": 0
+    }
+  ]
+}

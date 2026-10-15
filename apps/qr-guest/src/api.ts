@@ -1,4 +1,5 @@
 import { resolveMenuImage } from '../../../packages/utils/src/menu_image';
+import type {RestaurantPageContent,RestaurantPageView,RestaurantPageDish} from '../../../packages/ui/src/restaurant-page/types';
 import { guestErrorMessage } from './guestErrors';
 import { menuDishImage } from '../../../packages/utils/src/dish_photos';
 
@@ -10,6 +11,7 @@ export interface OperationsOptions {serviceEnabled:boolean;requestTypes:Array<{i
 export interface Branding {coverUrl?:string|null;backgroundColor?:string;layout?:string;contactMessage?:string; welcomeTitle: string | null; welcomeMessage: string | null; footerMessage: string | null; orderButtonLabel: string | null; accentColor: string | null; logoUrl: string | null }
 
 export interface Describe {
+  restaurantPage?: {content:RestaurantPageContent;publishedAt:string;trackingSlug?:string|null}|null;
   advanced?: { loyaltyEnabled:boolean; promotionsEnabled:boolean; feedbackEnabled:boolean; historyEnabled:boolean; groupEnabled:boolean; languages:string[]; defaultLanguage:string; recommendationIds:string[]; workload:{estimateMinutes:number;atCapacity:boolean} };
   currency?: string;
   branding?: Branding;
@@ -27,7 +29,7 @@ export interface Describe {
   };
 }
 
-export interface MenuItem { translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[]; sortOrder?: number; minQuantity?: number; maxQuantity?: number; allowInstructions?: boolean }
+export interface MenuItem { allergens?: string[]; translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; categoryId: string; price: number; imageUrl?: string; dietaryType?: string; modifierGroupIds: string[]; sortOrder?: number; minQuantity?: number; maxQuantity?: number; allowInstructions?: boolean }
 export interface MenuGroup { id: string; name: string; description?: string; isRequired: boolean; minSelections: number; maxSelections: number; options: Array<{ id: string; name: string; description?: string; imageUrl?: string; priceDelta: number; isDefault?: boolean }> }
 export interface Menu { languages?:string[]; defaultLanguage?:string; menuVersion: number; etag: string; categories: Array<{ translations?: Record<string, {name: string; description?: string}>; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number }>; items: MenuItem[]; modifierGroups: MenuGroup[] }
 
@@ -59,12 +61,17 @@ export function imageSrc(url: string | undefined, dishName?: string): string | u
 async function call<T>(path: string, init: RequestInit & { session?: string } = {}): Promise<{ data: T | null; status: number; etag: string | null }> {
   const base = apiBase();
   if (!base) throw new ApiError('This ordering page is not configured.', 0, 'NOT_CONFIGURED');
+  // Order status/payment routes are session-bound too. Returning from checkout
+  // must carry the same server-signed browser proof as order creation.
+  let session=init.session;
+  if(!session){try{session=sessionStorage.getItem('jv_qr_session2')||undefined;}catch{/* unavailable storage carries no fabricated proof */}}
   let res: Response;
   try {
     res = await fetch(`${base}/api/v1/public/qr${path}`, {
+      cache: 'no-store',
       ...init,
       signal: init.signal ?? AbortSignal.timeout(15000),
-      headers: { 'Content-Type': 'application/json', ...(init.session ? { 'X-QR-Session': init.session } : {}), ...(init.headers ?? {}) }
+      headers: { 'Content-Type': 'application/json', ...(session ? { 'X-QR-Session': session } : {}), ...(init.headers ?? {}) }
     });
   } catch {
     throw new ApiError('No connection. Please check your internet and try again.', 0, 'NETWORK');
@@ -77,6 +84,8 @@ async function call<T>(path: string, init: RequestInit & { session?: string } = 
 }
 
 export const QrApi = {
+  pageEvent:async(slug:string,type:string)=>call(`/sites/${encodeURIComponent(slug)}/events`,{method:'POST',body:JSON.stringify({type})}),
+  site:async(slug:string)=>(await call<RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean}>(`/sites/${encodeURIComponent(slug)}`)).data!,
   operations:async<T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/operations${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   loyalty: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/loyalty${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,
   group: async <T>(token:string,path:string,session:string,method='GET',body?:unknown)=>(await call<T>(`/${encodeURIComponent(token)}/groups${path}`,{method,session,...(body?{body:JSON.stringify(body)}:{})})).data!,

@@ -22,11 +22,17 @@ export const CaptainCustomerModal: React.FC = () => {
   if (!isCustomerModalOpen) return null;
 
   const customers = captainDb.customerAccounts;
+  // security-audit LOW captain-crm-01: this used to list every guest the restaurant has ever
+  // served (name, phone, loyalty points) the moment the modal opened, with no search needed --
+  // a least-privilege/data-minimization gap, not a trust-boundary break (CUSTOMER stays a
+  // restaurant-wide shared resource on purpose, so a guest's loyalty history follows them across
+  // branches -- see branch-entity-scope.ts). A waiter can still look up any guest by phone or
+  // name; they just can no longer browse the whole list with an empty search box.
   const filtered = query.trim()
     ? customers.filter(
         (c) => c.phone.includes(query.trim()) || (c.name || '').toLowerCase().includes(query.trim().toLowerCase())
       )
-    : customers;
+    : [];
 
   const handleSelect = (customer: CustomerAccount) => {
     setAttachedCustomer(customer);
@@ -71,7 +77,7 @@ export const CaptainCustomerModal: React.FC = () => {
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">{filtered.length} guests found</span>
+            <span className="text-xs text-slate-500 font-medium">{query.trim() ? `${filtered.length} guests found` : 'Search by phone or name'}</span>
             <button
               onClick={() => { setIsCreating(true); setNewPhone(query.replace(/\D/g, '')); }}
               className="px-3 py-1.5 rounded-xl bg-jaman-saffron/10 hover:bg-jaman-saffron/20 text-jaman-saffron text-xs font-bold flex items-center gap-1.5 transition-colors min-h-[36px]"
@@ -146,7 +152,7 @@ export const CaptainCustomerModal: React.FC = () => {
                 </div>
               );
             })
-          ) : (
+          ) : query.trim() ? (
             <div className="h-40 flex flex-col items-center justify-center text-center text-slate-400">
               <User className="w-8 h-8 text-slate-300 mb-1" />
               <p className="text-xs">No guests matched "{query}"</p>
@@ -156,6 +162,11 @@ export const CaptainCustomerModal: React.FC = () => {
               >
                 + Register this phone number
               </button>
+            </div>
+          ) : (
+            <div className="h-40 flex flex-col items-center justify-center text-center text-slate-400">
+              <Search className="w-8 h-8 text-slate-300 mb-1" />
+              <p className="text-xs">Type a phone number or name to find a guest</p>
             </div>
           )}
         </div>

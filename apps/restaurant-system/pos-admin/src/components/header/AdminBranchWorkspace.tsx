@@ -2,12 +2,14 @@ import { useEffect, useState, useId } from 'react';
 import {fetchCloudBranches,fetchTenantDashboard,type CloudBranch} from '../../cloud/cloudClient';
 import { db } from '@jamanvaar/database';
 import {activeAdminBranch,saveAdminBranch} from '../../adminBranchScope';
+import {requestQrLeave} from '../qrconsole/useQrUnsavedChanges';
 
 export function AdminBranchWorkspace({onReady}:{onReady:()=>void}) {
   const pickerId = useId();
   const [branches,setBranches]=useState<CloudBranch[]>([]),[allowAll,setAllowAll]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   const [retry,setRetry]=useState(0);
   async function change(branch:string) {
+    if (!(await requestQrLeave())) return;
     setBusy(true);
     try {
       const storage=(window as unknown as {__jamanvaarStorage?:{flush:()=>Promise<void>}}).__jamanvaarStorage;
@@ -27,7 +29,7 @@ export function AdminBranchWorkspace({onReady}:{onReady:()=>void}) {
     onReady();
   }).catch(e=>{if(!stopped)setError(e instanceof Error?e.message:'Could not load branches');});return()=>{stopped=true;};},[retry]);
   return <div className="px-4 py-2 border-b border-jaman-border bg-white flex flex-wrap items-center gap-3 text-sm">
-    <label className="font-bold" htmlFor={pickerId}>Workspace</label><select id={pickerId} aria-label="Branch workspace" value={activeAdminBranch??''} disabled={busy} onChange={e=>void change(e.target.value)} className="rounded-xl border border-jaman-border py-2 px-3 bg-jaman-cream max-w-full"><option value="" disabled>Choose branch</option>{allowAll&&<option value="all">All restaurant · overview</option>}{branches.map(b=><option key={b.id} value={b.id} disabled={b.status!=='ACTIVE'}>{b.name} · {b.code}{b.status!=='ACTIVE'?' (inactive)':''}</option>)}</select>
+    <label className="font-bold" htmlFor={pickerId}>Branch</label><select id={pickerId} aria-label="Branch workspace" value={activeAdminBranch??''} disabled={busy} onChange={e=>void change(e.target.value)} className="rounded-xl border border-jaman-border py-2 px-3 bg-jaman-cream max-w-full"><option value="" disabled>Choose branch</option>{allowAll&&<option value="all">All restaurant · overview</option>}{branches.map(b=><option key={b.id} value={b.id} disabled={b.status!=='ACTIVE'}>{b.name} · {b.code}{b.status!=='ACTIVE'?' (inactive)':''}</option>)}</select>
     <span className="text-xs text-slate-500">{activeAdminBranch==='all'?'Choose a branch to manage orders, tables and devices.':'Orders, tables, inventory and devices belong to this branch.'}</span>
     {error&&<><span role="alert" className="text-rose-700">{error}</span><button onClick={()=>setRetry(n=>n+1)} className="rounded-lg border px-3 py-1">Retry</button></>}
   </div>;

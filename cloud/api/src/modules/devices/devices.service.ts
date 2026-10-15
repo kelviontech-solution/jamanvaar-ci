@@ -1,3 +1,4 @@
+import { branchLicense } from '../../common/security/branch-license';
 import { activeProfile, scheduleProfile } from './profile-policy';
 import { BadRequestException, ForbiddenException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, Prisma, PlatformUser } from '@prisma/client';
@@ -284,6 +285,8 @@ export class DevicesService {
         ? await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: subs.map((x) => x.id) }, enabled: true }, select: { appCode: true } })
         : [];
       const enabledApps = new Set<string>(enabled.map((e) => e.appCode));
+      const branchApps = new Map<string, Set<string>>();
+      for(const branch of branches){const allowed=new Set<string>();for(const appCode of enabledApps){const grant=await branchLicense(tx,issuer.restaurantId,branch.id,appCode as import('@prisma/client').AppCode);if(!grant||grant.enabled&&(!grant.expiresAt||grant.expiresAt>new Date()))allowed.add(appCode);}branchApps.set(branch.id,allowed);}
       const latestExpiry = subs.reduce<Date | null>((max, x) => (!max || x.expiresAt > max ? x.expiresAt : max), null);
       return {
         restaurant,
@@ -292,7 +295,7 @@ export class DevicesService {
         devices: devices.map((d) => ({
           id: d.id, type: d.type, name: d.name, branchId: d.branchId, status: d.status, isLocked: d.isLocked,
           tokenHash: d.deviceTokenHash, appEnabled: d.type === 'POS_ADMIN'
-            ? enabledApps.has('POS_ADMIN') || enabledApps.has('KIOSK_ADMIN') : enabledApps.has(d.type)
+            ? ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'].some(app => (d.branchId ? branchApps.get(d.branchId) : enabledApps)?.has(app)) : (d.branchId ? branchApps.get(d.branchId) : enabledApps)?.has(d.type) === true
         })),
         serverTime: new Date().toISOString()
       };

@@ -267,20 +267,17 @@ function Dashboard({ toast }: { toast: (s: string) => void }) {
         if (active) setAllBranches(account.role === "OWNER");
         if (!["OWNER", "MANAGER"].includes(account.role))
           throw new Error("Owner or manager access is required");
+        const r = await qrApi<QrBranch[]>("/api/v1/restaurant/qr/branches", {headers:{'x-admin-branch':account.role === 'OWNER' ? 'all' : account.branchId ?? ''}});
         const current = storedAdminBranch(),
-          needed =
-            account.role === "OWNER" ? (current ?? "all") : account.branchId;
+          needed = account.role === "OWNER" ? (current ?? (r.filter(b=>b.status === 'ACTIVE').length === 1 ? r.find(b=>b.status === 'ACTIVE')!.id : 'all')) : account.branchId;
         if (!needed) throw new Error("A manager must be assigned a branch");
         if (current !== needed) {
           saveAdminBranch(needed);
           location.reload();
           return [];
         }
-        return account.role === "OWNER"
-          ? qrApi<QrBranch[]>("/api/v1/restaurant/qr/branches", {
-              headers: { "x-admin-branch": "all" },
-            })
-          : QrAdminApi.branches();
+        if (needed !== 'all' && !r.some(b=>b.id === needed && b.status === 'ACTIVE')) throw new Error('The saved branch is no longer available. Contact your administrator.');
+        return r;
       })
       .then((r) => {
         if (active) {

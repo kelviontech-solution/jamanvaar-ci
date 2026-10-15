@@ -354,6 +354,20 @@ export function RestaurantDetailPage() {
   } | null>(null);
   const [actionPending, setActionPending] = useState(false);
 
+  // Impersonate Owner: reason, pending state and the minted token (security-audit, see
+  // handleImpersonateOwner above for why this is a dedicated reason-prompting modal plus a
+  // readonly token panel, not a one-click window.open).
+  const [impersonateModalOpen, setImpersonateModalOpen] = useState(false);
+  const [impersonateReason, setImpersonateReason] = useState('');
+  const [impersonating, setImpersonating] = useState(false);
+  const [impersonationResult, setImpersonationResult] = useState<{
+    accessToken: string;
+    expiresAt: string;
+    restaurantName: string;
+    ownerEmail: string;
+    ownerName: string;
+  } | null>(null);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
@@ -645,20 +659,32 @@ export function RestaurantDetailPage() {
     }
   }
 
-  async function handleImpersonateOwner() {
-    if (!restaurant) return;
-    setActionPending(true);
+  // security-audit: this used to POST to a URL path (`/support/impersonate/${id}`) that doesn't
+  // match the backend's real route (`POST /support/impersonate` with restaurantId in the body) --
+  // the call always 404'd, so the flow never actually worked. It also had no confirmation step, no
+  // operator-entered reason, and no permission gate (unlike every sibling action on this page), and
+  // would have opened the minted owner-level bearer token embedded in a `window.open` URL query
+  // string -- bookmarkable, left in browser history, and visible in any screen share. Fixed to match
+  // the real API contract and to show the token the same safe way Support > Impersonate already
+  // does (a readonly copyable field, never a URL), gated behind an operator-entered reason and the
+  // same canWriteRestaurants check every other write action on this page uses.
+  async function handleImpersonateOwner(e: React.FormEvent) {
+    e.preventDefault();
+    if (!restaurant || !impersonateReason.trim()) return;
+    setImpersonating(true);
     try {
-      const res = await api.post<{ accessToken: string; owner: { email: string } }>(
-        `/api/v1/support/impersonate/${restaurant.id}`,
-        { reason: 'Super Admin troubleshooting and audit inspection' }
+      const res = await api.post<{ accessToken: string; expiresAt: string; restaurantName: string; ownerEmail: string; ownerName: string }>(
+        '/api/v1/support/impersonate',
+        { restaurantId: restaurant.id, reason: impersonateReason.trim() }
       );
-      showToast(`Support session minted for ${res.owner.email}. Launching console…`);
-      window.open(`${RESTAURANT_ADMIN_URL}?impersonationToken=${encodeURIComponent(res.accessToken)}`, '_blank');
+      setImpersonationResult(res);
+      setImpersonateModalOpen(false);
+      setImpersonateReason('');
+      showToast(`Support session minted for ${res.ownerEmail}`);
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Impersonation token generation failed');
     } finally {
-      setActionPending(false);
+      setImpersonating(false);
     }
   }
 
@@ -1026,7 +1052,12 @@ export function RestaurantDetailPage() {
                     <KeyRound className="w-3.5 h-3.5 mr-1" />
                     <span>Reset Password</span>
                   </Button>
-                  <Button size="sm" variant="accent" onClick={handleImpersonateOwner}>
+                  <Button
+                    size="sm"
+                    variant="accent"
+                    disabled={!canWriteRestaurants}
+                    onClick={() => { setImpersonateReason(''); setImpersonateModalOpen(true); }}
+                  >
                     <ShieldAlert className="w-3.5 h-3.5 mr-1" />
                     <span>Impersonate Owner</span>
                   </Button>
@@ -1057,6 +1088,41 @@ export function RestaurantDetailPage() {
               <EmptyState title="No owner on record" description="Create an owner account below to grant administrative access." />
             )}
           </Card>
+
+          {/* No restaurant-identity comparison needed here (unlike Support's cross-restaurant
+              switcher): this whole page remounts via key={location.pathname} whenever the
+              operator navigates to a different restaurant's detail view, so impersonationResult
+              can never belong to any restaurant but this one. */}
+          {impersonationResult && (
+            <Card style={{ border: '1px solid var(--jv-accent-border)', background: 'var(--jv-accent-soft)' }}>
+              <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Impersonation Token — {impersonationResult.ownerName}</h3>
+                  <button
+                    onClick={() => setImpersonationResult(null)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--jv-text-muted)' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--jv-text-secondary)', margin: 0 }}>
+                  A real, valid tenant access token for <strong>{impersonationResult.ownerEmail}</strong>, expiring at{' '}
+                  {new Date(impersonationResult.expiresAt).toLocaleTimeString('en-IN')}. Use it as a Bearer token
+                  against tenant-scoped endpoints (Postman/devtools) or paste it manually into{' '}
+                  {RESTAURANT_ADMIN_URL} — it is never put in a URL, so it cannot leak via browser history, bookmarks
+                  or a screen share of the address bar. This action has been recorded in the audit log.
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    readOnly
+                    value={impersonationResult.accessToken}
+                    style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.72rem', padding: '0.5rem', border: '1px solid var(--jv-border)', borderRadius: 6, background: 'var(--jv-surface)', color: 'var(--jv-text)' }}
+                  />
+                  <CopyButton text={impersonationResult.accessToken} label="" title="Copy token" />
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Restaurant Staff & Terminal Users */}
           <Card>
@@ -2176,6 +2242,41 @@ export function RestaurantDetailPage() {
             }}
           />
         )
+      )}
+
+      {/* Impersonate Owner Modal — requires an operator-entered reason before minting the token
+          (security-audit: the backend already demands one, but the old code sent a hardcoded
+          string, so the permanent audit record never reflected what was actually being
+          investigated). */}
+      {impersonateModalOpen && owner && (
+        <Modal title={`Impersonate ${owner.fullName}`} onClose={() => setImpersonateModalOpen(false)}>
+          <form onSubmit={handleImpersonateOwner} className="modal-form">
+            <p className="muted" style={{ fontSize: 13, margin: '0 0 12px 0' }}>
+              Mints a 15-minute tenant-owner access token for <strong>{owner.email}</strong>, usable as a Bearer
+              token against tenant-scoped endpoints. This bypasses the restaurant's suspended state if applicable and
+              is recorded in the audit log with the reason below.
+            </p>
+            <div className="field">
+              <label>Reason *</label>
+              <input
+                type="text"
+                value={impersonateReason}
+                onChange={(e) => setImpersonateReason(e.target.value)}
+                placeholder="e.g. Investigating ticket #1234 — payout stuck in PENDING"
+                required
+                autoFocus
+              />
+            </div>
+            <div className="modal-actions" style={{ marginTop: 16 }}>
+              <Button type="button" variant="ghost" onClick={() => setImpersonateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="accent" disabled={impersonating || !impersonateReason.trim() || !canWriteRestaurants}>
+                {impersonating ? 'Minting…' : 'Mint Impersonation Token'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {/* Reset Password Modal */}

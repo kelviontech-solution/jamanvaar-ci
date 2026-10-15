@@ -1,0 +1,107 @@
+{
+  "passed": 25,
+  "total": 25,
+  "tests": [
+    {
+      "name": "pos POS authenticates issued staff and opens menu",
+      "passed": true
+    },
+    {
+      "name": "pos Floor & Tables",
+      "passed": true
+    },
+    {
+      "name": "pos Live Orders",
+      "passed": true
+    },
+    {
+      "name": "pos Bills & Invoices",
+      "passed": true
+    },
+    {
+      "name": "pos Kitchen & KOT",
+      "passed": true
+    },
+    {
+      "name": "pos Customers CRM",
+      "passed": true
+    },
+    {
+      "name": "pos Shift & Cash",
+      "passed": true
+    },
+    {
+      "name": "pos Day History",
+      "passed": true
+    },
+    {
+      "name": "pos POS Reports",
+      "passed": true
+    },
+    {
+      "name": "pos Inventory & Stock",
+      "passed": true
+    },
+    {
+      "name": "pos Settings",
+      "passed": true
+    },
+    {
+      "name": "captain Captain opens branch tables",
+      "passed": true
+    },
+    {
+      "name": "captain Active Orders",
+      "passed": true
+    },
+    {
+      "name": "captain Food Ready",
+      "passed": true
+    },
+    {
+      "name": "captain Messages",
+      "passed": true
+    },
+    {
+      "name": "captain Live KOT Tickets",
+      "passed": true
+    },
+    {
+      "name": "captain Guest Service Requests",
+      "passed": true
+    },
+    {
+      "name": "captain Shift & Performance",
+      "passed": true
+    },
+    {
+      "name": "kds KDS opens the assigned kitchen scope",
+      "passed": true
+    },
+    {
+      "name": "kds Cooking",
+      "passed": true
+    },
+    {
+      "name": "kds Ready",
+      "passed": true
+    },
+    {
+      "name": "kds Served",
+      "passed": true
+    },
+    {
+      "name": "kds Expo",
+      "passed": true
+    },
+    {
+      "name": "kds Active",
+      "passed": true
+    },
+    {
+      "name": "kiosk Kiosk welcome and touch ordering remain usable",
+      "passed": true
+    }
+  ],
+  "note": "All assertions completed; persistent browser cleanup stalled and the owned runner was stopped afterward."
+}

@@ -1,3 +1,5 @@
+import { snapshotOrderLines } from './order-snapshots';
+import {assertBranchAccepting} from '../operations/operations-policy';
 import { BadRequestException, ConflictException, NotFoundException, Injectable } from '@nestjs/common';
 import { mergeKitchenPriority } from './kitchen-priority';
 import { randomUUID } from 'node:crypto';
@@ -5,7 +7,7 @@ import { validateRefundJournal, type RefundJournalEvent } from './refund-journal
 import { Device, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { nextSyncSequence } from '../../common/sync-sequence';
-import { mergeOrderItems } from './order-merge';
+import { mergeOrderItems, itemLevelTakesBack } from './order-merge';
 import { decideStatus, integrityFlags, validateQrOrderAction } from './order-rules';
 import { allocateOrderPayment, paymentBalance, reconcileOrderPayments, COLLECTED_ORDER_STATUSES } from '../payments/order-payment-ledger';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
@@ -301,22 +303,29 @@ export class OrderSyncService {
             : null;
           if (capturedKiosk) Object.assign(header, capturedKiosk);
 
-          // Device-priced orders are believed (devices work offline on an older menu) but checked; problems are flagged, never rejected.
+          // Device-priced orders are believed (devices work offline on an older menu) but checked; problems are
+          // flagged, never rejected. This now runs on every push that actually applies new price/item fields --
+          // not only creation -- so a later push to an existing order cannot silently lower its total with no
+          // review flag or conflict record (security-audit: price-integrity-create-only). `header`/`merge.items`
+          // are what actually gets persisted below; a stale-header or captured-kiosk push keeps the PRIOR totals
+          // unchanged (see `header` above), so there is nothing new to re-check in those two cases.
           let reviewFlags: string[] = [];
-          if (!existing) {
-            const ids = evt.items.map((i) => i.menuItemId || i.externalItemId);
+          if (!staleHeader && !capturedKiosk) {
+            const checkedItems = (existing ? merge.items : evt.items) as any[];
+            const ids = checkedItems.map((i) => i.menuItemId || i.externalItemId);
             const menuRows = await tx.syncedEntity.findMany({ where: { restaurantId: device.restaurantId, entityType: 'MENU_ITEM', externalId: { in: ids } }, select: { externalId: true, payload: true } });
             const base = new Map<string, number>();
             for (const r of menuRows) {
               const p = r.payload as { price?: unknown; deleted?: unknown } | null;
               if (p && p.deleted !== true && typeof p.price === 'number') base.set(r.externalId, Math.round(p.price * 100));
             }
-            reviewFlags = integrityFlags(evt.items as any[], evt.subtotal, base);
+            reviewFlags = integrityFlags(checkedItems, header.subtotal, base);
             if (reviewFlags.length > 0) {
               await tx.syncConflict.create({
                 data: {
                   restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
-                  localVersion: { subtotal: evt.subtotal, totalAmount: evt.totalAmount } as any, cloudVersion: {} as any,
+                  localVersion: { subtotal: header.subtotal, totalAmount: header.totalAmount } as any,
+                  cloudVersion: (existing ? { subtotal: existing.subtotal, totalAmount: existing.totalAmount } : {}) as any,
                   reason: `PRICE_REVIEW: ${reviewFlags.slice(0, 6).join('; ')}`
                 }
               });
@@ -409,8 +418,31 @@ export class OrderSyncService {
             || (evt.meta?.refundEvents !== undefined && JSON.stringify(evt.meta.refundEvents) !== JSON.stringify(priorMeta.refundEvents ?? []))
             || (payStatus === 'REFUNDED' && existing.paymentStatus !== 'REFUNDED')
               || (typeof evt.meta?.refundAmountPaise === 'number' && evt.meta.refundAmountPaise !== priorMeta.refundAmountPaise && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type))
-            || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status));
-          if (takesBack && !(STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type) && (device as Device & { adminActorId?: string }).adminActorId)) {
+            || ((evt.meta as { statusCorrection?: boolean } | undefined)?.statusCorrection === true && existing.status !== decision.status)
+            // security-audit MEDIUM order-sync-01: a line cancelled on its own, with the order's own status untouched.
+            || itemLevelTakesBack(existing?.items as any[] | undefined, merge.items));
+
+          // security-audit MEDIUM pos-money-controls-01: these two need the same manager evidence
+          // as the takesBack cases above, whether introduced on a brand-new order's very first
+          // push (no `existing` yet, so takesBack itself can never fire) or added to one that
+          // already exists. Mirrors the client's own SEC-013/MED-08 "high discount" rule
+          // (posStore.ts's isHighDiscount: >25% or >Rs.500 of actual rupee impact).
+          //
+          // security-audit MEDIUM kiosk-loyalty-01 (found in run-5): discountAmount/subtotal on
+          // SyncedOrder are paise (see schema.prisma), not rupees -- the absolute threshold below
+          // was comparing a paise value against a rupee constant, making the real cutoff ~Rs.5
+          // instead of Rs.500. That silently rejected (STAFF_UNVERIFIED) every kiosk cash order
+          // with a real coupon/loyalty discount above ~Rs.5, since a KIOSK device never attaches
+          // a staff session. The percentage check was unaffected -- paise cancels out on both
+          // sides of that ratio.
+          const subtotalForDiscountCheck = evt.subtotal || existing?.subtotal || 0;
+          const isHighDiscountAmount = (amountPaise: number) =>
+            amountPaise > 50_000 || (subtotalForDiscountCheck > 0 && amountPaise / subtotalForDiscountCheck > 0.25);
+          const highDiscountIntroduced = isHighDiscountAmount(evt.discountAmount ?? 0) && !isHighDiscountAmount(existing?.discountAmount ?? 0);
+          const creditSettlementIntroduced = evt.paymentMethod === 'CREDIT' && existing?.paymentMethod !== 'CREDIT' && PAYMENT_AUTHORITATIVE_DEVICE_TYPES.has(device.type);
+          const requiresManagerEvidence = takesBack || highDiscountIntroduced || creditSettlementIntroduced;
+
+          if (requiresManagerEvidence && !(STAFF_PROOF_EXEMPT_DEVICE_TYPES.has(device.type) && (device as Device & { adminActorId?: string }).adminActorId)) {
             // Client timestamps cannot extend a signed authorization indefinitely.
             const at = Date.now();
             const rawSession = (evt.meta as { staffSession?: string } | undefined)?.staffSession;
@@ -436,7 +468,7 @@ export class OrderSyncService {
                 data: {
                   restaurantId: device.restaurantId, branchId: device.branchId, deviceId: device.id, entityType: 'ORDER', entityId: evt.externalOrderId,
                   localVersion: { status: evt.status, paymentStatus: evt.paymentStatus, totalAmount: evt.totalAmount } as any,
-                  cloudVersion: { status: existing!.status, paymentStatus: existing!.paymentStatus } as any,
+                  cloudVersion: { status: existing?.status ?? null, paymentStatus: existing?.paymentStatus ?? null } as any,
                   reason: refusal ?? `STAFF_UNVERIFIED: ${device.type} took an order or money back without proof of who did it (accepted: offline sign-in)`
                 }
               });
@@ -466,12 +498,22 @@ export class OrderSyncService {
             externalOrderId: evt.externalOrderId,
             status: decision.status,
             ...header,
-            items: merge.items as any,
+            items: await snapshotOrderLines(tx, device.restaurantId, merge.items, existing?.items) as any,
             paymentStatus: payStatus,
             paymentMethod: evt.paymentMethod,
             meta: finalMeta as any
           };
           const source = orderSourceFor(device.type, evt.meta);
+          if(!existing && source==='KIOSK' && device.branchId){
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-limit:'+device.restaurantId}))`;
+            // A paid gateway order has already been accepted; never strand a collection.
+            const paid=await tx.order.findUnique({where:{restaurantId_externalOrderId:{restaurantId:device.restaurantId,externalOrderId:evt.externalOrderId}},select:{status:true}});
+            if(paid?.status!=='PAID')await assertBranchAccepting(tx,device.restaurantId,device.branchId,'KIOSK');
+          }
+          const priorHistory=Array.isArray((existing?.meta as any)?.operationHistory)?(existing!.meta as any).operationHistory:[];
+          const changed=!existing||existing.status!==decision.status||JSON.stringify(existing.items)!==JSON.stringify(merge.items)||existing.paymentStatus!==payStatus;
+          data.meta={...finalMeta,operationHistory:changed?[...priorHistory,{at:new Date().toISOString(),status:decision.status,paymentStatus:payStatus,deviceId:device.id,actor:(finalMeta as any).verifiedStaff?.name??device.type}].slice(-150):priorHistory} as any;
+
 
           const seq = await nextSyncSequence(tx, device.restaurantId);
           latestSeq = seq;
@@ -766,6 +808,7 @@ export class OrderSyncService {
       if (existing) return { order: existing, duplicate: true, seq: existing.seq ?? undefined };
 
       if (input.serializeRestaurantLimit) {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + input.restaurantId}))`;
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-limit:' + input.restaurantId}))`;
       }
       const extraMeta = input.beforeCreate ? await input.beforeCreate(tx) : undefined;
@@ -785,7 +828,7 @@ export class OrderSyncService {
           status: input.status,
           tableId: input.tableId ?? undefined,
           tableLabel: input.tableLabel ?? undefined,
-          items: input.items as any,
+            items: await snapshotOrderLines(tx, input.restaurantId, input.items, [], input.menuVersion) as any,
           subtotal: input.subtotal,
           taxAmount: input.taxAmount,
           discountAmount: input.discountAmount,
@@ -836,12 +879,21 @@ export class OrderSyncService {
   async catchUp(device: Device, since?: string, afterSeq?: number) {
     const singleBranch = device.branchId && (await this.prisma.runAsTenant(device.restaurantId, tx => tx.branch.count({ where: { restaurantId: device.restaurantId } }))) === 1;
     const branchFilter = device.branchId ? singleBranch ? { OR: [{ branchId: device.branchId }, { branchId: null }] } : { branchId: device.branchId } : {};
+    // security-audit HIGH kiosk-order-sync-01: every other device type here is staff-operated and
+    // legitimately needs the whole branch's live orders (POS settles them, KDS cooks them, Captain
+    // edits them). KIOSK is the one anonymous, guest-facing terminal in this list -- it was pulling
+    // every other guest's order too (name, phone, items, discounts, cashier) into its own local DB
+    // just to learn the status of orders IT placed. `meta.originDeviceId` is set once, server-side,
+    // the first time any device pushes an order, and is never overwritten by a later device that
+    // touches it (see pushEvents) -- so it reliably answers "which device created this" even after
+    // a POS/KDS/Captain settles or edits the order afterwards.
+    const kioskOwnOrdersFilter = device.type === 'KIOSK' ? { meta: { path: ['originDeviceId'], equals: device.id } } : {};
 
     // Sequence cursor (preferred): strictly increasing, gapless, independent of any clock.
     if (afterSeq !== undefined) {
       const rows = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
         tx.syncedOrder.findMany({
-          where: { restaurantId: device.restaurantId, seq: { gt: afterSeq }, ...branchFilter },
+          where: { restaurantId: device.restaurantId, seq: { gt: afterSeq }, ...branchFilter, ...kioskOwnOrdersFilter },
           orderBy: { seq: 'asc' },
           take: CATCH_UP_MAX_ROWS + 1
         })
@@ -856,7 +908,7 @@ export class OrderSyncService {
     const sinceDate = since ? new Date(since) : new Date(Date.now() - CATCH_UP_DEFAULT_LOOKBACK_MS);
     const orders = await this.prisma.runAsTenant(device.restaurantId, (tx) =>
       tx.syncedOrder.findMany({
-        where: { restaurantId: device.restaurantId, updatedAt: { gt: sinceDate }, ...branchFilter },
+        where: { restaurantId: device.restaurantId, updatedAt: { gt: sinceDate }, ...branchFilter, ...kioskOwnOrdersFilter },
         orderBy: { updatedAt: 'asc' },
         take: CATCH_UP_MAX_ROWS
       })

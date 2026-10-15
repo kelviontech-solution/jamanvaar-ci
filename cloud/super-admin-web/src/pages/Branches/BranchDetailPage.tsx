@@ -1,3 +1,4 @@
+import { BranchLicensing } from './BranchLicensing';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,7 +33,7 @@ import {
 import '../../components/card-grid.css';
 import '../../components/shared.css';
 
-type Tab = 'overview' | 'restaurant' | 'staff' | 'devices' | 'keys' | 'audit';
+type Tab = 'overview' | 'restaurant' | 'staff' | 'devices' | 'keys' | 'audit' | 'licensing';
 
 const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { key: 'overview', label: 'Overview', icon: Building2 },
@@ -40,6 +41,7 @@ const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ classNa
   { key: 'staff', label: 'Staff Users', icon: Users },
   { key: 'devices', label: 'Devices & Terminals', icon: Laptop2 },
   { key: 'keys', label: 'Activation Keys', icon: KeyRound },
+  { key: 'licensing', label: 'Branch Licensing', icon: KeyRound },
   { key: 'audit', label: 'Audit Logs', icon: FileText },
 ];
 
@@ -266,6 +268,7 @@ export function BranchDetailPage() {
       {/* ── TAB CONTENT ── */}
 
       {/* Overview */}
+      {tab === 'licensing' && <BranchLicensing branchId={branch.id} />}
       {tab === 'overview' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Branch Info */}

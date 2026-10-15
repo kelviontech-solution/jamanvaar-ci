@@ -10,6 +10,14 @@ import { db, StaffRepository } from '@jamanvaar/database';
  * sync tick uses to push/pull STAFF_USER, the same way MENU_ITEM/CUSTOMER already work.
  */
 describe('Staff cross-device sync payload (BUG-019/034/035)', () => {
+  it('removes a transferred user from the old branch without requiring a PIN hash',()=>{
+    StaffRepository.applyRemoteUser({id:'moved-staff',branchId:'branch-a',fullName:'Moved staff',roleId:'role-cashier',pinHash:'pinv2:salt:hash',isActive:true});
+    expect(db.users.some(u=>u.id==='moved-staff')).toBe(true);
+    StaffRepository.applyRemoteUser({id:'moved-staff',branchId:'branch-a',removedFromBranch:true,updatedAt:new Date().toISOString()});
+    expect(db.users.some(u=>u.id==='moved-staff')).toBe(false);
+    StaffRepository.applyRemoteUser({id:'moved-staff',branchId:'branch-a',removedFromBranch:true});
+    expect(db.users.some(u=>u.id==='moved-staff')).toBe(false);
+  });
   beforeEach(() => {
     db.resetToDefaultSeed();
     db.users = [];

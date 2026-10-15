@@ -35,6 +35,12 @@ export class ActivationKeysService {
     private readonly appEntitlements: ApplicationEntitlementsService
   ) {}
 
+  private async grantingDeviceApp(tx:Prisma.TransactionClient,restaurantId:string,type:AppCode,branchId?:string|null):Promise<AppCode>{
+    if(type==='POS_ADMIN')for(const app of ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'] as AppCode[]){if(await this.appEntitlements.isAppEnabled(tx,restaurantId,app,branchId))return app;}
+    await this.appEntitlements.assertAppEnabled(tx,restaurantId,type,branchId);
+    return type;
+  }
+
   /** Where-clause for each lifecycle. EXPIRED is a date rule as well as a status: nothing else flips it. */
   private lifecycleWhere(lifecycle: string, now: Date): Prisma.ActivationKeyWhereInput | undefined {
     switch (lifecycle) {
@@ -187,6 +193,16 @@ export class ActivationKeysService {
   }
 
   async generate(dto: GenerateActivationKeyDto, actor: PlatformUser) {
+    return this.generateWithActor(dto,actor.id,'PLATFORM');
+  }
+
+  async generateForOwner(dto: GenerateActivationKeyDto, ownerId:string) {
+    const owner=await this.prisma.runAsTenant(dto.restaurantId,tx=>tx.user.findFirst({where:{id:ownerId,restaurantId:dto.restaurantId,role:'OWNER',status:'ACTIVE'}}));
+    if(!owner||!dto.replacesDeviceId)throw new BadRequestException('An active owner and an existing device are required');
+    return this.generateWithActor(dto,ownerId,'TENANT');
+  }
+
+  private async generateWithActor(dto:GenerateActivationKeyDto,actorId:string,actorType:'TENANT'|'PLATFORM') {
     return this.prisma.runAsPlatform(async (tx) => {
       const restaurant = await tx.restaurant.findFirst({ where: { id: dto.restaurantId, deletedAt: null } });
       if (!restaurant) throw new NotFoundException('Restaurant not found');
@@ -261,8 +277,8 @@ export class ActivationKeysService {
 
           await this.audit.log(
             {
-              actorType: 'PLATFORM',
-              actorId: actor.id,
+              actorType,
+              actorId,
               restaurantId: dto.restaurantId,
               action: 'ACTIVATION_KEY_GENERATED',
               category: 'ACTIVATION',
@@ -333,13 +349,18 @@ export class ActivationKeysService {
       // but the plan was downgraded before it got redeemed (an 'ANY' key
       // reaches this check for the first time here, since generate() above
       // has nothing to check it against yet).
-      await this.appEntitlements.assertAppEnabled(tx, key.restaurantId, dto.deviceType as AppCode);
+
 
       // Re-binding a terminal: the old record is revoked here, in the same transaction, so its seat is free for this device
       // and there is never a moment with two live records for one terminal.
       if (key.replacesDeviceId) {
         const old = await tx.device.findFirst({ where: { id: key.replacesDeviceId, restaurantId: key.restaurantId } });
         if (old && old.type !== dto.deviceType) throw new BadRequestException(`This key replaces a ${old.type}, not a ${dto.deviceType}`);
+        if(old&&key.branchId&&old.branchId!==key.branchId&&old.status!=='REVOKED'){
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:'+key.restaurantId}))`;
+          const pending=await tx.syncedOrder.count({where:{restaurantId:key.restaurantId,deviceId:old.id,status:{notIn:['SERVED','COMPLETED','CANCELLED','VOID','VOIDED','REFUNDED']}}});
+          if(pending||old.pendingSyncCount>0||!old.lastSeenAt||Date.now()-old.lastSeenAt.getTime()>120000)throw new ConflictException('Reconnect the original terminal, sync its queue and finish open orders before changing branches.');
+        }
         if (old && old.status !== 'REVOKED') {
           await tx.device.update({ where: { id: old.id }, data: { status: 'REVOKED', deviceTokenHash: null } });
           await tx.tenantRefreshToken.updateMany({ where: { deviceId: old.id, revokedAt: null }, data: { revokedAt: new Date() } });
@@ -354,7 +375,8 @@ export class ActivationKeysService {
       // BUG-061 / Phase 2: the quota check is per-app now, not one global cap shared across
       // every device type and every subscription the restaurant holds (see
       // ApplicationEntitlementsService.assertDeviceQuotaAvailable's doc comment).
-      await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, dto.deviceType as AppCode);
+      const grantingApp = await this.grantingDeviceApp(tx,key.restaurantId,dto.deviceType as AppCode,deviceBranchId);
+      await this.appEntitlements.assertDeviceQuotaAvailable(tx, key.restaurantId, grantingApp, deviceBranchId);
 
       // The device's long-lived credential for everything it calls after this
       // point (e.g. PATCH /api/v1/devices/me/heartbeat) — returned once, here,
@@ -474,7 +496,8 @@ export class ActivationKeysService {
         const device = await tx.device.findUnique({ where: { id: existing.redeemedByDeviceId } });
         if (device && device.status === 'REVOKED') {
           // Phase 2: per-app quota, not one global cap (see assertDeviceQuotaAvailable).
-          await this.appEntitlements.assertDeviceQuotaAvailable(tx, existing.restaurantId, device.type as AppCode);
+          const grantingApp=await this.grantingDeviceApp(tx,existing.restaurantId,device.type as AppCode,device.branchId);
+          await this.appEntitlements.assertDeviceQuotaAvailable(tx, existing.restaurantId, grantingApp, device.branchId);
           await tx.device.update({ where: { id: device.id }, data: { status: 'ACTIVE' } });
           restoredDeviceId = device.id;
         }

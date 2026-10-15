@@ -776,6 +776,7 @@ export const useCaptainStore = create<CaptainState>((set, get) => {
 
   // Cart & Ordering
   addItemToCart: (item, modifiers = [], notes = '', course = 'COURSE_1', quantity = 1) => {
+    if (item.allergens?.length && !notes.includes('Declared allergens:')) notes = [notes, 'Declared allergens: ' + item.allergens.join(', ')].filter(Boolean).join(' | ');
     if (item.isAvailable === false) {
       console.warn(`Cannot add unavailable dish "${item.name}" to cart.`);
       return;

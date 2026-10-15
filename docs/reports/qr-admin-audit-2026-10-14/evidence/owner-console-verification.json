@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-15",
+  "environment": "Local isolated test database; no production deployment",
+  "shared": {
+    "passed": 2172,
+    "files": 306
+  },
+  "backend": {
+    "fullSelectionPassed": 297,
+    "suites": 20,
+    "finalOwnerCompatibilityRecheckPassed": 16,
+    "newUniqueCompatibilityCases": 1,
+    "uniqueTestsCovered": 298
+  },
+  "uniqueAutomatedTests": 2470,
+  "browser": {
+    "ownerConsole": 51,
+    "operationalApps": 25,
+    "superAdminRecovery": 2,
+    "totalPassed": 78
+  },
+  "builds": {
+    "api": "PASS",
+    "adminAndQrProduct": "PASS",
+    "pos": "PASS",
+    "kiosk": "PASS",
+    "captain": "PASS",
+    "kds": "PASS",
+    "superAdmin": "PASS",
+    "qrGuest": "PASS",
+    "warning": "Existing large Vite chunks"
+  },
+  "typeChecks": {
+    "api": "PASS via Nest build",
+    "admin": "PASS",
+    "pos": "PASS",
+    "kiosk": "PASS",
+    "captain": "PASS",
+    "kds": "PASS",
+    "superAdmin": "PASS",
+    "qrGuest": "PASS"
+  },
+  "finalNavRecheck": {
+    "passed": 150,
+    "files": 4,
+    "additionalUniqueTests": 0
+  },
+  "limitations": [
+    "Provider transport simulated; real merchant/phone/printer acceptance remains",
+    "Native installers not rebuilt",
+    "Licensing is restaurant-wide; branch-specific product licensing is a separate model"
+  ],
+  "evidence": [
+    "owner-console-browser.json",
+    "all-app-browser-regression.json",
+    "owner-console-super-recovery.json",
+    "owner-console-final-overview.png"
+  ]
+}

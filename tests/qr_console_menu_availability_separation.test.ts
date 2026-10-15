@@ -23,22 +23,17 @@ describe('QR console Menu tab: the dish editor and the availability/publish list
     const unconditional = /<p className="text-sm text-slate-500">\s*Uses the same catalog, modifiers, taxes and branch availability as your\s*restaurant\. Edit dishes in Menu & Categories\./;
     expect(src).not.toMatch(unconditional);
     // The solo-QR branch must instead point at the editor actually on screen.
-    expect(src).toMatch(/menu editor above/);
+    expect(src).toMatch(/using Edit shared draft/);
   });
 
-  it('QrConsole renders a visible section break between the dish editor and the availability list when both are stacked (solo-QR route)', () => {
+  it('uses an explicit editor/availability selector rather than stacking both menus', () => {
     const src = readFileSync(join(SRC, 'components/qrconsole/QrConsole.tsx'), 'utf8');
-    const menuTabMatch = /\{tab === "MENU" && \(([\s\S]*?)\n {8}\)\}/.exec(src);
-    expect(menuTabMatch, 'could not find the MENU tab render block').not.toBeNull();
-    const block = menuTabMatch![1];
-    const catalogIdx = block.indexOf('<QrCatalog');
-    const dividerIdx = block.indexOf('Guest availability');
-    const availabilityIdx = block.indexOf('<QrMenuAvailability');
-    expect(catalogIdx, 'QrCatalog should still render in this block').toBeGreaterThanOrEqual(0);
-    expect(dividerIdx, 'expected a visible "Guest availability" section break').toBeGreaterThanOrEqual(0);
-    expect(availabilityIdx, 'QrMenuAvailability should still render in this block').toBeGreaterThanOrEqual(0);
-    // Order matters: editor, then the break, then the availability/publish list.
-    expect(catalogIdx).toBeLessThan(dividerIdx);
-    expect(dividerIdx).toBeLessThan(availabilityIdx);
+    expect(src).toContain('{tab === "MENU" && <QrMenuWorkspace');
+    expect(src).toContain("['EDIT','AVAILABILITY']");
+    expect(src).toContain('Edit shared draft');
+    expect(src).toContain('Published guest availability');
+    expect(src).toContain("mode==='EDIT'?<QrCatalog/>:<QrMenuAvailability");
+    expect(src).not.toContain("mode==='EDIT'&&/^\\/qr\\//");
+    expect(src).toContain('if(await requestQrLeave())setMode(value)');
   });
 });

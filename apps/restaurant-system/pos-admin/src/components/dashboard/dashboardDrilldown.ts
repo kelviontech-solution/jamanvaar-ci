@@ -1,6 +1,6 @@
 import { ORDER_SOURCE_LABELS } from '@jamanvaar/utils';
 
-export interface BillingEntry { from: string; to: string; source: string; collection: 'ALL' | 'PENDING'; search?: string }
+export interface BillingEntry { from: string; to: string; source: string; collection: 'ALL' | 'PENDING'; search?: string; orderId?:string }
 export type OwnerTaskPage = 'BILLING_SALES' | 'SYNC' | 'MENU' | 'INVENTORY' | 'SHIFTS';
 export function dashboardDay(value: string, timezone: string): string {
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;

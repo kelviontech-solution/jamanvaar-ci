@@ -36,10 +36,14 @@ export function AiRestaurantAccess() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.get<RestaurantListItem[]>('/api/v1/restaurants').then(setRestaurants).catch(() => setRestaurants([]));
+    let live = true;
+    api.get<RestaurantListItem[]>('/api/v1/restaurants').then(r => {if(live)setRestaurants(r);}).catch(() => {if(live)setMessage('Could not load restaurants. Reload to retry.');});
+    return () => {live=false;};
   }, []);
 
   useEffect(() => {
+    let live = true;
+    setAccess(null);
     if (!restaurantId) {
       setAccess(null);
       return;
@@ -48,6 +52,7 @@ export function AiRestaurantAccess() {
     api
       .get<Access>(`/api/v1/ai-assistant/restaurants/${restaurantId}/access`)
       .then((a) => {
+        if (!live) return;
         setAccess(a);
         setState((a.override?.state as State | null) ?? 'PLAN');
         setLimit(a.override?.dailyQueryLimit != null ? String(a.override.dailyQueryLimit) : '');
@@ -56,7 +61,8 @@ export function AiRestaurantAccess() {
         setStock(t.lowStockThreshold != null ? String(t.lowStockThreshold) : '');
         setVariance(t.cashDrawerVarianceThreshold != null ? String(t.cashDrawerVarianceThreshold) : '');
       })
-      .catch((e) => setMessage(e instanceof ApiError ? e.message : 'Could not load this restaurant'));
+      .catch((e) => {if(live)setMessage(e instanceof ApiError ? e.message : 'Could not load this restaurant');});
+    return () => {live=false;};
   }, [restaurantId]);
 
   async function save(e: FormEvent) {
@@ -87,12 +93,11 @@ export function AiRestaurantAccess() {
       <div style={{ padding: 20 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>JAMAN AI for one restaurant</h3>
         <p className="muted" style={{ margin: '4px 0 14px', fontSize: 13 }}>
-          By default a restaurant follows its plan: PRO is ON, CORE is LOCKED (a teaser) or OFF (hidden), depending on the teaser setting above.
-          Change it here for a single restaurant.
+          Access follows all current subscriptions: PRO, Enterprise or an explicit assistant feature grant enables JAMAN AI. Expired subscriptions do not grant access. Override access here for one restaurant, including standalone QR customers.
         </p>
         <div className="form-field" style={{ maxWidth: 420 }}>
           <label htmlFor="ai-restaurant">Restaurant</label>
-          <select id="ai-restaurant" value={restaurantId} onChange={(e) => setRestaurantId(e.target.value)}>
+          <select id="ai-restaurant" value={restaurantId} disabled={saving} onChange={(e) => setRestaurantId(e.target.value)}>
             <option value="">Choose a restaurant…</option>
             {restaurants.map((r) => (
               <option key={r.id} value={r.id}>{r.name}</option>
@@ -100,6 +105,7 @@ export function AiRestaurantAccess() {
           </select>
         </div>
 
+        {message && <div className="banner" role="status">{message}</div>}
         {access && (
           <form onSubmit={save} style={{ marginTop: 16, display: 'grid', gap: 14 }}>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -142,7 +148,6 @@ export function AiRestaurantAccess() {
               </div>
             </div>
 
-            {message && <div className="banner" role="status">{message}</div>}
             <div>
               <Button type="submit" variant="accent" disabled={saving}>{saving ? 'Saving…' : 'Save for this restaurant'}</Button>
             </div>

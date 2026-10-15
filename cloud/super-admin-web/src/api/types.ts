@@ -1104,6 +1104,8 @@ export interface RestaurantReport {
  * override applied by a Super Admin.
  */
 export interface QrEntitlement {
+  capabilities?: Record<string, boolean>;
+  capabilityStatus?: Array<{code: string; enabled: boolean; reason: string}>;
   qrEntitled: boolean;
   qrOrderingEnabled: boolean;
   /** Null: no limit is configured on the plan or the override. */
@@ -1180,6 +1182,7 @@ export interface PlatformQrMetrics {
 }
 
 export interface RestaurantQrDetail {
+  branches?: {id:string;name:string}[];
   restaurant: RestaurantQrStatusItem;
   entitlement: QrEntitlement;
   usage: QrUsageSnapshot | null;

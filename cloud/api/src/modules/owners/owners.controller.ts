@@ -1,7 +1,7 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { OwnersService } from './owners.service';
-import { updateOwnerSchema } from './dto/owner.dto';
+import { updateOwnerSchema, resetOwnerPasswordSchema } from './dto/owner.dto';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
@@ -42,14 +42,12 @@ export class OwnersController {
   }
 
   @Post(':id/reset-password')
+  @UsePipes(new ZodValidationPipe(resetOwnerPasswordSchema))
   resetPassword(
     @Param('id') id: string,
-    @Body('password') password: string,
+    @Body() body: ReturnType<typeof resetOwnerPasswordSchema.parse>,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    if (!password || password.trim().length < 4) {
-      throw new BadRequestException('Password must be at least 4 characters long');
-    }
-    return this.owners.resetPassword(id, password.trim(), actor);
+    return this.owners.resetPassword(id, body.password.trim(), actor);
   }
 }

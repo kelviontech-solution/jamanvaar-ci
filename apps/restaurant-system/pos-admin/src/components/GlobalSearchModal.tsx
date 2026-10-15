@@ -6,6 +6,8 @@ import { formatINR, formatTime } from '@jamanvaar/utils';
 import { Order, MenuItem, CustomerAccount, DiningTable, User as UserType } from '@jamanvaar/types';
 
 interface GlobalSearchModalProps {
+  tasks?:{id:string;label:string;keywords:string}[];
+  onSelectTask?:(id:string)=>void;
   showCustomers?: boolean;
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +19,7 @@ interface GlobalSearchModalProps {
 }
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
+  tasks=[],onSelectTask,
   showCustomers = true,
   isOpen,
   onClose,
@@ -116,6 +119,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
         {/* Results Container */}
         <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-1">
+          {tasks.filter(task=>!query||`${task.label} ${task.keywords}`.toLowerCase().includes(query.toLowerCase())).length>0&&<section aria-label="Authorized tasks" className="space-y-2"><h3 className="font-bold text-sm">Tasks</h3><div className="flex flex-wrap gap-2">{tasks.filter(task=>!query||`${task.label} ${task.keywords}`.toLowerCase().includes(query.toLowerCase())).map(task=><button key={task.id} type="button" className="min-h-11 border rounded-xl px-4 text-left bg-white" onClick={()=>{onSelectTask?.(task.id);onClose();}}>{task.label}</button>)}</div></section>}
           {/* Orders Section */}
           {results.orders.length > 0 && (
             <div className="space-y-2">

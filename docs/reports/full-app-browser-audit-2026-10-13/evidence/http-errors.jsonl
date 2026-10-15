@@ -1,0 +1,10 @@
+{"app":"captain","role":"captain","path":"/api/v1/restaurant/qr/operations/requests","status":403}
+{"app":"captain","role":"captain","path":"/api/v1/restaurant/qr/operations/requests","status":403}
+{"app":"kiosk","role":"kiosk","path":"/api/v1/payments/d0fd7935-78ce-453d-a8df-25cece985170/qr","status":503}
+{"app":"admin","role":"owner-admin","path":"/api/v1/tenant/me/applications","status":401}
+{"app":"captain","role":"captain","path":"/api/v1/restaurant/qr/operations/requests","status":403}
+{"app":"kiosk","role":"kiosk","path":"/api/v1/payments/9e8095f8-6e5f-4ab7-b493-bdb710f44a57/qr","status":503}
+{"app":"captain","role":"captain","path":"/api/v1/restaurant/qr/operations/requests","status":403}
+{"app":"kiosk","role":"kiosk","path":"/api/v1/payments/fa3f37c7-2d21-4998-97df-fd5c7f4fd18b/qr","status":503}
+{"app":"captain","role":"captain","path":"/api/v1/restaurant/qr/operations/requests","status":403}
+{"app":"kiosk","role":"kiosk","path":"/api/v1/payments/7c4e22dd-3670-4e91-80c4-0526c63566fd/qr","status":503}

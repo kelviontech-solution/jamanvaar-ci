@@ -239,7 +239,8 @@ describe('QR ordering (SaaS)', () => {
       code = made.body;
       const token = tokenOf(code.url);
       expect(token).toMatch(/^[A-Za-z0-9_-]{32}$/);
-      expect(token).not.toContain('12');
+      // Random tokens may coincidentally contain the digits 12; they must not encode a table label.
+      expect(token).not.toContain('table-12');
       const info = await http().get(`/api/v1/public/qr/${token}`);
       expect(info.status, JSON.stringify(info.body)).toBe(200);
       expect(info.body.restaurant.name).toContain('QrSaasA');
@@ -346,7 +347,7 @@ describe('QR ordering (SaaS)', () => {
       const info = await http().get(`/api/v1/public/qr/${tokenA12}`);
       const text = JSON.stringify(info.body);
       for (const forbidden of [F.A.id, F.A.b1, 'restaurantId', 'branchId', 'tableId', 'deviceToken', 'password', 'gstin', 'subscription']) expect(text).not.toContain(forbidden);
-      expect(Object.keys(info.body).sort()).toEqual(['advanced', 'branch', 'branding', 'currency', 'mode', 'ordering', 'restaurant', 'table']);
+      expect(Object.keys(info.body).sort()).toEqual(['advanced', 'branch', 'branding', 'currency', 'mode', 'ordering', 'restaurant', 'restaurantPage', 'table']);
     });
 
     it('serves the restaurant\'s own menu with its own modifiers, hides other channels, sold-out and unpriceable dishes', async () => {
@@ -639,6 +640,29 @@ describe('QR ordering (SaaS)', () => {
         expect((await http().get('/api/v1/public/qr/orders/JQ-AAAAAAAA')).status).toBe(404);
         expect((await http().get('/api/v1/public/qr/orders/1')).status).toBe(404);
         expect((await http().get('/api/v1/public/qr/orders/qr_0123456789')).status).toBe(404);
+      });
+
+      it('security-audit: an order created under one browser session cannot be read or acted on by a different session or no session', async () => {
+        const sessionA = (await http().post('/api/v1/public/qr/session')).body.session as string;
+        const sessionB = (await http().post('/api/v1/public/qr/session')).body.session as string;
+        const placed = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).set('x-qr-session', sessionA).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]));
+        expect(placed.status).toBe(201);
+        const pub = placed.body.publicOrderId;
+
+        // The owning session reads its own order fine.
+        expect((await http().get(`/api/v1/public/qr/orders/${pub}`).set('x-qr-session', sessionA)).status).toBe(200);
+
+        // A different session, and no session at all, get the same 404 an unknown order gets -- never 200, never 403.
+        expect((await http().get(`/api/v1/public/qr/orders/${pub}`).set('x-qr-session', sessionB)).status).toBe(404);
+        expect((await http().get(`/api/v1/public/qr/orders/${pub}`)).status).toBe(404);
+        expect((await http().post(`/api/v1/public/qr/orders/${pub}/counter-payment`).set('x-qr-session', sessionB)).status).toBe(404);
+        expect((await http().post(`/api/v1/public/qr/orders/${pub}/payment`).set('x-qr-session', sessionB)).status).toBe(404);
+      });
+
+      it('security-audit: an order placed with no browser session at all stays reachable with no session, as it always has (legacy/no-cookie callers)', async () => {
+        const placed = await http().post(`/api/v1/public/qr/${tokenA12}/orders`).send(orderBody([{ itemId: 'coffee-a', quantity: 1 }]));
+        expect(placed.status).toBe(201);
+        expect((await http().get(`/api/v1/public/qr/orders/${placed.body.publicOrderId}`)).status).toBe(200);
       });
     });
 

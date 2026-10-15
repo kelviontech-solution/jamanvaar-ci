@@ -4,6 +4,7 @@ import { formatDate, formatINR, formatTime, restaurantGstRate, taxLabels } from 
 
 export type SendReceiptFn = (
   channel: 'WHATSAPP' | 'SMS',
+  orderId: string,
   phoneNumber: string,
   templateParams: string[]
 ) => Promise<{ success: boolean; providerMessageId?: string; errorMessage?: string }>;
@@ -136,7 +137,7 @@ export class EBillService {
 
     let sendResult: { success: boolean; providerMessageId?: string; errorMessage?: string };
     try {
-      sendResult = await sendFn('WHATSAPP', phoneNumber, templateParams);
+      sendResult = await sendFn('WHATSAPP', order.id, phoneNumber, templateParams);
     } catch (err: any) {
       sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
     }
@@ -346,7 +347,7 @@ export class EBillService {
 
     let sendResult: { success: boolean; providerMessageId?: string; errorMessage?: string };
     try {
-      sendResult = await sendFn('SMS', phoneNumber, templateParams);
+      sendResult = await sendFn('SMS', order.id, phoneNumber, templateParams);
     } catch (err: any) {
       sendResult = { success: false, errorMessage: err?.message || 'Failed to reach the notification service' };
     }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mergeOrderItems, kitchenStatusRank } from '../src/modules/order-sync/order-merge';
+import { mergeOrderItems, kitchenStatusRank, itemLevelTakesBack } from '../src/modules/order-sync/order-merge';
 
 const item = (id: string, extra: Record<string, unknown> = {}): any => ({
   externalItemId: id, name: id, quantity: 1, unitPrice: 100, lineTotal: 100, modifiers: [], ...extra
@@ -106,5 +106,46 @@ describe('mergeOrderItems', () => {
     const { items, foreignItemsKept } = mergeOrderItems(undefined, [item('x'), item('y')], 'POS');
     expect(items).toHaveLength(2);
     expect(foreignItemsKept).toBe(false);
+  });
+});
+
+describe('itemLevelTakesBack (security-audit MEDIUM order-sync-01)', () => {
+  it('is true when a push newly cancels a line that was active before', () => {
+    const existing = [item('a', { kitchenStatus: 'PREPARING' })];
+    const merged = mergeOrderItems(existing, [item('a', { kitchenStatus: 'CANCELLED', unitPrice: 0, lineTotal: 0 })], 'CAPTAIN').items;
+    expect(itemLevelTakesBack(existing, merged)).toBe(true);
+  });
+
+  it('is true for VOID and VOIDED too, not just CANCELLED', () => {
+    const existing = [item('a', { kitchenStatus: 'READY' })];
+    expect(itemLevelTakesBack(existing, [item('a', { kitchenStatus: 'VOID' })])).toBe(true);
+    expect(itemLevelTakesBack(existing, [item('a', { kitchenStatus: 'VOIDED' })])).toBe(true);
+  });
+
+  it('is false re-syncing a line that was already cancelled (no re-approval demanded for an idempotent push)', () => {
+    const existing = [item('a', { kitchenStatus: 'CANCELLED', unitPrice: 0, lineTotal: 0 })];
+    const merged = mergeOrderItems(existing, [item('a', { kitchenStatus: 'CANCELLED', unitPrice: 0, lineTotal: 0 })], 'CAPTAIN').items;
+    expect(itemLevelTakesBack(existing, merged)).toBe(false);
+  });
+
+  it('is false for ordinary forward kitchen progress (not a cancellation)', () => {
+    const existing = [item('a', { kitchenStatus: 'PENDING' })];
+    const merged = mergeOrderItems(existing, [item('a', { kitchenStatus: 'PREPARING' })], 'KDS').items;
+    expect(itemLevelTakesBack(existing, merged)).toBe(false);
+  });
+
+  it('is false for a brand-new order with no existing items at all', () => {
+    const merged = mergeOrderItems(undefined, [item('a', { kitchenStatus: 'PENDING' })], 'POS').items;
+    expect(itemLevelTakesBack(undefined, merged)).toBe(false);
+  });
+
+  it('is true when ONE line among several is newly cancelled, even if the order itself stays active', () => {
+    const existing = [item('a', { kitchenStatus: 'PREPARING' }), item('b', { kitchenStatus: 'READY' })];
+    const merged = mergeOrderItems(
+      existing,
+      [item('a', { kitchenStatus: 'PREPARING' }), item('b', { kitchenStatus: 'CANCELLED', unitPrice: 0, lineTotal: 0 })],
+      'CAPTAIN'
+    ).items;
+    expect(itemLevelTakesBack(existing, merged)).toBe(true);
   });
 });

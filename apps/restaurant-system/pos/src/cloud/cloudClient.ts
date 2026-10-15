@@ -150,12 +150,13 @@ export async function createRefund(paymentId: string, amountPaise: number, reaso
 
 export async function sendReceipt(
   channel: 'WHATSAPP' | 'SMS',
+  orderId: string,
   phoneNumber: string,
   templateParams: string[]
 ): Promise<{ success: boolean; providerMessageId?: string; errorMessage?: string }> {
   const res = await deviceFetch('/api/v1/receipts/send', {
     method: 'POST',
-    body: JSON.stringify({ channel, phoneNumber, templateParams })
+    body: JSON.stringify({ channel, orderId, phoneNumber, templateParams })
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {

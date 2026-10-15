@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 /**
@@ -145,9 +145,37 @@ describe('Order sync payload fidelity and per-order validation', () => {
     expect(after.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === underpriced.externalOrderId).meta.reviewFlags).toContain('BELOW_MENU_PRICE:unique-inclusive-line:10000<11800');
   });
 
+  it('security-audit: a later push to an EXISTING order is price-checked too, not only its creation', async () => {
+    await prisma.runAsTenant(restaurantId, tx => tx.syncedEntity.create({ data: {
+      restaurantId, entityType: 'MENU_ITEM', externalId: 'update-check-menu', syncVersion: 1,
+      payload: { name: 'Update check dish', price: 200 }
+    } }));
+    const correct = {
+      ...fullEvent('update-price-check'),
+      status: 'NEW', paymentStatus: 'PENDING', paymentMethod: 'CASH_AT_COUNTER',
+      items: [{ externalItemId: 'update-check-line', menuItemId: 'update-check-menu', name: 'Update check dish', quantity: 1, unitPrice: 20000, lineTotal: 20000, modifiers: [] }],
+      subtotal: 20000, taxAmount: 0, totalAmount: 20000
+    };
+    const created = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [correct] });
+    expect(created.body.results[0].status).toBe('ok');
+    const afterCreate = await authed('get', '/api/v1/orders/sync', adminDeviceToken);
+    expect(afterCreate.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === 'update-price-check').meta.reviewFlags).toBeUndefined();
+
+    // Same order, pushed again as an update, same item id, but the unit price has been silently halved.
+    // Before this fix, integrityFlags() never ran on an update to an existing order, so this landed with
+    // no review flag and no conflict record at all.
+    const discounted = { ...correct, items: [{ ...correct.items[0], unitPrice: 5000, lineTotal: 5000 }], subtotal: 5000, totalAmount: 5000, updatedAt: new Date().toISOString() };
+    const updated = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [discounted] });
+    expect(updated.body.results[0].status).toBe('ok');
+    const afterUpdate = await authed('get', '/api/v1/orders/sync', adminDeviceToken);
+    const order = afterUpdate.body.orders.find((o: { externalOrderId: string }) => o.externalOrderId === 'update-price-check');
+    expect(order.totalAmount).toBe(5000); // devices work offline, so the push is never rejected...
+    expect(order.meta.reviewFlags).toContain('BELOW_MENU_PRICE:update-check-line:5000<20000'); // ...but it is now flagged for review even on an update
+  });
+
   describe('per-dish kitchen status: course, undo and cancellation', () => {
     const dishOrder = (id: string, items: Array<Record<string, unknown>>) => ({
-      ...fullEvent(id), status: 'PREPARING', paymentStatus: 'PENDING', paymentMethod: 'CASH', meta: { orderNumber: `N-${id}`, tokenNumber: '1' },
+      ...fullEvent(id), status: 'PREPARING', paymentStatus: 'PENDING', paymentMethod: 'CASH', meta: { orderNumber: `N-${id}`, tokenNumber: '1' } as Record<string, unknown>,
       items: items.map((i) => ({ menuItemId: 'm', name: 'Dish', quantity: 1, unitPrice: 10000, lineTotal: 10000, modifiers: [], ...i })),
       subtotal: 10000 * items.length, taxAmount: 0, totalAmount: 10000 * items.length, updatedAt: new Date().toISOString()
     });
@@ -188,6 +216,8 @@ describe('Order sync payload fidelity and per-order validation', () => {
         { externalItemId: 'b', kitchenStatus: 'PREPARING' }
       ]);
       cancelled.subtotal = 10000; cancelled.totalAmount = 10000;
+      // security-audit MEDIUM order-sync-01: cancelling a line now needs the same manager proof as cancelling the whole order.
+      cancelled.meta = { ...cancelled.meta, staffSession: await refundManagerSession(app, prisma, posToken) };
       const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [cancelled] });
       expect(push.body.results[0].status).toBe('ok');
 
@@ -197,6 +227,79 @@ describe('Order sync payload fidelity and per-order validation', () => {
       const order = await pullOrder(id);
       const a = order.items.find((i: { externalItemId: string }) => i.externalItemId === 'a');
       expect(a).toMatchObject({ kitchenStatus: 'CANCELLED', cancelReason: 'Out of stock', unitPrice: 0, lineTotal: 0, statusRev: 1 });
+    });
+
+    it('security-audit MEDIUM order-sync-01: cancelling one line with no manager proof is refused, even though the order itself stays active', async () => {
+      const id = `dish-cancel-no-proof-${Date.now()}`;
+      await authed('post', '/api/v1/orders/sync', posToken).send({ events: [dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'PREPARING' }])] });
+
+      const cancelled = dishOrder(id, [{ externalItemId: 'a', kitchenStatus: 'CANCELLED', statusRev: 1, cancelReason: 'Comp', unitPrice: 0, lineTotal: 0 }]);
+      cancelled.subtotal = 0; cancelled.totalAmount = 0;
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [cancelled] });
+
+      expect(push.body.results[0].status).toBe('error');
+      const order = await pullOrder(id);
+      // the line must still be at its original price -- the unapproved cancellation never applied
+      expect(order.items.find((i: { externalItemId: string }) => i.externalItemId === 'a')).toMatchObject({ kitchenStatus: 'PREPARING', unitPrice: 10000 });
+    });
+  });
+
+  describe('security-audit MEDIUM pos-money-controls-01: high discounts and CREDIT settlement need manager proof', () => {
+    // All money fields on an order-sync event are paise (see schema.prisma): subtotal: 10000 = Rs.100.
+    it('refuses a brand-new order whose discount already exceeds the high-discount threshold with no manager proof', async () => {
+      const id = `discount-no-proof-${Date.now()}`;
+      const evt = { ...fullEvent(id), subtotal: 10000, taxAmount: 0, discountAmount: 5000, totalAmount: 5000, paymentStatus: 'PENDING' };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('error');
+    });
+
+    it('accepts the same high discount once a verified manager session rides along', async () => {
+      const id = `discount-with-proof-${Date.now()}`;
+      const evt = {
+        ...fullEvent(id), subtotal: 10000, taxAmount: 0, discountAmount: 5000, totalAmount: 5000, paymentStatus: 'PENDING',
+        meta: { ...fullEvent(id).meta, staffSession: await refundManagerSession(app, prisma, posToken) }
+      };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('ok');
+    });
+
+    it('a small discount under the threshold needs no manager proof at all', async () => {
+      const id = `discount-small-${Date.now()}`;
+      const evt = { ...fullEvent(id), subtotal: 10000, taxAmount: 0, discountAmount: 100, totalAmount: 9900, paymentStatus: 'PENDING' };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('ok');
+    });
+
+    /**
+     * security-audit MEDIUM kiosk-loyalty-01 (found in run-5): discountAmount/subtotal are
+     * paise, not rupees -- a discount of Rs.100 (10,000 paise) is nowhere near the real
+     * Rs.500/25% threshold, but an earlier version of this check compared the paise value
+     * directly against the literal constant 500, making the real cutoff ~Rs.5 and wrongly
+     * refusing ordinary small discounts (e.g. every kiosk coupon/loyalty redemption) with no
+     * manager proof attached, since a KIOSK device never attaches a staff session at all.
+     */
+    it('a Rs.100 discount on a Rs.10,000 order is NOT treated as high (catches a paise-vs-rupee unit mix-up)', async () => {
+      const id = `discount-paise-boundary-${Date.now()}`;
+      const evt = { ...fullEvent(id), subtotal: 1_000_000, taxAmount: 0, discountAmount: 10_000, totalAmount: 990_000, paymentStatus: 'PENDING' };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('ok');
+    });
+
+    it('refuses settling a brand-new order to a CREDIT (house account) with no manager proof', async () => {
+      const id = `credit-no-proof-${Date.now()}`;
+      const evt = { ...fullEvent(id), paymentMethod: 'CREDIT', paymentStatus: 'SUCCESS' };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('error');
+    });
+
+    it('accepts a CREDIT settlement once a verified manager session rides along', async () => {
+      const id = `credit-with-proof-${Date.now()}`;
+      const evt = {
+        ...fullEvent(id), paymentMethod: 'CREDIT', paymentStatus: 'SUCCESS',
+        meta: { ...fullEvent(id).meta, staffSession: await refundManagerSession(app, prisma, posToken) }
+      };
+      const push = await authed('post', '/api/v1/orders/sync', posToken).send({ events: [evt] });
+      expect(push.body.results[0].status).toBe('ok');
     });
   });
 

@@ -144,6 +144,22 @@ describe('Receipt e-bill delivery', () => {
     return externalOrderId;
   }
 
+  /** A cash-at-counter order explicitly stamped with the device that created it, the way order-sync
+   *  always stamps `deviceId` in production -- used to prove the receipt-destination IDOR fix. */
+  async function seedCashOrderOwnedBy(deviceId: string): Promise<string> {
+    const externalOrderId = `receipt-owned-cash-${Date.now()}-${Math.random()}`;
+    await prisma.runAsTenant(restaurantId, (tx) =>
+      tx.syncedOrder.create({
+        data: {
+          restaurantId, externalOrderId, deviceId, orderType: 'TOKEN_QR', status: 'CONFIRMED',
+          items: [{ externalItemId: 'itm-1', name: 'Idli Sambar', quantity: 1, unitPrice: 8000, lineTotal: 8000 }],
+          subtotal: 8000, taxAmount: 400, totalAmount: 8400, paymentMethod: 'CASH_AT_COUNTER', paymentStatus: 'PENDING', source: 'KIOSK'
+        }
+      })
+    );
+    return externalOrderId;
+  }
+
   /** What a kiosk cash order really leaves behind: the online-payment attempt stuck at PENDING (the guest
    *  then chose to pay at the counter) AND the confirmed cash order, both under the same external id. */
   async function seedCashOrderWithAbandonedOnlineAttempt(): Promise<string> {
@@ -166,18 +182,18 @@ describe('Receipt e-bill delivery', () => {
     await app.close();
   });
 
-  it('a KIOSK device can send a WhatsApp receipt', async () => {
+  it('a KIOSK device can send a WhatsApp receipt for a real order it can see', async () => {
     const res = await authed('post', '/api/v1/receipts/send', kioskToken).send({
-      channel: 'WHATSAPP', phoneNumber: '9876543210', templateParams: ['ORD-1', '108', 'Rs. 252.00']
+      channel: 'WHATSAPP', orderId: cashOrderId, phoneNumber: '9876543210', templateParams: ['ORD-1', '108', 'Rs. 252.00']
     });
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ success: true, providerMessageId: 'wamid.mock123' });
     expect(sendWhatsAppMock).toHaveBeenCalledWith({ phoneNumber: '9876543210', templateParams: ['ORD-1', '108', 'Rs. 252.00'] });
   });
 
-  it('a POS device can send an SMS receipt', async () => {
+  it('a POS device can send an SMS receipt for a real order', async () => {
     const res = await authed('post', '/api/v1/receipts/send', posToken).send({
-      channel: 'SMS', phoneNumber: '9876543210', templateParams: ['ORD-2', '109', 'Rs. 100.00']
+      channel: 'SMS', orderId: paidOrderId, phoneNumber: '9876543210', templateParams: ['ORD-2', '109', 'Rs. 100.00']
     });
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ success: true, providerMessageId: 'msg91-mock-req-id' });
@@ -185,14 +201,14 @@ describe('Receipt e-bill delivery', () => {
 
   it('rejects an invalid phone number before calling the gateway', async () => {
     const res = await authed('post', '/api/v1/receipts/send', kioskToken).send({
-      channel: 'WHATSAPP', phoneNumber: '12345', templateParams: ['ORD-3', '110', 'Rs. 50.00']
+      channel: 'WHATSAPP', orderId: cashOrderId, phoneNumber: '12345', templateParams: ['ORD-3', '110', 'Rs. 50.00']
     });
     expect(res.status).toBe(400);
   });
 
   it('a KDS device cannot send a receipt (403)', async () => {
     const res = await authed('post', '/api/v1/receipts/send', kdsToken).send({
-      channel: 'WHATSAPP', phoneNumber: '9876543210', templateParams: ['ORD-4', '111', 'Rs. 75.00']
+      channel: 'WHATSAPP', orderId: cashOrderId, phoneNumber: '9876543210', templateParams: ['ORD-4', '111', 'Rs. 75.00']
     });
     expect(res.status).toBe(403);
   });
@@ -200,7 +216,7 @@ describe('Receipt e-bill delivery', () => {
   it('a gateway rejection surfaces as 200 with success:false, not a 500', async () => {
     sendWhatsAppMock.mockResolvedValueOnce({ success: false, errorMessage: 'Template not approved' });
     const res = await authed('post', '/api/v1/receipts/send', kioskToken).send({
-      channel: 'WHATSAPP', phoneNumber: '9876543210', templateParams: ['ORD-5', '112', 'Rs. 90.00']
+      channel: 'WHATSAPP', orderId: cashOrderId, phoneNumber: '9876543210', templateParams: ['ORD-5', '112', 'Rs. 90.00']
     });
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ success: false, errorMessage: 'Template not approved' });
@@ -208,9 +224,38 @@ describe('Receipt e-bill delivery', () => {
 
   it('no device token at all is rejected 401', async () => {
     const res = await request(app.getHttpServer()).post('/api/v1/receipts/send').send({
-      channel: 'WHATSAPP', phoneNumber: '9876543210', templateParams: ['ORD-6', '113', 'Rs. 60.00']
+      channel: 'WHATSAPP', orderId: cashOrderId, phoneNumber: '9876543210', templateParams: ['ORD-6', '113', 'Rs. 60.00']
     });
     expect(res.status).toBe(401);
+  });
+
+  describe('security-audit LOW cloud-api-receipts-01: /send is bound to a real, reachable order', () => {
+    it('refuses a /send with no orderId at all (schema-level)', async () => {
+      const res = await authed('post', '/api/v1/receipts/send', posToken).send({
+        channel: 'SMS', phoneNumber: '9876543210', templateParams: ['x', 'y', 'z']
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it('refuses a /send referencing an order that does not exist at all', async () => {
+      const res = await authed('post', '/api/v1/receipts/send', posToken).send({
+        channel: 'SMS', orderId: `no-such-order-${Date.now()}`, phoneNumber: '9876543210', templateParams: ['x', 'y', 'z']
+      });
+      expect(res.status).toBe(404);
+    });
+
+    it('refuses a KIOSK device referencing an order a DIFFERENT kiosk device created', async () => {
+      const device1 = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findFirst({ where: { restaurantId, type: 'KIOSK' } }));
+      const key2 = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const kioskToken2 = (await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key2.body.code, deviceType: 'KIOSK' })).body.deviceToken as string;
+      const owned = await seedCashOrderOwnedBy(device1!.id);
+
+      // The owning kiosk (kioskToken) can reference its own order -- a different one cannot.
+      const stolen = await authed('post', '/api/v1/receipts/send', kioskToken2).send({
+        channel: 'SMS', orderId: owned, phoneNumber: '9876543210', templateParams: ['x', 'y', 'z']
+      });
+      expect(stolen.status).toBe(404);
+    });
   });
 
   describe('Email bill (PDF invoice)', () => {
@@ -310,6 +355,25 @@ describe('Receipt e-bill delivery', () => {
     it('no device token at all is rejected 401', async () => {
       const res = await request(app.getHttpServer()).post('/api/v1/receipts/email').send({ orderId: paidOrderId, email: 'guest@example.com' });
       expect(res.status).toBe(401);
+    });
+
+    it('security-audit: a self-service KIOSK cannot email a receipt for an order a DIFFERENT kiosk created', async () => {
+      const device1 = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findFirst({ where: { restaurantId, type: 'KIOSK' } }));
+      const key2 = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const kioskToken2 = (await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key2.body.code, deviceType: 'KIOSK' })).body.deviceToken as string;
+      const owned = await seedCashOrderOwnedBy(device1!.id);
+
+      // The owning kiosk can email the receipt for its own order.
+      expect((await authed('post', '/api/v1/receipts/email', kioskToken).send({ orderId: owned, email: 'guest@example.com' })).status).toBe(201);
+      emailSendMock.mockClear();
+
+      // A different kiosk at the same restaurant cannot -- same orderId, wrong device.
+      const stolen = await authed('post', '/api/v1/receipts/email', kioskToken2).send({ orderId: owned, email: 'attacker@example.com' });
+      expect(stolen.status).toBe(404);
+      expect(emailSendMock).not.toHaveBeenCalled();
+
+      // A staff console is unrestricted by this check -- resending a bill for a guest is a normal counter task.
+      expect((await authed('post', '/api/v1/receipts/email', posToken).send({ orderId: owned, email: 'staff-resend@example.com' })).status).toBe(201);
     });
   });
 
@@ -448,6 +512,23 @@ describe('Receipt e-bill delivery', () => {
       expect((await send(kioskToken, 'no-such-order', '9876543210')).status).toBe(404);
       expect((await send(kdsToken, cashOrderId, '9876543210')).status).toBe(403);
       expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('security-audit: a self-service KIOSK cannot WhatsApp a bill for an order a DIFFERENT kiosk created', async () => {
+      const device1 = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findFirst({ where: { restaurantId, type: 'KIOSK' } }));
+      const key2 = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const kioskToken2 = (await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key2.body.code, deviceType: 'KIOSK' })).body.deviceToken as string;
+      const owned = await seedCashOrderOwnedBy(device1!.id);
+
+      expect((await send(kioskToken, owned, '9876543210')).status).toBe(201);
+      fetchSpy.mockClear();
+
+      const stolen = await send(kioskToken2, owned, '9876543210');
+      expect(stolen.status).toBe(404);
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      // A staff console is unrestricted by this check.
+      expect((await send(posToken, owned, '9876543210')).status).toBe(201);
     });
   });
 });

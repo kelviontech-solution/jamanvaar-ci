@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { BranchStore } from '../../../packages/branch-core/src/store';
 import { BranchCore } from '../../../packages/branch-core/src/core';
@@ -207,7 +207,8 @@ describe('Branch Core <-> Cloud', () => {
     const inCloud = await prisma.runAsPlatform((tx) => tx.syncedEntity.findFirst({ where: { restaurantId, entityType: 'MENU_ITEM', externalId: 'dish-1' } }));
     expect(inCloud).toBeTruthy();
 
-    await cloud('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [{ externalId: 'dish-2', payload: { id: 'dish-2', name: 'Dal Makhani', updatedAt: new Date().toISOString() } }] });
+    // security-audit MEDIUM pos-money-controls-01: a POS push to MENU_ITEM now needs manager proof.
+    await cloud('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', await refundManagerSession(app, prisma, posToken)).send({ events: [{ externalId: 'dish-2', payload: { id: 'dish-2', name: 'Dal Makhani', updatedAt: new Date().toISOString() } }] });
     await uplink.sync();
     expect(core.pullEntities('MENU_ITEM').entities.map((e) => e.externalId)).toContain('dish-2');
   });

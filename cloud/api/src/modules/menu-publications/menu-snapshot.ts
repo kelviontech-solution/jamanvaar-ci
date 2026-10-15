@@ -22,6 +22,7 @@ const translations = (value: unknown): MenuTranslations | undefined => {
 
 export interface SnapCategory { translations?: MenuTranslations; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number; qrVisible: boolean }
 export interface SnapItem {
+  allergens?: string[];
   translations?: MenuTranslations;
   id: string; name: string; description?: string; categoryId: string; pricePaise: number; imageUrl?: string; dietaryType?: string; sortOrder: number;
   available: boolean; salesChannels: string[] | null; qrEnabled: boolean; branchIds: string[]; taxGroupId?: string; modifierGroupIds: string[];
@@ -103,7 +104,7 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
     const minQ = Math.max(1, Math.floor(num(p.minQuantity, 1)));
     const maxQ = Math.min(50, Math.max(minQ, Math.floor(num(p.maxQuantity, 50))));
     items.push({
-      id, name, description: str(p.description), translations: translations(p.translations), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType),
+      id, name, description: str(p.description), translations: translations(p.translations), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType), allergens: Array.isArray(p.allergens) ? p.allergens.filter((v): v is string => typeof v === 'string').slice(0,30) : [],
       sortOrder: num(p.sortOrder), available: p.isAvailable !== false, salesChannels: Array.isArray(p.salesChannels) ? (p.salesChannels as unknown[]).filter((c): c is string => typeof c === 'string') : null,
       qrEnabled: p.isQrOrderingEnabled !== false, branchIds: Array.isArray(p.branchIds) ? (p.branchIds as unknown[]).filter((b): b is string => typeof b === 'string') : [],
       taxGroupId, modifierGroupIds: Array.isArray(p.modifierGroupIds) ? (p.modifierGroupIds as unknown[]).filter((g): g is string => typeof g === 'string') : [],

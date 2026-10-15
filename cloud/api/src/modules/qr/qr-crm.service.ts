@@ -80,7 +80,7 @@ export class QrCrmService {
   }
   private async authorize(tx: Prisma.TransactionClient, device: Device, global = false) {
     const actor = this.actor(device);
-    await this.entitlements.assertQrCapability(tx, device.restaurantId, 'QR_LOYALTY');
+    await this.entitlements.assertQrCapability(tx, device.restaurantId, 'QR_LOYALTY', device.branchId);
     const user = await tx.user.findFirst({ where: { id: actor, restaurantId: device.restaurantId, status: 'ACTIVE' } });
     if (
       !user ||

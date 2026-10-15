@@ -1,0 +1,571 @@
+{
+  "text": "QA Owner full 1792004605417\nRESTAURANT ADMIN\nQA Owner full 1792004605417 — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA Owner full 1792004605417 — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nRestaurant workspace\n← Back to managementShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nPickup Scheduling\nAdvanced Features\nQR Ordering license active\nQA Owner full plan 1792004605417 · 16/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nPickup Scheduling\n\nOffer takeaway slots that respect your branch hours and kitchen capacity.\n\n✦ JAMAN AI\nEnabled\nPickup scheduling\nEnable scheduled takeaway pickup\nAllow ASAP takeaway\n\nAvailable on menu-only QR codes for takeaway. Table QR orders stay dine-in. Times use the restaurant timezone and also respect ordering hours. Pending online orders reserve capacity until safely cancelled; payment failures never free a slot while a payment could still succeed.\n\nMinimum preparation lead (minutes)\nBooking cutoff (minutes)\nSlot interval (minutes)\nOrders per slot\nBooking horizon (days)\nPickup hours\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nAdd hours\nClosed dates (one YYYY-MM-DD per line)\nPickup instructions\nSave settings",
+  "headings": [
+    "Pickup Scheduling",
+    "Pickup scheduling",
+    "Pickup hours"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "QA Owner full 1792004605417 — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 112,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 126,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "← Back to management",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Scheduling",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 55,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Save settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 123,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 0",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 0",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 1",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 1",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 2",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 2",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 3",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 3",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 4",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 4",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 5",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 5",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 6",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 6",
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

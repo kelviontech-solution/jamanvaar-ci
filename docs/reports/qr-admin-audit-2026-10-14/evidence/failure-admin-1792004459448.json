@@ -1,0 +1,384 @@
+{
+  "text": "QA Owner full 1792004374886\nRESTAURANT ADMIN\nQA Owner full 1792004374886 — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA Owner full 1792004374886 — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nRestaurant workspace\n← Back to managementShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nQR Settings\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Owner full plan 1792004374886 · 16/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nQR Settings\n\nManage core ordering settings and customer-facing messages.\n\n✦ JAMAN AI\nEnabled\nMobile online payment: Setup needed\n\nAsk Super Admin to activate payment collection for this restaurant. Razorpay Route is not required for Jamanvaar collection with manual payouts.\n\nQR ordering\nTurn all QR ordering on or off at once.\nTable ordering\nCodes on tables that identify the table.\nMenu-only codes\nCodes for menu cards; the guest chooses dine-in with a table number, or takeaway.\nCustomer notes\nLet guests add notes to their order.\nCustomisations\nLet guests choose add-ons and options.\nPay at counter\nGuests pay at the counter when they are done.\nOnline payment\nRazorpay mobile checkout. Available to guests once payment collection is active.\nShow order status\nGuests can follow Received, Preparing, Ready.\nSend straight to the kitchen\nWhen off, the counter accepts each order first.\nAsk for name\nGuests must enter their name.\nAsk for mobile number\nGuests must enter their mobile number.\nGuest page: words, colour and logo\n\nEdit your heading, messages, colour and logo with a live preview of exactly what guests will see, on Customer Branding.\n\nOpen Customer Branding →",
+  "headings": [
+    "QR Settings",
+    "Guest page: words, colour and logo"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "QA Owner full 1792004374886 — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 112,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 126,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "← Back to management",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Open Customer Branding →",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 222,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

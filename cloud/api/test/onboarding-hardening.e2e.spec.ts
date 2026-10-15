@@ -120,7 +120,8 @@ describe('onboarding and multi-app hardening', () => {
 
   describe('device-priced orders are checked, never rejected', () => {
     it('a price below the published menu price and inconsistent totals are flagged for review and recorded', async () => {
-      await as('post', '/api/v1/entity-sync/MENU_ITEM', F.pos).send({ events: [{ externalId: 'pizza', payload: { id: 'pizza', name: 'Pizza', price: 10, categoryId: 'c', updatedAt: now() } }] });
+      // security-audit MEDIUM pos-money-controls-01: a POS push to MENU_ITEM now needs manager proof.
+      await as('post', '/api/v1/entity-sync/MENU_ITEM', F.pos).set('x-staff-session', await refundManagerSession(app, prisma, F.pos)).send({ events: [{ externalId: 'pizza', payload: { id: 'pizza', name: 'Pizza', price: 10, categoryId: 'c', updatedAt: now() } }] });
       const res = await push(F.pos, order('h-price', 'NEW', [{ ...item('pizza', 'PENDING', 300), lineTotal: 300 }], { subtotal: 350, totalAmount: 350 }));
       expect(res.body.results[0].status).toBe('ok'); // an offline device on an older menu is legitimate
       const o = await row('h-price');

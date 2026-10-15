@@ -250,7 +250,7 @@ export class QrWorkflowsService {
     if (!d.branchId) throw new BadRequestException('Select one branch for the pickup calendar');
     return this.prisma.runAsTenant(d.restaurantId, async (tx) => {
       await this.authorize(tx, d);
-      await this.entitlements.assertQrCapability(tx, d.restaurantId, 'QR_SCHEDULED_PICKUP');
+      await this.entitlements.assertQrCapability(tx, d.restaurantId, 'QR_SCHEDULED_PICKUP', d.branchId);
       const range = await qrReportRange(tx, d.restaurantId, d.branchId, from, to),
         settings = await this.ops.effectiveIn(tx, d.restaurantId, d.branchId);
       const rows = await tx.syncedOrder.findMany({

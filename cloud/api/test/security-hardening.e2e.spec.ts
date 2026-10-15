@@ -79,6 +79,62 @@ describe('security hardening (kiosk authority, manager PIN, admin-code redemptio
     expect(locked.status).toBe(429); // five misses on this terminal: even the right PIN waits
   });
 
+  /**
+   * security-audit HIGH kiosk-pin-lockout-01: MAX_FAILURES_PER_RESTAURANT shares one counter
+   * across every device. A public, anonymous KIOSK terminal hammering wrong PINs used to feed
+   * that same shared counter, so a guest at the self-order screen could lock out every manager
+   * override and staff sign-in on every OTHER terminal (POS, Captain, KDS) in the restaurant for
+   * the next 10 minutes -- a free, repeatable denial-of-service with no staff credential needed.
+   */
+  it('a kiosk being hammered with wrong PINs cannot lock out a staff-operated POS terminal elsewhere in the restaurant', async () => {
+    // A dedicated restaurant, isolated from the rest of this file: the lockout counters this test
+    // deliberately exhausts are keyed per-restaurant, and the shared fixture above is reused by
+    // every later test in this file for the next 10-minute window.
+    const r2 = await authed('post', '/api/v1/restaurants', platformToken).send({ name: `TEST SecHard Lockout ${Date.now()}`, ownerName: 'Owner', ownerEmail: `sechard-lockout-${Date.now()}@test.example.com` });
+    const restaurantId2 = r2.body.restaurant.id;
+    const plan2 = await authed('post', '/api/v1/plans', platformToken).send({ tier: 'PRO', name: `TEST SecHard Lockout Plan ${Date.now()}`, priceMonthly: 700000, maxBranches: 3, maxDevices: 20, maxUsers: 20, entitlements: { posTerminal: true } });
+    await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId: restaurantId2, planId: plan2.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
+      applications: ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN']
+    });
+    const redeem2 = async (type: string) => {
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId: restaurantId2, allowedDeviceType: type, expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const res = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: type });
+      return res.body.deviceToken as string;
+    };
+    const posAdmin2 = await redeem2('POS_ADMIN');
+    const ownerProof2 = await ownerDeviceSession(prisma, posAdmin2);
+    const pinHash2 = (pin: string) => {
+      const salt = randomBytes(16);
+      return `pinv2:${salt.toString('hex')}:${pbkdf2Sync(`${restaurantId2}:${pin}`, salt, 100_000, 32, 'sha256').toString('hex')}`;
+    };
+    await request(app.getHttpServer()).post('/api/v1/entity-sync/STAFF_USER')
+      .set('Authorization', `Bearer ${posAdmin2}`).set('x-owner-authorization', ownerProof2)
+      .send({ events: [{ externalId: 'u-mgr2', payload: { id: 'u-mgr2', fullName: 'Mgr2', roleId: 'role-manager', isActive: true, pinHash: pinHash2('4321') } }] });
+
+    const freshPosToken = await redeem2('POS');
+
+    // A single terminal's own guesses self-lock it after 5 misses (MAX_FAILURES_PER_DEVICE), so
+    // one kiosk alone can only ever push 5 failures toward the shared restaurant-wide counter --
+    // a restaurant with several self-order kiosks (common for a larger QSR) has several public,
+    // anonymous terminals each capable of contributing that many. Four kiosks x 5 misses each
+    // reaches the old shared cap (MAX_FAILURES_PER_RESTAURANT = 20) with nobody needing more than
+    // one guessed attempt per terminal to ever be refused.
+    for (let k = 0; k < 4; k++) {
+      const kiosk = await redeem2('KIOSK');
+      for (let i = 0; i < 5; i++) await authed('post', '/api/v1/staff/verify-manager-pin', kiosk).send({ pin: '0000' });
+    }
+
+    // A completely different, never-before-used POS terminal can still verify the real manager
+    // PIN: the kiosks' guesses never pushed the shared restaurant-wide counter past its cap.
+    const stillWorks = await authed('post', '/api/v1/staff/verify-manager-pin', freshPosToken).send({ pin: '4321' });
+    expect(stillWorks.status).toBe(201);
+    expect(stillWorks.body).toMatchObject({ approved: true, staffName: 'Mgr2' });
+
+    await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: restaurantId2 } }));
+    await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: plan2.body.id } }));
+  });
+
   it('a general (ANY) activation code cannot be redeemed as an admin console', async () => {
     const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, expiresAt: new Date(Date.now() + 86400000).toISOString() });
     if (key.status !== 201) return; // key type ANY may not be issuable in this build; the service rule is covered where it is

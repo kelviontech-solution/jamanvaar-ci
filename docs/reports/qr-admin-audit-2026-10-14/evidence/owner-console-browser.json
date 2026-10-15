@@ -1,0 +1,210 @@
+{
+  "passed": 51,
+  "total": 51,
+  "tests": [
+    {
+      "name": "qr common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "qr offers complete QR navigation and one sidebar",
+      "passed": true
+    },
+    {
+      "name": "qr QR owners can edit shared menu and use JAMAN AI",
+      "passed": true
+    },
+    {
+      "name": "qr phone QR navigation fits and returns focus",
+      "passed": true
+    },
+    {
+      "name": "kiosk common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "kiosk has no enabled QR tools or direct QR access",
+      "passed": true
+    },
+    {
+      "name": "kiosk-qr common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "kiosk-qr offers complete QR navigation and one sidebar",
+      "passed": true
+    },
+    {
+      "name": "kiosk-qr QR owners can edit shared menu and use JAMAN AI",
+      "passed": true
+    },
+    {
+      "name": "kiosk-qr phone QR navigation fits and returns focus",
+      "passed": true
+    },
+    {
+      "name": "Kiosk QR console does not expose restaurant inventory",
+      "passed": true
+    },
+    {
+      "name": "restaurant common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "restaurant has no enabled QR tools or direct QR access",
+      "passed": true
+    },
+    {
+      "name": "restaurant-qr common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "restaurant-qr offers complete QR navigation and one sidebar",
+      "passed": true
+    },
+    {
+      "name": "restaurant-qr QR owners can edit shared menu and use JAMAN AI",
+      "passed": true
+    },
+    {
+      "name": "restaurant-qr phone QR navigation fits and returns focus",
+      "passed": true
+    },
+    {
+      "name": "full common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "full suite uses direct kiosk management links and preserves old deep links",
+      "passed": true
+    },
+    {
+      "name": "full offers complete QR navigation and one sidebar",
+      "passed": true
+    },
+    {
+      "name": "full QR owners can edit shared menu and use JAMAN AI",
+      "passed": true
+    },
+    {
+      "name": "full phone QR navigation fits and returns focus",
+      "passed": true
+    },
+    {
+      "name": "full QR page OVERVIEW loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page ORDERS loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page SERVICE loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page MENU loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page TABLES loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page DESIGN loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page BRAND loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page PAYMENTS loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page RULES loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page PICKUP loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page SETTINGS loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page ADVANCED loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page ANALYTICS loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page PERFORMANCE loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page CRM loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page ONBOARDING loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page ACCEPTANCE loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page RECONCILIATION loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page CALENDAR loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "full QR page PRINTPACK loads inside unified owner console",
+      "passed": true
+    },
+    {
+      "name": "integrated QR back-to-management preserves an unsaved draft",
+      "passed": true
+    },
+    {
+      "name": "browser Back across QR and owner pages keeps the editor until discard",
+      "passed": true
+    },
+    {
+      "name": "terminal-qr common login opens the licensed console automatically",
+      "passed": true
+    },
+    {
+      "name": "terminal-qr offers complete QR navigation and one sidebar",
+      "passed": true
+    },
+    {
+      "name": "terminal-qr QR owners can edit shared menu and use JAMAN AI",
+      "passed": true
+    },
+    {
+      "name": "terminal-qr phone QR navigation fits and returns focus",
+      "passed": true
+    },
+    {
+      "name": "Super Admin QR capability editor saves and reads back actual grants",
+      "passed": true
+    },
+    {
+      "name": "Super Admin can create standalone QR plans without POS defaults",
+      "passed": true
+    },
+    {
+      "name": "Super Admin AI controls explain mixed plans and QR access",
+      "passed": true
+    }
+  ]
+}

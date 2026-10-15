@@ -1,5 +1,6 @@
 import { LocalRelayConnection, readRelayEvents } from './local_relay_connection';
 import { KeyValueStore } from './key_value_store';
+import { encryptCustomerAccountsForStorage, decodeStoredCustomerAccounts, generateDeviceKeyHex } from './pii_encryption';
 import {
   AppNotification,
   AuditLog,
@@ -1043,6 +1044,35 @@ export class JamanvaarDatabase {
     this.lastWritten.set(fullKey, text);
   }
 
+  private piiKeyHex: string | null = null;
+  private lastCustomerAccountsPlaintext: string | null = null;
+  private lastCustomerAccountsCiphertext: string | null = null;
+
+  /**
+   * security-audit LOW-pos-admin-02: the AES key that encrypts customerAccounts at rest (see
+   * pii_encryption.ts), generated once per device/role and read through this.ls() directly --
+   * never through KeyValueStore, whose own attach() happens in a separate step from
+   * attachDurableStorage() (see browser_boot.ts) and is not guaranteed to run first. Reading
+   * it any other way risks silently generating a fresh key before the real one is attached,
+   * which would make every existing customer record undecryptable on next load.
+   */
+  private getOrCreatePiiKeyHex(): string {
+    const localStorage = this.ls();
+    const storageKey = `${this.storagePrefix}pii_key`;
+    if (localStorage) {
+      const existing = localStorage.getItem(storageKey);
+      if (existing) {
+        this.piiKeyHex = existing;
+        return existing;
+      }
+    }
+    if (this.piiKeyHex) return this.piiKeyHex;
+    const fresh = generateDeviceKeyHex();
+    this.piiKeyHex = fresh;
+    localStorage?.setItem(storageKey, fresh);
+    return fresh;
+  }
+
   /** Last save failure (quota full, storage unavailable...), or null when the last save succeeded. */
   private persistenceError: string | null = null;
 
@@ -1155,7 +1185,17 @@ export class JamanvaarDatabase {
       put('inventory_batches', this.inventoryBatches);
       put('stock_counts', this.stockCounts);
       put('recipes', this.recipes);
-      put('customer_accounts', this.customerAccounts);
+      // security-audit LOW-pos-admin-02: customer PII is encrypted at rest -- see pii_encryption.ts.
+      // AES-GCM's nonce must differ every call, so re-encrypting on every save would make
+      // customer_accounts always look "changed" to the lastWritten dedup above (BUG-033),
+      // rewriting it on every notify() even when nothing in it actually changed. Caching by
+      // plaintext keeps that optimization: only re-encrypt when the real content differs.
+      const customersPlaintext = JSON.stringify(this.customerAccounts);
+      if (customersPlaintext !== this.lastCustomerAccountsPlaintext) {
+        this.lastCustomerAccountsPlaintext = customersPlaintext;
+        this.lastCustomerAccountsCiphertext = encryptCustomerAccountsForStorage(this.customerAccounts, this.getOrCreatePiiKeyHex());
+      }
+      if (this.lastCustomerAccountsCiphertext !== null) put('customer_accounts', this.lastCustomerAccountsCiphertext);
       put('users', this.users);
       put('roles', this.roles);
       put('configured_printers', this.configuredPrinters);
@@ -1428,8 +1468,9 @@ export class JamanvaarDatabase {
       const storedRecipes = localStorage.getItem(`${p}recipes`);
       if (storedRecipes) this.recipes = JSON.parse(storedRecipes);
 
+      // security-audit LOW-pos-admin-02: customer PII is encrypted at rest -- see pii_encryption.ts.
       const storedCustomers = localStorage.getItem(`${p}customer_accounts`);
-      if (storedCustomers) this.customerAccounts = JSON.parse(storedCustomers);
+      if (storedCustomers) this.customerAccounts = decodeStoredCustomerAccounts(storedCustomers, this.getOrCreatePiiKeyHex());
 
       const storedUsers = localStorage.getItem(`${p}users`);
       if (storedUsers) this.users = JSON.parse(storedUsers);

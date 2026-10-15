@@ -202,7 +202,7 @@ export class QrOperationsService {
         version: row?.syncVersion ?? 0,
         capabilities: await this.entitlements.resolveQrCapabilities(
           tx,
-          device.restaurantId,
+          device.restaurantId, device.branchId,
         ),
       };
     });
@@ -228,7 +228,7 @@ export class QrOperationsService {
           await this.entitlements.assertQrCapability(
             tx,
             device.restaurantId,
-            "QR_SERVICE_REQUESTS",
+            "QR_SERVICE_REQUESTS", device.branchId
           );
         if (
           Object.keys(changes).some((k) =>
@@ -238,7 +238,7 @@ export class QrOperationsService {
           await this.entitlements.assertQrCapability(
             tx,
             device.restaurantId,
-            "QR_SCHEDULED_PICKUP",
+            "QR_SCHEDULED_PICKUP", device.branchId
           );
         const key = device.branchId ?? "restaurant";
         await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${"qr-operations:" + device.restaurantId + ":" + key}))`;
@@ -311,7 +311,7 @@ export class QrOperationsService {
       const s = await this.effectiveIn(tx, ctx.restaurant.id, ctx.branch.id),
         c = await this.entitlements.resolveQrCapabilities(
           tx,
-          ctx.restaurant.id,
+          ctx.restaurant.id, ctx.branch.id,
         );
       return {
         serviceEnabled:
@@ -374,7 +374,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         ctx.restaurant.id,
-        "QR_SERVICE_REQUESTS",
+        "QR_SERVICE_REQUESTS", ctx.branch.id
       );
       const s = await this.effectiveIn(tx, ctx.restaurant.id, ctx.branch.id);
       const rows = await tx.syncedEntity.findMany({
@@ -409,7 +409,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         rid,
-        "QR_SERVICE_REQUESTS",
+        "QR_SERVICE_REQUESTS", ctx.branch.id,
       );
       const s = await this.effectiveIn(tx, rid, ctx.branch.id),
         type = s.requestTypes.find((t) => t.id === input.typeId && t.enabled);
@@ -512,7 +512,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_SERVICE_REQUESTS",
+        "QR_SERVICE_REQUESTS", device.branchId
       );
       const s = await this.effectiveIn(
         tx,
@@ -629,7 +629,7 @@ export class QrOperationsService {
   async assignees(device: Device) {
     if (!['POS_ADMIN','CAPTAIN','POS'].includes(device.type)) throw new ForbiddenException('Service staff access required');
     return this.prisma.runAsTenant(device.restaurantId, async tx => {
-      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS');
+      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS', device.branchId);
       return {devices:await tx.device.findMany({where:{restaurantId:device.restaurantId,status:'ACTIVE',type:{in:['CAPTAIN','POS','POS_ADMIN']},...(device.branchId?{branchId:device.branchId}:{})},select:{id:true,name:true,branchId:true}}),
         staff:await this.serviceStaff(tx,device.restaurantId,device.branchId)};
     });
@@ -637,7 +637,7 @@ export class QrOperationsService {
   async assign(device: Device,id:string,input:{version:number;assignedDeviceId?:string|null;assignedStaffId?:string|null;escalate?:boolean;reason:string}) {
     if (!['POS_ADMIN','CAPTAIN','POS'].includes(device.type)) throw new ForbiddenException('Service staff access required');
     const branchId=await this.prisma.runAsTenant(device.restaurantId,async tx=>{
-      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS');
+      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_SERVICE_REQUESTS', device.branchId);
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-service-action:'+device.restaurantId+':'+id}))`;
       const where={restaurantId_entityType_externalId:{restaurantId:device.restaurantId,entityType:'QR_SERVICE_REQUEST',externalId:id}},row=await tx.syncedEntity.findUnique({where}),p=row?.payload as any;
       if(!row||(device.branchId&&p.branchId!==device.branchId))throw new NotFoundException('Request not found');
@@ -664,7 +664,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_SERVICE_REQUESTS",
+        "QR_SERVICE_REQUESTS", device.branchId
       );
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${"qr-service-action:" + device.restaurantId + ":" + id}))`;
       const where = {
@@ -767,7 +767,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         ctx.restaurant.id,
-        "QR_SCHEDULED_PICKUP",
+        "QR_SCHEDULED_PICKUP", ctx.branch.id
       );
       const s = await this.effectiveIn(tx, ctx.restaurant.id, ctx.branch.id);
       if (!s.pickupEnabled) return { slots: [], timezone: ctx.branch.timezone };
@@ -835,7 +835,7 @@ export class QrOperationsService {
     await this.entitlements.assertQrCapability(
       tx,
       ctx.restaurant.id,
-      "QR_SCHEDULED_PICKUP",
+      "QR_SCHEDULED_PICKUP", ctx.branch.id
     );
     if (
       orderType !== "TAKEAWAY" ||
@@ -878,7 +878,7 @@ export class QrOperationsService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_MENU_ANALYTICS",
+        "QR_MENU_ANALYTICS", device.branchId
       );
       const scope = {
         restaurantId: device.restaurantId,
@@ -1043,32 +1043,35 @@ export class QrOperationsService {
   }
   async health(device: Device) {
     this.console(device);
-    const rid = device.restaurantId;
+    return this.healthForScope(device.restaurantId, device.branchId);
+  }
+  /** Used only after an authenticated caller has authorized this restaurant/branch. */
+  async healthForScope(rid: string, branchId: string | null) {
     const [ent, branches, menu, settings, online, codes] = await Promise.all([
       this.prisma.runAsTenant(rid, (tx) =>
-        this.entitlements.resolve(tx, rid, "QR_ORDERING"),
+        this.entitlements.resolve(tx, rid, "QR_ORDERING", branchId),
       ),
       this.prisma.runAsTenant(rid, (tx) =>
         tx.branch.findMany({
           where: {
             restaurantId: rid,
             status: "ACTIVE",
-            ...(device.branchId ? { id: device.branchId } : {}),
+            ...(branchId ? { id: branchId } : {}),
           },
           select: { id: true, name: true },
         }),
       ),
       this.menus
-        .build(rid, device.branchId)
+        .build(rid, branchId)
         .catch(() => ({ items: [], menuVersion: 0 })),
-      this.settings.effective(rid, device.branchId),
+      this.settings.effective(rid, branchId),
       this.payments.qrOnlineAvailable(rid),
       this.prisma.runAsTenant(rid, (tx) =>
         tx.qrCode.findMany({
           where: {
             restaurantId: rid,
             status: "ACTIVE",
-            ...(device.branchId ? { branchId: device.branchId } : {}),
+            ...(branchId ? { branchId } : {}),
           },
           select: { branchId: true, tableId: true, mode: true },
         }),
@@ -1173,7 +1176,7 @@ export class QrOperationsService {
     ];
     return {
       checks,
-      scope: device.branchId
+      scope: branchId
         ? "Selected branch"
         : "Restaurant defaults â€” check each branch separately",
       ready: checks.filter((c) => c.required).every((c) => c.ready),

@@ -1,3 +1,4 @@
+import { OperationsModule } from './modules/operations/operations.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -136,6 +137,7 @@ import { validateEnv } from './config/env.validation';
     RealtimeModule,
     EntitySyncModule,
     JobsModule,
+    OperationsModule,
     PlatformNotificationsModule
   ],
   providers: [

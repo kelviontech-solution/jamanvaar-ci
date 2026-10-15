@@ -149,7 +149,8 @@ describe('the screens fit a phone', () => {
     const app = read('pos-admin/src/App.tsx');
     expect(app).toMatch(/aria-label="Main menu"/);
     expect(app).toMatch(/lg:static[\s\S]{0,60}lg:translate-x-0/);
-    expect(app).toContain('onOpenNav={() => setNavOpen(true)}');
+    expect(app).toMatch(/onOpenNav=\{\(\) =>[\s\S]{0,160}setNavOpen\(true\)/);
+    expect(app).toContain("'.qr-admin-menu'");
     expect(app).toMatch(/setActiveTab\(nav\.id as PosAdminTab\); setNavOpen\(false\)/);
     const header = read('pos-admin/src/components/header/PosAdminHeader.tsx');
     expect(header).toContain('aria-label="Open menu"');

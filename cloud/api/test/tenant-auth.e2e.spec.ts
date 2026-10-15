@@ -669,7 +669,7 @@ describe('Tenant authentication + authorization', () => {
         activationSessionToken, activationKey, deviceType: 'POS_ADMIN'
       });
       expect(activateRes.status).toBe(403);
-      expect(activateRes.body.message).toContain('Neither POS_ADMIN nor KIOSK_ADMIN is enabled');
+      expect(activateRes.body.message).toContain('No owner management module is enabled');
 
       await prisma.runAsPlatform((tx) => tx.restaurant.deleteMany({ where: { id: famRestaurantId } }));
       await prisma.runAsPlatform((tx) => tx.plan.deleteMany({ where: { id: famPlanId } }));

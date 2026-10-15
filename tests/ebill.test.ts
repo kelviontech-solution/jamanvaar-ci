@@ -93,7 +93,7 @@ describe('EBillService', () => {
     // content is still the human-readable formatted text for the admin's
     // receipt history — it is not the literal WhatsApp template payload sent.
     expect(res.record.content).toContain('ORDER #ORD-99');
-    expect(sendFn).toHaveBeenCalledWith('WHATSAPP', '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
+    expect(sendFn).toHaveBeenCalledWith('WHATSAPP', mockOrder.id, '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
   });
 
   it('reports a real provider failure for WhatsApp e-bill when the injected send function fails', async () => {
@@ -117,7 +117,7 @@ describe('EBillService', () => {
     const res = await EBillService.sendSmsEBill(mockOrder, '9876543210', sendFn);
     expect(res.success).toBe(true);
     expect(res.record.deliveryStatus).toBe('SENT');
-    expect(sendFn).toHaveBeenCalledWith('SMS', '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
+    expect(sendFn).toHaveBeenCalledWith('SMS', mockOrder.id, '9876543210', ['ORD-99', '108', expect.stringContaining('252')]);
   });
 
   it('reports a real provider failure for SMS e-bill when the injected send function fails', async () => {

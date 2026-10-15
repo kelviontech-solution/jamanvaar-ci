@@ -268,6 +268,28 @@ describe('SaaS management modules: Plans, Subscriptions, Activation Keys, Device
       expect(activate.status).toBe(200);
       expect(activate.body.status).toBe('ACTIVE');
     });
+
+    /**
+     * security-audit HIGH owners-reset-password-01: every other path that sets this exact
+     * credential (setInitialPasswordSchema, activateOwnerSchema, tenantChangePasswordSchema --
+     * see login.dto.ts's own B2-048 comment) requires the shared strongPassword policy (10+
+     * chars, a letter, a number or symbol, not a common word). This platform-support reset path
+     * only checked `password.trim().length < 4`, so a weak login password for the account that
+     * controls a restaurant's whole business console could be set through this one door while
+     * every other door into the same credential was already locked down.
+     */
+    it('refuses a weak reset password the same way every other path into this credential already does', async () => {
+      const weak = await authed('post', `/api/v1/owners/${ownerId}/reset-password`).send({ password: '1234' });
+      expect(weak.status).toBe(400);
+
+      const common = await authed('post', `/api/v1/owners/${ownerId}/reset-password`).send({ password: 'password123' });
+      expect(common.status).toBe(400);
+    });
+
+    it('accepts a strong reset password', async () => {
+      const res = await authed('post', `/api/v1/owners/${ownerId}/reset-password`).send({ password: 'Correct-Horse-9' });
+      expect(res.status).toBe(201);
+    });
   });
 
   describe('Audit log query', () => {

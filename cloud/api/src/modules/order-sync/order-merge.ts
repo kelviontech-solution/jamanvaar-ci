@@ -27,6 +27,26 @@ export function kitchenStatusRank(status: string | undefined): number {
   return status ? (KITCHEN_RANK[status.toUpperCase()] ?? 0) : 0;
 }
 
+const CANCEL_STATUSES = new Set(['CANCELLED', 'VOID', 'VOIDED']);
+
+/**
+ * security-audit MEDIUM order-sync-01: the order-level `takesBack` check in order-sync.service.ts
+ * only looked at the order's own status field, so cancelling (comping) individual lines -- which
+ * mergeOrderItems above always accepts, since CANCELLED outranks every other kitchen status --
+ * reduced a bill's total with no manager-approval proof at all. True whenever this push newly
+ * cancels a line that was not already cancelled before it; re-syncing an already-cancelled line
+ * (whose cancellation was already approved) does not re-trigger the gate.
+ */
+export function itemLevelTakesBack<T extends MergeableItem>(existingItems: T[] | undefined, mergedItems: T[]): boolean {
+  const priorStatusById = new Map((existingItems ?? []).map((i) => [i.externalItemId, i.kitchenStatus]));
+  return mergedItems.some((item) => {
+    const status = item.kitchenStatus?.toUpperCase();
+    if (!status || !CANCEL_STATUSES.has(status)) return false;
+    const prior = priorStatusById.get(item.externalItemId)?.toUpperCase();
+    return !prior || !CANCEL_STATUSES.has(prior);
+  });
+}
+
 export function mergeOrderItems<T extends MergeableItem>(
   existing: T[] | undefined,
   incoming: T[],

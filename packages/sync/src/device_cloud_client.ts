@@ -14,6 +14,12 @@ import { StaffSession } from './staff_session';
 import type { OrderSyncPushEvent, OrderSyncPushResult, CloudSyncedOrder } from './outbox';
 import type { EntitySyncEvent, EntitySyncPushResult, CloudSyncedEntity } from './entity_sync';
 
+/** Mirrors cloud/api's entity-sync.controller.ts MENU_MANAGER_SESSION_REQUIRED_ENTITY_TYPES.
+ * These also need the approval token (not just the session token) -- the Menu Manager is
+ * normally unlocked by a cashier entering a manager's PIN as a one-off override, which issues
+ * an approval, not a full session switch (see entity-sync.controller.ts for why). */
+const MENU_MANAGER_ENTITY_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP']);
+
 export class CloudApiError extends Error {
   constructor(
     message: string,
@@ -110,8 +116,17 @@ export function createDeviceCloudClient(options: DeviceCloudClientOptions) {
     ): Promise<{ orders: CloudSyncedOrder[]; serverTime: string; latestSeq?: number; hasMore?: boolean; serverKey?: 'cloud' | 'core' }> =>
       request(`/api/v1/orders/sync${orderSyncPullQuery(cursor)}`, 'Order sync pull failed'),
 
-    pushEntitySync: (entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> =>
-      request(`/api/v1/entity-sync/${entityType}`, 'Entity sync push failed', { method: 'POST', body: JSON.stringify({ events }), ...(entityType === 'STAFF_USER' && StaffSession.sessionToken() ? { headers: { 'x-staff-session': StaffSession.sessionToken()! } } : {}) }),
+    pushEntitySync: (entityType: string, events: EntitySyncEvent[]): Promise<{ results: EntitySyncPushResult[]; serverTime: string }> => {
+      // security-audit MEDIUM pos-money-controls-01: menu/tax entity types now need manager
+      // proof too -- see entity-sync.controller.ts's MENU_MANAGER_SESSION_REQUIRED_ENTITY_TYPES.
+      const headers: Record<string, string> = {};
+      if (entityType === 'STAFF_USER' && StaffSession.sessionToken()) headers['x-staff-session'] = StaffSession.sessionToken()!;
+      if (MENU_MANAGER_ENTITY_TYPES.has(entityType)) {
+        if (StaffSession.sessionToken()) headers['x-staff-session'] = StaffSession.sessionToken()!;
+        if (StaffSession.approvalToken()) headers['x-staff-approval'] = StaffSession.approvalToken()!;
+      }
+      return request(`/api/v1/entity-sync/${entityType}`, 'Entity sync push failed', { method: 'POST', body: JSON.stringify({ events }), ...(Object.keys(headers).length ? { headers } : {}) });
+    },
 
     pullEntitySync: (
       entityType: string,

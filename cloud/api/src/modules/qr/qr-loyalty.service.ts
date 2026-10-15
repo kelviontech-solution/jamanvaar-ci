@@ -73,7 +73,7 @@ export class QrLoyaltyService {
     return String(payload.phone);
   }
   private async enabledIn(tx: Tx, restaurantId: string, branchId: string) {
-    await this.entitlements.assertQrCapability(tx, restaurantId, "QR_LOYALTY");
+    await this.entitlements.assertQrCapability(tx, restaurantId, "QR_LOYALTY", branchId);
     if (
       !(await this.advanced.effectiveIn(tx, restaurantId, branchId))
         .loyaltyEnabled
@@ -322,7 +322,7 @@ export class QrLoyaltyService {
         await this.entitlements.resolveQrCapability(
           tx,
           restaurantId,
-          "QR_LOYALTY",
+          "QR_LOYALTY", branchId
         )
       ).enabled
     )

@@ -1,0 +1,87 @@
+{
+  "at": "2026-10-15T10:24:38.763Z",
+  "passed": 20,
+  "total": 20,
+  "tests": [
+    {
+      "name": "Unlicensed restaurant page is visibly locked while the QR module remains accessible",
+      "passed": true
+    },
+    {
+      "name": "Super Admin signs in, finds restaurant page setup and saves only the page grant through the browser",
+      "passed": true
+    },
+    {
+      "name": "A temporary editor load failure has a working in-place retry",
+      "passed": true
+    },
+    {
+      "name": "Guided setup fills only missing details and does not enable or publish the page automatically",
+      "passed": true
+    },
+    {
+      "name": "An enabled incomplete welcome is explained before review or publication",
+      "passed": true
+    },
+    {
+      "name": "Owner uploads a real hero photo and edits a live mobile design without publishing",
+      "passed": true
+    },
+    {
+      "name": "Translated content, scheduled notices and privacy controls have accurate mobile previews",
+      "passed": true
+    },
+    {
+      "name": "Save and review compares all changed fields, saves privately and requires acknowledgement before publishing",
+      "passed": true
+    },
+    {
+      "name": "Branch sharing does not switch editing scope or discard unsaved work",
+      "passed": true
+    },
+    {
+      "name": "Scanned page works without a published menu and preserves the original table",
+      "passed": true
+    },
+    {
+      "name": "Three templates render differently on real mobile customer pages with working photographs",
+      "passed": true
+    },
+    {
+      "name": "Menu and contact navigation preserve a real cart through reload",
+      "passed": true
+    },
+    {
+      "name": "Featured dish opens real customization and retains the existing cart",
+      "passed": true
+    },
+    {
+      "name": "Public share page translates restaurant content, reports actual link clicks and remains browse-only",
+      "passed": true
+    },
+    {
+      "name": "An original order return resumes order status instead of the landing page",
+      "passed": true
+    },
+    {
+      "name": "Owner can publish a branch override and other branches keep the restaurant page",
+      "passed": true
+    },
+    {
+      "name": "Reviewed branch copying changes only a target draft and preserves branch contact information",
+      "passed": true
+    },
+    {
+      "name": "The unified launch checklist records an administrator attestation against a real branch QR order",
+      "passed": true
+    },
+    {
+      "name": "Restaurant Admin exposes the same page builder and licensed capabilities as standalone QR Admin",
+      "passed": true
+    },
+    {
+      "name": "Mobile editor keeps preview, review and publish controls reachable without overflow",
+      "passed": true
+    }
+  ]
+}

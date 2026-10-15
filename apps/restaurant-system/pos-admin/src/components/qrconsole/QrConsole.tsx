@@ -1,4 +1,7 @@
+import {QrRestaurantPage} from './QrRestaurantPage';
+import {OperationsConsole} from '../operations/OperationsConsole';
 import { QrOnboarding } from './QrOnboarding';
+import { QrAiAssistant } from './QrAiAssistant';
 import { QrPaymentWizard, QrReconciliation, QrPickupCalendar } from './QrWorkflows';
 import { QrPrintPack } from './QrPrintPack';
 import { QR_BEFORE_NAVIGATE, requestQrLeave } from './useQrUnsavedChanges';
@@ -14,6 +17,7 @@ import { QrCapabilities } from "./QrCapabilities";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   QR_PAGES,
+  QR_NAVIGATION,
   QR_ADVANCED_SECTIONS,
   currentQrTab,
   currentQrFeature,
@@ -86,10 +90,12 @@ export function QrConsole({
   onViewPlan,
   showToast,
   layout = "embedded",
+  onBack,
 }: {
   onViewPlan: () => void;
   showToast: (msg: string) => void;
-  layout?: "embedded" | "workspace";
+  layout?: "embedded" | "workspace" | "integrated";
+  onBack?: () => void;
 }) {
   const { state, refresh } = useQrEntitlement();
   const {confirm:confirmNavigation,confirmDialog:navigationDialog} = useConfirm();
@@ -99,16 +105,18 @@ export function QrConsole({
   const [feature, setFeature] = useState(currentQrFeature);
   const menuTrigger = useRef<HTMLButtonElement>(null);
   const sidebar = useRef<HTMLElement>(null);
-  const workspace = layout === "workspace";
-  const navigate = async (next: Tab, section = "Settings") => {
+  const workspace = layout !== "embedded";
+  const navigate = async (next: Tab, section = "Settings", branchScope?:string) => {
     if (!window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE, {cancelable:true})) && !(await confirmNavigation({title:'Leave without saving?',message:'Your changes on this page have not been saved.',confirmLabel:'Discard & continue',cancelLabel:'Keep editing',tone:'danger'}))) return;
     setTab(next);
     setFeature(section);
     const url = new URL(location.href);
     url.searchParams.set("tab", next);
+    if(branchScope)url.searchParams.set('setupBranch',branchScope);
     if (next === "ADVANCED") url.searchParams.set("feature", section);
     else url.searchParams.delete("feature");
     history.pushState(null, "", url);
+    window.dispatchEvent(new Event('jamanvaar-admin-location'));
     setMenuOpen(false);
     if (workspace) window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -193,12 +201,12 @@ export function QrConsole({
 
   const page = QR_PAGES.find((p) => p.id === tab)!;
   const basicPages = new Set<Tab>(['OVERVIEW','ORDERS','SERVICE','MENU','TABLES','PAYMENTS','BRAND','CRM','ONBOARDING','ACCEPTANCE','RECONCILIATION','CALENDAR','PRINTPACK','RULES','ADVANCED','ANALYTICS']);
-  const visiblePages = QR_PAGES.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
+  const visiblePages = QR_NAVIGATION.filter(page => advancedNavigation || basicPages.has(page.id) || page.id === tab);
   const tabs: Array<[Tab, string]> = visiblePages.map((p) => [p.id, p.label]);
   return (
     <div
       className={
-        workspace ? "qr-console qr-console--workspace" : "qr-console space-y-5"
+        workspace ? `qr-console qr-console--workspace ${layout === 'integrated' ? 'qr-integrated' : ''}` : "qr-console space-y-5"
       }
       data-testid="qr-console"
       data-jv-workspace="qr-admin"
@@ -243,6 +251,7 @@ export function QrConsole({
               </button>
             </div>
             <nav aria-label="QR administration">
+              {onBack && <button type="button" className="qr-btn secondary" onClick={onBack}>← Back to management</button>}
               <button type="button" aria-expanded={advancedNavigation} onClick={() => setAdvancedNavigation(value => !value)} className="qr-btn secondary">{advancedNavigation ? 'Show daily tools' : 'Show advanced tools'}</button>
               {[...new Set(visiblePages.map(page => page.group))].map((group) => (
                 <div className="qr-nav-group" key={group}>
@@ -324,6 +333,7 @@ export function QrConsole({
                 : "Guests scan the code on their table, order from your menu, and the order reaches your counter and kitchen."}
             </p>
           </div>
+          <QrAiAssistant />
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" /> Enabled{" "}
             {entitlement.source === "MANUAL_OVERRIDE"
@@ -331,6 +341,7 @@ export function QrConsole({
               : ""}
           </span>
         </div>
+        {['MENU','ONBOARDING','BRAND','DESIGN','PAYMENTS','RULES','SETTINGS','ADVANCED'].includes(tab)&&<section aria-label="QR change scope" className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm"><strong>{tab==='MENU'||tab==='ONBOARDING'?'Shared restaurant menu':'QR ordering channel'}</strong><p className="mt-1 text-slate-600">{tab==='MENU'||tab==='ONBOARDING'?'Draft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.':tab==='BRAND'||tab==='DESIGN'?'Restaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.':'Review the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.'}</p></section>}
         {fromCache && (
           <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
             Showing your last known plan. Connect to the internet to refresh it;
@@ -363,11 +374,13 @@ export function QrConsole({
             <QrSetupHealth navigate={(t) => navigate(t as Tab)} />
           </div>
         )}
+        {tab === 'OPERATIONS' && <OperationsConsole/>}
         {tab === "CRM" && <QrCrm />}
         {tab === "SERVICE" && <QrServiceOperations />}
         {tab === "PICKUP" && <QrPickupOperations />}
         {tab === "PERFORMANCE" && <QrMenuPerformance />}
         {tab === "BRAND" && <QrBrandStudio />}
+        {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
         {tab === "TABLES" && <TablesAndQr showToast={showToast} />}
         {tab === "MENU" && <QrMenuWorkspace showToast={showToast} />}
         {tab === "ADVANCED" && (
@@ -377,7 +390,7 @@ export function QrConsole({
             hideNavigation={workspace}
           />
         )}
-        {tab === 'ONBOARDING' && <QrOnboarding/>}
+        {tab === 'ONBOARDING' && <QrOnboarding onNavigate={page=>void navigate(page as Tab)}/>}
         {tab === 'ACCEPTANCE' && <QrPaymentWizard/>}
         {tab === 'RECONCILIATION' && <QrReconciliation/>}
         {tab === 'CALENDAR' && <QrPickupCalendar/>}
@@ -614,7 +627,7 @@ function TablesAndQr({ showToast }: { showToast: (m: string) => void }) {
   const { confirm, confirmDialog } = useConfirm();
   const tables = useLoad<QrTableRow[]>(QrAdminApi.tables, 20000);
   const branches = useLoad<QrBranch[]>(QrAdminApi.branches);
-  const [branchId, setBranchId] = useState<string>("");
+  const [branchId, setBranchId] = useState<string>(()=>{const value=new URLSearchParams(location.search).get('setupBranch');return value&&value!=='restaurant'?value:'';});
   const [busy, setBusy] = useState<string | null>(null);
   const [viewing, setViewing] = useState<QrTableRow | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -1380,4 +1393,4 @@ function Settings({ showToast }: { showToast: (m: string) => void }) {
   );
 }
 
-function QrMenuWorkspace({showToast}:{showToast:(message:string)=>void}){const [mode,setMode]=useState('EDIT');return <div className="space-y-4"><div className="sticky top-0 z-10 rounded-xl border bg-white p-3 flex flex-wrap gap-3">{['EDIT','AVAILABILITY'].map(value=><button type="button" key={value} aria-pressed={mode===value} className="min-h-11 rounded-xl border px-4 font-bold" onClick={async()=>{if(await requestQrLeave())setMode(value);}}>{value==='EDIT'?'Edit shared draft':'Published guest availability'}</button>)}</div>{mode==='EDIT'&&/^\/qr\//.test(location.pathname)?<QrCatalog/>:<QrMenuAvailability showToast={showToast}/>}</div>;}
+function QrMenuWorkspace({showToast}:{showToast:(message:string)=>void}){const [mode,setMode]=useState('EDIT');return <div className="space-y-4"><div className="sticky top-0 z-10 rounded-xl border bg-white p-3 flex flex-wrap gap-3">{['EDIT','AVAILABILITY'].map(value=><button type="button" key={value} aria-pressed={mode===value} className="min-h-11 rounded-xl border px-4 font-bold" onClick={async()=>{if(await requestQrLeave())setMode(value);}}>{value==='EDIT'?'Edit shared draft':'Published guest availability'}</button>)}</div>{mode==='EDIT'?<QrCatalog/>:<QrMenuAvailability showToast={showToast}/>}</div>;}

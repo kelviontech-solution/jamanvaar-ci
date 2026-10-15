@@ -16,7 +16,7 @@ export interface CsvColumn<T> {
 // `CopyButton.tsx`'s own deep-import comment for the same reason.)
 const FORMULA_TRIGGER_CHARS = new Set(['=', '+', '-', '@', '\t', '\r']);
 
-function escapeCsvCell(value: string | number | null | undefined): string {
+export function escapeCsvCell(value: string | number | null | undefined): string {
   let str = value === null || value === undefined ? '' : String(value);
   if (str.length > 0 && FORMULA_TRIGGER_CHARS.has(str[0])) {
     str = `'${str}`;

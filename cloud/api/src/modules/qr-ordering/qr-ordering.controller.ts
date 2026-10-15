@@ -8,6 +8,8 @@ import { CurrentPlatformUser } from '../../common/decorators/current-platform-us
 @UseGuards(PlatformAuthGuard)
 export class QrOrderingController {
   constructor(private readonly qrService: QrOrderingService) {}
+  @Get('feature-bundles') bundles(){return this.qrService.bundles();}
+  @Patch('feature-bundles') saveBundles(@Body() body:unknown,@CurrentPlatformUser() actor:PlatformUser){return this.qrService.saveBundles(body,actor);}
 
   @Get('restaurants')
   listRestaurants() {

@@ -242,7 +242,7 @@ interface RequestOptions {
   skipAuthRetry?: boolean;
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const res = await EndpointResolver.fetch(path, {
     method: options.method ?? 'GET',
     credentials: 'include',
@@ -686,6 +686,8 @@ export async function fetchCloudApplications(): Promise<CloudAppCatalogEntry[]> 
 }
 
 export interface TenantDashboard {
+  viewerRole?: 'OWNER' | 'MANAGER';
+  attention?: {unpaidBills:{id:string;label:string;branchId:string|null;createdAt:string;outstanding:number}[];delayedMinutes:number;delayedOrders:{externalOrderId:string;branchId:string|null;label:string;ageMinutes:number;status:string}[];unavailableDishes:{id:string;name:string;branchId:string|null}[];devices:{id:string;name:string;branchId:string|null;health:string}[]};
   scope:{branchId:string|null;label:string;from:string;to:string;timezone:string};
   summary:{sales:number;grossSales:number;refunds:number;orders:number;averageOrder:number;pendingAmount:number;pendingPayments:number};
   trend:{bucket:string;sales:number}[];bySource:{source:string;sales:number;orders:number}[];
@@ -694,6 +696,10 @@ export interface TenantDashboard {
   deviceCounts:{type:string;total:number;online:number}[];alerts:{title:string;detail:string}[];
   recentOrders:{externalOrderId:string;tokenNumber?:string;orderNumber?:string;branchName:string;source:string;status:string;paymentStatus?:string;total:number}[];
   generatedAt:string;
+}
+export interface LaunchAcceptance {verified:boolean;record:null|{orderId:string;verifiedAt:string};orders:{id:string;label:string;source:string;total:number}[]}
+export function fetchLaunchAcceptance(branchId:string,input?:{orderId:string;counterReceived:boolean;kitchenReceived:boolean;receiptVerified:boolean}) {
+  return request<LaunchAcceptance>('/api/v1/tenant/dashboard/launch-acceptance?branchId='+encodeURIComponent(branchId),input?{method:'POST',body:input}:{});
 }
 export function fetchTenantDashboard(query:{branchId?:string;period?:string;source?:string;from?:string;to?:string}={}) {
   return request<TenantDashboard>(`/api/v1/tenant/dashboard?${new URLSearchParams(query)}`);

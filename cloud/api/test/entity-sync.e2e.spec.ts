@@ -1,9 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession, refundManagerSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { hashOpaqueToken } from '../src/common/security/token.util';
+import { StaffSessionService } from '../src/modules/entity-sync/staff-session.service';
 
 /**
  * The generic sync bridge extension (Phase 5 of the remediation sequence) —
@@ -140,7 +141,9 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
   });
 
   it('pushes and pulls a MENU_ITEM — the database-layer extension that gives a restaurant\'s menu real cloud persistence instead of living only in one device\'s browser storage', async () => {
-    const pushRes = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({
+    // refundManagerSession upserts a STAFF_USER fixture keyed by this device's id -- cleaned up
+    // below so it doesn't change the STAFF_USER row count later tests in this file assert on.
+    const pushRes = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', await refundManagerSession(app, prisma, posToken)).send({
       events: [{ externalId: 'item-butter-naan', payload: { name: 'Butter Naan', price: 60, categoryId: 'cat-breads', isAvailable: true } }]
     });
     expect(pushRes.status).toBe(201);
@@ -148,6 +151,81 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     const pullRes = await authed('get', '/api/v1/entity-sync/MENU_ITEM', posToken);
     expect(pullRes.body.entities).toHaveLength(1);
     expect(pullRes.body.entities[0]).toMatchObject({ externalId: 'item-butter-naan', payload: { name: 'Butter Naan', price: 60 } });
+
+    const posDevice = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posToken) } }));
+    await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'STAFF_USER', externalId: `refund-manager-${posDevice.id}` } }));
+  });
+
+  /**
+   * security-audit MEDIUM pos-money-controls-01: POS's own client-side Menu Manager screen is
+   * gated behind a manager PIN (PosCatalog.tsx's "security-audit MED-06"), but nothing server-side
+   * ever checked for that proof -- any plain cashier PIN that merely passes canUseTerminal could
+   * open a terminal session that reprices the whole menu. Menu/tax entity types now require the
+   * same manager evidence order-sync's takesBack already does for cancel/void/refund.
+   */
+  describe('security-audit MEDIUM pos-money-controls-01: menu/tax edits need manager proof from POS', () => {
+    it('refuses a POS push to MENU_ITEM with no manager proof at all', async () => {
+      const res = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({
+        events: [{ externalId: 'item-no-proof', payload: { name: 'Unapproved Dish', price: 999, isAvailable: true } }]
+      });
+      expect(res.status).toBe(403);
+      const stillNothing = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.findFirst({ where: { entityType: 'MENU_ITEM', externalId: 'item-no-proof' } }));
+      expect(stillNothing).toBeNull();
+    });
+
+    it('refuses a POS push to MENU_ITEM signed in as a plain cashier (not a manager)', async () => {
+      const staffId = `cashier-menu-test-${Date.now()}`;
+      await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.upsert({
+        where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'STAFF_USER', externalId: staffId } },
+        create: { restaurantId, entityType: 'STAFF_USER', externalId: staffId, payload: { id: staffId, fullName: 'Plain Cashier', roleId: 'role-cashier', isActive: true } },
+        update: {}
+      }));
+      try {
+        const posDevice = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posToken) } }));
+        const cashierSession = app.get(StaffSessionService).issue('session', {
+          restaurantId, deviceId: posDevice.id, staffId, role: 'role-cashier', name: 'Plain Cashier'
+        }).token;
+
+        const res = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', cashierSession).send({
+          events: [{ externalId: 'item-cashier-proof', payload: { name: 'Cashier-priced Dish', price: 999, isAvailable: true } }]
+        });
+        expect(res.status).toBe(403);
+      } finally {
+        // This test's own STAFF_USER fixture must not leak into the STAFF_USER-count assertions elsewhere in this file.
+        await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'STAFF_USER', externalId: staffId } }));
+      }
+    });
+
+    it('accepts a POS push to MENU_ITEM approved via the Menu Manager override PIN (an approval token, not a full session switch)', async () => {
+      const posDevice = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posToken) } }));
+      const approvalToken = app.get(StaffSessionService).issue('approval', {
+        restaurantId, deviceId: posDevice.id, staffId: 'mgr-menu-approval-test', role: 'role-manager', name: 'Approving Manager'
+      }).token;
+      await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.upsert({
+        where: { restaurantId_entityType_externalId: { restaurantId, entityType: 'STAFF_USER', externalId: 'mgr-menu-approval-test' } },
+        create: { restaurantId, entityType: 'STAFF_USER', externalId: 'mgr-menu-approval-test', payload: { id: 'mgr-menu-approval-test', fullName: 'Approving Manager', roleId: 'role-manager', isActive: true } },
+        update: {}
+      }));
+      try {
+        const res = await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-approval', approvalToken).send({
+          events: [{ externalId: 'item-override-approved', payload: { name: 'Manager-approved Dish', price: 450, isAvailable: true } }]
+        });
+        expect(res.status).toBe(201);
+        const saved = await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.findFirst({ where: { entityType: 'MENU_ITEM', externalId: 'item-override-approved' } }));
+        expect(saved).toBeTruthy();
+      } finally {
+        await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'STAFF_USER', externalId: 'mgr-menu-approval-test' } }));
+      }
+    });
+
+    it('a KIOSK_ADMIN device pushing MENU_ITEM is unaffected -- this check only applies to POS', async () => {
+      const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+      const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'KIOSK_ADMIN' });
+      const res = await authed('post', '/api/v1/entity-sync/MENU_ITEM', redeem.body.deviceToken).send({
+        events: [{ externalId: 'item-kiosk-sync', payload: { name: 'Kiosk-synced Dish', price: 200, isAvailable: true } }]
+      });
+      expect(res.status).toBe(201);
+    });
   });
 
   /**
@@ -307,6 +385,9 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
    */
   describe('MENU_ITEM / COMBO / COUPON / CUSTOMER_FEEDBACK (BUG-149/130/133/136)', () => {
     let kioskToken: string;
+    // security-audit MEDIUM pos-money-controls-01: every POS push to MENU_ITEM below needs the
+    // same manager proof a real Menu Manager override issues -- see the dedicated describe above.
+    let posManagerSession: string;
     const dish = (over: Record<string, unknown>) => ({
       externalId: 'dish-1',
       payload: { id: 'dish-1', name: 'Hara Bhara Kebab', price: 220, updatedAt: '2026-09-20T10:00:00.000Z', ...over }
@@ -316,10 +397,18 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
       const key = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK_ADMIN', expiresAt: new Date(Date.now() + 86400000).toISOString() });
       const redeem = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: key.body.code, deviceType: 'KIOSK_ADMIN' });
       kioskToken = redeem.body.deviceToken as string;
+      posManagerSession = await refundManagerSession(app, prisma, posToken);
+    });
+
+    afterAll(async () => {
+      // Tidy up the STAFF_USER fixture refundManagerSession upserts, for hygiene -- this block
+      // runs after the one STAFF_USER-count assertion in this file, so it's not load-bearing.
+      const posDevice = await prisma.runAsTenant(restaurantId, (tx) => tx.device.findUniqueOrThrow({ where: { deviceTokenHash: hashOpaqueToken(posToken) } }));
+      await prisma.runAsTenant(restaurantId, (tx) => tx.syncedEntity.deleteMany({ where: { restaurantId, entityType: 'STAFF_USER', externalId: `refund-manager-${posDevice.id}` } }));
     });
 
     it('a stale copy of a dish does not undo a newer edit, and a newer edit replaces it', async () => {
-      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [dish({ price: 230, updatedAt: '2026-09-20T10:30:00.000Z' })] });
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', posManagerSession).send({ events: [dish({ price: 230, updatedAt: '2026-09-20T10:30:00.000Z' })] });
       // A device that never heard about the edit uploads its old copy.
       await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({ events: [dish({ price: 220, updatedAt: '2026-09-20T10:00:00.000Z' })] });
 
@@ -333,7 +422,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
     });
 
     it('a deleted dish stays deleted: an older re-upload of it is ignored', async () => {
-      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [{ externalId: 'dish-2', payload: { id: 'dish-2', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', posManagerSession).send({ events: [{ externalId: 'dish-2', payload: { id: 'dish-2', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
       await authed('post', '/api/v1/entity-sync/MENU_ITEM', kioskToken).send({ events: [dish({ externalId: 'dish-2' } as never)].map((e) => ({ externalId: 'dish-2', payload: { ...e.payload, id: 'dish-2', updatedAt: '2026-09-20T09:00:00.000Z' } })) });
 
       const pull = await authed('get', '/api/v1/entity-sync/MENU_ITEM', kioskToken);
@@ -352,7 +441,7 @@ describe('Generic entity sync bridge (CRM/Inventory/Payments)', () => {
      * of the incoming timestamp; only another deletion can touch a deleted record from here on.
      */
     it('a deleted dish stays deleted even against a re-upload timestamped the same as or after the tombstone (B2-038)', async () => {
-      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).send({ events: [{ externalId: 'dish-3', payload: { id: 'dish-3', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
+      await authed('post', '/api/v1/entity-sync/MENU_ITEM', posToken).set('x-staff-session', posManagerSession).send({ events: [{ externalId: 'dish-3', payload: { id: 'dish-3', deleted: true, updatedAt: '2026-09-20T12:00:00.000Z' } }] });
 
       // A device that has not yet learned of the deletion re-pushes its still-live copy, timestamped
       // AFTER the tombstone - exactly what a device's own later sync tick produces once it re-stamps

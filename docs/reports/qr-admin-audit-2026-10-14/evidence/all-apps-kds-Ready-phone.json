@@ -1,0 +1,173 @@
+{
+  "text": "KITCHEN DISPLAY (KDS)\nJAMAN AI\nAll stations\nMain Kitchen\nPizza Station\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice\n5\n0\nDisplay & station timing\nActive\n5\nCooking\n5\nReady\n0\nServed\n2\nPass\n5\nPriority, then oldest\nOldest first\nAll Kitchen Orders Cleared\n\nNo tickets currently waiting at this station. New orders from POS, Captain or the kiosk appear here by themselves, no refresh needed.\n\nDisplay",
+  "headings": [
+    "All Kitchen Orders Cleared"
+  ],
+  "buttons": [
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Kitchen Intelligence",
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All stations",
+      "aria": "Kitchen station All stations",
+      "title": "",
+      "disabled": false,
+      "width": 96,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": "Kitchen station Main Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Pizza Station",
+      "aria": "Kitchen station Pizza Station",
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Staff practice",
+      "title": "",
+      "disabled": false,
+      "width": 294,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false,
+      "width": 39,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Active\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 111,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Cooking\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 124,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ready\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Served\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pass\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen screen layout",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "minimumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "fallbackMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "maximumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search kitchen tickets",
+      "placeholder": "Search token, table, KOT or dish…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen ticket ordering",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Display size and contrast",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5319/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 58
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

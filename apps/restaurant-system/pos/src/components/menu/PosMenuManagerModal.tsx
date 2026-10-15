@@ -1671,6 +1671,7 @@ export const PosMenuManagerModal: React.FC<{
                 />
               </div>
 
+              <label className="block font-bold text-slate-600">Declared allergens<input aria-label="Declared allergens" defaultValue={(editingItem.allergens??[]).join(', ')} onBlur={e=>setEditingItem({...editingItem,allergens:[...new Set(e.target.value.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,30)})} maxLength={500} placeholder="Milk, peanuts, wheat" className="block w-full rounded-xl border p-3 mt-1"/></label>
               {/* Customization & Modifier Groups Selector */}
               <div className="bg-jaman-cream border border-jaman-border rounded-2xl p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">

@@ -1,0 +1,56 @@
+{
+  "text": "Freshly prepared · Served with care\n\nWelcome to\n\nUI Audit Restaurant A\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nTerminal 09d7ee44-de4\nStaff Mode\nDisplay",
+  "headings": [
+    "UI Audit Restaurant A"
+  ],
+  "buttons": [
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false,
+      "width": 470,
+      "height": 79,
+      "visible": true
+    },
+    {
+      "text": "Staff Mode",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Display size and contrast",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "",
+      "src": "blob:http://localhost:5314/232e37eb-fcec-439f-9ffc-56585abc01e9",
+      "loaded": true,
+      "width": 1440
+    },
+    {
+      "alt": "JAMANVAAR by Kelviontech",
+      "src": "http://localhost:5314/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 190
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

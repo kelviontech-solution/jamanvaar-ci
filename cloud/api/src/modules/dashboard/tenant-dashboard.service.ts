@@ -6,8 +6,9 @@ import { deviceHealth, ONLINE_WITHIN_MS } from '../../common/device-health';
 
 export function dashboardDates(period: string, timezone: string, from?: string, to?: string, now = new Date()) {
   const parts = new Intl.DateTimeFormat('en', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
-  const get = (type: string) => parts.find(p => p.type === type)!.value;
-  let end = `${get('year')}-${get('month')}-${get('day')}`, start = end;
+  const get = (type: string) => parts.find((p) => p.type === type)!.value;
+  let end = `${get('year')}-${get('month')}-${get('day')}`,
+    start = end;
   const shift = (date: string, n: number) => new Date(Date.parse(`${date}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
   if (period === 'YESTERDAY') start = end = shift(end, -1);
   else if (period === '7_DAYS') start = shift(end, -6);
@@ -15,9 +16,14 @@ export function dashboardDates(period: string, timezone: string, from?: string, 
   else if (period === 'THIS_MONTH') start = end.slice(0, 7) + '-01';
   else if (period === 'THIS_YEAR') start = end.slice(0, 4) + '-01-01';
   else if (period === 'CUSTOM') {
-    const valid = (v?: string): v is string => Boolean(v && /^\d{4}-\d{2}-\d{2}$/.test(v) && Number.isFinite(Date.parse(`${v}T00:00:00Z`)) && new Date(`${v}T00:00:00Z`).toISOString().slice(0,10) === v);
-    if (!valid(from) || !valid(to) || from > to || Date.parse(to) - Date.parse(from) > 366 * 86400000) throw new BadRequestException('Choose a valid date range of up to one year');
-    start = from; end = to;
+    const valid = (v?: string): v is string =>
+      Boolean(
+        v && /^\d{4}-\d{2}-\d{2}$/.test(v) && Number.isFinite(Date.parse(`${v}T00:00:00Z`)) && new Date(`${v}T00:00:00Z`).toISOString().slice(0, 10) === v
+      );
+    if (!valid(from) || !valid(to) || from > to || Date.parse(to) - Date.parse(from) > 366 * 86400000)
+      throw new BadRequestException('Choose a valid date range of up to one year');
+    start = from;
+    end = to;
   } else if (period !== 'TODAY') throw new BadRequestException('Invalid dashboard period');
   return { from: start, to: end, timezone, period };
 }
@@ -26,29 +32,131 @@ export function dashboardDates(period: string, timezone: string, from?: string, 
 export class TenantDashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async launchAcceptance(user: User, requested?: string, deviceId?: string, input?: Record<string, unknown>) {
+    const branchId = await this.branchScope(user, requested, deviceId);
+    if (!branchId) throw new BadRequestException('Choose one branch for launch verification');
+    return this.prisma.runAsTenant(user.restaurantId, async (tx) => {
+      const key = `launch-check:${branchId}`;
+      const publication = await tx.menuPublication.findFirst({
+        where: { restaurantId: user.restaurantId },
+        orderBy: { version: 'desc' },
+        select: { version: true, createdAt: true }
+      });
+      const validOrder = {
+        restaurantId: user.restaurantId,
+        branchId,
+        status: { in: ['SERVED', 'COMPLETED'] },
+        paymentStatus: { in: ['PAID', 'SUCCESS'] },
+        ...(publication ? { createdAt: { gte: publication.createdAt } } : {})
+      };
+      if (input !== undefined) {
+        if (
+          !input ||
+          typeof input !== 'object' ||
+          Array.isArray(input) ||
+          Object.keys(input).some((k) => !['orderId', 'counterReceived', 'kitchenReceived', 'receiptVerified'].includes(k)) ||
+          typeof input.orderId !== 'string' ||
+          !input.orderId ||
+          input.orderId.length > 200 ||
+          input.counterReceived !== true ||
+          input.kitchenReceived !== true ||
+          input.receiptVerified !== true
+        )
+          throw new BadRequestException('Select an order and confirm counter, kitchen and receipt checks');
+        if (!publication) throw new BadRequestException('Publish the menu before recording launch verification');
+        const order = await tx.syncedOrder.findFirst({ where: { ...validOrder, externalOrderId: input.orderId } });
+        if (!order) throw new BadRequestException('The test order must belong to this branch, be paid and served or completed');
+        const payload = {
+          branchId,
+          orderId: order.externalOrderId,
+          source: order.source,
+          menuVersion: publication.version,
+          verifiedBy: user.id,
+          verifiedAt: new Date().toISOString(),
+          counterReceived: true,
+          kitchenReceived: true,
+          receiptVerified: true
+        };
+        await tx.syncedEntity.upsert({
+          where: { restaurantId_entityType_externalId: { restaurantId: user.restaurantId, entityType: 'ADMIN_LAUNCH_CHECK', externalId: key } },
+          create: { restaurantId: user.restaurantId, entityType: 'ADMIN_LAUNCH_CHECK', externalId: key, payload },
+          update: { payload, syncVersion: { increment: 1 } }
+        });
+      }
+      const [saved, orders] = await Promise.all([
+        tx.syncedEntity.findUnique({
+          where: { restaurantId_entityType_externalId: { restaurantId: user.restaurantId, entityType: 'ADMIN_LAUNCH_CHECK', externalId: key } }
+        }),
+        tx.syncedOrder.findMany({
+          where: validOrder,
+          select: { externalOrderId: true, source: true, totalAmount: true, meta: true },
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        })
+      ]);
+      const record = saved?.payload as Record<string, unknown> | undefined;
+      const acceptedOrder = record?.orderId
+        ? await tx.syncedOrder.findFirst({ where: { ...validOrder, externalOrderId: String(record.orderId) }, select: { id: true } })
+        : null;
+      return {
+        record: record ?? null,
+        verified: !!acceptedOrder && record?.menuVersion === publication?.version,
+        menuVersion: publication?.version ?? 0,
+        orders: orders.map((o) => ({
+          id: o.externalOrderId,
+          source: o.source,
+          label: (o.meta as any)?.tokenNumber ?? (o.meta as any)?.orderNumber ?? o.externalOrderId,
+          total: o.totalAmount / 100
+        }))
+      };
+    });
+  }
+
   async branchScope(user: User, requested?: string, deviceId?: string): Promise<string | null> {
     if (!['OWNER', 'MANAGER'].includes(user.role)) throw new ForbiddenException('Restaurant dashboard requires owner or manager access');
     let assigned = user.branchId;
-    if (user.role !== 'OWNER' && !assigned && deviceId) assigned = (await this.prisma.runAsTenant(user.restaurantId, tx => tx.device.findFirst({ where: { id: deviceId, restaurantId: user.restaurantId }, select: { branchId: true } })))?.branchId ?? null;
+    if (user.role !== 'OWNER' && !assigned && deviceId)
+      assigned =
+        (
+          await this.prisma.runAsTenant(user.restaurantId, (tx) =>
+            tx.device.findFirst({ where: { id: deviceId, restaurantId: user.restaurantId }, select: { branchId: true } })
+          )
+        )?.branchId ?? null;
     if (user.role !== 'OWNER' && (!assigned || (requested && requested !== assigned))) throw new ForbiddenException('You can only view your assigned branch');
-    const branchId = user.role === 'OWNER' ? requested && requested !== 'all' ? requested : null : assigned;
-    if (branchId && !await this.prisma.runAsTenant(user.restaurantId, tx => tx.branch.findFirst({ where: { id: branchId, restaurantId: user.restaurantId }, select: { id: true } }))) throw new ForbiddenException('Branch is outside your restaurant');
+    const branchId = user.role === 'OWNER' ? (requested && requested !== 'all' ? requested : null) : assigned;
+    if (
+      branchId &&
+      !(await this.prisma.runAsTenant(user.restaurantId, (tx) =>
+        tx.branch.findFirst({ where: { id: branchId, restaurantId: user.restaurantId }, select: { id: true } })
+      ))
+    )
+      throw new ForbiddenException('Branch is outside your restaurant');
     return branchId;
   }
 
   async get(user: User, query: { branchId?: string; period?: string; from?: string; to?: string; source?: string }, deviceId?: string) {
-    const started = performance.now(), branchId = await this.branchScope(user, query.branchId, deviceId);
-    if (query.source && !['ALL','POS','CAPTAIN','KIOSK','QR','WHATSAPP','ONLINE'].includes(query.source)) throw new BadRequestException('Invalid order source');
-    return this.prisma.runAsTenant(user.restaurantId, async tx => {
+    const started = performance.now(),
+      branchId = await this.branchScope(user, query.branchId, deviceId);
+    if (query.source && !['ALL', 'POS', 'CAPTAIN', 'KIOSK', 'QR', 'WHATSAPP', 'ONLINE'].includes(query.source))
+      throw new BadRequestException('Invalid order source');
+    return this.prisma.runAsTenant(user.restaurantId, async (tx) => {
       await tx.$executeRawUnsafe('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
-      const restaurant = await tx.restaurant.findUniqueOrThrow({ where: { id: user.restaurantId }, select: { id: true, name: true, currency: true, timezone: true } });
-      const branches = await tx.branch.findMany({ where: { restaurantId: user.restaurantId, ...(branchId ? { id: branchId } : {}) }, select: { id: true, name: true, code: true, timezone: true, status: true }, orderBy: { name: 'asc' } });
-      const timezone = branches.find(b => b.id === branchId)?.timezone ?? restaurant.timezone;
+      const restaurant = await tx.restaurant.findUniqueOrThrow({
+        where: { id: user.restaurantId },
+        select: { id: true, name: true, currency: true, timezone: true }
+      });
+      const branches = await tx.branch.findMany({
+        where: { restaurantId: user.restaurantId, ...(branchId ? { id: branchId } : {}) },
+        select: { id: true, name: true, code: true, timezone: true, status: true },
+        orderBy: { name: 'asc' }
+      });
+      const timezone = branches.find((b) => b.id === branchId)?.timezone ?? restaurant.timezone;
       const dates = dashboardDates(query.period ?? 'TODAY', timezone, query.from, query.to);
       const source = query.source && query.source !== 'ALL' ? Prisma.sql`AND o.source = ${query.source}` : Prisma.empty;
       const scope = Prisma.sql`o."restaurantId" = ${user.restaurantId} ${branchId ? Prisma.sql`AND o."branchId" = ${branchId}` : Prisma.empty} ${source}`;
       const local = Prisma.sql`timezone(${timezone}, timezone('UTC', o."createdAt"))`;
-      const from = new Date(`${dates.from}T00:00:00Z`), to = new Date(`${dates.to}T00:00:00Z`);
+      const from = new Date(`${dates.from}T00:00:00Z`),
+        to = new Date(`${dates.to}T00:00:00Z`);
       const range = Prisma.sql`o."createdAt" >= ${ts(new Date(from.getTime() - 86400000))} AND o."createdAt" < ${ts(new Date(to.getTime() + 2 * 86400000))} AND (${local})::date >= ${dates.from}::date AND (${local})::date <= ${dates.to}::date`;
       // One canonical operational order per sale; gateway transactions contribute refunds, never another sale.
       const base = Prisma.sql`WITH refund_totals AS (
@@ -92,12 +200,39 @@ export class TenantDashboardService {
         UNION ALL SELECT 'recent', COALESCE(jsonb_agg(q),'[]'::jsonb) FROM (
           SELECT "externalOrderId", "branchId", source, status, "paymentStatus", "tableLabel", "totalAmount", to_char("createdAt",'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "createdAt", meta->>'orderNumber' AS "orderNumber", meta->>'tokenNumber' AS "tokenNumber" FROM sales ORDER BY "createdAt" DESC LIMIT 12
         ) q`;
-      const [finance, fleet, fleetCounts, tables, qr, stock, apps, alertDevices] = await Promise.all([
-        tx.$queryRaw<Array<{kind:string;data:any[]}>>(financialQuery),
-        tx.device.findMany({ where: { restaurantId: user.restaurantId, ...(branchId ? { branchId } : {}) }, select: { id:true,name:true,type:true,branchId:true,status:true,lastSeenAt:true,lastSyncAt:true,syncStatus:true,syncError:true,pendingSyncCount:true,appVersion:true,kitchenStation:true,isLocked:true }, orderBy: { name: 'asc' }, take: 1000 }),
-        tx.$queryRaw<any[]>(Prisma.sql`SELECT type, "branchId", COUNT(*)::int AS total, COUNT(*) FILTER(WHERE status='ACTIVE')::int AS active, COUNT(*) FILTER(WHERE status='ACTIVE' AND "lastSeenAt">=${ts(new Date(Date.now()-ONLINE_WITHIN_MS))})::int AS online FROM "Device" WHERE "restaurantId"=${user.restaurantId} ${branchId ? Prisma.sql`AND "branchId"=${branchId}` : Prisma.empty} GROUP BY type,"branchId"`),
-        tx.$queryRaw<any[]>(Prisma.sql`SELECT COUNT(*)::int AS total, COUNT(*) FILTER(WHERE payload->>'status'='OCCUPIED')::int AS occupied FROM "SyncedEntity" WHERE "restaurantId"=${user.restaurantId} AND "entityType"='DINING_TABLE' AND payload->>'deleted' IS DISTINCT FROM 'true' ${branchId ? Prisma.sql`AND payload->>'branchId'=${branchId}` : Prisma.empty}`),
-        tx.qrCode.groupBy({ by:['branchId'], where: { restaurantId:user.restaurantId,status:'ACTIVE',...(branchId ? {branchId} : {}) },_count:{_all:true} }),
+      const [finance, fleet, fleetCounts, tables, qr, stock, apps, alertDevices, delayedOrders, unavailableDishes, unpaidBills] = await Promise.all([
+        tx.$queryRaw<Array<{ kind: string; data: any[] }>>(financialQuery),
+        tx.device.findMany({
+          where: { restaurantId: user.restaurantId, ...(branchId ? { branchId } : {}) },
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            branchId: true,
+            status: true,
+            lastSeenAt: true,
+            lastSyncAt: true,
+            syncStatus: true,
+            syncError: true,
+            pendingSyncCount: true,
+            appVersion: true,
+            kitchenStation: true,
+            isLocked: true
+          },
+          orderBy: { name: 'asc' },
+          take: 1000
+        }),
+        tx.$queryRaw<any[]>(
+          Prisma.sql`SELECT type, "branchId", COUNT(*)::int AS total, COUNT(*) FILTER(WHERE status='ACTIVE')::int AS active, COUNT(*) FILTER(WHERE status='ACTIVE' AND "lastSeenAt">=${ts(new Date(Date.now() - ONLINE_WITHIN_MS))})::int AS online FROM "Device" WHERE "restaurantId"=${user.restaurantId} ${branchId ? Prisma.sql`AND "branchId"=${branchId}` : Prisma.empty} GROUP BY type,"branchId"`
+        ),
+        tx.$queryRaw<any[]>(
+          Prisma.sql`SELECT COUNT(*)::int AS total, COUNT(*) FILTER(WHERE payload->>'status'='OCCUPIED')::int AS occupied FROM "SyncedEntity" WHERE "restaurantId"=${user.restaurantId} AND "entityType"='DINING_TABLE' AND payload->>'deleted' IS DISTINCT FROM 'true' ${branchId ? Prisma.sql`AND payload->>'branchId'=${branchId}` : Prisma.empty}`
+        ),
+        tx.qrCode.groupBy({
+          by: ['branchId'],
+          where: { restaurantId: user.restaurantId, status: 'ACTIVE', ...(branchId ? { branchId } : {}) },
+          _count: { _all: true }
+        }),
         tx.$queryRaw<any[]>(Prisma.sql`WITH stock AS (
           SELECT e.payload->>'name' AS name,e.payload->>'branchId' AS "branchId",
             CASE WHEN jsonb_typeof(e.payload->'openingStock')='number' THEN (e.payload->>'openingStock')::float8 + COALESCE(m.delta,0)
@@ -109,20 +244,150 @@ export class TenantDashboardService {
           WHERE e."restaurantId"=${user.restaurantId} AND e."entityType"='INVENTORY_ITEM' AND e.payload->>'deleted' IS DISTINCT FROM 'true'
             ${branchId ? Prisma.sql`AND e.payload->>'branchId'=${branchId}` : Prisma.empty}
         ) SELECT name,"branchId",balance FROM stock WHERE balance<=minimum ORDER BY balance,name LIMIT 20`),
-        tx.applicationEntitlement.findMany({ where:{restaurantId:user.restaurantId,enabled:true,subscription:{status:{in:['ACTIVE','TRIAL']},expiresAt:{gt:new Date()}}},select:{appCode:true} }),
-        tx.device.findMany({where:{restaurantId:user.restaurantId,...(branchId?{branchId}:{}),OR:[{isLocked:true},{syncError:{not:null}},{pendingSyncCount:{gt:0}},{status:'ACTIVE',lastSeenAt:null},{status:'ACTIVE',lastSeenAt:{lt:new Date(Date.now()-ONLINE_WITHIN_MS)}}]},select:{id:true,branchId:true,name:true,type:true,status:true,lastSeenAt:true,isLocked:true,syncError:true,pendingSyncCount:true},orderBy:{updatedAt:'desc'},take:20})
+        tx.applicationEntitlement.findMany({
+          where: { restaurantId: user.restaurantId, enabled: true, subscription: { status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() } } },
+          select: { appCode: true }
+        }),
+        tx.device.findMany({
+          where: {
+            restaurantId: user.restaurantId,
+            ...(branchId ? { branchId } : {}),
+            OR: [
+              { isLocked: true },
+              { syncError: { not: null } },
+              { pendingSyncCount: { gt: 0 } },
+              { status: 'ACTIVE', lastSeenAt: null },
+              { status: 'ACTIVE', lastSeenAt: { lt: new Date(Date.now() - ONLINE_WITHIN_MS) } }
+            ]
+          },
+          select: { id: true, branchId: true, name: true, type: true, status: true, lastSeenAt: true, isLocked: true, syncError: true, pendingSyncCount: true },
+          orderBy: { updatedAt: 'desc' },
+          take: 20
+        }),
+        // Operational attention stays live when the owner filters historical sales.
+        tx.syncedOrder.findMany({
+          where: {
+            restaurantId: user.restaurantId,
+            ...(branchId ? { branchId } : {}),
+            status: { in: ['NEW', 'PENDING', 'PLACED', 'CONFIRMED', 'ACCEPTED', 'PREPARING', 'COOKING', 'IN_PROGRESS'] },
+            createdAt: { lt: new Date(Date.now() - 20 * 60000) },
+            OR: [{ paymentStatus: { in: ['PAID', 'SUCCESS'] } }, { paymentMethod: { in: ['CASH', 'CASH_AT_COUNTER', 'PAY_AT_COUNTER'] } }]
+          },
+          select: { externalOrderId: true, branchId: true, tableLabel: true, meta: true, createdAt: true, status: true },
+          orderBy: { createdAt: 'asc' },
+          take: 20
+        }),
+        tx.$queryRaw<Array<{ id: string; name: string; branchId: string | null }>>(
+          Prisma.sql`SELECT DISTINCT e."externalId" AS id,e.payload->>'name' AS name,CASE WHEN e.payload->>'isAvailable'='false' THEN COALESCE(NULLIF(e.payload->>'branchId',''),${branchId}) ELSE b.payload->>'branchId' END AS "branchId" FROM "SyncedEntity" e LEFT JOIN "SyncedEntity" b ON b."restaurantId"=e."restaurantId" AND b."entityType"='BRANCH_MENU_OVERRIDE' AND b.payload->>'itemId'=e."externalId" AND b.payload->>'isAvailable'='false' AND b.payload->>'deleted' IS DISTINCT FROM 'true' ${branchId ? Prisma.sql`AND b.payload->>'branchId'=${branchId}` : Prisma.empty} WHERE e."restaurantId"=${user.restaurantId} AND e."entityType"='MENU_ITEM' AND (e.payload->>'isAvailable'='false' OR b.id IS NOT NULL) AND e.payload->>'deleted' IS DISTINCT FROM 'true' AND NULLIF(e.payload->>'archivedAt','') IS NULL ${branchId ? Prisma.sql`AND (e.payload->>'branchId'=${branchId} OR NULLIF(e.payload->>'branchId','') IS NULL) AND (jsonb_typeof(e.payload->'branchIds') IS DISTINCT FROM 'array' OR e.payload->'branchIds'='[]'::jsonb OR e.payload->'branchIds' ? ${branchId})` : Prisma.empty} ORDER BY name LIMIT 20`
+        ),
+        tx.$queryRaw<Array<{ id: string; label: string; branchId: string | null; createdAt: string; outstanding: number }>>(
+          Prisma.sql`SELECT o."externalOrderId" AS id,COALESCE(o.meta->>'tokenNumber',o.meta->>'orderNumber',o."externalOrderId") AS label,o."branchId",to_char(o."createdAt",'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "createdAt",GREATEST(0,o."totalAmount"-COALESCE(p.collected,0))::float8/100 AS outstanding FROM "SyncedOrder" o LEFT JOIN (SELECT "orderId",SUM(amount) FILTER(WHERE kind='COLLECTION') AS collected FROM "OrderPaymentEntry" WHERE "restaurantId"=${user.restaurantId} GROUP BY "orderId") p ON p."orderId"=o.id WHERE o."restaurantId"=${user.restaurantId} ${branchId ? Prisma.sql`AND o."branchId"=${branchId}` : Prisma.empty} AND o.status NOT IN ('DRAFT','CANCELLED','VOID','VOIDED','REFUNDED') AND COALESCE(o."paymentStatus",'PENDING') NOT IN ('SUCCESS','PAID','REFUNDED','PARTIALLY_REFUNDED','REFUND_PENDING') AND o."totalAmount">COALESCE(p.collected,0) ORDER BY o."createdAt" LIMIT 20`
+        )
       ]);
-      const {totals,trend,byBranch,bySource,topItems,recent}=Object.fromEntries(finance.map(row=>[row.kind,row.data]));
-      const money=(n:unknown)=>Number(n??0)/100, t=totals[0], devices=fleet.map(d=>({...d,health:deviceHealth(d),syncState:d.syncError?'error':d.pendingSyncCount>0?'pending':!d.lastSyncAt?'never_synced':'synced'}));
-      const branchesData=branches.map(branch=>{
-        const sum=byBranch.find(b=>b.branchId===branch.id), mine=fleetCounts.filter(d=>d.branchId===branch.id), deployed=mine.filter(d=>d.active>0).map(d=>d.type);
-        const qrCount=qr.find(q=>q.branchId===branch.id)?._count._all??0;
-        return {...branch,sales:money(sum?.sales),orders:Number(sum?.orders??0),paidOrders:Number(sum?.paidOrders??0),averageOrder:sum?.paidOrders?money(sum.sales)/sum.paidOrders:0,devices:mine.reduce((n,d)=>n+d.total,0),online:mine.reduce((n,d)=>n+d.online,0),deployedProducts:[...deployed,...(qrCount?['QR_ORDERING']:[])],activeQrCodes:qrCount};
+      const { totals, trend, byBranch, bySource, topItems, recent } = Object.fromEntries(finance.map((row) => [row.kind, row.data]));
+      const money = (n: unknown) => Number(n ?? 0) / 100,
+        t = totals[0],
+        devices = fleet.map((d) => ({
+          ...d,
+          health: deviceHealth(d),
+          syncState: d.syncError ? 'error' : d.pendingSyncCount > 0 ? 'pending' : !d.lastSyncAt ? 'never_synced' : 'synced'
+        }));
+      const branchesData = branches.map((branch) => {
+        const sum = byBranch.find((b) => b.branchId === branch.id),
+          mine = fleetCounts.filter((d) => d.branchId === branch.id),
+          deployed = mine.filter((d) => d.active > 0).map((d) => d.type);
+        const qrCount = qr.find((q) => q.branchId === branch.id)?._count._all ?? 0;
+        return {
+          ...branch,
+          sales: money(sum?.sales),
+          orders: Number(sum?.orders ?? 0),
+          paidOrders: Number(sum?.paidOrders ?? 0),
+          averageOrder: sum?.paidOrders ? money(sum.sales) / sum.paidOrders : 0,
+          devices: mine.reduce((n, d) => n + d.total, 0),
+          online: mine.reduce((n, d) => n + d.online, 0),
+          deployedProducts: [...deployed, ...(qrCount ? ['QR_ORDERING'] : [])],
+          activeQrCodes: qrCount
+        };
       });
-      const alerts=[...alertDevices.map(d=>({kind:'DEVICE',branchId:d.branchId,title:d.name??d.type,detail:d.isLocked?'Device locked':d.syncError?'Sync error':d.pendingSyncCount?`${d.pendingSyncCount} pending changes`:deviceHealth(d).replace('_',' '),target:'SYNC'})),...stock.map(s=>({kind:'STOCK',branchId:s.branchId,title:s.name,detail:s.balance<=0?'Out of stock':'Low stock',target:'INVENTORY'}))];
-      const unassigned=byBranch.find(b=>b.branchId===null);
-      const deviceCounts=[...new Set(fleetCounts.map(d=>d.type))].map(type=>({type,total:fleetCounts.filter(d=>d.type===type).reduce((n,d)=>n+d.total,0),online:fleetCounts.filter(d=>d.type===type).reduce((n,d)=>n+d.online,0)}));
-      return {restaurant,scope:{branchId,label:branchId?branches[0]?.name:'All branches',...dates,source:query.source??'ALL'},summary:{sales:money(t.sales),grossSales:money(t.gross),refunds:money(t.refunds),orders:t.orders,paidOrders:t.paid,averageOrder:t.paid?money(t.sales)/t.paid:0,pendingPayments:t.pending,pendingAmount:money(t.pending_amount),activeBranches:branches.filter(b=>b.status==='ACTIVE').length,tables:tables[0]?.total??0,occupiedTables:tables[0]?.occupied??0},trend:trend.map(p=>({...p,sales:money(p.sales)})),byBranch:branchesData,unassigned:unassigned?{sales:money(unassigned.sales),orders:unassigned.orders}:null,bySource:bySource.map(s=>({...s,sales:money(s.sales)})),topItems:topItems.map(i=>({...i,revenue:money(i.revenue)})),devices,deviceCounts,devicesTruncated:fleetCounts.reduce((n,d)=>n+d.total,0)>fleet.length,licensedProducts:[...new Set(apps.map(a=>a.appCode))],alerts,recentOrders:recent.map(o=>({...o,total:money(o.totalAmount),branchName:branches.find(b=>b.id===o.branchId)?.name??'Unassigned'})),generatedAt:new Date().toISOString(),queryMs:Math.round(performance.now()-started)};
+      const alerts = [
+        ...alertDevices.map((d) => ({
+          kind: 'DEVICE',
+          branchId: d.branchId,
+          title: d.name ?? d.type,
+          detail: d.isLocked
+            ? 'Device locked'
+            : d.syncError
+              ? 'Sync error'
+              : d.pendingSyncCount
+                ? `${d.pendingSyncCount} pending changes`
+                : deviceHealth(d).replace('_', ' '),
+          target: 'SYNC'
+        })),
+        ...stock.map((s) => ({
+          kind: 'STOCK',
+          branchId: s.branchId,
+          title: s.name,
+          detail: s.balance <= 0 ? 'Out of stock' : 'Low stock',
+          target: 'INVENTORY'
+        }))
+      ];
+      const unassigned = byBranch.find((b) => b.branchId === null);
+      const deviceCounts = [...new Set(fleetCounts.map((d) => d.type))].map((type) => ({
+        type,
+        total: fleetCounts.filter((d) => d.type === type).reduce((n, d) => n + d.total, 0),
+        online: fleetCounts.filter((d) => d.type === type).reduce((n, d) => n + d.online, 0)
+      }));
+      return {
+        restaurant,
+        viewerRole: user.role,
+        attention: {
+          unpaidBills: unpaidBills.map((b) => ({
+            ...b,
+            createdAt: dashboardDates(
+              'TODAY',
+              branches.find((branch) => branch.id === b.branchId)?.timezone ?? restaurant.timezone,
+              undefined,
+              undefined,
+              new Date(b.createdAt)
+            ).from
+          })),
+          delayedMinutes: 20,
+          delayedOrders: delayedOrders.map((o) => ({
+            ...o,
+            label: (o.meta as any)?.tokenNumber ?? (o.meta as any)?.orderNumber ?? o.externalOrderId,
+            ageMinutes: Math.floor((Date.now() - o.createdAt.getTime()) / 60000)
+          })),
+          unavailableDishes,
+          devices: alertDevices.map((d) => ({ id: d.id, branchId: d.branchId, name: d.name ?? d.type, health: deviceHealth(d) }))
+        },
+        scope: { branchId, label: branchId ? branches[0]?.name : 'All branches', ...dates, source: query.source ?? 'ALL' },
+        summary: {
+          sales: money(t.sales),
+          grossSales: money(t.gross),
+          refunds: money(t.refunds),
+          orders: t.orders,
+          paidOrders: t.paid,
+          averageOrder: t.paid ? money(t.sales) / t.paid : 0,
+          pendingPayments: t.pending,
+          pendingAmount: money(t.pending_amount),
+          activeBranches: branches.filter((b) => b.status === 'ACTIVE').length,
+          tables: tables[0]?.total ?? 0,
+          occupiedTables: tables[0]?.occupied ?? 0
+        },
+        trend: trend.map((p) => ({ ...p, sales: money(p.sales) })),
+        byBranch: branchesData,
+        unassigned: unassigned ? { sales: money(unassigned.sales), orders: unassigned.orders } : null,
+        bySource: bySource.map((s) => ({ ...s, sales: money(s.sales) })),
+        topItems: topItems.map((i) => ({ ...i, revenue: money(i.revenue) })),
+        devices,
+        deviceCounts,
+        devicesTruncated: fleetCounts.reduce((n, d) => n + d.total, 0) > fleet.length,
+        licensedProducts: [...new Set(apps.map((a) => a.appCode))],
+        alerts,
+        recentOrders: recent.map((o) => ({ ...o, total: money(o.totalAmount), branchName: branches.find((b) => b.id === o.branchId)?.name ?? 'Unassigned' })),
+        generatedAt: new Date().toISOString(),
+        queryMs: Math.round(performance.now() - started)
+      };
     });
   }
 }

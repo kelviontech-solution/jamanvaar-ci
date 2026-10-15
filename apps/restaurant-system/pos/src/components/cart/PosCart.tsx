@@ -105,9 +105,9 @@ export const PosCart: React.FC = () => {
   const hasSentItems = cart.items.some((ci) => (ci.kotSentQty || 0) > 0);
   const canSendKot = hasItems && unsentCount > 0 && !isSendingKot;
   const kotLabel = kotSentState && unsentCount === 0
-    ? 'KOT SENT'
+    ? 'SAVED ? WAITING TO SYNC'
     : hasSentItems && unsentCount === 0
-      ? 'SENT TO KITCHEN'
+      ? 'SAVED ON THIS DEVICE'
       : hasSentItems
         ? `SEND KOT (${unsentCount} NEW)`
         : 'SEND KOT';

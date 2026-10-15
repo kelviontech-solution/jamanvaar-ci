@@ -98,7 +98,7 @@ export class MenuPublicationsService {
   }
 
   /** Builds the snapshot from the draft inside an open transaction and records the numbered version. */
-  private async publishTx(tx: Prisma.TransactionClient, restaurantId: string, deviceId: string | null, note: string | null) {
+  async publishTx(tx: Prisma.TransactionClient, restaurantId: string, deviceId: string | null, note: string | null) {
     // Serialise concurrent publishes so version numbers stay consecutive.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'menu-publish:' + restaurantId}))`;
     const built = buildContent(await this.draftRows(tx, restaurantId));

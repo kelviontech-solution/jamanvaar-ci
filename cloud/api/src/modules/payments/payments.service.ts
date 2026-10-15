@@ -1,3 +1,4 @@
+import {assertBranchAccepting} from '../operations/operations-policy';
 import { RealtimeBus } from "../../common/realtime/realtime-bus";
 import { lockSettlement } from './settlement-lock.util';
 import { syncConfirmedPaymentLedger, lockCanonicalPaymentOrder } from './order-payment-ledger';
@@ -145,6 +146,7 @@ export class PaymentsService {
         if (prior.kioskId !== kioskId || prior.source !== 'KIOSK') throw new ForbiddenException('This payment reference belongs to another device or channel');
         return prior;
       }
+      if(kiosk.branchId){await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:' + restaurantId}))`;await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-limit:' + restaurantId}))`;await assertBranchAccepting(tx,restaurantId,kiosk.branchId,'KIOSK');}
       return tx.order.create({
         data: {
           restaurantId,
@@ -688,6 +690,18 @@ export class PaymentsService {
     const request = this.readPaymentStatus(restaurantId, paymentId).finally(() => this.statusRequests.delete(key));
     this.statusRequests.set(key, request);
     return request;
+  }
+
+  /** Replays only kitchen admission for an already confirmed transaction; never starts another payment. */
+  async recoverConfirmedDelivery(restaurantId:string,paymentId:string,actorId:string){
+    const payment=await this.prisma.runAsTenant(restaurantId,tx=>tx.paymentTransaction.findFirst({where:{id:paymentId,restaurantId,status:'SUCCESS'},include:{order:true}}));
+    if(!payment)throw new ConflictException('Check the original payment status before retrying kitchen delivery.');
+    if(payment.order.source==='KIOSK')throw new ConflictException('Reconnect the original kiosk and synchronize its accepted order. Do not create a second order or collect again.');
+    if(!['QR','WHATSAPP'].includes(payment.order.source))throw new ConflictException('This order must be recovered from its original ordering device.');
+    const problem=await this.ingestWhatsAppOrderIfNeeded(payment);
+    if(problem)throw new ConflictException(problem);
+    await this.prisma.runAsTenant(restaurantId,tx=>this.audit.log({actorType:'TENANT',actorId,restaurantId,action:'CONFIRMED_PAYMENT_DELIVERY_RETRIED',category:'PAYMENTS',details:{paymentId,externalOrderId:payment.order.externalOrderId}},tx));
+    return {status:'DELIVERY_RETRIED',paymentId,reference:payment.order.externalOrderId};
   }
 
   private async readPaymentStatus(restaurantId: string, paymentId: string) {

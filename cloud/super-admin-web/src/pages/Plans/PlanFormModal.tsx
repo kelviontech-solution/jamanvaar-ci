@@ -1,6 +1,6 @@
-import { useState, useMemo, type FormEvent } from 'react';
+import { useState, useMemo, useEffect, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import { ENTITLEMENT_KEYS, ENTITLEMENT_LABELS, type Entitlements, type Plan } from '../../api/types';
+import { ENTITLEMENT_KEYS, ENTITLEMENT_LABELS, type Entitlements, type Plan, type FeatureRecord } from '../../api/types';
 import {
   CORE_PLAN_FEATURE_GROUPS,
   PRO_PLAN_FEATURE_GROUPS,
@@ -17,6 +17,7 @@ import '../../components/shared.css';
 import './plans.css';
 
 interface FormState {
+  productFamily: 'RESTAURANT' | 'KIOSK';
   // QR/ENTERPRISE plans are created via seed/API today, not this form — 'QR' is accepted here so
   // opening an *existing* QR-tier plan for edit doesn't type-error or crash; the tier picker below
   // only offers CORE/PRO/ENTERPRISE, unchanged from before this phase.
@@ -28,7 +29,7 @@ interface FormState {
   maxBranches: string;
   maxDevices: string;
   maxUsers: string;
-  entitlements: Entitlements;
+  entitlements: Entitlements & Record<string, boolean>;
 }
 
 const EMPTY_ENTITLEMENTS = Object.fromEntries(ENTITLEMENT_KEYS.map((k) => [k, false])) as Entitlements;
@@ -37,6 +38,7 @@ function toFormState(plan?: Plan): FormState {
   if (!plan) {
     return {
       tier: 'CORE',
+      productFamily: 'RESTAURANT',
       name: 'JAMANVAAR CORE',
       description: 'Foundation Edition: Complete offline-first restaurant operations suite.',
       priceMonthly: '5000',
@@ -49,6 +51,7 @@ function toFormState(plan?: Plan): FormState {
   }
   return {
     tier: plan.tier,
+    productFamily: plan.productFamily,
     name: plan.name,
     description: plan.description ?? '',
     priceMonthly: String(plan.priceMonthly / 100),
@@ -71,6 +74,9 @@ export function PlanFormModal({
 }) {
   const [activeSubTab, setActiveSubTab] = useState<'matrix' | 'details' | 'limits' | 'preview'>('matrix');
   const [form, setForm] = useState<FormState>(() => toFormState(plan));
+  const [qrFeatures, setQrFeatures] = useState<FeatureRecord[]>([]);
+  const [catalogError, setCatalogError] = useState('');
+  useEffect(() => {let live=true;void api.get<FeatureRecord[]>('/api/v1/features').then(rows=>{if(live)setQrFeatures(rows.filter(f=>f.code.startsWith('QR_') && !!f.legacyEntitlementKey));}).catch(()=>{if(live)setCatalogError('QR feature catalogue could not be loaded. Reload this form before editing QR capabilities.');});return()=>{live=false;};},[]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
@@ -88,7 +94,7 @@ export function PlanFormModal({
     // resolveTierEntitlements (from @jamanvaar/types, shared with the local runtime) only knows
     // CORE/PRO/ENTERPRISE — 'QR' plans aren't created/edited via this tier-switcher (the picker
     // below only offers those three), so QR falls back to CORE's entitlement defaults here.
-    const resolved = resolveTierEntitlements(tier === 'QR' ? 'CORE' : tier, form.entitlements);
+    const resolved = tier === 'QR' ? {...EMPTY_ENTITLEMENTS,menuManagement:true,tableManagement:true,foodCustomization:true,qrTableOrdering:true} : resolveTierEntitlements(tier, form.entitlements);
     let defaultPrice = form.priceMonthly;
     let defaultName = form.name;
     if (!plan) {
@@ -98,6 +104,8 @@ export function PlanFormModal({
       } else if (tier === 'PRO') {
         defaultPrice = '7000';
         defaultName = 'JAMANVAAR PRO';
+      } else if (tier === 'QR') {
+        defaultName = 'JAMANVAAR QR';
       } else {
         defaultPrice = '15000';
         defaultName = 'JAMANVAAR ENTERPRISE';
@@ -113,7 +121,7 @@ export function PlanFormModal({
   }
 
   function applyTierDefaults() {
-    const defaults = form.tier === 'PRO' ? PRO_DEFAULT_ENTITLEMENTS : CORE_DEFAULT_ENTITLEMENTS;
+    const defaults = form.tier === 'QR' ? {...EMPTY_ENTITLEMENTS,menuManagement:true,tableManagement:true,foodCustomization:true,qrTableOrdering:true} : form.tier === 'ENTERPRISE' ? resolveTierEntitlements('ENTERPRISE', form.entitlements) : form.tier === 'PRO' ? PRO_DEFAULT_ENTITLEMENTS : CORE_DEFAULT_ENTITLEMENTS;
     setForm((f) => ({
       ...f,
       entitlements: { ...defaults } as Entitlements
@@ -183,6 +191,7 @@ export function PlanFormModal({
     setSubmitting(true);
     try {
       const payload = {
+        productFamily: form.productFamily,
         tier: form.tier,
         name: form.name,
         description: form.description || undefined,
@@ -262,6 +271,9 @@ export function PlanFormModal({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Tier Selection & Inheritance Banner */}
               <div className="plan-tier-selector">
+                <button type="button" className={`tier-option-card ${form.tier === 'QR' ? 'selected' : ''}`} onClick={() => handleTierChange('QR')}>
+                  <span className="tier-title">Standalone QR</span><span className="tier-desc">Independent QR management. Add optional capabilities below; no POS or Kiosk license required.</span>
+                </button>
                 <div
                   className={`tier-option-card ${form.tier === 'CORE' ? 'selected' : ''}`}
                   onClick={() => handleTierChange('CORE')}
@@ -494,6 +506,14 @@ export function PlanFormModal({
           )}
 
           {/* TAB 2: PRICING & DETAILS */}
+          {activeSubTab === 'matrix' && <section className="form-field" style={{marginTop:20}}>
+            <label htmlFor="plan-product-family">Product family</label>
+            <select id="plan-product-family" value={form.productFamily} onChange={e => update('productFamily',e.target.value as FormState['productFamily'])}><option value="RESTAURANT">Restaurant / standalone QR</option><option value="KIOSK">Kiosk</option></select>
+            <h3>QR module capabilities</h3><p className="form-note">These flags apply to QR inside any plan. Platform feature activation and rollout still control availability.</p>
+            {catalogError && <p role="alert">{catalogError}</p>}
+            <button type="button" disabled={!qrFeatures.length} onClick={()=>setForm(f=>({...f,entitlements:{...f.entitlements,qrTableOrdering:true,...Object.fromEntries(qrFeatures.map(feature=>[feature.legacyEntitlementKey!,true]))}}))}>Include all QR capabilities</button>
+            <div className="module-entitlement-grid">{qrFeatures.map(feature=><label key={feature.id} className="entitlement-checkbox-label"><input type="checkbox" checked={form.entitlements[feature.legacyEntitlementKey!] === true} onChange={e=>setForm(f=>({...f,entitlements:{...f.entitlements,[feature.legacyEntitlementKey!]:e.target.checked}}))}/><span>{feature.name}{!feature.isActive?' · platform inactive':feature.rolloutPercent < 100?` · ${feature.rolloutPercent}% rollout`:''}</span></label>)}</div>
+          </section>}
           {activeSubTab === 'details' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div className="form-section-label">General Information</div>

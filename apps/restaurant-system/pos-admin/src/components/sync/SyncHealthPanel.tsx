@@ -22,7 +22,9 @@ const HEALTH_STYLE: Record<string, string> = {
  * backlog, the menu version each one has applied, and anything the server's reconciliation flagged for review.
  * Reconciliation only reports; nothing here changes money or stock.
  */
-export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => void }) {
+export function SyncHealthPanel({ showToast, initialDeviceId = '' }: { showToast: (msg: string) => void; initialDeviceId?: string }) {
+  const [deviceId,setDeviceId]=useState(initialDeviceId);
+  useEffect(()=>{setDeviceId(initialDeviceId);},[initialDeviceId]);
   const [devices, setDevices] = useState<FleetDevice[]>([]);
   const [issues, setIssues] = useState<SyncIssue[]>([]);
   const [menuVersion, setMenuVersion] = useState<number>(0);
@@ -110,6 +112,8 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
 
       <section className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm">
         <h2 className="text-lg font-bold text-jaman-navy mb-3">Devices</h2>
+        {deviceId&&<p className="mb-3 text-sm">Showing the device selected from Today. <button type="button" className="min-h-11 underline font-bold" onClick={()=>setDeviceId('')}>Show all devices</button></p>}
+        {deviceId&&!devices.some(d=>d.id===deviceId)&&<p role="status" className="text-sm text-amber-800">This device is no longer available in this branch.</p>}
         {devices.length === 0 ? (
           <p className="text-sm text-[#4A5568]">No devices have connected yet.</p>
         ) : (
@@ -121,7 +125,7 @@ export function SyncHealthPanel({ showToast }: { showToast: (msg: string) => voi
                 </tr>
               </thead>
               <tbody>
-                {devices.map((d) => (
+                {devices.filter(d=>!deviceId || d.id===deviceId).map((d) => (
                   <tr key={d.id} className="border-t border-jaman-border">
                     <td className="py-2 pr-4 font-semibold text-jaman-navy">{d.name ?? d.type}<span className="ml-2 text-xs text-[#64748B]">{d.type}</span></td>
                     <td className={`pr-4 font-semibold ${HEALTH_STYLE[d.health] ?? ''}`}>{d.health.replace('_', ' ')}</td>

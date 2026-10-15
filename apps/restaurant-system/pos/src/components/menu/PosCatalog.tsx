@@ -1,3 +1,4 @@
+import { CashierSpeedBar } from './CashierSpeedBar';
 import React, { useState, useMemo } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
 import { db } from '@jamanvaar/database';
@@ -202,6 +203,7 @@ export const PosCatalog: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent space-y-2.5 select-none min-w-0">
+      <CashierSpeedBar />
       {/* 1. CURRENT CATEGORY HEADING (the categories themselves are chosen in the left sidebar) */}
       <div className="shrink-0 px-1 pt-1">
         <h2 className="font-bold text-xl sm:text-2xl text-jaman-navy tracking-tight truncate leading-tight">{currentCategoryLabel}</h2>

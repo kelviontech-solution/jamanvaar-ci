@@ -1,3 +1,4 @@
+import {initializeDisplayPreferences,DisplayPreferences} from '@jamanvaar/ui';
 import { verifyInstalledUpdate } from '@jamanvaar/ui';
 import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
@@ -7,6 +8,7 @@ import { DeviceGateOverlay, PlatformNoticeBanner, CommandActivityToast } from '@
 import { DeviceGate } from '@jamanvaar/sync';
 import { resetTerminal } from './cloud/cloudClient';
 import './index.css';
+initializeDisplayPreferences();
 
 // BUG-145 follow-up: a device credential the cloud no longer recognises is fixed by activating this terminal
 // again, not by blocking the screen — see DeviceGate's own comment. This is what actually does that unbinding.
@@ -26,6 +28,7 @@ void bootDurableStorage({ appId: 'kds', restaurantId: localStorage.getItem('jama
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
       <App />
+      <DisplayPreferences compact/>
       <PlatformNoticeBanner />
       <CommandActivityToast />
       <DeviceGateOverlay appName="Kitchen Display" />

@@ -1,3 +1,4 @@
+import { branchWaitEstimate } from '../operations/wait-estimate';
 import {qrReportRange} from './qr-report-range';
 import {
   BadRequestException,
@@ -180,7 +181,7 @@ export class QrAdvancedService {
     return this.prisma.runAsTenant(device.restaurantId, async (tx) => {
       const licensing = await this.entitlements.resolveQrCapabilities(
         tx,
-        device.restaurantId,
+        device.restaurantId, device.branchId,
       );
       if (!licensing.module.enabled)
         throw new ForbiddenException("QR Ordering is not enabled");
@@ -246,7 +247,7 @@ export class QrAdvancedService {
             await this.entitlements.assertQrCapability(
               tx,
               device.restaurantId,
-              capability,
+              capability, device.branchId,
             );
         }
         const where = {
@@ -338,7 +339,7 @@ export class QrAdvancedService {
       const settings = await this.effectiveIn(tx, restaurantId, branchId);
       const licensing = await this.entitlements.resolveQrCapabilities(
         tx,
-        restaurantId,
+        restaurantId, branchId,
       );
       for (const [flag, cap] of Object.entries(flagCapabilities))
         (settings as Record<string, unknown>)[flag] =
@@ -360,7 +361,7 @@ export class QrAdvancedService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_MULTI_BRANCH",
+        "QR_MULTI_BRANCH", device.branchId,
       );
       const row = await tx.syncedEntity.findUnique({
         where: {
@@ -412,7 +413,7 @@ export class QrAdvancedService {
         await this.entitlements.assertQrCapability(
           tx,
           device.restaurantId,
-          "QR_MULTI_BRANCH",
+          "QR_MULTI_BRANCH", device.branchId,
         );
         const branches = await tx.branch.findMany({
           where: {
@@ -433,7 +434,7 @@ export class QrAdvancedService {
             await this.entitlements.assertQrCapability(
               tx,
               device.restaurantId,
-              cap,
+              cap, device.branchId,
             );
         }
         const preview = [];
@@ -611,20 +612,21 @@ export class QrAdvancedService {
     preparationMinutes: number,
   ) {
     const settings = await this.effectiveIn(tx, restaurantId, branchId);
+    const wait = await branchWaitEstimate(tx, restaurantId, branchId, preparationMinutes);
     if (
       !settings.capacityEnabled ||
       !(
         await this.entitlements.resolveQrCapability(
           tx,
           restaurantId,
-          "QR_KITCHEN_CAPACITY",
+          "QR_KITCHEN_CAPACITY", branchId,
         )
       ).enabled
     )
       return {
         enabled: false,
         units: 0,
-        estimateMinutes: preparationMinutes,
+        ...wait,
         atCapacity: false,
       };
     const active = await tx.syncedOrder.findMany({
@@ -655,11 +657,8 @@ export class QrAdvancedService {
     return {
       enabled: true,
       units,
-      estimateMinutes:
-        preparationMinutes +
-        (settings.busyAtWorkload && units >= settings.busyAtWorkload
-          ? settings.busyExtraMinutes
-          : 0),
+      ...wait,
+      estimateMinutes: wait.estimateMinutes,
       atCapacity: settings.workloadLimit > 0 && units >= settings.workloadLimit,
     };
   }
@@ -667,18 +666,26 @@ export class QrAdvancedService {
   async feedback(
     publicOrderId: string,
     input: { rating: number; comment?: string; categories?: string[] },
+    sessionId?: string,
   ) {
     const order = await this.prisma.runAsPlatform((tx) =>
       tx.syncedOrder.findUnique({ where: { publicOrderId } }),
     );
     if (!order || order.source !== "QR")
       throw new NotFoundException("Order not found");
+    // Same session-ownership binding as QrPublicService.assertOwnsOrder: an order created with no
+    // browser session on record stays reachable, but one with a recorded owner can only submit
+    // feedback from that same browser -- otherwise anyone who learns a completed order's id could
+    // post a fake "verified" review against it.
+    const owner = (order.meta as Record<string, unknown> | null)?.qrBrowserSession;
+    if (typeof owner === "string" && owner !== sessionId)
+      throw new NotFoundException("Order not found");
     return this.prisma.runAsTenant(order.restaurantId, async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${"order:" + order.restaurantId + ":" + order.externalOrderId}))`;
       await this.entitlements.assertQrCapability(
         tx,
         order.restaurantId,
-        "QR_FEEDBACK",
+        "QR_FEEDBACK", order.branchId,
       );
       const settings = await this.effectiveIn(
         tx,
@@ -735,7 +742,7 @@ export class QrAdvancedService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_FEEDBACK",
+        "QR_FEEDBACK", device.branchId,
       );
       const range=await qrReportRange(tx,device.restaurantId,device.branchId,from,to);
       const rows = await tx.syncedEntity.findMany({
@@ -779,7 +786,7 @@ export class QrAdvancedService {
       await this.entitlements.assertQrCapability(
         tx,
         restaurantId,
-        "QR_ORDER_HISTORY",
+        "QR_ORDER_HISTORY", branchId,
       );
       if (!(await this.effectiveIn(tx, restaurantId, branchId)).historyEnabled)
         throw new ForbiddenException("Order history is disabled");
@@ -820,7 +827,7 @@ export class QrAdvancedService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_NOTIFICATIONS",
+        "QR_NOTIFICATIONS", device.branchId,
       );
       const settings = await this.effectiveIn(
         tx,
@@ -914,7 +921,7 @@ export class QrAdvancedService {
     this.assertConsole(device);if(device.branchId&&requestedBranch&&requestedBranch!==device.branchId)throw new ForbiddenException('This stock belongs to another branch');const branchId=device.branchId??requestedBranch;
     if(!branchId)throw new BadRequestException('Choose a branch to manage counted dishes');
     return this.prisma.runAsTenant(device.restaurantId,async tx=>{
-      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_INVENTORY_SYNC');if(!await tx.branch.findFirst({where:{id:branchId,restaurantId:device.restaurantId}}))throw new BadRequestException('Branch not found');
+      await this.entitlements.assertQrCapability(tx,device.restaurantId,'QR_INVENTORY_SYNC',branchId);if(!await tx.branch.findFirst({where:{id:branchId,restaurantId:device.restaurantId}}))throw new BadRequestException('Branch not found');
       const rows=await tx.syncedEntity.findMany({where:{restaurantId:device.restaurantId,entityType:{in:['MENU_ITEM','BRANCH_MENU_OVERRIDE']}},select:{entityType:true,externalId:true,payload:true}});
       const overrides=new Map(rows.filter(r=>r.entityType==='BRANCH_MENU_OVERRIDE'&&(r.payload as any).branchId===branchId).map(r=>[(r.payload as any).itemId,r.payload as any]));
       return {branchId,items:rows.filter(r=>r.entityType==='MENU_ITEM'&&!(r.payload as any).deleted).map(r=>{const p=r.payload as any,override=overrides.get(r.externalId);return {itemId:r.externalId,name:p.name,stockQuantity:override?.stockQuantity??p.stockQuantity??null,source:typeof override?.stockQuantity==='number'?'BRANCH':typeof p.stockQuantity==='number'?'RESTAURANT':'MANUAL_AVAILABILITY'};})};
@@ -943,7 +950,7 @@ export class QrAdvancedService {
       this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_SPLIT_PAYMENT",
+        "QR_SPLIT_PAYMENT", device.branchId,
       ),
     );
     return this.orders.recordQrPartialCash(device, id, input);

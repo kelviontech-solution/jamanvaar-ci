@@ -1,3 +1,4 @@
+import { rememberAppearance } from '../operations/appearance-history';
 import { mergeCustomerLoyalty, CustomerAccount } from './customer-loyalty-merge';
 import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -167,6 +168,7 @@ export class EntitySyncService {
             }
           });
           const existingBranch = (existing?.payload as { branchId?: string } | null)?.branchId;
+          if(entityType==='STAFF_USER'&&deviceBranchId&&existingBranch&&existingBranch!==deviceBranchId)throw new Error('BRANCH_FORBIDDEN: Staff moved to another branch; refresh the staff list');
           if (entityType === 'KIOSK_CONFIGURATION' && evt.payload.stationRegistry === undefined && (existing?.payload as {stationRegistry?:unknown} | null)?.stationRegistry) evt = {...evt,payload:{...evt.payload,stationRegistry:(existing!.payload as unknown as {stationRegistry:unknown}).stationRegistry}};
           if (entityType === 'SERVICE_MESSAGE') evt = {...evt, payload:serviceRequestProgress(evt.payload, existing?.payload as Record<string,unknown> | null ?? null, evt.externalId, deviceId, deviceType)};
           if (entityType === 'STAFF_USER' && typeof evt.payload.branchId !== 'string' && (existingBranch || (!existing && deviceBranchId))) {
@@ -218,6 +220,7 @@ export class EntitySyncService {
             }
           }
 
+          if (entityType === 'KIOSK_CONFIGURATION' && existing && (existing.payload as any)?.welcome) await rememberAppearance(tx,restaurantId,'KIOSK',evt.externalId,(existing.payload as any).branchId??null,(existing.payload as any).welcome);
           const saved = existing
             ? await tx.syncedEntity.update({
                 where: { id: existing.id },
@@ -317,9 +320,12 @@ export class EntitySyncService {
     const metadata = { latestSeq, hasMore, serverTime: readStartedAt };
 
     if (entityType === 'STAFF_USER' && deviceType) {
-      const staff = page.filter((e) => {
+      const moves=branchId?await this.prisma.runAsTenant(restaurantId,tx=>tx.syncedEntity.findMany({where:{restaurantId,entityType:'OPS_STAFF_TRANSFER',externalId:{in:page.map(e=>e.externalId)}},select:{externalId:true,payload:true}})):[];
+      const removed=new Set(moves.filter(r=>Array.isArray((r.payload as any)?.previousBranches)&&(r.payload as any).previousBranches.includes(branchId)).map(r=>r.externalId));
+      const staff = page.flatMap((e) => {
         const payload = e.payload as Record<string, unknown> | null;
-        return (!branchId || !payload?.branchId || payload.branchId === branchId) && staffVisibleTo(deviceType as never, payload);
+        if(branchId&&payload?.branchId&&payload.branchId!==branchId&&removed.has(e.externalId))return [{...e,payload:{id:e.externalId,branchId,removedFromBranch:true,updatedAt:e.updatedAt.toISOString()}}];
+        return (!branchId || !payload?.branchId || payload.branchId === branchId) && staffVisibleTo(deviceType as never, payload)?[e]:[];
       });
       return { entities: staff, ...metadata };
     }

@@ -1,3 +1,4 @@
+import { cashierSettings } from '../../cashierSpeed';
 import { PosLoyaltyRewards } from '../customers/PosLoyaltyRewards';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore, isManagerOrAboveRole } from '../../store/posStore';
@@ -59,6 +60,7 @@ const CHANNELS: ChannelConfig[] = [
 
 export const PosPaymentModal: React.FC = () => {
   const {t:staffText} = useStaffLanguage();
+  const enabledChannels = CHANNELS.filter(ch => cashierSettings().paymentMethods.includes(ch.id));
   const {
     isPaymentOpen,
     setIsPaymentOpen,
@@ -137,7 +139,7 @@ export const PosPaymentModal: React.FC = () => {
       setIsSplitMode(false);
       setGuestPlan(null);
       setIsGuestSplitOpen(false);
-      setActiveChannel('CASH');
+      setActiveChannel(enabledChannels[0]?.id ?? 'CASH');
     }
   }, [isPaymentOpen]);
 
@@ -196,6 +198,7 @@ export const PosPaymentModal: React.FC = () => {
 
   // Single Pay: Select payment method and assign 100% of the bill
   const handleSelectSingleMethod = (channel: PaymentChannel) => {
+    if (!enabledChannels.some(ch => ch.id === channel)) return;
     setGuestPlan(null);
     setIsSplitMode(false);
     setActiveChannel(channel);
@@ -214,22 +217,20 @@ export const PosPaymentModal: React.FC = () => {
 
   // Switch to Split Payment Card
   const handleSelectSplitModeCard = () => {
+    if (enabledChannels.length < 2) return;
     setGuestPlan(null);
     setIsSplitMode(true);
-    // Split 50/50 Cash + UPI
+    // Start with two enabled tender channels
     const half = Math.floor(totalPayable / 2);
     const rem = Number((totalPayable - half).toFixed(2));
     setAllocations({
-      CASH: half,
-      UPI: rem,
-      CARD: 0,
-      WALLET: 0,
-      HOUSE_ACCOUNT: 0
+      CASH: 0, UPI: 0, CARD: 0, WALLET: 0, HOUSE_ACCOUNT: 0,
+      [enabledChannels[0].id]: half, [enabledChannels[1].id]: rem
     });
-    setSplitPrimaryChannel('CASH');
-    setSplitSecondaryChannel('UPI');
+    setSplitPrimaryChannel(enabledChannels[0].id);
+    setSplitSecondaryChannel(enabledChannels[1].id);
     setCashReceivedInput(half.toString());
-    setActiveChannel('CASH');
+    setActiveChannel(enabledChannels[0]?.id ?? 'CASH');
     setErrorMessage('');
   };
 
@@ -416,6 +417,7 @@ export const PosPaymentModal: React.FC = () => {
     // a real, already-attached customer at minimum makes the sale traceable to a named party,
     // and a manager PIN (the same gate a high discount or a void needs) stops a cashier from
     // using it unsupervised — same treatment as HIGH_DISCOUNT in PosDiscountModal.tsx.
+    if (activeEntries.some(([channel]) => !enabledChannels.some(ch => ch.id === channel))) { setErrorMessage('A selected payment method is disabled. Choose an enabled method.'); return; }
     const usesHouseAccount = activeEntries.some(([channel]) => channel === 'HOUSE_ACCOUNT');
     if (usesHouseAccount && !selectedCustomer) {
       setErrorMessage('House Account requires a customer to be attached first — use "Attach Customer" on the cart.');
@@ -629,7 +631,7 @@ export const PosPaymentModal: React.FC = () => {
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {CHANNELS.map((ch) => {
+                {enabledChannels.map((ch) => {
                   const Icon = ch.icon;
                   const isSelected = !isSplitMode && activeChannel === ch.id;
                   const amt = allocations[ch.id] || 0;
@@ -808,10 +810,7 @@ export const PosPaymentModal: React.FC = () => {
                         }}
                         className="bg-jaman-cream border border-jaman-border rounded-lg px-2 py-0.5 text-xs font-bold text-jaman-navy focus:outline-none"
                       >
-                        <option value="UPI">UPI / Bharat QR</option>
-                        <option value="CARD">Credit / Debit Card</option>
-                        <option value="WALLET">Digital Wallet</option>
-                        <option value="HOUSE_ACCOUNT">House Account</option>
+                        {enabledChannels.filter(ch=>ch.id!==splitPrimaryChannel).map(ch=><option key={ch.id} value={ch.id}>{ch.label}</option>)}
                       </select>
                     </div>
                   </div>
@@ -961,7 +960,7 @@ export const PosPaymentModal: React.FC = () => {
                       >
                         Exact Note ({formatINR(cashPortion)})
                       </button>
-                      {[100, 200, 500, 1000, 2000, 5000]
+                      {cashierSettings().quickAmounts
                         .filter((val) => val >= cashPortion)
                         .slice(0, 5)
                         .map((val) => (

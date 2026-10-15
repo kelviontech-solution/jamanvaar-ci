@@ -686,6 +686,7 @@ export const usePosStore = create<PosState>((set, get) => {
       specialInstructions: string = '',
       quantity: number = 1
     ) => {
+      if (item.allergens?.length && !specialInstructions.includes('Declared allergens:')) specialInstructions = [specialInstructions, 'Declared allergens: ' + item.allergens.join(', ')].filter(Boolean).join(' | ');
       // 1. Central Item Availability Protection: never add unavailable dishes
       if (item.isAvailable === false) {
         console.warn(`Cannot add unavailable dish "${item.name}" to cart.`);

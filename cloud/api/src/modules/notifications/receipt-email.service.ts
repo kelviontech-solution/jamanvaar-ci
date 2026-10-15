@@ -49,10 +49,23 @@ export class ReceiptEmailService {
     private readonly email: EmailService
   ) {}
 
-  async sendBillEmail(restaurantId: string, orderId: string, email: string, branchId?: string | null): Promise<{ success: true }> {
+  /**
+   * `requestingDevice` closes a receipt-redirection gap (security-audit): a self-service KIOSK is
+   * operated directly by whichever guest is standing at it, so it may only email the receipt for an
+   * order IT placed -- never any other order at the restaurant by orderId alone. A POS/POS_ADMIN
+   * console is staff-operated and keeps its existing restaurant/branch-only scope, since resending a
+   * bill for a guest who calls back is a normal counter task, not a guest self-service action.
+   */
+  async sendBillEmail(restaurantId: string, orderId: string, email: string, branchId: string | null | undefined, requestingDevice: { id: string; type: string }): Promise<{ success: true }> {
     if (!this.email.configured) {
       throw new ServiceUnavailableException('Email is not configured on this server (set SMTP_HOST, SMTP_USER, SMTP_PASSWORD)');
     }
+    // An order with no recorded device owner (e.g. one seeded outside the normal device-authenticated
+    // flow) stays reachable the way it always has -- there is nothing to bind it to. In production,
+    // order-sync always stamps deviceId/kioskId, so this exception never weakens the real check.
+    const assertOwnKioskOrder = (ownerDeviceId: string | null) => {
+      if (requestingDevice.type === 'KIOSK' && ownerDeviceId !== null && ownerDeviceId !== requestingDevice.id) throw new NotFoundException('Order not found');
+    };
 
     const built = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const presentation = async (orderBranchId?: string | null) => {
@@ -77,6 +90,7 @@ export class ReceiptEmailService {
       // Order must therefore not end the search -- only refuse when no confirmed order exists either.
       let unpaid: string | null = null;
       if (order) {
+        assertOwnKioskOrder(order.kioskId);
         const payment = order.paymentTransactions[0];
         if (payment && PAID_STATUSES.includes(payment.status)) {
         return this.buildPdf(order.restaurant, {
@@ -101,6 +115,7 @@ export class ReceiptEmailService {
         if (unpaid) throw new BadRequestException(unpaid);
         return null;
       }
+      assertOwnKioskOrder(synced.deviceId);
       if (CLOSED_ORDER_STATUSES.includes(synced.status)) {
         throw new BadRequestException(`Cannot email an invoice for an order with status ${synced.status}`);
       }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStaffLanguage } from './StaffLanguage';
+import {FullTrainingSandbox} from './FullTrainingSandbox';
 
 /** Deliberately owns no repository, network, printing or payment capability. */
 export function StaffPracticePanel() {
@@ -13,6 +14,7 @@ export function StaffPracticePanel() {
     <button type="button" aria-label={t('Staff practice')} aria-expanded={open} className="min-h-11 w-full text-left font-bold" onClick={() => {setOpen(!open); reset();}}>{t('Staff practice')} {open ? '−' : '+'}</button>
     {open && <div className="space-y-3">
       <p className="text-sm">{t('Practice only: no real order, payment, stock change or printing.')}</p>
+      <FullTrainingSandbox/>
       <ol className="flex flex-wrap gap-2 text-xs" aria-label={t('Practice progress')}>{['Menu', 'Orders', 'Cooking', 'Served', 'Collect', 'Done'].map((label, index) => <li key={label} aria-current={stage === index ? 'step' : undefined} className={`rounded-full px-2 py-1 ${stage === index ? 'bg-jaman-navy text-white' : 'bg-white'}`}>{index + 1}. {t(label)}</li>)}</ol>
       <h3 className="font-bold">{t(titles[stage])}</h3>
       {stage < 5 && <p>{t('Practice dish')} · ₹100 × {count || 1}</p>}

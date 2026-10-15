@@ -53,6 +53,80 @@ describe('a settled order earns its attached customer real loyalty points, exact
   });
 });
 
+/**
+ * security-audit HIGH kiosk-loyalty-02: a kiosk cash order used to earn AND redeem loyalty
+ * points the moment the guest tapped "Get Token" -- before any cash had actually changed hands
+ * at the counter. A guest could place a large order, take the token, and walk away with real,
+ * spendable points for a purchase that was never paid for (and nothing reversed them if staff
+ * later cancelled the unpaid order). Redemption is now only a request stamped on the order
+ * (loyaltyPointsRedeemed) and deducted here, at the same real, payment-confirmed moment the
+ * earn above already waits for.
+ */
+describe('security-audit HIGH kiosk-loyalty-02: a requested redemption is only deducted once the order is actually settled', () => {
+  beforeEach(() => {
+    db.resetToDefaultSeed();
+  });
+
+  it('deducts the requested redemption only when the order is settled, not before', () => {
+    const phone = '9000000011';
+    CustomerRepository.getOrCreateAccount(phone, 'Priya');
+    CustomerRepository.earnPointsForOrder(phone, 10000); // give them a real balance to redeem from
+    const before = CustomerRepository.getByPhone(phone)!.loyaltyPoints;
+    expect(before).toBeGreaterThan(100);
+
+    const order = OrderRepository.createOrder({
+      orderType: 'TAKEAWAY', items: [], subtotal: 500, taxAmount: 25, totalAmount: 425,
+      paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'CONFIRMED', source_type: 'KIOSK',
+      customerPhone: phone, loyaltyPointsRedeemed: 100
+    });
+
+    // Not deducted yet: the order is confirmed (a token was issued) but nobody has paid.
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(before);
+
+    const settled = OrderRepository.settleOrder(order.id, 'CASH', 425, undefined, 'Cashier');
+    expect(settled).not.toBeNull();
+    // Settling also earns new points for this order's own total (the existing, already-correct
+    // behaviour) -- the redemption is the ONE additional thing this fix adds: a -100 on top of that.
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(before + settled!.loyaltyPointsEarned! - 100);
+  });
+
+  it('re-settling the same order never deducts the redemption twice', () => {
+    const phone = '9000000012';
+    CustomerRepository.getOrCreateAccount(phone, 'Raj');
+    CustomerRepository.earnPointsForOrder(phone, 10000);
+    const before = CustomerRepository.getByPhone(phone)!.loyaltyPoints;
+
+    const order = OrderRepository.createOrder({
+      orderType: 'TAKEAWAY', items: [], subtotal: 500, taxAmount: 25, totalAmount: 425,
+      paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'CONFIRMED', source_type: 'KIOSK',
+      customerPhone: phone, loyaltyPointsRedeemed: 100
+    });
+    const txnId = 'TXN-REDEEM-FIXED-1';
+
+    const first = OrderRepository.settleOrder(order.id, 'CASH', 425, txnId, 'Cashier');
+    const pointsAfterFirst = CustomerRepository.getByPhone(phone)!.loyaltyPoints;
+    OrderRepository.settleOrder(order.id, 'CASH', 425, txnId, 'Cashier');
+
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(pointsAfterFirst);
+    expect(pointsAfterFirst).toBe(before + first!.loyaltyPointsEarned! - 100);
+  });
+
+  it('an order that is never settled (e.g. cancelled unpaid) never deducts the requested redemption at all', () => {
+    const phone = '9000000013';
+    CustomerRepository.getOrCreateAccount(phone, 'Meena');
+    CustomerRepository.earnPointsForOrder(phone, 10000);
+    const before = CustomerRepository.getByPhone(phone)!.loyaltyPoints;
+
+    OrderRepository.createOrder({
+      orderType: 'TAKEAWAY', items: [], subtotal: 500, taxAmount: 25, totalAmount: 425,
+      paymentMethod: 'CASH', paymentStatus: 'PENDING', orderStatus: 'CONFIRMED', source_type: 'KIOSK',
+      customerPhone: phone, loyaltyPointsRedeemed: 100
+    });
+
+    expect(CustomerRepository.getByPhone(phone)!.loyaltyPoints).toBe(before);
+  });
+});
+
 describe("the base earn rate is the admin's own setting, not a fixed number", () => {
   beforeEach(() => {
     db.resetToDefaultSeed();

@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-15T11:41:30.762Z",
+  "passed": 20,
+  "files": 6,
+  "exitCode": 0,
+  "suites": [
+    "qr_page_enhancements",
+    "qr_restaurant_page_setup",
+    "qr_restaurant_page",
+    "qr_admin_license_capability_labels",
+    "qr_order_session",
+    "qr_checkout_sdk"
+  ]
+}

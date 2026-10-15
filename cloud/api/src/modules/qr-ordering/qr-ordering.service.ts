@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PlatformUser, Prisma, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { ApplicationEntitlementsService, ResolvedEntitlement } from '../application-entitlements/application-entitlements.service';
 import { QR_APP_CODE, QR_AUDIT, startOfDayIn } from '../qr/qr.support';
+import { QR_CAPABILITIES } from '../application-entitlements/qr-capabilities';
+import { DEFAULT_QR_BUNDLES, qrBundleSchema } from './qr-feature-bundles';
 
 /** The Super Admin's view of a restaurant's QR entitlement. It is a projection of the ONE entitlement result, not a second source. */
 export interface QrEntitlement {
@@ -17,8 +19,11 @@ export interface QrEntitlement {
   liveOrderTracking: boolean;
   qrAnalytics: boolean;
   onlinePayments: boolean;
+  capabilities?: Record<string, boolean>;
+  capabilityStatus?: Array<{code: string; enabled: boolean; reason: string}>;
   source: 'PLAN' | 'PLATFORM_OVERRIDE';
   reason: string;
+  planName?: string | null;
 }
 
 /** Computed from real orders and codes at the time of asking; nothing here is reported by a client. */
@@ -62,6 +67,7 @@ export interface PlatformQrMetrics {
 }
 
 export interface RestaurantQrDetail {
+  branches: {id:string;name:string}[];
   restaurant: RestaurantQrStatusItem;
   entitlement: QrEntitlement;
   usage: QrUsageSnapshot | null;
@@ -77,7 +83,7 @@ export interface QrAuditEntry {
 }
 
 /** What a Super Admin may change for one restaurant. Stored on the subscription's own entitlement row, on top of the plan. */
-export type QrEntitlementOverride = Partial<Omit<QrEntitlement, 'source' | 'reason'>>;
+export type QrEntitlementOverride = Partial<Omit<QrEntitlement, 'source' | 'reason' | 'capabilityStatus' | 'planName'>>;
 
 export const QR_ENTITLEMENT_UPDATED_ACTION = 'RESTAURANT_QR_ENTITLEMENT_UPDATED';
 export const QR_USAGE_REPORTED_ACTION = 'RESTAURANT_QR_USAGE_REPORTED';
@@ -106,6 +112,26 @@ const OVERRIDE_KEYS: Record<string, string> = {
 
 @Injectable()
 export class QrOrderingService {
+  async bundles() {
+    return this.prisma.runAsPlatform(async tx => {
+      const row = await tx.platformSetting.findUnique({where:{key:'qr.featureBundles'}});
+      return row ? qrBundleSchema.parse(row.value) : DEFAULT_QR_BUNDLES;
+    });
+  }
+  async saveBundles(input:unknown,actor:PlatformUser) {
+    const parsed=qrBundleSchema.safeParse(input);
+    if(!parsed.success)throw new BadRequestException(parsed.error.issues.map(i=>i.message).join('; '));
+    return this.prisma.runAsPlatform(async tx=>{
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('qr-feature-bundles'))`;
+      const row=await tx.platformSetting.findUnique({where:{key:'qr.featureBundles'}});
+      const previous=row?qrBundleSchema.parse(row.value):DEFAULT_QR_BUNDLES;
+      if(previous.revision!==parsed.data.revision)throw new ConflictException('Bundles changed. Reload before saving.');
+      const next={...parsed.data,revision:previous.revision+1};
+      await tx.platformSetting.upsert({where:{key:'qr.featureBundles'},create:{key:'qr.featureBundles',category:'CATALOG',description:'Reviewed optional QR feature bundles',value:next,updatedBy:actor.id},update:{value:next,updatedBy:actor.id}});
+      await this.audit.log({actorType:'PLATFORM',actorId:actor.id,action:'QR_FEATURE_BUNDLES_UPDATED',category:'SAAS',details:{revision:next.revision,bundleIds:next.bundles.map(b=>b.id)}},tx);
+      return next;
+    });
+  }
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
@@ -119,22 +145,27 @@ export class QrOrderingService {
     const on = res.enabled;
     return {
       qrEntitled: on,
-      qrOrderingEnabled: on,
+      qrOrderingEnabled: on && l.qrServiceEnabled !== false,
       maxActiveTables: readInt(l, 'qrMaxActiveTables', 'maxActiveTables'),
       maxOrdersPerDay: readInt(l, 'qrMaxOrdersPerDay', 'maxOrdersPerDay'),
       digitalMenu: on && (readBool(l, 'qrDigitalMenu', 'digitalMenu') ?? true),
       guestCustomization: on && (readBool(l, 'qrGuestCustomization', 'guestCustomization') ?? true),
       liveOrderTracking: on && (readBool(l, 'qrLiveOrderTracking', 'liveOrderTracking') ?? true),
       qrAnalytics: on && (readBool(l, 'qrAnalytics') ?? true),
-      onlinePayments: on && (readBool(l, 'qrOnlinePayments', 'onlinePayments') ?? false),
+      onlinePayments: on && (readBool(l, 'qrOnlinePayments', 'onlinePayments') ?? true),
+      capabilities: Object.fromEntries(Object.entries(QR_CAPABILITIES).map(([code, key]) => [code, on && l[key] === true])),
       source: res.source === 'MANUAL_OVERRIDE' ? 'PLATFORM_OVERRIDE' : 'PLAN',
-      reason: res.reason
+      reason: res.reason,
+      planName: res.planName
     };
   }
 
   /** `restaurantId` must come from the authenticated principal, never from the request payload. */
   public async getEntitlementForRestaurant(restaurantId: string): Promise<QrEntitlement> {
-    return this.project(await this.prisma.runAsPlatform((tx) => this.entitlements.resolve(tx, restaurantId, QR_APP_CODE)));
+    return this.prisma.runAsPlatform(async tx => {
+      const result = await this.entitlements.resolveQrCapabilities(tx, restaurantId);
+      return {...this.project(result.module), capabilityStatus: result.capabilities};
+    });
   }
 
   // ---------------------------------------------------------------- usage: computed, never reported
@@ -154,7 +185,7 @@ export class QrOrderingService {
 
   private readonly include = {
     branches: { select: { id: true, name: true, status: true } },
-    subscriptions: { where: { status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] as Array<'TRIAL' | 'ACTIVE' | 'PAST_DUE'> } }, orderBy: { createdAt: 'desc' as const }, take: 1, include: { plan: true } }
+    subscriptions: { where: { status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] as Array<'TRIAL' | 'ACTIVE' | 'PAST_DUE'> }, expiresAt: { gt: new Date() } }, orderBy: { createdAt: 'desc' as const }, include: { plan: true } }
   };
 
   private async load(restaurantId: string) {
@@ -167,14 +198,15 @@ export class QrOrderingService {
     const plan = restaurant.subscriptions[0]?.plan;
     let status: RestaurantQrStatusItem['status'] = 'ACTIVE';
     if (!entitlement.qrEntitled) status = 'NOT_ENTITLED';
-    else if (entitlement.maxActiveTables !== null && entitlement.maxActiveTables > 0 && usage.activeTables >= entitlement.maxActiveTables) status = 'LIMIT_REACHED';
+    else if (!entitlement.qrOrderingEnabled) status = 'DISABLED';
+    else if (entitlement.maxActiveTables !== null && usage.activeTables >= entitlement.maxActiveTables) status = 'LIMIT_REACHED';
     return {
       id: restaurant.id,
       name: restaurant.name,
       city: restaurant.city ?? undefined,
       primaryBranchName: restaurant.branches[0]?.name ?? 'No branch',
       branchCount: restaurant.branches.length,
-      planName: plan?.name ?? 'No plan',
+      planName: entitlement.planName ?? plan?.name ?? 'No plan',
       planTier: plan?.tier ?? 'NONE',
       qrEntitled: entitlement.qrEntitled,
       qrOrderingEnabled: entitlement.qrOrderingEnabled,
@@ -218,7 +250,7 @@ export class QrOrderingService {
     const restaurant = await this.load(restaurantId);
     const entitlement = await this.getEntitlementForRestaurant(restaurantId);
     const usage = await this.usageFor(restaurantId, restaurant.timezone);
-    return { restaurant: this.toItem(restaurant, entitlement, usage), entitlement, usage, planEntitlements: asRecord(restaurant.subscriptions[0]?.plan?.entitlements) };
+    return { restaurant: this.toItem(restaurant, entitlement, usage), entitlement, usage, branches:restaurant.branches.filter(b=>b.status==='ACTIVE').map(b=>({id:b.id,name:b.name})),planEntitlements: asRecord(restaurant.subscriptions[0]?.plan?.entitlements) };
   }
 
   public async getRestaurantUsage(restaurantId: string): Promise<{ usage: QrUsageSnapshot | null }> {
@@ -241,11 +273,22 @@ export class QrOrderingService {
    * application switch uses (dependency checks, audit), never onto the plan and never into a side table.
    */
   public async updateRestaurantEntitlement(restaurantId: string, updates: QrEntitlementOverride, actor: PlatformUser): Promise<RestaurantQrStatusItem> {
+    const allowed = new Set(['qrEntitled', 'qrOrderingEnabled', 'capabilities', ...Object.keys(OVERRIDE_KEYS)]);
+    if (!updates || typeof updates !== 'object' || Array.isArray(updates) || Object.keys(updates).some(k => !allowed.has(k))) throw new BadRequestException('Unknown QR entitlement field');
+    for (const key of ['qrEntitled','qrOrderingEnabled'] as const) if (updates[key] !== undefined && typeof updates[key] !== 'boolean') throw new BadRequestException(`${key} must be a boolean`);
     const restaurant = await this.load(restaurantId);
     const subscription = restaurant.subscriptions[0];
     if (!subscription) throw new BadRequestException('This restaurant has no active subscription to attach an override to.');
 
     const config: Record<string, unknown> = {};
+    if (updates.qrOrderingEnabled !== undefined) config.qrServiceEnabled = updates.qrOrderingEnabled;
+    if (updates.capabilities !== undefined) {
+      if (!updates.capabilities || typeof updates.capabilities !== 'object' || Array.isArray(updates.capabilities)) throw new BadRequestException('Capabilities must be an object');
+      for (const [code, enabled] of Object.entries(updates.capabilities)) {
+        if (!Object.prototype.hasOwnProperty.call(QR_CAPABILITIES, code) || typeof enabled !== 'boolean') throw new BadRequestException('Unknown QR capability or invalid boolean');
+        config[QR_CAPABILITIES[code as keyof typeof QR_CAPABILITIES]] = enabled;
+      }
+    }
     for (const [field, key] of Object.entries(OVERRIDE_KEYS)) {
       const value = (updates as Record<string, unknown>)[field];
       if (value === undefined) continue;
@@ -256,17 +299,21 @@ export class QrOrderingService {
       }
       config[key] = value;
     }
-    const enable = updates.qrEntitled ?? updates.qrOrderingEnabled;
+    const enable = updates.qrEntitled;
     if (enable === undefined && Object.keys(config).length === 0) throw new BadRequestException('No supported QR entitlement fields supplied');
 
-    const row = await this.prisma.runAsPlatform((tx) => tx.applicationEntitlement.findUnique({ where: { subscriptionId_appCode: { subscriptionId: subscription.id, appCode: QR_APP_CODE } } }));
-    if (!row) throw new NotFoundException('This subscription has no QR ordering entitlement row.');
-    const nextConfig = { ...asRecord(row.config), ...config } as Prisma.InputJsonValue;
-    await this.entitlements.update(subscription.id, QR_APP_CODE, { ...(enable !== undefined ? { enabled: enable } : {}), ...(Object.keys(config).length ? { config: nextConfig as Record<string, unknown> } : {}), acknowledgeDeviceImpact: true } as never, actor);
+    await this.prisma.runAsPlatform(async tx => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'qr-grants:' + restaurantId}))`;
+    const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: restaurant.subscriptions.map(s => s.id) }, appCode: QR_APP_CODE } });
+    if (!rows.length) throw new NotFoundException('No QR ordering entitlement row exists.');
+    // A platform-wide restaurant override must affect every current QR grant,
+    // otherwise a second subscription can silently keep a revoked feature alive.
+    for (const row of rows) await this.entitlements.update(row.subscriptionId, QR_APP_CODE, { ...(enable !== undefined ? { enabled: enable } : {}), ...(Object.keys(config).length ? { config: { ...asRecord(row.config), ...config } } : {}), acknowledgeDeviceImpact: true }, actor, tx);
 
     await this.audit.log({
       actorType: 'PLATFORM', actorId: actor.id, restaurantId, action: enable === undefined ? QR_ENTITLEMENT_UPDATED_ACTION : enable ? QR_AUDIT.FEATURE_ENABLED : QR_AUDIT.FEATURE_DISABLED, category: 'SAAS',
       details: { restaurantId, restaurantName: restaurant.name, subscriptionId: subscription.id, updates }
+    }, tx);
     });
 
     const entitlement = await this.getEntitlementForRestaurant(restaurantId);

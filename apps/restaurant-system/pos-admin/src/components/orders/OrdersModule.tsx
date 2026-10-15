@@ -9,12 +9,14 @@ import { OrderDetailModal } from '../OrderDetailModal';
 import { ThermalReceiptView, printThermalReceipt, EmptyState, printElement, useConfirm, ModalBackdrop } from '@jamanvaar/ui';
 
 interface OrdersModuleProps {
+  initialOrderId?: string;
   orders: Order[];
   onOrderUpdated: () => void;
   showToast: (msg: string) => void;
 }
 
 export const OrdersModule: React.FC<OrdersModuleProps> = ({
+  initialOrderId,
   orders,
   onOrderUpdated,
   showToast
@@ -59,6 +61,8 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
 
   // Selected Order Detail Modal & Printable Bill Modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const attentionOrder = orders.find(order => order.id === initialOrderId);
+  useEffect(() => { if (attentionOrder) setSelectedOrder(attentionOrder); }, [attentionOrder]);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
 
@@ -252,6 +256,7 @@ export const OrdersModule: React.FC<OrdersModuleProps> = ({
   return (
     <>
     <div className="space-y-6 max-w-7xl mx-auto select-none">
+      {initialOrderId&&!attentionOrder&&<p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">The selected order has not arrived in this branch’s local view yet. Keep this page open while it syncs, or check Devices & sync if it does not appear.</p>}
       <div className="flex items-center gap-3 text-xs font-bold text-jaman-navy">
         <label htmlFor="history-order-source">Order source</label>
         <select id="history-order-source" value={sourceFilter} onChange={e => { setSourceFilter(e.target.value); setCurrentPage(1); }} className="bg-white border border-jaman-border rounded-xl px-3 py-2">

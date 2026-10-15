@@ -47,7 +47,7 @@ export const syncedOrderItemSchema = z.object({
   sentAt: z.string().max(40).optional(),
   readyAt: z.string().max(40).optional(),
   kitchenStation: z.string().max(64).optional(),
-  specialInstructions: z.string().max(500).optional(),
+  specialInstructions: z.string().max(2000).optional(),
   lineTotal: z.number().int().min(0)
 });
 

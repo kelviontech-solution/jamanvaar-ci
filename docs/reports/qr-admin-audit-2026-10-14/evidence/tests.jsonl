@@ -119,3 +119,261 @@
 {"app":"admin","page":"http://localhost:5316/qr/admin/?tab=TABLES","feature":"Table QR dialog has name, focus and Escape","status":"PASS","result":{"accessible":true}}
 {"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"Menu draft and guest availability are separate bounded views","status":"PASS","result":{"bounded24":true}}
 {"app":"admin","page":"http://localhost:5316/qr/admin/?tab=CRM","feature":"CRM customer, program, reward and reasoned points work with shared POS records","status":"PASS","result":{"points200":true,"reward150for100":true,"posEntityShared":true}}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=MENU","feature":"kiosk-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=ACCEPTANCE","feature":"kiosk-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/inventory","feature":"Kiosk QR console does not expose restaurant inventory","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"restaurant-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"restaurant-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"full common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/welcome-screen","feature":"full suite uses direct kiosk management links and preserves old deep links","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"full offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"full QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"full phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"terminal-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"terminal-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/qr-ordering","feature":"Super Admin QR capability editor shows every optional feature","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/plans","feature":"Super Admin can create standalone QR plans without POS defaults","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/ai-assistant","feature":"Super Admin AI controls explain mixed plans and QR access","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS authenticates issued staff and opens menu","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Floor & Tables","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Live Orders","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Bills & Invoices","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Kitchen & KOT","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Customers CRM","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Shift & Cash","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Day History","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS Reports","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Inventory & Stock","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Settings","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Captain opens branch tables","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Active Orders","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Food Ready","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Messages","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Live KOT Tickets","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Guest Service Requests","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Shift & Performance","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"KDS opens the assigned kitchen scope","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Cooking","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Ready","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Served","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Expo","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Active","status":"PASS"}
+{"app":"kiosk","page":"http://localhost:5314/","feature":"Kiosk welcome and touch ordering remain usable","status":"FAIL","error":"locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^Add .* to cart$/ }).first() to be visible\u001b[22m\n"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS authenticates issued staff and opens menu","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Floor & Tables","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Live Orders","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Bills & Invoices","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Kitchen & KOT","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Customers CRM","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Shift & Cash","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Day History","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS Reports","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Inventory & Stock","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Settings","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Captain opens branch tables","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Active Orders","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Food Ready","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Messages","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Live KOT Tickets","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Guest Service Requests","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Shift & Performance","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"KDS opens the assigned kitchen scope","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Cooking","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Ready","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Served","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Expo","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Active","status":"PASS"}
+{"app":"kiosk","page":"http://localhost:5314/","feature":"Kiosk welcome and touch ordering remain usable","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=MENU","feature":"kiosk-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=ACCEPTANCE","feature":"kiosk-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/inventory","feature":"Kiosk QR console does not expose restaurant inventory","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"restaurant-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"restaurant-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"full common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/welcome-screen","feature":"full suite uses direct kiosk management links and preserves old deep links","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"full offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"full QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"full phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW","feature":"full QR page OVERVIEW loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ORDERS","feature":"full QR page ORDERS loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=SERVICE","feature":"full QR page SERVICE loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"full QR page MENU loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=TABLES","feature":"full QR page TABLES loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=DESIGN","feature":"full QR page DESIGN loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=BRAND","feature":"full QR page BRAND loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PAYMENTS","feature":"full QR page PAYMENTS loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=RULES","feature":"full QR page RULES loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PICKUP","feature":"full QR page PICKUP loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=SETTINGS","feature":"full QR page SETTINGS loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ADVANCED","feature":"full QR page ADVANCED loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ANALYTICS","feature":"full QR page ANALYTICS loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PERFORMANCE","feature":"full QR page PERFORMANCE loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=CRM","feature":"full QR page CRM loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ONBOARDING","feature":"full QR page ONBOARDING loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"full QR page ACCEPTANCE loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=RECONCILIATION","feature":"full QR page RECONCILIATION loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=CALENDAR","feature":"full QR page CALENDAR loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PRINTPACK","feature":"full QR page PRINTPACK loads inside unified owner console","status":"FAIL","error":"locator.innerText: Error: strict mode violation: locator('main') resolved to 2 elements:\n    1) <main class=\"jv-page-enter flex-1 overflow-y-auto  bg-jaman-cream min-h-0 min-w-0\">…</main> aka getByRole('main').filter({ hasText: 'Browse workspaceRestaurant' })\n    2) <main class=\"relative z-20 flex flex-col items-center justify-center text-center max-w-xl w-full mx-auto px-4 py-8 pointer-events-auto\">…</main> aka getByText('Your restaurant workspaceRESTAURANT ADMINPreparing application•Local-first')\n\nCall log:\n\u001b[2m  - waiting for locator('main')\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"integrated QR back-to-management preserves an unsaved draft","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"browser Back across QR and owner pages keeps the editor until discard","status":"FAIL","error":"locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'QR Ordering', exact: true })\u001b[22m\n"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"terminal-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"terminal-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/qr-ordering","feature":"Super Admin QR capability editor saves and reads back actual grants","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/plans","feature":"Super Admin can create standalone QR plans without POS defaults","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/ai-assistant","feature":"Super Admin AI controls explain mixed plans and QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/dashboard","feature":"kiosk-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering","feature":"kiosk-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=MENU","feature":"kiosk-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/qr-ordering?tab=ACCEPTANCE","feature":"kiosk-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/kiosk-admin/inventory","feature":"Kiosk QR console does not expose restaurant inventory","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant has no enabled QR tools or direct QR access","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"restaurant-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"restaurant-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"restaurant-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"restaurant-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"full common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/welcome-screen","feature":"full suite uses direct kiosk management links and preserves old deep links","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering","feature":"full offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"full QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"full phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW","feature":"full QR page OVERVIEW loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ORDERS","feature":"full QR page ORDERS loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=SERVICE","feature":"full QR page SERVICE loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=MENU","feature":"full QR page MENU loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=TABLES","feature":"full QR page TABLES loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=DESIGN","feature":"full QR page DESIGN loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=BRAND","feature":"full QR page BRAND loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PAYMENTS","feature":"full QR page PAYMENTS loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=RULES","feature":"full QR page RULES loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PICKUP","feature":"full QR page PICKUP loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=SETTINGS","feature":"full QR page SETTINGS loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ADVANCED","feature":"full QR page ADVANCED loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ANALYTICS","feature":"full QR page ANALYTICS loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PERFORMANCE","feature":"full QR page PERFORMANCE loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=CRM","feature":"full QR page CRM loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ONBOARDING","feature":"full QR page ONBOARDING loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=ACCEPTANCE","feature":"full QR page ACCEPTANCE loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=RECONCILIATION","feature":"full QR page RECONCILIATION loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=CALENDAR","feature":"full QR page CALENDAR loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=PRINTPACK","feature":"full QR page PRINTPACK loads inside unified owner console","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/dashboard","feature":"integrated QR back-to-management preserves an unsaved draft","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=BRAND","feature":"browser Back across QR and owner pages keeps the editor until discard","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr common login opens the licensed console automatically","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/","feature":"terminal-qr offers complete QR navigation and one sidebar","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=MENU","feature":"terminal-qr QR owners can edit shared menu and use JAMAN AI","status":"PASS"}
+{"app":"admin","page":"http://localhost:5316/qr/admin/?tab=ACCEPTANCE","feature":"terminal-qr phone QR navigation fits and returns focus","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/qr-ordering","feature":"Super Admin QR capability editor saves and reads back actual grants","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/plans","feature":"Super Admin can create standalone QR plans without POS defaults","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/ai-assistant","feature":"Super Admin AI controls explain mixed plans and QR access","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/ai-assistant","feature":"Super Admin AI list failure is actionable","status":"PASS"}
+{"app":"super","page":"http://localhost:5380/ai-assistant","feature":"Super Admin AI save cannot change restaurant mid-request","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS authenticates issued staff and opens menu","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Floor & Tables","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Live Orders","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Bills & Invoices","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Kitchen & KOT","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Customers CRM","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Shift & Cash","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Day History","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS Reports","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Inventory & Stock","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Settings","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Captain opens branch tables","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Active Orders","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Food Ready","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Messages","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Live KOT Tickets","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Guest Service Requests","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Shift & Performance","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"KDS opens the assigned kitchen scope","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Cooking","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Ready","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Served","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Expo","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Active","status":"PASS"}
+{"app":"kiosk","page":"http://localhost:5314/","feature":"Kiosk welcome and touch ordering remain usable","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS authenticates issued staff and opens menu","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Floor & Tables","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Live Orders","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Bills & Invoices","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Kitchen & KOT","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Customers CRM","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Shift & Cash","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Day History","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS Reports","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Inventory & Stock","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Settings","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Captain opens branch tables","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Active Orders","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Food Ready","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Messages","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Live KOT Tickets","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Guest Service Requests","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Shift & Performance","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"KDS opens the assigned kitchen scope","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Cooking","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Ready","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Served","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Expo","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Active","status":"PASS"}
+{"app":"kiosk","page":"http://localhost:5314/","feature":"Kiosk welcome and touch ordering remain usable","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS authenticates issued staff and opens menu","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Floor & Tables","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Live Orders","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Bills & Invoices","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Kitchen & KOT","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Customers CRM","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Shift & Cash","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Day History","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"POS Reports","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Inventory & Stock","status":"PASS"}
+{"app":"pos","page":"http://localhost:5315/","feature":"Settings","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Captain opens branch tables","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Active Orders","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Food Ready","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Messages","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Live KOT Tickets","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Guest Service Requests","status":"PASS"}
+{"app":"captain","page":"http://localhost:5317/","feature":"Shift & Performance","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"KDS opens the assigned kitchen scope","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Cooking","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Ready","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Served","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Expo","status":"PASS"}
+{"app":"kds","page":"http://localhost:5319/","feature":"Active","status":"PASS"}
+{"app":"kiosk","page":"http://localhost:5314/","feature":"Kiosk welcome and touch ordering remain usable","status":"PASS"}

@@ -15,7 +15,8 @@ export const PosShiftAndCashView: React.FC = () => {
     currentUser,
     posTerminalId,
     setActiveTab,
-    setIsPrintQueueOpen
+    setIsPrintQueueOpen,
+    requestManagerOverride
   } = usePosStore();
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -166,19 +167,9 @@ export const PosShiftAndCashView: React.FC = () => {
   // dialog just looked broken. Cash Out is now checked against the drawer's own current balance
   // before it is attempted (ShiftRepository.addCashMovement enforces the same limit itself and
   // returns null if bypassed), so a cashier can no longer take out more than the drawer holds.
-  const handleCashMovementSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeShift) { showToast('No shift is open.'); return; }
-    const amountVal = Number(movementAmount);
-    if (!amountVal || amountVal <= 0) { showToast('Enter an amount greater than ₹0.'); return; }
-    if (movementType === 'CASH_OUT' && amountVal > activeShift.expectedCash) {
-      showToast(`Cash Out of ₹${amountVal} exceeds the drawer's current balance of ₹${activeShift.expectedCash}.`);
-      return;
-    }
-
-    const cashierName = currentUser?.fullName || activeShift.cashierName;
+  const commitCashMovement = (amountVal: number, cashierName: string) => {
     const recorded = ShiftRepository.addCashMovement(
-      activeShift.id,
+      activeShift!.id,
       movementType,
       amountVal,
       movementReason,
@@ -195,6 +186,34 @@ export const PosShiftAndCashView: React.FC = () => {
     setMovementNotes('');
     setRefreshKey((k) => k + 1);
     showToast(`Recorded ${movementType === 'CASH_IN' ? 'Cash In' : 'Cash Out'} of ₹${amountVal}`);
+  };
+
+  // security-audit MEDIUM pos-cashout-01: this screen is a second entry point to the same
+  // ShiftRepository.addCashMovement the Cash Drawer modal already gates behind a manager
+  // approval for CASH_OUT (see that modal's own "security-audit MED-06" comment) -- this one
+  // had no such gate at all, so a plain cashier could remove cash from the drawer unapproved.
+  const handleCashMovementSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeShift) { showToast('No shift is open.'); return; }
+    const amountVal = Number(movementAmount);
+    if (!amountVal || amountVal <= 0) { showToast('Enter an amount greater than ₹0.'); return; }
+    if (movementType === 'CASH_OUT' && amountVal > activeShift.expectedCash) {
+      showToast(`Cash Out of ₹${amountVal} exceeds the drawer's current balance of ₹${activeShift.expectedCash}.`);
+      return;
+    }
+
+    const cashierName = currentUser?.fullName || activeShift.cashierName;
+    if (movementType === 'CASH_OUT' && !isManagerOrAboveRole(currentUser)) {
+      requestManagerOverride(
+        'MANUAL_CASH_DRAWER',
+        'Manager Approval Required',
+        `${cashierName} is recording a ₹${amountVal} Cash Out — "${movementReason}".`,
+        () => commitCashMovement(amountVal, cashierName)
+      );
+      return;
+    }
+
+    commitCashMovement(amountVal, cashierName);
   };
 
   const handleCloseShiftSubmit = (e: React.FormEvent) => {

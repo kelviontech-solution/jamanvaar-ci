@@ -7,6 +7,8 @@ import { getDependentsOf } from './feature-catalog';
 import { QR_CAPABILITIES, QrCapability } from './qr-capabilities';
 import { isRestaurantInRollout } from './rollout.util';
 
+import { applyBranchLicense, assertBranchProduct } from '../../common/security/branch-license';
+
 type TxClient = Prisma.TransactionClient;
 
 export const ALL_APP_CODES: AppCode[] = ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'KIOSK', 'KIOSK_ADMIN', 'QR_ORDERING', 'WHATSAPP_ORDERING'];
@@ -32,7 +34,7 @@ const DEVICE_BACKED_APP_CODES = new Set<AppCode>(['POS', 'POS_ADMIN', 'CAPTAIN',
  * mechanism exists (spec section 37) — Super Admin can already override per-subscription via
  * the `applications` param regardless.
  */
-export type EntitlementReason = 'OK' | 'RESTAURANT_INACTIVE' | 'NO_SUBSCRIPTION' | 'SUBSCRIPTION_EXPIRED' | 'NOT_INCLUDED' | 'DISABLED';
+export type EntitlementReason = 'OK' | 'RESTAURANT_INACTIVE' | 'NO_SUBSCRIPTION' | 'SUBSCRIPTION_EXPIRED' | 'NOT_INCLUDED' | 'DISABLED' | 'BRANCH_PRODUCT_DISABLED';
 
 export interface ResolvedEntitlement {
   appCode: AppCode;
@@ -49,7 +51,7 @@ export type FamilyTierKey = `${ProductFamily}:${PlanTier}`;
 export const DEFAULT_APPS_BY_FAMILY_TIER: Partial<Record<FamilyTierKey, AppCode[]>> = {
   'RESTAURANT:CORE': ['POS', 'POS_ADMIN'],
   'RESTAURANT:PRO': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS'],
-  'RESTAURANT:QR': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING'],
+  'RESTAURANT:QR': ['QR_ORDERING'],
   'RESTAURANT:ENTERPRISE': ['POS', 'POS_ADMIN', 'CAPTAIN', 'KDS', 'QR_ORDERING', 'WHATSAPP_ORDERING'],
   'KIOSK:CORE': ['KIOSK', 'KIOSK_ADMIN'],
   'KIOSK:PRO': ['KIOSK', 'KIOSK_ADMIN'],
@@ -67,8 +69,8 @@ export class ApplicationEntitlementsService {
     private readonly audit: AuditService
   ) {}
 
-  async resolveQrCapability(tx: TxClient, restaurantId: string, code: QrCapability) {
-    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING');
+  async resolveQrCapability(tx: TxClient, restaurantId: string, code: QrCapability, branchId?: string | null) {
+    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING', branchId);
     const feature = await tx.feature.findUnique({ where: { code }, select: { isActive: true, legacyEntitlementKey: true, rolloutPercent: true } });
     const key = feature?.legacyEntitlementKey ?? QR_CAPABILITIES[code];
     const inRollout = feature?.isActive === true && isRestaurantInRollout(restaurantId, feature.rolloutPercent);
@@ -76,8 +78,8 @@ export class ApplicationEntitlementsService {
     return { code, enabled, reason: !base.enabled ? base.reason : !feature?.isActive || !inRollout ? 'PRODUCT_UNAVAILABLE' : enabled ? 'OK' : 'NOT_INCLUDED', planName: base.planName, limits: base.limits };
   }
 
-  async resolveQrCapabilities(tx: TxClient, restaurantId: string) {
-    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING');
+  async resolveQrCapabilities(tx: TxClient, restaurantId: string, branchId?: string | null) {
+    const base = await this.resolve(tx, restaurantId, 'QR_ORDERING', branchId);
     const features = await tx.feature.findMany({ where: { code: { in: Object.keys(QR_CAPABILITIES) } } });
     return { module: base, capabilities: Object.entries(QR_CAPABILITIES).map(([code, key]) => {
       const feature = features.find(f => f.code === code);
@@ -87,8 +89,8 @@ export class ApplicationEntitlementsService {
     }) };
   }
 
-  async assertQrCapability(tx: TxClient, restaurantId: string, code: QrCapability) {
-    const capability = await this.resolveQrCapability(tx, restaurantId, code);
+  async assertQrCapability(tx: TxClient, restaurantId: string, code: QrCapability, branchId?: string | null) {
+    const capability = await this.resolveQrCapability(tx, restaurantId, code, branchId);
     if (!capability.enabled) throw new ForbiddenException({ code: 'QR_FEATURE_NOT_LICENSED', feature: code, message: 'This optional QR feature is not included in the current license. Contact your platform administrator.' });
     return capability;
   }
@@ -154,7 +156,7 @@ export class ApplicationEntitlementsService {
    * authorize with it; the Branch Core receives it in its roster. Nothing outside this method compares a plan name,
    * tier or price. Fails closed.
    */
-  async resolve(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<ResolvedEntitlement> {
+  async resolve(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null): Promise<ResolvedEntitlement> {
     const closed = (reason: EntitlementReason, extra: Partial<ResolvedEntitlement> = {}): ResolvedEntitlement => ({
       appCode, enabled: false, reason, source: null, limits: {}, validUntil: null, planName: null, ...extra
     });
@@ -172,7 +174,7 @@ export class ApplicationEntitlementsService {
     const current = subs.filter((s) => !s.expiresAt || s.expiresAt > now);
     if (current.length === 0) return closed('SUBSCRIPTION_EXPIRED', { validUntil: subs[0].expiresAt?.toISOString() ?? null, planName: subs[0].plan.name });
 
-    const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: current.map((s) => s.id) }, appCode } });
+    const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: { in: current.map((s) => s.id) }, appCode }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }] });
     const granting = rows.find((r) => r.enabled);
     const owning = current.find((s) => s.id === (granting ?? rows[0])?.subscriptionId) ?? current[0];
     const planFlags = owning.plan.entitlements && typeof owning.plan.entitlements === 'object' && !Array.isArray(owning.plan.entitlements) ? (owning.plan.entitlements as Record<string, unknown>) : {};
@@ -182,16 +184,32 @@ export class ApplicationEntitlementsService {
     if (!granting) {
       return closed(rows.length > 0 && planDefault ? 'DISABLED' : 'NOT_INCLUDED', { planName: owning.plan.name, validUntil: owning.expiresAt?.toISOString() ?? null });
     }
-    return {
+    const limits: Record<string, unknown> = { ...planFlags, ...rowConfig };
+    if (appCode === 'QR_ORDERING') {
+      // Each purchased grant keeps its own overrides. QR add-ons from another
+      // live subscription must not disappear when a newer base plan is added.
+      const grants = rows.filter(r => r.enabled).map(r => {
+        const s = current.find(s => s.id === r.subscriptionId)!;
+        return { ...(s.plan.entitlements as Record<string, unknown> ?? {}), ...(r.config as Record<string, unknown> ?? {}) };
+      });
+      for (const key of Object.values(QR_CAPABILITIES)) limits[key] = grants.some(g => g[key] === true);
+      for (const key of ['qrMaxOrdersPerDay', 'qrMaxActiveTables']) {
+        const legacyKey = key === 'qrMaxOrdersPerDay' ? 'maxOrdersPerDay' : 'maxActiveTables';
+        const values = grants.map(g => Object.prototype.hasOwnProperty.call(g, key) ? g[key] : g[legacyKey]);
+        // An omitted/null cap grants unlimited capacity; otherwise use the largest purchased cap.
+        limits[key] = values.some(v => v == null) ? null : Math.max(...values.filter((v): v is number => typeof v === 'number'));
+      }
+    }
+    return applyBranchLicense(tx, restaurantId, branchId, appCode, {
       appCode,
       enabled: true,
       reason: 'OK',
-      source: granting.enabled === planDefault ? 'PLAN' : 'MANUAL_OVERRIDE',
+      source: granting.enabled === planDefault && rows.every(r => !r.config || Object.keys(r.config as object).length === 0) ? 'PLAN' : 'MANUAL_OVERRIDE',
       // The subscription's own row (a per-restaurant override) wins over the plan's default limits.
-      limits: { ...planFlags, ...rowConfig },
+      limits,
       validUntil: owning.expiresAt?.toISOString() ?? null,
       planName: owning.plan.name
-    };
+    } as ResolvedEntitlement);
   }
 
   private withSource<T extends { appCode: AppCode; enabled: boolean }>(
@@ -244,8 +262,8 @@ export class ApplicationEntitlementsService {
     });
   }
 
-  async update(subscriptionId: string, appCode: AppCode, dto: UpdateApplicationEntitlementDto, actor: PlatformUser) {
-    return this.prisma.runAsPlatform(async (tx) => {
+  async update(subscriptionId: string, appCode: AppCode, dto: UpdateApplicationEntitlementDto, actor: PlatformUser, transaction?: TxClient) {
+    const apply = async (tx: TxClient) => {
       const existing = await tx.applicationEntitlement.findUnique({
         where: { subscriptionId_appCode: { subscriptionId, appCode } }
       });
@@ -298,7 +316,8 @@ export class ApplicationEntitlementsService {
       );
 
       return updated;
-    });
+    };
+    return transaction ? apply(transaction) : this.prisma.runAsPlatform(apply);
   }
 
   /**
@@ -312,9 +331,10 @@ export class ApplicationEntitlementsService {
    * past-due subscription and returns true if ANY of them grants the app, not just whichever
    * was created most recently.
    */
-  async isAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<boolean> {
+  async isAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null): Promise<boolean> {
+    if (branchId) return (await this.resolve(tx, restaurantId, appCode, branchId)).enabled;
     const subs = await tx.subscription.findMany({
-      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] }, expiresAt: { gt: new Date() }, restaurant: { status: 'ACTIVE', deletedAt: null } },
       select: { id: true }
     });
     if (subs.length === 0) return false;
@@ -333,7 +353,7 @@ export class ApplicationEntitlementsService {
    */
   async listEnabledAppCodesForTenant(tx: TxClient, restaurantId: string): Promise<AppCode[]> {
     const subs = await tx.subscription.findMany({
-      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] } },
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE', 'PAST_DUE'] }, expiresAt: { gt: new Date() }, restaurant: { status: 'ACTIVE', deletedAt: null } },
       select: { id: true }
     });
     if (subs.length === 0) return [];
@@ -347,8 +367,8 @@ export class ApplicationEntitlementsService {
   }
 
   /** Throws a clear 403 instead of a bare boolean when the caller wants to fail the request outright. */
-  async assertAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
-    const ok = await this.isAppEnabled(tx, restaurantId, appCode);
+  async assertAppEnabled(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null): Promise<void> {
+    const ok = await this.isAppEnabled(tx, restaurantId, appCode, branchId);
     if (!ok) {
       throw new ForbiddenException(
         `${appCode} is not enabled on this restaurant's current subscription. Enable it under Applications before provisioning a device.`
@@ -376,14 +396,14 @@ export class ApplicationEntitlementsService {
    * A no-op (never throws) when there's no active subscription or no granting entitlement row
    * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
    */
-  async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode): Promise<void> {
+  async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null): Promise<void> {
     // QR-only management uses POS_ADMIN records; never cast QR_ORDERING to DeviceType.
     if (!DEVICE_BACKED_APP_CODES.has(appCode) && appCode !== 'QR_ORDERING') return;
     // Counting and then inserting is a race: N simultaneous activations would all count the same "free seats" and all succeed.
     // The lock is held to the end of the caller's transaction, so the next activation counts AFTER this one's device exists.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'device-quota:' + restaurantId + ':' + appCode}))`;
     const subs = await tx.subscription.findMany({
-      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE'] } },
+      where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE'] }, expiresAt:{gt:new Date()} },
       select: { id: true, plan: { select: { maxDevices: true } } }
     });
     if (subs.length === 0) return;
@@ -401,6 +421,12 @@ export class ApplicationEntitlementsService {
         : null;
     const quota = row.deviceQuota ?? featureQuota ?? owningSub.plan.maxDevices;
 
+    const branchGrant = await assertBranchProduct(tx, restaurantId, branchId, appCode);
+    if (branchId && branchGrant?.deviceQuota !== null && branchGrant?.deviceQuota !== undefined) {
+      const types = appCode === 'QR_ORDERING' ? ['POS_ADMIN' as const] : appCode === 'KIOSK_ADMIN' && !(await this.isAppEnabled(tx, restaurantId, 'POS_ADMIN', branchId)) ? ['POS_ADMIN' as const, 'KIOSK_ADMIN' as const] : [appCode as DeviceType];
+      const count = await tx.device.count({where:{restaurantId,branchId,type:{in:types},status:{not:'REVOKED'}}});
+      if (count >= branchGrant.deviceQuota) throw new ConflictException(`This branch allows ${branchGrant.deviceQuota} ${appCode} devices; revoke an unused device or change the branch allocation.`);
+    }
     const activeDeviceCount = await tx.device.count({
       where: { restaurantId, type: { in: appCode === 'QR_ORDERING' ? ['POS_ADMIN'] : await this.deviceTypesForEntitlement(tx, restaurantId, appCode) }, status: { not: 'REVOKED' } }
     });

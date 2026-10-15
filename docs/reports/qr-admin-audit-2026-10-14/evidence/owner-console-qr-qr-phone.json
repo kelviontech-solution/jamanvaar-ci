@@ -1,0 +1,273 @@
+{
+  "text": "QR ADMIN\nBranch\nAll restaurant\nQA Owner qr 1792004605417 — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Owner qr plan 1792004605417 · 16/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nPayment Acceptance\n\nCheck configuration and record a real phone checkout against verified payment.\n\n✦ JAMAN AI\nEnabled\nOnline payment acceptance\n\nConfiguration readiness and an actual phone checkout are separate checks. Run a small order through your normal table QR, pay on the phone, return and verify that the same order reaches the kitchen.\n\n1. Check your payment configuration\n\nReady: QR Ordering license\n\nReady: A usable payment method\n\nNeeds attention: Online payment readiness / Configure your merchant integration or turn off online payment.\n\nOpen payment settings\n2. Test on your actual phone\n\nOpen or scan one of these active table links. This creates a real order only when you submit checkout; it can charge your chosen amount.\n\nGenerate a table QR first\n3. Record verified acceptance\nServer-confirmed online order\nSelect paid test order\n\nNo confirmed online order in this scope yet. Cash or pending orders cannot certify online checkout.\n\n Payment app / checkout worked on the phone\n Phone returned and displayed the verified payment result\n Same order appeared in POS / KDS\nAcceptance notesRecord acceptance\nRefresh payment readiness",
+  "headings": [
+    "Payment Acceptance",
+    "Online payment acceptance",
+    "1. Check your payment configuration",
+    "2. Test on your actual phone",
+    "3. Record verified acceptance"
+  ],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Record acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Refresh payment readiness",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 211,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "QR Admin branch",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "Jamanvaar",
+      "src": "/qr/assets/branding/jamanvaar-logo.png",
+      "loaded": true,
+      "width": 94
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

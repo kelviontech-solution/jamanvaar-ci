@@ -1,3 +1,7 @@
+import {RestaurantPage,RestaurantContactFooter} from '../../../packages/ui/src/restaurant-page/RestaurantPage';
+import type {RestaurantPageView,RestaurantPageDish,PageEngagementAction} from '../../../packages/ui/src/restaurant-page/types';
+import { translatedPage } from '../../../packages/ui/src/restaurant-page/page-content';
+import type { ComponentProps } from 'react';
 import {ServiceRequests,PickupSelector} from './Operations';
 import { accentInk, accentText } from './brandContrast';
 import { printElement } from '../../../packages/ui/src/printElement';
@@ -53,8 +57,8 @@ async function ensureSession(): Promise<string> {
   return sessionRequest;
 }
 
-type Screen = 'MENU' | 'CART' | 'CHECKOUT' | 'STATUS';
-const currentScreen = (): Screen => ({'#menu':'MENU','#cart':'CART','#checkout':'CHECKOUT','#status':'STATUS'} as Record<string,Screen>)[location.hash] ?? 'MENU';
+type Screen = 'HOME' | 'MENU' | 'CART' | 'CHECKOUT' | 'STATUS';
+const currentScreen = (): Screen => ({'#home':'HOME','#menu':'MENU','#cart':'CART','#checkout':'CHECKOUT','#status':'STATUS'} as Record<string,Screen>)[location.hash] ?? 'MENU';
 const paymentUrl = (url: string | null | undefined) => {
   try { const value=new URL(url ?? ''); return value.protocol==='https:' && (value.hostname==='rzp.io' || value.hostname==='razorpay.com' || value.hostname.endsWith('.razorpay.com')) ? value.href : null; } catch { return null; }
 };
@@ -72,9 +76,27 @@ function DishPhoto({ source, name, className = '' }: { source?: string; name: st
 }
 
 export default function App() {
+  const site=/^\/q\/site\/([A-Za-z0-9_-]{24})\/?$/.exec(location.pathname);
+  if(site)return <PublicRestaurantSite slug={site[1]}/>;
   const token = tokenFromPath();
   if (!token) return <Message title="This QR code is not valid" text="Please scan the code on your table again, or ask a team member." />;
   return <Ordering token={token} />;
+}
+
+function recordPageAction(page:RestaurantPageView,action:PageEngagementAction){
+  if(navigator.doNotTrack==='1'||(navigator as Navigator&{globalPrivacyControl?:boolean}).globalPrivacyControl)return;
+  if(page.trackingSlug&&page.content.engagementEnabled)void QrApi.pageEvent(page.trackingSlug,action).catch(()=>{});
+}
+function GuestRestaurantPage(props:ComponentProps<typeof RestaurantPage>){
+  const [language,setLanguage]=useState(()=>store.get('jv_qr_language')||props.page.content.defaultLanguage||'en');
+  useEffect(()=>{recordPageAction(props.page,'PAGE_VIEW');},[props.page.trackingSlug,props.page.publishedAt]);
+  return <RestaurantPage {...props} language={language} onLanguageChange={value=>{setLanguage(value);store.set('jv_qr_language',value);}} onAction={action=>recordPageAction(props.page,action)}/>;
+}
+function PublicRestaurantSite({slug}:{slug:string}){
+ const [page,setPage]=useState<(RestaurantPageView&{items:RestaurantPageDish[];menuReady:boolean})|null>(null),[error,setError]=useState('');
+ useEffect(()=>{let alive=true,running=false;const refresh=async()=>{if(running||document.hidden)return;running=true;try{const value=await QrApi.site(slug);if(alive){setPage(value);setError('');}}catch(e){if(alive){setError((e as Error).message);if(e instanceof ApiError&&e.status===404)setPage(null);}}finally{running=false;}};void refresh();const timer=setInterval(()=>void refresh(),15000);return()=>{alive=false;clearInterval(timer);};},[slug]);
+ if(!page)return <Message title={error?'Restaurant page unavailable':'Opening the restaurant'} text={error||'Please wait a moment.'}/>;
+ return <><GuestRestaurantPage page={{...page,content:{...page.content,logoUrl:(imageSrc(page.content.logoUrl)||''),heroUrl:(imageSrc(page.content.heroUrl)||''),gallery:page.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}} items={page.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={page.menuReady?()=>document.getElementById('public-restaurant-menu')?.scrollIntoView({behavior:'smooth'}):undefined} availability={page.menuReady?'Browse our menu here. Please contact the restaurant to place an order.':'Our menu is not available online yet. Please contact the restaurant.'}/>{page.menuReady&&<section className="rp-page" id="public-restaurant-menu" tabIndex={-1}><div className="rp-section"><h2>Our menu</h2><div className="rp-dishes">{page.items.map(d=><article className="rp-dish" key={d.id}>{d.imageUrl&&<DishPhoto source={d.imageUrl} name={d.name}/>}<div><h3>{d.name}</h3><p>{d.description}</p><b>{new Intl.NumberFormat('en-IN',{style:'currency',currency:page.currency}).format(d.price)}</b>{d.allergens?.length?<p>Allergens: {d.allergens.join(', ')}</p>:null}</div></article>)}</div></div></section>}</>;
 }
 
 function Message({ title, text, action, busy, note }: { title: string; text?: string; action?: { label: string; run: () => void }; busy?: boolean; note?: string }) {
@@ -96,17 +118,20 @@ function Ordering({ token }: { token: string }) {
   const [problem, setProblem] = useState<{ title: string; text: string; retry: boolean } | null>(null);
   const [screen, setScreen] = useState<Screen>(currentScreen);
   const navigate = (target: Screen) => { const url=new URL(location.href); if(target!=='STATUS')url.searchParams.delete('order');url.hash=target.toLowerCase();history.pushState({},'',url);setScreen(target); };
+  useEffect(()=>{if(info&&screen==='HOME'&&!info.restaurantPage)navigate('MENU');},[info,screen]);
   useEffect(()=>{const restore=()=>setScreen(currentScreen());window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore);},[]);
   const [cart, setCart] = useState<Cart>(() => parseCart(store.get(`jv_qr_cart:${token}`)));
   const [placed, setPlaced] = useState<Placed | null>(null);
   const [openingPayment, setOpeningPayment] = useState<string | null>(null);
   const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
+  const [featuredDish,setFeaturedDish]=useState<string|null>(null);
   const [restoreError,setRestoreError]=useState<string|null>(null);
   const [restoreAttempt,setRestoreAttempt]=useState(0);
   // A manual retry must visibly do something: busy label while it runs, and an explicit note if it fails again.
   const [retrying, setRetrying] = useState(false);
   const [retryFailed, setRetryFailed] = useState(false);
   const etag = useRef<string | null>(null);
+  const restoredActive=useRef(false);
   useEffect(() => {
     const resume = (event: PageTransitionEvent) => {
       if (event.persisted && openingPayment) { setOpeningPayment(null); navigate('STATUS'); }
@@ -119,7 +144,10 @@ function Ordering({ token }: { token: string }) {
     setProblem(null);
     try {
       await ensureSession();
-      const [d, m] = await Promise.all([QrApi.describe(token, sessionId), QrApi.menu(token, sessionId)]);
+      const [d, menuResult] = await Promise.all([QrApi.describe(token, sessionId), QrApi.menu(token, sessionId).catch((error:ApiError)=>({error}))]);
+      if('error' in menuResult && (!d.restaurantPage || menuResult.error.code!=='MENU_NOT_PUBLISHED'))throw menuResult.error;
+      const m='error' in menuResult?{menu:{items:[],categories:[],modifierGroups:[],menuVersion:0,etag:''} as Menu,etag:null}:menuResult;
+      if(d.restaurantPage?.content.entryMode==='PAGE'&&!location.hash&&!new URLSearchParams(location.search).has('order')&&!restoredActive.current&&itemCount(parseCart(store.get(`jv_qr_cart:${token}`)))===0)setScreen('HOME');
       currencyCode = d.currency || 'INR';
       setInfo(d);
       seenMenuVersion = m.menu?.menuVersion ?? seenMenuVersion;
@@ -148,7 +176,8 @@ function Ordering({ token }: { token: string }) {
     const returned = new URLSearchParams(location.search).get('order');
     const last = returned || store.get(`jv_qr_last:${token}`);
     let active = true;
-    if (last) QrApi.status(last).then((p) => { if(!active)return;setPlaced(p);setRestoreError(null);store.set(`jv_qr_last:${token}`,p.publicOrderId);if (returned || location.hash==='#status' || (p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !location.hash)) setScreen('STATUS'); })
+    if(returned){restoredActive.current=true;setScreen('STATUS');}
+    if (last) QrApi.status(last).then((p) => { if(!active)return;setPlaced(p);setRestoreError(null);store.set(`jv_qr_last:${token}`,p.publicOrderId);if (returned || location.hash==='#status' || (p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !location.hash)){restoredActive.current=true;setScreen('STATUS');} })
       .catch((error:ApiError) => { if(!active)return;if(error.status===404)store.del(`jv_qr_last:${token}`);setRestoreError(error.message); });
     return()=>{active=false;};
   }, [token,restoreAttempt]);
@@ -161,7 +190,7 @@ function Ordering({ token }: { token: string }) {
       if(running||document.hidden)return;
       running=true;
       try {
-        const [m,d]=await Promise.all([QrApi.menu(token,sessionId,etag.current),QrApi.describe(token,sessionId)]);
+        const [m,d]=await Promise.all([QrApi.menu(token,sessionId,etag.current).catch((error:ApiError)=>{if(error.code==='MENU_NOT_PUBLISHED')return {menu:null,etag:null};throw error;}),QrApi.describe(token,sessionId)]);
         if(!active)return;
         setInfo(d);
         if(m.menu){etag.current=m.etag;seenMenuVersion=m.menu.menuVersion;setMenu(m.menu);}
@@ -170,7 +199,7 @@ function Ordering({ token }: { token: string }) {
       finally {running=false;}
     };
     // Recheck payment methods, rules and availability when entering checkout.
-    if (screen === 'CHECKOUT') void refresh();
+    if (screen === 'CHECKOUT' || screen === 'MENU') void refresh();
     const t=setInterval(()=>void refresh(),20000);
     const onFocus=()=>void refresh();
     window.addEventListener('focus',onFocus);document.addEventListener('visibilitychange',onFocus);
@@ -200,19 +229,25 @@ function Ordering({ token }: { token: string }) {
 
   };
 
+  const restaurantPage=info.restaurantPage?{...info.restaurantPage,restaurantName:info.restaurant.name,branchName:info.branch.name,table:info.table?.displayNumber,currency:info.currency||'INR',content:{...info.restaurantPage.content,logoUrl:(imageSrc(info.restaurantPage.content.logoUrl)||''),heroUrl:(imageSrc(info.restaurantPage.content.heroUrl)||''),gallery:info.restaurantPage.content.gallery.map(i=>({...i,url:(imageSrc(i.url)||'')}))}}:null;
+  const effectiveBrand=restaurantPage?{...info.branding,welcomeTitle:restaurantPage.content.title||info.restaurant.name,welcomeMessage:restaurantPage.content.welcome,logoUrl:restaurantPage.content.logoUrl||info.branding?.logoUrl||null,coverUrl:restaurantPage.content.heroUrl||info.branding?.coverUrl,accentColor:restaurantPage.content.accent,backgroundColor:({HERITAGE:'#FAF5EB',CAFE:'#FFF7ED',MODERN:'#F6F7F1'})[restaurantPage.content.template]}:info.branding;
+  const menuInfo=effectiveBrand?{...info,branding:{...effectiveBrand,footerMessage:effectiveBrand.footerMessage??null,orderButtonLabel:effectiveBrand.orderButtonLabel??null}}:info;
+  if(screen==='HOME'&&restaurantPage)return <GuestRestaurantPage page={restaurantPage} items={menu.items.map(i=>({...i,imageUrl:imageSrc(i.imageUrl,i.name)}))} onMenu={info.ordering.menuReady?()=>navigate('MENU'):undefined} availability={!info.ordering.menuReady?'Our menu is not available online yet. Please contact the restaurant.':!info.ordering.enabled?info.ordering.availability?.message||'Ordering is currently unavailable. You can still browse the menu.':''} onDish={id=>{setFeaturedDish(id);navigate('MENU');}}/>;
+
   return (
-    <div className={`app brand-${info.branding?.layout??'CARDS'}`} style={{'--saffron':info.branding?.accentColor||'#c2570c','--bg':info.branding?.backgroundColor||'#faf7f2','--accent-ink':accentInk(info.branding?.accentColor||'#c2570c'),'--accent-text':accentText(info.branding?.accentColor||'#c2570c')} as React.CSSProperties}>
+    <div className={`app brand-${effectiveBrand?.layout??'CARDS'}`} style={{'--saffron':effectiveBrand?.accentColor||'#c2570c','--bg':effectiveBrand?.backgroundColor||'#faf7f2','--accent-ink':accentInk(effectiveBrand?.accentColor||'#c2570c'),'--accent-text':accentText(effectiveBrand?.accentColor||'#c2570c')} as React.CSSProperties}>
       <header className="top">
-        <img src={imageSrc(info.branding?.logoUrl || '/assets/branding/jamanvaar-logo.png')} alt={info.branding?.logoUrl ? info.restaurant.name : 'Jamanvaar by Kelviontech'} className="logo" />
+        <img src={imageSrc(effectiveBrand?.logoUrl || '/assets/branding/jamanvaar-logo.png')} alt={effectiveBrand?.logoUrl ? info.restaurant.name : 'Jamanvaar by Kelviontech'} className="logo" />
         <div className="restaurant-heading">
-          <div className="name">{info.branding?.welcomeTitle || info.restaurant.name}</div>
+          <div className="name">{effectiveBrand?.welcomeTitle || info.restaurant.name}</div>
           <div className="sub">{info.branch.name}{info.table ? ` · Table ${info.table.displayNumber}` : ' · Menu'}</div>
         </div>
+        {restaurantPage&&<button type="button" className="rp-info-link" onClick={()=>navigate('HOME')}>About & contact</button>}
         <div className="mode"><span className="live-dot" />{info.table ? `Table ${info.table.displayNumber}` : 'Guest menu'}</div>
       </header>
-      <ServiceRequests token={token} session={sessionId}/>{screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
+      <ServiceRequests token={token} session={sessionId}/>{screen !== 'MENU' && <nav className="journey" aria-label="Order progress">{(['MENU', 'CART', 'CHECKOUT', 'STATUS'] as Screen[]).map((step, index) => { const current = screen === 'STATUS' && placed?.status === 'PENDING_PAYMENT' ? 'CHECKOUT' : screen; return <span key={step} className={step === current ? 'current' : ''} aria-current={step === current ? 'step' : undefined}><b>{index + 1}</b>{({ HOME: 'Restaurant', MENU: 'Menu', CART: 'Cart', CHECKOUT: 'Checkout', STATUS: 'Your order' })[step]}</span>; })}</nav>}
 
-      {screen === 'MENU' && <MenuScreen info={info} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} />}
+      {screen === 'MENU' && <MenuScreen info={menuInfo} menu={menu} cart={cart} setCart={setCart} onCart={() => navigate('CART')} placed={placed} onStatus={() => navigate('STATUS')} initialDishId={featuredDish} onDishOpened={()=>setFeaturedDish(null)} />}
       {screen==='MENU'&&info.advanced?.historyEnabled&&<GuestHistory token={token} session={sessionId} onRecover={async id=>{try{setPlaced(await QrApi.status(id));store.set(`jv_qr_last:${token}`,id);navigate('STATUS');}catch(err){setPaymentNotice((err as Error).message);}}} onReorder={items=>{let next=cart;let skipped=0;for(const line of items){const item=menu.items.find(i=>i.id===line.itemId);const options=item?item.modifierGroupIds.flatMap(id=>menu.modifierGroups.find(g=>g.id===id)?.options??[]):[];const chosen=line.optionIds.map(id=>options.find(o=>o.id===id));if(!item||chosen.some(o=>!o)){skipped++;continue;}next=addLine(next,{itemId:item.id,name:item.name,quantity:line.quantity,unitPrice:item.price+chosen.reduce((n,o)=>n+(o?.priceDelta??0),0),optionIds:line.optionIds,optionNames:chosen.map(o=>o!.name),note:line.note});}setCart(next);setPaymentNotice(skipped?`${skipped} previous item(s) are no longer available. Review your cart and required choices.`:'Previous items added at current menu prices. Review your cart before ordering.');navigate('CART');}}/>}
       {screen==='MENU'&&info.advanced?.groupEnabled&&<GroupOrder token={token} session={sessionId} cart={cart} info={info} onPlaced={acceptPlaced}/>}
       {paymentNotice && <p className="warn pad" role="alert">{paymentNotice}</p>}
@@ -224,15 +259,16 @@ function Ordering({ token }: { token: string }) {
       {screen === 'STATUS' && placed && <StatusScreen placed={placed} setPlaced={setPlaced} showStatus={info.ordering.settings.showOrderStatus} onMore={() => navigate('MENU')} />}
       {screen==='STATUS'&&placed?.status==='COMPLETED'&&info.advanced?.feedbackEnabled&&<OrderFeedback key={placed.publicOrderId} order={placed}/>}
       {screen === 'STATUS' && !placed && <Message title={restoreError?"Could not restore your order":"Checking your order"} text={restoreError||"Please wait while we restore the order status."} action={restoreError?{label:'Check again',run:()=>setRestoreAttempt(a=>a+1)}:{label:'Back to menu',run:()=>navigate('MENU')}} />}
-      {info.branding?.contactMessage&&<p className="muted pad">{info.branding.contactMessage}</p>}{info.branding?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{info.branding.footerMessage}</footer>}
-      <footer className="brand-footer">Thoughtfully served with <strong>Jamanvaar</strong><span>by Kelviontech</span></footer>
+      {restaurantPage&&<RestaurantContactFooter content={translatedPage(restaurantPage.content,store.get('jv_qr_language')||restaurantPage.content.defaultLanguage||'en')} branchName={info.branch.name} onAction={action=>recordPageAction(restaurantPage,action)}/>}
+      {!restaurantPage&&effectiveBrand?.contactMessage&&<p className="muted pad">{effectiveBrand.contactMessage}</p>}{!restaurantPage&&effectiveBrand?.footerMessage && <footer className="muted pad" style={{ textAlign: 'center' }}>{effectiveBrand.footerMessage}</footer>}
+      {!restaurantPage&&<footer className="brand-footer">Thoughtfully served with <strong>Jamanvaar</strong><span>by Kelviontech</span></footer>}
     </div>
   );
 }
 
 // ------------------------------------------------------------------------------------------ menu
 
-function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { info: Describe; menu: Menu; cart: Cart; setCart: (c: Cart) => void; onCart: () => void; placed: Placed | null; onStatus: () => void }) {
+function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus,initialDishId,onDishOpened }: { info: Describe; menu: Menu; cart: Cart; setCart: (c: Cart) => void; onCart: () => void; placed: Placed | null; onStatus: () => void;initialDishId?:string|null;onDishOpened?:()=>void }) {
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState(() => store.get('jv_qr_language') || menu.defaultLanguage || 'en');
   const [lowBandwidth,setLowBandwidth]=useState(()=>store.get('jv_qr_compact')==='yes');
@@ -242,6 +278,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
   const diets = [...new Set(menu.items.map(i=>i.dietaryType).filter((d): d is string=>!!d))];
   const [category, setCategory] = useState<string>('ALL');
   const [picking, setPicking] = useState<MenuItem | null>(null);
+  useEffect(()=>{if(initialDishId){setPicking(menu.items.find(i=>i.id===initialDishId)??null);onDishOpened?.();}},[initialDishId,menu.items,onDishOpened]);
   const groups = useMemo(() => new Map(menu.modifierGroups.map((g) => [g.id, g])), [menu]);
   const visible = menu.items.map(local).filter((i) => (diet==='ALL'||i.dietaryType===diet) && (category === 'ALL' || i.categoryId === category) && (!query || `${i.name} ${i.description ?? ''}`.toLowerCase().includes(query.toLowerCase())));
 
@@ -282,6 +319,7 @@ function MenuScreen({ info, menu, cart, setCart, onCart, placed, onStatus }: { i
             <div className="grow">
               <div className="iname">{i.name}</div>{i.dietaryType&&<small className={`diet ${i.dietaryType === 'NON_VEG' ? 'nonveg' : ''}`}><span />{i.dietaryType.replaceAll('_',' ')}</small>}
               {i.description && <div className="idesc">{i.description}</div>}
+              {!!i.allergens?.length && <p className="allergen-note">Declared allergens: {i.allergens.join(', ')}</p>}
               <div className="price">{inr(i.price)}</div>
             </div>
             <button className="add" onClick={() => quickAdd(i)} aria-label={`Add ${i.name}`}>Add</button>
@@ -358,7 +396,8 @@ function Picker({ item, groups, allowMods, allowNotes, initial, onClose, onAdd }
             ))}
           </fieldset>
         ))}
-        {allowNotes && item.allowInstructions !== false && <textarea placeholder="Special instructions (optional)" maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />}
+        {!!item.allergens?.length && <p className="allergen-note">Declared allergens: {item.allergens.join(', ')}. Ask staff about cross-contact.</p>}
+        {allowNotes && item.allowInstructions !== false && <textarea placeholder="Allergies or special instructions (tell staff about severe allergies)" maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />}
         <div className="qty"><button onClick={() => setQty(Math.max(minQ, qty - 1))} disabled={qty <= minQ} aria-label="Fewer">−</button><b>{qty}</b><button onClick={() => setQty(Math.min(maxQ, qty + 1))} disabled={qty >= maxQ} aria-label="More">+</button>{minQ > 1 && <span className="muted"> minimum {minQ}</span>}{maxQ < 50 && <span className="muted"> maximum {maxQ}</span>}</div>
         <button className="primary" disabled={!!missing} onClick={() => onAdd({ itemId: item.id, name: item.name, unitPrice: unit, quantity: qty, optionIds, optionNames, note: allowNotes && item.allowInstructions !== false ? note.trim() || undefined : undefined })}>
           {missing ? `Choose ${missing.name}` : `${initial ? 'Save changes' : `Add ${qty}`} · ${inr(unit * qty)}`}

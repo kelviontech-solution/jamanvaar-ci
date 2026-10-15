@@ -369,3 +369,49 @@ it('QR CRM consent exports and follow-ups retain permissions and retry safety',a
   const audited=await prisma.runAsTenant(rid,tx=>tx.auditLog.count({where:{restaurantId:rid,action:'CUSTOMER_EXPORT'}}));expect(audited).toBeGreaterThanOrEqual(3);
  }finally{await prisma.runAsTenant(rid,async tx=>{for(const row of original)await tx.applicationEntitlement.update({where:{id:row.id},data:{config:row.config as any}});});}
 });
+
+
+it('live attention ignores historical sales filters and never shows another branch?s restricted dishes or orders',async()=>{
+  const prefix=`attention-${stamp}`;
+  try {
+    await prisma.runAsTenant(rid,async tx=>{
+      await tx.syncedOrder.createMany({data:['PREPARING','CANCELLED','READY'].map((status,i)=>({restaurantId:rid,branchId:branches[0].id,externalOrderId:prefix+i,status,paymentStatus:'SUCCESS',paymentMethod:'CASH',source:'POS',orderType:'TAKEAWAY',subtotal:10000,taxAmount:0,totalAmount:10000,items:[],createdAt:new Date(Date.now()-30*60000)}))});
+      await tx.syncedEntity.create({data:{restaurantId:rid,entityType:'MENU_ITEM',externalId:prefix,payload:{name:'Branch A unavailable test',isAvailable:false,branchIds:[branches[0].id]}}});
+    });
+    const a=await dashboard(`?branchId=${branches[0].id}&period=YESTERDAY&source=QR`);
+    expect(a.status,JSON.stringify(a.body)).toBe(200);expect(a.body.attention.delayedOrders.some((o:any)=>o.externalOrderId===prefix+'0')).toBe(true);
+    expect(a.body.attention.delayedOrders.some((o:any)=>[prefix+'1',prefix+'2'].includes(o.externalOrderId))).toBe(false);
+    expect(a.body.attention.unavailableDishes.some((d:any)=>d.id===prefix)).toBe(true);
+    await prisma.runAsTenant(rid,tx=>tx.syncedEntity.create({data:{restaurantId:rid,entityType:'BRANCH_MENU_OVERRIDE',externalId:prefix+'-override',payload:{branchId:branches[0].id,itemId:'tea',isAvailable:false}}}));
+    const override=await dashboard(`?branchId=${branches[0].id}`);expect(override.body.attention.unavailableDishes.some((d:any)=>d.id==='tea'&&d.branchId===branches[0].id)).toBe(true);
+    const b=await dashboard(`?branchId=${branches[1].id}`);
+    expect(b.body.attention.delayedOrders.some((o:any)=>o.externalOrderId.startsWith(prefix))).toBe(false);expect(b.body.attention.unavailableDishes.some((d:any)=>d.id===prefix)).toBe(false);
+    expect((await http().get('/api/v1/tenant/dashboard').set('Authorization',`Bearer ${managerJwt}`)).body.viewerRole).toBe('MANAGER');
+  } finally {await prisma.runAsTenant(rid,async tx=>{await tx.syncedOrder.deleteMany({where:{restaurantId:rid,externalOrderId:{startsWith:prefix}}});await tx.syncedEntity.deleteMany({where:{restaurantId:rid,externalId:{startsWith:prefix}}});});}
+});
+
+it('launch evidence requires a paid completed order in the authorized branch and is rechecked after refunds',async()=>{
+  const id=`launch-${stamp}`,url=`/api/v1/tenant/dashboard/launch-acceptance?branchId=${branches[0].id}`;
+  const evidence={orderId:id,counterReceived:true,kitchenReceived:true,receiptVerified:true};
+  try {
+    await prisma.runAsTenant(rid,tx=>tx.syncedOrder.create({data:{restaurantId:rid,branchId:branches[0].id,externalOrderId:id,status:'READY',paymentStatus:'SUCCESS',paymentMethod:'CASH',source:'POS',orderType:'TAKEAWAY',subtotal:10000,taxAmount:0,totalAmount:10000,items:[]}}));
+    const send=(data:any,token=ownerJwt)=>http().post(url).set('Authorization',`Bearer ${token}`).send(data);
+    expect((await send(evidence)).status).toBe(400);
+    await prisma.runAsTenant(rid,tx=>tx.syncedOrder.updateMany({where:{restaurantId:rid,externalOrderId:id},data:{status:'COMPLETED'}}));
+    expect((await send({...evidence,kitchenReceived:false})).status).toBe(400);
+    expect((await send({...evidence,restaurantId:rid})).status).toBe(400);
+    expect((await send(evidence,managerJwt)).status).toBe(403);
+    const wrong=await http().post(`/api/v1/tenant/dashboard/launch-acceptance?branchId=${branches[1].id}`).set('Authorization',`Bearer ${ownerJwt}`).send(evidence);expect(wrong.status).toBe(400);
+    const saved=await send(evidence);expect(saved.status,JSON.stringify(saved.body)).toBe(201);expect(saved.body.verified).toBe(true);
+    const get=()=>http().get(url).set('Authorization',`Bearer ${ownerJwt}`);
+    expect((await get()).body.record.orderId).toBe(id);
+    expect((await as('post','/api/v1/menu/publish').send({})).status).toBe(201);
+    expect((await get()).body.verified).toBe(false);
+    expect((await send(evidence)).status).toBe(400);
+    await prisma.runAsTenant(rid,tx=>tx.syncedOrder.updateMany({where:{restaurantId:rid,externalOrderId:id},data:{createdAt:new Date()}}));
+    expect((await send(evidence)).body.verified).toBe(true);
+
+    await prisma.runAsTenant(rid,tx=>tx.syncedOrder.updateMany({where:{restaurantId:rid,externalOrderId:id},data:{paymentStatus:'REFUNDED'}}));
+    expect((await get()).body.verified).toBe(false);
+  } finally {await prisma.runAsTenant(rid,async tx=>{await tx.syncedOrder.deleteMany({where:{restaurantId:rid,externalOrderId:id}});await tx.syncedEntity.deleteMany({where:{restaurantId:rid,entityType:'ADMIN_LAUNCH_CHECK',externalId:`launch-check:${branches[0].id}`}});});}
+});

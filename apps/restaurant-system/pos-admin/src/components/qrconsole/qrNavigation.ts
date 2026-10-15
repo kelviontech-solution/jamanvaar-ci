@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 export const QR_PAGES = [
+ {id:'RESTAURANT_PAGE',label:'Restaurant Page',group:'Branding',icon:Paintbrush,description:'Design your restaurant website, branch contacts and mobile welcome page.'},
+ {id:'OPERATIONS',label:'Operations Hub',group:'Live operations',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
  {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
  {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Launch setup',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
  {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Insights',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
@@ -140,6 +142,12 @@ export const QR_PAGES = [
   description: string;
 }>;
 export type QrTab = (typeof QR_PAGES)[number]["id"];
+const GROUP_ORDER = ['Live operations', 'Menu & guests', 'Launch setup', 'Branding', 'Insights', 'Advanced configuration'];
+const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED'];
+export const QR_NAVIGATION = [...QR_PAGES].sort((a,b) => {
+  const rank = (group: string) => {const index = GROUP_ORDER.indexOf(group);return index < 0 ? GROUP_ORDER.length : index;};
+  return rank(a.group) - rank(b.group) || TASK_ORDER.indexOf(a.id) - TASK_ORDER.indexOf(b.id);
+});
 export const QR_ADVANCED_SECTIONS = [
   "Settings",
   "Translations",

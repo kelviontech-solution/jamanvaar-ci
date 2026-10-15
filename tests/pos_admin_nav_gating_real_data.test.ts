@@ -102,7 +102,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
     const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
 
-    const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'POS_ADMIN' || app === 'KIOSK_ADMIN');
+    const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'POS_ADMIN' || app === 'KIOSK_ADMIN' || app === 'QR_ORDERING');
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
     const totalItemsInSource = NAV_SECTIONS.flatMap((g) => g.items.map((i) => i.id));
 

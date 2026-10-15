@@ -1,0 +1,63 @@
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","page":"http://localhost:5317/"}
+{"app":"kds","role":"kds","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5319/"}
+{"app":"kiosk","role":"kiosk","message":"TypeError: Cannot read properties of undefined (reading 'replace')\n    at Ah (http://localhost:5314/assets/index-gymbRBzi.js:414:211311)\n    at Iu (http://localhost:5314/assets/index-gymbRBzi.js:527:17373)\n    at qf (http://localhost:5314/assets/index-gymbRBzi.js:529:44578)\n    at Vf (http://localhost:5314/assets/index-gymbRBzi.js:529:40184)\n    at fv (http://localhost:5314/assets/index-gymbRBzi.js:529:40112)\n    at Fc (http://localhost:5314/assets/index-gymbRBzi.js:529:39965)\n    at Qu (http://localhost:5314/assets/index-gymbRBzi.js:529:36265)\n    at Gf (http://localhost:5314/assets/index-gymbRBzi.js:529:37077)\n    at Ii (http://localhost:5314/assets/index-gymbRBzi.js:527:3274)\n    at http://localhost:5314/assets/index-gymbRBzi.js:529:34576","page":"http://localhost:5314/"}
+{"app":"kiosk","role":"kiosk","message":"TypeError: Cannot read properties of undefined (reading 'replace')\n    at Ah (http://localhost:5314/assets/index-gymbRBzi.js:414:211311)\n    at Iu (http://localhost:5314/assets/index-gymbRBzi.js:527:17373)\n    at qf (http://localhost:5314/assets/index-gymbRBzi.js:529:44578)\n    at Vf (http://localhost:5314/assets/index-gymbRBzi.js:529:40184)\n    at fv (http://localhost:5314/assets/index-gymbRBzi.js:529:40112)\n    at Fc (http://localhost:5314/assets/index-gymbRBzi.js:529:39965)\n    at Qu (http://localhost:5314/assets/index-gymbRBzi.js:529:36265)\n    at Gf (http://localhost:5314/assets/index-gymbRBzi.js:529:37077)\n    at Ii (http://localhost:5314/assets/index-gymbRBzi.js:527:3274)\n    at http://localhost:5314/assets/index-gymbRBzi.js:529:34576","page":"http://localhost:5314/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","page":"http://localhost:5317/"}
+{"app":"kiosk","role":"kiosk","message":"Failed to load resource: the server responded with a status of 503 (Service Unavailable)","page":"http://localhost:5314/"}
+{"app":"kiosk","role":"kiosk","message":"Payment QR failed: Dt: The payment provider did not complete the request. Check payment status before trying again.\n    at xC (http://localhost:5314/assets/index-B8UB0da-.js:529:81279)\n    at async Ql (http://localhost:5314/assets/index-B8UB0da-.js:529:156646)\n    at async Eo (http://localhost:5314/assets/index-B8UB0da-.js:529:159645)\n    at async vi (http://localhost:5314/assets/index-B8UB0da-.js:529:158485)","page":"http://localhost:5314/"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5316/"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW"}
+{"app":"admin","role":"owner-admin","message":"Manifest: Line: 1, column: 1, Syntax error.","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW"}
+{"app":"admin","role":"owner-admin","message":"The script has an unsupported MIME type ('text/html').","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW"}
+{"app":"admin","role":"owner-admin","message":"Failed to load resource: the server responded with a status of 401 (Unauthorized)","page":"http://localhost:5316/restaurant-admin/qr-ordering?tab=OVERVIEW"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","page":"http://localhost:5317/"}
+{"app":"kiosk","role":"kiosk","message":"Failed to load resource: the server responded with a status of 503 (Service Unavailable)","page":"http://localhost:5314/"}
+{"app":"kiosk","role":"kiosk","message":"Payment QR failed: Dt: The payment provider did not complete the request. Check payment status before trying again.\n    at xC (http://localhost:5314/assets/index-B8UB0da-.js:529:81279)\n    at async Ql (http://localhost:5314/assets/index-B8UB0da-.js:529:156646)\n    at async Eo (http://localhost:5314/assets/index-B8UB0da-.js:529:159645)\n    at async vi (http://localhost:5314/assets/index-B8UB0da-.js:529:158485)","page":"http://localhost:5314/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","page":"http://localhost:5317/"}
+{"app":"kiosk","role":"kiosk","message":"Failed to load resource: the server responded with a status of 503 (Service Unavailable)","page":"http://localhost:5314/"}
+{"app":"kiosk","role":"kiosk","message":"Payment QR failed: Rt: The payment provider did not complete the request. Check payment status before trying again.\n    at jC (http://localhost:5314/assets/index-BhlGBRx9.js:529:82987)\n    at async Zl (http://localhost:5314/assets/index-BhlGBRx9.js:529:159737)\n    at async Eo (http://localhost:5314/assets/index-BhlGBRx9.js:529:162901)\n    at async vi (http://localhost:5314/assets/index-BhlGBRx9.js:529:161741)","page":"http://localhost:5314/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5317/"}
+{"app":"captain","role":"captain","message":"Failed to load resource: the server responded with a status of 403 (Forbidden)","page":"http://localhost:5317/"}
+{"app":"kiosk","role":"kiosk","message":"Failed to load resource: the server responded with a status of 503 (Service Unavailable)","page":"http://localhost:5314/"}
+{"app":"kiosk","role":"kiosk","message":"Payment QR failed: Rt: The payment provider did not complete the request. Check payment status before trying again.\n    at PC (http://localhost:5314/assets/index-C8ckaY27.js:529:82987)\n    at async Zl (http://localhost:5314/assets/index-C8ckaY27.js:529:159737)\n    at async Eo (http://localhost:5314/assets/index-C8ckaY27.js:529:162901)\n    at async vi (http://localhost:5314/assets/index-C8ckaY27.js:529:161741)","page":"http://localhost:5314/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}
+{"app":"pos","role":"pos","message":"Failed to load resource: net::ERR_CONNECTION_REFUSED","page":"http://localhost:5315/"}

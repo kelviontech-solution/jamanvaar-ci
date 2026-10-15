@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "name": "types-pos-admin",
+      "exitCode": 0
+    },
+    {
+      "name": "types-pos",
+      "exitCode": 0
+    },
+    {
+      "name": "types-kds",
+      "exitCode": 0
+    },
+    {
+      "name": "types-captain",
+      "exitCode": 0
+    },
+    {
+      "name": "types-kiosk-user",
+      "exitCode": 0
+    }
+  ]
+}

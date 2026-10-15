@@ -118,6 +118,52 @@ describe('Order sync bridge + suspension enforcement', () => {
     expect(pullRes.body.orders.map((o: any) => o.externalOrderId)).toEqual(['local-ord-2']);
   });
 
+  /**
+   * security-audit HIGH kiosk-order-sync-01: unlike every other device type in this suite, a KIOSK
+   * is an anonymous, guest-facing terminal with no staff behind it. It must only catch up on orders
+   * it itself created (to learn their status), never another guest's order placed on a different
+   * kiosk at the same branch -- that order carries a stranger's name, phone and basket.
+   */
+  it('a KIOSK device only catches up on orders it created, not another kiosk\'s guest orders', async () => {
+    // This restaurant's existing subscription is a RESTAURANT-family plan (posTerminal/kotKdsRouting
+    // only) — KIOSK needs its own plan family and subscription (see multi-family-subscriptions.e2e.spec.ts),
+    // then an explicit per-app enable since KIOSK isn't in this tier's default app list.
+    const kioskPlanRes = await authed('post', '/api/v1/plans', platformToken).send({
+      tier: 'CORE', productFamily: 'KIOSK', name: `TEST Order Sync Kiosk Plan ${Date.now()}`, priceMonthly: 900000, maxBranches: 1, maxDevices: 5, maxUsers: 5, entitlements: {}
+    });
+    const kioskSubRes = await authed('post', '/api/v1/subscriptions', platformToken).send({
+      restaurantId, planId: kioskPlanRes.body.id, status: 'ACTIVE', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    });
+    await authed('patch', `/api/v1/subscriptions/${kioskSubRes.body.id}/applications/KIOSK`, platformToken).send({ enabled: true });
+
+    const kioskKey1 = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const kioskRedeem1 = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kioskKey1.body.code, deviceType: 'KIOSK' });
+    const kioskToken1 = kioskRedeem1.body.deviceToken;
+
+    const kioskKey2 = await authed('post', '/api/v1/activation-keys', platformToken).send({ restaurantId, allowedDeviceType: 'KIOSK', expiresAt: new Date(Date.now() + 86400000).toISOString() });
+    const kioskRedeem2 = await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({ code: kioskKey2.body.code, deviceType: 'KIOSK' });
+    const kioskToken2 = kioskRedeem2.body.deviceToken;
+
+    await authed('post', '/api/v1/orders/sync', kioskToken1).send({ events: [orderEvent('kiosk1-guest-order')] });
+    await authed('post', '/api/v1/orders/sync', kioskToken2).send({ events: [orderEvent('kiosk2-guest-order')] });
+
+    const kiosk1Pull = await authed('get', '/api/v1/orders/sync', kioskToken1);
+    const kiosk1Ids = kiosk1Pull.body.orders.map((o: any) => o.externalOrderId);
+    expect(kiosk1Ids).toContain('kiosk1-guest-order');
+    expect(kiosk1Ids).not.toContain('kiosk2-guest-order');
+
+    const kiosk2Pull = await authed('get', '/api/v1/orders/sync', kioskToken2);
+    const kiosk2Ids = kiosk2Pull.body.orders.map((o: any) => o.externalOrderId);
+    expect(kiosk2Ids).toContain('kiosk2-guest-order');
+    expect(kiosk2Ids).not.toContain('kiosk1-guest-order');
+
+    // A staff-operated device (KDS here) is unaffected -- it still sees every guest's order.
+    const kdsPull = await authed('get', '/api/v1/orders/sync', kdsToken);
+    const kdsIds = kdsPull.body.orders.map((o: any) => o.externalOrderId);
+    expect(kdsIds).toContain('kiosk1-guest-order');
+    expect(kdsIds).toContain('kiosk2-guest-order');
+  });
+
   /** security-audit HIGH-05: a branch-bound device must not receive another branch's orders (customer PII, totals). */
   it('a device bound to one branch does not see another branch\'s orders on catch-up', async () => {
     const branchARes = await authed('post', '/api/v1/branches', platformToken).send({ restaurantId, name: 'Branch A', code: 'BA' });

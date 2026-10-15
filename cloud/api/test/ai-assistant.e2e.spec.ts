@@ -174,9 +174,9 @@ describe('JAMAN AI configuration, access and usage (BUG-055..058)', () => {
   });
 
   describe('usage is counted from real queries, with a real daily limit (BUG-055/056)', () => {
-    it('starts at zero: no invented totals', async () => {
+    it('reports the stored platform-wide query count without invented totals', async () => {
       const { telemetry } = (await platform('get', '/api/v1/ai-assistant/config')).body;
-      const real = await prisma.aiUsageDaily.aggregate({ _sum: { queries: true } });
+      const real = await prisma.runAsPlatform(tx=>tx.aiUsageDaily.aggregate({ _sum: { queries: true } }));
       expect(telemetry.totalQueries).toBe(real._sum.queries ?? 0);
       expect(telemetry.totalQueries).not.toBe(1420);
     });
@@ -190,8 +190,11 @@ describe('JAMAN AI configuration, access and usage (BUG-055..058)', () => {
       expect(telemetry.totalQueries).toBeGreaterThanOrEqual(3);
       const top = telemetry.topIntents.find((t: { intent: string }) => t.intent === 'TODAY_SALES');
       expect(top.count).toBeGreaterThanOrEqual(2);
+      const own = await prisma.runAsPlatform(tx=>tx.aiUsageDaily.findMany({where:{restaurantId:rests.pro}}));
+      const sales = own.find(row=>row.intent==='TODAY_SALES');
+      expect(sales).toMatchObject({queries:2,totalLatencyMs:40});
+      expect(own.find(row=>row.intent==='LOW_STOCK')).toMatchObject({queries:1,totalLatencyMs:20});
       expect(telemetry.latencyMs).toBeGreaterThan(0);
-      expect(telemetry.latencyMs).toBeLessThanOrEqual(30);
       expect(telemetry.todayQueries).toBeGreaterThanOrEqual(3);
     });
 
@@ -200,9 +203,10 @@ describe('JAMAN AI configuration, access and usage (BUG-055..058)', () => {
       const before = (await deviceCall('get', '/api/v1/devices/me/ai-config', 'pro')).body;
       expect(before.remainingToday).toBe(5 - before.usedToday);
 
-      let last: { body: { limitReached: boolean; remainingToday: number } } | undefined;
+      let last: { status:number; body: { limitReached: boolean; remainingToday: number;message:string } } | undefined;
       for (let i = 0; i < 6; i++) last = await deviceCall('post', '/api/v1/devices/me/ai-telemetry', 'pro').send({ intent: 'AOV', latencyMs: 5 });
-      expect(last!.body).toMatchObject({ limitReached: true, remainingToday: 0 });
+      expect(last!.status).toBe(403);
+      expect(last!.body.message).toContain('daily query limit');
       expect((await deviceCall('get', '/api/v1/devices/me/ai-config', 'pro')).body).toMatchObject({ remainingToday: 0, limitReached: true });
       await platform('patch', `/api/v1/ai-assistant/restaurants/${rests.pro}/access`).send({ dailyQueryLimit: null });
     });

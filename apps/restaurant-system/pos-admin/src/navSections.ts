@@ -40,6 +40,7 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
   {
     section: 'OPERATIONS',
     items: [
+      { id: 'OPERATIONS_HUB', label: 'Operations hub', icon: Activity },
       { id: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard },
       { id: 'BILLING_SALES', label: 'Billing / Invoices', icon: DollarSign, requiresApp: 'POS_ADMIN' },
       { id: 'ORDERS', label: 'Orders', icon: ShoppingBag, requiresApp: 'POS_ADMIN' },
@@ -51,7 +52,7 @@ export const NAV_SECTIONS: Array<GatedNavSection<NavSectionItem>> = [
   },
   {
     section: 'DIGITAL ORDERING',
-    items: [{ id: 'QR_ORDERING', label: 'QR Table Ordering', icon: QrCode }]
+    items: [{ id: 'QR_ORDERING', label: 'QR Ordering', icon: QrCode, requiresApp: 'QR_ORDERING' }]
   },
   {
     section: 'MENU & INVENTORY',
@@ -98,24 +99,27 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
   if (product === 'POS_ADMIN') {
     const items = new Map(NAV_SECTIONS.flatMap(g => g.items).map(i => [i.id,i]));
     const groups: Array<[string,string[]]> = [
-      ['TODAY',['DASHBOARD','ORDERS','BILLING_SALES','PAYMENTS','SHIFTS']],
-      ['KITCHEN',['LIVE_KDS','KITCHEN_KOT']],
-      ['MENU',['MENU','MENU_OPTIONS','COUPONS','INVENTORY','INVENTORY_CONTROL']],
-      ['TABLES',['TABLES','RESERVATIONS','QR_ORDERING']],
-      ['GUESTS & TEAM',['CUSTOMERS','STAFF']],
+      ['DAILY',['DASHBOARD','ORDERS','MENU','CUSTOMERS','SYNC']],
+      ['OPERATIONS',['OPERATIONS_HUB','BILLING_SALES','SHIFTS','LIVE_KDS','KITCHEN_KOT','TABLES','RESERVATIONS','INVENTORY','INVENTORY_CONTROL']],
+      ['KIOSK MANAGEMENT',['KIOSKS','KIOSK_WELCOME','KIOSK_DESIGN','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']],
+      ['QR ORDERING',['QR_ORDERING']],
       ['REPORTS',['REPORTS','AUDIT']],
-      ['DEVICES',['HARDWARE','SYNC','DOWNLOADS']],
-      ['SETUP',['RECEIPTS','SETTINGS','LICENSE','BACKUP','SUPPORT']],
+      ['SETUP',['TEMPLATES','MENU_OPTIONS','COUPONS','STAFF','PAYMENTS','HARDWARE','RECEIPTS','SETTINGS','LICENSE','BACKUP','SUPPORT','DOWNLOADS']],
     ];
-    const labels: Record<string,string> = {DASHBOARD:'Today',STAFF:'Team & permissions',CUSTOMERS:'Customers & loyalty',KITCHEN_KOT:'Kitchen tickets',LIVE_KDS:'Kitchen progress',SYNC:'Connections & sync',AUDIT:'Activity history',SHIFTS:'Register shifts & cash'};
+    items.set('KIOSK_WELCOME',{id:'KIOSK_WELCOME',label:'Welcome screens',icon:Tablet,requiresApp:'KIOSK_ADMIN'});
+    items.set('TEMPLATES',{id:'TEMPLATES',label:'Menu templates',icon:UtensilsCrossed,requiresApp:'POS_ADMIN'});
+    items.set('KIOSK_PAYMENTS',{id:'KIOSK_PAYMENTS',label:'Kiosk payment settings',icon:CreditCard,requiresApp:'KIOSK_ADMIN'});
+    items.set('FEEDBACK',{id:'FEEDBACK',label:'Kiosk feedback',icon:Heart,requiresApp:'KIOSK_ADMIN'});
+    const labels: Record<string,string> = {DASHBOARD:'Today',MENU:'Menu',STAFF:'Team & permissions',CUSTOMERS:'Customers & loyalty',KITCHEN_KOT:'Kitchen tickets',LIVE_KDS:'Kitchen progress',SYNC:'Devices & sync',AUDIT:'Activity history',SHIFTS:'Register shifts & cash'};
     return groups.map(([section,ids]) => ({section,items:ids.filter(id => items.has(id) && Object.hasOwn(PRODUCT_PAGES.POS_ADMIN,id)).map(id => ({...items.get(id)!,label:labels[id] ?? items.get(id)!.label}))}));
   }
   const existing = new Map(NAV_SECTIONS.flatMap(group => group.items).map(item => [item.id, item]));
   const sections = [
-    ['KIOSK OPERATIONS', ['DASHBOARD', 'KIOSKS', 'ORDERS', 'LIVE_KDS', 'TABLES']],
-    ['CUSTOMER EXPERIENCE', ['MENU', 'TEMPLATES', 'MENU_OPTIONS', 'KIOSK_WELCOME', 'KIOSK_DESIGN', 'KIOSK_COMBOS', 'COUPONS']],
-    ['PAYMENTS & SERVICE', ['KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'FEEDBACK', 'STAFF', 'REPORTS']],
-    ['SYSTEM', ['SETTINGS', 'SYNC', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'DOWNLOADS']]
+    ['DAILY', ['DASHBOARD', 'ORDERS', 'MENU', 'SYNC']],
+    ['OPERATIONS', ['OPERATIONS_HUB','LIVE_KDS', 'TABLES', 'REPORTS', 'FEEDBACK']],
+    ['KIOSK MANAGEMENT', ['KIOSKS', 'KIOSK_WELCOME', 'KIOSK_DESIGN', 'KIOSK_COMBOS']],
+    ['QR ORDERING', ['QR_ORDERING']],
+    ['SETUP', ['TEMPLATES', 'MENU_OPTIONS', 'COUPONS', 'KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'STAFF', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'DOWNLOADS']]
   ] as const;
   const additions: Record<string, NavSectionItem> = {
     KIOSK_WELCOME: { id: 'KIOSK_WELCOME', label: 'Kiosk Welcome Screen', icon: Tablet },
@@ -125,7 +129,7 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
   };
   return sections.map(([section, ids]) => ({ section, items: ids.map(id => {
     const item = existing.get(id) || additions[id];
-    return { ...item, label: id === 'SETTINGS' ? 'Kiosk Settings' : item.label,
-      requiresApp: 'KIOSK_ADMIN' as const, requiresAnyApp: undefined };
+    return { ...item, label: id === 'SETTINGS' ? 'Kiosk Settings' : id === 'DASHBOARD' ? 'Today' : id === 'SYNC' ? 'Devices & sync' : id === 'MENU' ? 'Menu' : item.label,
+      requiresApp: id === 'QR_ORDERING' ? 'QR_ORDERING' as const : 'KIOSK_ADMIN' as const, requiresAnyApp: undefined };
   }) }));
 }

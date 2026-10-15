@@ -1,3 +1,5 @@
+import {QrRestaurantPageService} from './qr-restaurant-page.service';
+import { pageEventSchema } from './qr-restaurant-page.schema';
 import { Body, Controller, Get, HttpCode, NotFoundException, StreamableFile, Param, Post, Put, Query, Req, Res, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Device } from '@prisma/client';
@@ -28,7 +30,7 @@ const orderActionSchema = z.object({ action: z.enum(['PREPARING', 'READY', 'COMP
 @UseInterceptors(QrRateLimitInterceptor)
 @Controller('api/v1/public/qr')
 export class QrPublicController {
-  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions, private readonly publications: MenuPublicationsService) {}
+  constructor(private readonly qr: QrPublicService, private readonly sessions: QrSessions, private readonly publications: MenuPublicationsService, private readonly pages: QrRestaurantPageService) {}
 
   /** A published menu picture. Its address is the hash of its bytes, so the browser may keep it for a year. */
   @Get('images/:hash')
@@ -50,27 +52,37 @@ export class QrPublicController {
 
   // Declared before ':token' routes so "orders" is never read as a token.
   @Get('orders/:publicOrderId')
-  status(@Param('publicOrderId') publicOrderId: string) {
-    return this.qr.orderStatus(publicOrderId);
+  status(@Param('publicOrderId') publicOrderId: string, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.orderStatus(publicOrderId, undefined, req.qrSession);
   }
 
   @Post('orders/:publicOrderId/payment')
   @HttpCode(200)
-  retryPayment(@Param('publicOrderId') publicOrderId: string) {
-    return this.qr.retryPayment(publicOrderId);
+  retryPayment(@Param('publicOrderId') publicOrderId: string, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.retryPayment(publicOrderId, req.qrSession);
   }
 
   @Post('orders/:publicOrderId/counter-payment')
   @HttpCode(200)
-  switchToCounter(@Param('publicOrderId') publicOrderId: string) {
-    return this.qr.switchToCounter(publicOrderId);
+  switchToCounter(@Param('publicOrderId') publicOrderId: string, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.switchToCounter(publicOrderId, req.qrSession);
   }
 
   @Post('orders/:publicOrderId/verify-payment')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(z.object({ paymentId: z.string().regex(/^pay_[A-Za-z0-9]+$/).max(128), signature: z.string().regex(/^[a-f0-9]{64}$/i) }).strict()))
-  verifyCheckout(@Param('publicOrderId') publicOrderId: string, @Body() body: { paymentId: string; signature: string }) {
-    return this.qr.verifyCheckout(publicOrderId, body);
+  verifyCheckout(@Param('publicOrderId') publicOrderId: string, @Body() body: { paymentId: string; signature: string }, @Req() req: Request & { qrSession?: string }) {
+    return this.qr.verifyCheckout(publicOrderId, body, req.qrSession);
+  }
+
+  @Get('sites/:slug')
+  site(@Param('slug') slug:string){return this.pages.site(slug);}
+  @Post('sites/:slug/events')
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(pageEventSchema))
+  pageEvent(@Param('slug') slug:string,@Body() body:z.infer<typeof pageEventSchema>,@Req() req:Request){
+    if (req.headers.dnt === '1' || req.headers['sec-gpc'] === '1') return {recorded:false};
+    return this.pages.track(slug,body.type);
   }
 
   @Get(':token')
@@ -125,7 +137,7 @@ export class QrRestaurantController {
   @Get('entitlement')
   entitlement(@CurrentDevice() device: Device) {
     this.qr.assertConsole(device);
-    return this.qr.entitlement(device.restaurantId);
+    return this.qr.entitlement(device.restaurantId, device.branchId);
   }
 
   @Post('feature-request')

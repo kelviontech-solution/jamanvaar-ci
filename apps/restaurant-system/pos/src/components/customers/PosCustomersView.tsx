@@ -11,7 +11,6 @@ export const PosCustomersView: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newPoints, setNewPoints] = useState(0);
 
   const accounts = db.customerAccounts;
 
@@ -27,8 +26,13 @@ export const PosCustomersView: React.FC = () => {
     e.preventDefault();
     if (!newPhone.trim()) return;
 
+    // security-audit MEDIUM pos-loyalty-01: this used to take an arbitrary cashier-entered
+    // points value with no cap or approval, and that value became real, server-accepted
+    // discount value for QR-ordering redemption. New customers now get only the repository's
+    // own standard welcome bonus (CustomerRepository.createCustomer's default), the same as
+    // every other creation path -- a cashier can no longer fabricate a balance here.
     const existing = CustomerRepository.getByPhone(newPhone.trim());
-    const acc = existing ?? CustomerRepository.createCustomer({ phone: newPhone.trim(), name: newName.trim() || 'Valued Guest', loyaltyPoints: Math.max(0, Math.floor(newPoints)) });
+    const acc = existing ?? CustomerRepository.createCustomer({ phone: newPhone.trim(), name: newName.trim() || 'Valued Guest' });
     db.notify();
 
     setSelectedCustomer(acc);
@@ -166,16 +170,6 @@ export const PosCustomersView: React.FC = () => {
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Priya Sharma"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-jaman-navy focus:outline-none focus:border-jaman-saffron"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Welcome Loyalty Points</label>
-                <input
-                  type="number"
-                  value={newPoints}
-                  onChange={(e) => setNewPoints(Number(e.target.value) || 0)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-jaman-navy focus:outline-none focus:border-jaman-saffron"
                 />
               </div>
 

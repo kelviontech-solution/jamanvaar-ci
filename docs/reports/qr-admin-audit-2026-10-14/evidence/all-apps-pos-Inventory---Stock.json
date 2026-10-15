@@ -1,0 +1,2801 @@
+{
+  "text": "POS TERMINAL\nUI Audit Restaurant A\n\nUI Audit Restaurant A\n•\nde318c70-1a23-446d-a44b-485ec7efbb1b\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nSYNC ERROR ⚠\nSync now\nPrinter Offline\n2\nDAY OPEN\n•\nNo Shift\nJAMAN AI\n5\nU\nUI Cashier\nCASHIER\nUnfinished Order Detected: Found auto-saved session with 2 items (₹258) (TAKEAWAY).\nLast saved at 8:41:43 AM\nRestore Order\nDiscard\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\n1\nLive Orders\nBills & Invoices\nKitchen & KOT\n5\nCustomers CRM\nShift & Cash\nDay History\nPOS Reports\nInventory & Stock\nSettings\nFewer tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\n2\nCore: Offline First\nKitchen Inventory & Availability\n\nControl which dishes are available for billing and kitchen preparation.\n\nTOTAL DISHES\n114\nAVAILABLE\n114\nUNAVAILABLE\n0\nLOW STOCK\n0\nAll\n114\nAvailable\n114\nUnavailable\n0\nLow Stock\n0\nOut of Stock\n0\nStation:\nAll Kitchen Stations\nPizza Station\n\tDISH / SKU\tKITCHEN STATION\tPRICE\tAVAILABILITY\tSTOCK\tACTION\n\t\nUI Audit Dish 001\nSKU: UI-1\n\tMain Kitchen\t₹100\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 002\nSKU: UI-2\n\tMain Kitchen\t₹101\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 003\nSKU: UI-3\n\tMain Kitchen\t₹102\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 004\nSKU: UI-4\n\tMain Kitchen\t₹103\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 005\nSKU: UI-5\n\tMain Kitchen\t₹104\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 006\nSKU: UI-6\n\tMain Kitchen\t₹105\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 007\nSKU: UI-7\n\tMain Kitchen\t₹106\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 008\nSKU: UI-8\n\tMain Kitchen\t₹107\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 009\nSKU: UI-9\n\tMain Kitchen\t₹108\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 010\nSKU: UI-10\n\tMain Kitchen\t₹109\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 011\nSKU: UI-11\n\tMain Kitchen\t₹110\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 012\nSKU: UI-12\n\tMain Kitchen\t₹111\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 013\nSKU: UI-13\n\tMain Kitchen\t₹112\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 014\nSKU: UI-14\n\tMain Kitchen\t₹113\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 015\nSKU: UI-15\n\tMain Kitchen\t₹114\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 016\nSKU: UI-16\n\tMain Kitchen\t₹115\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 017\nSKU: UI-17\n\tMain Kitchen\t₹116\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 018\nSKU: UI-18\n\tMain Kitchen\t₹117\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 019\nSKU: UI-19\n\tMain Kitchen\t₹118\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 020\nSKU: UI-20\n\tMain Kitchen\t₹119\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 021\nSKU: UI-21\n\tMain Kitchen\t₹120\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 022\nSKU: UI-22\n\tMain Kitchen\t₹121\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 023\nSKU: UI-23\n\tMain Kitchen\t₹122\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 024\nSKU: UI-24\n\tMain Kitchen\t₹123\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 025\nSKU: UI-25\n\tMain Kitchen\t₹124\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 026\nSKU: UI-26\n\tMain Kitchen\t₹125\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 027\nSKU: UI-27\n\tMain Kitchen\t₹126\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 028\nSKU: UI-28\n\tMain Kitchen\t₹127\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 029\nSKU: UI-29\n\tMain Kitchen\t₹128\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 030\nSKU: UI-30\n\tMain Kitchen\t₹129\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 031\nSKU: UI-31\n\tMain Kitchen\t₹130\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 032\nSKU: UI-32\n\tMain Kitchen\t₹131\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 033\nSKU: UI-33\n\tMain Kitchen\t₹132\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 034\nSKU: UI-34\n\tMain Kitchen\t₹133\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 035\nSKU: UI-35\n\tMain Kitchen\t₹134\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 036\nSKU: UI-36\n\tMain Kitchen\t₹135\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 037\nSKU: UI-37\n\tMain Kitchen\t₹136\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 038\nSKU: UI-38\n\tMain Kitchen\t₹137\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 039\nSKU: UI-39\n\tMain Kitchen\t₹138\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 040\nSKU: UI-40\n\tMain Kitchen\t₹139\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 041\nSKU: UI-41\n\tMain Kitchen\t₹140\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 042\nSKU: UI-42\n\tMain Kitchen\t₹141\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 043\nSKU: UI-43\n\tMain Kitchen\t₹142\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 044\nSKU: UI-44\n\tMain Kitchen\t₹143\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 045\nSKU: UI-45\n\tMain Kitchen\t₹144\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 046\nSKU: UI-46\n\tMain Kitchen\t₹145\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 047\nSKU: UI-47\n\tMain Kitchen\t₹146\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 048\nSKU: UI-48\n\tMain Kitchen\t₹147\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 049\nSKU: UI-49\n\tMain Kitchen\t₹148\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 050\nSKU: UI-50\n\tMain Kitchen\t₹149\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 051\nSKU: UI-51\n\tMain Kitchen\t₹150\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 052\nSKU: UI-52\n\tMain Kitchen\t₹151\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 053\nSKU: UI-53\n\tMain Kitchen\t₹152\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 054\nSKU: UI-54\n\tMain Kitchen\t₹153\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 055\nSKU: UI-55\n\tMain Kitchen\t₹154\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 056\nSKU: UI-56\n\tMain Kitchen\t₹155\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 057\nSKU: UI-57\n\tMain Kitchen\t₹156\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 058\nSKU: UI-58\n\tMain Kitchen\t₹157\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 059\nSKU: UI-59\n\tMain Kitchen\t₹158\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 060\nSKU: UI-60\n\tMain Kitchen\t₹159\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 061\nSKU: UI-61\n\tMain Kitchen\t₹160\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 062\nSKU: UI-62\n\tMain Kitchen\t₹161\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 063\nSKU: UI-63\n\tMain Kitchen\t₹162\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 064\nSKU: UI-64\n\tMain Kitchen\t₹163\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 065\nSKU: UI-65\n\tMain Kitchen\t₹164\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 066\nSKU: UI-66\n\tMain Kitchen\t₹165\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 067\nSKU: UI-67\n\tMain Kitchen\t₹166\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 068\nSKU: UI-68\n\tMain Kitchen\t₹167\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 069\nSKU: UI-69\n\tMain Kitchen\t₹168\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 070\nSKU: UI-70\n\tMain Kitchen\t₹169\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 071\nSKU: UI-71\n\tMain Kitchen\t₹170\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 072\nSKU: UI-72\n\tMain Kitchen\t₹171\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 073\nSKU: UI-73\n\tMain Kitchen\t₹172\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 074\nSKU: UI-74\n\tMain Kitchen\t₹173\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 075\nSKU: UI-75\n\tMain Kitchen\t₹174\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 076\nSKU: UI-76\n\tMain Kitchen\t₹175\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 077\nSKU: UI-77\n\tMain Kitchen\t₹176\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 078\nSKU: UI-78\n\tMain Kitchen\t₹177\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 079\nSKU: UI-79\n\tMain Kitchen\t₹178\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 080\nSKU: UI-80\n\tMain Kitchen\t₹179\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 081\nSKU: UI-81\n\tMain Kitchen\t₹180\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 082\nSKU: UI-82\n\tMain Kitchen\t₹181\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 083\nSKU: UI-83\n\tMain Kitchen\t₹182\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 084\nSKU: UI-84\n\tMain Kitchen\t₹183\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 085\nSKU: UI-85\n\tMain Kitchen\t₹184\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 086\nSKU: UI-86\n\tMain Kitchen\t₹185\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 087\nSKU: UI-87\n\tMain Kitchen\t₹186\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 088\nSKU: UI-88\n\tMain Kitchen\t₹187\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 089\nSKU: UI-89\n\tMain Kitchen\t₹188\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 090\nSKU: UI-90\n\tMain Kitchen\t₹189\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 091\nSKU: UI-91\n\tMain Kitchen\t₹190\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 092\nSKU: UI-92\n\tMain Kitchen\t₹191\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 093\nSKU: UI-93\n\tMain Kitchen\t₹192\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 094\nSKU: UI-94\n\tMain Kitchen\t₹193\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 095\nSKU: UI-95\n\tMain Kitchen\t₹194\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 096\nSKU: UI-96\n\tMain Kitchen\t₹195\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 097\nSKU: UI-97\n\tMain Kitchen\t₹196\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 098\nSKU: UI-98\n\tMain Kitchen\t₹197\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 099\nSKU: UI-99\n\tMain Kitchen\t₹198\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nUI Audit Dish 100\nSKU: UI-100\n\tMain Kitchen\t₹199\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nAudit QR Dish 1791966297209\nSKU:\n\tMain Kitchen\t₹126\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nAudit QR Dish 1791966447575\nSKU:\n\tMain Kitchen\t₹126\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nMargherita Pizza\nSKU: PIZ-001\n\tPizza Station\t₹149\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nFarmhouse Pizza\nSKU: PIZ-002\n\tPizza Station\t₹199\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nPaneer Tikka Pizza\nSKU: PIZ-003\n\tPizza Station\t₹229\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nVeggie Supreme Pizza\nSKU: PIZZA-VEGGIE-SUPREME-PIZZA\n\tPizza Station\t₹219\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nMexican Green Wave Pizza\nSKU: PIZZA-MEXICAN-GREEN-WAVE-PIZZA\n\tPizza Station\t₹229\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nPeri Peri Paneer Pizza\nSKU: PIZZA-PERI-PERI-PANEER-PIZZA\n\tPizza Station\t₹249\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nCheese Burst Margherita\nSKU: PIZZA-CHEESE-BURST-MARGHERITA\n\tPizza Station\t₹249\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nCheese Burst Farmhouse\nSKU: PIZZA-CHEESE-BURST-FARMHOUSE\n\tPizza Station\t₹299\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nJalapeno Corn Pizza\nSKU: PIZZA-JALAPENO-CORN-PIZZA\n\tPizza Station\t₹199\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nMushroom Pizza\nSKU: PIZZA-MUSHROOM-PIZZA\n\tPizza Station\t₹219\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nChicken Tikka Pizza\nSKU: PIZZA-CHICKEN-TIKKA-PIZZA\n\tPizza Station\t₹279\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\n\n\t\nPepper Chicken Pizza\nSKU: PIZZA-PEPPER-CHICKEN-PIZZA\n\tPizza Station\t₹269\t\nAVAILABLE\n\tStock tracking not configured\t\nMark Unavailable\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n5\nLocal-first billing\nDisplay",
+  "headings": [
+    "Kitchen Inventory & Availability"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "title": "Start fresh order",
+      "disabled": false,
+      "width": 136,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "title": "Search dishes, SKU, tables, bills, customers",
+      "disabled": false,
+      "width": 100,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "Printer Offline\n2",
+      "aria": null,
+      "title": "Thermal Print Queue & Spooler — printer needs attention",
+      "disabled": false,
+      "width": 157,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "title": "Business Day & Shift Status — Click to manage",
+      "disabled": false,
+      "width": 187,
+      "height": 26,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Quick Help",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI\n5",
+      "aria": "Open JAMAN AI Assistant",
+      "title": "JAMAN AI — Offline Restaurant Intelligence (Ctrl+J)",
+      "disabled": false,
+      "width": 95,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "U\nUI Cashier\nCASHIER",
+      "aria": null,
+      "title": "User Profile & Session Options — Hardware needs attention",
+      "disabled": false,
+      "width": 124,
+      "height": 45,
+      "visible": true
+    },
+    {
+      "text": "Restore Order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 127,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Discard",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 28,
+      "visible": true
+    },
+    {
+      "text": "Pages & categories",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 101,
+      "height": 54,
+      "visible": true
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Floor & Tables\n1",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Live Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Kitchen & KOT\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Day History",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "POS Reports",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Inventory & Stock",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Fewer tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 202,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "title": "JAMAN AI Assistant (Voice & Conversational POS Actions)",
+      "disabled": false,
+      "width": 202,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Print Queue\n2",
+      "aria": null,
+      "title": "Print Queue",
+      "disabled": false,
+      "width": 202,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All\n114",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 70,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Available\n114",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 109,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Unavailable\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 109,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Low Stock\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 103,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Out of Stock\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 115,
+      "height": 24,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 001 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 002 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 003 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 004 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 005 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 006 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 007 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 008 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 009 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 010 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 011 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 012 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 013 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 014 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 015 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 016 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 017 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 018 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 019 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 020 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 021 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 022 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 023 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 024 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 025 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 026 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 027 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 028 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 029 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 030 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 031 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 032 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 033 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 034 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 035 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 036 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 037 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 038 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 039 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 040 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 041 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 042 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 043 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 044 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 045 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 046 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 047 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 048 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 049 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 050 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 051 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 052 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 053 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 054 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 055 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 056 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 057 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 058 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 059 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 060 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 061 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 062 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 063 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 064 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 065 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 066 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 067 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 068 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 069 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 070 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 071 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 072 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 073 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 074 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 075 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 076 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 077 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 078 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 079 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 080 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 081 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 082 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 083 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 084 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 085 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 086 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 087 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 088 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 089 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 090 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 091 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 092 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 093 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 094 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 095 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 096 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 097 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 098 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 099 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set UI Audit Dish 100 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Audit QR Dish 1791966297209 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Audit QR Dish 1791966447575 as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Margherita Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Farmhouse Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Paneer Tikka Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Veggie Supreme Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Mexican Green Wave Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Peri Peri Paneer Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Cheese Burst Margherita as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Cheese Burst Farmhouse as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Jalapeno Corn Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Mushroom Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Chicken Tikka Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Mark Unavailable",
+      "aria": null,
+      "title": "Set Pepper Chicken Pizza as unavailable for billing",
+      "disabled": false,
+      "width": 114,
+      "height": 46,
+      "visible": true
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "title": "Click to open Sales Reports",
+      "disabled": false,
+      "width": 129,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "title": "Click to view Live Orders",
+      "disabled": false,
+      "width": 93,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "title": "Click to open Floor Plan",
+      "disabled": false,
+      "width": 148,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "Pending KOT:\n5",
+      "aria": null,
+      "title": "Click to open Kitchen KOTs",
+      "disabled": false,
+      "width": 116,
+      "height": 16,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search by dish name, SKU, or station..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Display size and contrast",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5315/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 94
+    },
+    {
+      "alt": "UI Audit Dish 001",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 002",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 003",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 004",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 005",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 006",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 007",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 008",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 009",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 010",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 011",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 012",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 013",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 014",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 015",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 016",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 017",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 018",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 019",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 020",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 021",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 022",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 023",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 024",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 025",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 026",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 027",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 028",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 029",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 030",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 031",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 032",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 033",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 034",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 035",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 036",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 037",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 038",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 039",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 040",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 041",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 042",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 043",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 044",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 045",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 046",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 047",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 048",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 049",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 050",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 051",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 052",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 053",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 054",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 055",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 056",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 057",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 058",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 059",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 060",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 061",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 062",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 063",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 064",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 065",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 066",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 067",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 068",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 069",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 070",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 071",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 072",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 073",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 074",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 075",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 076",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 077",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 078",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 079",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 080",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 081",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 082",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 083",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 084",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 085",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 086",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 087",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 088",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 089",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 090",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 091",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 092",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 093",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 094",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 095",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 096",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 097",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 098",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 099",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "UI Audit Dish 100",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Audit QR Dish 1791966297209",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Audit QR Dish 1791966447575",
+      "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Margherita Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-0c2f4f7947bce2.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Farmhouse Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-79544015debad7.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Paneer Tikka Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-37a7198da56bcc.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Veggie Supreme Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-cbdc293a4fefa8.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Mexican Green Wave Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-a7b2b58b041edc.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Peri Peri Paneer Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-9b6883c7844897.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Cheese Burst Margherita",
+      "src": "/assets/menu/template-photos-v1/dish-e6fd759a7d08ec.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Cheese Burst Farmhouse",
+      "src": "/assets/menu/template-photos-v1/dish-35192683c415ce.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Jalapeno Corn Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-62f3efdf1a06e3.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Mushroom Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-bc4a46a29c61ed.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Chicken Tikka Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-bb33292f16a733.webp",
+      "loaded": true,
+      "width": 38
+    },
+    {
+      "alt": "Pepper Chicken Pizza",
+      "src": "/assets/menu/template-photos-v1/dish-f2ad5d33a28717.webp",
+      "loaded": true,
+      "width": 38
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

@@ -52,9 +52,13 @@ export function SupportPage() {
   } | null>(null);
   const [actionReason, setActionReason] = useState('');
   const [performingAction, setPerformingAction] = useState(false);
+  // security-audit: restaurantId is tracked alongside the token so the panel below is keyed on the
+  // restaurant's real identity, not its (non-unique) display name -- two restaurants can share a
+  // name, and a name-only comparison would show one restaurant's stale token under another's panel.
   const [impersonationResult, setImpersonationResult] = useState<{
     accessToken: string;
     expiresAt: string;
+    restaurantId: string;
     restaurantName: string;
     ownerEmail: string;
     ownerName: string;
@@ -87,6 +91,10 @@ export function SupportPage() {
 
   async function loadDiagnostics(restaurantId: string) {
     setSelectedRestaurantId(restaurantId);
+    // Clear a leftover impersonation token when moving to a DIFFERENT restaurant; preserve it when
+    // this is just the post-action refresh of the same restaurant (handlePerformAction calls this
+    // right after minting a token for the restaurant already on screen).
+    setImpersonationResult((prev) => (prev && prev.restaurantId !== restaurantId ? null : prev));
     setDiagLoading(true);
     setError(null);
     try {
@@ -133,7 +141,7 @@ export function SupportPage() {
           restaurantId: actionModal.targetId,
           reason: actionReason.trim()
         });
-        setImpersonationResult(res);
+        setImpersonationResult({ ...res, restaurantId: actionModal.targetId });
         setSuccessToast(`Impersonation token issued for ${res.ownerName} (${res.restaurantName})`);
       }
 
@@ -320,7 +328,7 @@ export function SupportPage() {
               )}
             </Card>
 
-            {impersonationResult && impersonationResult.restaurantName === diagnostics.restaurant.name && (
+            {impersonationResult && impersonationResult.restaurantId === diagnostics.restaurant.id && (
               <Card className="card-pad" style={{ border: '1px solid var(--jv-accent-border)', background: 'var(--jv-accent-soft)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Impersonation Token — {impersonationResult.ownerName}</h3>

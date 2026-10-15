@@ -2,7 +2,7 @@ import React from 'react';
 import '@jamanvaar/types';
 
 export interface StatusBadgeProps {
-  status: string;
+  status?: string | null;
   type?: 'dietary' | 'order' | 'kiosk' | 'generic';
   className?: string;
 }
@@ -12,6 +12,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   type = 'generic',
   className = ''
 }) => {
+  // Older/imported menu records can omit this field. Do not crash ordering or
+  // present an unknown dish as vegetarian by default.
+  const label = typeof status === 'string' && status.trim() ? status.trim() : undefined;
+  if (type === 'dietary' && !['VEG','NON_VEG','JAIN','EGG','VEGAN'].includes(label ?? '')) return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-50 text-gray-700 border border-gray-200 ${className}`}>Diet not specified</span>;
+  status = label ?? 'UNKNOWN';
   // Dietary indicator
   if (type === 'dietary' || status === 'VEG' || status === 'NON_VEG' || status === 'JAIN') {
     if (status === 'EGG' || status === 'VEGAN') return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${status === 'EGG' ? 'bg-amber-50 text-amber-900 border-amber-300' : 'bg-green-50 text-green-800 border-green-300'} ${className}`}><span className={`w-2 h-2 rounded-full ${status === 'EGG' ? 'bg-amber-800' : 'bg-green-700'}`} />{status === 'EGG' ? 'Egg' : 'Vegan'}</span>;
@@ -62,7 +67,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     dot: 'bg-gray-400'
   };
 
-  const formattedLabel = status.replace(/_/g, ' ');
+  const progressLabels: Record<string,string> = {SAVED_LOCALLY:'Saved on this device', SYNCING:'Waiting to sync', SYNCED:'Saved to cloud', FAILED:'Sync needs attention', DEAD_LETTER:'Sync needs support', KITCHEN_ACCEPTED:'Received by kitchen'};
+  const formattedLabel = progressLabels[status] ?? status.replace(/_/g, ' ');
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${style.bg} ${style.text} ${className}`}>

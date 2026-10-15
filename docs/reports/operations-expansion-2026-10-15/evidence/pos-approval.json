@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "scenario": "POS discount UI requests remote approval; owner authorizes exact waiting action; POS applies discount"
+}

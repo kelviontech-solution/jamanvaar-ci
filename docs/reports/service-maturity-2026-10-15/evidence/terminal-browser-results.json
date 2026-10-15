@@ -1,0 +1,22 @@
+{
+  "passed": 4,
+  "total": 4,
+  "tests": [
+    {
+      "name": "POS speed mode receives branch favorites and barcode aliases",
+      "passed": true
+    },
+    {
+      "name": "POS checkout shows only the enabled payment method",
+      "passed": true
+    },
+    {
+      "name": "POS unfinished cart survives a page reload",
+      "passed": true
+    },
+    {
+      "name": "Kiosk recovers a cart after refresh and allows a clean new session",
+      "passed": true
+    }
+  ]
+}

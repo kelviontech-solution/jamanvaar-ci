@@ -456,6 +456,27 @@ model ApplicationEntitlement {
   @@index([restaurantId])
 }
 
+/// Append-only, time-effective branch allocation of an already purchased product.
+/// No row means inherit restaurant rights; a disabled/expired latest allocation denies access.
+model BranchProductLicense {
+  id               String   @id @default(uuid())
+  restaurantId     String
+  branchId         String
+  appCode          AppCode
+  enabled          Boolean
+  deviceQuota      Int?
+  disabledFeatures String[] @default([])
+  effectiveAt      DateTime
+  expiresAt        DateTime?
+  revision         Int
+  cancelledAt      DateTime?
+  createdBy        String
+  createdAt        DateTime @default(now())
+
+  @@unique([branchId, appCode, revision])
+  @@index([restaurantId, branchId, appCode, effectiveAt])
+}
+
 enum ActivationKeyDeviceType {
   POS
   POS_ADMIN
@@ -1871,6 +1892,7 @@ model InventoryMovement {
   itemName      String
   type          String // PURCHASE | RESTOCK | SALE | SALE_REVERSAL | WASTE | SPOILAGE | ADJUSTMENT
   quantityDelta Float
+  unitCostPaise Int? // Server-frozen ingredient cost; null when cost or units are unknown.
   unit          String
   orderId       String?
   reason        String

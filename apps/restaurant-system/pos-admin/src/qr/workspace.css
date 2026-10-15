@@ -116,6 +116,9 @@
   display: grid;
   grid-template-columns: 252px minmax(0, 1fr);
 }
+@media (min-width: 1101px) {
+  .qr-integrated .qr-admin-sidebar { top: 0; height: calc(100dvh - 150px); }
+}
 .qr-admin-sidebar {
   position: sticky;
   top: 80px;

@@ -1,0 +1,131 @@
+{
+  "passed": 25,
+  "total": 25,
+  "tests": [
+    {
+      "app": "pos",
+      "name": "POS authenticates issued staff and opens menu",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Floor & Tables",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Live Orders",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Bills & Invoices",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Kitchen & KOT",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Customers CRM",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Shift & Cash",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Day History",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "POS Reports",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Inventory & Stock",
+      "passed": true
+    },
+    {
+      "app": "pos",
+      "name": "Settings",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Captain opens branch tables",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Active Orders",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Food Ready",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Messages",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Live KOT Tickets",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Guest Service Requests",
+      "passed": true
+    },
+    {
+      "app": "captain",
+      "name": "Shift & Performance",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "KDS opens the assigned kitchen scope",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "Cooking",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "Ready",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "Served",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "Expo",
+      "passed": true
+    },
+    {
+      "app": "kds",
+      "name": "Active",
+      "passed": true
+    },
+    {
+      "app": "kiosk",
+      "name": "Kiosk welcome and touch ordering remain usable",
+      "passed": true
+    }
+  ]
+}

@@ -25,7 +25,7 @@ export class PlatformSettingsService {
   async getAll() {
     return this.prisma.runAsPlatform(async (tx) => {
       const settings = await tx.platformSetting.findMany({
-        where: { NOT: [{ key: { startsWith: 'welcome.asset.' } }, { key: { startsWith: 'welcome.design.' } }] },
+        where: { NOT: [{ key: { startsWith: 'welcome.asset.' } }, { key: { startsWith: 'welcome.design.' } }, {key:'qr.featureBundles'}] },
         orderBy: { category: 'asc' }
       });
       // Settings added after an install was seeded show their defaults until first saved.

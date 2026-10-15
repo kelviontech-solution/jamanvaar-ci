@@ -1,0 +1,94 @@
+{
+  "passed": 22,
+  "total": 22,
+  "tests": [
+    {
+      "name": "full daily sidebar and collapsed setup",
+      "passed": true
+    },
+    {
+      "name": "full relevant onboarding and test verification",
+      "passed": true
+    },
+    {
+      "name": "full setup can be paused and resumed after reload",
+      "passed": true
+    },
+    {
+      "name": "full expandable setup retains all tools",
+      "passed": true
+    },
+    {
+      "name": "expanded QR section opens the complete shared workspace and returns",
+      "passed": true
+    },
+    {
+      "name": "owner attention shows live tasks and focuses an exact disconnected device",
+      "passed": true
+    },
+    {
+      "name": "unavailable dish opens a focused shared-menu task",
+      "passed": true
+    },
+    {
+      "name": "branch availability restoration keeps the shared dish unavailable",
+      "passed": true
+    },
+    {
+      "name": "delayed order opens its exact task while sync catches up",
+      "passed": true
+    },
+    {
+      "name": "old unpaid bill opens independently of today and business-day cutoffs",
+      "passed": true
+    },
+    {
+      "name": "final test-order confirmation is saved and survives reload",
+      "passed": true
+    },
+    {
+      "name": "restaurant-wide attention opens the exact remote branch",
+      "passed": true
+    },
+    {
+      "name": "kiosk customer preview and explicit scope remain available in unified console",
+      "passed": true
+    },
+    {
+      "name": "manager starts with branch operations and collapsed business charts",
+      "passed": true
+    },
+    {
+      "name": "full phone layout and runtime errors",
+      "passed": true
+    },
+    {
+      "name": "kiosk daily sidebar and collapsed setup",
+      "passed": true
+    },
+    {
+      "name": "kiosk relevant onboarding and test verification",
+      "passed": true
+    },
+    {
+      "name": "kiosk setup can be paused and resumed after reload",
+      "passed": true
+    },
+    {
+      "name": "kiosk expandable setup retains all tools",
+      "passed": true
+    },
+    {
+      "name": "kiosk phone layout and runtime errors",
+      "passed": true
+    },
+    {
+      "name": "QR-only guided setup keeps shared catalog and final test checks",
+      "passed": true
+    },
+    {
+      "name": "qr phone layout and runtime errors",
+      "passed": true
+    }
+  ]
+}

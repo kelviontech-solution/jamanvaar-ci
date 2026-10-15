@@ -1,0 +1,54 @@
+{
+  "passed": 12,
+  "total": 12,
+  "tests": [
+    {
+      "name": "Daily brief shows live collections and branch wait estimates",
+      "passed": true
+    },
+    {
+      "name": "Guided recovery uses the original disconnected device and real sync command",
+      "passed": true
+    },
+    {
+      "name": "Payment exceptions expose genuine empty state and assignment guidance",
+      "passed": true
+    },
+    {
+      "name": "Cashier configuration saves enabled methods, amounts and favorites",
+      "passed": true
+    },
+    {
+      "name": "Refill configuration persists included dishes and portion limits",
+      "passed": true
+    },
+    {
+      "name": "Recurring menu form saves branch hours, holiday exceptions and can cancel",
+      "passed": true
+    },
+    {
+      "name": "Food-cost report distinguishes missing history from current cost",
+      "passed": true
+    },
+    {
+      "name": "Rollback shows published version scope and needs an explicit review",
+      "passed": true
+    },
+    {
+      "name": "Payment exception assignment and exact original history work with real pending records",
+      "passed": true
+    },
+    {
+      "name": "Historical report renders recorded ingredient changes with readable names and units",
+      "passed": true
+    },
+    {
+      "name": "All new operation pages fit a phone and have no runtime errors",
+      "passed": true
+    },
+    {
+      "name": "Super Admin reviews and saves a scheduled branch product allocation",
+      "passed": true
+    }
+  ]
+}

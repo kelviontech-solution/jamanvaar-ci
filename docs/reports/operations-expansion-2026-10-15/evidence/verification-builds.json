@@ -1,0 +1,8 @@
+{
+  "checks": [
+    {
+      "name": "builds",
+      "exitCode": 0
+    }
+  ]
+}

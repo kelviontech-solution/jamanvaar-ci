@@ -56,7 +56,16 @@ export class StaffApprovalService {
   }
 
   private async reject(device: Device, action: string): Promise<never> {
-    await Promise.all([this.counters.add(`mgrpin:d:${device.id}`, WINDOW_MS), this.counters.add(`mgrpin:r:${device.restaurantId}`, WINDOW_MS)]);
+    // security-audit HIGH kiosk-pin-lockout-01: KIOSK is the one device type here with no staff
+    // behind it -- any guest at the public self-order screen could hammer wrong PINs and, once
+    // the restaurant-wide counter below hit MAX_FAILURES_PER_RESTAURANT, lock every manager
+    // override and staff sign-in on every OTHER terminal (POS, Captain, KDS) in the building for
+    // the next 10 minutes, repeatably. A KIOSK's own wrong guesses still trip its own per-device
+    // limit (brute-forcing one kiosk is still capped), they just never count toward the shared
+    // restaurant-wide one that staff-operated terminals rely on each other to stay under.
+    const bumps = [this.counters.add(`mgrpin:d:${device.id}`, WINDOW_MS)];
+    if (device.type !== 'KIOSK') bumps.push(this.counters.add(`mgrpin:r:${device.restaurantId}`, WINDOW_MS));
+    await Promise.all(bumps);
     await this.audit.log({ actorType: 'TENANT', actorId: device.id, restaurantId: device.restaurantId, action, category: 'AUTH', details: { deviceType: device.type } });
     throw new ForbiddenException({ statusCode: 403, code: 'PIN_INVALID', message: 'That PIN was not accepted.' });
   }

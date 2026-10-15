@@ -58,6 +58,11 @@ export class StaffSession {
   static approvalScope(): RefundApprovalScope | undefined {
     const a = load().approval; return a && alive(a.expiresAt) ? a.scope : undefined;
   }
+  /** Accept only a server-issued, short-lived, action-scoped remote refund approval. */
+  static acceptRemoteApproval(token:string,expiresAt:string,staffName:string,scope:RefundApprovalScope):boolean {
+    if(!token||!alive(expiresAt)||Date.parse(expiresAt)>Date.now()+3*60_000||scope.action!=='REFUND')return false;
+    save({...load(),approval:{token,expiresAt,staffName,scope}});return true;
+  }
 
   /** Called after the local PIN check succeeds. Asks the server to sign the person in; a manager session is also a standing approval. */
   static async signIn(pin: string, fetcher: Fetcher): Promise<boolean> {

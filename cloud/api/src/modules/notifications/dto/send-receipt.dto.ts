@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 export const sendReceiptSchema = z.object({
   channel: z.enum(['WHATSAPP', 'SMS']),
+  // security-audit LOW cloud-api-receipts-01: bound to a real order this device can see, the
+  // same way /email and /whatsapp already are.
+  orderId: z.string().min(1),
   phoneNumber: z.string().regex(/^(\+?91)?[6-9]\d{9}$/, 'Must be a 10-digit Indian mobile number, optionally prefixed with +91'),
   templateParams: z.array(z.string().max(200)).min(0).max(10)
 });

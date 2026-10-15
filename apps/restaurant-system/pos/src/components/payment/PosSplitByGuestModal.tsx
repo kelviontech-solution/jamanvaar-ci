@@ -1,3 +1,4 @@
+import { cashierSettings } from '../../cashierSpeed';
 import React, { useMemo, useState } from 'react';
 import { X, Users } from 'lucide-react';
 import { amountsByMethod, groupsBySeat, groupsEqually, splitBill, type GuestMethod, type SplitBillTotals, type SplitGroup, type SplitLine } from '@jamanvaar/business';
@@ -29,6 +30,7 @@ const MAX_GUESTS = 10;
  * the ordinary payment screen with those amounts, so cash change and UPI / card confirmation work as they always do.
  */
 export const PosSplitByGuestModal: React.FC<Props> = ({ isOpen, onClose, lines, bill, onApply }) => {
+  const enabledMethods = METHODS.filter(method=>cashierSettings().paymentMethods.includes(method.id));
   const anySeat = lines.some((l) => l.seat !== undefined && l.amount > 0);
   const [mode, setMode] = useState<Mode>(anySeat ? 'SEAT' : 'EQUAL');
   const [guestCount, setGuestCount] = useState(2);
@@ -44,8 +46,8 @@ export const PosSplitByGuestModal: React.FC<Props> = ({ isOpen, onClose, lines, 
   }, [mode, lines, liveLines, guestCount, picks]);
 
   const result = useMemo(() => splitBill(lines, bill, groups), [lines, bill, groups]);
-  const methodOf = (i: number): GuestMethod => methods[i] ?? 'CASH';
-  const ready = !result.error && result.unassigned.length === 0 && result.shares.length > 0 && result.shares.every((s) => s.total > 0);
+  const methodOf = (i: number): GuestMethod => methods[i] ?? enabledMethods[0]?.id ?? 'CASH';
+  const ready = enabledMethods.length > 0 && result.shares.every((_,i)=>enabledMethods.some(m=>m.id===methodOf(i))) && !result.error && result.unassigned.length === 0 && result.shares.length > 0 && result.shares.every((s) => s.total > 0);
 
   if (!isOpen) return null;
 
@@ -115,7 +117,7 @@ export const PosSplitByGuestModal: React.FC<Props> = ({ isOpen, onClose, lines, 
                 <div className="flex items-baseline justify-between"><span className="font-black text-jaman-navy">{s.label}</span><span className="font-mono text-xl font-black text-jaman-navy">{exact(s.total)}</span></div>
                 <p className="text-[11px] text-slate-500 font-mono">Food {exact(s.subtotal)}{s.discount > 0 ? ` - discount ${exact(s.discount)}` : ''} + tax {exact(s.tax)}{s.charges > 0 ? ` + charges ${exact(s.charges)}` : ''}</p>
                 <div className="flex gap-1.5" role="group" aria-label={`How ${s.label} pays`}>
-                  {METHODS.map((m) => (
+                  {enabledMethods.map((m) => (
                     <button key={m.id} type="button" aria-pressed={methodOf(i) === m.id} onClick={() => setMethods((prev) => { const next = [...prev]; next[i] = m.id; return next; })} className={chip(methodOf(i) === m.id)}>{m.label}</button>
                   ))}
                 </div>

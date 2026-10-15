@@ -71,13 +71,15 @@ export class InventoryLedgerService {
           results.push({ movementId: m.movementId, status: 'error', error: 'BRANCH_FORBIDDEN: Movement, item and order must belong to this branch' });
           continue;
         }
+        const stock=item?.payload as any, rawCost=stock?.costPerUnit??stock?.costPrice??stock?.unitCost;
+        const unitCostPaise=typeof rawCost==='number'&&Number.isFinite(rawCost)&&rawCost>=0&&(!stock?.unit||stock.unit===m.unit)?Math.round(rawCost*100):null;
         const seq = await nextSyncSequence(tx, device.restaurantId);
         const inserted = await tx.$executeRaw`
           INSERT INTO "InventoryMovement"
-            ("id","restaurantId","branchId","movementId","deviceId","itemId","itemName","type","quantityDelta","unit","orderId","reason","occurredAt","seq")
+            ("id","restaurantId","branchId","movementId","deviceId","itemId","itemName","type","quantityDelta","unit","orderId","reason","occurredAt","seq","unitCostPaise")
           VALUES
             (${randomUUID()}, ${device.restaurantId}, ${branchId}, ${m.movementId}, ${device.id}, ${m.itemId}, ${m.itemName}, ${m.type},
-             ${m.quantityDelta}, ${m.unit}, ${m.orderId ?? null}, ${m.reason}, ${new Date(m.occurredAt)}, ${seq})
+             ${m.quantityDelta}, ${m.unit}, ${m.orderId ?? null}, ${m.reason}, ${new Date(m.occurredAt)}, ${seq}, ${unitCostPaise})
           ON CONFLICT ("restaurantId","movementId") DO NOTHING`;
         results.push(inserted === 0 ? { movementId: m.movementId, status: 'ok', duplicate: true } : { movementId: m.movementId, status: 'ok', seq });
       }

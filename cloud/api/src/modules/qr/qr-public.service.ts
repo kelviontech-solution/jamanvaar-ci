@@ -1,3 +1,5 @@
+import {QrRestaurantPageService} from './qr-restaurant-page.service';
+import {assertBranchAccepting,branchServiceState} from '../operations/operations-policy';
 import {QrOperationsService} from './qr-operations.service';
 import { reserveQrDishStock } from '../payments/qr-dish-stock';
 import { BadRequestException, ConflictException, ForbiddenException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
@@ -87,7 +89,8 @@ export class QrPublicService {
     private readonly payments: PaymentsService,
     private readonly advanced: QrAdvancedService,
     private readonly promotions: QrPromotionsService,
-    private readonly loyalty: QrLoyaltyService
+    private readonly loyalty: QrLoyaltyService,
+    private readonly pages: QrRestaurantPageService
   ) {}
 
   // ------------------------------------------------------------------ resolution (spec 13, 14)
@@ -101,7 +104,17 @@ export class QrPublicService {
   async resolve(rawToken: string): Promise<QrContext> {
     if (typeof rawToken !== 'string' || !QR_TOKEN_PATTERN.test(rawToken)) throw new QrUnavailableException('INVALID_QR');
     const cached = this.cache.get(rawToken);
-    if (cached) return cached;
+    if (cached) {
+      // Branch grants can take effect on a clock boundary without a write/invalidation.
+      const activeBranch = await this.prisma.runAsTenant(cached.code.restaurantId, tx => tx.branch.findFirst({where:{id:cached.branch.id,restaurantId:cached.code.restaurantId,status:'ACTIVE'},select:{id:true}}));
+      if(!activeBranch)throw new QrUnavailableException('BRANCH_INACTIVE');
+      const entitlement = await this.prisma.runAsTenant(cached.code.restaurantId, tx => this.entitlements.resolve(tx, cached.code.restaurantId, QR_APP_CODE, cached.branch.id));
+      if (!entitlement.enabled) throw new QrUnavailableException('ENTITLEMENT_REQUIRED');
+      const settings = await this.settingsService.effective(cached.code.restaurantId, cached.branch.id);
+      if (!settings.orderingEnabled) throw new QrUnavailableException('ORDERING_OFF');
+      if (entitlement.limits.qrDigitalMenu === false || cached.code.mode === QR_MODE.TABLE_ORDER && !settings.tableOrderingEnabled || cached.code.mode === QR_MODE.MENU_ONLY && !settings.menuOnlyEnabled) throw new QrUnavailableException('MODE_OFF');
+      return {...cached, entitlement, settings};
+    }
     const ctx = await this.resolveFresh(rawToken);
     this.cache.set(rawToken, ctx);
     return ctx;
@@ -115,16 +128,17 @@ export class QrPublicService {
     if (code.status !== QR_STATUS.ACTIVE) throw new QrUnavailableException('QR_DISABLED');
     if (!code.branchId) throw new QrUnavailableException('QR_BRANCH_MISSING');
 
-    const [restaurant, branch, entitlement] = await this.prisma.runAsPlatform(async (tx) =>
+    const [restaurant, branch] = await this.prisma.runAsPlatform(async (tx) =>
       Promise.all([
         tx.restaurant.findFirst({ where: { id: code.restaurantId, deletedAt: null }, select: { id: true, name: true, address: true, city: true, timezone: true, currency: true, status: true } }),
-        tx.branch.findFirst({ where: { id: code.branchId!, restaurantId: code.restaurantId }, select: { id: true, name: true, timezone: true, status: true } }),
-        this.entitlements.resolve(tx, code.restaurantId, QR_APP_CODE)
+        tx.branch.findFirst({ where: { id: code.branchId!, restaurantId: code.restaurantId }, select: { id: true, name: true, timezone: true, status: true } })
       ])
     );
     if (!restaurant || restaurant.status !== 'ACTIVE') throw new QrUnavailableException('RESTAURANT_INACTIVE');
     if (!branch || branch.status !== 'ACTIVE') throw new QrUnavailableException('BRANCH_INACTIVE');
+    const entitlement = await this.prisma.runAsTenant(code.restaurantId, tx => this.entitlements.resolve(tx, code.restaurantId, QR_APP_CODE, code.branchId));
     if (!entitlement.enabled) throw new QrUnavailableException('ENTITLEMENT_REQUIRED');
+    if (entitlement.limits.qrDigitalMenu === false) throw new QrUnavailableException('MODE_OFF');
 
     const settings = await this.settingsService.effective(code.restaurantId, code.branchId);
     if (!settings.orderingEnabled) throw new QrUnavailableException('ORDERING_OFF');
@@ -178,21 +192,23 @@ export class QrPublicService {
     const onlineAvailable = ctx.settings.allowOnlinePayment && await this.payments.qrOnlineAvailable(ctx.restaurant.id);
     const advanced = await this.advanced.publicSettings(ctx.restaurant.id, ctx.branch.id);
     const workload = await this.prisma.runAsTenant(ctx.restaurant.id, tx => this.advanced.workloadIn(tx, ctx.restaurant.id, ctx.branch.id, ctx.settings.rules?.preparationMinutes ?? DEFAULT_QR_RULES.preparationMinutes));
+    const service=await this.prisma.runAsTenant(ctx.restaurant.id,tx=>branchServiceState(tx,ctx.restaurant.id,ctx.branch.id,'QR'));
     await this.touchScan(ctx, sessionId);
     return {
       currency: ctx.restaurant.currency,
       advanced: { promotionsEnabled: advanced.promotionsEnabled, loyaltyEnabled: advanced.loyaltyEnabled, feedbackEnabled: advanced.feedbackEnabled, historyEnabled: advanced.historyEnabled, groupEnabled: advanced.groupEnabled, languages: advanced.multilingualEnabled ? advanced.languages : ['en'], defaultLanguage: advanced.multilingualEnabled ? advanced.defaultLanguage : 'en', recommendationIds: advanced.promotionsEnabled ? advanced.recommendationIds : [], workload },
       branding,
+      restaurantPage: await this.pages.publicPage(ctx.restaurant.id,ctx.branch.id),
       restaurant: { name: ctx.restaurant.name, address: ctx.restaurant.address ?? undefined, city: ctx.restaurant.city ?? undefined },
       branch: { name: ctx.branch.name },
       mode: ctx.code.mode,
       table: ctx.table ? { displayNumber: ctx.table.number, capacity: ctx.table.capacity } : null,
       ordering: {
-        enabled: orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone).available && !workload.atCapacity,
-        availability: workload.atCapacity ? { available:false,message:'Our kitchen is busy. Your cart is saved; please try again shortly.' } : orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone),
+        enabled: service.available && orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone).available && !workload.atCapacity,
+        availability: !service.available ? service : workload.atCapacity ? { available:false,message:'Our kitchen is busy. Your cart is saved; please try again shortly.' } : orderingAvailability(ctx.settings.rules ?? DEFAULT_QR_RULES, ctx.branch.timezone),
         menuReady: menu.ready,
         menuVersion: menu.menuVersion,
-        settings: { ...this.publicSettings(ctx.settings), preparationMinutes: workload.estimateMinutes, allowOnlinePayment: onlineAvailable },
+        settings: { ...this.publicSettings(ctx.settings), preparationMinutes: service.configured ? Math.max(service.preparationMinutes,workload.estimateMinutes) : workload.estimateMinutes, allowOnlinePayment: onlineAvailable },
         onlinePayment: { available: onlineAvailable, message: onlineAvailable ? 'Secure Razorpay checkout with UPI and supported payment methods.' : 'Online payment is currently unavailable. Please pay at the counter or ask a team member.' }
       }
     };
@@ -284,12 +300,13 @@ export class QrPublicService {
       if(prior.status==='DRAFT' && prior.paymentMethod==='ONLINE' && settings.allowOnlinePayment){
         try {
           const checkout = await this.payments.createQrPayment(ctx.restaurant.id,prior.publicOrderId!);
-          if (checkout.status !== 'SUCCESS') return this.orderStatus(prior.publicOrderId!, checkout);
+          if (checkout.status !== 'SUCCESS') return this.orderStatus(prior.publicOrderId!, checkout, sessionId);
         } catch { /* Status exposes the failed attempt and its explicit retry action. */ }
       }
-      return this.orderStatus(prior.publicOrderId!);
+      return this.orderStatus(prior.publicOrderId!, undefined, sessionId);
     }
-    const rules = settings.rules ?? DEFAULT_QR_RULES;
+    const service=await this.prisma.runAsTenant(ctx.restaurant.id,tx=>branchServiceState(tx,ctx.restaurant.id,ctx.branch.id,'QR'));
+    const rules = {...(settings.rules ?? DEFAULT_QR_RULES),...(service.configured?{preparationMinutes:service.preparationMinutes}:{})};
     const availability = orderingAvailability(rules, ctx.branch.timezone);
     if (!availability.available && !dto.pickupAt) throw new ConflictException({ code: 'ORDERING_CLOSED', message: availability.message });
     const online = dto.paymentMethod === 'ONLINE';
@@ -398,6 +415,7 @@ export class QrPublicService {
       paymentMethod: dto.paymentMethod,
       serializeRestaurantLimit: true,
       beforeCreate: async (tx) => {
+        await assertBranchAccepting(tx,ctx.restaurant.id,ctx.branch.id,'QR');
         // Recheck under the shared restaurant admission lock: simultaneous guests cannot overshoot capacity.
         const now = new Date();
         const pickupMeta=await this.operations.reservePickupIn(tx,ctx,orderType,dto.pickupAt);
@@ -458,15 +476,15 @@ export class QrPublicService {
         const checkout = await this.payments.createQrPayment(ctx.restaurant.id, order.publicOrderId!);
         // Opening checkout does not need another provider status round trip.
         // Payment is verified independently on return/status or by signed webhook.
-        return this.orderStatus(order.publicOrderId!, checkout.status === 'SUCCESS' ? undefined : checkout);
+        return this.orderStatus(order.publicOrderId!, checkout.status === 'SUCCESS' ? undefined : checkout, sessionId);
       }
       catch {
         // The provider may have delivered a signed success while its create response timed out.
-        try { return await this.orderStatus(order.publicOrderId!); }
+        try { return await this.orderStatus(order.publicOrderId!, undefined, sessionId); }
         catch { return { ...this.confirmation(order), payment: { status: 'FAILED', url: null, expiresAt: null } }; }
       }
     }
-    return this.orderStatus(order.publicOrderId!);
+    return this.orderStatus(order.publicOrderId!, undefined, sessionId);
   }
 
   private async menuMovedOn(_ctx: QrContext, dto: PlaceQrOrder, currentVersion: number): Promise<boolean> {
@@ -499,11 +517,23 @@ export class QrPublicService {
 
   // ------------------------------------------------------------------ status (spec 35, 56)
 
+  /**
+   * An order created under a browser session (the common case: the rate-limit interceptor issues and verifies one
+   * on every public QR request) can only be read or acted on by that same session, the same way a repeat "place"
+   * call already refused a different browser in createOrder above. An order created with no session on record (a
+   * caller that never sent `x-qr-session`) stays reachable the way it always has -- there is nothing to bind it to.
+   */
+  private assertOwnsOrder(order: { meta: unknown }, sessionId?: string): void {
+    const owner = (order.meta as Record<string, unknown> | null)?.qrBrowserSession;
+    if (typeof owner === 'string' && owner !== sessionId) throw new NotFoundException('Order not found.');
+  }
+
   /** The public reference is the capability: unguessable, random, and it reveals only this order's customer-safe state. */
-  async orderStatus(publicOrderId: string, checkout?: Awaited<ReturnType<PaymentsService['createQrPayment']>>) {
+  async orderStatus(publicOrderId: string, checkout?: Awaited<ReturnType<PaymentsService['createQrPayment']>>, sessionId?: string) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId ?? '')) throw new NotFoundException('Order not found.');
     let order = await this.prisma.runAsPlatform((tx) => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR') throw new NotFoundException('Order not found.');
+    this.assertOwnsOrder(order, sessionId);
     const payment = order.paymentMethod === 'ONLINE' || order.paymentMethod === 'RAZORPAY' ? checkout ?? await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId) : null;
     if (payment?.status === 'SUCCESS') order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUniqueOrThrow({ where: { publicOrderId } }));
     const settings = await this.settingsService.effective(order.restaurantId, order.branchId);
@@ -515,38 +545,41 @@ export class QrPublicService {
     return { ...(settings.showOrderStatus || order.status === 'DRAFT' ? view : { ...view, status: 'RECEIVED' as const }), balance: displayBalance, payment, preparationMinutes: settings.rules?.preparationMinutes ?? DEFAULT_QR_RULES.preparationMinutes, allowCounterPayment: settings.allowCash && order.status === 'DRAFT' && order.paymentMethod === 'ONLINE' && payment?.checkoutMode !== 'STANDARD' };
   }
 
-  async switchToCounter(publicOrderId: string) {
+  async switchToCounter(publicOrderId: string, sessionId?: string) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId)) throw new NotFoundException('Order not found');
     const order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR' || !order.qrCodeId) throw new NotFoundException('Order not found');
-    if (order.paymentStatus === 'SUCCESS' || order.paymentMethod === 'CASH_AT_COUNTER') return this.orderStatus(publicOrderId);
+    this.assertOwnsOrder(order, sessionId);
+    if (order.paymentStatus === 'SUCCESS' || order.paymentMethod === 'CASH_AT_COUNTER') return this.orderStatus(publicOrderId, undefined, sessionId);
     const code = await this.prisma.runAsTenant(order.restaurantId, tx => tx.qrCode.findUniqueOrThrow({ where: { id: order.qrCodeId! } }));
     const ctx = await this.resolveFresh(code.publicToken);
     if (!ctx.settings.allowCash) throw new ForbiddenException('Counter payment is unavailable');
     await this.payments.switchQrToCounter(order.restaurantId, publicOrderId);
-    return this.orderStatus(publicOrderId);
+    return this.orderStatus(publicOrderId, undefined, sessionId);
   }
 
-  async verifyCheckout(publicOrderId: string, body: { paymentId: string; signature: string }) {
+  async verifyCheckout(publicOrderId: string, body: { paymentId: string; signature: string }, sessionId?: string) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId)) throw new NotFoundException('Order not found');
     const order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR' || order.status === 'CANCELLED') throw new NotFoundException('Order not found');
+    this.assertOwnsOrder(order, sessionId);
     const checkout = await this.payments.verifyQrCheckout(order.restaurantId, order.externalOrderId, body);
-    return this.orderStatus(publicOrderId, checkout);
+    return this.orderStatus(publicOrderId, checkout, sessionId);
   }
 
-  async retryPayment(publicOrderId: string) {
+  async retryPayment(publicOrderId: string, sessionId?: string) {
     if (!PUBLIC_ORDER_ID_PATTERN.test(publicOrderId)) throw new NotFoundException('Order not found');
     const order = await this.prisma.runAsPlatform(tx => tx.syncedOrder.findUnique({ where: { publicOrderId } }));
     if (!order || order.source !== 'QR' || !['ONLINE', 'RAZORPAY'].includes(order.paymentMethod ?? '') || !order.qrCodeId) throw new NotFoundException('Online order not found');
-    if (order.paymentStatus === 'SUCCESS') return this.orderStatus(publicOrderId);
+    this.assertOwnsOrder(order, sessionId);
+    if (order.paymentStatus === 'SUCCESS') return this.orderStatus(publicOrderId, undefined, sessionId);
     const code = await this.prisma.runAsTenant(order.restaurantId, tx => tx.qrCode.findUniqueOrThrow({ where: { id: order.qrCodeId! } }));
     const ctx = await this.resolve(code.publicToken);
     if (!ctx.settings.allowOnlinePayment) throw new ForbiddenException('Online payments are currently unavailable');
     const payment = await this.payments.qrPaymentStatus(order.restaurantId, order.externalOrderId);
-    if (payment.status === 'SUCCESS') return this.orderStatus(publicOrderId);
+    if (payment.status === 'SUCCESS') return this.orderStatus(publicOrderId, undefined, sessionId);
     const checkout = await this.payments.createQrPayment(order.restaurantId, publicOrderId);
-    return this.orderStatus(publicOrderId, checkout.status === 'SUCCESS' ? undefined : checkout);
+    return this.orderStatus(publicOrderId, checkout.status === 'SUCCESS' ? undefined : checkout, sessionId);
   }
 
   // ------------------------------------------------------------------ events (spec 47)

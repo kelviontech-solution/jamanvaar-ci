@@ -64,6 +64,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   // Search
   const [searchQuery, setSearchQuery] = useState<string>(initialFilters?.search ?? '');
+  const [focusedOrderId,setFocusedOrderId]=useState(initialFilters?.orderId ?? '');
 
   // View Mode: Flat vs Day-Grouped
   const [viewMode, setViewMode] = useState<'FLAT' | 'DAY_GROUPED'>('FLAT');
@@ -81,6 +82,8 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   // 1. Date Range Boundaries using CentralReportingService
   const { dateFilteredOrders, dateLabel } = useMemo(() => {
+    // A direct unpaid-bill task must survive business-day cutoffs and old debt.
+    if(focusedOrderId)return {dateFilteredOrders:orders.filter(order=>order.id===focusedOrderId&&isSubmittedBillingOrder(order)),dateLabel:'Selected bill'};
     const range = CentralReportingService.getBusinessDateRange(
       datePreset as any,
       customStartDate,
@@ -91,7 +94,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
     }).filter(isSubmittedBillingOrder).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return { dateFilteredOrders: filtered, dateLabel: range.label };
-  }, [orders, orders.length, orders[0]?.id, datePreset, customStartDate, customEndDate]);
+  }, [orders, orders.length, orders[0]?.id, datePreset, customStartDate, customEndDate,focusedOrderId]);
 
   // 2. Summary Metrics for the Selected Date Range from CentralReportingService
   const sourceOrders = useMemo(() => dateFilteredOrders.filter(o => sourceFilter === 'ALL' || getOrderSource(o) === sourceFilter), [dateFilteredOrders, sourceFilter]);
@@ -346,6 +349,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto select-none pb-12">
+      {focusedOrderId&&<section aria-label="Focused bill task" className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm space-y-2"><p>Showing the selected bill independently of date cutoffs. {dateFilteredOrders.length===0?'It has not arrived in this branch’s local ledger yet; wait for sync or check Devices & sync.':''}</p><button type="button" className="min-h-11 rounded-xl border bg-white px-4 font-bold" onClick={()=>{setFocusedOrderId('');setSearchQuery('');setCollectionFilter('ALL');setDatePreset('TODAY');}}>Show today’s ledger</button></section>}
 
       {/* 0. BILLS WAITING: guests who asked for their bill and have not paid. Settled at the POS counter. */}
       {billsWaiting().length > 0 && (

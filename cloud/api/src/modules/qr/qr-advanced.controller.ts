@@ -239,7 +239,8 @@ export class QrAdvancedPublicController {
   feedback(
     @Param("publicOrderId") id: string,
     @Body() body: z.infer<typeof feedbackSchema>,
+    @Req() req: { qrSession?: string },
   ) {
-    return this.advanced.feedback(id, body);
+    return this.advanced.feedback(id, body, req.qrSession);
   }
 }

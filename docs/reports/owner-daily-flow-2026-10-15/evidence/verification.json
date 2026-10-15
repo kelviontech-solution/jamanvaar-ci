@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-15",
+  "environment": "Local isolated test database; no production deployment",
+  "recordedAt": "2026-10-14T20:04:36.425Z",
+  "finalUnit": {
+    "passed": 195,
+    "files": 9
+  },
+  "backend": {
+    "passed": 62,
+    "files": 3
+  },
+  "broadRoot": {
+    "tested": 2178,
+    "initialPass": 2174,
+    "initialFailure": 4,
+    "resolvedByRerun": 4,
+    "note": "Three default timeouts and one supervisor timing assertion under load. The 23 other cases in the affected selection passed on a one-worker recheck; DPAPI tests passed with a 30-second runner timeout. One HTTP-body contract test was added after the broad run."
+  },
+  "browser": {
+    "ownerFlow": 22,
+    "ownerFlowTotal": 22,
+    "operationalApps": 25,
+    "operationalTotal": 25,
+    "totalPassed": 47
+  },
+  "builds": {
+    "api": "PASS",
+    "adminAndStandaloneQr": "PASS",
+    "adminTypecheck": "PASS"
+  },
+  "limits": {
+    "productionDeployed": false,
+    "nativeArtifactsBuilt": false,
+    "realPaymentCharged": false,
+    "physicalPrinterVerified": false,
+    "branchCommercialLicensingImplemented": false
+  },
+  "performance": [
+    238,
+    190,
+    192
+  ]
+}

@@ -1,4 +1,6 @@
-﻿import { useEffect, useRef, useState } from 'react';
+﻿import { activeAdminBranch } from '../../adminBranchScope';
+import { PlanOnboarding } from '../dashboard/PlanOnboarding';
+import { useEffect, useRef, useState } from 'react';
 import { Modal, CachedImg } from '@jamanvaar/ui';
 import { PREBUILT_MENU_TEMPLATES } from '@jamanvaar/database';
 import { formatINR } from '@jamanvaar/utils';
@@ -13,7 +15,7 @@ const hash = (s: string) => {
   for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
   return (h >>> 0).toString(36);
 };
-export function QrOnboarding() {
+export function QrOnboarding({onNavigate}:{onNavigate?:(page:string)=>void} = {}) {
   const [step, setStep] = useState(0),
     [templateId, setTemplateId] = useState(''),
     [chosen, setChosen] = useState<number[]>([]),
@@ -486,6 +488,7 @@ export function QrOnboarding() {
           </form>
         )}
       </Modal>
+      {activeAdminBranch && activeAdminBranch !== 'all' && <PlanOnboarding apps={['QR_ORDERING']} branchId={activeAdminBranch} counts={{menu:preview?.items?.length ?? 0,tables:0,staff:0,printers:0,kiosks:0}} onNavigate={page=>onNavigate?.(page==='QR_ORDERING'?'TABLES':page)}/>}
     </div>
   );
 }

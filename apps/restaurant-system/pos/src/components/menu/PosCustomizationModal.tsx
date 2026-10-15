@@ -117,6 +117,7 @@ export const PosCustomizationModal: React.FC = () => {
               <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
                 {customizingItem.name}
               </h2>
+              {!!customizingItem.allergens?.length && <p className="text-sm text-amber-100">Declared allergens: {customizingItem.allergens.join(', ')}</p>}
               <div className="text-xs text-slate-300 flex items-center gap-2 mt-0.5">
                 <span>Base: ₹{customizingItem.price}</span>
                 <span>•</span>

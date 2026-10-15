@@ -32,6 +32,7 @@ const toggles = [
   ["promotionsEnabled", "QR_PROMOTIONS", "Menu recommendations"],
 ] as const;
 const labels: Record<string, string> = {
+  QR_RESTAURANT_PAGE: 'Restaurant website & mobile page builder',
   QR_GROUP_ORDERING: "Shared ordering",
   QR_SPLIT_PAYMENT: "Split counter collections",
   QR_LOYALTY: "Loyalty",

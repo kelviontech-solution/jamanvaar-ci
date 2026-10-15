@@ -203,17 +203,29 @@ const EMPTY_ACTIVATION: ActivationForm = {
 // and other one-time-shown secrets are deliberately excluded: re-deriving
 // or re-issuing those isn't safe/idempotent, so a resumed draft re-enters
 // at whichever step the admin was on and re-runs that step's own action.
+//
+// security-audit: this used to also persist owner.initialPassword (in the
+// default 'set_now' mode, the owner's real, permanent login password) and
+// ownerActivationToken (a live invite token) in plaintext to localStorage,
+// directly contradicting this comment -- neither survives into the saved
+// draft now. A resumed draft gets a freshly-generated password (same as a
+// brand-new form) and shows the existing "Unavailable" fallback for the
+// activation token (see the 'done' step and review step below), the same
+// path already used when that step's own action fails -- the operator uses
+// Support > Resend Invite for a fresh token if the restaurant/owner were
+// already created server-side before the page was closed.
 const ONBOARDING_DRAFT_KEY = 'jamanvaar_onboarding_draft_v1';
+
+type PersistedOwnerForm = Omit<OwnerForm, 'initialPassword'>;
 
 interface OnboardingDraft {
   step: Step;
   details: DetailsForm;
-  owner: OwnerForm;
+  owner: PersistedOwnerForm;
   planForm: PlanForm;
   modulesForm: ModulesForm;
   activationForm: ActivationForm;
   restaurantId: string | null;
-  ownerActivationToken: string | null;
   inviteEmailSent: boolean;
   subscriptionId: string | null;
   savedAt: string;
@@ -278,12 +290,15 @@ export function OnboardRestaurantPage() {
     if (!pendingDraft) return;
     setStep(pendingDraft.step);
     setDetails(pendingDraft.details);
-    setOwner(pendingDraft.owner);
+    // The password never survives into the saved draft (security-audit) -- a resumed draft gets a
+    // freshly-generated one, same as a brand-new form; the operator can still regenerate it manually.
+    setOwner({ ...pendingDraft.owner, initialPassword: generateSecurePassword() });
     setPlanForm(pendingDraft.planForm);
     setModulesForm(pendingDraft.modulesForm);
     setActivationForm(pendingDraft.activationForm);
     setRestaurantId(pendingDraft.restaurantId);
-    setOwnerActivationToken(pendingDraft.ownerActivationToken);
+    // ownerActivationToken also never survives into the draft (security-audit); it stays null here
+    // and the UI's existing "Unavailable" fallback (see the review/done steps) covers this case.
     setInviteEmailSent(pendingDraft.inviteEmailSent);
     setSubscriptionId(pendingDraft.subscriptionId);
     setPendingDraft(null);
@@ -313,15 +328,20 @@ export function OnboardRestaurantPage() {
       }
       return;
     }
+    // security-audit: initialPassword (a real, often-permanent login credential) and
+    // ownerActivationToken (a live invite token) are excluded from the persisted draft -- see the
+    // comment on OnboardingDraft above. Destructuring instead of a redaction step keeps this correct
+    // even if OwnerForm grows another field later (an added field is persisted by default, not
+    // silently leaked by an allowlist that forgot to mention it).
+    const { initialPassword: _initialPassword, ...ownerWithoutPassword } = owner;
     const draft: OnboardingDraft = {
       step,
       details,
-      owner,
+      owner: ownerWithoutPassword,
       planForm,
       modulesForm,
       activationForm,
       restaurantId,
-      ownerActivationToken,
       inviteEmailSent,
       subscriptionId,
       savedAt: new Date().toISOString()
@@ -332,7 +352,7 @@ export function OnboardRestaurantPage() {
       // Storage full/unavailable — draft-saving is a convenience, not a
       // requirement, so fail silently rather than block the wizard.
     }
-  }, [draftResolved, step, details, owner, planForm, modulesForm, activationForm, restaurantId, ownerActivationToken, inviteEmailSent, subscriptionId]);
+  }, [draftResolved, step, details, owner, planForm, modulesForm, activationForm, restaurantId, inviteEmailSent, subscriptionId]);
   const [provisionedKeys, setProvisionedKeys] = useState<ProvisionedKey[]>([]);
   const [copyToast, setCopyToast] = useState<string | null>(null);
 

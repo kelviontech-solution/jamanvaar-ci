@@ -11,6 +11,8 @@ export const ADMIN_PRODUCTS = {
 // is never used as proof of a product entitlement.
 export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, string>>> = {
   POS_ADMIN: {
+    OPERATIONS_HUB: 'operations', KIOSKS: 'terminals', KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen',
+    KIOSK_COMBOS: 'combos', KIOSK_PAYMENTS: 'kiosk-payments', FEEDBACK: 'feedback',
     DASHBOARD: 'dashboard', BILLING_SALES: 'billing', ORDERS: 'orders', LIVE_KDS: 'live-kitchen',
     TABLES: 'tables', RESERVATIONS: 'reservations', KITCHEN_KOT: 'kitchen', QR_ORDERING: 'qr-ordering',
     MENU: 'menu', MENU_OPTIONS: 'options', INVENTORY: 'inventory', INVENTORY_CONTROL: 'purchasing',
@@ -20,6 +22,7 @@ export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, str
     DOWNLOADS: 'downloads'
   },
   KIOSK_ADMIN: {
+    OPERATIONS_HUB: 'operations', QR_ORDERING: 'qr-ordering',
     DASHBOARD: 'dashboard', KIOSKS: 'terminals', MENU: 'menu', TEMPLATES: 'templates', MENU_OPTIONS: 'options',
     KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
     LIVE_KDS: 'kitchen', TABLES: 'tables', STAFF: 'staff', KIOSK_PAYMENTS: 'payments',
@@ -48,6 +51,21 @@ export function adminPagePath(product: AdminProduct, page: PosAdminTab): string 
 export function availableAdminProducts(apps: readonly AppCode[]): AdminProduct[] {
   return (['POS_ADMIN', 'KIOSK_ADMIN'] as const).filter(app => apps.includes(app));
 }
+const KIOSK_PAGES = new Set<PosAdminTab>(['KIOSKS','KIOSK_DESIGN','KIOSK_WELCOME','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']);
+const SHARED_PAGES = new Set<PosAdminTab>(['OPERATIONS_HUB','DASHBOARD','MENU','MENU_OPTIONS','TEMPLATES','COUPONS','ORDERS','LIVE_KDS','TABLES','STAFF','REPORTS','HARDWARE','RECEIPTS','SYNC','SETTINGS','LICENSE','AUDIT','BACKUP','SUPPORT','DOWNLOADS']);
+/** Presentation never grants access. Deep links use the same module checks as navigation. */
+export function canAccessAdminPage(apps: readonly AppCode[], product: AdminProduct, page: PosAdminTab): boolean {
+  if (!apps.includes(product) || !Object.hasOwn(PRODUCT_PAGES[product], page)) return false;
+  if (page === 'QR_ORDERING') return apps.includes('QR_ORDERING');
+  if (KIOSK_PAGES.has(page)) return apps.includes('KIOSK_ADMIN');
+  if (SHARED_PAGES.has(page)) return apps.includes('POS_ADMIN') || apps.includes('KIOSK_ADMIN');
+  return apps.includes('POS_ADMIN');
+}
+export function ownerEntryPath(apps: readonly AppCode[]): string | null {
+  return apps.includes('POS_ADMIN') ? '/restaurant-admin/dashboard'
+    : apps.includes('KIOSK_ADMIN') ? '/kiosk-admin/dashboard'
+    : apps.includes('QR_ORDERING') ? '/qr/admin/' : null;
+}
 export interface AdminPreference { product?: AdminProduct; pages?: Partial<Record<AdminProduct, PosAdminTab>> }
 export function readAdminPreference(raw: string | null): AdminPreference {
   try {
@@ -63,6 +81,12 @@ export function readAdminPreference(raw: string | null): AdminPreference {
   } catch { return {}; }
 }
 export function resolveAdminRoute(route: AdminRoute, available: readonly AdminProduct[], saved: AdminPreference): AdminRoute {
+  // Full-suite owners manage both modules in one console. Preserve old Kiosk links.
+  if (available.includes('POS_ADMIN') && available.includes('KIOSK_ADMIN')) {
+    if (route.invalid) return route;
+    const page = route.page || saved.pages?.POS_ADMIN || 'DASHBOARD';
+    return { product: 'POS_ADMIN', page, invalid: !Object.hasOwn(PRODUCT_PAGES.POS_ADMIN, page) };
+  }
   if (route.product || route.invalid) return route;
   const product = saved.product && available.includes(saved.product) ? saved.product : available.length === 1 ? available[0] : null;
   return { product, page: product ? saved.pages?.[product] || 'DASHBOARD' : null, invalid: false };

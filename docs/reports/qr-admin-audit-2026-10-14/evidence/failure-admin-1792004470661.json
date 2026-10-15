@@ -1,0 +1,391 @@
+{
+  "text": "QA Owner full 1792004374886\nRESTAURANT ADMIN\nQA Owner full 1792004374886 — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nQA Owner full 1792004374886 — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nRestaurant workspace\n← Back to managementShow advanced tools\nLAUNCH SETUP\nGuided Menu Setup\nPayment Acceptance\nTables & QR\nPayment Settings\nOrdering Rules\nINSIGHTS\nCollection Reconciliation\nAnalytics\nLIVE OPERATIONS\nPickup Calendar\nOverview\nQR Orders\nService Requests\nBRANDING\nQR Print Packs\nCustomer Branding\nMENU & GUESTS\nCustomers & Loyalty\nMenu & Availability\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Owner full plan 1792004374886 · 16/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / MENU & GUESTS\nCustomers & Loyalty\n\nManage shared customers, point balances, rewards and verified visit history.\n\n✦ JAMAN AI\nEnabled\nCustomers & loyalty\n\nCustomer profiles and point balances are shared with your restaurant's POS and verified QR checkout. Customer order history below follows the selected branch. Points are earned only after confirmed collection; guests verify their phone before using rewards.\n\nAdd customer\nLoyalty program\nRefresh customers\n\nProgram paused / Earn 1 points per ₹100 paid. You can manage the restaurant-wide program.\n\nGuest reward setup\n\nRestaurant program: Paused\n\nQR rewards for this branch: Not enabled\n\nPhone verification: Provider setup required — contact your platform administrator\n\nOpen branch reward settings\n\nGuests can redeem when all three checks are ready and an active reward matches their balance.\n\nCustomer segment\nAll customers\nReturning guests (2+ visits)\nCustomers with points\nEmail consent recorded\nWhatsApp consent recorded\nOwner export scope\nCustomer records (no email marketing list)\nConsented email contacts\nConsented WhatsApp contacts\n\nExports are audited. Do not use a customer-record export for campaigns without channel-specific consent.\n\nExport customer CSV\nFind customer by name or phone\n\n0 matching customers\n\nNo customers match. Add a customer or clear your search. New accounts start with zero points.\n\nFirst customers\nMore customers\nRewards guests can choose at checkout\n\nRedeeming is optional. Paused rewards cannot be redeemed; existing customer points are preserved.\n\nAdd bill reward",
+  "headings": [
+    "Customers & Loyalty",
+    "Customers & loyalty",
+    "Rewards guests can choose at checkout"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "QA Owner full 1792004374886 — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 112,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 126,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 99,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 87,
+      "height": 40,
+      "visible": true
+    },
+    {
+      "text": " Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "← Back to management",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 74,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Add customer",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 131,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Loyalty program",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Refresh customers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Open branch reward settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 232,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Export customer CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 180,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "First customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 139,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "More customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 145,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Add bill reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 44,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search orders, invoices, dishes, tables..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch workspace",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Customer segment",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Owner export scope",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Find loyalty customer",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5316/restaurant-admin/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 86
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

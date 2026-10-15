@@ -1,3 +1,4 @@
+import { branchLicense } from './branch-license';
 import type { Prisma } from '@prisma/client';
 
 export type AdminApp = 'POS_ADMIN' | 'KIOSK_ADMIN' | 'QR_ORDERING';
@@ -15,7 +16,9 @@ export function requiredConsoleApps(pathname: string): readonly AdminApp[] {
   // Express decodes route parameters. Authorize the same resource, so encoding a letter
   // in INVENTORY_ITEM cannot bypass the restaurant-only check.
   try { path = decodeURIComponent(path); } catch { /* Express rejects malformed escapes */ }
+  if (/^\/api\/v1\/tenant\/operations(?:\/|$)/.test(path)) return ALL_ADMIN_APPS;
   if (/^\/api\/v1\/restaurant\/qr(?:\/|$)/.test(path)) return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
+  if (/^\/api\/v1\/devices\/me\/(?:ai-config|ai-telemetry)\/?$/.test(path)) return ALL_ADMIN_APPS;
   if (/^\/api\/v1\/menu\/(?:preview|publish|branch-overrides)\/?$/.test(path)) return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
   const entity = /^\/api\/v1\/entity-sync\/([^/]+)\/?$/.exec(path)?.[1];
   // This existing atomic record also carries shared receipt/brand/printer settings.
@@ -27,11 +30,13 @@ export function requiredConsoleApps(pathname: string): readonly AdminApp[] {
   return BOTH;
 }
 
-export async function enabledConsoleApps(tx: Prisma.TransactionClient, restaurantId: string): Promise<AdminApp[]> {
+export async function enabledConsoleApps(tx: Prisma.TransactionClient, restaurantId: string, branchId?: string | null): Promise<AdminApp[]> {
   const rows = await tx.applicationEntitlement.findMany({
     where: { appCode: { in: [...ALL_ADMIN_APPS] }, enabled: true, subscription: {
       restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() }
     } }, select: { appCode: true }
   });
-  return [...new Set(rows.map(row => row.appCode as AdminApp))];
+  const apps = [...new Set(rows.map(row => row.appCode as AdminApp))];
+  const grants = await Promise.all(apps.map(async app => { const row = await branchLicense(tx, restaurantId, branchId, app); return !row || row.enabled && (!row.expiresAt || row.expiresAt > new Date()) ? app : null; }));
+  return grants.filter((app): app is AdminApp => app !== null);
 }

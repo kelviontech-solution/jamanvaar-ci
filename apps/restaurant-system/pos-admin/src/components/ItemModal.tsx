@@ -42,6 +42,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [dietaryType, setDietaryType] = useState<DietaryType>('VEG');
   const [spiceLevel, setSpiceLevel] = useState<SpiceLevel>('NONE');
   const [description, setDescription] = useState('');
+  const [allergens, setAllergens] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isAvailable, setIsAvailable] = useState(true);
   const [isPopular, setIsPopular] = useState(false);
@@ -78,6 +79,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setDietaryType(itemToEdit.dietaryType || 'VEG');
       setSpiceLevel(itemToEdit.spiceLevel || 'NONE');
       setDescription(itemToEdit.description || '');
+      setAllergens((itemToEdit.allergens ?? []).join(', '));
       setImageUrl(itemToEdit.imageUrl || '');
       setIsAvailable(itemToEdit.isAvailable ?? true);
       setIsPopular(!!itemToEdit.isPopular);
@@ -103,6 +105,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
       setDietaryType('VEG');
       setSpiceLevel('NONE');
       setDescription('');
+      setAllergens('');
       setImageUrl('/assets/menu/common/fallback-dish.svg');
       setIsAvailable(true);
       setIsPopular(false);
@@ -230,6 +233,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         dietaryType,
         spiceLevel,
         description,
+        allergens: [...new Set(allergens.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,30),
         imageUrl,
         isAvailable,
         isPopular,
@@ -260,6 +264,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         dietaryType,
         spiceLevel,
         description,
+        allergens: [...new Set(allergens.split(',').map(v=>v.trim()).filter(Boolean))].slice(0,30),
         imageUrl,
         isAvailable,
         isPopular,
@@ -397,6 +402,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
           </div>
         </div>
 
+        <div><label className="block text-xs font-bold text-slate-600 mb-1" htmlFor="dish-allergens">Declared allergens</label><input id="dish-allergens" value={allergens} onChange={e=>setAllergens(e.target.value)} maxLength={500} placeholder="Milk, peanuts, wheat" className="w-full rounded-xl border border-jaman-border p-3"/><p className="text-xs text-slate-500 mt-1">Enter the restaurant's verified ingredient declarations. Tell staff about preparation and cross-contact risks separately.</p></div>
         {/* Description */}
         <div>
           <label className="block text-xs font-bold text-slate-600 mb-1">Dish Description</label>

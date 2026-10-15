@@ -1,0 +1,1195 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\n1\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nSaaS Plans\n\nAuthoritative plans governing feature access, pricing, and hardware quotas — never hardcoded in client applications.\n\nCreate Plan\nAll Plans\n35\nActive\n35\nInactive\n0\n35 of 35 plans\nPLAN & TIER\tMONTHLY (₹)\tYEARLY (₹)\tQUOTAS\tFEATURES\tRESTAURANTS\tSTATUS\tACTIONS\n\nJAMANVAAR CORE\nCORE\nRun the restaurant: POS, billing, KOT, menu, inventory, basic reports.\n\t₹420\t₹5,000\t\n1 Br • 5 Dev\n10 Users\n\t15/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nJAMANVAAR PRO\nPRO\nEverything in Core, plus KDS and the Captain wireless service workflow.\n\t₹580\t₹7,000\t\n5 Br • 20 Dev\n50 Users\n\t21/23 Active\t2\t\nACTIVE\t\nEdit\nDeactivate\n\n\nJAMANVAAR QR\nQR\nEverything in Pro, plus QR table ordering for guest self-service.\n\t₹750\t₹9,000\t\n5 Br • 20 Dev\n50 Users\n\t21/23 Active\t2\t\nACTIVE\t\nEdit\nDeactivate\n\n\nKIOSK STANDARD\nCORE\nSelf-ordering kiosk + Kiosk Admin: menu sync, cart, checkout, basic device management.\n\t₹750\t₹9,000\t\n5 Br • 5 Dev\n10 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nKIOSK PRO\nPRO\nEverything in Kiosk Standard, plus multi-kiosk remote management and advanced analytics.\n\t₹920\t₹11,000\t\n5 Br • 20 Dev\n10 Users\n\t1/23 Active\t2\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST Receipts Plan 1791951735900\nPRO\nPRO edition\n\t₹7,000\t—\t\n3 Br • 20 Dev\n20 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST Receipts Plan 1791952439477\nPRO\nPRO edition\n\t₹7,000\t—\t\n3 Br • 20 Dev\n20 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST Receipts Plan 1791954535902\nPRO\nPRO edition\n\t₹7,000\t—\t\n3 Br • 20 Dev\n20 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST Receipts Plan 1791956366717\nPRO\nPRO edition\n\t₹7,000\t—\t\n3 Br • 20 Dev\n20 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST QR feature request 1791966440397\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 10 Dev\n10 Users\n\t2/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST MyApps Plan 1792002170387\nCORE\nCORE edition\n\t₹1,000\t—\t\n1 Br • 5 Dev\n10 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner qr plan 1792002231821\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner qr plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk-qr plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant-qr plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner full plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner terminal-qr plan 1792002393617\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST MyApps Plan 1792002626517\nCORE\nCORE edition\n\t₹1,000\t—\t\n1 Br • 5 Dev\n10 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner qr plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk-qr plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant-qr plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner full plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nTEST MyApps Plan 1792004457971\nCORE\nCORE edition\n\t₹1,000\t—\t\n1 Br • 5 Dev\n10 Users\n\t1/23 Active\t0\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner terminal-qr plan 1792004374886\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner qr plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner kiosk-qr plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t18/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner restaurant-qr plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner full plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\n\n\nQA Owner terminal-qr plan 1792004605417\nQR\nQR edition\n\t₹100\t—\t\n3 Br • 15 Dev\n5 Users\n\t19/23 Active\t1\t\nACTIVE\t\nEdit\nDeactivate\nSaaS Plan Builder & Configurator\nCentralized feature entitlement resolution for KELVIONTECH commercial licenses.\n×\n⚡ Feature Entitlements\n4/23\n💳 Pricing & Details\n🏢 Usage Limits\n👁️ Card Preview\nStandalone QR\nIndependent QR management. Add optional capabilities below; no POS or Kiosk license required.\nJAMANVAAR CORE\n₹5,000\nFoundation edition. Counter POS, billing, KOT, tables & inventory.\nJAMANVAAR PRO\n₹7,000\nFlagship edition. Everything in Core + Captain app, QR table ordering, mesh sync & AI.\nENTERPRISE\nCustom\nMulti-outlet restaurant chains with custom limits and integrations.\nSelect All\nClear All\n📦\n1. POS & Fast Billing\n0 / 2 Entitlements (28 Capabilities)\nSelect All\n▲\nHigh-speed counter billing, token order creation, dine-in/takeaway, order hold/recall, discounts and automated taxes.\nPOS Terminal\nDine-in / Takeaway / Delivery / Token\nIncluded Granular Capabilities:\n✓ Fast Counter Billing\n✓ New Order Creation\n✓ Dine-In Orders\n✓ Takeaway Orders\n✓ Delivery Orders\n✓ Token Orders\n✓ Item Search\n✓ SKU Search\n✓ Category-Based Menu\n✓ Quick Add Items\n✓ Item Quantity Control\n✓ Item Customization\n✓ Item Modifiers\n✓ Special Instructions\n✓ Order Notes\n✓ Customer Attachment\n+12 more capabilities\n📦\n2. Payments & Cash Drawer\n0 / 2 Entitlements (19 Capabilities)\nSelect All\n▼\n📦\n3. Table & Floor Management\n1 / 1 Entitlements (20 Capabilities)\nDeselect Module\n▼\n📦\n4. Kitchen, KOT & KDS\n0 / 1 Entitlements (45 Capabilities)\nSelect All\n▼\n📦\n5. Menu & Inventory Management\n2 / 3 Entitlements (21 Capabilities)\nSelect All\n▼\n📦\n6. Reports, GST & Administration\n0 / 6 Entitlements (76 Capabilities)\nSelect All\n▼\n⭐\n7. Connected Restaurant EcosystemPRO EXCLUSIVE\n1 / 8 Entitlements (155 Capabilities)\nSelect All\n▲\nWireless Captain app for table-side ordering, QR table scan-to-order, self-service kiosk, real-time multi-terminal mesh sync, JAMAN AI assistant and advanced analytics.\nCaptain App\nPRO\nAdvanced Captain Reports\nPRO\nAdvanced Service Workflow\nPRO\nQR Table Ordering & Standees\nPRO\nPOS Assistant (JAMAN AI)\nPRO\nSelf-Order Kiosk & Kiosk Admin\nPRO\nQR Service Requests (call waiter, water, bill...)\nPRO\nQR Scheduled Pickup\nPRO\nIncluded Granular Capabilities:\n✓ Captain Login\n✓ Waiter Login\n✓ Staff Profile\n✓ Assigned Tables\n✓ My Tables\n✓ Table Availability\n✓ Table Occupancy\n✓ Table-Side Ordering\n✓ Browse Menu\n✓ Search Dishes\n✓ Add Items\n✓ Modify Quantity\n✓ Item Modifiers\n✓ Special Instructions\n✓ Customer Attachment\n✓ Table Notes\n+139 more capabilities\nProduct family\nRestaurant / standalone QR\nKiosk\nQR module capabilities\n\nThese flags apply to QR inside any plan. Platform feature activation and rollout still control availability.\n\nInclude all QR capabilities\nLow-bandwidth preferences\nAdvanced QR branding\nVerified feedback\nShared table ordering\nAdvanced inventory controls\nKitchen workload\nQR loyalty\nQR menu performance\nAdvanced branch administration\nMultilingual menus\nOperational notifications\nGuest order history\nQR promotions\nQR Scheduled Pickup\nQR Service Requests\nSplit collections\nAdvanced usage controls\n4 / 23 Entitlements Active•69 Granular Features\nCancel\nCreate Plan",
+  "headings": [
+    "SaaS Plans",
+    "SaaS Plan Builder & Configurator",
+    "QR module capabilities"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "1",
+      "aria": "Notifications, 1 unread",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Create Plan",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All Plans\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 111,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Active\n35",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Inactive\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Edit",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 49,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Deactivate",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "×",
+      "aria": "Close",
+      "title": "",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "⚡ Feature Entitlements\n4/23",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 234,
+      "height": 39,
+      "visible": true
+    },
+    {
+      "text": "💳 Pricing & Details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 39,
+      "visible": true
+    },
+    {
+      "text": "🏢 Usage Limits",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 39,
+      "visible": true
+    },
+    {
+      "text": "👁️ Card Preview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 39,
+      "visible": true
+    },
+    {
+      "text": "Standalone QR\nIndependent QR management. Add optional capabilities below; no POS or Kiosk license required.",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 295,
+      "height": 116,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Clear All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 72,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▲",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▼",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Deselect Module",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▼",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▼",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▼",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▼",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Select All",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 66,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "▲",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 25,
+      "height": 25,
+      "visible": true
+    },
+    {
+      "text": "Include all QR capabilities",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 910,
+      "height": 21,
+      "visible": true
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 77,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Create Plan",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 105,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search by plan name or tier…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": null,
+      "placeholder": "Search features or modules (e.g. QR, Captain, KDS, GST)..."
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

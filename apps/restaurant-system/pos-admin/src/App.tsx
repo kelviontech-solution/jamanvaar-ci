@@ -1,11 +1,14 @@
-import { activeAdminBranch } from './adminBranchScope';
+import {OperationsConsole} from './components/operations/OperationsConsole';
+import { activeAdminBranch, saveAdminBranch } from './adminBranchScope';
 import { AdminBranchWorkspace } from './components/header/AdminBranchWorkspace';
 import { BranchBusinessDashboard } from './components/dashboard/BranchBusinessDashboard';
-import type { BillingEntry } from './components/dashboard/dashboardDrilldown';
-import { OnboardingChecklistCard } from './components/dashboard/OnboardingChecklistCard';
+import type { AttentionTask } from './components/dashboard/AttentionTasks';
+import { dashboardDay, type BillingEntry } from './components/dashboard/dashboardDrilldown';
+import { PlanOnboarding } from './components/dashboard/PlanOnboarding';
 import { MenuLaunchCheck } from './components/dashboard/MenuLaunchCheck';
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
 import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
+import { SettingsScopeNotice } from './components/settings/SettingsScopeNotice';
 import { KioskComboPanel } from './components/settings/KioskComboPanel';
 import React, { useEffect, useState, useMemo } from 'react';
 import { AuditRepository, CouponRepository, db, NotificationRepository, RestaurantIdentityRepository } from '@jamanvaar/database';
@@ -46,7 +49,8 @@ import {
 import { lanMeshSync } from '@jamanvaar/sync';
 import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
 import { productNavSections } from './navSections';
-import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts } from './adminProducts';
+import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts, ownerEntryPath, parseAdminRoute } from './adminProducts';
+import { requestQrLeave } from './components/qrconsole/useQrUnsavedChanges';
 import { useAdminProduct } from './hooks/useAdminProduct';
 import { KioskDashboard } from './components/kiosk/KioskDashboard';
 import { OnlinePaymentsPanel } from './components/payments/OnlinePaymentsPanel';
@@ -162,7 +166,7 @@ export default function PosAdminApp() {
   });
   const toggleSection = (section: string) => {
     setCollapsedSections((prev) => {
-      const next = { ...prev, [section]: !prev[section] };
+      const next = { ...prev, [section]: !(prev[section] ?? section !== 'DAILY') };
       try {
         localStorage.setItem('jamanvaar_posadmin_collapsed_sections', JSON.stringify(next));
       } catch {
@@ -216,13 +220,36 @@ export default function PosAdminApp() {
   const kiosks = useKioskFleetPolling(isAdminLoggedIn, hasApp);
   const availableProducts = availableAdminProducts(enabledApps);
   const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
-  const context = useAdminProduct(tenantId, availableProducts, contextReady);
+  const context = useAdminProduct(tenantId, availableProducts, contextReady, enabledApps);
+  useEffect(() => {
+    if (contextReady && ownerEntryPath(enabledApps) === '/qr/admin/') window.location.replace('/qr/admin/');
+  }, [contextReady, enabledApps.join(',')]);
   const product = context.product;
   const isKioskAdmin = product === 'KIOSK_ADMIN';
   const activeTab: PosAdminTab = context.page || 'DASHBOARD';
   const setActiveTab: React.Dispatch<React.SetStateAction<PosAdminTab>> = next => {
     const page = typeof next === 'function' ? next(activeTab) : next;
-    if (product && Object.hasOwn(PRODUCT_PAGES[product], page)) context.navigate(product, page);
+    if (product && Object.hasOwn(PRODUCT_PAGES[product], page)) {
+      if (activeTab === 'QR_ORDERING' && page !== activeTab) void requestQrLeave().then(ok => { if (ok) context.navigate(product, page); });
+      else context.navigate(product, page);
+    }
+  };
+  const [attentionEntry,setAttentionEntry] = useState(() => ({id:queryParams.get('attentionId') || '',label:queryParams.get('attentionLabel') || '',page:parseAdminRoute(window.location.pathname).page || ''}));
+  const openAttentionTask = async (requestedTask:AttentionTask) => {
+    const task:AttentionTask=isKioskAdmin&&requestedTask.page==='BILLING_SALES'?{...requestedTask,page:'ORDERS'}:requestedTask;
+    if (!product) return;
+    const targetBranch=task.branchId || (activeAdminBranch !== 'all' ? activeAdminBranch : null);
+    if (!targetBranch) {showToast('Choose the branch whose shared menu you want to review.');setActiveTab('MENU');return;}
+    try {
+      if (targetBranch !== activeAdminBranch) {
+        if (!(await requestQrLeave())) return;
+        const storage=(window as unknown as {__jamanvaarStorage?:{flush:()=>Promise<void>}}).__jamanvaarStorage;
+        await storage?.flush();saveAdminBranch(targetBranch);
+        const url=new URL(`${product === 'KIOSK_ADMIN' ? '/kiosk-admin' : '/restaurant-admin'}/${PRODUCT_PAGES[product][task.page]}`,location.origin);
+        url.searchParams.set('attentionId',task.id);url.searchParams.set('attentionLabel',task.label);if(task.createdAt)url.searchParams.set('attentionDate',task.createdAt);
+        window.location.assign(url.href);
+      } else {if(task.page==='BILLING_SALES'&&task.createdAt){const date=dashboardDay(task.createdAt,'UTC');setDashboardBillingEntry({from:date,to:date,source:'ALL',collection:'PENDING',search:task.id,orderId:task.id});}setAttentionEntry({id:task.id,label:task.label,page:task.page});setActiveTab(task.page);}
+    } catch(e) {showToast(e instanceof Error ? e.message : 'Could not open the selected task.');}
   };
   const appName = product ? ADMIN_PRODUCTS[product].name : 'Jamanvaar Apps';
   useEffect(() => { document.title = `JAMANVAAR | ${isAdminLoggedIn ? appName : 'Owner Sign-in'}`; }, [appName, isAdminLoggedIn]);
@@ -353,7 +380,7 @@ export default function PosAdminApp() {
 
   // Modals Open States & Editing Entities
   const [selectedOrderDetail, setSelectedOrderDetail] = useState<Order | null>(null);
-  const [dashboardBillingEntry, setDashboardBillingEntry] = useState<BillingEntry>();
+  const [dashboardBillingEntry, setDashboardBillingEntry] = useState<BillingEntry | undefined>(()=>{const date=queryParams.get('attentionDate');return date?{from:dashboardDay(date,'UTC'),to:dashboardDay(date,'UTC'),source:'ALL',collection:'PENDING',search:queryParams.get('attentionId') || undefined,orderId:queryParams.get('attentionId') || undefined}:undefined;});
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<MenuItem | null>(null);
 
@@ -610,6 +637,7 @@ export default function PosAdminApp() {
   }
 
   if (!contextReady || !product) {
+    if (contextReady && ownerEntryPath(enabledApps) === '/qr/admin/') return <div className="min-h-screen flex items-center justify-center bg-jaman-cream" role="status">Opening QR Admin…</div>;
     return (
       <ProductPickerScreen
         entitlementsLoading={entitlementsLoading}
@@ -638,9 +666,6 @@ export default function PosAdminApp() {
         {/* UNIFIED SAAS HEADER */}
         <PosAdminHeader
           applicationName={appName}
-          availableProducts={availableProducts}
-          selectedProduct={product}
-          onSwitchProduct={app => context.navigate(app)}
           showRestaurantActions={!isKioskAdmin && activeAdminBranch !== 'all' && branchScopeReady}
           restaurantName={db.restaurant.name}
           outletName={!branchScopeReady ? 'Loading branch' : activeAdminBranch === 'all' ? 'All branches' : db.outlet.name}
@@ -651,11 +676,11 @@ export default function PosAdminApp() {
           activeShift={activeShift}
           onOpenEodModal={() => setIsEodModalOpen(true)}
           onOpenReconModal={() => setIsReconModalOpen(true)}
-          onOpenAssistant={handleOpenAssistant}
+          onOpenAssistant={() => activeTab === 'QR_ORDERING' ? document.querySelector<HTMLButtonElement>('[data-testid="qr-ai-open"]')?.click() : handleOpenAssistant()}
           onOpenNotifDrawer={() => setIsNotifDrawerOpen(true)}
           unreadNotifsCount={unreadNotifsCount}
           onAdminLogout={handleAdminLogout}
-          onOpenNav={() => setNavOpen(true)}
+          onOpenNav={() => activeTab === 'QR_ORDERING' ? document.querySelector<HTMLButtonElement>('.qr-admin-menu')?.click() : setNavOpen(true)}
         />
 
         <AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} />
@@ -674,7 +699,7 @@ export default function PosAdminApp() {
           {navOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setNavOpen(false)} aria-hidden="true" />}
 
           {/* LEFT ADMIN SIDEBAR (a slide-in drawer below the large breakpoint) */}
-          <aside
+          {activeTab !== 'QR_ORDERING' && <aside
             aria-label="Main menu"
             className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] transition-transform duration-200 ${navOpen ? 'translate-x-0' : '-translate-x-full'} lg:static lg:z-auto lg:w-64 lg:max-w-none lg:translate-x-0 bg-[#FAF8F5] lg:bg-[#FAF8F5]/95 backdrop-blur-md border-r border-[#EAE3D6] flex flex-col justify-between p-3.5 shrink-0 overflow-y-auto min-h-0 shadow-2xl lg:shadow-2xs select-none`}
           >
@@ -684,12 +709,13 @@ export default function PosAdminApp() {
                 // A section holding the currently-open tab always shows,
                 // regardless of its remembered collapse state — you should
                 // never lose sight of where you are.
-                const isExpanded = hasActiveTab || !collapsedSections[grp.section];
+                const isExpanded = hasActiveTab || !(collapsedSections[grp.section] ?? grp.section !== 'DAILY');
                 return (
                 <div key={grp.section} className="space-y-1">
                   <button
                     type="button"
                     onClick={() => toggleSection(grp.section)}
+                    aria-expanded={isExpanded}
                     className="w-full flex items-center justify-between px-3 py-0.5 cursor-pointer group/section"
                   >
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover/section:text-slate-600 font-mono">
@@ -725,7 +751,7 @@ export default function PosAdminApp() {
                       return (
                         <button
                           key={nav.id}
-                          onClick={() => { setActiveTab(nav.id as PosAdminTab); setNavOpen(false); }}
+                          onClick={() => { setAttentionEntry({id:'',label:'',page:''});setActiveTab(nav.id as PosAdminTab); setNavOpen(false); }}
                           title={isLockedPro ? 'Not included in your current plan — tap to see what it offers' : undefined}
                           aria-current={isSelected ? 'page' : undefined}
                           className={`group relative w-full min-h-[46px] flex items-center justify-between px-3.5 py-2.5 rounded-2xl border font-medium text-[13px] transition-colors duration-150 cursor-pointer ${
@@ -783,23 +809,20 @@ export default function PosAdminApp() {
               <button type="button" onClick={() => { setNavOpen(false); handleOpenAssistant(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-jaman-navy text-xs font-bold cursor-pointer">Assistant</button>
               <button type="button" onClick={() => { setNavOpen(false); handleAdminLogout(); }} className="min-h-[44px] rounded-xl bg-white border border-jaman-border text-rose-700 text-xs font-bold cursor-pointer">Log out</button>
             </div>
-          </aside>
+          </aside>}
 
           {/* MAIN VIEW CONTENT AREA — ALL 18 PRODUCTION MODULES */}
           {!branchScopeReady || (activeAdminBranch === 'all' && activeTab !== 'DASHBOARD' && activeTab !== 'QR_ORDERING') ? <main className="flex-1 p-6"><div className="bg-white border border-jaman-border rounded-2xl p-6 max-w-xl"><h2 className="font-extrabold text-xl">{branchScopeReady ? 'Choose a branch to continue' : 'Verifying your workspace…'}</h2><p className="text-slate-500 mt-2">{branchScopeReady ? "Orders, tables, staff and devices belong to one branch at a time — pick one below." : 'Use the Workspace selector above to manage that branch’s orders, tables, staff and devices.'}</p>{branchScopeReady && <div className="mt-4 -mx-2"><AdminBranchWorkspace onReady={() => setBranchScopeReady(true)} /></div>}</div></main> :
-          <main key={activeTab} className="jv-page-enter flex-1 overflow-y-auto p-3 sm:p-6 bg-jaman-cream min-h-0 min-w-0">
+          <main key={activeTab} className={`jv-page-enter flex-1 overflow-y-auto ${activeTab === 'QR_ORDERING' ? '' : 'p-3 sm:p-6'} bg-jaman-cream min-h-0 min-w-0`}>
+            <SettingsScopeNotice page={activeTab} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>
             {/* TAB 1: DASHBOARD */}
-            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/>{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
-            {activeTab === 'DASHBOARD' && branchScopeReady && !isKioskAdmin && activeAdminBranch !== 'all' && <OnboardingChecklistCard items={[
-              {id:'menu',label:'Add your dishes',hint:'Add dishes here, then use the publication check below to verify what guests can see.',done:menuItems.length>0,onGo:()=>setActiveTab('MENU')},
-              {id:'tables',label:'Set up this branch’s tables',done:tables.length>0,onGo:()=>setActiveTab('TABLES')},
-              {id:'staff',label:'Add your team',done:users.length>0,onGo:()=>setActiveTab('STAFF')},
-              {id:'printer',label:'Connect receipt and kitchen printers',done:configuredPrinters.length>0,onGo:()=>setActiveTab('HARDWARE')}
-            ]} />}
+            {activeTab === 'OPERATIONS_HUB' && branchScopeReady && <OperationsConsole branchId={activeAdminBranch}/>}
+            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard onTask={task=>void openAttentionTask(task)} branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/>{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
+            {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch && activeAdminBranch !== 'all' && <PlanOnboarding key={enabledApps.slice().sort().join('-')} apps={enabledApps} branchId={activeAdminBranch} counts={{menu:menuItems.filter(item=>!item.archivedAt).length,tables:tables.length,staff:users.filter(u=>u.roleId!=='role-admin').length,printers:configuredPrinters.length,kiosks:kiosks.filter(k=>k.branchId===activeAdminBranch&&k.health==='online'&&!k.isLocked).length}} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>}
             {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch !== 'all' && <MenuLaunchCheck branchId={activeAdminBranch ?? undefined} qrEnabled={hasApp('QR_ORDERING')} onNavigate={tab => setActiveTab(tab as typeof activeTab)}/>}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
-            {activeTab === 'QR_ORDERING' && <QrConsole onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} />}
+            {activeTab === 'QR_ORDERING' && <div className="qr-admin-app flex-1 min-w-0 overflow-y-auto"><QrConsole layout="integrated" onBack={() => setActiveTab('DASHBOARD')} onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} /></div>}
 
             {/* TAB 3: BILLING / INVOICES */}
             {activeTab === 'BILLING_SALES' && (
@@ -814,6 +837,7 @@ export default function PosAdminApp() {
             {/* TAB 4: ORDERS & ORDER HISTORY */}
             {activeTab === 'ORDERS' && (
               <OrdersModule
+                initialOrderId={attentionEntry.page==='ORDERS'?attentionEntry.id:undefined}
                 orders={orders}
                 onOrderUpdated={() => setDbTick((t) => t + 1)}
                 showToast={showToast}
@@ -829,10 +853,12 @@ export default function PosAdminApp() {
             )}
 
             {/* TAB 6: MENU & CATEGORIES */}
-            {activeTab === 'SYNC' && <SyncHealthPanel showToast={showToast} />}
+            {activeTab === 'SYNC' && <SyncHealthPanel initialDeviceId={attentionEntry.page==='SYNC'?attentionEntry.id:undefined} showToast={showToast} />}
 
             {activeTab === 'MENU' && (
               <MenuCategoriesModule
+                initialItemId={attentionEntry.page==='MENU'?attentionEntry.id:undefined}
+                initialSearch={attentionEntry.page==='MENU'?attentionEntry.label:undefined}
                 categories={categories}
                 menuItems={menuItems}
                 onOpenItemModal={(item) => {
@@ -1177,6 +1203,8 @@ export default function PosAdminApp() {
 
         {/* ALL SPECIALIZED MODAL DIALOGS */}
         <GlobalSearchModal
+          tasks={[{id:'service',label:'Pause ordering / service controls',keywords:'kitchen capacity hours pause kiosk qr'},{id:'checklists',label:'Opening and closing checks',keywords:'open close checklist'},{id:'menu',label:'Review or schedule menu changes',keywords:'change price publish photos breakfast festival'},{id:'handover',label:'Prepare a branch handover',keywords:'shift closing unresolved'},{id:'approvals',label:'Review discount / refund approvals',keywords:'approve discount refund bill manager'}]}
+          onSelectTask={id=>{const url=new URL(location.href);url.searchParams.set('opsTask',id);history.replaceState(null,'',url);setActiveTab('OPERATIONS_HUB');window.dispatchEvent(new CustomEvent('jamanvaar-ops-open-task',{detail:id}));}}
           isOpen={isGlobalSearchOpen}
           showCustomers={!isKioskAdmin}
           onClose={() => setIsGlobalSearchOpen(false)}
@@ -1479,7 +1507,7 @@ export default function PosAdminApp() {
         <NotificationToastContainer role="POS_ADMIN" />
         <UrgentGuestAlertModal role="POS_ADMIN" />
 
-        {ai.showButton(db.restaurant?.showJamanAI !== false) && (
+        {activeTab !== 'QR_ORDERING' && ai.showButton(db.restaurant?.showJamanAI !== false) && (
           <JamanAiFloatingButton
             onClick={handleOpenAssistant}
             isOpen={isAssistantOpen}
@@ -1492,7 +1520,7 @@ export default function PosAdminApp() {
           isOpen={isAssistantOpen}
           onClose={() => setIsAssistantOpen(false)}
           app="ADMIN"
-          userRole="OWNER_ADMIN"
+          userRole={SessionPersistence.load('admin')?.roleId === 'role-manager' ? 'MANAGER' : 'OWNER_ADMIN'}
           onPerformAction={(action) => {
             if (action.actionType === 'NAVIGATE_TAB' && action.targetTab) {
               // The assistant names screens the way the POS does; this console calls a few of them differently. An unknown name is

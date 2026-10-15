@@ -71,7 +71,7 @@ export class QrPromotionsService {
       await this.entitlements.assertQrCapability(
         tx,
         device.restaurantId,
-        "QR_PROMOTIONS",
+        "QR_PROMOTIONS", device.branchId
       );
       const rows = await tx.syncedEntity.findMany({
         where: { restaurantId: device.restaurantId, entityType: "COUPON" },
@@ -140,7 +140,7 @@ export class QrPromotionsService {
         await this.entitlements.assertQrCapability(
           tx,
           device.restaurantId,
-          "QR_PROMOTIONS",
+          "QR_PROMOTIONS", device.branchId
         );
         const ids = input.branchIds.length
           ? input.branchIds
@@ -257,7 +257,7 @@ export class QrPromotionsService {
     await this.entitlements.assertQrCapability(
       tx,
       restaurantId,
-      "QR_PROMOTIONS",
+      "QR_PROMOTIONS", branchId
     );
     if (
       !(await this.advanced.effectiveIn(tx, restaurantId, branchId))

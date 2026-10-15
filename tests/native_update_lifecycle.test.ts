@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ check: vi.fn(), getVersion: vi.fn(), flush: vi.fn(), health: vi.fn(), visible: vi.fn(), apply: vi.fn(), apk: vi.fn(), apkStatus: vi.fn(), installApk: vi.fn() }));
-vi.mock('@jamanvaar/database', () => ({ db: { printJobs: [], getPersistenceHealth: mocks.health } }));
+vi.mock('@jamanvaar/database', () => ({ db: { orders: [], syncEvents: [], printJobs: [], getPersistenceHealth: mocks.health } }));
 vi.mock('@jamanvaar/sync', () => ({ NATIVE_UPDATE_ATTEMPT_KEY: 'jamanvaar_native_update_attempt_v1', AppUpdate: { getVisible: mocks.visible, apply: mocks.apply } }));
 vi.mock('@tauri-apps/plugin-updater', () => ({ check: mocks.check }));
 vi.mock('@tauri-apps/api/app', () => ({ getVersion: mocks.getVersion, getName: async () => 'JAMANVAAR POS' }));
 vi.mock('@jamanvaar/tauri-plugin-apk-updater', () => ({ downloadAndInstall: mocks.apk, getUpdateStatus: mocks.apkStatus, installDownloaded: mocks.installApk }));
-import { installNativeUpdate, verifyInstalledUpdate, registerNativeUpdateGuard } from '../packages/ui/src/native_update';
+import { db } from '@jamanvaar/database';
+import { installNativeUpdate, verifyInstalledUpdate, registerNativeUpdateGuard, scheduleNativeMaintenance, scheduledMaintenance, cancelScheduledMaintenance } from '../packages/ui/src/native_update';
 
 describe('installed native update lifecycle', () => {
   it('blocks an unfinished order and rechecks it before installer handoff', async () => {
@@ -24,11 +25,19 @@ describe('installed native update lifecycle', () => {
   });
   const rawJson = { platforms: { 'windows-x86_64': { signature: Buffer.from('untrusted comment: test\nAAAA\ntrusted comment: timestamp:1\tfile:JAMANVAAR POS_2.0.0_x64-setup.exe\nAAAA').toString('base64') } } };
   beforeEach(() => {
-    vi.clearAllMocks(); localStorage.clear();
+    vi.clearAllMocks(); localStorage.clear(); db.orders=[]; db.syncEvents=[];
     Object.defineProperty(window, '__TAURI_INTERNALS__', { value: {}, configurable: true });
     Object.defineProperty(navigator, 'userAgent', { value: 'Windows', configurable: true });
     Object.defineProperty(window, '__jamanvaarStorage', { value: { flush: mocks.flush }, configurable: true });
     mocks.flush.mockResolvedValue(undefined); mocks.health.mockReturnValue({ ok: true }); mocks.visible.mockReturnValue(null);
+  });
+  it('defers updates while canonical orders or offline changes are pending', async()=>{
+    db.orders=[{orderStatus:'PREPARING',syncStatus:'SYNCED'} as any];await expect(installNativeUpdate(vi.fn())).rejects.toThrow('finish active orders');
+    db.orders=[];db.syncEvents=[{status:'PENDING'} as any];await expect(installNativeUpdate(vi.fn())).rejects.toThrow('synchronize pending local changes');expect(mocks.check).not.toHaveBeenCalled();
+  });
+  it('persists an explicit maintenance schedule, supports cancellation and refuses mandatory deferral',()=>{
+    mocks.visible.mockReturnValue({latestVersion:'2.0.0',mandatory:false});scheduleNativeMaintenance(new Date(Date.now()+120000).toISOString());expect(scheduledMaintenance()).toMatchObject({version:'2.0.0',status:'SCHEDULED'});cancelScheduledMaintenance();expect(scheduledMaintenance()).toBeNull();
+    mocks.visible.mockReturnValue({latestVersion:'2.0.0',mandatory:true});expect(()=>scheduleNativeMaintenance(new Date(Date.now()+120000).toISOString())).toThrow('cannot be postponed');
   });
   it('downloads with the official updater, flushes data, records handoff before install and only confirms on next native launch', async () => {
     const download = vi.fn().mockResolvedValue(undefined), install = vi.fn().mockImplementation(async () => {

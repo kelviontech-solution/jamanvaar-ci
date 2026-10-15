@@ -170,8 +170,8 @@ export class AiAssistantService {
     const day = today();
 
     const [proSubscriptions, totalActiveSubscriptions, totals, todayTotals, byIntent, restaurantsToday] = await Promise.all([
-      this.prisma.platformDb.subscription.count({ where: { status: { in: ['ACTIVE', 'TRIAL'] }, plan: { tier: 'PRO' } } }),
-      this.prisma.platformDb.subscription.count({ where: { status: { in: ['ACTIVE', 'TRIAL'] } } }),
+      this.prisma.platformDb.subscription.groupBy({by:['restaurantId'], where: { status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt:{gt:new Date()}, restaurant:{status:'ACTIVE',deletedAt:null}, plan: { tier: 'PRO' } } }),
+      this.prisma.platformDb.subscription.groupBy({by:['restaurantId'], where: { status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt:{gt:new Date()}, restaurant:{status:'ACTIVE',deletedAt:null} } }),
       this.prisma.platformDb.aiUsageDaily.aggregate({ _sum: { queries: true, totalLatencyMs: true } }),
       this.prisma.platformDb.aiUsageDaily.aggregate({ where: { day }, _sum: { queries: true } }),
       this.prisma.platformDb.aiUsageDaily.groupBy({ by: ['intent'], _sum: { queries: true }, orderBy: { _sum: { queries: 'desc' } }, take: 5 }),
@@ -188,9 +188,9 @@ export class AiAssistantService {
         totalQueries,
         todayQueries: todayTotals._sum.queries ?? 0,
         restaurantsUsingToday: restaurantsToday.length,
-        activeProTenants: proSubscriptions,
-        totalActiveTenants: totalActiveSubscriptions,
-        adoptionRatePercent: totalActiveSubscriptions > 0 ? Math.round((proSubscriptions / totalActiveSubscriptions) * 100) : 0,
+        activeProTenants: proSubscriptions.length,
+        totalActiveTenants: totalActiveSubscriptions.length,
+        adoptionRatePercent: totalActiveSubscriptions.length > 0 ? Math.round((proSubscriptions.length / totalActiveSubscriptions.length) * 100) : 0,
         topIntent: byIntent[0]?.intent ?? null,
         topIntents: byIntent.map((t) => ({ intent: t.intent, count: t._sum.queries ?? 0 })),
         // Measured, average per query as reported by the terminals; null until there is data.
@@ -291,26 +291,27 @@ export class AiAssistantService {
    * restaurant's own overrides on top.
    */
   async resolve(restaurantId: string) {
-    const [settings, access, subscription, usedRow] = await Promise.all([
+    const [settings, access, subscriptions, usedRow] = await Promise.all([
       this.getSettings(),
       this.prisma.platformDb.restaurantAiAccess.findUnique({ where: { restaurantId } }),
-      this.prisma.platformDb.subscription.findFirst({ where: { restaurantId, status: { in: ['ACTIVE', 'TRIAL'] } }, include: { plan: true }, orderBy: { createdAt: 'desc' } }),
+      this.prisma.platformDb.subscription.findMany({ where: { restaurantId, status: { in: ['ACTIVE', 'TRIAL'] }, expiresAt: { gt: new Date() }, restaurant: { status: 'ACTIVE', deletedAt: null } }, include: { plan: true }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }] }),
       this.prisma.platformDb.aiUsageDaily.aggregate({ where: { restaurantId, day: today() }, _sum: { queries: true } })
     ]);
 
+    const subscription = subscriptions.find(s => s.plan.tier === 'PRO' || s.plan.tier === 'ENTERPRISE' || (s.plan.entitlements as Record<string, unknown> | null)?.posAssistant === true) ?? subscriptions[0];
     const tier = subscription?.plan?.tier ?? 'CORE';
     const entitlements = (subscription?.plan?.entitlements as Record<string, boolean> | undefined) ?? {};
-    const planAllows = tier === 'PRO' || entitlements.posAssistant === true;
+    const planAllows = subscriptions.length > 0 && (tier === 'PRO' || tier === 'ENTERPRISE' || entitlements.posAssistant === true);
     const planState: AiAccessState = planAllows ? 'ON' : settings.corePlanTeaserEnabled ? 'LOCKED' : 'OFF';
     const explicit = access?.state === 'ON' || access?.state === 'LOCKED' || access?.state === 'OFF' ? (access.state as AiAccessState) : null;
 
     const overrides = (access?.thresholdOverrides as ThresholdOverrides | null) ?? {};
     const merged: AiGlobalSettings = { ...settings, ...overrides };
-    const dailyLimit = access?.dailyQueryLimit ?? (tier === 'PRO' ? settings.dailyQueryLimitPro : null);
+    const dailyLimit = access?.dailyQueryLimit ?? (planAllows ? settings.dailyQueryLimitPro : null);
     const usedToday = usedRow._sum.queries ?? 0;
 
     return {
-      state: explicit ?? planState,
+      state: subscriptions.length === 0 ? 'OFF' as AiAccessState : explicit ?? planState,
       source: (explicit ? 'RESTAURANT' : 'PLAN') as 'RESTAURANT' | 'PLAN',
       tier,
       planName: subscription?.plan?.name ?? null,
@@ -368,10 +369,15 @@ export class AiAssistantService {
     if (!intent || intent.length > 60) throw new BadRequestException('Invalid intent');
 
     const latency = Math.max(0, Math.min(60_000, Math.round(latencyMs ?? 0)));
-    await this.prisma.platformDb.aiUsageDaily.upsert({
+    await this.prisma.runAsPlatform(async tx => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'ai-query:' + restaurantId + ':' + today().toISOString()}))`;
+      const used = await tx.aiUsageDaily.aggregate({where:{restaurantId,day:today()},_sum:{queries:true}});
+      if (before.dailyLimit !== null && (used._sum.queries ?? 0) >= before.dailyLimit) throw new ForbiddenException('JAMAN AI daily query limit reached');
+      await tx.aiUsageDaily.upsert({
       where: { restaurantId_day_intent: { restaurantId, day: today(), intent } },
       create: { restaurantId, day: today(), intent, queries: 1, totalLatencyMs: latency },
       update: { queries: { increment: 1 }, totalLatencyMs: { increment: latency } }
+      });
     });
     const after = await this.resolve(restaurantId);
     return { success: true, usedToday: after.usedToday, remainingToday: after.remainingToday, limitReached: after.limitReached };

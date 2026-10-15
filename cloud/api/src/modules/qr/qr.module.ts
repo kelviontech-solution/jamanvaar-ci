@@ -1,3 +1,6 @@
+import { QrRestaurantPageController } from './qr-restaurant-page.controller';
+import { QrRestaurantPageService } from './qr-restaurant-page.service';
+import { TenantAuthModule } from '../tenant-auth/tenant-auth.module';
 import { QrWorkflowsService } from './qr-workflows.service';
 import { QrWorkflowsController } from './qr-workflows.controller';
 import {QrCrmService} from './qr-crm.service';
@@ -39,9 +42,9 @@ import { PlatformNotificationsModule } from '../platform-notifications/platform-
  * analytics events. It owns no order table, no menu, no sync protocol and no entitlement logic of its own.
  */
 @Module({
-  imports: [PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
-  controllers: [QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
-  providers: [QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
+  imports: [TenantAuthModule, PrismaModule, AuditModule, ApplicationEntitlementsModule, OrderSyncModule, MenuPublicationsModule, PlatformAuthModule, PaymentsModule, PlatformNotificationsModule],
+  controllers: [QrRestaurantPageController,QrWorkflowsController,QrCrmController,QrOperationsController,QrOperationsPublicController,QrPublicController, QrRestaurantController, QrLegacyGuestController, QrRuntimeController, QrAdvancedController, QrAdvancedPublicController, QrGroupController],
+  providers: [QrRestaurantPageService,QrWorkflowsService,QrCrmService,QrOperationsService,QrLoyaltyService, QrPromotionsService, QrGroupService, QrAdvancedService, QrPublicService, QrAdminService, QrMenuService, QrSettingsService, DeviceAuthGuard, QrRateLimiter, QrRateLimitInterceptor, QrSessions, QrAdmission, QrResolutionCache, QrMetrics, { provide: APP_INTERCEPTOR, useClass: QrCacheFlushInterceptor }],
   exports: [QrPublicService, QrAdminService, QrSettingsService, QrMenuService, QrAdmission]
 })
 export class QrModule {}

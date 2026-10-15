@@ -81,6 +81,7 @@ export const CaptainModifierModal: React.FC<CaptainModifierModalProps> = ({
             <div className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${item.dietaryType === 'VEG' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
               <h3 className="text-lg font-bold text-jaman-navy">{item.name}</h3>
+              {!!item.allergens?.length && <p className="text-sm text-amber-900">Declared allergens: {item.allergens.join(', ')}</p>}
             </div>
             <span className="text-xs text-jaman-saffron font-bold font-mono block mt-0.5">
               Base Price: {formatINR(item.price)}

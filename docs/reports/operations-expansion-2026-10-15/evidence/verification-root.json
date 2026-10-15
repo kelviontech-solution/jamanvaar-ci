@@ -1,0 +1,8 @@
+{
+  "checks": [
+    {
+      "name": "root-tests",
+      "exitCode": 0
+    }
+  ]
+}

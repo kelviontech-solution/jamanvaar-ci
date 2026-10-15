@@ -1,3 +1,5 @@
+import {PickupDisplay} from './components/operations/PickupDisplay';
+import {initializeDisplayPreferences,DisplayPreferences} from '@jamanvaar/ui';
 import { verifyInstalledUpdate } from '@jamanvaar/ui';
 import { bootDurableStorage } from '@jamanvaar/database';
 import React from 'react';
@@ -6,6 +8,7 @@ import App from './App';
 import { DeviceGateOverlay, PlatformNoticeBanner, CommandActivityToast } from '@jamanvaar/ui';
 import { DeviceGate } from '@jamanvaar/sync';
 import './index.css';
+initializeDisplayPreferences();
 import { resetTerminal, startPlatformNoticePolling } from './cloud/cloudClient';
 import { adminBranchStorageApp,storedAdminBranch } from './adminBranchScope';
 import { KioskConfigurationRepository } from '@jamanvaar/database';
@@ -24,7 +27,9 @@ startPlatformNoticePolling();
 
 
 // The local database moves from localStorage to SQLite before anything reads it. If the browser can't, the app carries on as before.
-void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !storedAdminBranch(), restaurantId: localStorage.getItem('jamanvaar_cloud_restaurant_id') }).then(() => {
+if(new URLSearchParams(location.search).has('pickup')){
+  ReactDOM.createRoot(document.getElementById('root')!).render(<PickupDisplay/>);
+} else void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !storedAdminBranch(), restaurantId: localStorage.getItem('jamanvaar_cloud_restaurant_id') }).then(() => {
   const branch=storedAdminBranch();if(branch&&branch!=='all')KioskConfigurationRepository.bindBranch(branch);
   DeviceGate.reload();
   void verifyInstalledUpdate();
@@ -32,6 +37,7 @@ void bootDurableStorage({ appId: adminBranchStorageApp(), migrateLegacy: !stored
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
+      <DisplayPreferences compact/>
       <PlatformNoticeBanner />
       <CommandActivityToast />
       <DeviceGateOverlay appName="Admin device" />

@@ -670,6 +670,10 @@ export class OrderRepository {
       customerPhone: orderData.customerPhone,
       customerName: orderData.customerName,
       loyaltyRedemption: orderData.loyaltyRedemption,
+      // security-audit HIGH kiosk-loyalty-02: this hand-picked field list was silently dropping
+      // loyaltyPointsRedeemed from orderData -- settleOrder()'s deduction never had anything to
+      // read, so a kiosk redemption request never actually cost the guest any points.
+      loyaltyPointsRedeemed: orderData.loyaltyPointsRedeemed,
       items: orderData.items || [],
       subtotal: validatedSubtotal,
       discountAmount: orderData.discountAmount || 0,
@@ -890,6 +894,14 @@ export class OrderRepository {
     if (!order.serverQrLoyalty && order.customerPhone && order.loyaltyPointsEarned === undefined) {
       CustomerRepository.getOrCreateAccount(order.customerPhone, order.customerName);
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(order.customerPhone, order.totalAmount, order.id);
+      // security-audit HIGH kiosk-loyalty-02: a points redemption applied at order creation (the
+      // kiosk's cash-at-counter flow) used to deduct the points immediately, before the order was
+      // actually paid -- now it is only requested (order.loyaltyPointsRedeemed) and deducted here,
+      // at the same real, payment-confirmed moment the earn above already waits for. Guarded by
+      // the same loyaltyPointsEarned check so a retried settle can never double-deduct.
+      if (order.loyaltyPointsRedeemed) {
+        CustomerRepository.redeemPoints(order.customerPhone, order.loyaltyPointsRedeemed);
+      }
     }
 
     db.notify();
@@ -3823,13 +3835,45 @@ export class RecipeRepository {
 // per-account — same shape as the LAN-pairing-PIN lockout (MED-09).
 const PIN_LOCKOUT_AFTER_FAILURES = 5;
 const PIN_LOCKOUT_MS = 30_000;
-let pinFailureCount = 0;
-let pinLockedUntil = 0;
+// security-audit LOW-pos-admin-01: these two counters used to be plain module-level `let`s,
+// so restarting the app (trivial for anyone with the physical access this lockout is meant to
+// slow down) reset the lockout to zero. Persisted through KeyValueStore -- the same durable
+// store/localStorage every other per-device value in this file goes through -- so the lockout
+// survives a restart. Global (not per-user/restaurant), matching the lockout's own design: a PIN
+// doesn't identify who's guessing, so there is only one counter per terminal.
+const PIN_LOCKOUT_KEY = 'jamanvaar_pin_lockout_state';
+
+interface PinLockoutState {
+  failureCount: number;
+  lockedUntil: number;
+}
+
+// Fallback for a runtime with neither a durable store nor `localStorage` attached (e.g. this
+// test suite's plain-Node environment) -- without it, KeyValueStore.set() silently no-ops and
+// the lockout would never engage at all. Whenever KeyValueStore does have a backing, its value
+// is authoritative (it's what actually survives a restart); this cache only covers its absence.
+let inMemoryLockoutFallback: PinLockoutState = { failureCount: 0, lockedUntil: 0 };
+
+function readPinLockoutState(): PinLockoutState {
+  try {
+    const raw = KeyValueStore.get(PIN_LOCKOUT_KEY);
+    if (!raw) return inMemoryLockoutFallback;
+    const parsed = JSON.parse(raw) as Partial<PinLockoutState>;
+    return { failureCount: Number(parsed.failureCount) || 0, lockedUntil: Number(parsed.lockedUntil) || 0 };
+  } catch {
+    return inMemoryLockoutFallback;
+  }
+}
+
+function writePinLockoutState(state: PinLockoutState): void {
+  inMemoryLockoutFallback = state;
+  KeyValueStore.set(PIN_LOCKOUT_KEY, JSON.stringify(state));
+}
 
 export class StaffRepository {
   /** How long the caller must still wait, in ms, or 0 if verifyPin isn't currently locked out. */
   public static pinLockoutRemainingMs(): number {
-    return Math.max(0, pinLockedUntil - Date.now());
+    return Math.max(0, readPinLockoutState().lockedUntil - Date.now());
   }
 
   public static getAllUsers(): User[] {
@@ -3919,8 +3963,9 @@ export class StaffRepository {
    * this device's own ~15s poll tick — a PIN tried in that window looked like a wrong PIN).
    */
   public static async verifyPin(pin: string, restaurantId?: string, opts?: { countFailure?: boolean; userId?: string }): Promise<{ user: User; isManager: boolean } | null> {
-    if (Date.now() < pinLockedUntil) return null;
-    pinLockedUntil = 0;
+    const lockout = readPinLockoutState();
+    if (Date.now() < lockout.lockedUntil) return null;
+    if (lockout.lockedUntil !== 0) writePinLockoutState({ failureCount: lockout.failureCount, lockedUntil: 0 });
 
     const scopedRestaurantId = restaurantId || db.restaurant.id;
     // A PIN only opens the person it was issued to: when the caller names the staff member, nobody else's PIN matches.
@@ -3949,16 +3994,18 @@ export class StaffRepository {
 
     if (!user) {
       if (opts?.countFailure !== false) {
-        pinFailureCount += 1;
-        if (pinFailureCount >= PIN_LOCKOUT_AFTER_FAILURES) {
-          pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
-          pinFailureCount = 0;
+        let failureCount = readPinLockoutState().failureCount + 1;
+        let lockedUntil = 0;
+        if (failureCount >= PIN_LOCKOUT_AFTER_FAILURES) {
+          lockedUntil = Date.now() + PIN_LOCKOUT_MS;
+          failureCount = 0;
         }
+        writePinLockoutState({ failureCount, lockedUntil });
       }
       return null;
     }
 
-    pinFailureCount = 0;
+    writePinLockoutState({ failureCount: 0, lockedUntil: 0 });
     const isManager = user.roleId === 'role-manager' || user.roleId === 'role-super-admin';
     return { user, isManager };
   }
@@ -4046,6 +4093,12 @@ export class StaffRepository {
   /** Applies one STAFF_USER record pulled from the cloud: creates it locally, or updates it in place by id. */
   public static applyRemoteUser(remote: Record<string, unknown>): void {
     const id = remote.id;
+    // A transfer sends the old branch only this redacted removal, never the new branch's PIN or profile.
+    if(typeof id==='string'&&remote.removedFromBranch===true){
+      const index=db.users.findIndex(u=>u.id===id);
+      if(index>=0){db.users.splice(index,1);db.notify();}
+      return;
+    }
     const pinHash = remote.pinHash;
     if (typeof id !== 'string' || !id || typeof pinHash !== 'string' || !pinHash) return;
     const incoming = {

@@ -29,6 +29,20 @@ function assertDeviceMayRead(entityType: SyncableEntityType, device: Device): vo
   }
 }
 
+/**
+ * security-audit MEDIUM pos-money-controls-01: menu/tax price edits propagate to every terminal
+ * fleet-wide via entity-sync, but had no server-side check at all -- only STAFF_USER writes
+ * required a verified manager session here. A POS terminal's own client-side Menu Manager gate
+ * (see PosCatalog.tsx's "security-audit MED-06" comment) is cosmetic without this.
+ *
+ * Unlike STAFF_USER's check below (which requires the CURRENTLY SIGNED-IN person to literally be
+ * a manager), menu/tax edits are normally unlocked by a cashier entering a manager's PIN as a
+ * one-off override -- that flow issues an approval token, not a session token, for whoever stays
+ * signed in. Accepting either (the same way order-sync.service.ts's takesBack already does for
+ * cancellation/void/refund) matches how the client actually proves this.
+ */
+const MENU_MANAGER_SESSION_REQUIRED_ENTITY_TYPES = new Set(['MENU_ITEM', 'MENU_CATEGORY', 'MODIFIER_GROUP', 'TAX_GROUP']);
+
 @DeviceSyncThrottle()
 @Controller('api/v1/entity-sync/:entityType')
 @UseGuards(DeviceAuthGuard)
@@ -37,7 +51,13 @@ export class EntitySyncController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(pushEntitySyncSchema))
-  async push(@Param('entityType') entityType: string, @Body() body: PushEntitySyncDto, @CurrentDevice() device: Device, @Headers('x-staff-session') staffToken?: string) {
+  async push(
+    @Param('entityType') entityType: string,
+    @Body() body: PushEntitySyncDto,
+    @CurrentDevice() device: Device,
+    @Headers('x-staff-session') staffToken?: string,
+    @Headers('x-staff-approval') approvalToken?: string
+  ) {
     assertSyncableEntityType(entityType);
     assertDeviceMayWrite(entityType, device);
     // A terminal credential identifies a machine, never the person allowed to administer accounts.
@@ -53,6 +73,19 @@ export class EntitySyncController {
       const staff = current ? current.payload as Record<string, unknown> : null;
       if (!claim || claim.exp <= Date.now() || !staff || staff.deleted === true || staff.isActive === false || staff.roleId !== claim.role || (device.branchId && staff.branchId && staff.branchId !== device.branchId)) {
         throw new ForbiddenException({ code: 'STAFF_ADMINISTRATION_REQUIRED', message: 'Sign in as a manager before changing staff accounts.' });
+      }
+    }
+    if (MENU_MANAGER_SESSION_REQUIRED_ENTITY_TYPES.has(entityType) && device.type === 'POS') {
+      const at = Date.now();
+      const session = this.sessions.verify(staffToken, device.restaurantId, device.id, 'session', at);
+      const approval = this.sessions.verify(approvalToken, device.restaurantId, device.id, 'approval', at);
+      const claim = [approval, session].find((c) => c && MANAGER_ROLES.includes(c.role)) ?? null;
+      const current = claim && await this.prisma.runAsTenant(device.restaurantId, tx => tx.syncedEntity.findFirst({
+        where: { restaurantId: device.restaurantId, entityType: 'STAFF_USER', externalId: claim.sid }, select: { payload: true }
+      }));
+      const staff = current ? current.payload as Record<string, unknown> : null;
+      if (!claim || !staff || staff.deleted === true || staff.isActive === false || staff.roleId !== claim.role || (device.branchId && staff.branchId && staff.branchId !== device.branchId)) {
+        throw new ForbiddenException({ code: 'STAFF_ADMINISTRATION_REQUIRED', message: 'Sign in as a manager before changing menu or tax settings.' });
       }
     }
     return this.entitySync.pushEvents(device, entityType, body.events);

@@ -51,7 +51,13 @@ export class ReceiptWhatsAppService {
     private readonly config: ConfigService
   ) {}
 
-  async sendBillWhatsApp(restaurantId: string, orderId: string, phone: string, branchId?: string | null): Promise<{ success: boolean; errorMessage?: string }> {
+  /**
+   * `requestingDevice` closes a receipt-redirection gap (security-audit): a self-service KIOSK is
+   * operated directly by whichever guest is standing at it, so it may only WhatsApp the bill for an
+   * order IT placed -- never any other order at the restaurant by orderId alone. A POS/POS_ADMIN
+   * console keeps its existing restaurant/branch-only scope (a normal staff counter task).
+   */
+  async sendBillWhatsApp(restaurantId: string, orderId: string, phone: string, branchId: string | null | undefined, requestingDevice: { id: string; type: string }): Promise<{ success: boolean; errorMessage?: string }> {
     const normalized = normalizeIndianMobile(phone);
     if (!normalized) throw new BadRequestException('Enter a valid 10-digit Indian mobile number');
 
@@ -59,7 +65,7 @@ export class ReceiptWhatsAppService {
     const secret = this.config.get<string>('JAMANVAAR_SERVICE_SECRET');
     if (!baseUrl || !secret) throw new ServiceUnavailableException('WhatsApp billing is not configured on this server');
 
-    const bill = await this.loadBill(restaurantId, orderId, branchId);
+    const bill = await this.loadBill(restaurantId, orderId, branchId, requestingDevice);
     // The number the admin chose in Receipt settings; empty = the restaurant's default connected number.
     const fromNumber = await readSavedBillNumber(this.prisma, restaurantId);
     const orderNo = bill.externalOrderId.slice(-10).toUpperCase();
@@ -121,7 +127,13 @@ export class ReceiptWhatsAppService {
 
   /** Online-paid order first (needs a real SUCCESS payment), then the cash-at-counter SyncedOrder
    *  mirror -- identical resolution rules to ReceiptEmailService. */
-  private async loadBill(restaurantId: string, orderId: string, branchId?: string | null): Promise<BillSource> {
+  private async loadBill(restaurantId: string, orderId: string, branchId: string | null | undefined, requestingDevice: { id: string; type: string }): Promise<BillSource> {
+    // An order with no recorded device owner (e.g. one seeded outside the normal device-authenticated
+    // flow) stays reachable the way it always has -- there is nothing to bind it to. In production,
+    // order-sync always stamps deviceId/kioskId, so this exception never weakens the real check.
+    const assertOwnKioskOrder = (ownerDeviceId: string | null) => {
+      if (requestingDevice.type === 'KIOSK' && ownerDeviceId !== null && ownerDeviceId !== requestingDevice.id) throw new NotFoundException('Order not found');
+    };
     const built = await this.prisma.runAsTenant(restaurantId, async (tx) => {
       const restaurantSelect = { name: true, legalName: true, gstin: true, address: true } as const;
       // Honour the restaurant's own "WhatsApp receipts" switch (same lookup the email route uses). No saved
@@ -144,6 +156,7 @@ export class ReceiptWhatsAppService {
       let unpaid: string | null = null;
       if (order) {
         if (branchId && order.branchId && branchId !== order.branchId) throw new NotFoundException('Order not found');
+        assertOwnKioskOrder(order.kioskId);
         const payment = order.paymentTransactions[0];
         if (payment && PAID_STATUSES.includes(payment.status)) {
           await assertEnabled(order.branchId);
@@ -160,6 +173,7 @@ export class ReceiptWhatsAppService {
         return null;
       }
       if (branchId && synced.branchId && branchId !== synced.branchId) throw new NotFoundException('Order not found');
+      assertOwnKioskOrder(synced.deviceId);
       if (CLOSED_ORDER_STATUSES.includes(synced.status)) {
         throw new BadRequestException(`Cannot send a bill for an order with status ${synced.status}`);
       }

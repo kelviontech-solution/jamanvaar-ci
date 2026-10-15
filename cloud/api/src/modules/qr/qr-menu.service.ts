@@ -15,6 +15,7 @@ export interface QrMenuCategory {
   sortOrder: number;
 }
 export interface QrMenuItem {
+  allergens?: string[];
   translations?: Record<string, {name: string; description?: string}>;
   id: string;
   name: string;
@@ -152,7 +153,7 @@ export class QrMenuService {
         isAvailable: true, modifierGroups: groups, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       });
       return {
-        id: i.id, name: i.name, description: i.description, translations: i.translations, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: publicImageUrl(i.imageUrl), dietaryType: i.dietaryType,
+        id: i.id, name: i.name, description: i.description, translations: i.translations, categoryId: i.categoryId, price: i.effectivePricePaise / 100, imageUrl: publicImageUrl(i.imageUrl), dietaryType: i.dietaryType, allergens: i.allergens ?? [],
         modifierGroupIds: groups.map((g) => g.id), sortOrder: i.sortOrder, minQuantity: i.minQuantity, maxQuantity: i.maxQuantity, allowInstructions: i.allowInstructions
       };
     });

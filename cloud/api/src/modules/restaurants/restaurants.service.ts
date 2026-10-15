@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { randomInt } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
 import { PlatformUser, RestaurantStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -38,6 +39,11 @@ export class RestaurantsService {
    */
   async createRestaurant(dto: CreateRestaurantDto, actor: PlatformUser) {
     const result = await this.prisma.runAsPlatform(async (tx) => {
+      let generatedCode: string | undefined;
+      if (!dto.mobile) {
+        do { generatedCode = `JM${randomInt(1_000_000_000,10_000_000_000)}`; }
+        while (await tx.restaurant.findUnique({where:{restaurantCode:generatedCode}}));
+      }
       let restaurant;
       try {
         restaurant = await tx.restaurant.create({
@@ -55,12 +61,12 @@ export class RestaurantsService {
             defaultLanguage: dto.defaultLanguage,
             ...(dto.mobile
               ? { mobile: normalizeIndianPhone(dto.mobile), restaurantCode: generateRestaurantCode(dto.mobile) }
-              : {})
+              : {restaurantCode:generatedCode})
           }
         });
       } catch (err) {
         if (err instanceof Error && 'code' in err && (err as { code?: string }).code === 'P2002') {
-          throw new ConflictException(`A restaurant is already registered with mobile number ${normalizeIndianPhone(dto.mobile!)}`);
+          throw new ConflictException(dto.mobile ? `A restaurant is already registered with mobile number ${normalizeIndianPhone(dto.mobile)}` : 'Restaurant identity conflict. Retry creating this restaurant.');
         }
         throw err;
       }

@@ -118,7 +118,7 @@ export class QrGroupService {
       await this.entitlements.assertQrCapability(
         tx,
         ctx.restaurant.id,
-        "QR_GROUP_ORDERING",
+        "QR_GROUP_ORDERING", ctx.branch.id
       );
       await tx.syncedEntity.create({
         data: {
@@ -329,7 +329,7 @@ export class QrGroupService {
         return { checkout: group.checkout!, sharedGuests: Object.values(group.guests).map(guest => ({ label: guest.label, lines: guest.lines })) };
       },
     );
-    if (prepared.reference) return this.qr.orderStatus(prepared.reference);
+    if (prepared.reference) return this.qr.orderStatus(prepared.reference, undefined, session);
     try {
       const order = await this.qr.placeOrder(
         token,
@@ -372,7 +372,7 @@ export class QrGroupService {
           existing.publicOrderId,
           true,
         );
-        return this.qr.orderStatus(existing.publicOrderId);
+        return this.qr.orderStatus(existing.publicOrderId, undefined, session);
       }
       await this.finish(
         ctx.restaurant.id,

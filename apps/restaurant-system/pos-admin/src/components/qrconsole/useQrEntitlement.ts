@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { KeyValueStore } from '@jamanvaar/database';
 import { QrAdminApi, type QrEntitlementView } from '../../cloud/qrAdminClient';
+import { CloudApiError } from '../../cloud/cloudClient';
 
 /**
  * Whether this restaurant has QR ordering, as the SERVER says. The screen only displays it; every action is
@@ -51,7 +52,12 @@ export function useQrEntitlement(): { state: QrEntitlementState; refresh: () => 
         }
         setState({ status: 'ready', entitlement: value, fromCache: false });
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (error instanceof CloudApiError && [401,403].includes(error.status)) {
+          KeyValueStore.remove(CACHE_KEY);
+          setState({status:'unknown',message:'Your QR access or sign-in has changed. Sign in again or check your subscription.'});
+          return;
+        }
         const cached = readCache();
         setState(cached ? { status: 'ready', entitlement: cached.value, fromCache: true } : { status: 'unknown', message: 'Connect to the internet to check whether your plan includes QR Ordering.' });
       });
@@ -59,8 +65,9 @@ export function useQrEntitlement(): { state: QrEntitlementState; refresh: () => 
 
   useEffect(() => {
     refresh();
-    const t = setInterval(refresh, 5 * 60 * 1000);
-    return () => clearInterval(t);
+    const t = setInterval(refresh, 60 * 1000);
+    window.addEventListener('focus',refresh);
+    return () => {clearInterval(t);window.removeEventListener('focus',refresh);};
   }, [refresh]);
 
   return { state, refresh };

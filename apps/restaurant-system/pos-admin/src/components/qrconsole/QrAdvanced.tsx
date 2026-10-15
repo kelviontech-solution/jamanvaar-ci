@@ -26,6 +26,9 @@ import { formatRestaurantDate } from '@jamanvaar/utils';
 import { useConfirm } from '@jamanvaar/ui';
 
 const scopedBranch = () =>
+  new URLSearchParams(location.search).has('setupBranch')
+    ? (new URLSearchParams(location.search).get('setupBranch') === 'restaurant' ? '' : new URLSearchParams(location.search).get('setupBranch') || '')
+    :
   /^\/qr\//.test(location.pathname) &&
   activeAdminBranch &&
   activeAdminBranch !== "all"
@@ -1298,12 +1301,12 @@ export function QrMenuAvailability({ showToast }: Props) {
             // "Edit dishes in Menu & Categories" with the link to it hidden, pointing guests at a
             // page that, in this exact context, both doesn't exist and isn't needed: the editor is
             // already right there.
-            'Add, edit or remove dishes using the menu editor above. This list is separate: it controls which already-published dishes each branch shows guests, and when your edits actually go live.'
+            'Add, edit or remove dishes using Edit shared draft. This list controls published guest availability for each branch.'
           : 'Uses the same catalog, modifiers, taxes and branch availability as your restaurant. Publishing makes the current catalog available to guests.'}
       </p>
       {!/^\/qr\//.test(location.pathname) && (
         <a
-          href="/restaurant-admin/menu"
+          href={location.pathname.startsWith('/kiosk-admin/') ? '/kiosk-admin/menu' : '/restaurant-admin/menu'}
           className="text-brand font-bold text-sm"
         >
           Open Menu & Categories →

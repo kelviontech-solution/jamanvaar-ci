@@ -1,3 +1,6 @@
+import { BranchWaitEstimate } from '@jamanvaar/ui';
+const loadWait = async () => { const r = await deviceFetch('/api/v1/operations/device/wait-estimate'); if(!r.ok) throw new Error('Wait estimate unavailable'); return r.json(); };
+import { ThaliRefills } from './ThaliRefills';
 import { db } from '@jamanvaar/database';
 import { deviceFetch } from '../../cloud/cloudClient';
 const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => {const r=await deviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`);if(!r.ok)throw new Error('Activity unavailable');return r.json();};
@@ -351,10 +354,12 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
                 {kotSuccessAlert && (
                   <div role="status" className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{kotSuccessAlert} The kitchen screen is updated.</span>
+                    <span>{kotSuccessAlert} Saved on this device. Kitchen delivery is being synchronized.</span>
                   </div>
                 )}
 
+                <ThaliRefills />
+                <BranchWaitEstimate load={loadWait} />
                 {cartItems.length === 0 ? (
                   <div className="space-y-3">
                     <EmptyState

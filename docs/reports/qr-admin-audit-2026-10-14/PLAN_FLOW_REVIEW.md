@@ -2,7 +2,11 @@
 
 14 October 2026. Source review of the current local workspace. This assessment does not represent a new production browser test or deployment, and does not change application behavior.
 
+**Implementation update — 15 October 2026:** the owner-console composition, QR access, Super Admin and AI changes are implemented locally. See [OWNER_CONSOLE_IMPLEMENTATION.md](OWNER_CONSOLE_IMPLEMENTATION.md) for current behavior, test results and release limits. The findings and proposed design below preserve the pre-implementation assessment; they are not a list of outstanding defects.
+
 ## Assessment
+
+**Daily-flow follow-up — 15 October 2026:** see [the implemented navigation, attention dashboard, onboarding and scope improvements](../owner-daily-flow-2026-10-15/IMPLEMENTATION.md). Branch-specific commercial licensing remains a separate architectural gap.
 
 Revised after the owner's clarification: the application dropdown should not be the primary management flow. A restaurant buying the full suite should have one owner console with licensed management modules in its navigation. Separate operational apps and standalone product entry points remain supported. Purchasing several products should add tools without forcing the owner to choose between Restaurant Admin and Kiosk Admin to complete everyday tasks.
 

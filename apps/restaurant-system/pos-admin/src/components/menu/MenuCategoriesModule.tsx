@@ -1,3 +1,4 @@
+import { BranchAvailabilityNotice } from './BranchAvailabilityNotice';
 import { CachedImg, MenuCategoryIcon } from '@jamanvaar/ui';
 import { isMenuPlaceholder, menuDishImage, menuCategoryImage } from '@jamanvaar/utils';
 import React, { useEffect, useRef, useState } from 'react';
@@ -23,6 +24,8 @@ import {
 import { ComboModal } from './ComboModal';
 
 interface MenuCategoriesModuleProps {
+  initialItemId?: string;
+  initialSearch?: string;
   categories: Category[];
   menuItems: MenuItem[];
   onOpenItemModal: (item?: MenuItem | null) => void;
@@ -85,6 +88,8 @@ function InlinePrice({ item, onSaved }: { item: MenuItem; onSaved: (message: str
 }
 
 export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
+  initialItemId,
+  initialSearch = '',
   categories,
   menuItems,
   onOpenItemModal,
@@ -95,7 +100,8 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
   showToast,
   onRequestConfirm
 }) => {
-  const [menuSearch, setMenuSearch] = useState('');
+  const [menuSearch, setMenuSearch] = useState(initialSearch);
+  useEffect(()=>{setMenuSearch(initialSearch);},[initialSearch]);
   const csvInputRef = React.useRef<HTMLInputElement>(null);
   const [csvPreview, setCsvPreview] = useState<MenuCsvPreview | null>(null);
   const [csvError, setCsvError] = useState('');
@@ -151,9 +157,9 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
       if (item.archivedAt) return false;
       const matchesSearch =
         !menuSearch ||
-        item.name.toLowerCase().includes(menuSearch.toLowerCase()) ||
-        item.description.toLowerCase().includes(menuSearch.toLowerCase()) ||
-        item.sku.toLowerCase().includes(menuSearch.toLowerCase()) ||
+        (item.name ?? '').toLowerCase().includes(menuSearch.toLowerCase()) ||
+        (item.description ?? '').toLowerCase().includes(menuSearch.toLowerCase()) ||
+        (item.sku ?? '').toLowerCase().includes(menuSearch.toLowerCase()) ||
         item.tags?.some(tag => tag.toLowerCase().includes(menuSearch.toLowerCase())) ||
         item.subcategory?.toLowerCase().includes(menuSearch.toLowerCase());
 
@@ -217,6 +223,7 @@ export const MenuCategoriesModule: React.FC<MenuCategoriesModuleProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      <BranchAvailabilityNotice itemId={initialItemId}/>
       {csvError && <p role="alert" className="text-rose-700">{csvError}</p>}
       {publicationMessage && <p role="status" className="rounded-xl bg-orange-50 border border-orange-200 p-3 text-sm text-jaman-navy">{publicationMessage}</p>}
       {csvPreview && <MenuCsvPreviewModal key={JSON.stringify(csvPreview)} preview={csvPreview} onClose={() => setCsvPreview(null)} />}

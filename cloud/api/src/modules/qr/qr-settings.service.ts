@@ -1,3 +1,4 @@
+import { rememberAppearance } from '../operations/appearance-history';
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { RealtimeBus } from '../../common/realtime/realtime-bus';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -102,6 +103,11 @@ export class QrSettingsService {
       for (const f of FIELDS) if (!row.branchId || !overrides || overrides.includes(f)) merged[f] = row[f] as boolean;
       merged.rules = { ...merged.rules!, ...(row.rules as Partial<QrRules> ?? {}) };
     }
+    const entitlement = await this.prisma.runAsTenant(restaurantId, tx => this.entitlements.resolve(tx, restaurantId, 'QR_ORDERING', branchId));
+    if (!entitlement.enabled || entitlement.limits.qrServiceEnabled === false) merged.orderingEnabled = false;
+    if (entitlement.limits.qrOnlinePayments === false) merged.allowOnlinePayment = false;
+    if (entitlement.limits.qrGuestCustomization === false) {merged.allowModifiers = false; merged.allowCustomerNotes = false;}
+    if (entitlement.limits.qrLiveOrderTracking === false) merged.showOrderStatus = false;
     return merged;
   }
 
@@ -194,6 +200,10 @@ export class QrSettingsService {
     }
     if (Object.keys(data).length === 0 && !['cover','backgroundColor','layout','contactMessage'].some(k=>k in dto)) throw new BadRequestException('No changes supplied');
     await this.prisma.runAsTenant(restaurantId, async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'entity:'+restaurantId}))`;
+      const previousBrand=await tx.qrBranding.findUnique({where:{restaurantId}});
+      const previousExtra=await tx.syncedEntity.findUnique({where:{restaurantId_entityType_externalId:{restaurantId,entityType:'QR_BRAND_EXTRAS',externalId:'restaurant'}}});
+      if(previousBrand)await rememberAppearance(tx,restaurantId,'QR','restaurant',null,{base:Object.fromEntries(['welcomeTitle','welcomeMessage','footerMessage','orderButtonLabel','accentColor','logoRef'].map(k=>[k,(previousBrand as any)[k]??null])),extra:previousExtra?.payload??{}});
       if(['cover','backgroundColor','layout','contactMessage'].some(k=>k in dto)||dto.reset){
         await this.entitlements.assertQrCapability(tx,restaurantId,'QR_BRANDING');
         const where={restaurantId_entityType_externalId:{restaurantId,entityType:'QR_BRAND_EXTRAS',externalId:'restaurant'}};

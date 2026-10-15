@@ -1,0 +1,1284 @@
+{
+  "text": "PLATFORM CONTROL\nPlatform Owner\nPLATFORM CONTROL CENTER\nExecutive Dashboard\nRestaurant Health & Risk\nBUSINESS MANAGEMENT\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nSAAS MANAGEMENT\nOverview\nPlans & Entitlements\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nOPERATIONS & MDM\nDevice Fleet / MDM\nSync & Conflict Monitor\nBackups & Recovery\nSystem Telemetry\nStatus History\nStaging Sandboxes\nSECURITY & REPORTS\nReports & Analytics\nMargin & Cost\nAudit Logs\nEmergency Offline Policy\nPlatform Team\nSupport Tickets\nDiagnostics & Support\nAnnouncements\nPlatform Settings\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\n1\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nQR Ordering Suite Control\nSAAS FLEET\n\nPlatform control for QR table ordering entitlements, quotas and fleet health. Usage figures are reported by each restaurant's POS; the platform never estimates them.\n\nRefresh fleet\nQR entitlement saved for QA Owner qr 1792004605417\nRestaurants\n24\n18 active · 6 disabled or unentitled\nReporting usage\n24\n0 have never reported QR usage\nActive QR tables\n1\n24 of 24 restaurants reporting\nQR orders today\n0\n24 of 24 restaurants reporting\nQR revenue today\n₹0\n24 of 24 restaurants reporting\nApproaching quota\n0\nCandidates for a table quota or plan upgrade\nReading this page: a — means the restaurant has not reported that measurement yet, not that it is zero. Active tables, orders, revenue and last activity appear once the restaurant's POS reports QR usage to the platform. Entitlements and quotas below are platform configuration and are always accurate.\nAll\n24\nActive\n18\nDisabled\n0\nLimit reached\n0\nNot entitled\n6\nAll plan tiers\nPRO\nQR\nAny usage state\nReporting usage\nNo usage reported\n24 of 24 restaurants\nRESTAURANT & BRANCH\tPLAN\tENTITLEMENT\tACTIVE TABLES\tREPORTED TODAY\tSTATUS\tLAST ACTIVITY\tACTIONS\n\nQ\nQA Owner full 1792002393617\nQA Owner full 1792002393617 — Main Branch\n\t\nQA Owner full plan 1792002393617\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner full 1792004374886\nQA Owner full 1792004374886 — Main Branch\n\t\nQA Owner full plan 1792004374886\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner full 1792004605417\nQA Owner full 1792004605417 — Main Branch\n\t\nQA Owner full plan 1792004605417\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk-qr 1792002393617\nQA Owner kiosk-qr 1792002393617 — Main Branch\n\t\nQA Owner kiosk-qr plan 1792002393617\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk-qr 1792004374886\nQA Owner kiosk-qr 1792004374886 — Main Branch\n\t\nQA Owner kiosk-qr plan 1792004374886\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk-qr 1792004605417\nQA Owner kiosk-qr 1792004605417 — Main Branch\n\t\nQA Owner kiosk-qr plan 1792004605417\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk 1792002393617\nQA Owner kiosk 1792002393617 — Main Branch\n\t\nQA Owner kiosk plan 1792002393617\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk 1792004374886\nQA Owner kiosk 1792004374886 — Main Branch\n\t\nQA Owner kiosk plan 1792004374886\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner kiosk 1792004605417\nQA Owner kiosk 1792004605417 — Main Branch\n\t\nQA Owner kiosk plan 1792004605417\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner qr 1792002231821\nQA Owner qr 1792002231821 — Main Branch\n\t\nQA Owner qr plan 1792002231821\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner qr 1792002393617\nQA Owner qr 1792002393617 — Main Branch\n\t\nQA Owner qr plan 1792002393617\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner qr 1792004374886\nQA Owner qr 1792004374886 — Main Branch\n\t\nQA Owner qr plan 1792004374886\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner qr 1792004605417\nQA Owner qr 1792004605417 — Main Branch\n\t\nQA Owner qr plan 1792004605417\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant-qr 1792002393617\nQA Owner restaurant-qr 1792002393617 — Main Branch\n\t\nQA Owner restaurant-qr plan 1792002393617\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant-qr 1792004374886\nQA Owner restaurant-qr 1792004374886 — Main Branch\n\t\nQA Owner restaurant-qr plan 1792004374886\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant-qr 1792004605417\nQA Owner restaurant-qr 1792004605417 — Main Branch\n\t\nQA Owner restaurant-qr plan 1792004605417\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant 1792002393617\nQA Owner restaurant 1792002393617 — Main Branch\n\t\nQA Owner restaurant plan 1792002393617\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant 1792004374886\nQA Owner restaurant 1792004374886 — Main Branch\n\t\nQA Owner restaurant plan 1792004374886\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner restaurant 1792004605417\nQA Owner restaurant 1792004605417 — Main Branch\n\t\nQA Owner restaurant plan 1792004605417\nQR\n\t\nNOT ENTITLED\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nNOT ENTITLED\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner terminal-qr 1792002393617\nQA Owner terminal-qr 1792002393617 — Main Branch\n\t\nQA Owner terminal-qr plan 1792002393617\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner terminal-qr 1792004374886\nQA Owner terminal-qr 1792004374886 — Main Branch\n\t\nQA Owner terminal-qr plan 1792004374886\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nQ\nQA Owner terminal-qr 1792004605417\nQA Owner terminal-qr 1792004605417 — Main Branch\n\t\nQA Owner terminal-qr plan 1792004605417\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nU\nUI Audit Restaurant A\nUI Audit Restaurant A — Main Branch\n+1\n·\nAhmedabad\n\t\nJAMANVAAR PRO\nPRO\n\t\nENTITLED\nService on\n\t\n1 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\n\n\nU\nUI Audit Restaurant B\nUI Audit Restaurant B — Main Branch\n+1\n·\nAhmedabad\n\t\nJAMANVAAR QR\nQR\n\t\nENTITLED\nService on\n\t\n0 / 0\n\t\n0 orders\n₹0\nReported Just now\n\t\nACTIVE\t\n—\nNo activity reported\n\t\nView\nManage\nQA Owner qr 1792004605417\nACTIVE\nQA Owner qr plan 1792004605417\n·\nQA Owner qr 1792004605417 — Main Branch\nOverview\nEntitlement\nAudit log\nQR entitlement\nEntitlement source\nPLATFORM OVERRIDE\nA Super Admin has overridden the plan defaults for this restaurant.\nACCESS\nQR ordering entitlement\nMaster grant. Turning this off removes the QR suite from the tenant regardless of plan.\nLive ordering service\nWhen off, guest scans are refused at the cloud edge and the table shows a maintenance notice.\nQUOTAS\nMax active tables\nNumber of table QR codes that may be live at once. Leave empty for no limit.\nMax orders per day\nNo daily order cap\nGUEST FEATURES\nDigital menu\nGuests can browse the branch menu from the scanned table.\nGuest customization\nGuests may choose variants, add-ons and preparation notes on an item.\nLive order tracking\nGuests see preparation status updates pushed from the KOT/KDS pipeline.\nQR analytics\nTable-level scan, conversion and basket reporting in Restaurant Admin.\nOnline payments\nGuests can settle the bill from their own device instead of at the counter.\nOPTIONAL QR CAPABILITIES\n\nManage the same QR module in Restaurant Admin, Kiosk Admin and standalone QR Admin. These grants remain subject to the platform feature catalogue and rollout controls.\n\nInclude all QR capabilities\nGuest service requests\nCurrently available\nScheduled pickup\nCurrently available\nMenu performance analytics\nCurrently available\nCustomer branding\nCurrently available\nGroup ordering\nCurrently available\nKitchen capacity controls\nCurrently available\nCustomers & loyalty\nNot currently included\nMultiple languages\nCurrently available\nPromotions\nCurrently available\nMultiple branches\nCurrently available\nGuest feedback\nCurrently available\nSplit payments\nCurrently available\nCustomer notifications\nCurrently available\nOrder history\nCurrently available\nUsage limits\nCurrently available\nInventory integration\nCurrently available\nAccessibility settings\nCurrently available\nDiscard changes\nSave entitlement",
+  "headings": [
+    "QR Ordering Suite Control",
+    "QA Owner qr 1792004605417\nACTIVE"
+  ],
+  "buttons": [
+    {
+      "text": "PLATFORM CONTROL CENTER",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "BUSINESS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SAAS MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "OPERATIONS & MDM",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "SECURITY & REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "ACCOUNT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 231,
+      "height": 17,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle Navigation Menu",
+      "title": "",
+      "disabled": false,
+      "width": 0,
+      "height": 0,
+      "visible": false
+    },
+    {
+      "text": "1",
+      "aria": "Notifications, 1 unread",
+      "title": "Notifications",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Toggle dark mode",
+      "title": "Switch to dark theme",
+      "disabled": false,
+      "width": 36,
+      "height": 36,
+      "visible": true
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Log out of Super Admin",
+      "disabled": false,
+      "width": 88,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Refresh fleet",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "All\n24",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Active\n18",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 98,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Disabled\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 109,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Limit reached\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 138,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "Not entitled\n6",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "QA Owner full 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner full 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner full 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk-qr 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk-qr 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk-qr 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner kiosk 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner qr 1792002231821",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner qr 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner qr 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner qr 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant-qr 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant-qr 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant-qr 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner restaurant 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Grant the QR entitlement first",
+      "disabled": true,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner terminal-qr 1792002393617",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner terminal-qr 1792004374886",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "QA Owner terminal-qr 1792004605417",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 61,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "UI Audit Restaurant A",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "UI Audit Restaurant B",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 107,
+      "height": 41,
+      "visible": true
+    },
+    {
+      "text": "View",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 76,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Manage",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 94,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Disable QR ordering",
+      "disabled": false,
+      "width": 40,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Close",
+      "title": "",
+      "disabled": false,
+      "width": 32,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 95,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Entitlement",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Audit log",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 90,
+      "height": 42,
+      "visible": true
+    },
+    {
+      "text": "Include all QR capabilities",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 21,
+      "visible": true
+    },
+    {
+      "text": "Discard changes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 136,
+      "height": 38,
+      "visible": true
+    },
+    {
+      "text": "Save entitlement",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 138,
+      "height": 38,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search pages, restaurants, owners, devices, keys…"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": null,
+      "placeholder": "Search restaurant, branch, city or plan..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Filter by plan tier",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Filter by usage reporting",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": "No limit"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": null,
+      "placeholder": "Unlimited"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": null,
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 1,
+  "images": [
+    {
+      "alt": "JAMANVAAR",
+      "src": "http://localhost:5380/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 175
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}

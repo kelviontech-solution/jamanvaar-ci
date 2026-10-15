@@ -1,5 +1,6 @@
 /** Optional capabilities use the existing Feature -> Plan flag -> subscription config resolution. */
 export const QR_CAPABILITIES = {
+  QR_RESTAURANT_PAGE: 'qrRestaurantPage',
   QR_SERVICE_REQUESTS: 'qrServiceRequests',
   QR_SCHEDULED_PICKUP: 'qrScheduledPickup',
   QR_MENU_ANALYTICS: 'qrMenuAnalytics',

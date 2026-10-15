@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "featuresImplemented": 20,
+  "operationsChecks": 59,
+  "existingBackendRegression": 302,
+  "rootSuiteBeforeFinalStaffRegression": 2179,
+  "affectedStaffSessionNavigationRegression": 34,
+  "browser": {
+    "operations": 21,
+    "crossApp": 25,
+    "posRemoteApproval": 1,
+    "total": 47
+  },
+  "apiBuild": "passed",
+  "frontendBuilds": [
+    "Admin",
+    "POS",
+    "Kiosk",
+    "Captain",
+    "KDS"
+  ],
+  "frontendTypeChecks": "passed",
+  "productionDeployed": false,
+  "realHardwareAndPaymentProviderAcceptance": false
+}

@@ -1,0 +1,255 @@
+{
+  "text": "KITCHEN DISPLAY (KDS)\nStation:\nAll stations\nJAMAN AI\nAll stations\nMain Kitchen\nPizza Station\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nStaff practice\nLIVE\n|\n08:52:18 AM\n5\nCooking\n0\nReady\nSwitch Station\nDisplay & station timing\nACTIVE\n5\nCOOKING\n5\nREADY\n0\nSERVED\n2\nEXPO (PASS)\n5\nPriority, then oldest\nOldest first\n#QR-1\nKOT-QR-1\nTable UI01\n•\nDINE IN\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n1/1 of the order ready\n1×\nUI Audit Dish 003\nOrder history\n#8f-r1\nServed\nRECALL\n#K-102\nMAIN-20261013-401\nNo table\n•\nTAKEAWAY\n•\nMain Kitchen\nNormal priority\nUrgent · cook first\n1/1 of the order ready\n1×\nUI Audit Dish 002\nOrder history\n#ducsg\nServed\nRECALL\nDisplay",
+  "headings": [],
+  "buttons": [
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Kitchen Intelligence",
+      "title": "",
+      "disabled": false,
+      "width": 104,
+      "height": 34,
+      "visible": true
+    },
+    {
+      "text": "All stations",
+      "aria": "Kitchen station All stations",
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Main Kitchen",
+      "aria": "Kitchen station Main Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "Pizza Station",
+      "aria": "Kitchen station Pizza Station",
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 32,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Staff practice",
+      "title": "",
+      "disabled": false,
+      "width": 294,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "Switch Station",
+      "aria": "Switch station or log out",
+      "title": "Switch kitchen station or logout",
+      "disabled": false,
+      "width": 127,
+      "height": 30,
+      "visible": true
+    },
+    {
+      "text": "ACTIVE\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 149,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "COOKING\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 165,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "READY\n0",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "SERVED\n2",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 148,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "EXPO (PASS)\n5",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 187,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Reprint KOT KOT-QR-1",
+      "title": "Reprint this ticket without creating another order",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "1×\nUI Audit Dish 003",
+      "aria": "1 UI Audit Dish 003: served",
+      "title": "",
+      "disabled": true,
+      "width": 293,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "Order history",
+      "aria": "Order activity for token QR-1",
+      "title": "",
+      "disabled": false,
+      "width": 334,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "RECALL",
+      "aria": null,
+      "title": "Served by mistake? Bring the ticket back",
+      "disabled": false,
+      "width": 112,
+      "height": 48,
+      "visible": true
+    },
+    {
+      "text": "",
+      "aria": "Reprint KOT MAIN-20261013-401",
+      "title": "Reprint this ticket without creating another order",
+      "disabled": false,
+      "width": 44,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "1×\nUI Audit Dish 002",
+      "aria": "1 UI Audit Dish 002: served",
+      "title": "",
+      "disabled": true,
+      "width": 293,
+      "height": 56,
+      "visible": true
+    },
+    {
+      "text": "Order history",
+      "aria": "Order activity for token K-102",
+      "title": "",
+      "disabled": false,
+      "width": 334,
+      "height": 44,
+      "visible": true
+    },
+    {
+      "text": "RECALL",
+      "aria": null,
+      "title": "Served by mistake? Bring the ticket back",
+      "disabled": false,
+      "width": 112,
+      "height": 48,
+      "visible": true
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Staff interface language",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen screen layout",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "minimumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "fallbackMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "maximumMinutes",
+      "placeholder": null
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search kitchen tickets",
+      "placeholder": "Search token, table, KOT or dish…"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kitchen ticket ordering",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Priority for token QR-1",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Priority for token K-102",
+      "placeholder": null
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Display size and contrast",
+      "placeholder": null
+    }
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 960
+  },
+  "dialogs": 0,
+  "images": [
+    {
+      "alt": "JAMANVAAR by KELVIONTECH",
+      "src": "http://localhost:5319/assets/full-Dm5gQFLD.png",
+      "loaded": true,
+      "width": 83
+    }
+  ],
+  "duplicateIds": [],
+  "unlabelledButtons": 0
+}
