@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-16T05:23:47.743Z",
+  "passed": 10,
+  "total": 10,
+  "tests": [
+    {
+      "name": "Restaurant Admin explains that kiosk management is ready and where a terminal key is entered",
+      "passed": true
+    },
+    {
+      "name": "A failed key request keeps the form, error and entered details",
+      "passed": true
+    },
+    {
+      "name": "Submitting creates a real branch-specific support request without leaving kiosk setup",
+      "passed": true
+    },
+    {
+      "name": "Request replies are available in place with a direct return to setup",
+      "passed": true
+    },
+    {
+      "name": "Customer kiosk opens with Restaurant ID and branch only, never the key",
+      "passed": true
+    },
+    {
+      "name": "Wrong-app and wrong-branch keys are explained and remain unused",
+      "passed": true
+    },
+    {
+      "name": "A real issued kiosk key activates the touchscreen and Check connection finds its terminal",
+      "passed": true
+    },
+    {
+      "name": "Fleet failure is visible and retry restores the list instead of claiming no terminals",
+      "passed": true
+    },
+    {
+      "name": "Appearance shortcut and mobile setup work with the existing admin session",
+      "passed": true
+    },
+    {
+      "name": "Additional kiosks can request separate keys with explicit duplicate protection",
+      "passed": true
+    }
+  ]
+}

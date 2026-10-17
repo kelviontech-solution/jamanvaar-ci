@@ -67,6 +67,7 @@ services:
       # PUBLIC_ORIGIN itself to the qr-guest container (see nginx/system.kelviontech.in.conf's
       # `location /q/`), so this is the same origin every other app above builds against.
       - QR_ORDER_BASE_URL=${PUBLIC_ORIGIN:-}
+      - KIOSK_WEB_URL=${KIOSK_WEB_URL:-}
       - QR_SESSION_SECRET=${QR_SESSION_SECRET:-}
       - QR_PAYMENT_CHECKOUT_MODE=${QR_PAYMENT_CHECKOUT_MODE:-STANDARD}
       - JAMANVAAR_SERVICE_SECRET=${JAMANVAAR_SERVICE_SECRET:-}

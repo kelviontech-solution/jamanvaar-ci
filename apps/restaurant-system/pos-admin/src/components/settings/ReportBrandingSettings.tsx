@@ -1,10 +1,11 @@
 import { OperatingProfilesPanel } from './OperatingProfilesPanel';
-import React, { useState } from 'react';
-import { useAiAccess, SettingsSaveBar, type SettingsSaveState } from '@jamanvaar/ui';
+import React, { useEffect, useState } from 'react';
+import { useAiAccess, useConfirm, SettingsSaveBar, type SettingsSaveState } from '@jamanvaar/ui';
 import { refreshConfiguredAi } from '@jamanvaar/business';
 import { db, resolveOperatingProfile } from '@jamanvaar/database';
 import { isValidGstinFormat, isValidFssaiFormat, isValidIndianPincode, isValidIndianPhone } from '@jamanvaar/utils';
 import { saveRestaurantIdentity } from '../../cloud/cloudClient';
+import { useQrUnsavedChanges } from '../qrconsole/useQrUnsavedChanges';
 import { Building, ShieldCheck, Phone, User, CheckCircle2 } from 'lucide-react';
 
 interface ReportBrandingSettingsProps {
@@ -46,6 +47,10 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   const [businessDayCutoffHour, setBusinessDayCutoffHour] = useState(db.restaurant.businessDayCutoffHour ?? 5);
   const [restaurantTimezone, setRestaurantTimezone] = useState(resolveOperatingProfile(db.restaurant).timezone);
   const [showJamanAI, setShowJamanAI] = useState(db.restaurant.showJamanAI !== false);
+  // #15: off by default so no restaurant starts getting an email it never asked for; urgent
+  // service problems are never held for this -- they already show live on QR/Kiosk's own Alerts.
+  const [digestEnabled, setDigestEnabled] = useState(db.restaurant.digestEnabled === true);
+  const [digestHour, setDigestHour] = useState(db.restaurant.digestHour ?? 9);
   // B2-040: GSTIN/FSSAI/pincode/phone were accepted as any string with no format check at all —
   // "GSTIN: abc" reached real customer tax invoices via db.receiptConfig below. All four stay
   // optional (a small/unregistered restaurant may genuinely have none), but a value that IS
@@ -55,6 +60,27 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
   const [saveState, setSaveState] = useState<SettingsSaveState>('idle');
   const [saveMessage, setSaveMessage] = useState<string | undefined>(undefined);
+  // R10: unsaved edits here used to vanish silently on tab-switch — no warning, no draft.
+  // Tracked separately from `saveState` (which also goes to 'error' on a validation failure,
+  // i.e. before anything is actually persisted — that path must still count as dirty) and
+  // cleared only once the edits actually reach db.restaurant/db.notify() in handleSave below.
+  const [hasUnsavedEdits, setHasUnsavedEdits] = useState(false);
+  const { confirm, confirmDialog } = useConfirm();
+  useQrUnsavedChanges(hasUnsavedEdits);
+  useEffect(() => {
+    const onRequestLeave = (event: Event) => {
+      const resolve = (event as CustomEvent<{ resolve: (ok: boolean) => void }>).detail.resolve;
+      if (!hasUnsavedEdits) { resolve(true); return; }
+      void confirm({
+        title: 'Discard unsaved changes?',
+        message: 'This restaurant identity form has unsaved edits. Leaving now discards them.',
+        confirmLabel: 'Leave without saving',
+        tone: 'danger'
+      }).then(resolve);
+    };
+    window.addEventListener('jamanvaar-qr-request-leave', onRequestLeave);
+    return () => window.removeEventListener('jamanvaar-qr-request-leave', onRequestLeave);
+  }, [hasUnsavedEdits, confirm]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,8 +147,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     db.receiptConfig.fssaiNumber = fssaiNumber;
 
     db.restaurant.showJamanAI = showJamanAI;
+    db.restaurant.digestEnabled = digestEnabled;
+    db.restaurant.digestHour = digestHour;
 
     db.notify();
+    setHasUnsavedEdits(false);
     // B2-054: the legal/registration details (name, GSTIN, FSSAI, address, city, state) used to
     // stay on this one device forever — POS, Captain, KDS and both kiosk apps never learned of an
     // edit made here, and it was lost entirely on a fresh device or a reinstall. Best-effort: a
@@ -131,7 +160,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
     let synced = true;
     try {
       const currentOperating = resolveOperatingProfile(db.restaurant);
-      await saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI, ...(currentOperating.timezone !== restaurantTimezone || currentOperating.cutoffHour !== businessDayCutoffHour ? {operatingProfile:{timezone:restaurantTimezone,cutoffHour:businessDayCutoffHour}} : {}), branding: { tagline, logoUrl, phone, email, pincode, website, ownerName, managerName, footerText, primaryColor, secondaryColor, msmeNumber } });
+      await saveRestaurantIdentity({ name, legalName, gstin, fssaiNumber, address, city, state, showJamanAI, digestEnabled, digestHour, ...(currentOperating.timezone !== restaurantTimezone || currentOperating.cutoffHour !== businessDayCutoffHour ? {operatingProfile:{timezone:restaurantTimezone,cutoffHour:businessDayCutoffHour}} : {}), branding: { tagline, logoUrl, phone, email, pincode, website, ownerName, managerName, footerText, primaryColor, secondaryColor, msmeNumber } });
       db.notify();
     } catch {
       synced = false;
@@ -149,8 +178,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
   };
 
   return (
-    <form onSubmit={handleSave} onChange={() => { setSaveState((current) => (current === 'saving' ? current : 'dirty')); setSaveMessage(undefined); }} className="space-y-6">
-      
+    <>
+    <form onSubmit={handleSave} onChange={() => { setSaveState((current) => (current === 'saving' ? current : 'dirty')); setSaveMessage(undefined); setHasUnsavedEdits(true); }} className="space-y-6">
+
       {/* Section header (the page title lives in the Settings page header) */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
@@ -186,7 +216,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       {/* App Preferences — layered on top of the platform-wide JAMAN AI
           entitlement toggle in Super Admin, which only controls whether the
           feature exists at all; this is the per-restaurant opt-out. */}
-      <div className="bg-white p-5 rounded-2xl border border-jaman-border shadow-2xs flex items-center justify-between gap-4">
+      <div id="settings-jaman-ai" className="bg-white p-5 rounded-2xl border border-jaman-border shadow-2xs flex items-center justify-between gap-4">
         <div>
           <span className="text-sm font-bold text-jaman-navy block">Show JAMAN AI Assistant</span>
           <span className="text-xs text-slate-500">
@@ -217,6 +247,44 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
           />
           <div className="w-11 h-6 bg-slate-200 peer-checked:bg-brand rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
         </label>
+      </div>
+
+      {/* #15: routine summary, off by default; urgent problems are never held for this -- they
+          already show live on QR/Kiosk's own Alerts, not batched here. */}
+      <div id="settings-daily-digest" className="bg-white p-5 rounded-2xl border border-jaman-border shadow-2xs space-y-3">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <span className="text-sm font-bold text-jaman-navy block">Daily Summary Email</span>
+            <span className="text-xs text-slate-500">
+              Sends the owner a routine summary (orders, collections, refunds) by email once a day, at the hour below. Urgent service problems are never delayed for this — they already show immediately in the QR / Kiosk Alerts feed.
+            </span>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              aria-label="Enable Daily Summary Email"
+              checked={digestEnabled}
+              onChange={(e) => setDigestEnabled(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-slate-200 peer-checked:bg-brand rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+          </label>
+        </div>
+        {digestEnabled && (
+          <label className="block text-xs font-bold text-slate-600" htmlFor="rb-digest-hour">
+            Send at (restaurant time)
+            <select
+              id="rb-digest-hour"
+              value={digestHour}
+              onChange={(e) => setDigestHour(Number(e.target.value))}
+              className="mt-1 w-full sm:w-48 bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2 text-sm font-bold"
+            >
+              {Array.from({ length: 24 }, (_, hour) => (
+                <option key={hour} value={hour}>{String(hour).padStart(2, '0')}:00</option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       {/* Live Preview Card */}
@@ -263,10 +331,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-trade-name">
                 Restaurant Trade / Brand Name:
               </label>
               <input
+                id="rb-trade-name"
                 type="text"
                 required
                 value={name}
@@ -278,10 +347,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-legal-name">
                 Legal Registered Entity Name:
               </label>
               <input
+                id="rb-legal-name"
                 type="text"
                 value={legalName}
                 onChange={(e) => setLegalName(e.target.value)}
@@ -292,10 +362,11 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-tagline">
                 Brand Tagline / Slogan:
               </label>
               <input
+                id="rb-tagline"
                 type="text"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
@@ -305,11 +376,12 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-logo-url">
                 Restaurant Logo Asset Path / URL:
               </label>
               <div className="flex items-center gap-2">
                 <input
+                  id="rb-logo-url"
                   type="text"
                   value={logoUrl}
                   onChange={(e) => setLogoUrl(e.target.value)}
@@ -337,39 +409,46 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-gstin">
                 GSTIN Number (15 Digits):
               </label>
               <input
+                id="rb-gstin"
                 type="text"
                 value={gstin}
                 onChange={(e) => setGstin(e.target.value.toUpperCase())}
                 placeholder="24ABCDE1234F1Z5"
+                aria-invalid={!!fieldErrors.gstin}
+                aria-describedby={fieldErrors.gstin ? 'rb-gstin-error' : undefined}
                 className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-brand ${fieldErrors.gstin ? 'border-rose-400' : 'border-jaman-border'}`}
               />
-              {fieldErrors.gstin && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.gstin}</span>}
+              {fieldErrors.gstin && <span id="rb-gstin-error" className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.gstin}</span>}
               <span className="text-[11px] text-slate-500 mt-0.5 block">Optional — leave blank if not GST-registered</span>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-fssai">
                 FSSAI License Number (14 Digits):
               </label>
               <input
+                id="rb-fssai"
                 type="text"
                 value={fssaiNumber}
                 onChange={(e) => setFssaiNumber(e.target.value)}
                 placeholder="10722001000452"
+                aria-invalid={!!fieldErrors.fssaiNumber}
+                aria-describedby={fieldErrors.fssaiNumber ? 'rb-fssai-error' : undefined}
                 className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-brand ${fieldErrors.fssaiNumber ? 'border-rose-400' : 'border-jaman-border'}`}
               />
-              {fieldErrors.fssaiNumber && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.fssaiNumber}</span>}
+              {fieldErrors.fssaiNumber && <span id="rb-fssai-error" className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.fssaiNumber}</span>}
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-msme">
                 MSME / Udyam Number (Optional):
               </label>
               <input
+                id="rb-msme"
                 type="text"
                 value={msmeNumber}
                 onChange={(e) => setMsmeNumber(e.target.value)}
@@ -389,8 +468,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="sm:col-span-2">
-              <label className="block font-bold text-slate-700 mb-1">Street Address:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-address">Street Address:</label>
               <input
+                id="rb-address"
                 type="text"
                 required
                 value={address}
@@ -401,8 +481,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">City:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-city">City:</label>
               <input
+                id="rb-city"
                 type="text"
                 required
                 value={city}
@@ -413,9 +494,10 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">State & Pincode:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-state">State & Pincode:</label>
               <div className="flex gap-2">
                 <input
+                  id="rb-state"
                   type="text"
                   required
                   value={state}
@@ -424,14 +506,17 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
                   className="w-2/3 bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2.5 font-bold text-jaman-navy focus:outline-none focus:border-brand"
                 />
                 <input
+                  aria-label="Pincode"
                   type="text"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="380054"
+                  aria-invalid={!!fieldErrors.pincode}
+                  aria-describedby={fieldErrors.pincode ? 'rb-pincode-error' : undefined}
                   className={`w-1/3 bg-jaman-ivory border rounded-xl px-2 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-brand ${fieldErrors.pincode ? 'border-rose-400' : 'border-jaman-border'}`}
                 />
               </div>
-              {fieldErrors.pincode && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.pincode}</span>}
+              {fieldErrors.pincode && <span id="rb-pincode-error" className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.pincode}</span>}
             </div>
           </div>
         </div>
@@ -445,21 +530,25 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Contact Phone:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-phone">Contact Phone:</label>
               <input
+                id="rb-phone"
                 type="text"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 79 4890 1234"
+                aria-invalid={!!fieldErrors.phone}
+                aria-describedby={fieldErrors.phone ? 'rb-phone-error' : undefined}
                 className={`w-full bg-jaman-ivory border rounded-xl px-3.5 py-2.5 font-mono font-bold text-jaman-navy focus:outline-none focus:border-brand ${fieldErrors.phone ? 'border-rose-400' : 'border-jaman-border'}`}
               />
-              {fieldErrors.phone && <span className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.phone}</span>}
+              {fieldErrors.phone && <span id="rb-phone-error" className="text-[11px] text-rose-600 font-bold mt-0.5 block">{fieldErrors.phone}</span>}
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Contact Email:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-email">Contact Email:</label>
               <input
+                id="rb-email"
                 type="email"
                 required
                 value={email}
@@ -470,8 +559,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Official Website URL:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-website">Official Website URL:</label>
               <input
+                id="rb-website"
                 type="text"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
@@ -491,8 +581,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Restaurant Owner Name:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-owner-name">Restaurant Owner Name:</label>
               <input
+                id="rb-owner-name"
                 type="text"
                 value={ownerName}
                 onChange={(e) => setOwnerName(e.target.value)}
@@ -502,8 +593,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Floor Manager Name:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-manager-name">Floor Manager Name:</label>
               <input
+                id="rb-manager-name"
                 type="text"
                 value={managerName}
                 onChange={(e) => setManagerName(e.target.value)}
@@ -513,8 +605,9 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Report Footer Closing Remark:</label>
+              <label className="block font-bold text-slate-700 mb-1" htmlFor="rb-footer-text">Report Footer Closing Remark:</label>
               <input
+                id="rb-footer-text"
                 type="text"
                 value={footerText}
                 onChange={(e) => setFooterText(e.target.value)}
@@ -539,5 +632,7 @@ export const ReportBrandingSettings: React.FC<ReportBrandingSettingsProps> = ({
       </div>
 
     </form>
+    {confirmDialog}
+    </>
   );
 };

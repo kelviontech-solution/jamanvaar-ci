@@ -4,8 +4,8 @@ import { AdminBranchWorkspace } from './components/header/AdminBranchWorkspace';
 import { BranchBusinessDashboard } from './components/dashboard/BranchBusinessDashboard';
 import type { AttentionTask } from './components/dashboard/AttentionTasks';
 import { dashboardDay, type BillingEntry } from './components/dashboard/dashboardDrilldown';
-import { PlanOnboarding } from './components/dashboard/PlanOnboarding';
-import { MenuLaunchCheck } from './components/dashboard/MenuLaunchCheck';
+import { LaunchCenter } from './components/kiosk/LaunchCenter';
+import { CustomerExperience } from './components/kiosk/CustomerExperience';
 import { KioskContentPanel } from './components/settings/KioskContentPanel';
 import { KioskWelcomeScreenPanel } from './components/settings/KioskWelcomeScreenPanel';
 import { SettingsScopeNotice } from './components/settings/SettingsScopeNotice';
@@ -51,9 +51,9 @@ import { useEntitlements, filterNavSections } from './hooks/useEntitlements';
 import { productNavSections } from './navSections';
 import { ADMIN_PRODUCTS, PRODUCT_PAGES, availableAdminProducts, ownerEntryPath, parseAdminRoute } from './adminProducts';
 import { requestQrLeave } from './components/qrconsole/useQrUnsavedChanges';
+import { getCurrentAdminName } from './currentAdminIdentity';
 import { useAdminProduct } from './hooks/useAdminProduct';
-import { KioskDashboard } from './components/kiosk/KioskDashboard';
-import { OnlinePaymentsPanel } from './components/payments/OnlinePaymentsPanel';
+import { KioskSetupPanel } from './components/kiosk/KioskSetupPanel';
 import {
   CentralReportingService,
   ReportGeneratorService,
@@ -88,6 +88,7 @@ import { ReceiptEBillPanel } from './components/receipts/ReceiptEBillPanel';
 import { WhatsAppBillNumberPanel } from './components/receipts/WhatsAppBillNumberPanel';
 import { FeedbackPanel } from './components/kiosk/FeedbackPanel';
 import { ReportBrandingSettings } from './components/settings/ReportBrandingSettings';
+import { AccountantView } from './components/accountant/AccountantView';
 import { SubscriptionPlansView } from './components/settings/SubscriptionPlansView';
 import { AuditTrailModule } from './components/audit/AuditTrailModule';
 import { BackupRestoreModule } from './components/backup/BackupRestoreModule';
@@ -102,6 +103,7 @@ import { PosAdminHeader } from './components/header/PosAdminHeader';
 // Specialized Modal Dialogs
 import { ConfirmModal } from './components/ConfirmModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
+import { SETTINGS_SEARCH_INDEX } from './settingsSearchIndex';
 import { OrderDetailModal } from './components/OrderDetailModal';
 import { ItemModal } from './components/ItemModal';
 import { CategoryModal } from './components/CategoryModal';
@@ -217,7 +219,7 @@ export default function PosAdminApp() {
   // own initial mount-time fetch already 401'd) re-fetches instead of staying wrong until reload.
   const tenantId = localStorage.getItem('jamanvaar_cloud_restaurant_id');
   const { enabledApps, hasApp, loading: entitlementsLoading, refetch: refetchEntitlements, error: entitlementError, authRequired } = useEntitlements(`${isAdminLoggedIn}:${cloudConnected}:${tenantId}`, isAdminLoggedIn);
-  const kiosks = useKioskFleetPolling(isAdminLoggedIn, hasApp);
+  const {kiosks,loading:kioskFleetLoading,error:kioskFleetError,refresh:refreshKiosks} = useKioskFleetPolling(isAdminLoggedIn, hasApp, activeAdminBranch);
   const availableProducts = availableAdminProducts(enabledApps);
   const contextReady = isAdminLoggedIn && !entitlementsLoading && !entitlementError;
   const context = useAdminProduct(tenantId, availableProducts, contextReady, enabledApps);
@@ -230,7 +232,7 @@ export default function PosAdminApp() {
   const setActiveTab: React.Dispatch<React.SetStateAction<PosAdminTab>> = next => {
     const page = typeof next === 'function' ? next(activeTab) : next;
     if (product && Object.hasOwn(PRODUCT_PAGES[product], page)) {
-      if (activeTab === 'QR_ORDERING' && page !== activeTab) void requestQrLeave().then(ok => { if (ok) context.navigate(product, page); });
+      if (page !== activeTab) void requestQrLeave().then(ok => { if (ok) context.navigate(product, page); });
       else context.navigate(product, page);
     }
   };
@@ -275,7 +277,7 @@ export default function PosAdminApp() {
     SessionPersistence.save('admin', {
       userId: user.id,
       fullName: user.fullName,
-      roleId: user.role === 'OWNER' ? 'role-admin' : 'role-manager',
+      roleId: user.role === 'OWNER' ? 'role-admin' : user.role === 'ACCOUNTANT' ? 'role-accountant' : 'role-manager',
       restaurantId: user.restaurantId,
       terminalId: 'ADMIN-01'
     });
@@ -597,7 +599,7 @@ export default function PosAdminApp() {
       action: 'BULK_PRICE_ADJUSTMENT',
       category: 'MENU',
       details: `Adjusted prices across all ${menuItems.length} dishes by ${bulkPercent}%`,
-      username: 'Manager'
+      username: getCurrentAdminName()
     });
     db.notify();
     setIsBulkPriceModalOpen(false);
@@ -634,6 +636,13 @@ export default function PosAdminApp() {
         handleActivateSubmit={handleActivateSubmit}
       />
     );
+  }
+
+  // #6: an accountant login never reaches the normal console at all -- gated here, before the
+  // product/entitlements flow, so there is no path through this file that could ever render a
+  // write-capable screen for this role.
+  if (SessionPersistence.load('admin')?.roleId === 'role-accountant') {
+    return <AccountantView onLogout={handleAdminLogout} />;
   }
 
   if (!contextReady || !product) {
@@ -716,7 +725,7 @@ export default function PosAdminApp() {
                     type="button"
                     onClick={() => toggleSection(grp.section)}
                     aria-expanded={isExpanded}
-                    className="w-full flex items-center justify-between px-3 py-0.5 cursor-pointer group/section"
+                    className="w-full min-h-11 flex items-center justify-between px-3 py-0.5 cursor-pointer group/section"
                   >
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover/section:text-slate-600 font-mono">
                       {grp.section}
@@ -817,9 +826,10 @@ export default function PosAdminApp() {
             <SettingsScopeNotice page={activeTab} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>
             {/* TAB 1: DASHBOARD */}
             {activeTab === 'OPERATIONS_HUB' && branchScopeReady && <OperationsConsole branchId={activeAdminBranch}/>}
-            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard onTask={task=>void openAttentionTask(task)} branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/>{isKioskAdmin && activeAdminBranch !== 'all' && <KioskDashboard kiosks={kiosks} onNavigate={setActiveTab} />}</>}
-            {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch && activeAdminBranch !== 'all' && <PlanOnboarding key={enabledApps.slice().sort().join('-')} apps={enabledApps} branchId={activeAdminBranch} counts={{menu:menuItems.filter(item=>!item.archivedAt).length,tables:tables.length,staff:users.filter(u=>u.roleId!=='role-admin').length,printers:configuredPrinters.length,kiosks:kiosks.filter(k=>k.branchId===activeAdminBranch&&k.health==='online'&&!k.isLocked).length}} onNavigate={page=>setActiveTab(page as PosAdminTab)}/>}
-            {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch !== 'all' && <MenuLaunchCheck branchId={activeAdminBranch ?? undefined} qrEnabled={hasApp('QR_ORDERING')} onNavigate={tab => setActiveTab(tab as typeof activeTab)}/>}
+            {/* U04: shown above the dashboard in both apps now — Restaurant Admin used to render
+                this below the (empty, pre-launch) dashboard while Kiosk Admin showed it first. */}
+            {activeTab === 'DASHBOARD' && branchScopeReady && activeAdminBranch && activeAdminBranch !== 'all' && <LaunchCenter branchId={activeAdminBranch} onNavigate={setActiveTab}/>}
+            {activeTab === 'DASHBOARD' && branchScopeReady && <><BranchBusinessDashboard onTask={task=>void openAttentionTask(task)} branchId={activeAdminBranch ?? 'all'} taskPages={isKioskAdmin ? ['SYNC','MENU'] : undefined} onNavigate={(page,entry) => {if(activeAdminBranch === 'all'){showToast('Choose the branch you want to manage in the Workspace selector.');return;}setDashboardBillingEntry(entry);setActiveTab(page);}}/></>}
 
             {/* TAB 2: DIGITAL ORDERING & QR SUITE */}
             {activeTab === 'QR_ORDERING' && <div className="qr-admin-app flex-1 min-w-0 overflow-y-auto"><QrConsole layout="integrated" onBack={() => setActiveTab('DASHBOARD')} onViewPlan={() => setActiveTab('LICENSE')} showToast={showToast} /></div>}
@@ -979,9 +989,10 @@ export default function PosAdminApp() {
               />
             )}
 
-            {activeTab === 'KIOSK_PAYMENTS' && <div className="space-y-6"><OnlinePaymentsPanel /><KioskPaymentSettingsPanel /></div>}
+            {activeTab === 'KIOSK_PAYMENTS' && <KioskPaymentSettingsPanel />}
             {activeTab === 'FEEDBACK' && <FeedbackPanel orders={orders} />}
             {activeTab === 'TEMPLATES' && <h1 className="text-2xl font-bold">Menu Templates</h1>}
+            {activeTab === 'KIOSK_EXPERIENCE' && hasApp('KIOSK_ADMIN') && <CustomerExperience branchId={activeAdminBranch || ''} kiosks={kiosks} showToast={showToast} onGoToSettings={()=>setActiveTab('SETTINGS')} />}
             {activeTab === 'KIOSK_DESIGN' && hasApp('KIOSK_ADMIN') && <KioskContentPanel showToast={showToast} />}
             {activeTab === 'KIOSK_WELCOME' && hasApp('KIOSK_ADMIN') && <KioskWelcomeScreenPanel kiosks={kiosks} showToast={showToast} />}
             {activeTab === 'KIOSK_COMBOS' && hasApp('KIOSK_ADMIN') && <KioskComboPanel showToast={showToast} />}
@@ -992,20 +1003,9 @@ export default function PosAdminApp() {
                   <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Terminal Control</h1>
                   <p className="text-sm text-[#4A5568] mt-1">Manage self-ordering stations, lockdown states, and maintenance modes.</p>
                 </div>
-                {kiosks.length === 0 && (
-                  <div className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm text-center space-y-3">
-                    <p className="text-xs text-[#64748B]">
-                      No Kiosk Terminals yet. A terminal appears here the moment it's activated with a real activation code and joins this restaurant's network.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => { setActiveTab('SUPPORT'); showToast('Raise a ticket to request a new Kiosk activation key.'); }}
-                      className="inline-flex items-center justify-center font-semibold rounded-xl bg-brand text-white px-4 py-2.5 text-sm cursor-pointer hover:opacity-90"
-                    >
-                      Request Activation Key
-                    </button>
-                  </div>
-                )}
+                <KioskSetupPanel key={activeAdminBranch} branchId={activeAdminBranch!} branchName={db.outlet.name} terminalCount={kiosks.length} fleetLoading={kioskFleetLoading} fleetError={kioskFleetError} onRefresh={refreshKiosks} onNavigate={setActiveTab} showToast={showToast}/>
+                {kioskFleetError&&<div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">Could not load kiosk terminals: {kioskFleetError}<button type="button" className="ml-3 underline font-bold" onClick={()=>void refreshKiosks()}>Retry terminal list</button></div>}
+                {!kioskFleetLoading&&!kioskFleetError&&kiosks.length===0&&<p className="text-sm text-slate-500">No kiosks have been activated in this branch yet. Follow the steps above to connect your first terminal.</p>}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {kiosks.map((k) => (
                     <div key={k.id} data-testid={`kiosk-terminal-${k.id}`} className="bg-white rounded-2xl p-6 border border-jaman-border shadow-sm space-y-4">
@@ -1231,6 +1231,29 @@ export default function PosAdminApp() {
             setStaffToEdit(usr);
             setIsStaffModalOpen(true);
             setActiveTab('STAFF');
+          }}
+          settingsEntries={SETTINGS_SEARCH_INDEX}
+          onSelectSettingsEntry={(id) => {
+            const entry = SETTINGS_SEARCH_INDEX.find((s) => s.id === id);
+            if (!entry) return;
+            setActiveTab(entry.tab);
+            // The target panel mounts on the next render (and later still if it waits on an
+            // entitlement/kiosk-fleet fetch); poll briefly rather than assuming one frame is enough.
+            let attempts = 0;
+            const tryHighlight = () => {
+              const el = document.getElementById(entry.anchorId);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const previousOutline = el.style.outline;
+                const previousOffset = el.style.outlineOffset;
+                el.style.outline = '3px solid #EF6A0B';
+                el.style.outlineOffset = '3px';
+                setTimeout(() => { el.style.outline = previousOutline; el.style.outlineOffset = previousOffset; }, 2500);
+              } else if (attempts++ < 20) {
+                setTimeout(tryHighlight, 100);
+              }
+            };
+            setTimeout(tryHighlight, 50);
           }}
         />
 

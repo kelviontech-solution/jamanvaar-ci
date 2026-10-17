@@ -1,3 +1,4 @@
+import { AttentionQueue } from './AttentionQueue';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
@@ -84,6 +85,7 @@ export function DashboardPage() {
         </div>
       </div>
 
+      <AttentionQueue/>
       {error && (
         <div className="dashboard-error" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>{error}</span>

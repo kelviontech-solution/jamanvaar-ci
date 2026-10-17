@@ -14,6 +14,7 @@ import {
   CalendarClock,
   ChartColumnIncreasing,
   Paintbrush,
+  LifeBuoy,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,7 +22,7 @@ export const QR_PAGES = [
  {id:'RESTAURANT_PAGE',label:'Restaurant Page',group:'Branding',icon:Paintbrush,description:'Design your restaurant website, branch contacts and mobile welcome page.'},
  {id:'OPERATIONS',label:'Operations Hub',group:'Live operations',icon:LayoutDashboard,description:'Branch service controls, guest follow-up, handovers and acceptance.'},
  {id:'ONBOARDING',label:'Guided Menu Setup',group:'Launch setup',icon:UtensilsCrossed,description:'Load cuisine templates, review pricing and publish your shared guest menu.'},
- {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Launch setup',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
+ {id:'ACCEPTANCE',label:'Payment Acceptance',group:'Payments',icon:CreditCard,description:'Check configuration and record a real phone checkout against verified payment.'},
  {id:'RECONCILIATION',label:'Collection Reconciliation',group:'Insights',icon:ReceiptText,description:'Close the day using collection-date totals by collector, method and branch.'},
  {id:'CALENDAR',label:'Pickup Calendar',group:'Live operations',icon:CalendarClock,description:'Review booked pickup slots and complete guest handovers.'},
  {id:'PRINTPACK',label:'QR Print Packs',group:'Branding',icon:QrCode,description:'Download branded cards, print sheets and replacement inventory together.'},
@@ -82,7 +83,7 @@ export const QR_PAGES = [
   {
     id: "PAYMENTS",
     label: "Payment Settings",
-    group: "Launch setup",
+    group: "Payments",
     icon: CreditCard,
     description:
       "Control online checkout and counter payments with clear collection status.",
@@ -90,7 +91,7 @@ export const QR_PAGES = [
   {
     id: "RULES",
     label: "Ordering Rules",
-    group: "Launch setup",
+    group: "Service rules",
     icon: Clock3,
     description:
       "Set opening hours, preparation time and the ordering modes you offer.",
@@ -98,7 +99,7 @@ export const QR_PAGES = [
   {
     id: "PICKUP",
     label: "Pickup Scheduling",
-    group: "Advanced configuration",
+    group: "Service rules",
     icon: CalendarClock,
     description:
       "Offer takeaway slots that respect your branch hours and kitchen capacity.",
@@ -106,14 +107,14 @@ export const QR_PAGES = [
   {
     id: "SETTINGS",
     label: "QR Settings",
-    group: "Launch setup",
+    group: "Guest experience",
     icon: Settings2,
     description: "Manage core ordering settings and customer-facing messages.",
   },
   {
     id: "ADVANCED",
     label: "Advanced Features",
-    group: "Advanced configuration",
+    group: "Service rules",
     icon: Sparkles,
     description:
       "Configure licensed languages, loyalty, promotions and operational tools.",
@@ -134,6 +135,14 @@ export const QR_PAGES = [
     description:
       "See which dishes turn browsing into orders using actual sales data.",
   },
+  {
+    id: "SUPPORT",
+    label: "Help & Support",
+    group: "Help",
+    icon: LifeBuoy,
+    description:
+      "Raise a problem or feature request and follow the JAMANVAAR team's replies by ticket number.",
+  },
 ] as const satisfies ReadonlyArray<{
   id: string;
   label: string;
@@ -142,8 +151,14 @@ export const QR_PAGES = [
   description: string;
 }>;
 export type QrTab = (typeof QR_PAGES)[number]["id"];
-const GROUP_ORDER = ['Live operations', 'Menu & guests', 'Launch setup', 'Branding', 'Insights', 'Advanced configuration'];
-const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED'];
+// U03: QR Settings, Ordering Rules, Payment Settings, Advanced Features and Operations used to
+// scatter across "Launch setup" and "Advanced configuration" with no coherent story — Operations
+// was already consolidated under "Live operations" (quick service controls stay there, first),
+// and the rest now sit under the three groups the audit asked for: Guest experience, Payments,
+// Service rules. "Restaurant default vs. branch override" is already called out per-page by the
+// scope banner in QrConsole.tsx (see the tab list there) — unaffected by this reshuffle.
+const GROUP_ORDER = ['Live operations', 'Launch setup', 'Guest experience', 'Menu & guests', 'Payments', 'Service rules', 'Branding', 'Insights', 'Help'];
+const TASK_ORDER: QrTab[] = ['OVERVIEW','OPERATIONS','ORDERS','SERVICE','CALENDAR','MENU','CRM','ONBOARDING','TABLES','PAYMENTS','ACCEPTANCE','RULES','BRAND','RESTAURANT_PAGE','DESIGN','PRINTPACK','ANALYTICS','RECONCILIATION','PERFORMANCE','PICKUP','SETTINGS','ADVANCED','SUPPORT'];
 export const QR_NAVIGATION = [...QR_PAGES].sort((a,b) => {
   const rank = (group: string) => {const index = GROUP_ORDER.indexOf(group);return index < 0 ? GROUP_ORDER.length : index;};
   return rank(a.group) - rank(b.group) || TASK_ORDER.indexOf(a.id) - TASK_ORDER.indexOf(b.id);

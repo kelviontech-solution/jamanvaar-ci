@@ -180,7 +180,7 @@ export const ShiftCashDrawerModule: React.FC<ShiftCashDrawerModuleProps> = ({
           </div>
           <button
             onClick={onOpenCashDropModal}
-            className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-xs cursor-pointer"
+            className="min-h-11 px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-xs cursor-pointer"
           >
             Open Cashier Shift
           </button>

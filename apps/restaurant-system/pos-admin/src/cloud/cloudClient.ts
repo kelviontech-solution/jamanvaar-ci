@@ -588,7 +588,7 @@ export interface CloudTenantUser {
   restaurantId: string;
   email: string;
   fullName: string;
-  role: 'OWNER' | 'MANAGER' | 'STAFF';
+  role: 'OWNER' | 'MANAGER' | 'STAFF' | 'ACCOUNTANT';
   status: 'PENDING_ACTIVATION' | 'ACTIVE' | 'DISABLED';
   phone: string | null;
   invitedAt: string | null;
@@ -609,7 +609,7 @@ export async function fetchCloudLogins(): Promise<CloudTenantUser[]> {
 export async function createCloudLogin(input: {
   email: string;
   fullName: string;
-  role: 'MANAGER' | 'STAFF';
+  role: 'MANAGER' | 'STAFF' | 'ACCOUNTANT';
   password: string;
 }): Promise<CloudTenantUser> {
   return request<CloudTenantUser>('/api/v1/tenant/me/users', { method: 'POST', body: input });
@@ -617,6 +617,25 @@ export async function createCloudLogin(input: {
 
 export async function setCloudLoginStatus(userId: string, status: 'ACTIVE' | 'DISABLED'): Promise<CloudTenantUser> {
   return request<CloudTenantUser>(`/api/v1/tenant/me/users/${userId}/status`, { method: 'PATCH', body: { status } });
+}
+
+/** #16: step 1 -- sends a verification code to the proposed recovery mailbox. */
+export async function requestRecoveryEmail(recoveryEmail: string): Promise<void> {
+  await request('/api/v1/tenant/me/recovery-email', { method: 'POST', body: { recoveryEmail } });
+}
+
+/** #16: step 2 -- the code from that email confirms the owner actually controls the mailbox. */
+export async function confirmRecoveryEmail(otp: string): Promise<void> {
+  await request('/api/v1/tenant/me/recovery-email/confirm', { method: 'POST', body: { otp } });
+}
+
+export async function clearRecoveryEmail(): Promise<void> {
+  await request('/api/v1/tenant/me/recovery-email/clear', { method: 'POST' });
+}
+
+export interface CloudTenantAccount { role: string; email: string; recoveryEmail: string | null; recoveryEmailPending: boolean }
+export function fetchCloudAccount(): Promise<CloudTenantAccount> {
+  return request('/api/v1/tenant/me');
 }
 
 export interface CloudBackupSummary {
@@ -999,6 +1018,22 @@ export async function getPaymentsSummary(): Promise<PaymentsSummary> {
   return data as PaymentsSummary;
 }
 
+/**
+ * #13: resends a bill on WhatsApp for an order that already exists -- the backend looks the
+ * order up by orderId and builds the bill itself (receipt-whatsapp.service.ts), so retrying
+ * a failed send never requires recreating the order. POS_ADMIN is already an authorized
+ * device type for /api/v1/receipts/whatsapp server-side; this was just never wired up here.
+ */
+export async function retryReceiptWhatsApp(orderId: string, phone: string): Promise<{ success: boolean; errorMessage?: string }> {
+  const res = await signedDeviceFetch('/api/v1/receipts/whatsapp', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, phone })
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) throw new CloudApiError(data?.message ?? `Sending the bill on WhatsApp failed (${res.status})`, res.status);
+  return data;
+}
+
 export async function pushOrderSync(
   events: OrderSyncPushEvent[]
 ): Promise<{ results: OrderSyncPushResult[]; serverTime: string }> {
@@ -1175,6 +1210,7 @@ export interface SupportTicketRow {
   createdAt: string;
   updatedAt: string;
   resolvedAt: string | null;
+  branchId?: string | null;
 }
 
 export interface SupportTicketDetail extends SupportTicketRow {
@@ -1191,12 +1227,17 @@ export function fetchSupportTickets(): Promise<SupportTicketRow[]> {
   return request<SupportTicketRow[]>('/api/v1/tenant/support-tickets');
 }
 
+export function fetchKioskSetup(): Promise<{restaurantCode:string|null;name:string;kioskWebUrl:string|null}> {
+  return request('/api/v1/tenant/me/kiosk-setup');
+}
+
 export function fetchSupportTicket(id: string): Promise<SupportTicketDetail> {
   return request<SupportTicketDetail>(`/api/v1/tenant/support-tickets/${id}`);
 }
 
 /** This device is attached automatically so support can see which terminal the problem is on. */
 export function createSupportTicket(input: {
+  activationRequest?: { type:'KIOSK'; terminalName:string };
   subject: string;
   description: string;
   category: SupportTicketCategory;

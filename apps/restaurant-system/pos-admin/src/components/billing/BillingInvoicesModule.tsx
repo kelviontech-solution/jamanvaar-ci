@@ -400,7 +400,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
           <div className="bg-white p-1 rounded-xl border border-jaman-border flex items-center shadow-2xs">
             <button
               onClick={() => setViewMode('FLAT')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'FLAT'
                   ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                   : 'text-slate-600 hover:bg-jaman-cream'
@@ -410,7 +410,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
             </button>
             <button
               onClick={() => setViewMode('DAY_GROUPED')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'DAY_GROUPED'
                   ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                   : 'text-slate-600 hover:bg-jaman-cream'
@@ -422,7 +422,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <button
             onClick={handleExportPdf}
-            className="px-3.5 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-95"
             title="Download / Print Invoices Ledger as PDF"
           >
             <FileText className="w-3.5 h-3.5 text-white" />
@@ -431,7 +431,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
 
           <button
             onClick={handleExportCsv}
-            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-jaman-navy text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-jaman-navy text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
             <span>Export CSV</span>
@@ -460,7 +460,7 @@ export const BillingInvoicesModule: React.FC<BillingInvoicesModuleProps> = ({
                 setDatePreset(preset.id as DateFilterPreset);
                 setCurrentPage(1);
               }}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
+              className={`min-h-11 px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                 datePreset === preset.id
                   ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                   : 'bg-jaman-cream hover:bg-[#F4EFE6] text-slate-700'

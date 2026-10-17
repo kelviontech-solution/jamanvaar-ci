@@ -1,0 +1,222 @@
+{
+  "url": "/",
+  "text": "POS TERMINAL\nGarden House Flow QA\n\nGarden House Flow QA\n•\n778791f8-025e-4e62-a387-dca68ac1534a\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nPrinter Offline\n1\nDAY OPEN\n•\n₹280\nJAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nAll pages\nCATEGORIES\nAll Menu\n18\nCHEF SPECIALS\n18\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\n1\nCore: Offline First\nSelect a table\n\nPick the table first, then add dishes. Running tables continue their open order.\n\nNot dine-in?\nTakeaway\nDelivery\nToken\nFull floor plan\nAll zones\nMain Hall\nT-T1\n4 seats\nRUNNING\nToday Sales:\n₹280\nOrders:\n1\nAOV:\n₹280\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "headings": [
+    "Select a table"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 28
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 40
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 26
+    },
+    {
+      "text": "Printer Offline\n1",
+      "aria": null,
+      "disabled": false,
+      "width": 154,
+      "height": 30
+    },
+    {
+      "text": "DAY OPEN\n•\n₹280",
+      "aria": null,
+      "disabled": false,
+      "width": 161,
+      "height": 26
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "disabled": false,
+      "width": 95,
+      "height": 30
+    },
+    {
+      "text": "A\nAudit Cashier\nCASHIER",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 45
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "All pages",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 32
+    },
+    {
+      "text": "All Menu\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 40
+    },
+    {
+      "text": "CHEF SPECIALS\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 38
+    },
+    {
+      "text": "Print Queue\n1",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 34
+    },
+    {
+      "text": "Takeaway",
+      "aria": null,
+      "disabled": false,
+      "width": 106,
+      "height": 40
+    },
+    {
+      "text": "Delivery",
+      "aria": null,
+      "disabled": false,
+      "width": 96,
+      "height": 40
+    },
+    {
+      "text": "Token",
+      "aria": null,
+      "disabled": false,
+      "width": 83,
+      "height": 40
+    },
+    {
+      "text": "Full floor plan",
+      "aria": null,
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "All zones",
+      "aria": null,
+      "disabled": false,
+      "width": 81,
+      "height": 40
+    },
+    {
+      "text": "Main Hall",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 40
+    },
+    {
+      "text": "T-T1\n4 seats\nRUNNING",
+      "aria": "Table T1, Main Hall, 4 seats, Running",
+      "disabled": false,
+      "width": 155,
+      "height": 120
+    },
+    {
+      "text": "Today Sales:\n₹280",
+      "aria": null,
+      "disabled": false,
+      "width": 142,
+      "height": 16
+    },
+    {
+      "text": "Orders:\n1",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 16
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 16
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 116,
+      "height": 16
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Staff interface language",
+      "type": "select-one"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

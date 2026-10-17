@@ -21,6 +21,10 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
   const [messageTemplate, setMessageTemplate] = useState('Hi {{name}}! ');
   const [filter, setFilter] = useState<CustomerSegmentFilter>(EMPTY_FILTER);
   const [sendQueue, setSendQueue] = useState<{ campaign: MarketingCampaign; phones: string[]; index: number } | null>(null);
+  // R08: opening the wa.me tab used to mark the recipient "sent" immediately — closing the tab,
+  // a blocked popup, or never actually typing/tapping send inside WhatsApp still counted as a
+  // successful send. Now opening and confirming are two explicit steps; only the second marks it.
+  const [hasOpenedCurrent, setHasOpenedCurrent] = useState(false);
 
   const refresh = () => setCampaigns(MarketingRepository.getCampaigns());
 
@@ -56,9 +60,10 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
       return;
     }
     setSendQueue({ campaign, phones: remaining.map((c) => c.phone), index: 0 });
+    setHasOpenedCurrent(false);
   };
 
-  const sendCurrentAndAdvance = () => {
+  const openCurrentChat = () => {
     if (!sendQueue) return;
     const phone = sendQueue.phones[sendQueue.index];
     const customer = CustomerRepository.getByPhone(phone);
@@ -67,8 +72,12 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
       const cleanPhone = phone.replace(/[^0-9]/g, '');
       const fullPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
       window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`, '_blank');
-      MarketingRepository.markSent(sendQueue.campaign.id, phone);
     }
+    setHasOpenedCurrent(true);
+  };
+
+  const advanceQueue = () => {
+    if (!sendQueue) return;
     if (sendQueue.index + 1 >= sendQueue.phones.length) {
       showToast(`Campaign "${sendQueue.campaign.name}" send queue complete`);
       setSendQueue(null);
@@ -76,7 +85,16 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
     } else {
       setSendQueue({ ...sendQueue, index: sendQueue.index + 1 });
     }
+    setHasOpenedCurrent(false);
   };
+
+  const confirmSentAndAdvance = () => {
+    if (!sendQueue) return;
+    MarketingRepository.markSent(sendQueue.campaign.id, sendQueue.phones[sendQueue.index]);
+    advanceQueue();
+  };
+
+  const skipCurrent = () => advanceQueue();
 
   return (
     <>
@@ -84,20 +102,31 @@ export const MarketingCampaignsModal: React.FC<MarketingCampaignsModalProps> = (
       {sendQueue ? (
         <div className="space-y-4 py-1">
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
-            No WhatsApp Business API is connected — each send still opens a WhatsApp chat you confirm and tap send on yourself. This queue just steps you through the whole segment instead of picking recipients one at a time.
+            No WhatsApp Business API is connected — each send opens a WhatsApp chat you confirm and tap send on yourself.
+            Opening the chat does not count as sent; confirm it only after you've actually tapped send inside WhatsApp.
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-500">Sending "{sendQueue.campaign.name}"</div>
             <div className="text-lg font-bold text-jaman-navy">{sendQueue.index + 1} of {sendQueue.phones.length}</div>
             <div className="text-xs text-slate-500 mt-1">
-              Next: {CustomerRepository.getByPhone(sendQueue.phones[sendQueue.index])?.name || sendQueue.phones[sendQueue.index]}
+              {hasOpenedCurrent ? 'Opened: ' : 'Next: '}
+              {CustomerRepository.getByPhone(sendQueue.phones[sendQueue.index])?.name || sendQueue.phones[sendQueue.index]}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <Button variant="ghost" onClick={() => setSendQueue(null)}>Stop</Button>
-            <Button variant="primary" onClick={sendCurrentAndAdvance}>
-              <Send className="w-4 h-4" /> Open WhatsApp & Next
-            </Button>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <Button variant="ghost" onClick={() => { setSendQueue(null); setHasOpenedCurrent(false); }}>Stop</Button>
+            {!hasOpenedCurrent ? (
+              <Button variant="primary" onClick={openCurrentChat}>
+                <Send className="w-4 h-4" /> Open WhatsApp
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={skipCurrent}>Didn't send — skip</Button>
+                <Button variant="primary" onClick={confirmSentAndAdvance}>
+                  <Send className="w-4 h-4" /> Confirm Sent & Next
+                </Button>
+              </>
+            )}
           </div>
         </div>
       ) : creating ? (

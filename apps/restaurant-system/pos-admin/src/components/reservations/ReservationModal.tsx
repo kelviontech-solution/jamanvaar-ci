@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { DiningTable } from '@jamanvaar/types';
 import { Modal, Button, FormInput, FormSelect } from '@jamanvaar/ui';
 import { ReservationRepository, AuditRepository } from '@jamanvaar/database';
+import { getCurrentAdminName } from '../../currentAdminIdentity';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -79,7 +80,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       action: 'RESERVATION_CREATED',
       category: 'SETTINGS',
       details: `Reservation for ${created.customerName} (${created.guestCount} guests) at ${new Date(created.reservationTime).toLocaleString('en-IN')}`,
-      username: 'Manager'
+      username: getCurrentAdminName()
     });
 
     onSaved(created.customerName);

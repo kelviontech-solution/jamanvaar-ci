@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestApp, createTestPlatformUser, platformLogin } from './helpers';
+import { createTestApp, createTestPlatformUser, platformLogin, ownerDeviceSession } from './helpers';
 import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('Activation code redemption (the other half of activation-keys generation)', () => {
@@ -42,6 +42,7 @@ describe('Activation code redemption (the other half of activation-keys generati
       ownerEmail: `redeem-owner-${Date.now()}@test.example.com`
     });
     restaurantId = restaurantRes.body.restaurant.id;
+    expect(restaurantRes.body.restaurant.restaurantCode).toMatch(/^JM[6-9][0-9]{9}$/);
 
     // A key/redemption is now gated on the restaurant's actual application
     // entitlements (see ApplicationEntitlementsService.assertAppEnabled) —
@@ -92,6 +93,42 @@ describe('Activation code redemption (the other half of activation-keys generati
       .post('/api/v1/activation/redeem')
       .send({ code: 'JMV-0000-0000-0000', deviceType: 'POS' });
     expect(res.status).toBe(404);
+  });
+
+  it('rejects a mismatched restaurant or branch without consuming the kiosk key', async () => {
+    const code=await generateKey('KIOSK');
+    const branch=await prisma.runAsPlatform(tx=>tx.branch.findFirstOrThrow({where:{restaurantId}}));
+    const wrong='00000000-0000-4000-8000-000000000001';
+    const redeem=(expectedRestaurantId:string,expectedBranchId:string)=>request(app.getHttpServer()).post('/api/v1/activation/redeem').send({code,deviceType:'KIOSK',expectedRestaurantId,expectedBranchId});
+    expect((await redeem(wrong,branch.id)).status).toBe(400);
+    expect((await redeem(restaurantId,wrong)).status).toBe(400);
+    const key=await prisma.runAsPlatform(tx=>tx.activationKey.findUniqueOrThrow({where:{code}}));
+    expect(key.status).toBe('ACTIVE');expect(key.redeemedByDeviceId).toBeNull();
+    expect((await redeem(restaurantId,branch.id)).status).toBe(201);
+  });
+
+  it('returns only the authenticated restaurant setup identity and persists a branch-scoped request', async () => {
+    const code=await generateKey('POS_ADMIN');
+    const a=await request(app.getHttpServer()).post('/api/v1/activation/redeem').send({code,deviceType:'POS_ADMIN'});
+    expect(a.status).toBe(201);
+    const token=await ownerDeviceSession(prisma,a.body.deviceToken);
+    const route='/api/v1/tenant/me/kiosk-setup';
+    expect((await request(app.getHttpServer()).get(route)).status).toBe(401);
+    expect((await request(app.getHttpServer()).get(route).set('Authorization','Bearer '+a.body.deviceToken)).status).toBe(401);
+    const setup=await request(app.getHttpServer()).get(route).set('Authorization','Bearer '+token);
+    const restaurant=await prisma.runAsPlatform(tx=>tx.restaurant.findUniqueOrThrow({where:{id:restaurantId}}));
+    expect(setup.status).toBe(200);expect(setup.body.restaurantCode).toBe(restaurant.restaurantCode);
+    expect(Object.keys(setup.body).sort()).toEqual(['kioskWebUrl','name','restaurantCode']);
+    const branch=await prisma.runAsPlatform(tx=>tx.branch.findFirstOrThrow({where:{restaurantId}}));
+    const tickets='/api/v1/tenant/support-tickets';
+    const sent=await request(app.getHttpServer()).post(tickets).set('Authorization','Bearer '+token).send({subject:'Kiosk activation key',description:'Please issue one KIOSK terminal activation key.',category:'ONBOARDING',branchId:branch.id});
+    expect(sent.status).toBe(201);
+    const list=await request(app.getHttpServer()).get(tickets).set('Authorization','Bearer '+token);
+    expect(list.body.find((t:any)=>t.id===sent.body.id).branchId).toBe(branch.id);
+    const keyCount=await prisma.runAsPlatform(tx=>tx.activationKey.count({where:{restaurantId,status:'ACTIVE'}}));
+    expect(sent.body).not.toHaveProperty('activationKey');
+    expect((await request(app.getHttpServer()).post(tickets).set('Authorization','Bearer '+token).send({subject:'Kiosk activation key',description:'Wrong branch',category:'ONBOARDING',branchId:'00000000-0000-4000-8000-000000000001'})).status).toBe(400);
+    expect(await prisma.runAsPlatform(tx=>tx.activationKey.count({where:{restaurantId,status:'ACTIVE'}}))).toBe(keyCount);
   });
 
   it('redeems a valid ANY-type code and creates a real, queryable Device row', async () => {

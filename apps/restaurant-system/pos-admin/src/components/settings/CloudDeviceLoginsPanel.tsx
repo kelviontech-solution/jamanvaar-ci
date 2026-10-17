@@ -7,10 +7,15 @@ import {
   createCloudLogin,
   setCloudLoginStatus,
   getStoredRestaurantId,
+  fetchCloudAccount,
+  requestRecoveryEmail,
+  confirmRecoveryEmail,
+  clearRecoveryEmail,
   CloudApiError,
-  type CloudTenantUser
+  type CloudTenantUser,
+  type CloudTenantAccount
 } from '../../cloud/cloudClient';
-import { KeyRound, Plus, Copy, CheckCircle2, UserRound, Ban } from 'lucide-react';
+import { KeyRound, Plus, Copy, CheckCircle2, UserRound, Ban, ShieldCheck, Mail } from 'lucide-react';
 
 // B2-003: was 'Jaman@' + Math.floor(1000 + Math.random() * 9000) — a fixed, guessable prefix
 // plus only 9,000 possible values from a non-cryptographic RNG, for a password that
@@ -34,17 +39,28 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'MANAGER' | 'STAFF'>('STAFF');
+  const [role, setRole] = useState<'MANAGER' | 'STAFF' | 'ACCOUNTANT'>('STAFF');
   const [password, setPassword] = useState(randomPassword());
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState('');
   const [justCreated, setJustCreated] = useState<{ email: string; password: string } | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // #16: a verified alternate mailbox for account recovery, plus a reminder that any active
+  // Manager/Accountant login below is already an "alternate authorized contact" who can sign in
+  // without ever knowing the owner's password.
+  const [account, setAccount] = useState<CloudTenantAccount | null>(null);
+  const [recoveryStep, setRecoveryStep] = useState<'IDLE' | 'PENDING_OTP'>('IDLE');
+  const [recoveryEmailInput, setRecoveryEmailInput] = useState('');
+  const [recoveryOtp, setRecoveryOtp] = useState('');
+  const [recoveryBusy, setRecoveryBusy] = useState(false);
+  const [recoveryMessage, setRecoveryMessage] = useState('');
+
   async function refresh() {
     try {
-      const list = await fetchCloudLogins();
+      const [list, acc] = await Promise.all([fetchCloudLogins(), fetchCloudAccount()]);
       setUsers(list);
+      setAccount(acc);
       setLoadError('');
       setLoggedIn(true);
     } catch (err) {
@@ -59,6 +75,54 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
   useEffect(() => {
     if (connected && loggedIn) refresh();
   }, [connected, loggedIn]);
+
+  async function submitRecoveryEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setRecoveryBusy(true);
+    setRecoveryMessage('');
+    try {
+      await requestRecoveryEmail(recoveryEmailInput.trim());
+      setRecoveryStep('PENDING_OTP');
+      setRecoveryMessage(`Verification code sent to ${recoveryEmailInput.trim()}.`);
+    } catch (err) {
+      setRecoveryMessage(err instanceof CloudApiError ? err.message : 'Could not send the verification code.');
+    } finally {
+      setRecoveryBusy(false);
+    }
+  }
+
+  async function submitRecoveryOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setRecoveryBusy(true);
+    setRecoveryMessage('');
+    try {
+      await confirmRecoveryEmail(recoveryOtp.trim());
+      setRecoveryStep('IDLE');
+      setRecoveryOtp('');
+      setRecoveryEmailInput('');
+      await refresh();
+      setRecoveryMessage('Recovery email verified.');
+    } catch (err) {
+      setRecoveryMessage(err instanceof CloudApiError ? err.message : 'That code is not valid or has expired.');
+    } finally {
+      setRecoveryBusy(false);
+    }
+  }
+
+  async function removeRecoveryEmail() {
+    setRecoveryBusy(true);
+    try {
+      await clearRecoveryEmail();
+      await refresh();
+      setRecoveryMessage('Recovery email removed.');
+    } catch (err) {
+      setRecoveryMessage(err instanceof CloudApiError ? err.message : 'Could not remove the recovery email.');
+    } finally {
+      setRecoveryBusy(false);
+    }
+  }
+
+  const alternateContacts = (users ?? []).filter((u) => u.status === 'ACTIVE' && (u.role === 'MANAGER' || u.role === 'ACCOUNTANT'));
 
   if (!connected) return null;
 
@@ -111,6 +175,74 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
   }
 
   return (
+    <>
+    <div className="bg-white rounded-2xl p-5 border border-jaman-border shadow-2xs space-y-3">
+      <div className="flex items-center gap-2">
+        <ShieldCheck className="w-4 h-4 text-slate-500" />
+        <h3 className="text-sm font-bold text-jaman-navy">Account Recovery</h3>
+      </div>
+      <p className="text-[11px] text-slate-500">
+        A verified alternate mailbox that can receive a password-reset code if your main login email is ever unreachable. Any active Manager or
+        Accountant login below is already an alternate authorized contact — they can sign in on their own credentials without ever knowing yours.
+      </p>
+
+      {account?.recoveryEmail ? (
+        <div className="flex items-center justify-between gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3.5 py-2.5">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Verified: {account.recoveryEmail}</span>
+          </div>
+          <button type="button" disabled={recoveryBusy} onClick={() => void removeRecoveryEmail()} className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+            Remove
+          </button>
+        </div>
+      ) : recoveryStep === 'PENDING_OTP' ? (
+        <form onSubmit={submitRecoveryOtp} className="flex flex-wrap items-end gap-2">
+          <label className="text-[11px] font-bold text-slate-600 block">
+            6-digit code sent to {recoveryEmailInput}
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={recoveryOtp}
+              onChange={(e) => setRecoveryOtp(e.target.value.replace(/\D/g, ''))}
+              className="mt-1 w-32 bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm font-mono font-bold"
+            />
+          </label>
+          <button type="submit" disabled={recoveryBusy || recoveryOtp.length !== 6} className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover text-white font-bold text-xs disabled:opacity-40 cursor-pointer">
+            Verify
+          </button>
+          <button type="button" disabled={recoveryBusy} onClick={() => { setRecoveryStep('IDLE'); setRecoveryOtp(''); }} className="text-[11px] font-bold text-slate-500 hover:underline cursor-pointer">
+            Cancel
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={submitRecoveryEmail} className="flex flex-wrap items-end gap-2">
+          <label className="text-[11px] font-bold text-slate-600 block flex-1 min-w-[220px]">
+            Recovery email address
+            <input
+              type="email"
+              required
+              value={recoveryEmailInput}
+              onChange={(e) => setRecoveryEmailInput(e.target.value)}
+              placeholder="alternate@example.com"
+              className="mt-1 w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-sm font-semibold"
+            />
+          </label>
+          <button type="submit" disabled={recoveryBusy} className="px-3.5 py-2 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs disabled:opacity-40 cursor-pointer flex items-center gap-1.5">
+            <Mail className="w-3.5 h-3.5" /> Send Code
+          </button>
+        </form>
+      )}
+      {recoveryMessage && <p className="text-[11px] font-bold text-slate-600">{recoveryMessage}</p>}
+
+      {alternateContacts.length > 0 && (
+        <p className="text-[11px] text-slate-500">
+          Alternate authorized contacts: {alternateContacts.map((u) => `${u.fullName} (${u.role.toLowerCase()})`).join(', ')}.
+        </p>
+      )}
+    </div>
+
     <div className="bg-white rounded-2xl p-5 border border-jaman-border shadow-2xs space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -201,11 +333,12 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
               <label className="text-[11px] font-bold text-slate-600 block mb-1">Role</label>
               <select
                 value={role}
-                onChange={(e) => setRole(e.target.value as 'MANAGER' | 'STAFF')}
+                onChange={(e) => setRole(e.target.value as 'MANAGER' | 'STAFF' | 'ACCOUNTANT')}
                 className="w-full bg-white border border-jaman-border rounded-xl px-3 py-2 text-xs font-semibold text-jaman-navy focus:outline-none focus:border-brand"
               >
                 <option value="STAFF">Staff (Captain, waiter, cashier)</option>
                 <option value="MANAGER">Manager</option>
+                <option value="ACCOUNTANT">Accountant (read-only: collections, refunds, taxes, exports)</option>
               </select>
             </div>
             <div>
@@ -283,5 +416,6 @@ export const CloudDeviceLoginsPanel: React.FC = () => {
         </div>
       )}
     </div>
+    </>
   );
 };

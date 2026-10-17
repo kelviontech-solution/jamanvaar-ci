@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-16T14:32:52.837Z",
+  "observations": [
+    {
+      "name": "Merged product row edited through newest subscription can leave the effective grant unchanged",
+      "httpStatus": 200,
+      "beforeEnabled": true,
+      "afterEnabled": true,
+      "editedFamily": "KIOSK",
+      "grantingFamily": "RESTAURANT"
+    },
+    {
+      "name": "Changing plan family can create two active subscriptions for the same restaurant/product family",
+      "httpStatus": 200,
+      "activeFamilies": [
+        "RESTAURANT",
+        "RESTAURANT"
+      ]
+    },
+    {
+      "name": "Renewing a suspended subscription changes it to ACTIVE without the separate reactivate action",
+      "httpStatus": 200,
+      "status": "ACTIVE"
+    },
+    {
+      "name": "LOCAL_WINS resolves conflict metadata without applying local record",
+      "httpStatus": 201,
+      "resolution": "LOCAL_WINS",
+      "storedPrice": 100,
+      "localPrice": 120
+    },
+    {
+      "name": "Conflict resolution endpoint accepts an invalid strategy and re-resolves an already resolved conflict",
+      "httpStatus": 201,
+      "resolution": "QA_INVALID_STRATEGY"
+    }
+  ]
+}

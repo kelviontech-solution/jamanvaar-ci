@@ -8,6 +8,7 @@ export function ServiceRequests({
   session: string;
 }) {
   const [options, setOptions] = useState<OperationsOptions | null>(null),
+    [optionsFailed, setOptionsFailed] = useState(false),
     [rows, setRows] = useState<any[]>([]),
     [note, setNote] = useState(""),
     [error, setError] = useState(""),
@@ -15,13 +16,25 @@ export function ServiceRequests({
     [open, setOpen] = useState(false);
   useEffect(() => {
     let active = true;
-    QrApi.operations<OperationsOptions>(token, "", session)
-      .then((r) => {
-        if (active) setOptions(r);
-      })
-      .catch(() => {});
+    // A failed fetch here used to leave `options` null forever with no retry, which silently
+    // removed the guest's only route to ask for help — indistinguishable from the restaurant
+    // having the feature turned off. Retry periodically until it actually loads (F24).
+    const load = () =>
+      QrApi.operations<OperationsOptions>(token, "", session)
+        .then((r) => {
+          if (!active) return;
+          setOptions(r);
+          setOptionsFailed(false);
+          clearInterval(timer);
+        })
+        .catch(() => {
+          if (active) setOptionsFailed(true);
+        });
+    void load();
+    const timer = setInterval(() => void load(), 15000);
     return () => {
       active = false;
+      clearInterval(timer);
     };
   }, [token, session]);
   useEffect(() => {
@@ -62,6 +75,15 @@ export function ServiceRequests({
       setBusy(false);
     }
   };
+  // "Not loaded yet because the request failed" is not the same as "the restaurant turned this
+  // off" — the first still deserves some way to reach staff, the second deserves nothing shown.
+  if (!options && optionsFailed) {
+    return (
+      <section className="service-panel">
+        <p className="muted">Need something at your table? Please call a team member over.</p>
+      </section>
+    );
+  }
   if (!options?.serviceEnabled) return null;
   return (
     <section className="service-panel">

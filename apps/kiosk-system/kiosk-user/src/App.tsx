@@ -20,7 +20,7 @@ import { cancelAbandonedKioskDraft, confirmKioskCashOrder } from './kioskOrderLi
 import { activateKioskDevice, resolveRestaurantByCode, syncRestaurantIdentity, RESTAURANT_CODE_RE, isKioskDeviceConnected, getKioskDeviceId, getKioskRestaurantId, createPaymentOrder, createPaymentQr, markPaymentFulfilled, claimKitchenTicket, savePendingPayment, loadPendingPayment, clearPendingPayment, getPaymentOrderStatus, emailReceipt, whatsappReceipt, pushOrderSync, pullOrderSync, reportHeartbeat, reportCustomerAiQuery, pushEntitySync, pullEntitySync, CloudApiError, type CartLinePayload, leaseNumberBlock, verifyManagerPin } from './cloud/cloudClient';
 import { AuditRepository, ComboRepository, CouponRepository, CustomerRepository, db, KeyValueStore, FeedbackRepository, KioskDisplaySettingsRepository, KioskRepository, KOTRepository, MenuRepository, OrderRepository, ReceiptRepository, ServiceMessages, ServiceRequestRepository, TableRepository, WelcomeScreenSettingsRepository, RestaurantIdentityRepository, KioskLocalPrinterRepository } from '@jamanvaar/database';
 import { KioskPrinterSettingsModal } from './KioskPrinterSettingsModal';
-import { CartItem, ChatMessage, ComboDeal, Coupon, CustomerAccount, DiningTable, KioskDevice, MenuItem, NetworkState, Order, OrderType, PaymentMethod, PaymentStatus, SelectedModifier, VoiceLanguage } from '@jamanvaar/types';
+import { CartItem, ChatMessage, ComboDeal, Coupon, CustomerAccount, DiningTable, KioskDevice, LoyaltyReward, MenuItem, NetworkState, Order, OrderType, PaymentMethod, PaymentStatus, SelectedModifier, VoiceLanguage } from '@jamanvaar/types';
 import { buildStandardMenu } from './standardMenu';
 import {
   calculateCart,
@@ -28,7 +28,9 @@ import {
   calculateItemUnitPrice,
   CustomerChatbotEngine, AiConfig, refreshConfiguredAi,
   RecommendationEngine,
-  validateModifiers
+  validateModifiers,
+  dishNeedsChoiceBeforeAdd,
+  clampItemQuantity
 } from '@jamanvaar/business';
 import { Button, EmptyState, JamanvaarLogo, BrandHeader, Modal, StatusBadge, ThermalReceiptView, JAMANVAARStartup, JamanvaarKioskAuthLayout, ActivationNoticeBanner, ActivationHelpNote, CachedImg, MenuCategoryIcon, LocalCorePairing, useAiAccess, JamanAiAccessNotice } from '@jamanvaar/ui';
 import { formatINR, formatSplitTax, splitTaxPaise, generateIdempotencyKey, generateSecureNumericCode, generateUUID, localizedDescription, localizedName, SoundService, ImageCache, menuDishImage, collectMenuImageUrls, isMenuPlaceholder } from '@jamanvaar/utils';
@@ -74,6 +76,10 @@ function formatActivationKeyInput(raw: string): string {
   return groups.join('-');
 }
 
+const ACTIVATION_KEY_PATTERN = /^JMV-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+/** 15 alphanumeric characters once the dashes are stripped — same count formatActivationKeyInput groups into. */
+const ACTIVATION_KEY_LENGTH = 15;
+
 /**
  * Razorpay returns the UPI QR as a base64 image (Order Pay API, `qrcode` channel). Accepts a ready-made
  * data: URL or bare base64; anything else (for example a raw upi:// string, which this kiosk has no QR
@@ -98,7 +104,10 @@ export default function KioskUserApp() {
   // Device activation (Phase 3) — this terminal has no identity until an
   // activation code is redeemed; everything below assumes a real device.
   const [isDeviceActivated, setIsDeviceActivated] = useState<boolean>(() => isKioskDeviceConnected());
-  const [restaurantCodeInput, setRestaurantCodeInput] = useState('');
+  const [restaurantCodeInput, setRestaurantCodeInput] = useState(() => {
+    const code = new URLSearchParams(location.search).get('restaurantCode') || '';
+    return RESTAURANT_CODE_RE.test(code) ? code : '';
+  });
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
   const [showKeyHint, setShowKeyHint] = useState(false);
@@ -135,7 +144,8 @@ export default function KioskUserApp() {
     setActivationStep('registering');
     let result: Awaited<ReturnType<typeof activateKioskDevice>>;
     try {
-      result = await activateKioskDevice(activationCode);
+      const expectedBranch = new URLSearchParams(location.search).get('branchId');
+      result = await activateKioskDevice(activationCode,resolved.restaurantId,expectedBranch && /^[0-9a-f-]{36}$/i.test(expectedBranch) ? expectedBranch : undefined);
     } catch (err) {
       setActivationError(kioskActivationError(err, 'key', navigator.onLine));
       setActivationStep('form');
@@ -370,7 +380,12 @@ export default function KioskUserApp() {
   const [otpAttempts, setOtpAttempts] = useState(0);
   const OTP_VALID_MS = 2 * 60 * 1000;
   const OTP_MAX_ATTEMPTS = 5;
-  const [redeemedPoints, setRedeemedPoints] = useState<number>(0);
+  // security-audit/F16: this used to be a flat "points == rupees" redemption
+  // (redeem up to min(points, subtotal)), a different valuation than the catalog
+  // reward POS uses (e.g. ₹100 off for 150 points). Tracking the actual selected
+  // catalog reward instead means the discount always comes from
+  // CustomerRepository.rewardDiscount, the same contract every channel uses.
+  const [selectedReward, setSelectedReward] = useState<LoyaltyReward | null>(null);
 
   // Menu Navigation States
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('ALL');
@@ -379,7 +394,9 @@ export default function KioskUserApp() {
 
   // Modifier Customization Modal State
   const [optionSearch, setOptionSearch] = useState('');
-  const [searchTarget, setSearchTarget] = useState<'menu'|'options'|null>(null);
+  // F19: coupon entry and the customization note had no themed on-screen keyboard of their own,
+  // unlike search and the receipt email field — this reuses the exact same keyboard overlay.
+  const [searchTarget, setSearchTarget] = useState<'menu'|'options'|'coupon'|'instructions'|null>(null);
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
   const [activeItemQuantity, setActiveItemQuantity] = useState<number>(1);
   const [selectedModifiers, setSelectedModifiers] = useState<SelectedModifier[]>([]);
@@ -449,6 +466,11 @@ export default function KioskUserApp() {
   const [onlinePaymentUnavailable, setRazorpayUnavailable] = useState(false);
   // The restaurant's online payments are switched on only once its Razorpay vendor is verified. Until then the guest is told so.
   const [onlinePaymentsPending, setOnlinePaymentsPending] = useState(false);
+  // F18: a connection/timeout failure trying to create the payment order is not the same
+  // situation as the restaurant's online payment being genuinely unavailable (not activated,
+  // or a server-confirmed rejection) — only the former is worth inviting a retry for.
+  const [onlinePaymentConnectionIssue, setOnlinePaymentConnectionIssue] = useState(false);
+  const [upiDiscountWarningArmed, setUpiDiscountWarningArmed] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   remoteLogoutSafety.current = isProcessingPayment || (!!realPaymentId && !['SUCCESS', 'FAILED', 'EXPIRED', 'CANCELLED', 'REFUNDED'].includes(paymentStatus));
   // The UPI QR shown on this screen for the pending payment (created by the server, rendered here).
@@ -844,11 +866,12 @@ export default function KioskUserApp() {
     setQuotedPayable(null);
     setLocalOrderIdForPayment(null);
     setRazorpayUnavailable(false);
+    setOnlinePaymentConnectionIssue(false);
     setPlacedOrder(null);
     setShowIdleWarning(false);
     setIdleSeconds(0);
     setLoggedInAccount(null);
-    setRedeemedPoints(0);
+    setSelectedReward(null);
     setStaffOverrideActive(false);
     setLoyaltyRedemptionApproved(false);
     setFeedbackSubmitted(false);
@@ -903,8 +926,18 @@ export default function KioskUserApp() {
   });
 
   const staffDiscount = staffOverrideActive ? Math.round(rawCalculated.subtotal * 0.1) : 0;
+  // The reward's own discountAmount (e.g. ₹100), never the points count — those are two
+  // different numbers now that redemption follows the catalog reward's valuation.
+  const loyaltyDiscountAmount = selectedReward ? CustomerRepository.rewardDiscount(selectedReward, rawCalculated.items, rawCalculated.subtotal) : 0;
+  // Same "best affordable reward" pick POS's PosLoyaltyRewards banner offers, so a kiosk guest
+  // sees the identical catalog valuation rather than a channel-specific flat conversion.
+  const eligibleReward = loggedInAccount && CustomerRepository.getProgramSettings().enabled !== false
+    ? CustomerRepository.getRewards()
+        .filter((r) => r.isActive && loggedInAccount!.loyaltyPoints >= r.pointsCost && CustomerRepository.rewardDiscount(r, rawCalculated.items, rawCalculated.subtotal) > 0)
+        .sort((a, b) => CustomerRepository.rewardDiscount(b, rawCalculated.items, rawCalculated.subtotal) - CustomerRepository.rewardDiscount(a, rawCalculated.items, rawCalculated.subtotal))[0]
+    : undefined;
   const netTotalPayable = step === 'CHECKOUT_PAYMENT' && paymentMethod === 'UPI' && quotedPayable !== null
-    ? quotedPayable : Math.max(0, rawCalculated.totalPayable - redeemedPoints - staffDiscount);
+    ? quotedPayable : Math.max(0, rawCalculated.totalPayable - loyaltyDiscountAmount - staffDiscount);
   const cartItemQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const kioskSurfaceClass = 'rounded-xl border border-jaman-border bg-white shadow-sm';
   const kioskAmountClass = 'text-right tabular-nums whitespace-nowrap';
@@ -1013,7 +1046,7 @@ export default function KioskUserApp() {
     resetIdleTimer();
     setCustomizationError(null);
     setOptionSearch('');setCustomizingItem(item);
-    setActiveItemQuantity(1);
+    setActiveItemQuantity(item.minQuantity ?? 1);
     setSpecialInstructions('');
     setSelectedModifiers(defaultModifiersFor(item));
   };
@@ -1025,21 +1058,26 @@ export default function KioskUserApp() {
   // item, the tap instead adds it directly (same as "+"), so tapping the
   // card body is never a dead click.
   const handleCardClick = (item: MenuItem) => {
-    if (item.modifierGroupIds && item.modifierGroupIds.length > 0) {
+    if ((item.modifierGroupIds && item.modifierGroupIds.length > 0) || dishNeedsChoiceBeforeAdd(item, item.modifierGroups)) {
       handleOpenCustomize(item);
     } else {
       handleSelectItem(item);
     }
   };
 
-  // The kiosk's "+" quick-add always adds directly with default options,
-  // even for an item that has a required modifier group — the modal only
-  // opens from the explicit "Customize" button now. Guests can still
-  // adjust a default choice afterward from the cart, but tapping + must
-  // never interrupt them with a card.
+  // The kiosk's "+" quick-add adds directly with default options for a plain
+  // item, but a dish with a REQUIRED modifier group or a configured minimum
+  // quantity above one cannot be completed with bare defaults — a guest who
+  // never opens "Customize" must still not be able to submit an incomplete
+  // or under-minimum line. Route those through the same customization sheet
+  // instead; only a genuinely optional-everything dish adds directly.
   const handleSelectItem = (item: MenuItem) => {
     SoundService.playTap();
     resetIdleTimer();
+    if (dishNeedsChoiceBeforeAdd(item, item.modifierGroups)) {
+      handleOpenCustomize(item);
+      return;
+    }
     addToCartDirect(item, 1, defaultModifiersFor(item), '');
   };
 
@@ -1060,6 +1098,7 @@ export default function KioskUserApp() {
     notes: string
   ) => {
     SoundService.playAdd();
+    quantity = clampItemQuantity(item, quantity);
     const unitPrice = calculateItemUnitPrice(item.price, modifiers);
 
     applyCart((prev) => {
@@ -1078,7 +1117,7 @@ export default function KioskUserApp() {
       if (existingIdx !== -1) {
         const next = [...prev];
         const existing = next[existingIdx];
-        const nextQty = existing.quantity + quantity;
+        const nextQty = clampItemQuantity(item, existing.quantity + quantity);
         next[existingIdx] = {
           ...existing,
           quantity: nextQty,
@@ -1152,8 +1191,10 @@ export default function KioskUserApp() {
       prev
         .map((it) => {
           if (it.cartItemId !== cartItemId) return it;
-          const nextQty = it.quantity + delta;
-          if (nextQty <= 0) return null;
+          const rawQty = it.quantity + delta;
+          // Below the dish's configured minimum (default 1) means "remove it".
+          if (rawQty < (it.item.minQuantity ?? 1)) return null;
+          const nextQty = clampItemQuantity(it.item, rawQty);
           return {
             ...it,
             quantity: nextQty,
@@ -1255,6 +1296,7 @@ export default function KioskUserApp() {
     setPaymentTimeLeft(60);
     setPaymentStatus('WAITING_FOR_USER');
     setRazorpayUnavailable(false);
+    setOnlinePaymentConnectionIssue(false);
 
     const effectiveMethod = networkState === 'OFFLINE' ? 'CASH_AT_COUNTER' : paymentMethod;
 
@@ -1290,13 +1332,17 @@ export default function KioskUserApp() {
         kitchenStatus: 'PENDING'
       })),
       subtotal: rawCalculated.subtotal,
-      discountAmount: rawCalculated.discountAmount + redeemedPoints + staffDiscount,
-      // security-audit HIGH kiosk-loyalty-02: this used to only live in the redeemedPoints React
-      // state, never on the order itself -- settleOrder() (the real, payment-confirmed moment
-      // for a cash order) had no way to find out how many points to deduct later, and nothing
-      // else ever did either (see the fix in proceedToConfirmation below). Stamped here so it
-      // survives to settlement the same way customerPhone already does.
-      loyaltyPointsRedeemed: redeemedPoints > 0 ? redeemedPoints : undefined,
+      discountAmount: rawCalculated.discountAmount + loyaltyDiscountAmount + staffDiscount,
+      // The structured reward reference (not a bare points number) is what settleOrder()'s
+      // existing commitOrderRedemption step reads -- the same mechanism POS uses, which also
+      // validates the reward is still active/affordable/unchanged before deducting its points.
+      loyaltyRedemption: selectedReward && loggedInAccount ? {
+        rewardId: selectedReward.id,
+        name: selectedReward.name,
+        pointsCost: selectedReward.pointsCost,
+        discountAmount: loyaltyDiscountAmount,
+        customerPhone: loggedInAccount.phone
+      } : undefined,
       couponCode: appliedCoupon?.code,
       cgstAmount: rawCalculated.cgstAmount,
       sgstAmount: rawCalculated.sgstAmount,
@@ -1373,12 +1419,13 @@ export default function KioskUserApp() {
             const line = result.quote.lines[index];
             return line ? { ...item, unitPrice: line.unitPrice / 100, totalPrice: line.unitPrice * item.quantity / 100,
               snapshot: { taxGroupId: line.taxGroupId, taxRateBp: line.taxRate, taxInclusive: line.taxInclusive, lineTax: line.lineTax } } : item;
-          })
+          }),
+          loyaltyRedemption: undefined
         });
       }
       // The online quote currently has no coupon/points discount contract. Never consume a benefit the gateway did not apply.
-      if (appliedCoupon || redeemedPoints > 0 || staffDiscount > 0) {
-        setAppliedCoupon(null); setRedeemedPoints(0); setStaffOverrideActive(false); setLoyaltyRedemptionApproved(false);
+      if (appliedCoupon || selectedReward || staffDiscount > 0) {
+        setAppliedCoupon(null); setSelectedReward(null); setStaffOverrideActive(false); setLoyaltyRedemptionApproved(false);
         showToast('Discounts were not applied to this online payment. No coupon or points will be used; check the updated total before paying.');
       } else if (result.amount !== localAmountPaise) {
         showToast('Your order total was updated to match the latest price.');
@@ -1399,6 +1446,9 @@ export default function KioskUserApp() {
       // no retry is offered; fall straight to the cash-at-counter messaging.
       console.error('Payment order creation failed:', err);
       setOnlinePaymentsPending(err instanceof CloudApiError && err.code === 'PAYMENTS_NOT_ACTIVE');
+      // Anything that never got a server response at all (network drop, timeout) is not the same
+      // as a server-confirmed "not available" — only this case invites a retry.
+      setOnlinePaymentConnectionIssue(!(err instanceof CloudApiError));
       setRazorpayUnavailable(true);
     }
   };
@@ -1531,9 +1581,9 @@ export default function KioskUserApp() {
     // deduction added to settleOrder() in repositories.ts.
     if (loggedInAccount && order.loyaltyPointsEarned === undefined && order.paymentStatus === 'SUCCESS') {
       order.loyaltyPointsEarned = CustomerRepository.earnPointsForOrder(loggedInAccount.phone, order.totalAmount, order.id);
-      if (redeemedPoints > 0) {
-        CustomerRepository.redeemPoints(loggedInAccount.phone, redeemedPoints);
-      }
+      // Same validated commit POS's settleOrder() uses: re-checks the reward is still active,
+      // affordable and matches the order's own discount before deducting its points.
+      if (order.loyaltyRedemption) CustomerRepository.commitOrderRedemption(order);
     }
 
     // Update coupon usage
@@ -1999,6 +2049,13 @@ export default function KioskUserApp() {
                 aria-describedby={activationError ? 'kiosk-activation-error' : undefined}
                 className="w-full bg-[#FFFCF8] border-[1.5px] border-[#E5D7C8] focus:border-[#F97316] focus:shadow-[0_0_0_4px_rgba(249,115,22,0.10)] rounded-2xl px-5 py-4 text-lg text-center font-mono text-jaman-navy font-bold focus:outline-hidden transition-all uppercase tracking-wider placeholder:text-slate-400"
               />
+              {activationCode.length > 0 && !ACTIVATION_KEY_PATTERN.test(activationCode) && (
+                <p className="text-[11px] text-amber-700 font-semibold mt-1.5 text-center">
+                  {activationCode.replace(/-/g, '').length < ACTIVATION_KEY_LENGTH
+                    ? `Keep going — a key is ${ACTIVATION_KEY_LENGTH} characters (${activationCode.replace(/-/g, '').length} so far).`
+                    : "That's more than a real key — double-check against your Welcome Kit."}
+                </p>
+              )}
             </div>
             {activationError && (
               <div id="kiosk-activation-error" role="alert" className="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 px-4 py-3 rounded-2xl text-center flex items-center justify-center gap-1.5">
@@ -2008,7 +2065,7 @@ export default function KioskUserApp() {
             )}
             <button
               type="submit"
-              disabled={activationStep !== 'form' || !activationCode.trim() || !restaurantCodeInput.trim()}
+              disabled={activationStep !== 'form' || !ACTIVATION_KEY_PATTERN.test(activationCode) || !restaurantCodeInput.trim()}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#C2570C] to-[#B8500C] hover:brightness-105 disabled:opacity-100 disabled:grayscale-0 disabled:bg-none disabled:bg-[#5F6F80] disabled:shadow-none text-white font-extrabold text-base shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
             >
               <span>
@@ -3033,8 +3090,10 @@ export default function KioskUserApp() {
                       <div className="flex items-center gap-2">
                         <input
                           type="text"
+                          inputMode="none"
+                          readOnly
                           value={couponCodeInput}
-                          onChange={(e) => { setCouponCodeInput(e.target.value.toUpperCase()); setCouponError(null); }}
+                          onClick={() => setSearchTarget('coupon')}
                           placeholder="Enter coupon code"
                           className="min-w-0 flex-1 h-11 bg-white border border-jaman-border rounded-xl px-3 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-jaman-saffron/30 focus:border-jaman-saffron"
                         />
@@ -3050,11 +3109,11 @@ export default function KioskUserApp() {
                   )}
 
                   {/* Loyalty Redemption Option */}
-                  {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (
+                  {loggedInAccount && loggedInAccount.loyaltyPoints > 0 && (eligibleReward || selectedReward) && (
                     <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
                       <div>
-                        <span className="font-bold text-emerald-900">{kioskCopy("screen_redeem_loyalty_points_8591d3", "Redeem Loyalty Points")}</span>
-                        <p className="text-[10px] text-emerald-700">{kioskCopy("screen_balance__e03512", "Balance:")}{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts_52ee19", "Pts")}</p>
+                        <span className="font-bold text-emerald-900">{selectedReward ? selectedReward.name : eligibleReward?.name}</span>
+                        <p className="text-[10px] text-emerald-700">{kioskCopy("screen_balance__e03512", "Balance:")}{loggedInAccount.loyaltyPoints}{kioskCopy("screen_pts_52ee19", "Pts")} · {selectedReward ? selectedReward.pointsCost : eligibleReward?.pointsCost} pts for {formatINR(selectedReward ? loyaltyDiscountAmount : CustomerRepository.rewardDiscount(eligibleReward!, rawCalculated.items, rawCalculated.subtotal))}</p>
                         {/* security-audit HIGH kiosk-loyalty-03: the phone "verification" above is just
                             a self-displayed code (no SMS gateway exists), so it proves nothing about
                             whose points these actually are. A staff member must approve a redemption
@@ -3067,17 +3126,17 @@ export default function KioskUserApp() {
                           className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
                         >{kioskCopy("screen_call_staff_3c4d5e", "Call Staff")}
                         </button>
-                      ) : redeemedPoints > 0 ? (
+                      ) : selectedReward ? (
                         <button
-                          onClick={() => setRedeemedPoints(0)}
+                          onClick={() => setSelectedReward(null)}
                           className="text-xs font-bold text-rose-600"
-                        >{kioskCopy("screen_remove__4a816f", "Remove (₹")}{redeemedPoints})
+                        >{kioskCopy("screen_remove__4a816f", "Remove (₹")}{loyaltyDiscountAmount})
                         </button>
                       ) : (
                         <button
-                          onClick={() => setRedeemedPoints(Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal))}
+                          onClick={() => eligibleReward && setSelectedReward(eligibleReward)}
                           className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg"
-                        >{kioskCopy("screen_redeem__324583", "Redeem ₹")}{Math.min(loggedInAccount.loyaltyPoints, rawCalculated.subtotal)}
+                        >{kioskCopy("screen_redeem__324583", "Redeem ₹")}{eligibleReward ? CustomerRepository.rewardDiscount(eligibleReward, rawCalculated.items, rawCalculated.subtotal) : 0}
                         </button>
                       )}
                     </div>
@@ -3095,10 +3154,10 @@ export default function KioskUserApp() {
                         <span className={kioskAmountClass}>-{formatINR(rawCalculated.discountAmount)}</span>
                       </div>
                     )}
-                    {redeemedPoints > 0 && (
+                    {loyaltyDiscountAmount > 0 && (
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 text-sm text-emerald-600 font-bold">
-                        <span>{kioskCopy("screen_loyalty_reward_points_fe7dc0", "Loyalty Reward Points")}</span>
-                        <span className={kioskAmountClass}>-{formatINR(redeemedPoints)}</span>
+                        <span>{selectedReward?.name ?? kioskCopy("screen_loyalty_reward_points_fe7dc0", "Loyalty Reward Points")}</span>
+                        <span className={kioskAmountClass}>-{formatINR(loyaltyDiscountAmount)}</span>
                       </div>
                     )}
                     {staffDiscount > 0 && (
@@ -3187,12 +3246,23 @@ export default function KioskUserApp() {
                   showToast('Internet required for UPI. Please choose Pay Cash at Counter.');
                   return;
                 }
+                // F17: eligibility decided before payment selection, not discovered afterward —
+                // online payment has no coupon/points contract yet. The first tap toward it while a
+                // discount is active only warns and arms a confirmation; the discount survives that
+                // tap. A second tap (now armed) is what actually proceeds and clears it.
+                if (paymentMethod !== 'UPI' && (appliedCoupon || selectedReward) && !upiDiscountWarningArmed) {
+                  setUpiDiscountWarningArmed(true);
+                  showToast(`Tap UPI / QR again to confirm — online payment will remove your ${selectedReward ? selectedReward.name : appliedCoupon?.code}. Pay cash at the counter to keep it.`);
+                  return;
+                }
+                setUpiDiscountWarningArmed(false);
                 SoundService.playTap();
                 setPaymentMethod('UPI');
                 // The server decides whether online payment is active. A flag from an earlier attempt
                 // (made before the restaurant was activated) must not block the guest from asking again.
                 setRazorpayUnavailable(false);
                 setOnlinePaymentsPending(false);
+                setOnlinePaymentConnectionIssue(false);
                 // No QR has ever been requested yet for this order (guest arrived with Cash
                 // selected, or switched away from UPI and back) -- without this, the tile just
                 // highlights and the QR panel is stuck on "Preparing…" forever. Safe to call even
@@ -3218,7 +3288,7 @@ export default function KioskUserApp() {
                     text saying it was unavailable. Now marked the same way OFFLINE already is. */}
                 {(networkState === 'OFFLINE' || onlinePaymentUnavailable) && (
                   <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                    {networkState === 'OFFLINE' ? 'Requires Internet' : onlinePaymentsPending ? 'Being set up' : 'Unavailable'}
+                    {networkState === 'OFFLINE' ? 'Requires Internet' : onlinePaymentsPending ? 'Being set up' : onlinePaymentConnectionIssue ? 'Connection issue' : 'Unavailable'}
                   </span>
                 )}
               </div>
@@ -3233,6 +3303,7 @@ export default function KioskUserApp() {
               onClick={() => {
                 SoundService.playTap();
                 setPaymentMethod('CASH_AT_COUNTER');
+                setUpiDiscountWarningArmed(false);
               }}
               className={`p-6 rounded-3xl border-2 text-left space-y-4 transition-all duration-200 ${
                 paymentMethod === 'CASH_AT_COUNTER'
@@ -3304,12 +3375,32 @@ export default function KioskUserApp() {
             {paymentMethod === 'UPI' && onlinePaymentUnavailable && (
               <div className="py-8 space-y-4">
                 <Coins className="w-16 h-16 text-jaman-saffron mx-auto" />
-                <h3 className="text-xl font-black text-jaman-navy">{onlinePaymentsPending ? 'Online payment is being set up' : 'Online Payment Unavailable'}</h3>
+                <h3 className="text-xl font-black text-jaman-navy">
+                  {onlinePaymentsPending ? 'Online payment is being set up' : onlinePaymentConnectionIssue ? 'Could not reach online payment' : 'Online Payment Unavailable'}
+                </h3>
                 <p className="text-sm text-[#4A5568]">
                   {onlinePaymentsPending
                     ? 'This restaurant is verifying its online payments. Please pay cash at the counter for now — you will get your token as soon as you confirm.'
-                    : "Please pay cash at the counter instead — you'll get your token as soon as you confirm."}
+                    : onlinePaymentConnectionIssue
+                      ? 'A connection problem stopped us from starting online payment — this may be temporary. Tap UPI / QR again to retry, or pay cash at the counter.'
+                      : "Please pay cash at the counter instead — you'll get your token as soon as you confirm."}
                 </p>
+                {onlinePaymentConnectionIssue && (
+                  <button
+                    type="button"
+                    className="min-h-12 rounded-xl bg-jaman-saffron text-white font-bold px-6"
+                    onClick={() => {
+                      setRazorpayUnavailable(false);
+                      setOnlinePaymentConnectionIssue(false);
+                      if (!realPaymentId && !qrLoading && localOrderIdForPayment) {
+                        const order = OrderRepository.getOrderById(localOrderIdForPayment);
+                        if (order) void requestUpiPayment(order);
+                      }
+                    }}
+                  >
+                    Retry online payment
+                  </button>
+                )}
               </div>
             )}
 
@@ -3599,26 +3690,35 @@ export default function KioskUserApp() {
               <div className="flex items-center gap-3 bg-jaman-ivory border border-jaman-border px-3 py-2 rounded-xl">
                 <button
                   type="button"
+                  disabled={activeItemQuantity <= (customizingItem.minQuantity ?? 1)}
                   onClick={() => {
                     SoundService.playTap();
-                    setActiveItemQuantity((q) => Math.max(1, q - 1));
+                    setActiveItemQuantity((q) => Math.max(customizingItem.minQuantity ?? 1, q - 1));
                   }}
-                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
+                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy disabled:opacity-40"
                 >
                   <Minus className="w-5 h-5" aria-label="Decrease quantity" />
                 </button>
                 <span className="font-black text-lg w-6 text-center">{activeItemQuantity}</span>
                 <button
                   type="button"
+                  disabled={activeItemQuantity >= (customizingItem.maxQuantity ?? Infinity)}
                   onClick={() => {
                     SoundService.playTap();
-                    setActiveItemQuantity((q) => q + 1);
+                    setActiveItemQuantity((q) => Math.min(customizingItem.maxQuantity ?? Infinity, q + 1));
                   }}
-                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy"
+                  className="w-11 h-11 rounded-lg bg-white border border-jaman-border flex items-center justify-center font-bold text-jaman-navy disabled:opacity-40"
                 >
                   <Plus className="w-5 h-5" aria-label="Increase quantity" />
                 </button>
               </div>
+              {((customizingItem.minQuantity ?? 1) > 1 || Number.isFinite(customizingItem.maxQuantity ?? Infinity)) && (
+                <span className="text-xs font-semibold text-slate-500">
+                  {(customizingItem.minQuantity ?? 1) > 1 ? `Min ${customizingItem.minQuantity}` : ''}
+                  {(customizingItem.minQuantity ?? 1) > 1 && Number.isFinite(customizingItem.maxQuantity ?? Infinity) ? ' · ' : ''}
+                  {Number.isFinite(customizingItem.maxQuantity ?? Infinity) ? `Max ${customizingItem.maxQuantity}` : ''}
+                </span>
+              )}
 
               <Button variant="accent" size="lg" className="flex-1" onClick={handleConfirmCustomization}>{kioskCopy("screen_add_to_cart__7aa3dd", "Add to Cart •")}{formatINR(calculateItemTotal(customizingItem.price, activeItemQuantity, selectedModifiers))}
               </Button>
@@ -3779,8 +3879,10 @@ export default function KioskUserApp() {
               </div>
               <input
                 type="text"
+                inputMode="none"
+                readOnly
                 value={specialInstructions}
-                onChange={(e) => setSpecialInstructions(e.target.value)}
+                onClick={() => setSearchTarget('instructions')}
                 placeholder={t('notesPlaceholder')}
                 className="w-full bg-jaman-ivory border border-jaman-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-jaman-navy"
               />
@@ -4351,7 +4453,14 @@ export default function KioskUserApp() {
         </div>
       )}
     </div>
-      {searchTarget && <KioskSearchKeyboard title={searchTarget === 'menu' ? 'Search dishes' : 'Search dish options'} value={searchTarget==='menu' ? searchQuery : optionSearch} onChange={searchTarget==='menu' ? setSearchQuery : setOptionSearch} onClose={()=>setSearchTarget(null)} />}
+      {searchTarget && <KioskSearchKeyboard
+        title={searchTarget === 'menu' ? 'Search dishes' : searchTarget === 'options' ? 'Search dish options' : searchTarget === 'coupon' ? 'Enter coupon code' : 'Kitchen note / special instructions'}
+        value={searchTarget === 'menu' ? searchQuery : searchTarget === 'options' ? optionSearch : searchTarget === 'coupon' ? couponCodeInput : specialInstructions}
+        onChange={searchTarget === 'menu' ? setSearchQuery : searchTarget === 'options' ? setOptionSearch : searchTarget === 'coupon' ? (v: string) => { setCouponCodeInput(v.toUpperCase()); setCouponError(null); } : setSpecialInstructions}
+        confirmLabel={searchTarget === 'menu' || searchTarget === 'options' ? 'Show results' : 'Done'}
+        placeholder={searchTarget === 'coupon' ? 'Coupon code' : searchTarget === 'instructions' ? 'e.g. Less spicy, no onion' : undefined}
+        onClose={() => setSearchTarget(null)}
+      />}
     </JAMANVAARStartup>
   );
 }

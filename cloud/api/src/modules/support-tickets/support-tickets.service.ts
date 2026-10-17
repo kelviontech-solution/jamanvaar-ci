@@ -1,4 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ActivationKeysService } from '../activation-keys/activation-keys.service';
+import { permissionsForRole, PlatformRoleName } from '../../common/rbac/access';
 import { Prisma, PlatformUser, TicketPriority, TicketStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -34,8 +36,30 @@ export class SupportTicketsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly notifications: PlatformNotificationsService
+    private readonly notifications: PlatformNotificationsService,
+    private readonly keys: ActivationKeysService
   ) {}
+
+  async issueKioskKey(ticketId:string,actor:PlatformUser) {
+    if(permissionsForRole(actor.role as PlatformRoleName).devices!=='write')throw new ForbiddenException('Device provisioning permission is required.');
+    return this.prisma.runAsPlatform(async tx=>{
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'ticket-kiosk-key:'+ticketId}))`;
+      const ticket=await tx.supportTicket.findUnique({where:{id:ticketId},include:{events:true}});
+      if(!ticket?.restaurantId||!ticket.branchId||ticket.source!=='RESTAURANT'||ticket.category!=='ONBOARDING')throw new BadRequestException('A restaurant kiosk request with an assigned branch is required.');
+      const issued=ticket.events.find(e=>e.type==='KIOSK_KEY_ISSUED');
+      if(issued)return {alreadyIssued:true,keyId:issued.toValue,code:null};
+      if(['RESOLVED','CLOSED'].includes(ticket.status))throw new BadRequestException('Reopen the request before issuing a key.');
+      const request=ticket.events.find(e=>e.type==='KIOSK_ACTIVATION_REQUEST');
+      // Existing requests remain supported, but never infer a device type from arbitrary ticket text.
+      if(!request&&ticket.subject!=='Kiosk activation key')throw new BadRequestException('This is not a kiosk activation request.');
+      const name=request?JSON.parse(request.toValue||'{}').terminalName:undefined;
+      const key=await this.keys.generate({restaurantId:ticket.restaurantId,branchId:ticket.branchId,allowedDeviceType:'KIOSK',label:name||`Kiosk request ${ticket.number}`,expiresAt:new Date(Date.now()+7*86400000)},actor,tx);
+      await tx.ticketEvent.create({data:{ticketId,type:'KIOSK_KEY_ISSUED',actorName:actor.fullName,toValue:key.id}});
+      await tx.supportTicket.update({where:{id:ticketId},data:{status:'IN_PROGRESS'}});
+      await this.audit.log({actorType:'PLATFORM',actorId:actor.id,restaurantId:ticket.restaurantId,action:'KIOSK_SUPPORT_KEY_ISSUED',category:'ACTIVATION',details:{ticketId,keyId:key.id,branchId:ticket.branchId}},tx);
+      return {alreadyIssued:false,keyId:key.id,code:key.code};
+    });
+  }
 
   /**
    * Every team member sees every ticket; the views narrow it. `my-work` is what the logged-in

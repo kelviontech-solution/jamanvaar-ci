@@ -1,0 +1,43 @@
+{
+  "rows": [
+    {
+      "name": "Order-wide chef note is absent from the recovery snapshot",
+      "result": {
+        "draftHasOrderNotes": false,
+        "savedDraftKeys": [
+          "id",
+          "terminalId",
+          "orderType",
+          "guestCount",
+          "customerPhone",
+          "customerName",
+          "cart",
+          "billDiscountPercent",
+          "billDiscountFlat",
+          "updatedAt"
+        ],
+        "noteVisibleInCart": true
+      }
+    },
+    {
+      "name": "Chef notes editor carries previous text into a new empty cart",
+      "result": {
+        "previousGuestText": "Pack separately for this guest"
+      }
+    },
+    {
+      "name": "Cashier opens a register shift before counter collection",
+      "result": {
+        "noActiveShiftMessage": 0
+      }
+    },
+    {
+      "name": "Kiosk cash bill settles through the existing POS payment screen",
+      "result": {
+        "paymentStatus": "SUCCESS",
+        "source": "KIOSK",
+        "totalPaise": 28000
+      }
+    }
+  ]
+}

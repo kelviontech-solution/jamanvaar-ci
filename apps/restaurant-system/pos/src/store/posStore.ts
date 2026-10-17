@@ -7,7 +7,7 @@ import { Platform } from '@jamanvaar/api';
 import { PosRecoveryService } from '../services/recoveryService';
 import { lanMeshSync, SyncOutboxEngine, StaffSession, verifyPinWithSync, type RefundApprovalScope } from '@jamanvaar/sync';
 import { deviceFetch as posDeviceFetch } from '../cloud/cloudClient';
-import { SessionPersistence, AuthStatus, calculateCart } from '@jamanvaar/business';
+import { SessionPersistence, AuthStatus, calculateCart, resolveModifierGroups, dishNeedsChoiceBeforeAdd, clampItemQuantity } from '@jamanvaar/business';
 import { generateUUID } from '@jamanvaar/utils';
 import { outstandingBillAmount } from '@jamanvaar/utils';
 
@@ -49,6 +49,9 @@ const EMPTY_CART: Cart = {
   roundOffAmount: 0,
   totalPayable: 0
 };
+
+/** The result of any action that may replace the active cart: `ok` when it proceeded, or a reason the cashier can act on when the active cart's unsent work blocked it. */
+export type CartSwitchResult = { ok: true } | { ok: false; reason: string };
 
 interface PosState {
   // Authentication & Session
@@ -146,6 +149,8 @@ interface PosState {
     specialInstructions?: string,
     quantity?: number
   ) => void;
+  /** The one add-to-cart decision every entry point (card tap, quick-add chip, search result, speed bar) must call: opens the customization sheet when the dish has a required choice or a minimum quantity above one, otherwise adds it directly with its defaults. */
+  quickAddOrCustomize: (item: MenuItem) => void;
   updateItemQuantity: (cartItemId: string, delta: number) => void;
   updateItemCustomization: (
     cartItemId: string,
@@ -178,7 +183,7 @@ interface PosState {
   clearCart: () => void;
 
   holdCurrentOrder: (label?: string) => boolean;
-  recallHeldOrder: (heldId: string) => boolean;
+  recallHeldOrder: (heldId: string) => CartSwitchResult;
 
   repeatOrder: (order: Order) => Cart;
   repeatLastOrder: () => Cart | null;
@@ -218,11 +223,11 @@ interface PosState {
   ) => void;
   closeOverrideModal: () => void;
 
-  loadOrderFromTable: (table: DiningTable) => void;
+  loadOrderFromTable: (table: DiningTable) => CartSwitchResult;
   /** Same cart-loading behaviour as loadOrderFromTable, but by order id directly — for settling a
    * bill from Live Orders or a bill-request notification, where a table may not even apply
    * (takeaway/delivery orders can also sit in Live Orders awaiting settlement). */
-  loadOrderForSettlement: (orderId: string) => boolean;
+  loadOrderForSettlement: (orderId: string) => CartSwitchResult;
   openCashDrawer: () => void;
   recoverDraftSession: () => void;
   discardDraftSession: () => void;
@@ -350,6 +355,37 @@ function findRunningOrder(state: { selectedTable: DiningTable | null; runningOrd
   return found;
 }
 
+/**
+ * Called right before an action is about to REPLACE the active cart with a different cart (recalling
+ * a held order, opening a table's existing order, settling an order from Live Orders/a bill request).
+ * An empty cart has nothing to protect. A cart bound to a running kitchen order is already safe in
+ * that order's own record, UNLESS it has unsent line edits — those are refused rather than silently
+ * dropped, so the cashier sends the KOT or finishes editing before switching away. A cart that is NOT
+ * bound to any running order is unsaved local work: it is parked as a new held order automatically so
+ * opening someone else's bill can never erase it, matching holdCurrentOrder's own hold shape.
+ */
+function protectActiveCartBeforeSwitch(state: PosState): { ok: true } | { ok: false; reason: string } {
+  if (state.cart.items.length === 0) return { ok: true };
+  if (findRunningOrder(state)) {
+    const hasUnsent = state.cart.items.some((ci) => ci.quantity > (ci.kotSentQty || 0));
+    if (hasUnsent) {
+      return { ok: false, reason: 'This order has items not yet sent to the kitchen. Send KOT or finish editing it before opening another order.' };
+    }
+    return { ok: true };
+  }
+  HeldOrderRepository.holdOrder({
+    label: state.selectedTable ? `Table #${state.selectedTable.tableNumber}` : `Takeaway #${Date.now().toString().slice(-4)}`,
+    orderType: state.orderType,
+    tableNumber: state.selectedTable?.tableNumber,
+    customerName: state.selectedCustomer?.name || state.deliveryDetails.name || undefined,
+    customerPhone: state.selectedCustomer?.phone || state.deliveryDetails.phone || undefined,
+    cart: state.cart,
+    cashierName: state.currentUser?.fullName || 'Cashier',
+    notes: state.orderNotes
+  });
+  return { ok: true };
+}
+
 /** Brings an open order's lines and totals in line with the cart, and flags it for cloud sync. */
 function syncOrderToCart(order: Order, cart: Cart): void {
   if (order.orderStatus === 'COMPLETED' || order.tableReleasedAt) return;
@@ -387,7 +423,8 @@ function saveDiscountDraft(state: PosState): void {
     terminalId: state.posTerminalId, orderType: state.orderType,
     selectedTable: state.selectedTable, selectedCustomer: state.selectedCustomer,
     guestCount: state.guestCount, cart: state.cart,
-    billDiscountPercent: state.billDiscountPercent, billDiscountFlat: state.billDiscountFlat
+    billDiscountPercent: state.billDiscountPercent, billDiscountFlat: state.billDiscountFlat,
+    notes: state.orderNotes
   });
 }
 
@@ -610,7 +647,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: get().guestCount,
         cart: get().cart,
         billDiscountPercent: get().billDiscountPercent,
-        billDiscountFlat: get().billDiscountFlat
+        billDiscountFlat: get().billDiscountFlat,
+        notes: get().orderNotes
       });
     },
 
@@ -627,7 +665,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: get().guestCount,
         cart: get().cart,
         billDiscountPercent: get().billDiscountPercent,
-        billDiscountFlat: get().billDiscountFlat
+        billDiscountFlat: get().billDiscountFlat,
+        notes: get().orderNotes
       });
     },
 
@@ -642,7 +681,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: get().guestCount,
         cart: get().cart,
         billDiscountPercent: get().billDiscountPercent,
-        billDiscountFlat: get().billDiscountFlat
+        billDiscountFlat: get().billDiscountFlat,
+        notes: get().orderNotes
       });
     },
 
@@ -659,14 +699,20 @@ export const usePosStore = create<PosState>((set, get) => {
       get().applyDiscountUnchecked({ scope: 'BILL', type: 'FIXED', value: discountAmount, reason: `Loyalty reward: ${reward.name}` });
       const cart = { ...get().cart, loyaltyRedemption: { rewardId, name: reward.name, pointsCost: reward.pointsCost, discountAmount, customerPhone: customer.phone } };
       set({ cart, selectedCustomer: customer });
-      PosRecoveryService.saveDraft({ terminalId: state.posTerminalId, orderType: state.orderType, selectedTable: state.selectedTable, selectedCustomer: customer, guestCount: state.guestCount, cart, billDiscountPercent: 0, billDiscountFlat: discountAmount });
+      PosRecoveryService.saveDraft({ terminalId: state.posTerminalId, orderType: state.orderType, selectedTable: state.selectedTable, selectedCustomer: customer, guestCount: state.guestCount, cart, billDiscountPercent: 0, billDiscountFlat: discountAmount, notes: state.orderNotes });
     },
 
     setDeliveryDetails: (details) =>
       set((s) => ({ deliveryDetails: { ...s.deliveryDetails, ...details } })),
 
     setGuestCount: (count) => set({ guestCount: count }),
-    setOrderNotes: (notes) => set({ orderNotes: notes }),
+    setOrderNotes: (notes) => {
+      set({ orderNotes: notes });
+      // Chef notes are order-wide, not a per-item field, so they must be part of the same
+      // recovery draft as the cart itself — otherwise a reload after typing a note loses it
+      // even though the dishes survive.
+      saveDiscountDraft(get());
+    },
 
     setCustomizingItem: (item) => set({ customizingItem: item }),
     setIsPaymentOpen: (open) => set({ isPaymentOpen: open }),
@@ -692,6 +738,8 @@ export const usePosStore = create<PosState>((set, get) => {
         console.warn(`Cannot add unavailable dish "${item.name}" to cart.`);
         return;
       }
+      // 2. Configured quantity rules apply no matter which screen added the dish.
+      quantity = clampItemQuantity(item, quantity);
 
       const state = get();
       const modifierDelta = selectedModifiers.reduce((acc, m) => acc + (m.priceDelta || 0), 0);
@@ -711,7 +759,7 @@ export const usePosStore = create<PosState>((set, get) => {
       if (existingIdx !== -1) {
         newItems = [...state.cart.items];
         const existing = newItems[existingIdx];
-        const newQty = existing.quantity + quantity;
+        const newQty = clampItemQuantity(item, existing.quantity + quantity);
         newItems[existingIdx] = {
           ...existing,
           quantity: newQty,
@@ -751,8 +799,22 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount,
         cart: updatedCart,
         billDiscountPercent: state.billDiscountPercent,
-        billDiscountFlat: state.billDiscountFlat
+        billDiscountFlat: state.billDiscountFlat,
+        notes: state.orderNotes
       });
+    },
+
+    quickAddOrCustomize: (item: MenuItem) => {
+      if (item.isAvailable === false) {
+        console.warn(`Cannot add unavailable dish "${item.name}" to cart.`);
+        return;
+      }
+      const groups = resolveModifierGroups(item, db.modifierGroups);
+      if (dishNeedsChoiceBeforeAdd(item, groups)) {
+        get().setCustomizingItem(item);
+      } else {
+        get().addItemToCart(item);
+      }
     },
 
     updateItemQuantity: (cartItemId: string, delta: number) => {
@@ -762,11 +824,13 @@ export const usePosStore = create<PosState>((set, get) => {
 
       const newItems = [...state.cart.items];
       const target = newItems[itemIdx];
-      const newQty = target.quantity + delta;
+      const rawQty = target.quantity + delta;
 
-      if (newQty <= 0) {
+      // Below the dish's configured minimum (default 1) means "remove it", not an invalid partial quantity.
+      if (rawQty < (target.item.minQuantity ?? 1)) {
         newItems.splice(itemIdx, 1);
       } else {
+        const newQty = clampItemQuantity(target.item, rawQty);
         newItems[itemIdx] = {
           ...target,
           quantity: newQty,
@@ -793,7 +857,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount,
         cart: updatedCart,
         billDiscountPercent: state.billDiscountPercent,
-        billDiscountFlat: state.billDiscountFlat
+        billDiscountFlat: state.billDiscountFlat,
+        notes: state.orderNotes
       });
     },
 
@@ -838,7 +903,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount,
         cart: updatedCart,
         billDiscountPercent: state.billDiscountPercent,
-        billDiscountFlat: state.billDiscountFlat
+        billDiscountFlat: state.billDiscountFlat,
+        notes: state.orderNotes
       });
     },
 
@@ -871,7 +937,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount,
         cart: updatedCart,
         billDiscountPercent: state.billDiscountPercent,
-        billDiscountFlat: state.billDiscountFlat
+        billDiscountFlat: state.billDiscountFlat,
+        notes: state.orderNotes
       });
     },
 
@@ -897,7 +964,8 @@ export const usePosStore = create<PosState>((set, get) => {
         guestCount: state.guestCount,
         cart: updatedCart,
         billDiscountPercent: state.billDiscountPercent,
-        billDiscountFlat: state.billDiscountFlat
+        billDiscountFlat: state.billDiscountFlat,
+        notes: state.orderNotes
       });
     },
 
@@ -1073,8 +1141,12 @@ export const usePosStore = create<PosState>((set, get) => {
     },
 
     recallHeldOrder: (heldId: string) => {
+      const state = get();
+      const guard = protectActiveCartBeforeSwitch(state);
+      if (!guard.ok) return guard;
+
       const recalled = HeldOrderRepository.recallOrder(heldId);
-      if (!recalled) return false;
+      if (!recalled) return { ok: false, reason: 'This held order is no longer available.' };
 
       let foundTable: DiningTable | null = null;
       if (recalled.tableNumber) {
@@ -1093,9 +1165,26 @@ export const usePosStore = create<PosState>((set, get) => {
         orderType: recalled.orderType,
         selectedTable: foundTable,
         orderNotes: recalled.notes || '',
+        // The held cart was, by construction, never bound to a running order (holdCurrentOrder
+        // refuses to hold one that is) — any running-order binding from the cart just replaced
+        // must not leak onto this one, or its next KOT/payment would attach to the wrong order.
+        runningOrderId: null,
         activeTab: 'MENU'
       });
-      return true;
+
+      const next = get();
+      PosRecoveryService.saveDraft({
+        terminalId: next.posTerminalId,
+        orderType: next.orderType,
+        selectedTable: next.selectedTable,
+        selectedCustomer: next.selectedCustomer,
+        guestCount: next.guestCount,
+        cart: next.cart,
+        billDiscountPercent: next.billDiscountPercent,
+        billDiscountFlat: next.billDiscountFlat,
+        notes: next.orderNotes
+      });
+      return { ok: true };
     },
 
     sendKOT: () => {
@@ -1297,21 +1386,26 @@ export const usePosStore = create<PosState>((set, get) => {
 
       // 3. Save receipt record & dispatch thermal print job to Print Queue
       if (settled) {
+        const receiptRecordId = `rec-${Date.now()}`;
+        // F21: queued, not sent — the print job below is what actually determines whether the
+        // printer accepted it; a queue dispatch is not hardware success.
         ReceiptRepository.addRecord({
-          id: `rec-${Date.now()}`,
+          id: receiptRecordId,
           orderId: settled.id,
           orderNumber: settled.orderNumber,
           tokenNumber: settled.tokenNumber,
           deliveryMethod: 'PRINT',
-          deliveryStatus: 'SENT',
+          deliveryStatus: 'QUEUED',
           recipient: settled.customerPhone || 'Counter Guest',
           paperSize: '80mm',
           content: PosPrinterService.generateReceiptText(settled, '80mm'),
           createdAt: new Date().toISOString()
         });
 
-        // Add real print job to Hardware Print Queue
-        PosPrinterService.printOrderReceipt(settled, '80mm');
+        // Add real print job to Hardware Print Queue; reconcile the receipt record with its real outcome.
+        void PosPrinterService.printOrderReceipt(settled, '80mm').then((job) => {
+          ReceiptRepository.updateRecordStatus(receiptRecordId, job.status === 'PRINTED' ? 'SENT' : 'FAILED', job.status !== 'PRINTED' ? job.lastError : undefined);
+        });
 
         // If Cash payment, trigger cash drawer kick pulse
         if (method === 'CASH' || method === 'SPLIT') {
@@ -1371,15 +1465,18 @@ export const usePosStore = create<PosState>((set, get) => {
           orderType: 'DINE_IN',
           activeTab: 'MENU'
         });
-        return;
+        return { ok: true };
       }
+
+      const guard = protectActiveCartBeforeSwitch(get());
+      if (!guard.ok) return guard;
 
       const order = OrderRepository.getOrderById(table.currentOrderId);
       if (!order) {
         // The table's order has not reached this counter yet (table status can arrive before the order). Fetch it; the
         // table can then be opened from the floor plan again.
         void SyncOutboxEngine.catchUpFromCloud();
-        return;
+        return { ok: false, reason: "This table's order has not fully synced to this terminal yet. Try again in a moment." };
       }
 
       const cartItems: CartItem[] = order.items.map((oi) => {
@@ -1433,6 +1530,20 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
+
+      const next = get();
+      PosRecoveryService.saveDraft({
+        terminalId: next.posTerminalId,
+        orderType: next.orderType,
+        selectedTable: next.selectedTable,
+        selectedCustomer: next.selectedCustomer,
+        guestCount: next.guestCount,
+        cart: next.cart,
+        billDiscountPercent: next.billDiscountPercent,
+        billDiscountFlat: next.billDiscountFlat,
+        notes: next.orderNotes
+      });
+      return { ok: true };
     },
 
     // Same cart-loading logic as loadOrderFromTable above, but reachable by order id alone -- used
@@ -1441,7 +1552,10 @@ export const usePosStore = create<PosState>((set, get) => {
     // in Live Orders has none at all).
     loadOrderForSettlement: (orderId: string) => {
       const order = OrderRepository.getOrderById(orderId);
-      if (!order || outstandingBillAmount(order) === 0) return false;
+      if (!order || outstandingBillAmount(order) === 0) return { ok: false, reason: 'This order has not fully synced to this terminal yet. Try again in a moment.' };
+
+      const guard = protectActiveCartBeforeSwitch(get());
+      if (!guard.ok) return guard;
 
       const table = db.tables.find((t) => t.currentOrderId === orderId) ?? null;
 
@@ -1497,7 +1611,20 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedCustomer: order.customerPhone ? CustomerRepository.getByPhone(order.customerPhone) ?? null : null,
         activeTab: 'MENU'
       });
-      return true;
+
+      const next = get();
+      PosRecoveryService.saveDraft({
+        terminalId: next.posTerminalId,
+        orderType: next.orderType,
+        selectedTable: next.selectedTable,
+        selectedCustomer: next.selectedCustomer,
+        guestCount: next.guestCount,
+        cart: next.cart,
+        billDiscountPercent: next.billDiscountPercent,
+        billDiscountFlat: next.billDiscountFlat,
+        notes: next.orderNotes
+      });
+      return { ok: true };
     },
 
     recoverDraftSession: () => {
@@ -1526,6 +1653,7 @@ export const usePosStore = create<PosState>((set, get) => {
         discountValue: draft.cart.discountValue ?? 0,
         discountScope: draft.cart.discountScope ?? 'BILL',
         discountReason: draft.cart.discountReason ?? '',
+        orderNotes: draft.notes || '',
         recoverableDraft: null,
         activeTab: 'MENU'
       });
@@ -1606,6 +1734,9 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedCustomer: customer || null,
         billDiscountPercent: 0,
         billDiscountFlat: 0,
+        // This is a freshly-built cart from a past order's items, not a continuation of whatever
+        // was being typed before "Repeat Order" was pressed — it must not inherit that old note.
+        orderNotes: '',
         activeTab: 'MENU'
       });
 
@@ -1616,6 +1747,7 @@ export const usePosStore = create<PosState>((set, get) => {
         selectedCustomer: customer || null,
         guestCount: state.guestCount,
         cart: updatedCart,
+        notes: '',
         billDiscountPercent: 0,
         billDiscountFlat: 0
       });
@@ -1789,13 +1921,16 @@ export const usePosStore = create<PosState>((set, get) => {
         if (settled) {
           // 4. Create print job & receipt record
           const receiptContent = PosPrinterService.generateReceiptText(settled, '80mm');
+          const receiptRecordId = `rec-${Date.now()}`;
+          // F21: queued, not sent — reconciled below with the print job's real outcome, and left
+          // QUEUED (never claimed SENT) when auto-print is off and nothing was actually dispatched.
           ReceiptRepository.addRecord({
-            id: `rec-${Date.now()}`,
+            id: receiptRecordId,
             orderId: settled.id,
             orderNumber: settled.orderNumber,
             tokenNumber: settled.tokenNumber,
             deliveryMethod: 'PRINT',
-            deliveryStatus: 'SENT',
+            deliveryStatus: 'QUEUED',
             recipient: settled.customerPhone || 'Counter Guest',
             paperSize: '80mm',
             content: receiptContent,
@@ -1803,7 +1938,9 @@ export const usePosStore = create<PosState>((set, get) => {
           });
 
           if (cfg.autoPrint) {
-            PosPrinterService.printOrderReceipt(settled, '80mm');
+            void PosPrinterService.printOrderReceipt(settled, '80mm').then((job) => {
+              ReceiptRepository.updateRecordStatus(receiptRecordId, job.status === 'PRINTED' ? 'SENT' : 'FAILED', job.status !== 'PRINTED' ? job.lastError : undefined);
+            });
           }
 
           // If Cash, open cash drawer

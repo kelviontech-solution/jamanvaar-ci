@@ -430,10 +430,15 @@ export function QrOrderingRules({
     [dirty, setDirty] = useState(false),
     [busy, setBusy] = useState(false),[saveError,setSaveError]=useState('');
   useEffect(() => {
-    if (settings.data?.rules) {
+    // Q02: this used to run unconditionally on every `settings.data` change, including the one
+    // triggered by a switch's own save-and-reload below — so flipping an unrelated switch (e.g.
+    // "Send accepted orders straight to the kitchen") silently overwrote an in-progress, unsaved
+    // edit to Preparation estimate (or any other rules field) and disabled Save ordering rules as
+    // if nothing had ever been typed. Skip the sync while there's a real unsaved draft.
+    if (settings.data?.rules && !dirty) {
       setRules(settings.data.rules);
-      setDirty(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.data]);
   useQrUnsavedChanges(dirty);
   const save = async (body: Parameters<typeof QrAdminApi.saveSettings>[0]) => {
@@ -455,6 +460,34 @@ export function QrOrderingRules({
   const patch = (change: Partial<QrRules>) => {
     setRules((r) => (r ? { ...r, ...change } : r));
     setDirty(true);
+  };
+  /**
+   * Switches save instantly (no explicit Save button), unlike the staged `rules` draft above.
+   * Q03: the old inline handler flipped `settings.data` optimistically and never reverted it on a
+   * failed save — a rejected PUT left the toggle showing the new, never-actually-applied value
+   * right alongside the error, instead of the real server state. Also skips `settings.reload()`
+   * on success (Q02): reloading the whole settings object here is exactly what fed a stale
+   * `rules.rules` back into the effect above and clobbered an unrelated unsaved draft.
+   */
+  const saveSwitch = async (
+    key: "allowOnlinePayment" | "allowCash" | "orderingEnabled" | "autoAccept" | "menuOnlyEnabled",
+    checked: boolean
+  ) => {
+    const previous = settings.data?.[key];
+    setBusy(true);
+    setSaveError("");
+    settings.setData((current) => (current ? { ...current, [key]: checked } : current));
+    try {
+      await QrAdminApi.saveSettings({ [key]: checked }, branch);
+      showToast("Settings saved.");
+      ready.reload();
+    } catch (e) {
+      settings.setData((current) => (current ? { ...current, [key]: previous } : current));
+      setSaveError((e as Error).message);
+      showToast((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
   const switches: Array<
     [
@@ -574,13 +607,7 @@ export function QrOrderingRules({
                   !settings.data?.allowOnlinePayment)
               }
               checked={settings.data?.[key] ?? false}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                settings.setData((current) =>
-                  current ? { ...current, [key]: checked } : current,
-                );
-                void save({ [key]: checked });
-              }}
+              onChange={(e) => void saveSwitch(key, e.target.checked)}
             />
           </label>
         ))}

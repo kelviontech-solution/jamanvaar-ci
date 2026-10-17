@@ -1,0 +1,575 @@
+{
+  "url": "/qr/admin/?tab=RESTAURANT_PAGE",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / BRANDING\nRestaurant Page\n\nDesign your restaurant website, branch contacts and mobile welcome page.\n\n✦ JAMAN AI\nEnabled\n\nYOUR RESTAURANT, YOUR WELCOME\n\nRestaurant page studio\n\nDesign a warm first impression. Your menu, table and checkout stay connected.\n\nEditing scope\nRestaurant-wide defaults\nGarden House Flow QA — Main Branch\nApplies to branches using restaurant defaults\n1 active branches; branches with their own published page keep their override.\n\nA FEW STEPS TO YOUR FIRST PAGE\n\nSet up your restaurant welcome\nNot published\n\nYour changes stay private until you review and publish. Photos, social links and a gallery are optional.\n\n1. Choose a design\nHeritage · Page off in draft\n2. Add your welcome\nHeading and welcome needed to enable the page\n3. Check contact details\nOptional · add how guests can reach you\n4. Preview & publish\nReview the design and affected branches\nFill missing restaurant details\n\nMenu not published yet. You can publish restaurant information now; publish your menu before accepting orders.\n\n01 · Choose your design\nHeritage\nHeritage\nWarm ivory · editorial serif · side-by-side story\nCafé\nCafé\nSoft peach · bold type · playful rounded photos\nModern\nModern\nFull-bleed photo · clean type · deep green\n Enable published restaurant page\nWhen customers scan\nOpen menu directly\nShow restaurant page first\n\nPayment returns and existing order/cart tasks resume directly. Existing printed table QR codes keep working.\n\nAccent colour\n02 · Photos & first impression\nRestaurant logo\nHero photograph\nPhoto focal point · 50%\nPhoto horizontal focal point · 50%\n\nUpload JPEG, PNG or WebP up to 20 MB. We orient, resize and compress it automatically. Adjust the focal points and check the mobile crop before publishing.\n\nRestaurant page heading\nCuisine or short tagline\nWelcome message\nMore options · story, gallery, contact & languages\nLaunch checklist · page, menu, payment & test scan\n\nNot published\nDraft saved · Customers currently open the normal QR menu.\n\nSave draft\nReview & publish\nEngagement report · last 30 days\nCopy selected content to other branches\nLive mobile preview\nPreview width\n360 px\n390 px\n430 px\nDesktop\nPreview language\nEnglish\nPreview notice at\nUse current time\nLIVE DESIGN PREVIEW · NO REAL ORDER\nGarden House Flow QA\nALL BRANCHES\n✦\nAll branches\n\nA PLACE AT OUR TABLE\n\nGarden House Flow QA\n\nView menu\n↗\n\nAll branches\n\nAll branches\n\nServed with JAMANVAAR\n\nView menu\n↗\nDisplay",
+  "headings": [
+    "Restaurant Page",
+    "Restaurant page studio",
+    "Set up your restaurant welcome",
+    "Page sections",
+    "Garden House Flow QA"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "1. Choose a design Heritage · Page off in draft",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 530,
+      "height": 65
+    },
+    {
+      "text": "2. Add your welcome Heading and welcome needed to enable the page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 530,
+      "height": 65
+    },
+    {
+      "text": "3. Check contact details Optional · add how guests can reach you",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 530,
+      "height": 65
+    },
+    {
+      "text": "4. Preview & publish Review the design and affected branches",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 530,
+      "height": 65
+    },
+    {
+      "text": "Fill missing restaurant details",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 195,
+      "height": 44
+    },
+    {
+      "text": "HeritageHeritageWarm ivory · editorial serif · side-by-side story",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 190
+    },
+    {
+      "text": "CaféCaféSoft peach · bold type · playful rounded photos",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 190
+    },
+    {
+      "text": "ModernModernFull-bleed photo · clean type · deep green",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 190
+    },
+    {
+      "text": "Save draft",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 90,
+      "height": 44
+    },
+    {
+      "text": "Review & publish",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 130,
+      "height": 44
+    },
+    {
+      "text": "Use current time",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "View menu ↗",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 180,
+      "height": 51
+    },
+    {
+      "text": "View menu ↗",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 338,
+      "height": 51
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Editing scope"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable published restaurant page",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "When customers scan"
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "Accent colour",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Restaurant logo",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Hero photograph",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Photo focal point · 50%",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Photo horizontal focal point",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Restaurant page heading",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Cuisine or short tagline",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Welcome message",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Your restaurant story",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": "Featured published dishes (up to 8)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Add gallery photograph (up to 8)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Featured dishes",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Our story",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Photo gallery",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Visit & opening hours",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Public address",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Physical restaurant opening hours",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "tel",
+      "label": "Public phone number",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "tel",
+      "label": "WhatsApp number (country code + digits)",
+      "placeholder": "+919876543210"
+    },
+    {
+      "tag": "INPUT",
+      "type": "url",
+      "label": "Instagram profile link",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "url",
+      "label": "Google Maps directions link",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "url",
+      "label": "Google review link",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Service notice",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Footer message",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Default page language"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Edit translation"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Heading",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Tagline",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Welcome message",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Restaurant story",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Opening hours",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Notice",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "हिन्दी Footer",
+      "placeholder": "Uses main text: not set"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Scheduled service notice",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Notice starts",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Notice ends",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Collect anonymous page engagement after publishing",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Garden House Flow QA — Main Branch",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Design, colours & sections",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Welcome, story, translations & notice",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Logo, hero & gallery",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Contact details, hours & review links — replaces target details",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enablement, scan destination, featured dishes & analytics",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Preview width"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Preview language"
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Preview notice at",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

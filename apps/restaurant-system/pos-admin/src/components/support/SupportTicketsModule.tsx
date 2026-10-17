@@ -257,7 +257,7 @@ function NewTicket({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
   );
 }
 
-function TicketView({ ticket, onBack, onChanged, showToast }: { ticket: SupportTicketDetail; onBack: () => void; onChanged: () => Promise<void>; showToast: (m: string) => void }) {
+export function TicketView({ ticket, onBack, onChanged, showToast, backLabel = 'Back to tickets' }: { ticket: SupportTicketDetail; onBack: () => void; onChanged: () => Promise<void>; showToast: (m: string) => void; backLabel?:string }) {
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -318,7 +318,7 @@ function TicketView({ ticket, onBack, onChanged, showToast }: { ticket: SupportT
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-xs font-bold text-slate-600">
-        <ArrowLeft className="w-3.5 h-3.5" /> Back to tickets
+        <ArrowLeft className="w-3.5 h-3.5" /> {backLabel}
       </button>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>

@@ -1,0 +1,30 @@
+{
+    "verifiedAt":  "2026-10-16T12:48:38.509Z",
+    "environment":  "Built local applications and isolated test API/database; external providers disabled",
+    "browser":  {
+                    "total":  20,
+                    "passed":  20
+                },
+    "api":  {
+                "files":  4,
+                "total":  36,
+                "passed":  36
+            },
+    "client":  {
+                   "files":  4,
+                   "total":  36,
+                   "passed":  36
+               },
+    "builds":  {
+                   "restaurantKioskAdmin":  "passed",
+                   "api":  "passed",
+                   "superAdmin":  "passed"
+               },
+    "typechecks":  {
+                       "restaurantKioskAdmin":  "passed",
+                       "superAdmin":  "passed"
+                   },
+    "whitespace":  "passed",
+    "deployed":  false,
+    "githubPushed":  false
+}

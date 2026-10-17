@@ -1,0 +1,291 @@
+{
+  "url": "/qr/admin/?tab=ONBOARDING",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nGuided Menu Setup\n\nLoad cuisine templates, review pricing and publish your shared guest menu.\n\n✦ JAMAN AI\nEnabled\nShared restaurant menu\n\nDraft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.\n\nSet up your guest menu\n\nChoose a cuisine, select whole categories, review your prices and options, then publish. Existing dishes stay intact. Menu changes are shared with your restaurant apps.\n\n1. Choose template\n2. Review dishes\n3. Options & taxes\n4. Publish review\n\nYour subscription does not enable this application resource.\n\nCuisine template\nChoose a restaurant niche\nNorth Indian Restaurant / Mughlai & Heritage Indian\nGujarati Restaurant / Authentic Gujarati Heritage\nSouth Indian Restaurant / Traditional South Indian\nPunjabi Dhaba & Restaurant / Authentic Punjabi & Dhaba\nMughlai & Awadhi Restaurant / Royal Mughlai & Awadhi\nKathiyawadi Dhaba & Bhojanalaya / Rustic Saurashtra & Kathiyawadi\nRajasthani Marwari Bhojanalaya / Royal Rajasthani & Marwari\nSouth Indian Tiffin & Breakfast / Fast South Indian Tiffin\nPure Vegetarian Family Restaurant / 100% Pure Veg Multi-Cuisine\nJain Satvik Bhojanalaya / Authentic Jain & No Root-Veg\nIndian Multi-Cuisine Diner / North Indian, South Indian & Chinese\nIndian Family Restaurant & Banquet / North Indian & Family Meals\nGrand Indian Thali Restaurant / Unlimited & Executive Thalis\nAuthentic Chinese & Wok / Pan-Asian & Chinese Wok\nDesi Indo-Chinese Food Corner / Desi Chinese & Fast Asian\nFast Food & Quick Service Restaurant / Fast Food & American\nBurger & Grilled Sandwich Bar / Gourmet Burgers & Sandwiches\nArtisan Café & Coffee Bar / Specialty Coffee & Continental\nBakery, Patisserie & Cafe / Baking & Confectionery\nPizza Restaurant / Italian & Pizza\nStreet Food Restaurant / Authentic Indian Chaat\nSnacks & Quick Bites Corner / Indian Teatime Snacks\nBiryani & Kebab Darbar / Royal Dum Biryanis & Kebabs\nTandoori Grills & Clay-Oven Specialist / Authentic Charcoal Tandoor\nRoyal Indian Sweets & Mithai / Traditional Indian Mithai\nFresh Juice & Mocktail Bar / Cold-Pressed Juices & Shakes\nDessert / Ice Cream / Gourmet Ice Creams & Sundaes\nSouth & North Indian Fusion Diner / Dual Heritage Indian\nFine Dining Gourmet Indian / Gourmet Modern Indian\nCloud Kitchen Multi-Brand Menu / Delivery-Optimized Multi-Brand\nGet Your Restaurant Ready\n\n0 of 4 steps complete\n\nNEXT STEP\n\nAdd your dishes\n\nUse a template or upload your menu; review prices, photos and tax before publishing.\n\nAdd your dishes\nPublish the guest menu\nGenerate and check a table QR\nVerify a paid test order\n\nYour subscription does not enable this application resource. Retry setup checks\n\nOpen final test-order check\nDisplay",
+  "headings": [
+    "Guided Menu Setup",
+    "Set up your guest menu",
+    "Get Your Restaurant Ready"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "1. Choose template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 161,
+      "height": 44
+    },
+    {
+      "text": "2. Review dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 44
+    },
+    {
+      "text": "3. Options & taxes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44
+    },
+    {
+      "text": "4. Publish review",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 145,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "title": "Dismiss checklist",
+      "disabled": false,
+      "width": 24,
+      "height": 44
+    },
+    {
+      "text": "Add your dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 44
+    },
+    {
+      "text": "Publish the guest menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 44
+    },
+    {
+      "text": "Generate and check a table QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 44
+    },
+    {
+      "text": "Verify a paid test order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 44
+    },
+    {
+      "text": "Retry setup checks",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 123,
+      "height": 44
+    },
+    {
+      "text": "Open final test-order check",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 213,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Cuisine template"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 1
+}

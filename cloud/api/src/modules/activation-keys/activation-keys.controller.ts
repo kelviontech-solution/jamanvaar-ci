@@ -6,6 +6,7 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { PlatformAuthGuard } from '../../common/guards/platform-auth.guard';
 import { CurrentPlatformUser } from '../../common/decorators/current-platform-user.decorator';
 import { PlatformRoleName } from '../../common/rbac/access';
+import { z } from 'zod';
 
 @Controller('api/v1/activation-keys')
 @UseGuards(PlatformAuthGuard)
@@ -38,6 +39,13 @@ export class ActivationKeysController {
   @UsePipes(new ZodValidationPipe(bulkKeysSchema))
   bulkReactivate(@Body() body: ReturnType<typeof bulkKeysSchema.parse>, @CurrentPlatformUser() actor: PlatformUser) {
     return this.activationKeys.bulkReactivate(body.ids, actor);
+  }
+
+  @Get('quota-preview')
+  quotaPreview(@Query() query: Record<string,string>) {
+    const schema = z.object({restaurantId:z.string().uuid(), branchId:z.string().uuid().optional(),
+      appCode:z.enum(['POS','POS_ADMIN','KIOSK','KIOSK_ADMIN','CAPTAIN','KDS','QR_ORDERING'])}).strict();
+    return this.activationKeys.quotaPreview(new ZodValidationPipe(schema).transform(query, {type:'body'}));
   }
 
   @Get(':id')

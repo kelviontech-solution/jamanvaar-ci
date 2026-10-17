@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
+import { useDebounced } from '../../hooks/usePagedList';
+import { useAuth } from '../../auth/AuthContext';
 import { Badge, Button, Card, EmptyState, FilterTabs, SearchBar, SkeletonTable } from '../../components/ui';
 import { Wallet } from 'lucide-react';
 import '../../components/shared.css';
@@ -62,6 +64,8 @@ function statusTone(status: Payout['status']): 'success' | 'warning' | 'error' |
 }
 
 export function PayoutsListPage() {
+  const { can } = useAuth();
+  const canWrite = can('billing', 'write');
   const [overview, setOverview] = useState<PayoutOverview | null>(null);
   const [reconciliation, setReconciliation] = useState<ReconciliationRow[] | null>(null);
   const [payouts, setPayouts] = useState<Payout[] | null>(null);
@@ -70,6 +74,8 @@ export function PayoutsListPage() {
   const [limit] = useState(25);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [overviewError, setOverviewError] = useState<string | null>(null);
+  const [reconciliationError, setReconciliationError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
@@ -80,6 +86,7 @@ export function PayoutsListPage() {
   const [holdReason, setHoldReason] = useState('');
   const [password, setPassword] = useState('');
   const [actionPending, setActionPending] = useState(false);
+  const debouncedSearch = useDebounced(search);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -87,14 +94,21 @@ export function PayoutsListPage() {
   };
 
   const loadOverview = useCallback(() => {
-    api.get<PayoutOverview>('/api/v1/payments/payouts/overview').then(setOverview).catch(() => {});
+    setOverviewError(null);
+    api
+      .get<PayoutOverview>('/api/v1/payments/payouts/overview')
+      .then(setOverview)
+      // A failed load used to leave the summary tiles blank with no indication why — rather than
+      // replace real totals with zero, keep the last known numbers (if any) and say so.
+      .catch((err) => setOverviewError(err instanceof ApiError ? err.message : 'Failed to load the payout summary'));
   }, []);
 
   const loadReconciliation = useCallback(() => {
+    setReconciliationError(null);
     api
       .get<{ rows: ReconciliationRow[] }>('/api/v1/payments/payouts/reconciliation')
       .then((d) => setReconciliation(d.rows))
-      .catch(() => {});
+      .catch((err) => setReconciliationError(err instanceof ApiError ? err.message : 'Failed to load the reconciliation board'));
   }, []);
 
   const loadPayouts = useCallback(() => {
@@ -102,6 +116,7 @@ export function PayoutsListPage() {
     setError(null);
     const params = new URLSearchParams();
     if (statusFilter !== 'ALL') params.set('status', statusFilter);
+    if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
     params.set('page', String(page));
     params.set('limit', String(limit));
     api
@@ -112,7 +127,13 @@ export function PayoutsListPage() {
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Failed to load payouts'))
       .finally(() => setLoading(false));
-  }, [statusFilter, page, limit]);
+  }, [statusFilter, debouncedSearch, page, limit]);
+
+  // A new search (or status filter) can match far fewer rows than the page we were on — stay on
+  // page 1 so a match doesn't appear to vanish just because it isn't on whatever page was active.
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
 
   useEffect(loadOverview, [loadOverview]);
   useEffect(loadPayouts, [loadPayouts]);
@@ -174,13 +195,6 @@ export function PayoutsListPage() {
     }
   }
 
-  const filtered = useMemo(() => {
-    if (!payouts) return [];
-    if (!search.trim()) return payouts;
-    const q = search.toLowerCase();
-    return payouts.filter((p) => p.restaurant.name.toLowerCase().includes(q) || p.businessDate.includes(q));
-  }, [payouts, search]);
-
   const tile = (label: string, value: string, tone?: 'good' | 'warn') => (
     <Card>
       <div style={{ padding: 16 }}>
@@ -201,7 +215,7 @@ export function PayoutsListPage() {
             payout PAID only after you have actually sent the bank transfer and have a real UTR.
           </p>
         </div>
-        <Button variant="accent" disabled={runningEod} onClick={handleRunEod}>{runningEod ? 'Running…' : 'Run EOD batch now'}</Button>
+        <Button variant="accent" disabled={runningEod || !canWrite} title={canWrite ? undefined : "You don't have permission to run the EOD batch"} onClick={handleRunEod}>{runningEod ? 'Running…' : 'Run EOD batch now'}</Button>
       </div>
 
       {error && (
@@ -214,6 +228,12 @@ export function PayoutsListPage() {
         <div style={{ padding: '10px 16px', background: '#0B253A', color: '#fff', borderRadius: 8, marginBottom: 16, fontSize: 13, fontWeight: 600 }}>{toast}</div>
       )}
 
+      {overviewError && (
+        <div role="alert" style={{ marginBottom: 16, padding: '10px 16px', background: 'var(--jv-error-soft, #fef2f2)', border: '1px solid var(--jv-err-line, #fecaca)', borderRadius: 8, fontSize: 13, color: 'var(--jv-error-text, #991b1b)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span>{overviewError}{overview ? ' — showing last known totals below.' : ''}</span>
+          <Button size="sm" variant="ghost" onClick={loadOverview}>Retry</Button>
+        </div>
+      )}
       {overview && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 16, marginBottom: 16 }}>
           {tile('Gross Collection', formatRupees(overview.grossCollection))}
@@ -226,6 +246,12 @@ export function PayoutsListPage() {
         </div>
       )}
 
+      {reconciliationError && (
+        <div role="alert" style={{ marginBottom: 16, padding: '10px 16px', background: 'var(--jv-error-soft, #fef2f2)', border: '1px solid var(--jv-err-line, #fecaca)', borderRadius: 8, fontSize: 13, color: 'var(--jv-error-text, #991b1b)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span>{reconciliationError} — the "Why money is stuck" board below may be missing restaurants.</span>
+          <Button size="sm" variant="ghost" onClick={loadReconciliation}>Retry</Button>
+        </div>
+      )}
       {reconciliation && reconciliation.length > 0 && (
         <Card style={{ marginBottom: 16 }}>
           <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 800 }}>Why money is stuck</h3>
@@ -288,11 +314,11 @@ export function PayoutsListPage() {
 
       {payouts && (
         <Card>
-          {filtered.length === 0 ? (
+          {payouts.length === 0 ? (
             <EmptyState
               icon={<Wallet className="w-6 h-6 text-slate-400" />}
-              title="No payouts yet"
-              description="Run the EOD batch to claim any verified restaurant's unpaid, unrefunded collections into a payout."
+              title={debouncedSearch.trim() || statusFilter !== 'ALL' ? 'No payouts match this filter' : 'No payouts yet'}
+              description={debouncedSearch.trim() || statusFilter !== 'ALL' ? 'Try a different search term or status.' : "Run the EOD batch to claim any verified restaurant's unpaid, unrefunded collections into a payout."}
             />
           ) : (
             <div className="data-table-container">
@@ -308,7 +334,7 @@ export function PayoutsListPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((p) => (
+                  {payouts.map((p) => (
                     <tr key={p.id}>
                       <td>
                         <Link to={`/restaurants/${p.restaurantId}`} className="table-link" style={{ fontWeight: 600 }}>
@@ -333,12 +359,12 @@ export function PayoutsListPage() {
                       <td>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {(p.status === 'PENDING' || p.status === 'APPROVED' || p.status === 'ON_HOLD') && (
-                            <Button size="sm" variant="accent" onClick={() => { setModal({ payout: p, kind: 'mark-paid' }); setUtr(''); setTransferConfirmed(false); setPassword(''); }}>Mark paid</Button>
+                            <Button size="sm" variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to mark payouts paid"} onClick={() => { setModal({ payout: p, kind: 'mark-paid' }); setUtr(''); setTransferConfirmed(false); setPassword(''); }}>Mark paid</Button>
                           )}
                           {p.status === 'ON_HOLD' ? (
-                            <Button size="sm" variant="ghost" onClick={() => { setModal({ payout: p, kind: 'release' }); setPassword(''); }}>Release</Button>
+                            <Button size="sm" variant="ghost" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to release payouts"} onClick={() => { setModal({ payout: p, kind: 'release' }); setPassword(''); }}>Release</Button>
                           ) : p.status !== 'PAID' ? (
-                            <Button size="sm" variant="danger" onClick={() => { setModal({ payout: p, kind: 'hold' }); setHoldReason(''); setPassword(''); }}>Hold</Button>
+                            <Button size="sm" variant="danger" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to hold payouts"} onClick={() => { setModal({ payout: p, kind: 'hold' }); setHoldReason(''); setPassword(''); }}>Hold</Button>
                           ) : null}
                         </div>
                       </td>

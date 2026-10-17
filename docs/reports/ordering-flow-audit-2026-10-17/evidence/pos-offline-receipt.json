@@ -1,0 +1,557 @@
+{
+  "url": "/",
+  "text": "POS TERMINAL\nGarden House Flow QA\n\nGarden House Flow QA\n•\n778791f8-025e-4e62-a387-dca68ac1534a\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nSYNC ERROR ⚠\nSync now\nPrinter Offline\n2\nDAY OPEN\n•\n₹360\nJAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nAll pages\nCATEGORIES\nAll Menu\n18\nCHEF SPECIALS\n18\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\n2\nCore: Offline First\nQuick service +\nRepeat last order\nAll Menu\n18 dishes\nAll\nVeg\nJain\nNon-Veg\nQUICK:\nTwin Snack Plate\n₹80\nBuild Your Thali\n₹200\nPaneer Bowl\n₹120\nJain Dal\n₹80\nSeasonal Special 05\n₹80\nMenu\nPaneer Bowl\nMain Kitchen · FLOW-0\n₹120\nBuild Your Thali\nMain Kitchen · FLOW-1\n₹200\nMOD\nTwin Snack Plate\nMain Kitchen · FLOW-2\n₹80\nJain Dal\nJAIN\nMain Kitchen · FLOW-3\n₹80\nSeasonal Special 05\nMain Kitchen · FLOW-4\n₹80\nSeasonal Special 06\nMain Kitchen · FLOW-5\n₹80\nSeasonal Special 07\nMain Kitchen · FLOW-6\n₹80\nSeasonal Special 08\nMain Kitchen · FLOW-7\n₹80\nSeasonal Special 09\nMain Kitchen · FLOW-8\n₹80\nSeasonal Special 10\nMain Kitchen · FLOW-9\n₹80\nSeasonal Special 11\nMain Kitchen · FLOW-10\n₹80\nSeasonal Special 12\nMain Kitchen · FLOW-11\n₹80\nSeasonal Special 13\nMain Kitchen · FLOW-12\n₹80\nSeasonal Special 14\nMain Kitchen · FLOW-13\n₹80\nSeasonal Special 15\nMain Kitchen · FLOW-14\n₹80\nSeasonal Special 16\nMain Kitchen · FLOW-15\n₹80\nSeasonal Special 17\nMain Kitchen · FLOW-16\n₹80\nSeasonal Special 18\nMain Kitchen · FLOW-17\n₹80\nNEW ORDER — UNSAVED\n• Audit Cashier\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nBilling Counter Ready\n\nTap any dish from the menu to add it to this order.\n\n↻ Repeat Last Order\nDiscount\nHold Order\nClear All\nSubtotal ₹0\nGST ₹0\nTotal Payable\n₹0\nPAY ₹0\nSEND KOT\nINSTANT BILL\nCash • Auto Print\nToday Sales:\n₹360\nOrders:\n2\nAOV:\n₹180\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nPRINT RECEIPT\nCASH\nOrder #MAIN-20261017-201 • Token #101\n80mm\n58mm\nGARDEN HOUSE FLOW QA\nBILL / RECEIPT\nTOKEN #101\nInvoice No:\nMAIN-20261017-201\nOrder Type:\nTAKEAWAY\nDate: 17 Oct 2026\nTime: 11:57 am\nPOS: Self-Order Kiosk\nCashier: Audit Cashier\nITEM\nQTY\nRATE\nAMT\nSeasonal Special 18\n1\n₹80\n₹80\nSubtotal\n₹80\nCGST\n₹0.00\nSGST\n₹0.00\nTOTAL\n₹80\nPAID VIA:\nCASH\nPayment ref:\nTXN-07D96D127E\nAmount collected:\n₹80.00\nBalance due:\n₹0.00\nThank you for dining at Garden House Flow QA! Please visit again.\nPowered by JAMANVAAR\nWhatsApp\nSMS\nSave TXT\nDone\nPRINT RECEIPT\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "headings": [
+    "All Menu",
+    "Paneer Bowl",
+    "Build Your Thali",
+    "Twin Snack Plate",
+    "Jain Dal",
+    "Seasonal Special 05",
+    "Seasonal Special 06",
+    "Seasonal Special 07",
+    "Seasonal Special 08",
+    "Seasonal Special 09",
+    "Seasonal Special 10",
+    "Seasonal Special 11",
+    "Seasonal Special 12",
+    "Seasonal Special 13",
+    "Seasonal Special 14",
+    "Seasonal Special 15",
+    "Seasonal Special 16",
+    "Seasonal Special 17",
+    "Seasonal Special 18",
+    "PRINT RECEIPT",
+    "GARDEN HOUSE FLOW QA"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 28
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 40
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 26
+    },
+    {
+      "text": "Printer Offline\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 157,
+      "height": 30
+    },
+    {
+      "text": "DAY OPEN\n•\n₹360",
+      "aria": null,
+      "disabled": false,
+      "width": 161,
+      "height": 26
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "disabled": false,
+      "width": 95,
+      "height": 30
+    },
+    {
+      "text": "A\nAudit Cashier\nCASHIER",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 45
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "All pages",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 32
+    },
+    {
+      "text": "All Menu\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 40
+    },
+    {
+      "text": "CHEF SPECIALS\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 38
+    },
+    {
+      "text": "Print Queue\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 34
+    },
+    {
+      "text": "Quick service +",
+      "aria": null,
+      "disabled": false,
+      "width": 128,
+      "height": 36
+    },
+    {
+      "text": "Repeat last order",
+      "aria": null,
+      "disabled": false,
+      "width": 137,
+      "height": 36
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "disabled": false,
+      "width": 66,
+      "height": 38
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "disabled": false,
+      "width": 75,
+      "height": 38
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "disabled": false,
+      "width": 74,
+      "height": 38
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "disabled": false,
+      "width": 105,
+      "height": 38
+    },
+    {
+      "text": "Twin Snack Plate\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 167,
+      "height": 38
+    },
+    {
+      "text": "Build Your Thali\n₹200",
+      "aria": null,
+      "disabled": false,
+      "width": 163,
+      "height": 38
+    },
+    {
+      "text": "Paneer Bowl\n₹120",
+      "aria": null,
+      "disabled": false,
+      "width": 149,
+      "height": 38
+    },
+    {
+      "text": "Jain Dal\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 113,
+      "height": 38
+    },
+    {
+      "text": "Seasonal Special 05\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 187,
+      "height": 38
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 38
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "MOD",
+      "aria": null,
+      "disabled": false,
+      "width": 68,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "DINE-IN",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "TAKEAWAY",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "DELIVERY",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "TOKEN",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "Attach Customer",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 36
+    },
+    {
+      "text": "Chef Notes",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 36
+    },
+    {
+      "text": "↻ Repeat Last Order",
+      "aria": null,
+      "disabled": false,
+      "width": 396,
+      "height": 38
+    },
+    {
+      "text": "Discount",
+      "aria": null,
+      "disabled": true,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "Hold Order",
+      "aria": null,
+      "disabled": true,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "Clear All",
+      "aria": null,
+      "disabled": true,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "PAY ₹0",
+      "aria": null,
+      "disabled": true,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "SEND KOT",
+      "aria": null,
+      "disabled": true,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "INSTANT BILL\nCash • Auto Print",
+      "aria": null,
+      "disabled": true,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "Today Sales:\n₹360",
+      "aria": null,
+      "disabled": false,
+      "width": 142,
+      "height": 16
+    },
+    {
+      "text": "Orders:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 16
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 16
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 116,
+      "height": 16
+    },
+    {
+      "text": "80mm",
+      "aria": null,
+      "disabled": false,
+      "width": 58,
+      "height": 24
+    },
+    {
+      "text": "58mm",
+      "aria": null,
+      "disabled": false,
+      "width": 57,
+      "height": 24
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "WhatsApp",
+      "aria": null,
+      "disabled": false,
+      "width": 104,
+      "height": 38
+    },
+    {
+      "text": "SMS",
+      "aria": null,
+      "disabled": false,
+      "width": 68,
+      "height": 38
+    },
+    {
+      "text": "Save TXT",
+      "aria": null,
+      "disabled": false,
+      "width": 94,
+      "height": 38
+    },
+    {
+      "text": "Done",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 38
+    },
+    {
+      "text": "PRINT RECEIPT",
+      "aria": null,
+      "disabled": false,
+      "width": 166,
+      "height": 36
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Staff interface language",
+      "type": "select-one"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

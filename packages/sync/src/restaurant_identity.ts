@@ -16,6 +16,9 @@ export interface RestaurantIdentityFields {
   businessDayCutoffHour?: number;
   operatingProfile?: Restaurant['operatingProfile'];
   branding?: Partial<Restaurant>;
+  /** #15: routine daily summary email, off by default; digestHour is the restaurant-local hour (0-23) it goes out. */
+  digestEnabled?: boolean;
+  digestHour?: number;
 }
 
 /** What the cloud always returns for a GET — `name` is a required column, never absent. */

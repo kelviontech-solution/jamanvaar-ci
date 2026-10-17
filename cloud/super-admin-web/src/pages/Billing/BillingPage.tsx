@@ -43,6 +43,7 @@ import '../../components/shared.css';
 import '../Dashboard/dashboard.css';
 import './billing.css';
 import { useAdminConfirm } from '../../components/ui';
+import { useAuth } from '../../auth/AuthContext';
 
 type InvoiceFilterStatus = 'ALL' | 'ISSUED' | 'PAID' | 'PAST_DUE' | 'VOID';
 
@@ -84,6 +85,8 @@ function SellerHeader({ seller, withPan }: { seller?: SellerInfo; withPan: boole
 }
 
 export function BillingPage() {
+  const { can } = useAuth();
+  const canWrite = can('billing', 'write');
   const { confirm, confirmDialog } = useAdminConfirm();
   const [summary, setSummary] = useState<BillingSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +124,9 @@ export function BillingPage() {
   const [issueAmount, setIssueAmount] = useState('');
   const [issueTax, setIssueTax] = useState('');
   const [issueDueDate, setIssueDueDate] = useState('');
+  // Was always monthly/30 days regardless of what was actually selected — a restaurant paying
+  // annually got an invoice for one month's price covering a full year, or vice versa.
+  const [issueBillingCycle, setIssueBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [issueNotes, setIssueNotes] = useState('');
   const [issuing, setIssuing] = useState(false);
 
@@ -174,14 +180,22 @@ export function BillingPage() {
     return () => document.removeEventListener('click', close);
   }, [actionMenuInvoiceId]);
 
+  // Yearly uses the plan's real priceYearly when set; otherwise 12x the monthly price (same
+  // fallback rule InvoicesService.billingCycleFor uses for the automatic subscription invoice).
+  function amountForCycle(plan: Plan, cycle: 'monthly' | 'yearly'): number {
+    if (cycle === 'monthly') return plan.priceMonthly / 100;
+    return (plan.priceYearly ?? plan.priceMonthly * 12) / 100;
+  }
+
   function openIssueModal() {
     api.get<RestaurantCore[]>('/api/v1/restaurants').then(setRestaurants).catch(() => {});
+    setIssueBillingCycle('monthly');
     api.get<Plan[]>('/api/v1/plans').then((all) => {
       setPlans(all);
       const pro = all.find((p) => p.tier === 'PRO') || all[0];
       if (pro) {
         setIssuePlanId(pro.id);
-        const amt = pro.priceMonthly / 100;
+        const amt = amountForCycle(pro, 'monthly');
         setIssueAmount(String(amt));
         setIssueTax(String(Math.round(amt * 0.18)));
       }
@@ -200,7 +214,8 @@ export function BillingPage() {
     setIssuing(true);
     try {
       const now = new Date();
-      const end = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const periodDays = issueBillingCycle === 'yearly' ? 365 : 30;
+      const end = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
       const baseAmt = Math.round(Number(issueAmount) * 100);
       const taxAmt = Math.round(Number(issueTax) * 100);
 
@@ -414,7 +429,7 @@ export function BillingPage() {
             <Download className="w-4 h-4" />
             <span>{exporting ? 'Exporting…' : 'Export CSV'}</span>
           </Button>
-          <Button variant="accent" onClick={openIssueModal}>
+          <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to issue invoices"} onClick={openIssueModal}>
             <Plus className="w-4 h-4" />
             <span>Issue Invoice</span>
           </Button>
@@ -689,7 +704,7 @@ export function BillingPage() {
                   Reset Filters
                 </Button>
               ) : (
-                <Button variant="accent" onClick={openIssueModal}>
+                <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to issue invoices"} onClick={openIssueModal}>
                   Issue First Invoice
                 </Button>
               )
@@ -777,7 +792,7 @@ export function BillingPage() {
                       <td>
                         <div style={{ display: 'flex', gap: 6, position: 'relative', alignItems: 'center' }}>
                           {!isPaid && inv.status !== 'VOID' && inv.status !== 'REFUNDED' && (
-                            <Button size="sm" variant="accent" onClick={() => openPaymentModal(inv)}>
+                            <Button size="sm" variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to record payments"} onClick={() => openPaymentModal(inv)}>
                               Record Payment
                             </Button>
                           )}
@@ -904,6 +919,8 @@ export function BillingPage() {
                 {viewInvoice.status !== 'PAID' && (
                   <Button
                     variant="accent"
+                    disabled={!canWrite}
+                    title={canWrite ? undefined : "You don't have permission to record payments"}
                     onClick={() => {
                       const inv = viewInvoice;
                       setViewInvoice(null);
@@ -1390,7 +1407,7 @@ export function BillingPage() {
                   setIssuePlanId(pid);
                   const p = plans.find((x) => x.id === pid);
                   if (p) {
-                    const amt = p.priceMonthly / 100;
+                    const amt = amountForCycle(p, issueBillingCycle);
                     setIssueAmount(String(amt));
                     setIssueTax(String(Math.round(amt * 0.18)));
                   }
@@ -1399,9 +1416,30 @@ export function BillingPage() {
               >
                 {plans.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} (₹{(p.priceMonthly / 100).toLocaleString('en-IN')})
+                    {p.name} (₹{(p.priceMonthly / 100).toLocaleString('en-IN')}/mo)
                   </option>
                 ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Billing Period *</label>
+              <select
+                value={issueBillingCycle}
+                onChange={(e) => {
+                  const cycle = e.target.value as 'monthly' | 'yearly';
+                  setIssueBillingCycle(cycle);
+                  const p = plans.find((x) => x.id === issuePlanId);
+                  if (p) {
+                    const amt = amountForCycle(p, cycle);
+                    setIssueAmount(String(amt));
+                    setIssueTax(String(Math.round(amt * 0.18)));
+                  }
+                }}
+                style={{ height: 40, width: '100%', borderRadius: 6, border: '1px solid var(--jv-line-strong)', padding: '0 10px' }}
+              >
+                <option value="monthly">Monthly (30-day period)</option>
+                <option value="yearly">Yearly (365-day period)</option>
               </select>
             </div>
 
@@ -1419,12 +1457,12 @@ export function BillingPage() {
                 />
               </div>
               <div className="form-field">
-                <label>Statutory GST 18% (₹)</label>
-                <Input
-                  type="number"
-                  value={issueTax}
-                  onChange={(e) => setIssueTax(e.target.value)}
-                />
+                <label>Estimated GST (₹)</label>
+                <Input type="number" value={issueTax} disabled />
+                <p style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 4 }}>
+                  A rough preview only — the server calculates the real CGST/SGST/IGST split from the
+                  restaurant's state and the current seller configuration when the invoice is created.
+                </p>
               </div>
             </div>
 

@@ -1,9 +1,10 @@
+import { usePlatformSearch } from '../hooks/usePlatformSearch';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { areaForRoute } from '../auth/access';
 import { api } from '../api/client';
-import type { SystemHealth, SearchResult } from '../api/types';
+import type { SystemHealth } from '../api/types';
 import { applyTheme, getStoredTheme, type ThemePreference } from '../theme';
 // Deep relative import, not the '@jamanvaar/ui' barrel: that barrel also
 // re-exports components which import @jamanvaar/database, whose module-level
@@ -125,14 +126,16 @@ const PAGE_KEYWORDS: Record<string, string> = {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'Platform Control Center',
+    label: 'Daily work',
     items: [
-      { to: '/', label: 'Executive Dashboard', icon: LayoutDashboard, end: true },
-      { to: '/restaurant-health', label: 'Restaurant Health & Risk', icon: ShieldAlert }
+      { to: '/', label: 'Today & attention', icon: LayoutDashboard, end: true },
+      { to: '/restaurant-health', label: 'Restaurant Health & Risk', icon: ShieldAlert },
+      {to:'/tickets',label:'Support tasks',icon:Ticket},
+      {to:'/devices',label:'Devices',icon:Laptop2}
     ]
   },
   {
-    label: 'Business Management',
+    label: 'Restaurants & billing',
     items: [
       { to: '/restaurants', label: 'Restaurants', icon: Store },
       { to: '/owners', label: 'Restaurant Owners', icon: Users },
@@ -142,10 +145,10 @@ const NAV_GROUPS: NavGroup[] = [
     ]
   },
   {
-    label: 'SaaS Management',
+    label: 'Products & configuration',
     items: [
       { to: '/saas-management', label: 'Overview', icon: LayoutGrid, end: true },
-      { to: '/plans', label: 'Plans & Entitlements', icon: Package },
+      { to: '/plans', label: 'Plans & included features', icon: Package },
       { to: '/feature-catalog', label: 'Feature Catalog', icon: ListChecks },
       { to: '/qr-ordering', label: 'QR Ordering Suite', icon: QrCode },
       { to: '/whatsapp-ordering', label: 'WhatsApp Ordering', icon: MessageCircle },
@@ -159,25 +162,23 @@ const NAV_GROUPS: NavGroup[] = [
     ]
   },
   {
-    label: 'Operations & MDM',
+    label: 'Platform operations',
     items: [
-      { to: '/devices', label: 'Device Fleet / MDM', icon: Laptop2 },
       { to: '/sync-monitor', label: 'Sync & Conflict Monitor', icon: Activity },
       { to: '/backups', label: 'Backups & Recovery', icon: Database },
-      { to: '/system-health', label: 'System Telemetry', icon: HeartPulse },
+      { to: '/system-health', label: 'System health', icon: HeartPulse },
       { to: '/status-history', label: 'Status History', icon: AlertTriangle },
       { to: '/sandboxes', label: 'Staging Sandboxes', icon: Boxes }
     ]
   },
   {
-    label: 'Security & Reports',
+    label: 'Security & settings',
     items: [
       { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
       { to: '/margins', label: 'Margin & Cost', icon: TrendingUp },
       { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
       { to: '/offline-policy', label: 'Emergency Offline Policy', icon: ShieldAlert },
       { to: '/team', label: 'Platform Team', icon: ShieldCheck },
-      { to: '/tickets', label: 'Support Tickets', icon: Ticket },
       { to: '/support', label: 'Diagnostics & Support', icon: LifeBuoy },
       { to: '/announcements', label: 'Announcements', icon: Megaphone },
       { to: '/settings/platform', label: 'Platform Settings', icon: Sliders }
@@ -202,29 +203,9 @@ export function ProtectedLayout() {
   // /api/v1/support/search endpoint (used by the Support page) already
   // indexes all four entity types. Wired here as a live typeahead instead.
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searching, setSearching] = useState(false);
-
-  useEffect(() => {
-    const q = searchQuery.trim();
-    if (q.length < 2) {
-      setSearchResults(null);
-      return;
-    }
-    setSearching(true);
-    const handle = setTimeout(() => {
-      api
-        .get<SearchResult>(`/api/v1/support/search?q=${encodeURIComponent(q)}`)
-        .then((res) => {
-          setSearchResults(res);
-          setSearchOpen(true);
-        })
-        .catch(() => setSearchResults(null))
-        .finally(() => setSearching(false));
-    }, 250);
-    return () => clearTimeout(handle);
-  }, [searchQuery]);
+  const {searchResults,searching}=usePlatformSearch(searchQuery);
+  useEffect(()=>{if(searchResults)setSearchOpen(true);},[searchResults]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -243,7 +224,7 @@ export function ProtectedLayout() {
   function goToSearchResult(path: string) {
     setSearchOpen(false);
     setSearchQuery('');
-    setSearchResults(null);
+
     navigate(path);
   }
 
@@ -253,7 +234,7 @@ export function ProtectedLayout() {
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
     try {
       const raw = localStorage.getItem('jamanvaar_superadmin_collapsed_groups');
-      return raw ? JSON.parse(raw) : {};
+      return raw ? JSON.parse(raw) : {'Products & configuration':true,'Platform operations':true,'Security & settings':true};
     } catch {
       return {};
     }
@@ -656,7 +637,10 @@ export function ProtectedLayout() {
             >
               <span className="status-indicator-dot" />
               <span className="status-label">
-                {platformHealth === 'online' ? 'PLATFORM ONLINE' : platformHealth === 'degraded' ? 'DEGRADED' : 'CHECKING…'}
+                {/* Was "PLATFORM ONLINE" — this checks database reachability alone (see the tooltip),
+                    not sync, replication or any connected provider. Named to match what it actually
+                    checks instead of implying the whole platform is confirmed healthy. */}
+                {platformHealth === 'online' ? 'DATABASE ONLINE' : platformHealth === 'degraded' ? 'DEGRADED' : 'CHECKING…'}
               </span>
             </div>
 

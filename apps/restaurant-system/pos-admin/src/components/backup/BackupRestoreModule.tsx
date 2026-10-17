@@ -10,12 +10,24 @@ import {
   type CloudBackupSummary
 } from '../../cloud/cloudClient';
 
-const LAST_BACKUP_KEY = 'jamanvaar_pos_admin_last_backup_at';
+// Were one shared, unscoped key for both destinations: the reminder couldn't say whether the
+// last protection was a verified cloud upload or just a file saved to this device's downloads
+// folder, and carried no restaurant/outlet identity, so a reused browser profile could show a
+// different restaurant's old reminder as if it were this one's (A06).
+const LAST_LOCAL_EXPORT_KEY_PREFIX = 'jamanvaar_pos_admin_last_local_export_at:';
+const LAST_CLOUD_BACKUP_KEY_PREFIX = 'jamanvaar_pos_admin_last_cloud_backup_at:';
 const STALE_BACKUP_HOURS = 24;
 
-function readLastBackupAt(): Date | null {
+/** Bump this if the exported shape changes incompatibly. RestoreModal checks a file against this. */
+export const BACKUP_SCHEMA_VERSION = 'JAMANVAAR_POS_BACKUP_V1';
+
+function backupScopeKey(): string {
+  return `${db.restaurant?.id ?? 'unknown'}:${db.outlet?.id ?? 'unknown'}`;
+}
+
+function readTimestamp(prefix: string): Date | null {
   try {
-    const raw = localStorage.getItem(LAST_BACKUP_KEY);
+    const raw = localStorage.getItem(prefix + backupScopeKey());
     return raw ? new Date(raw) : null;
   } catch {
     return null;
@@ -40,27 +52,52 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
   showToast,
   onRequestConfirm
 }) => {
-  const [lastBackupAt, setLastBackupAt] = useState<Date | null>(readLastBackupAt());
-  const [cloudBackups, setCloudBackups] = useState<CloudBackupSummary[]>([]);
+  const [lastLocalExportAt, setLastLocalExportAt] = useState<Date | null>(readTimestamp(LAST_LOCAL_EXPORT_KEY_PREFIX));
+  const [lastCloudBackupAt, setLastCloudBackupAt] = useState<Date | null>(readTimestamp(LAST_CLOUD_BACKUP_KEY_PREFIX));
+  const [cloudBackups, setCloudBackups] = useState<CloudBackupSummary[] | null>(null);
+  const [cloudHistoryLoading, setCloudHistoryLoading] = useState(false);
+  const [cloudHistoryError, setCloudHistoryError] = useState<string | null>(null);
   const [cloudUploading, setCloudUploading] = useState(false);
   const [cloudBackupError, setCloudBackupError] = useState<string | null>(null);
   const cloudReady = isCloudConnected() && isCloudLoggedIn();
 
-  useEffect(() => {
-    if (cloudReady) {
-      fetchCloudBackups().then(setCloudBackups).catch(() => {});
-    }
+  // A failed history fetch used to be swallowed entirely: cloudBackups stayed `[]`, which the
+  // render below treats identically to "cloud is connected and genuinely has zero backups" (A05).
+  // `cloudBackups` now starts `null` (unknown) so loading/error/empty/populated are all distinct.
+  const loadCloudHistory = React.useCallback(() => {
+    if (!cloudReady) return;
+    setCloudHistoryLoading(true);
+    setCloudHistoryError(null);
+    fetchCloudBackups()
+      .then(setCloudBackups)
+      .catch((err) => setCloudHistoryError(err instanceof CloudApiError ? err.message : 'Could not load backup history. Check your connection and retry.'))
+      .finally(() => setCloudHistoryLoading(false));
   }, [cloudReady]);
 
-  const markBackedUp = () => {
+  useEffect(() => {
+    loadCloudHistory();
+  }, [loadCloudHistory]);
+
+  const markLocalExported = () => {
     const now = new Date();
     try {
-      localStorage.setItem(LAST_BACKUP_KEY, now.toISOString());
+      localStorage.setItem(LAST_LOCAL_EXPORT_KEY_PREFIX + backupScopeKey(), now.toISOString());
     } catch {
-      // localStorage can be unavailable (private mode, quota) — the backup
+      // localStorage can be unavailable (private mode, quota) — the export
       // itself already succeeded, only the "last backup" reminder is lost.
     }
-    setLastBackupAt(now);
+    setLastLocalExportAt(now);
+  };
+
+  const markCloudBackedUp = () => {
+    const now = new Date();
+    try {
+      localStorage.setItem(LAST_CLOUD_BACKUP_KEY_PREFIX + backupScopeKey(), now.toISOString());
+    } catch {
+      // localStorage can be unavailable (private mode, quota) — the upload
+      // itself already succeeded, only the "last backup" reminder is lost.
+    }
+    setLastCloudBackupAt(now);
   };
 
   const handleCloudBackup = async () => {
@@ -68,8 +105,8 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
     setCloudUploading(true);
     try {
       const summary = await uploadCloudBackup(db);
-      setCloudBackups((prev) => [summary, ...prev]);
-      markBackedUp();
+      setCloudBackups((prev) => [summary, ...(prev ?? [])]);
+      markCloudBackedUp();
       showToast(`Backed up to JAMANVAAR Cloud (${(summary.sizeBytes / 1024).toFixed(0)} KB, compressed)`);
     } catch (err) {
       setCloudBackupError(
@@ -85,7 +122,20 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
   };
 
   const handleExportJson = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(db, null, 2));
+    // Wrapped with an identity/version marker so RestoreModal can actually validate a snapshot
+    // (A01) and warn before restoring a different restaurant's backup (A03) — a raw `db` dump had
+    // neither, so any JSON object that merely looked like it (or didn't look like it at all)
+    // could be fed straight back into restore.
+    const payload = {
+      _backupSchema: BACKUP_SCHEMA_VERSION,
+      _exportedAt: new Date().toISOString(),
+      _restaurantId: db.restaurant?.id ?? null,
+      _restaurantName: db.restaurant?.name ?? null,
+      _outletId: db.outlet?.id ?? null,
+      _outletName: db.outlet?.name ?? null,
+      data: db
+    };
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute('download', `jamanvaar_db_backup_${Date.now()}.json`);
@@ -93,12 +143,15 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
     downloadAnchor.click();
     downloadAnchor.remove();
 
-    markBackedUp();
+    markLocalExported();
     showToast('Database Backup JSON downloaded successfully!');
   };
 
-  const hoursSinceLastBackup = lastBackupAt ? (Date.now() - lastBackupAt.getTime()) / (1000 * 60 * 60) : null;
-  const isBackupStale = hoursSinceLastBackup === null || hoursSinceLastBackup > STALE_BACKUP_HOURS;
+  const hoursSinceLastLocalExport = lastLocalExportAt ? (Date.now() - lastLocalExportAt.getTime()) / (1000 * 60 * 60) : null;
+  const hoursSinceLastCloudBackup = lastCloudBackupAt ? (Date.now() - lastCloudBackupAt.getTime()) / (1000 * 60 * 60) : null;
+  const isBackupStale =
+    (hoursSinceLastLocalExport === null || hoursSinceLastLocalExport > STALE_BACKUP_HOURS) &&
+    (hoursSinceLastCloudBackup === null || hoursSinceLastCloudBackup > STALE_BACKUP_HOURS);
 
   const handleResetToSeed = () => {
     if (onRequestConfirm) {
@@ -156,10 +209,18 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
         }`}
       >
         {isBackupStale ? <AlertTriangle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
-        <span>
-          {lastBackupAt
-            ? `Last backup on this device: ${lastBackupAt.toLocaleString()}${isBackupStale ? ` — over ${STALE_BACKUP_HOURS}h ago, back up again` : ''}`
-            : 'No backup has been taken on this device yet.'}
+        <span className="flex flex-col gap-0.5">
+          <span>
+            {lastCloudBackupAt
+              ? `Verified cloud backup: ${lastCloudBackupAt.toLocaleString()}`
+              : 'No verified cloud backup for this restaurant/outlet yet.'}
+          </span>
+          <span className="font-normal text-[11px] opacity-80">
+            {lastLocalExportAt
+              ? `Downloaded local copy: ${lastLocalExportAt.toLocaleString()}`
+              : 'No local JSON export downloaded yet.'}
+            {isBackupStale ? ` — both over ${STALE_BACKUP_HOURS}h old, back up again` : ''}
+          </span>
         </span>
       </div>
 
@@ -194,7 +255,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             <button
               onClick={handleCloudBackup}
               disabled={!cloudReady || cloudUploading}
-              className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs shrink-0 cursor-pointer transition-colors"
+              className="min-h-11 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs shrink-0 cursor-pointer transition-colors"
             >
               <CloudUpload className="w-4 h-4" />
               <span>{cloudUploading ? 'Backing up…' : 'Backup to Cloud Now'}</span>
@@ -207,19 +268,30 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
             </div>
           )}
 
-          {cloudReady && cloudBackups.length > 0 && (
+          {cloudReady && (
             <div className="border-t border-slate-100 pt-3">
               <div className="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-2">
                 Recent cloud backups
               </div>
-              <div className="space-y-1.5">
-                {cloudBackups.slice(0, 5).map((b) => (
-                  <div key={b.id} className="flex items-center justify-between text-xs text-slate-600">
-                    <span>{new Date(b.createdAt).toLocaleString()} · {b.method === 'AUTOMATIC' ? 'Automatic (device)' : 'Manual'}</span>
-                    <span className="tabular-nums text-slate-500">{(b.sizeBytes / 1024).toFixed(0)} KB</span>
-                  </div>
-                ))}
-              </div>
+              {cloudHistoryLoading ? (
+                <div className="text-xs text-slate-500">Loading backup history…</div>
+              ) : cloudHistoryError ? (
+                <div className="flex items-center justify-between gap-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+                  <span>{cloudHistoryError}</span>
+                  <button type="button" className="underline shrink-0" onClick={loadCloudHistory}>Retry</button>
+                </div>
+              ) : cloudBackups && cloudBackups.length > 0 ? (
+                <div className="space-y-1.5">
+                  {cloudBackups.slice(0, 5).map((b) => (
+                    <div key={b.id} className="flex items-center justify-between text-xs text-slate-600">
+                      <span>{new Date(b.createdAt).toLocaleString()} · {b.method === 'AUTOMATIC' ? 'Automatic (device)' : 'Manual'}</span>
+                      <span className="tabular-nums text-slate-500">{(b.sizeBytes / 1024).toFixed(0)} KB</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500">No cloud backups recorded yet.</div>
+              )}
             </div>
           )}
         </div>
@@ -244,7 +316,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
           </div>
           <button
             onClick={handleExportJson}
-            className="px-4 py-2.5 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs shrink-0 cursor-pointer transition-colors"
+            className="min-h-11 px-4 py-2.5 rounded-xl bg-jaman-navy hover:bg-jaman-darkBorder text-white font-bold text-xs flex items-center justify-center gap-2 shadow-2xs shrink-0 cursor-pointer transition-colors"
           >
             <Download className="w-4 h-4" />
             <span>Download Backup JSON</span>
@@ -266,7 +338,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
           </div>
           <button
             onClick={onOpenRestoreModal}
-            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-brand/25 shrink-0 cursor-pointer transition-colors"
+            className="min-h-11 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm shadow-brand/25 shrink-0 cursor-pointer transition-colors"
           >
             <Upload className="w-4 h-4" />
             <span>Upload & Restore</span>
@@ -303,7 +375,7 @@ export const BackupRestoreModule: React.FC<BackupRestoreModuleProps> = ({
           <button
             onClick={handleResetToSeed}
             disabled={cloudReady}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 disabled:hover:bg-white border border-rose-300 disabled:border-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-rose-700 font-bold text-xs shrink-0 cursor-pointer transition-colors"
+            className="min-h-11 px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 disabled:hover:bg-white border border-rose-300 disabled:border-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-rose-700 font-bold text-xs shrink-0 cursor-pointer transition-colors"
           >
             Reset Seed Data
           </button>

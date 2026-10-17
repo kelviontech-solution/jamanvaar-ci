@@ -14,13 +14,18 @@ import {
   GstTaxBreakdownRow,
   DayRow
 } from './reportDataEngine';
-import { ReportExportService } from './reportExportService';
 import { X, Printer, FileSpreadsheet, Palette, Monitor, FileText, Receipt, Calendar, Clock, UserCheck } from 'lucide-react';
 
 interface ReportPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   reportTitle: string;
+  // R03: which report tab opened this preview. Every tab used to render the identical
+  // hourly+dishes+GST "sales overview" document regardless of what was actually being
+  // previewed — previewing e.g. Hourly Sales alone still printed an unrelated dish ranking
+  // and GST table. Sections below are now shown only when relevant to this id; a report id
+  // outside every known group still gets the full overview rather than a blank document.
+  activeReportId: string;
   dateRange: ReportDateRange;
   theme: ReportDesignTheme;
   onOpenDesignSelector: () => void;
@@ -30,12 +35,18 @@ interface ReportPreviewModalProps {
   gst: GstTaxBreakdownRow[];
   days: DayRow[];
   orders: Order[];
+  /** The same per-report export routing the dashboard's own Export CSV button uses (R03). */
+  onExportCsv: () => void;
 }
+
+const SALES_OVERVIEW_IDS = new Set(['DAILY_SALES', 'SALES_SUMMARY', 'DAY_BY_DAY']);
+const DISH_IDS = new Set(['TOP_SELLING_DISHES', 'SLOW_MOVING_DISHES', 'CATEGORY_SALES', 'DISH_REVENUE']);
 
 export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
   isOpen,
   onClose,
   reportTitle,
+  activeReportId,
   dateRange,
   theme,
   onOpenDesignSelector,
@@ -44,8 +55,17 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
   dishes,
   gst,
   days,
-  orders
+  orders,
+  onExportCsv
 }) => {
+  const isSalesOverview = SALES_OVERVIEW_IDS.has(activeReportId);
+  const showHourly = isSalesOverview || activeReportId === 'HOURLY_SALES';
+  const showDishes = isSalesOverview || DISH_IDS.has(activeReportId);
+  const showGst = isSalesOverview || activeReportId === 'TAXES_GST';
+  // A report id outside every known group (station performance, EOD, customer/inventory
+  // panels that don't have a dedicated document section here yet) still gets the general
+  // overview rather than an empty page — an honest fallback, not a claim it's report-specific.
+  const showEverything = !showHourly && !showDishes && !showGst;
   const [viewMode, setViewMode] = useState<'A4' | 'DESKTOP' | 'THERMAL'>('A4');
   const [isCopied, setIsCopied] = useState(false);
   const { cardRef, dialogId } = useDialogFocus<HTMLDivElement>(isOpen, onClose);
@@ -75,11 +95,6 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
       title: reportTitle,
       pageSize: viewMode === 'THERMAL' ? '80mm auto' : 'A4 portrait'
     });
-  };
-
-  // CSV trigger
-  const handleExportCsv = () => {
-    ReportExportService.exportTransactionsCsv(orders, reportTitle);
   };
 
   // Style variations based on selected theme
@@ -210,7 +225,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             </button>
 
             <button
-              onClick={handleExportCsv}
+              onClick={onExportCsv}
               className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
@@ -348,7 +363,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             </div>
 
             {/* HOURLY SALES BAR VISUALIZATION */}
-            {hourly.length > 0 && (
+            {(showHourly || showEverything) && hourly.length > 0 && (
               <div className="my-5 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-extrabold text-xs text-jaman-navy uppercase tracking-wider">
@@ -394,6 +409,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             )}
 
             {/* TOP DISHES RANKING TABLE */}
+            {(showDishes || showEverything) && (
             <div className="my-6 space-y-2">
               <h4 className="font-extrabold text-xs text-jaman-navy uppercase tracking-wider">
                 Top Performing Menu Dishes
@@ -440,8 +456,10 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                 </table>
               </div>
             </div>
+            )}
 
             {/* GST STATUTORY AUDIT TABLE */}
+            {(showGst || showEverything) && (
             <div className="my-6 space-y-2">
               <h4 className="font-extrabold text-xs text-jaman-navy uppercase tracking-wider">
                 Statutory GST Tax Summary ({gstLabels().combined})
@@ -475,6 +493,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                 </table>
               </div>
             </div>
+            )}
 
             {/* DOCUMENT FOOTER & SIGNATURES */}
             <div className="pt-8 mt-6 border-t border-dashed border-slate-300 space-y-6">

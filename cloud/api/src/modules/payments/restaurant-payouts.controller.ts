@@ -44,8 +44,8 @@ export class RestaurantPayoutsController {
   }
 
   @Get()
-  list(@Query('restaurantId') restaurantId?: string, @Query('status') status?: string, @Query('page') page = '1', @Query('limit') limit = '25') {
-    return this.payouts.list({ restaurantId, status, page: Math.max(1, Number(page) || 1), limit: Math.min(100, Math.max(1, Number(limit) || 25)) });
+  list(@Query('restaurantId') restaurantId?: string, @Query('status') status?: string, @Query('search') search?: string, @Query('page') page = '1', @Query('limit') limit = '25') {
+    return this.payouts.list({ restaurantId, status, search, page: Math.max(1, Number(page) || 1), limit: Math.min(100, Math.max(1, Number(limit) || 25)) });
   }
 
   @Get(':id')

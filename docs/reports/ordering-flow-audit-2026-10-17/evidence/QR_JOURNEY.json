@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-17T06:15:42.386Z",
+  "rows": [
+    {
+      "name": "Required bread choice opens a blocking picker",
+      "result": {
+        "requiredChoiceBlockedAdd": true
+      }
+    },
+    {
+      "name": "QR minimum and maximum quantity are respected",
+      "result": {
+        "minimumTwoBlocksDecrement": true,
+        "maximumThreeBlocksIncrement": true
+      }
+    },
+    {
+      "name": "Checkout contact and note disappear after reviewing the cart",
+      "result": {
+        "name": "",
+        "phone": "",
+        "note": ""
+      }
+    },
+    {
+      "name": "Menu change automatically reloads and loses checkout fields",
+      "result": {
+        "name": "",
+        "note": "",
+        "cartPreserved": true
+      }
+    },
+    {
+      "name": "Failed cart quote has no explicit retry action",
+      "result": {
+        "checkoutDisabled": true,
+        "retryButtons": 0,
+        "priceCheckingText": 3
+      }
+    },
+    {
+      "name": "Counter order is placed once and survives same-tab reload",
+      "result": {
+        "status": "PREPARING",
+        "paymentStatus": "PENDING",
+        "restoredOrderNumber": true
+      }
+    },
+    {
+      "name": "Fresh tab cannot restore locally remembered order without its original session",
+      "result": {
+        "restoreError": true,
+        "text": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\nCould not restore your order\n\nOrder not found.\n\nCheck again\nThoughtfully served with Jamanvaar\nBY KELVIONTECH"
+      }
+    }
+  ]
+}

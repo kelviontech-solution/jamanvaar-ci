@@ -5,27 +5,45 @@ import { Card, Button, Input } from '../../components/ui';
 import { Building2, Save } from 'lucide-react';
 
 /** Extracted from PlatformSettingsPage.tsx's General tab. */
-export function PlatformBrandingCard({ settings, saving, setSaving, onSaved }: {
+export function PlatformBrandingCard({ settings, saving, setSaving, onSaved, onDirtyChange }: {
   settings: PlatformSetting[];
   saving: boolean;
   setSaving: (v: boolean) => void;
   onSaved: (message: string) => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const [platformName, setPlatformName] = useState('JAMANVAAR SaaS Control Plane');
   const [companyName, setCompanyName] = useState('Kelviontech');
   const [supportEmail, setSupportEmail] = useState('support@jamanvaar.app');
   const [supportPhone, setSupportPhone] = useState('');
   const [error, setError] = useState<string | undefined>();
+  const [saved, setSaved] = useState({ platformName: '', companyName: '', supportEmail: '', supportPhone: '' });
 
   useEffect(() => {
     const s = settings.find((x) => x.key === 'platform.branding');
     if (s?.value) {
-      setPlatformName(s.value.platformName || '');
-      setCompanyName(s.value.companyName || '');
-      setSupportEmail(s.value.supportEmail || '');
-      setSupportPhone(s.value.supportPhone || '');
+      const v = {
+        platformName: s.value.platformName || '',
+        companyName: s.value.companyName || '',
+        supportEmail: s.value.supportEmail || '',
+        supportPhone: s.value.supportPhone || ''
+      };
+      setPlatformName(v.platformName);
+      setCompanyName(v.companyName);
+      setSupportEmail(v.supportEmail);
+      setSupportPhone(v.supportPhone);
+      setSaved(v);
     }
   }, [settings]);
+
+  // Switching settings tabs used to unmount this card and silently drop an in-progress edit —
+  // no dialog, no warning. The parent now asks before switching away while this reports dirty.
+  useEffect(() => {
+    const dirty = platformName !== saved.platformName || companyName !== saved.companyName || supportEmail !== saved.supportEmail || supportPhone !== saved.supportPhone;
+    onDirtyChange?.(dirty);
+    return () => onDirtyChange?.(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platformName, companyName, supportEmail, supportPhone, saved]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -35,6 +53,7 @@ export function PlatformBrandingCard({ settings, saving, setSaving, onSaved }: {
       await api.patch('/api/v1/platform/settings/platform.branding', {
         value: { platformName, companyName, supportEmail, supportPhone }
       });
+      setSaved({ platformName, companyName, supportEmail, supportPhone });
       onSaved('Platform branding updated');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to save branding settings');

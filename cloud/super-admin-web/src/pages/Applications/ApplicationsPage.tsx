@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { ApplicationSummary } from '../../api/types';
 import { Button, Card, Badge, Modal, Input, EmptyState, useAdminConfirm } from '../../components/ui';
+import { useAuth } from '../../auth/AuthContext';
 import {
   Layers,
   Laptop2,
@@ -38,6 +39,8 @@ import '../../components/shared.css';
 import './applications.css';
 
 export function ApplicationsPage() {
+  const { can } = useAuth();
+  const canWrite = can('ops', 'write');
   const { confirm, confirmDialog } = useAdminConfirm();
   const [apps, setApps] = useState<ApplicationSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +109,10 @@ export function ApplicationsPage() {
       setNewVersion(app.currentVersion ?? '1.0.0');
     }
     setNewPlatforms(app.supportedPlatforms || ['web']);
+    // Was left over from whatever channel the previous modal (possibly for a different app) was
+    // last set to — picking BETA, cancelling, then opening another app's publish modal silently
+    // kept BETA selected there too.
+    setNewChannel('STABLE');
     setNewReleaseNotes('');
     setNewDownloadUrls({}); // Never accidentally republish the preceding version's artifact.
     setNewSignatures({});
@@ -221,7 +228,9 @@ export function ApplicationsPage() {
 
         <Card className="stat-tile">
           <div className="stat-tile-top">
-            <div className="stat-label">Fleet Sync Rate</div>
+            {/* Was "Fleet Sync Rate" — this is online/total connectivity (see the subtitle below), not
+                a measure of successful syncs; a connected device with failing syncs still counts here. */}
+            <div className="stat-label">Fleet Online Rate</div>
             <div className="stat-tile-icon stat-tile-icon-amber">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -293,7 +302,7 @@ export function ApplicationsPage() {
                 </div>
 
                 <div className="app-card-actions">
-                  <Button size="sm" variant="accent" onClick={() => openPublishModal(app)}>
+                  <Button size="sm" variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to publish releases"} onClick={() => openPublishModal(app)}>
                     <Plus className="w-3.5 h-3.5" />
                     <span>Publish Version</span>
                   </Button>
@@ -344,7 +353,12 @@ export function ApplicationsPage() {
                           </span>
                           <span>{new Date(rel.releasedAt).toLocaleDateString()}</span>
                           <span>{rel.status ?? 'PUBLISHED'} · {rel.artifactVerifiedAt ? 'Artifact verified' : 'Legacy metadata'}</span>
-                          {rel.status !== 'PAUSED' && <button type="button" className="btn btn-ghost btn-sm" onClick={async () => {
+                          {rel.channel === 'BETA' && rel.status !== 'PAUSED' && <button type="button" className="btn btn-ghost btn-sm" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to promote releases"} onClick={async () => {
+                            if (!(await confirm({ title: `Promote version ${rel.version} to STABLE?`, message: 'This makes the same already-verified artifact available on the STABLE channel — no new upload. It does not affect devices already on BETA.', confirmLabel: 'Promote to STABLE' }))) return;
+                            try { await api.post(`/api/v1/applications/releases/${rel.id}/promote`, {}); loadApplications(); }
+                            catch (err) { setError(err instanceof ApiError ? err.message : 'Could not promote release'); }
+                          }}>Promote to STABLE</button>}
+                          {rel.status !== 'PAUSED' && <button type="button" className="btn btn-ghost btn-sm" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to pause releases"} onClick={async () => {
                             if (!(await confirm({ title: `Pause version ${rel.version}?`, message: 'Installed apps will stop receiving this release.', confirmLabel: 'Pause release', danger: true }))) return;
                             try { await api.post(`/api/v1/applications/releases/${rel.id}/pause`, {}); loadApplications(); }
                             catch (err) { setError(err instanceof ApiError ? err.message : 'Could not pause release'); }
@@ -378,6 +392,11 @@ export function ApplicationsPage() {
         >
           <form onSubmit={handlePublishRelease} className="modal-form">
             {publishError && <div className="page-error">{publishError}</div>}
+
+            <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: '10px 14px', marginBottom: 4, fontSize: 13 }}>
+              About to publish <strong>{publishModalApp.name} v{newVersion || '—'}</strong> on <strong>{newChannel}</strong> for{' '}
+              <strong>{newPlatforms.length ? newPlatforms.map((p) => p.toUpperCase()).join(', ') : 'no platforms selected'}</strong>.
+            </div>
 
             <div className="form-row">
               <div className="form-field">

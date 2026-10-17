@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, ApiError, API_BASE, getAccessToken } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import {
   PageHeader,
   Card,
@@ -81,7 +81,7 @@ interface SummaryData {
 }
 
 interface RevenueData {
-  byPlan: Array<{ tier: string; name: string; revenue: number; count: number }>;
+  byPlan: Array<{ tier: string; name: string; revenue: number; count: number; priceMonthly: number | null }>;
   recentInvoices: Array<{
     id: string;
     invoiceNumber: string;
@@ -169,16 +169,28 @@ export function ReportsPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
+  // 'all' omits from/to entirely (open-ended, matches the service's own "All-Time" meaning);
+  // the others become an explicit [now - Nd, now] window so changing the range actually changes
+  // what the five report queries (and the CSV export) return, not just re-requests the same data.
+  const rangeQuery = (range: DateRange): string => {
+    if (range === 'all') return '';
+    const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    const to = new Date();
+    const from = new Date(to.getTime() - days * 86400_000);
+    return `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`;
+  };
+
   const loadData = () => {
     setLoading(true);
     setError(null);
+    const q = rangeQuery(dateRange);
 
     Promise.all([
       api.get<SummaryData>('/api/v1/platform/reports/summary'),
-      api.get<RevenueData>('/api/v1/platform/reports/revenue'),
-      api.get<RestaurantReportData>('/api/v1/platform/reports/restaurants'),
-      api.get<DeviceReportData>('/api/v1/platform/reports/devices'),
-      api.get<SubscriptionReportData>('/api/v1/platform/reports/subscriptions')
+      api.get<RevenueData>(`/api/v1/platform/reports/revenue${q}`),
+      api.get<RestaurantReportData>(`/api/v1/platform/reports/restaurants${q}`),
+      api.get<DeviceReportData>(`/api/v1/platform/reports/devices${q}`),
+      api.get<SubscriptionReportData>(`/api/v1/platform/reports/subscriptions${q}`)
     ])
       .then(([sum, rev, rest, dev, sub]) => {
         setSummary(sum);
@@ -200,16 +212,16 @@ export function ReportsPage() {
   const handleExport = async (type: string) => {
     setExporting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/v1/platform/reports/export?type=${type}`, {
-        credentials: 'include',
-        headers: getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}
-      });
-      if (!res.ok) throw new Error('Failed to export CSV');
-      const blob = await res.blob();
+      // Uses the shared authenticated download helper (token-refresh-and-retry on a stale
+      // access token) instead of a raw fetch with a token snapshot taken once up front, which
+      // silently failed exports made right after a token refresh.
+      const q = rangeQuery(dateRange);
+      const sep = q ? '&' : '?';
+      const { blob, filename } = await api.download(`/api/v1/platform/reports/export?type=${type}${q ? sep + q.slice(1) : ''}`);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `jamanvaar_${type}_report_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = filename ?? `jamanvaar_${type}_report_${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -360,9 +372,9 @@ export function ReportsPage() {
                     <div className="plan-revenue-val">₹{p.revenue.toLocaleString('en-IN')}</div>
                     <div className="plan-card-footer">
                       <span>{p.count} Invoices generated</span>
-                      <span className="plan-price-tag">
-                        {p.tier === 'CORE' ? '₹5,000/mo' : '₹7,000/mo'}
-                      </span>
+                      {p.priceMonthly !== null && (
+                        <span className="plan-price-tag">₹{p.priceMonthly.toLocaleString('en-IN')}/mo</span>
+                      )}
                     </div>
                   </Card>
                 ))}

@@ -49,7 +49,7 @@ export const InventoryControlModule: React.FC<Props> = ({ showToast }) => {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold ${tab === t.id ? 'bg-brand/[0.09] text-brand border-brand/40 font-semibold' : 'bg-white text-jaman-navy border-jaman-border hover:bg-slate-50'}`}
+            className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold ${tab === t.id ? 'bg-brand/[0.09] text-brand border-brand/40 font-semibold' : 'bg-white text-jaman-navy border-jaman-border hover:bg-slate-50'}`}
           >
             <t.icon className="w-3.5 h-3.5" /> {t.label}
           </button>

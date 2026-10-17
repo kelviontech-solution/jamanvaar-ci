@@ -40,6 +40,8 @@ export const restaurantIdentitySchema = z.object({
   showJamanAI: z.boolean().optional(),
   operatingProfile: operatingProfileSchema.optional(),
   branding: brandingSchema.optional(),
-  businessDayCutoffHour: z.number().int().min(0).max(23).optional()
+  businessDayCutoffHour: z.number().int().min(0).max(23).optional(),
+  digestEnabled: z.boolean().optional(),
+  digestHour: z.number().int().min(0).max(23).optional()
 });
 export type RestaurantIdentityDto = z.infer<typeof restaurantIdentitySchema>;

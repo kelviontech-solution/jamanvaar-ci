@@ -384,7 +384,7 @@ export class DevicesService {
     const restaurant = await this.prisma.runAsTenant(restaurantId, (tx) =>
       tx.restaurant.findUniqueOrThrow({
         where: { id: restaurantId },
-        select: { id: true, timezone: true, operatingProfile: true, brandingProfile: true, name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, showJamanAi: true, businessDayCutoffHour: true, updatedAt: true }
+        select: { id: true, timezone: true, operatingProfile: true, brandingProfile: true, name: true, legalName: true, gstin: true, fssaiNumber: true, address: true, city: true, state: true, showJamanAi: true, businessDayCutoffHour: true, digestEnabled: true, digestHour: true, updatedAt: true }
       })
     );
     const { showJamanAi, ...rest } = restaurant;
@@ -411,7 +411,9 @@ export class DevicesService {
           ...(dto.state !== undefined ? { state: dto.state } : {}),
           ...(operatingProfile ? { operatingProfile } : {}),
           ...(dto.branding ? { brandingProfile: { ...(before.branding as object ?? {}), ...dto.branding } } : {}),
-          ...(dto.showJamanAI !== undefined ? { showJamanAi: dto.showJamanAI } : {})
+          ...(dto.showJamanAI !== undefined ? { showJamanAi: dto.showJamanAI } : {}),
+          ...(dto.digestEnabled !== undefined ? { digestEnabled: dto.digestEnabled } : {}),
+          ...(dto.digestHour !== undefined ? { digestHour: dto.digestHour } : {})
         }
       });
       await this.audit.log({actorType:'TENANT',actorId,restaurantId,action:'RESTAURANT_PROFILE_UPDATED',category:'SETTINGS',details:{fields:Object.keys(dto),operatingProfile:operatingProfile ?? null} as never},tx);

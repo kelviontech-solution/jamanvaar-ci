@@ -1,3 +1,4 @@
+import { PlanReview } from '../Subscriptions/PlanReview';
 import { RESTAURANT_ADMIN_URL, KIOSK_ADMIN_URL } from '../../lib/appUrls';
 // Deep import, not the '@jamanvaar/ui' barrel (see layout/ProtectedLayout.tsx).
 import { printElement } from '../../../../../packages/ui/src/printElement';
@@ -262,6 +263,12 @@ export function OnboardRestaurantPage() {
   const [ownerActivationToken, setOwnerActivationToken] = useState<string | null>(null);
   const [inviteEmailSent, setInviteEmailSent] = useState(false);
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+  // True once a resumed draft shows a restaurant/owner that was already created in an earlier
+  // session: the password shown everywhere else in this component is a *freshly generated*
+  // value this session invented, which is NOT the account's real password (runOnboarding skips
+  // re-creating the owner when restaurantId is already set, so that generated value is never
+  // actually assigned to anything) — see resumeDraft() and SA-11.
+  const [resumedExistingAccount, setResumedExistingAccount] = useState(false);
 
   // Draft resume: a previous incomplete session's saved state, offered to
   // the admin on mount rather than silently auto-applied — so navigating
@@ -290,9 +297,15 @@ export function OnboardRestaurantPage() {
     if (!pendingDraft) return;
     setStep(pendingDraft.step);
     setDetails(pendingDraft.details);
-    // The password never survives into the saved draft (security-audit) -- a resumed draft gets a
-    // freshly-generated one, same as a brand-new form; the operator can still regenerate it manually.
-    setOwner({ ...pendingDraft.owner, initialPassword: generateSecurePassword() });
+    // The password never survives into the saved draft (security-audit). For a draft that hadn't
+    // created the restaurant yet, a fresh one is exactly right -- it's about to become the real
+    // password. But when the restaurant/owner were already created in the earlier session
+    // (restaurantId already set), that owner's real password was set then and is unknown here;
+    // generating a new value and showing it as "the password" would be a fabrication nobody
+    // actually assigned (runOnboarding skips owner creation once restaurantId exists).
+    const alreadyCreated = !!pendingDraft.restaurantId;
+    setResumedExistingAccount(alreadyCreated);
+    setOwner({ ...pendingDraft.owner, initialPassword: alreadyCreated ? '' : generateSecurePassword() });
     setPlanForm(pendingDraft.planForm);
     setModulesForm(pendingDraft.modulesForm);
     setActivationForm(pendingDraft.activationForm);
@@ -458,6 +471,8 @@ export function OnboardRestaurantPage() {
             city: details.city || undefined,
             state: details.state || undefined,
             country: details.country,
+            branchName: modulesForm.branchName || undefined,
+            branchCode: modulesForm.branchCode || undefined,
             ownerName: owner.ownerName,
             ownerEmail: owner.ownerEmail,
             ownerPhone: owner.ownerPhone || undefined,
@@ -492,8 +507,15 @@ export function OnboardRestaurantPage() {
         if (modulesForm.aiState && modulesForm.aiState !== 'PLAN') {
           try {
             await api.patch(`/api/v1/ai-assistant/restaurants/${rId}/access`, { state: modulesForm.aiState });
-          } catch {
-            // The restaurant exists either way; it can be changed later on the JAMAN AI page.
+          } catch (aiErr) {
+            // The restaurant exists either way, but a swallowed failure here used to leave no
+            // trace: the operator picked a deliberate override (ON/LOCKED/OFF) and the review
+            // screen would still claim it was applied. Surfaced as an actionable warning, same as
+            // a failed activation key below, instead of disappearing.
+            setProvisioningWarnings((w) => [
+              ...w,
+              `JAMAN AI access override (${modulesForm.aiState}) was NOT applied${aiErr instanceof ApiError ? `: ${aiErr.message}` : ''} — set it manually from the JAMAN AI page.`
+            ]);
           }
         }
 
@@ -591,10 +613,15 @@ export function OnboardRestaurantPage() {
       `*YOUR RESTAURANT ADMIN CREDENTIALS:*`,
       `• Restaurant Admin Portal (POS/Captain/KDS): ${RESTAURANT_ADMIN_URL}`,
       ...(hasKioskAdmin ? [`• Kiosk Admin Portal: ${KIOSK_ADMIN_URL}`] : []),
-      `• Restaurant ID: ${restaurantId || '—'}`,
+      // Was `restaurantId` — the internal UUID, not the customer-facing code every login screen
+      // and terminal activation flow actually asks for (see OwnerHandover.tsx's own use of
+      // restaurantCode). The two handover paths disagreed on which "Restaurant ID" means.
+      `• Restaurant ID: ${restaurantCode || '—'}`,
       `• Login Email: ${owner.ownerEmail}`,
       owner.passwordMode === 'set_now'
-        ? `• Password: ${owner.initialPassword}`
+        ? resumedExistingAccount
+          ? `• Password: (unchanged from this account's original setup — not available in this resumed session)`
+          : `• Password: ${owner.initialPassword}`
         : `• Invitation Token (open the Admin Portal → "First time? Set your password"): ${ownerActivationToken ?? 'unavailable — see warning in console'}`,
       `• Plan: ${selectedPlan?.name || 'JAMANVAAR PRO'} (Status: ${planForm.status})`,
       ``,
@@ -921,21 +948,30 @@ export function OnboardRestaurantPage() {
                 </label>
               </div>
 
-              {owner.passwordMode === 'set_now' && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, maxWidth: 440 }}>
-                  <input
-                    type="text"
-                    value={owner.initialPassword}
-                    onChange={(e) => setOwner((o) => ({ ...o, initialPassword: e.target.value }))}
-                    placeholder="Enter temporary password"
-                    required
-                    style={{ fontFamily: 'monospace', fontWeight: 700 }}
-                  />
-                  <Button type="button" variant="ghost" onClick={handleRegeneratePassword} title="Generate random password">
-                    <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                    Regenerate
-                  </Button>
-                </div>
+              {owner.passwordMode === 'set_now' && resumedExistingAccount ? (
+                <p style={{ fontSize: 13, color: 'var(--jv-ink)' }}>
+                  This restaurant and owner account were already created in an earlier session. The owner's
+                  real password was set then and isn't available here — this resumed draft cannot show or
+                  change it. Use the owner's existing password, or reset it through an audited recovery flow
+                  if it's been lost.
+                </p>
+              ) : (
+                owner.passwordMode === 'set_now' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, maxWidth: 440 }}>
+                    <input
+                      type="text"
+                      value={owner.initialPassword}
+                      onChange={(e) => setOwner((o) => ({ ...o, initialPassword: e.target.value }))}
+                      placeholder="Enter temporary password"
+                      required
+                      style={{ fontFamily: 'monospace', fontWeight: 700 }}
+                    />
+                    <Button type="button" variant="ghost" onClick={handleRegeneratePassword} title="Generate random password">
+                      <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                      Regenerate
+                    </Button>
+                  </div>
+                )
               )}
             </div>
 
@@ -1100,13 +1136,14 @@ export function OnboardRestaurantPage() {
 
               <div className="field">
                 <label>Billing Cycle</label>
-                <select
-                  value={planForm.billingCycle}
-                  onChange={(e) => setPlanForm((f) => ({ ...f, billingCycle: e.target.value as 'monthly' | 'yearly' }))}
-                >
+                <select value={planForm.billingCycle} disabled>
                   <option value="monthly">Monthly Recurring</option>
                   <option value="yearly">Annual Prepayment (10% Discount)</option>
                 </select>
+                <p className="form-hint">
+                  Not yet supported — the first invoice always charges the plan&rsquo;s monthly price regardless of
+                  this selection.
+                </p>
               </div>
             </div>
 
@@ -1165,29 +1202,17 @@ export function OnboardRestaurantPage() {
                 />
               </div>
               <div className="field">
-                <label>Branch Limit (Plan Maximum: {selectedPlan?.maxBranches || 1})</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={selectedPlan?.maxBranches || 1}
-                  value={modulesForm.maxBranches}
-                  onChange={(e) => setModulesForm((m) => ({ ...m, maxBranches: Number(e.target.value) }))}
-                  required
-                />
+                <label>Branch Limit</label>
+                <input type="number" value={selectedPlan?.maxBranches || 1} disabled />
+                <p className="form-hint">Set by the plan — not editable per restaurant yet.</p>
               </div>
             </div>
 
             <div className="form-grid" style={{ marginTop: 12 }}>
               <div className="field">
-                <label>Max Registered Devices (Plan Maximum: {selectedPlan?.maxDevices || 5})</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={selectedPlan?.maxDevices || 20}
-                  value={modulesForm.maxDevices}
-                  onChange={(e) => setModulesForm((m) => ({ ...m, maxDevices: Number(e.target.value) }))}
-                  required
-                />
+                <label>Max Registered Devices</label>
+                <input type="number" value={selectedPlan?.maxDevices || 5} disabled />
+                <p className="form-hint">Set by the plan — not editable per restaurant yet.</p>
               </div>
             </div>
 
@@ -1508,7 +1533,11 @@ export function OnboardRestaurantPage() {
                 <div className="credential-item">
                   <span className="credential-label">Temporary Password</span>
                   <span className="credential-value" style={{ color: 'var(--jv-accent-text)' }}>
-                    {owner.passwordMode === 'set_now' ? owner.initialPassword : 'Invitation token (generated on submit)'}
+                    {owner.passwordMode !== 'set_now'
+                      ? 'Invitation token (generated on submit)'
+                      : resumedExistingAccount
+                        ? 'Existing password unchanged (not available in this resumed session)'
+                        : owner.initialPassword}
                   </span>
                 </div>
                 <div className="credential-item">
@@ -1536,6 +1565,7 @@ export function OnboardRestaurantPage() {
               </div>
             )}
 
+            {selectedPlan&&<PlanReview plan={selectedPlan}/>}
             <div className="modal-actions" style={{ marginTop: 24 }}>
               <Button type="button" variant="ghost" onClick={() => setStep('activation')} disabled={processing}>
                 ← Back
@@ -1677,8 +1707,14 @@ export function OnboardRestaurantPage() {
                 <div className="credential-item">
                   <span className="credential-label">Initial Password</span>
                   <div className="credential-value" style={{ color: 'var(--jv-accent-text)' }}>
-                    <span>{owner.passwordMode === 'set_now' ? owner.initialPassword : 'Set by owner (see invitation token below)'}</span>
-                    {owner.passwordMode === 'set_now' && (
+                    <span>
+                      {owner.passwordMode !== 'set_now'
+                        ? 'Set by owner (see invitation token below)'
+                        : resumedExistingAccount
+                          ? 'Existing password unchanged — not available in this resumed session'
+                          : owner.initialPassword}
+                    </span>
+                    {owner.passwordMode === 'set_now' && !resumedExistingAccount && (
                       <button
                         type="button"
                         onClick={() => handleCopy(owner.initialPassword, 'Password')}
@@ -1823,8 +1859,8 @@ export function OnboardRestaurantPage() {
               </div>
 
               <div style={{ display: 'flex', gap: 10 }}>
-                <Button variant="accent" onClick={() => navigate(`/restaurants/${restaurantId}`)}>
-                  Open Restaurant Details &amp; Keys →
+                <Button variant="accent" onClick={() => navigate(`/restaurants/${restaurantId}?tab=handover`)}>
+                  Continue branch setup &amp; owner handover →
                 </Button>
               </div>
             </div>

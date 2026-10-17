@@ -1,0 +1,3025 @@
+{
+  "at": "2026-10-16T17:07:01.392Z",
+  "matrix": [
+    {
+      "app": "restaurant",
+      "page": "operations",
+      "size": "desktop",
+      "headings": [
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 28
+    },
+    {
+      "app": "restaurant",
+      "page": "operations",
+      "size": "phone",
+      "headings": [
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "terminals",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Terminal Control",
+        "1. Get a kiosk key",
+        "2. Enter it on the kiosk",
+        "3. Check the connection"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "terminals",
+      "size": "phone",
+      "headings": [
+        "Kiosk Terminal Control",
+        "1. Get a kiosk key",
+        "2. Enter it on the kiosk",
+        "3. Check the connection"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "customer-experience",
+      "size": "desktop",
+      "headings": [
+        "Customer experience",
+        "Welcome Screen",
+        "Branch default · Garden House Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Garden House Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "customer-experience",
+      "size": "phone",
+      "headings": [
+        "Customer experience",
+        "Welcome Screen",
+        "Branch default · Garden House Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Garden House Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "appearance",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Appearance & Content",
+        "Branding",
+        "Idle & Session Timing",
+        "Customer Screen Wording by Language"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "appearance",
+      "size": "phone",
+      "headings": [
+        "Kiosk Appearance & Content",
+        "Branding",
+        "Idle & Session Timing",
+        "Customer Screen Wording by Language"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "welcome-screen",
+      "size": "desktop",
+      "headings": [
+        "Welcome Screen",
+        "Branch default · Garden House Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Garden House Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "welcome-screen",
+      "size": "phone",
+      "headings": [
+        "Welcome Screen",
+        "Branch default · Garden House Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Garden House Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "combos",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Combos & Deals"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "combos",
+      "size": "phone",
+      "headings": [
+        "Kiosk Combos & Deals"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "kiosk-payments",
+      "size": "desktop",
+      "headings": [
+        "Online payments",
+        "Kiosk payment settings"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "kiosk-payments",
+      "size": "phone",
+      "headings": [
+        "Online payments",
+        "Kiosk payment settings"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "feedback",
+      "size": "desktop",
+      "headings": [
+        "Customer Experience & Feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "feedback",
+      "size": "phone",
+      "headings": [
+        "Customer Experience & Feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "dashboard",
+      "size": "desktop",
+      "headings": [
+        "Today at your restaurant",
+        "What needs attention",
+        "Unpaid bills",
+        "Delayed orders · over 20 min",
+        "Unavailable dishes",
+        "Device issues",
+        "Sales trend",
+        "Sales by source",
+        "Sales by branch",
+        "Top items",
+        "Device health",
+        "Alerts",
+        "Recent orders",
+        "Launch & handover"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "dashboard",
+      "size": "phone",
+      "headings": [
+        "Today at your restaurant",
+        "What needs attention",
+        "Unpaid bills",
+        "Delayed orders · over 20 min",
+        "Unavailable dishes",
+        "Device issues",
+        "Sales trend",
+        "Sales by source",
+        "Sales by branch",
+        "Top items",
+        "Device health",
+        "Alerts",
+        "Recent orders",
+        "Launch & handover"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "billing",
+      "size": "desktop",
+      "headings": [
+        "Billing & Invoices",
+        "No Invoices or Orders Found",
+        "Garden House Flow QA",
+        "Billing statement"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 22
+    },
+    {
+      "app": "restaurant",
+      "page": "billing",
+      "size": "phone",
+      "headings": [
+        "Billing & Invoices",
+        "No Invoices or Orders Found",
+        "Garden House Flow QA",
+        "Billing statement"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 17
+    },
+    {
+      "app": "restaurant",
+      "page": "orders",
+      "size": "desktop",
+      "headings": [
+        "16 OCTOBER 2026"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "restaurant",
+      "page": "orders",
+      "size": "phone",
+      "headings": [
+        "16 OCTOBER 2026"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "live-kitchen",
+      "size": "desktop",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 12
+    },
+    {
+      "app": "restaurant",
+      "page": "live-kitchen",
+      "size": "phone",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "tables",
+      "size": "desktop",
+      "headings": [
+        "Floor Plan & Table Layout",
+        "No Tables in this Floor Section"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "tables",
+      "size": "phone",
+      "headings": [
+        "Floor Plan & Table Layout",
+        "No Tables in this Floor Section"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "reservations",
+      "size": "desktop",
+      "headings": [
+        "Table Reservations"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "restaurant",
+      "page": "reservations",
+      "size": "phone",
+      "headings": [
+        "Table Reservations"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "restaurant",
+      "page": "kitchen",
+      "size": "desktop",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 12
+    },
+    {
+      "app": "restaurant",
+      "page": "kitchen",
+      "size": "phone",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "qr-ordering",
+      "size": "desktop",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 1
+    },
+    {
+      "app": "restaurant",
+      "page": "qr-ordering",
+      "size": "phone",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "restaurant",
+      "page": "menu",
+      "size": "desktop",
+      "headings": [
+        "Menu & Catalog Manager",
+        "This restaurant has no menu yet",
+        "Combos & Meal Deals",
+        "No Combos Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 27
+    },
+    {
+      "app": "restaurant",
+      "page": "menu",
+      "size": "phone",
+      "headings": [
+        "Menu & Catalog Manager",
+        "This restaurant has no menu yet",
+        "Combos & Meal Deals",
+        "No Combos Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 24
+    },
+    {
+      "app": "restaurant",
+      "page": "options",
+      "size": "desktop",
+      "headings": [
+        "Customisations & Tax",
+        "Guest menu",
+        "Customisation groups",
+        "Tax groups"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "options",
+      "size": "phone",
+      "headings": [
+        "Customisations & Tax",
+        "Guest menu",
+        "Customisation groups",
+        "Tax groups"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "inventory",
+      "size": "desktop",
+      "headings": [
+        "Inventory & Recipe Bill of Materials (BOM)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "inventory",
+      "size": "phone",
+      "headings": [
+        "Inventory & Recipe Bill of Materials (BOM)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "purchasing",
+      "size": "desktop",
+      "headings": [
+        "Purchasing & Stock Control"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 12
+    },
+    {
+      "app": "restaurant",
+      "page": "purchasing",
+      "size": "phone",
+      "headings": [
+        "Purchasing & Stock Control"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "customers",
+      "size": "desktop",
+      "headings": [
+        "Customer Relationship Management (CRM)",
+        "No Guest Profiles Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 17
+    },
+    {
+      "app": "restaurant",
+      "page": "customers",
+      "size": "phone",
+      "headings": [
+        "Customer Relationship Management (CRM)",
+        "No Guest Profiles Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 16
+    },
+    {
+      "app": "restaurant",
+      "page": "staff",
+      "size": "desktop",
+      "headings": [
+        "Staff & Role-Based Access (RBAC)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "staff",
+      "size": "phone",
+      "headings": [
+        "Staff & Role-Based Access (RBAC)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "restaurant",
+      "page": "payments",
+      "size": "desktop",
+      "headings": [
+        "Payments & Split Tenders Ledger",
+        "Understanding Split Multi-Tender Payments"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "payments",
+      "size": "phone",
+      "headings": [
+        "Payments & Split Tenders Ledger",
+        "Understanding Split Multi-Tender Payments"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "coupons",
+      "size": "desktop",
+      "headings": [
+        "Offers & Promo Coupons",
+        "Create your first promotion"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "coupons",
+      "size": "phone",
+      "headings": [
+        "Offers & Promo Coupons",
+        "Create your first promotion"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "shifts",
+      "size": "desktop",
+      "headings": [
+        "Shift & Cash Drawer Ledger",
+        "No Active Register Shift"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "shifts",
+      "size": "phone",
+      "headings": [
+        "Shift & Cash Drawer Ledger",
+        "No Active Register Shift"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "reports",
+      "size": "desktop",
+      "headings": [
+        "Reports & Analytics",
+        "Online Payments (Razorpay)",
+        "Performance at a Glance • Today (16 Oct 2026)",
+        "Sales Trend",
+        "Payment Method Split",
+        "Order Channel Split",
+        "Top Dishes by Revenue"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 28
+    },
+    {
+      "app": "restaurant",
+      "page": "reports",
+      "size": "phone",
+      "headings": [
+        "Reports & Analytics",
+        "Online Payments (Razorpay)",
+        "Performance at a Glance • Today (16 Oct 2026)",
+        "Sales Trend",
+        "Payment Method Split",
+        "Order Channel Split",
+        "Top Dishes by Revenue"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 27
+    },
+    {
+      "app": "restaurant",
+      "page": "printers",
+      "size": "desktop",
+      "headings": [
+        "Printers & Peripheral Devices",
+        "No Thermal Printers Configured",
+        "LAN Sync Bridge & Cross-Machine Pairing",
+        "Kitchen Printer Routing"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 14
+    },
+    {
+      "app": "restaurant",
+      "page": "printers",
+      "size": "phone",
+      "headings": [
+        "Printers & Peripheral Devices",
+        "No Thermal Printers Configured",
+        "LAN Sync Bridge & Cross-Machine Pairing",
+        "Kitchen Printer Routing"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 13
+    },
+    {
+      "app": "restaurant",
+      "page": "receipts",
+      "size": "desktop",
+      "headings": [
+        "Receipt & E-Bill System",
+        "Thank You & Footer",
+        "UPI Payment QR",
+        "Logo",
+        "Paper Dimension & Display Rules",
+        "Live Receipt Preview (80mm)",
+        "Garden House Flow QA",
+        "WhatsApp number for customer bills"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "receipts",
+      "size": "phone",
+      "headings": [
+        "Receipt & E-Bill System",
+        "Thank You & Footer",
+        "UPI Payment QR",
+        "Logo",
+        "Paper Dimension & Display Rules",
+        "Live Receipt Preview (80mm)",
+        "Garden House Flow QA",
+        "WhatsApp number for customer bills"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "sync",
+      "size": "desktop",
+      "headings": [
+        "Sync & Devices",
+        "This device: connection & diagnostics",
+        "Connect your devices",
+        "Menu publishing",
+        "Devices",
+        "Needs review (0)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "sync",
+      "size": "phone",
+      "headings": [
+        "Sync & Devices",
+        "This device: connection & diagnostics",
+        "Connect your devices",
+        "Menu publishing",
+        "Devices",
+        "Needs review (0)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "restaurant",
+      "page": "settings",
+      "size": "desktop",
+      "headings": [
+        "Restaurant settings",
+        "Garden House Flow QA / Garden House Flow QA — Main Branch",
+        "Terminal screen size",
+        "Report branding & legal profile",
+        "Branch operating profile",
+        "Brand preview",
+        "Garden House Flow QA",
+        "1. Restaurant Identity & Trade Names",
+        "2. Statutory Tax & Regulatory Credentials",
+        "3. Address & Geographical Location",
+        "4. Contact Channels & Website",
+        "5. Signatories & Printed Statement Footer"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "restaurant",
+      "page": "settings",
+      "size": "phone",
+      "headings": [
+        "Restaurant settings",
+        "Garden House Flow QA / Garden House Flow QA — Main Branch",
+        "Terminal screen size",
+        "Report branding & legal profile",
+        "Branch operating profile",
+        "Brand preview",
+        "Garden House Flow QA",
+        "1. Restaurant Identity & Trade Names",
+        "2. Statutory Tax & Regulatory Credentials",
+        "3. Address & Geographical Location",
+        "4. Contact Channels & Website",
+        "5. Signatories & Printed Statement Footer"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "restaurant",
+      "page": "subscription",
+      "size": "desktop",
+      "headings": [
+        "JAMANVAAR Software Plans",
+        "Change owner password",
+        "Device & Staff Logins"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 15
+    },
+    {
+      "app": "restaurant",
+      "page": "subscription",
+      "size": "phone",
+      "headings": [
+        "JAMANVAAR Software Plans",
+        "Change owner password",
+        "Device & Staff Logins"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "audit",
+      "size": "desktop",
+      "headings": [
+        "Security & Operational Audit Trail"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "audit",
+      "size": "phone",
+      "headings": [
+        "Security & Operational Audit Trail"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "backup",
+      "size": "desktop",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "restaurant",
+      "page": "backup",
+      "size": "phone",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "restaurant",
+      "page": "support",
+      "size": "desktop",
+      "headings": [
+        "Help & Support"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "support",
+      "size": "phone",
+      "headings": [
+        "Help & Support"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "templates",
+      "size": "desktop",
+      "headings": [
+        "Menu Templates",
+        "Load Restaurant Menu Template"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "templates",
+      "size": "phone",
+      "headings": [
+        "Menu Templates",
+        "Load Restaurant Menu Template"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "downloads",
+      "size": "desktop",
+      "headings": [
+        "App Downloads",
+        "Counter POS & Fast Billing",
+        "Restaurant Admin Portal",
+        "Captain App (Table-Side)",
+        "Kitchen Display System (KDS)",
+        "Self-Ordering Kiosk",
+        "Kiosk Terminal Admin"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "restaurant",
+      "page": "downloads",
+      "size": "phone",
+      "headings": [
+        "App Downloads",
+        "Counter POS & Fast Billing",
+        "Restaurant Admin Portal",
+        "Captain App (Table-Side)",
+        "Kitchen Display System (KDS)",
+        "Self-Ordering Kiosk",
+        "Kiosk Terminal Admin"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "restaurant",
+      "page": "failure-backup",
+      "size": "desktop",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "operations",
+      "size": "desktop",
+      "headings": [
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 23
+    },
+    {
+      "app": "kiosk",
+      "page": "operations",
+      "size": "phone",
+      "headings": [
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "qr-ordering",
+      "size": "desktop",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 1
+    },
+    {
+      "app": "kiosk",
+      "page": "qr-ordering",
+      "size": "phone",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "kiosk",
+      "page": "dashboard",
+      "size": "desktop",
+      "headings": [
+        "Launch & handover",
+        "Today at your restaurant",
+        "What needs attention",
+        "Unpaid bills",
+        "Delayed orders · over 20 min",
+        "Unavailable dishes",
+        "Device issues",
+        "Sales trend",
+        "Sales by source",
+        "Sales by branch",
+        "Top items",
+        "Device health",
+        "Alerts",
+        "Recent orders"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "dashboard",
+      "size": "phone",
+      "headings": [
+        "Launch & handover",
+        "Today at your restaurant",
+        "What needs attention",
+        "Unpaid bills",
+        "Delayed orders · over 20 min",
+        "Unavailable dishes",
+        "Device issues",
+        "Sales trend",
+        "Sales by source",
+        "Sales by branch",
+        "Top items",
+        "Device health",
+        "Alerts",
+        "Recent orders"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "terminals",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Terminal Control",
+        "1. Get a kiosk key",
+        "2. Enter it on the kiosk",
+        "3. Check the connection"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "terminals",
+      "size": "phone",
+      "headings": [
+        "Kiosk Terminal Control",
+        "1. Get a kiosk key",
+        "2. Enter it on the kiosk",
+        "3. Check the connection"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "menu",
+      "size": "desktop",
+      "headings": [
+        "Menu & Catalog Manager",
+        "This restaurant has no menu yet",
+        "Combos & Meal Deals",
+        "No Combos Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 26
+    },
+    {
+      "app": "kiosk",
+      "page": "menu",
+      "size": "phone",
+      "headings": [
+        "Menu & Catalog Manager",
+        "This restaurant has no menu yet",
+        "Combos & Meal Deals",
+        "No Combos Yet"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 23
+    },
+    {
+      "app": "kiosk",
+      "page": "templates",
+      "size": "desktop",
+      "headings": [
+        "Menu Templates",
+        "Load Restaurant Menu Template"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "templates",
+      "size": "phone",
+      "headings": [
+        "Menu Templates",
+        "Load Restaurant Menu Template"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "options",
+      "size": "desktop",
+      "headings": [
+        "Customisations & Tax",
+        "Guest menu",
+        "Customisation groups",
+        "Tax groups"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "options",
+      "size": "phone",
+      "headings": [
+        "Customisations & Tax",
+        "Guest menu",
+        "Customisation groups",
+        "Tax groups"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "customer-experience",
+      "size": "desktop",
+      "headings": [
+        "Customer experience",
+        "Welcome Screen",
+        "Branch default · Kiosk-only Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Kiosk-only Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "customer-experience",
+      "size": "phone",
+      "headings": [
+        "Customer experience",
+        "Welcome Screen",
+        "Branch default · Kiosk-only Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Kiosk-only Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "appearance",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Appearance & Content",
+        "Branding",
+        "Idle & Session Timing",
+        "Customer Screen Wording by Language"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "appearance",
+      "size": "phone",
+      "headings": [
+        "Kiosk Appearance & Content",
+        "Branding",
+        "Idle & Session Timing",
+        "Customer Screen Wording by Language"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "welcome-screen",
+      "size": "desktop",
+      "headings": [
+        "Welcome Screen",
+        "Branch default · Kiosk-only Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Kiosk-only Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "welcome-screen",
+      "size": "phone",
+      "headings": [
+        "Welcome Screen",
+        "Branch default · Kiosk-only Flow QA — Main Branch",
+        "Hotel name & welcome message",
+        "Second screen: Choose your language",
+        "Background collection",
+        "Royal Indian Dining",
+        "Modern Indian Dining",
+        "Gujarati Thali",
+        "North Indian Cuisine",
+        "South Indian Cuisine",
+        "Indian Street Food",
+        "Premium Biryani",
+        "Vegetarian Garden",
+        "Café & Casual Dining",
+        "Heritage Sweets",
+        "Midnight Spice",
+        "Terracotta Table",
+        "Teal Pop Kitchen",
+        "Botanical Bistro",
+        "Pastel Patisserie",
+        "Urban Street Kitchen",
+        "Kiosk Preview",
+        "Kiosk-only Flow QA",
+        "Image fit & position",
+        "Configuration delivery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "combos",
+      "size": "desktop",
+      "headings": [
+        "Kiosk Combos & Deals"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "combos",
+      "size": "phone",
+      "headings": [
+        "Kiosk Combos & Deals"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "coupons",
+      "size": "desktop",
+      "headings": [
+        "Offers & Promo Coupons",
+        "Create your first promotion"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "coupons",
+      "size": "phone",
+      "headings": [
+        "Offers & Promo Coupons",
+        "Create your first promotion"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "orders",
+      "size": "desktop",
+      "headings": [
+        "16 OCTOBER 2026"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "kiosk",
+      "page": "orders",
+      "size": "phone",
+      "headings": [
+        "16 OCTOBER 2026"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "kitchen",
+      "size": "desktop",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 11
+    },
+    {
+      "app": "kiosk",
+      "page": "kitchen",
+      "size": "phone",
+      "headings": [
+        "Kitchen Display & KOT Station Queue",
+        "Your Kitchen is Clear"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "tables",
+      "size": "desktop",
+      "headings": [
+        "Floor Plan & Table Layout",
+        "No Tables in this Floor Section"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "tables",
+      "size": "phone",
+      "headings": [
+        "Floor Plan & Table Layout",
+        "No Tables in this Floor Section"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "staff",
+      "size": "desktop",
+      "headings": [
+        "Staff & Role-Based Access (RBAC)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "staff",
+      "size": "phone",
+      "headings": [
+        "Staff & Role-Based Access (RBAC)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "kiosk",
+      "page": "payments",
+      "size": "desktop",
+      "headings": [
+        "Online payments",
+        "Kiosk payment settings"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "payments",
+      "size": "phone",
+      "headings": [
+        "Online payments",
+        "Kiosk payment settings"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "feedback",
+      "size": "desktop",
+      "headings": [
+        "Customer Experience & Feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "feedback",
+      "size": "phone",
+      "headings": [
+        "Customer Experience & Feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "reports",
+      "size": "desktop",
+      "headings": [
+        "Reports & Analytics",
+        "Online Payments (Razorpay)",
+        "Performance at a Glance • Today (16 Oct 2026)",
+        "Sales Trend",
+        "Payment Method Split",
+        "Order Channel Split",
+        "Top Dishes by Revenue"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 25
+    },
+    {
+      "app": "kiosk",
+      "page": "reports",
+      "size": "phone",
+      "headings": [
+        "Reports & Analytics",
+        "Online Payments (Razorpay)",
+        "Performance at a Glance • Today (16 Oct 2026)",
+        "Sales Trend",
+        "Payment Method Split",
+        "Order Channel Split",
+        "Top Dishes by Revenue"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 24
+    },
+    {
+      "app": "kiosk",
+      "page": "printers",
+      "size": "desktop",
+      "headings": [
+        "Printers & Peripheral Devices",
+        "No Thermal Printers Configured",
+        "LAN Sync Bridge & Cross-Machine Pairing",
+        "Kitchen Printer Routing"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 13
+    },
+    {
+      "app": "kiosk",
+      "page": "printers",
+      "size": "phone",
+      "headings": [
+        "Printers & Peripheral Devices",
+        "No Thermal Printers Configured",
+        "LAN Sync Bridge & Cross-Machine Pairing",
+        "Kitchen Printer Routing"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 12
+    },
+    {
+      "app": "kiosk",
+      "page": "receipts",
+      "size": "desktop",
+      "headings": [
+        "Receipt & E-Bill System",
+        "Thank You & Footer",
+        "UPI Payment QR",
+        "Logo",
+        "Paper Dimension & Display Rules",
+        "Live Receipt Preview (80mm)",
+        "Kiosk-only Flow QA",
+        "WhatsApp number for customer bills"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "receipts",
+      "size": "phone",
+      "headings": [
+        "Receipt & E-Bill System",
+        "Thank You & Footer",
+        "UPI Payment QR",
+        "Logo",
+        "Paper Dimension & Display Rules",
+        "Live Receipt Preview (80mm)",
+        "Kiosk-only Flow QA",
+        "WhatsApp number for customer bills"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "sync",
+      "size": "desktop",
+      "headings": [
+        "Sync & Devices",
+        "This device: connection & diagnostics",
+        "Connect your devices",
+        "Menu publishing",
+        "Devices",
+        "Needs review (0)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "sync",
+      "size": "phone",
+      "headings": [
+        "Sync & Devices",
+        "This device: connection & diagnostics",
+        "Connect your devices",
+        "Menu publishing",
+        "Devices",
+        "Needs review (0)"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "kiosk",
+      "page": "settings",
+      "size": "desktop",
+      "headings": [
+        "Kiosk settings",
+        "Kiosk-only Flow QA / Kiosk-only Flow QA — Main Branch",
+        "Terminal screen size",
+        "Report branding & legal profile",
+        "Branch operating profile",
+        "Brand preview",
+        "Kiosk-only Flow QA",
+        "1. Restaurant Identity & Trade Names",
+        "2. Statutory Tax & Regulatory Credentials",
+        "3. Address & Geographical Location",
+        "4. Contact Channels & Website",
+        "5. Signatories & Printed Statement Footer",
+        "Ordering choices",
+        "Customer kiosk language & idle timeout",
+        "Kiosk order token counter"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 10
+    },
+    {
+      "app": "kiosk",
+      "page": "settings",
+      "size": "phone",
+      "headings": [
+        "Kiosk settings",
+        "Kiosk-only Flow QA / Kiosk-only Flow QA — Main Branch",
+        "Terminal screen size",
+        "Report branding & legal profile",
+        "Branch operating profile",
+        "Brand preview",
+        "Kiosk-only Flow QA",
+        "1. Restaurant Identity & Trade Names",
+        "2. Statutory Tax & Regulatory Credentials",
+        "3. Address & Geographical Location",
+        "4. Contact Channels & Website",
+        "5. Signatories & Printed Statement Footer",
+        "Ordering choices",
+        "Customer kiosk language & idle timeout",
+        "Kiosk order token counter"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 7
+    },
+    {
+      "app": "kiosk",
+      "page": "subscription",
+      "size": "desktop",
+      "headings": [
+        "JAMANVAAR Software Plans",
+        "Change owner password",
+        "Device & Staff Logins"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 14
+    },
+    {
+      "app": "kiosk",
+      "page": "subscription",
+      "size": "phone",
+      "headings": [
+        "JAMANVAAR Software Plans",
+        "Change owner password",
+        "Device & Staff Logins"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "audit",
+      "size": "desktop",
+      "headings": [
+        "Security & Operational Audit Trail"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "audit",
+      "size": "phone",
+      "headings": [
+        "Security & Operational Audit Trail"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "backup",
+      "size": "desktop",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "kiosk",
+      "page": "backup",
+      "size": "phone",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 8
+    },
+    {
+      "app": "kiosk",
+      "page": "support",
+      "size": "desktop",
+      "headings": [
+        "Help & Support"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "support",
+      "size": "phone",
+      "headings": [
+        "Help & Support"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "downloads",
+      "size": "desktop",
+      "headings": [
+        "App Downloads",
+        "Counter POS & Fast Billing",
+        "Restaurant Admin Portal",
+        "Captain App (Table-Side)",
+        "Kitchen Display System (KDS)",
+        "Self-Ordering Kiosk",
+        "Kiosk Terminal Admin"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 6
+    },
+    {
+      "app": "kiosk",
+      "page": "downloads",
+      "size": "phone",
+      "headings": [
+        "App Downloads",
+        "Counter POS & Fast Billing",
+        "Restaurant Admin Portal",
+        "Captain App (Table-Side)",
+        "Kitchen Display System (KDS)",
+        "Self-Ordering Kiosk",
+        "Kiosk Terminal Admin"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 5
+    },
+    {
+      "app": "kiosk",
+      "page": "failure-backup",
+      "size": "desktop",
+      "headings": [
+        "Database Backup & Disaster Recovery"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 9
+    },
+    {
+      "app": "qr",
+      "page": "RESTAURANT_PAGE",
+      "size": "desktop",
+      "headings": [
+        "Restaurant Page",
+        "Restaurant page studio",
+        "Set up your restaurant welcome",
+        "Page sections",
+        "Garden House Flow QA"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "RESTAURANT_PAGE",
+      "size": "phone",
+      "headings": [
+        "Restaurant Page",
+        "Restaurant page studio",
+        "Set up your restaurant welcome",
+        "Page sections",
+        "Garden House Flow QA"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "OPERATIONS",
+      "size": "desktop",
+      "headings": [
+        "Operations Hub",
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 17
+    },
+    {
+      "app": "qr",
+      "page": "OPERATIONS",
+      "size": "phone",
+      "headings": [
+        "Operations Hub",
+        "Keep service running smoothly",
+        "Rush hour",
+        "Service queue",
+        "Customer pickup display"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ONBOARDING",
+      "size": "desktop",
+      "headings": [
+        "Guided Menu Setup",
+        "Set up your guest menu",
+        "Get Your Restaurant Ready"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 1
+    },
+    {
+      "app": "qr",
+      "page": "ONBOARDING",
+      "size": "phone",
+      "headings": [
+        "Guided Menu Setup",
+        "Set up your guest menu",
+        "Get Your Restaurant Ready"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 1
+    },
+    {
+      "app": "qr",
+      "page": "ACCEPTANCE",
+      "size": "desktop",
+      "headings": [
+        "Payment Acceptance",
+        "Online payment acceptance",
+        "1. Check your payment configuration",
+        "2. Test on your actual phone",
+        "3. Record verified acceptance"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ACCEPTANCE",
+      "size": "phone",
+      "headings": [
+        "Payment Acceptance",
+        "Online payment acceptance",
+        "1. Check your payment configuration",
+        "2. Test on your actual phone",
+        "3. Record verified acceptance"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "RECONCILIATION",
+      "size": "desktop",
+      "headings": [
+        "Collection Reconciliation",
+        "QR cash & collection reconciliation",
+        "Collection / refund entries"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "RECONCILIATION",
+      "size": "phone",
+      "headings": [
+        "Collection Reconciliation",
+        "QR cash & collection reconciliation",
+        "Collection / refund entries"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "CALENDAR",
+      "size": "desktop",
+      "headings": [
+        "Pickup Calendar",
+        "Pickup calendar & handover"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "CALENDAR",
+      "size": "phone",
+      "headings": [
+        "Pickup Calendar",
+        "Pickup calendar & handover"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PRINTPACK",
+      "size": "desktop",
+      "headings": [
+        "QR Print Packs",
+        "Bulk QR print packs"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PRINTPACK",
+      "size": "phone",
+      "headings": [
+        "QR Print Packs",
+        "Bulk QR print packs"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "CRM",
+      "size": "desktop",
+      "headings": [
+        "Customers & Loyalty",
+        "Customers & loyalty",
+        "Rewards guests can choose at checkout"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "CRM",
+      "size": "phone",
+      "headings": [
+        "Customers & Loyalty",
+        "Customers & loyalty",
+        "Rewards guests can choose at checkout"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "OVERVIEW",
+      "size": "desktop",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "OVERVIEW",
+      "size": "phone",
+      "headings": [
+        "Overview",
+        "A better guest experience starts here.",
+        "Set up guest ordering",
+        "Before your first guest"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ORDERS",
+      "size": "desktop",
+      "headings": [
+        "QR Orders"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ORDERS",
+      "size": "phone",
+      "headings": [
+        "QR Orders"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "SERVICE",
+      "size": "desktop",
+      "headings": [
+        "Service Requests",
+        "QR table service requests",
+        "Service request settings",
+        "Request buttons"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "SERVICE",
+      "size": "phone",
+      "headings": [
+        "Service Requests",
+        "QR table service requests",
+        "Service request settings",
+        "Request buttons"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "MENU",
+      "size": "desktop",
+      "headings": [
+        "Menu & Availability",
+        "Shared menu editor"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "MENU",
+      "size": "phone",
+      "headings": [
+        "Menu & Availability",
+        "Shared menu editor"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "TABLES",
+      "size": "desktop",
+      "headings": [
+        "Tables & QR"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "TABLES",
+      "size": "phone",
+      "headings": [
+        "Tables & QR"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "DESIGN",
+      "size": "desktop",
+      "headings": [
+        "QR Design Studio",
+        " QR Design Studio",
+        "Print preview"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "DESIGN",
+      "size": "phone",
+      "headings": [
+        "QR Design Studio",
+        " QR Design Studio",
+        "Print preview"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "BRAND",
+      "size": "desktop",
+      "headings": [
+        "Customer Branding",
+        "Customer page branding",
+        "Good food.Great company."
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "BRAND",
+      "size": "phone",
+      "headings": [
+        "Customer Branding",
+        "Customer page branding",
+        "Good food.Great company."
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PAYMENTS",
+      "size": "desktop",
+      "headings": [
+        "Payment Settings",
+        "Secure payment collection",
+        "Recent online payment attempts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PAYMENTS",
+      "size": "phone",
+      "headings": [
+        "Payment Settings",
+        "Secure payment collection",
+        "Recent online payment attempts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "RULES",
+      "size": "desktop",
+      "headings": [
+        "Ordering Rules",
+        "Hours, capacity & guest instructions"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "RULES",
+      "size": "phone",
+      "headings": [
+        "Ordering Rules",
+        "Hours, capacity & guest instructions"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PICKUP",
+      "size": "desktop",
+      "headings": [
+        "Pickup Scheduling",
+        "Pickup scheduling",
+        "Pickup hours"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PICKUP",
+      "size": "phone",
+      "headings": [
+        "Pickup Scheduling",
+        "Pickup scheduling",
+        "Pickup hours"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "SETTINGS",
+      "size": "desktop",
+      "headings": [
+        "QR Settings",
+        "Guest page: words, colour and logo"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "SETTINGS",
+      "size": "phone",
+      "headings": [
+        "QR Settings",
+        "Guest page: words, colour and logo"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ADVANCED",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Features for this branch"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ADVANCED",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Features for this branch"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ANALYTICS",
+      "size": "desktop",
+      "headings": [
+        "Analytics",
+        "Order-value trend",
+        "Popular dishes",
+        "By table / QR version",
+        "By branch",
+        "Recent online payment attempts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "ANALYTICS",
+      "size": "phone",
+      "headings": [
+        "Analytics",
+        "Order-value trend",
+        "Popular dishes",
+        "By table / QR version",
+        "By branch",
+        "Recent online payment attempts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PERFORMANCE",
+      "size": "desktop",
+      "headings": [
+        "Menu Performance",
+        "Menu performance",
+        "Sales by category",
+        "Ordering modes",
+        "Daily order trend (restaurant time)",
+        "Orders by hour (restaurant time)",
+        "Service request activity"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "PERFORMANCE",
+      "size": "phone",
+      "headings": [
+        "Menu Performance",
+        "Menu performance",
+        "Sales by category",
+        "Ordering modes",
+        "Daily order trend (restaurant time)",
+        "Orders by hour (restaurant time)",
+        "Service request activity"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Settings",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Features for this branch"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Settings",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Features for this branch"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Translations",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Menu translations"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Translations",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Menu translations"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Promotions",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Coupons and promotions"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Promotions",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Coupons and promotions"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Feedback",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Verified private feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Feedback",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Verified private feedback"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Alerts",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Recoverable operational alerts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Alerts",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Recoverable operational alerts"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Collections",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Payment attempts and confirmed collections"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-Collections",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Payment attempts and confirmed collections"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-License",
+      "size": "desktop",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Licensed capabilities and limits"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "advanced-License",
+      "size": "phone",
+      "headings": [
+        "Advanced Features",
+        "Advanced QR capabilities",
+        "Licensed capabilities and limits"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "failure-crm",
+      "size": "desktop",
+      "headings": [
+        "Customers & Loyalty",
+        "Customers & loyalty",
+        "Rewards guests can choose at checkout"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    },
+    {
+      "app": "qr",
+      "page": "failure-analytics",
+      "size": "desktop",
+      "headings": [
+        "Analytics"
+      ],
+      "overflow": false,
+      "brokenImages": 0,
+      "unnamedButtons": 0,
+      "smallTargets": 0
+    }
+  ],
+  "probes": [
+    {
+      "app": "restaurant",
+      "test": "Unrelated JSON object accepted as validated backup",
+      "applyEnabled": true,
+      "validatedLabel": true
+    },
+    {
+      "app": "restaurant",
+      "test": "Invalid replacement file leaves previous parsed backup actionable",
+      "applyEnabled": true,
+      "errorShown": true
+    },
+    {
+      "app": "restaurant",
+      "test": "Closing and reopening restore retains previous selection",
+      "applyEnabled": true
+    },
+    {
+      "app": "kiosk",
+      "test": "Unrelated JSON object accepted as validated backup",
+      "applyEnabled": true,
+      "validatedLabel": true
+    },
+    {
+      "app": "kiosk",
+      "test": "Invalid replacement file leaves previous parsed backup actionable",
+      "applyEnabled": true,
+      "errorShown": true
+    },
+    {
+      "app": "kiosk",
+      "test": "Closing and reopening restore retains previous selection",
+      "applyEnabled": true
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "http": [
+    {
+      "app": "restaurant",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401
+    },
+    {
+      "app": "restaurant",
+      "path": "/api/v1/tenant/me/backups",
+      "status": 503
+    },
+    {
+      "app": "kiosk",
+      "path": "/api/v1/tenant/me/applications",
+      "status": 401
+    },
+    {
+      "app": "kiosk",
+      "path": "/api/v1/tenant/me/backups",
+      "status": 503
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/tenant/me",
+      "status": 401
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/tenant/me",
+      "status": 401
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/menu/draft-status",
+      "status": 403
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/menu/draft-status",
+      "status": 403
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/restaurant/qr/crm",
+      "status": 503
+    },
+    {
+      "app": "qr",
+      "path": "/api/v1/restaurant/qr/analytics",
+      "status": 503
+    }
+  ]
+}

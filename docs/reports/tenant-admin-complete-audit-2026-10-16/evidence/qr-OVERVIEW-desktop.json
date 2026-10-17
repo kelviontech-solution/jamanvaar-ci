@@ -1,0 +1,254 @@
+{
+  "url": "/qr/admin/?tab=OVERVIEW",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LIVE OPERATIONS\nOverview\n\nYour branch at a glance. Keep orders moving and your guest experience ready.\n\n✦ JAMAN AI\nEnabled\nMAKE EVERY TABLE FEEL WELCOME\nA better guest experience starts here.\n\nKeep your menu fresh, respond to guests and follow orders from the first scan to the last plate.\n\n0\nTables\n0\nActive QR codes\n0\nQR orders today\n₹0\nAccepted order value today\n0\nWaiting / in kitchen\n0\nCompleted\n0\nLanding sessions today\n₹0\nAverage order\nOrders by table today\nNo QR orders yet today.\nCounted by the server from real orders. Order value excludes unpaid online drafts and cancellations; paid sales include verified online payments and collected counter bills (₹0 so far).\nSet up guest ordering\n\nWork through the setup checks below, then open your live table QR to verify the guest experience.\n\n1. Publish menu\n2. Set up table QR\n3. Check payments\n4. Preview appearance\nShow advanced tools\nBefore your first guest\nYour branch setup checklist\nCheck setup again\n\nA setup check verifies configuration. Place a small test order and confirm staff receive it before opening service.\n\nSelected branch · 6/9 checks passed · Finish the checks below\n\nPublished dishes\n\nUpload and publish your menu in Menu & Availability.\n\nOpen settings →\nActive, correctly mapped QR codes\n\nGenerate a QR code for a valid table or menu in Tables & QR.\n\nOpen settings →\nOnline payment readinessOptional\n\nConfigure your merchant integration or turn off online payment.\n\nOpen settings →\nView completed checks (6)\nDisplay",
+  "headings": [
+    "Overview",
+    "A better guest experience starts here.",
+    "Set up guest ordering",
+    "Before your first guest"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "1. Publish menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 44
+    },
+    {
+      "text": "2. Set up table QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 44
+    },
+    {
+      "text": "3. Check payments",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44
+    },
+    {
+      "text": "4. Preview appearance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 181,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 44
+    },
+    {
+      "text": "Check setup again",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 177,
+      "height": 46
+    },
+    {
+      "text": "Open settings →",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 84,
+      "height": 44
+    },
+    {
+      "text": "Open settings →",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 84,
+      "height": 44
+    },
+    {
+      "text": "Open settings →",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 84,
+      "height": 44
+    }
+  ],
+  "fields": [],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

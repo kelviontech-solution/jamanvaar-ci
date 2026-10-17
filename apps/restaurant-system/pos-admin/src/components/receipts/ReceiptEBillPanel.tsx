@@ -1,10 +1,14 @@
+import { useKioskDraft } from '../kiosk/useKioskDraft';
+import { requestConfigurationReceipts } from '../kiosk/configurationDelivery';
 import React, { useState } from 'react';
 import { AuditRepository, ReceiptRepository, db } from '@jamanvaar/database';
 import { PrinterService } from '@jamanvaar/api';
 import { formatTime } from '@jamanvaar/utils';
 import type { Order, ReceiptConfig } from '@jamanvaar/types';
-import { Button, ThermalReceiptView } from '@jamanvaar/ui';
+import { Button, ThermalReceiptView, useConfirm } from '@jamanvaar/ui';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
+import { retryReceiptWhatsApp } from '../../cloud/cloudClient';
+import { getCurrentAdminName } from '../../currentAdminIdentity';
 
 /** What the preview shows before any real order exists — a real order appears once a guest has ordered. */
 const SAMPLE_RECEIPT_ORDER = {
@@ -47,9 +51,53 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
   onGoToSettings
 }) => {
   const [config, setConfig] = useState<ReceiptConfig>(ReceiptRepository.getConfig());
+  const [baseline,setBaseline]=useState(()=>JSON.stringify(ReceiptRepository.getConfig()));
+  const draftGuard=useKioskDraft({scope:'receipt',value:config,dirty:JSON.stringify(config)!==baseline,restore:setConfig,discard:()=>setConfig(JSON.parse(baseline))});
   const records = ReceiptRepository.getAllRecords();
   const [publishing, setPublishing] = useState(false);
   const [publishMessage, setPublishMessage] = useState('');
+  // #13: this table only ever rendered the same green badge for every status, and a failed send
+  // had no way to retry -- the recipient is masked for privacy, so retrying asks for the number
+  // again, but reuses the already-known orderId; the order itself is never recreated.
+  const { prompt, confirmDialog } = useConfirm();
+  const [retryingId, setRetryingId] = useState<string | null>(null);
+  const retrySend = async (rec: ReturnType<typeof ReceiptRepository.getAllRecords>[number]) => {
+    const phone = await prompt({
+      title: `Retry WhatsApp bill for order ${rec.orderNumber}`,
+      message: 'The saved recipient is masked for privacy. Enter the number to resend to.',
+      inputLabel: 'WhatsApp number',
+      placeholder: '98765 43210',
+      required: true
+    });
+    if (!phone) return;
+    setRetryingId(rec.id);
+    try {
+      const result = await retryReceiptWhatsApp(rec.orderId, phone.trim());
+      ReceiptRepository.addRecord({
+        id: `rec-retry-${Date.now()}`,
+        orderId: rec.orderId,
+        orderNumber: rec.orderNumber,
+        tokenNumber: rec.tokenNumber,
+        deliveryMethod: 'WHATSAPP',
+        deliveryStatus: result.success ? 'SENT' : 'FAILED',
+        recipient: phone.replace(/\d(?=\d{2})/g, '*'),
+        content: rec.content,
+        createdAt: new Date().toISOString(),
+        ...(result.success ? { sentAt: new Date().toISOString() } : { errorMessage: result.errorMessage || 'WhatsApp send failed' })
+      });
+      AuditRepository.log({
+        action: 'RECEIPT_WHATSAPP_RETRIED',
+        category: 'SETTINGS',
+        details: `Retried WhatsApp bill for order ${rec.orderNumber}: ${result.success ? 'accepted by provider' : result.errorMessage || 'failed'}`,
+        username: getCurrentAdminName()
+      });
+      showToast(result.success ? 'Bill resent — accepted by WhatsApp provider.' : `Retry failed: ${result.errorMessage || 'WhatsApp send failed'}`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not retry this bill.');
+    } finally {
+      setRetryingId(null);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +111,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
     const upiChanged = (before.upiId ?? '') !== (config.upiId ?? '') || (before.upiPayeeName ?? '') !== (config.upiPayeeName ?? '');
     ReceiptRepository.updateConfig(config);
     AuditRepository.log({
-      username: 'admin',
+      username: getCurrentAdminName(),
       action: upiChanged ? 'RECEIPT_UPI_PAYOUT_CHANGED' : 'RECEIPT_SETTINGS_UPDATED',
       category: 'SETTINGS',
       details: upiChanged
@@ -72,14 +120,15 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
     });
     try {
       await syncKioskConfiguration({ push: true });
-      setPublishMessage('Receipt settings published to connected kiosks.');
+      setPublishMessage(await requestConfigurationReceipts());
+      setBaseline(JSON.stringify(config));draftGuard.clear();
       showToast('Receipt settings saved and published.');
     } catch (error) { setPublishMessage(error instanceof Error ? error.message : 'Receipt settings saved locally. Publication failed; retry when connected.'); }
     finally { setPublishing(false); }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6">{draftGuard.ui}{confirmDialog}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Receipt & E-Bill System</h1>
         <p className="text-sm text-[#4A5568] mt-1">
@@ -128,7 +177,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
               Paytm...) opens pre-filled, ready to confirm. Pays straight into this UPI ID, no gateway involved.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+              <div id="settings-upi-vpa">
                 <label className="block text-xs font-bold text-jaman-navy mb-1">Restaurant UPI ID (VPA)</label>
                 <input
                   type="text"
@@ -163,7 +212,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
               </span>
             </label>
 
-            <h3 className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">Logo</h3>
+            <h3 id="settings-receipt-logo" className="font-bold text-base text-jaman-navy pt-3 border-t border-[#F3EFE6]">Logo</h3>
             <p className="text-[11px] text-[#4A5568] -mt-2">
               Shown on the on-screen and WhatsApp receipt and printed at the top of the physical slip.
             </p>
@@ -252,7 +301,7 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
               </label>
             </div>
 
-            <div className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-3">
+            <div id="settings-cash-payment" className="p-4 bg-jaman-ivory border border-jaman-border rounded-2xl space-y-3">
               <label className="flex items-start gap-2 text-xs font-semibold text-jaman-navy cursor-pointer">
                 <input
                   type="checkbox"
@@ -332,22 +381,45 @@ export const ReceiptEBillPanel: React.FC<{ showToast: (msg: string) => void; onG
                   <th className="py-3 px-4">Recipient (Masked)</th>
                   <th className="py-3 px-4">Sent Time</th>
                   <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F3EFE6]">
-                {records.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-jaman-ivory">
-                    <td className="py-3 px-4 font-bold text-jaman-navy">
-                      {rec.orderNumber} (#{rec.tokenNumber})
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-brand">{rec.deliveryMethod}</td>
-                    <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{rec.recipient}</td>
-                    <td className="py-3 px-4 text-[#64748B]">{formatTime(rec.createdAt)}</td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700">{rec.deliveryStatus}</span>
-                    </td>
-                  </tr>
-                ))}
+                {records.map((rec) => {
+                  const statusStyle = rec.deliveryStatus === 'SENT'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : rec.deliveryStatus === 'FAILED'
+                      ? 'bg-rose-50 text-rose-700'
+                      : 'bg-amber-50 text-amber-700';
+                  // "SENT" here only ever means the WhatsApp provider accepted the send request --
+                  // there is no delivery-receipt webhook wired up, so it is never relabelled "Delivered".
+                  const statusLabel = rec.deliveryStatus === 'SENT' ? 'Provider accepted' : rec.deliveryStatus;
+                  return (
+                    <tr key={rec.id} className="hover:bg-jaman-ivory">
+                      <td className="py-3 px-4 font-bold text-jaman-navy">
+                        {rec.orderNumber} (#{rec.tokenNumber})
+                      </td>
+                      <td className="py-3 px-4 font-semibold text-brand">{rec.deliveryMethod}</td>
+                      <td className="py-3 px-4 font-mono font-bold text-jaman-navy">{rec.recipient}</td>
+                      <td className="py-3 px-4 text-[#64748B]">{formatTime(rec.createdAt)}</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${statusStyle}`} title={rec.errorMessage}>{statusLabel}</span>
+                      </td>
+                      <td className="py-3 px-4">
+                        {rec.deliveryStatus === 'FAILED' && rec.deliveryMethod === 'WHATSAPP' && (
+                          <button
+                            type="button"
+                            disabled={retryingId === rec.id}
+                            onClick={() => void retrySend(rec)}
+                            className="text-[11px] font-bold text-brand underline disabled:opacity-50"
+                          >
+                            {retryingId === rec.id ? 'Retrying…' : 'Retry'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api, ApiError } from '../../api/client';
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import type { SearchResult, RestaurantDiagnostics } from '../../api/types';
 import { Card, Button, Input, Modal, Badge, EmptyState } from '../../components/ui';
 import { absoluteTime, relativeTime } from '../../lib/relativeTime';
@@ -37,6 +38,10 @@ export function SupportPage() {
   const [error, setError] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [fleetList, setFleetList] = useState<any[]>([]);
+  // A slower diagnostics response for restaurant A could land after a faster one for B (selected
+  // afterward), silently replacing B's panel with A's stale data. This ref is bumped synchronously
+  // on every selection, so a response only applies if it's still for the latest request.
+  const diagnosticsRequestId = useRef(0);
 
   useEffect(() => {
     api.get<any[]>('/api/v1/restaurants')
@@ -90,20 +95,24 @@ export function SupportPage() {
   }
 
   async function loadDiagnostics(restaurantId: string) {
+    const requestId = ++diagnosticsRequestId.current;
     setSelectedRestaurantId(restaurantId);
     // Clear a leftover impersonation token when moving to a DIFFERENT restaurant; preserve it when
     // this is just the post-action refresh of the same restaurant (handlePerformAction calls this
     // right after minting a token for the restaurant already on screen).
     setImpersonationResult((prev) => (prev && prev.restaurantId !== restaurantId ? null : prev));
+    setDiagnostics(null);
     setDiagLoading(true);
     setError(null);
     try {
       const res = await api.get<RestaurantDiagnostics>(`/api/v1/support/diagnostics/${restaurantId}`);
+      if (diagnosticsRequestId.current !== requestId) return; // a newer selection superseded this response
       setDiagnostics(res);
     } catch (err) {
+      if (diagnosticsRequestId.current !== requestId) return;
       setError(err instanceof ApiError ? err.message : 'Failed to load diagnostics');
     } finally {
-      setDiagLoading(false);
+      if (diagnosticsRequestId.current === requestId) setDiagLoading(false);
     }
   }
 
@@ -121,8 +130,10 @@ export function SupportPage() {
         if (res.emailSent) {
           setSuccessToast(`New invitation emailed to ${actionModal.targetName}`);
         } else {
-          navigator.clipboard?.writeText(res.activationToken).catch(() => {});
-          setSuccessToast(`Email could not be sent — new token copied to clipboard, relay it to ${actionModal.targetName} manually`);
+          const copied = await copyText(res.activationToken);
+          setSuccessToast(copied
+            ? `Email could not be sent — new token copied to clipboard, relay it to ${actionModal.targetName} manually`
+            : `Email could not be sent, and the token could not be copied automatically. Token: ${res.activationToken}`);
         }
       } else if (actionModal.type === 'REVOKE_DEVICE') {
         await api.post('/api/v1/support/revoke-device-session', {
@@ -363,7 +374,10 @@ export function SupportPage() {
                   />
                   <Button
                     variant="ghost"
-                    onClick={() => navigator.clipboard?.writeText(impersonationResult.accessToken).catch(() => {})}
+                    onClick={async () => {
+                      const copied = await copyText(impersonationResult.accessToken);
+                      setSuccessToast(copied ? 'Token copied to clipboard' : 'Could not copy automatically — select and copy it manually');
+                    }}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>

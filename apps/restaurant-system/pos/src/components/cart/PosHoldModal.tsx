@@ -1,4 +1,4 @@
-import { ModalBackdrop } from '@jamanvaar/ui';
+import { ModalBackdrop, useConfirm } from '@jamanvaar/ui';
 import React from 'react';
 import { usePosStore } from '../../store/posStore';
 import { HeldOrderRepository } from '@jamanvaar/database';
@@ -6,12 +6,14 @@ import { X, Play, Trash2, Clock, CirclePause, ShoppingBag } from 'lucide-react';
 
 export const PosHoldModal: React.FC = () => {
   const { isHoldOrdersOpen, setIsHoldOrdersOpen, recallHeldOrder } = usePosStore();
+  const { notify, confirmDialog } = useConfirm();
 
   if (!isHoldOrdersOpen) return null;
 
   const heldOrders = HeldOrderRepository.getAllHeld();
 
   return (
+    <>
     <ModalBackdrop className="flex items-center justify-center p-4 select-none animate-in fade-in duration-150">
       <div className="bg-jaman-cream border border-jaman-border rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
@@ -64,8 +66,9 @@ export const PosHoldModal: React.FC = () => {
 
                 <div className="flex items-center gap-2 self-end sm:self-center">
                   <button
-                    onClick={() => {
-                      recallHeldOrder(h.id);
+                    onClick={async () => {
+                      const result = recallHeldOrder(h.id);
+                      if (!result.ok) { await notify({ title: 'Cannot recall this cart yet', message: result.reason }); return; }
                       setIsHoldOrdersOpen(false);
                     }}
                     className="px-3.5 py-2 rounded-xl bg-jaman-saffron hover:bg-jaman-orange text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
@@ -93,5 +96,7 @@ export const PosHoldModal: React.FC = () => {
         </div>
       </div>
     </ModalBackdrop>
+    {confirmDialog}
+    </>
   );
 };

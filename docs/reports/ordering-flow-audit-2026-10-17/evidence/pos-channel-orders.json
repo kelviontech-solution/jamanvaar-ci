@@ -1,0 +1,332 @@
+{
+  "url": "/",
+  "text": "POS TERMINAL\nGarden House Flow QA\n\nGarden House Flow QA\n•\n778791f8-025e-4e62-a387-dca68ac1534a\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\n1\nLive Orders\n2\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nTable service requests\nLive Restaurant Orders\nSession Active\n\nShowing real-time orders for current business session: 17 October 2026 (BD-20261017)\n\nActive Session (2)\nAll History (2)\nAll orders\nOutstanding bills · 2 · ₹840\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#MAIN-20261017-301\nToken #K-101\nTAKEAWAY\nKiosk (CLOUD-SYNC)\n11:47 AM\n•\n2 items\n₹280\nCONFIRMED\nPayment due ₹280\nSettle\n#QR-1\nToken #QR-1\nDINE_IN\nQR Table (T-T1)\n11:45 AM\n•\n3 items\n₹560\nPREPARING\nPayment due ₹560\nSettle\n\nSelect an order from the list to view full itemized breakdown and print receipt.\n\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1366,
+    "height": 768
+  },
+  "headings": [
+    "Live Restaurant Orders"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 28
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 40
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 26
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "disabled": false,
+      "width": 187,
+      "height": 26
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "disabled": false,
+      "width": 95,
+      "height": 30
+    },
+    {
+      "text": "A\nAudit Cashier\nCASHIER",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 45
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Floor & Tables\n1",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Live Orders\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "More tools",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 38
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 34
+    },
+    {
+      "text": "Active Session (2)",
+      "aria": null,
+      "disabled": false,
+      "width": 149,
+      "height": 28
+    },
+    {
+      "text": "All History (2)",
+      "aria": null,
+      "disabled": false,
+      "width": 121,
+      "height": 28
+    },
+    {
+      "text": "All orders",
+      "aria": null,
+      "disabled": false,
+      "width": 90,
+      "height": 44
+    },
+    {
+      "text": "Outstanding bills · 2 · ₹840",
+      "aria": null,
+      "disabled": false,
+      "width": 206,
+      "height": 44
+    },
+    {
+      "text": "All Sources",
+      "aria": null,
+      "disabled": false,
+      "width": 89,
+      "height": 24
+    },
+    {
+      "text": "QR Table",
+      "aria": null,
+      "disabled": false,
+      "width": 76,
+      "height": 24
+    },
+    {
+      "text": "Counter POS",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 24
+    },
+    {
+      "text": "Self-Order Kiosk",
+      "aria": null,
+      "disabled": false,
+      "width": 123,
+      "height": 24
+    },
+    {
+      "text": "Floor Captain",
+      "aria": null,
+      "disabled": false,
+      "width": 102,
+      "height": 24
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "disabled": false,
+      "width": 35,
+      "height": 24
+    },
+    {
+      "text": "New",
+      "aria": null,
+      "disabled": false,
+      "width": 47,
+      "height": 24
+    },
+    {
+      "text": "Confirmed",
+      "aria": null,
+      "disabled": false,
+      "width": 83,
+      "height": 24
+    },
+    {
+      "text": "Preparing",
+      "aria": null,
+      "disabled": false,
+      "width": 77,
+      "height": 24
+    },
+    {
+      "text": "Ready",
+      "aria": null,
+      "disabled": false,
+      "width": 57,
+      "height": 24
+    },
+    {
+      "text": "Served",
+      "aria": null,
+      "disabled": false,
+      "width": 62,
+      "height": 24
+    },
+    {
+      "text": "Completed",
+      "aria": null,
+      "disabled": false,
+      "width": 87,
+      "height": 24
+    },
+    {
+      "text": "Settle",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "Settle",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "disabled": false,
+      "width": 129,
+      "height": 16
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 16
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 16
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 116,
+      "height": 16
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Staff interface language",
+      "type": "select-one"
+    },
+    {
+      "placeholder": "Search order #, token, table, customer...",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

@@ -132,6 +132,11 @@ model Restaurant {
   timezone                 String           @default("Asia/Kolkata")
   currency                 String           @default("INR")
   defaultLanguage          String           @default("en")
+  /// #15: routine daily summaries wait for this hour (restaurant-local, via `timezone` above);
+  /// urgent service problems are never batched -- those stay on the always-live QR/Kiosk alerts
+  /// feed. Off by default so no restaurant starts receiving an email they never asked for.
+  digestEnabled            Boolean          @default(false)
+  digestHour               Int              @default(9)
   /// Registered/verified mobile number this restaurant's customer-facing Restaurant ID is
   /// derived from. Editable (a restaurant's phone can change) — restaurantCode is NOT
   /// recomputed when this changes; it stays immutable once generated (spec section 3).
@@ -229,6 +234,8 @@ enum TenantUserRole {
   OWNER
   MANAGER
   STAFF
+  // Read-only admin-console login: collections, refunds, taxes and exports only.
+  ACCOUNTANT
 }
 
 enum TenantUserStatus {
@@ -264,6 +271,15 @@ model User {
   passwordResetExpiresAt   DateTime?
   passwordResetSentAt      DateTime?
   passwordResetAttempts    Int              @default(0)
+  // #16: a verified alternate mailbox for account recovery, in case the owner loses access to
+  // the primary login email above. Verified the same OTP way as password reset (hash-only,
+  // expiring, rate-limited) so a typo'd address can never silently become the recovery path.
+  recoveryEmail              String?
+  recoveryEmailVerifiedAt    DateTime?
+  recoveryEmailOtpHash       String?
+  recoveryEmailOtpExpiresAt  DateTime?
+  recoveryEmailOtpSentAt     DateTime?
+  recoveryEmailOtpAttempts   Int              @default(0)
   // B2-030: per-account login lockout, independent of the shared per-IP throttle.
   failedLoginAttempts      Int              @default(0)
   lockedUntil              DateTime?

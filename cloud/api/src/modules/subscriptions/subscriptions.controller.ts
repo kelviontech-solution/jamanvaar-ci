@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { PlatformUser } from '@prisma/client';
 import { SubscriptionsService } from './subscriptions.service';
 import { assignSubscriptionSchema, bulkChangePlanSchema, BulkChangePlanDto, changePlanSchema, extendSchema, renewSchema } from './dto/subscription.dto';
@@ -36,6 +36,12 @@ export class SubscriptionsController {
     return this.subscriptions.bulkChangePlan(body.restaurantIds, body.planId, actor);
   }
 
+  @Get(':id/change-plan-preview')
+  previewChangePlan(@Param('id') id: string, @Query('planId') planId: string) {
+    if (!planId) throw new BadRequestException('planId is required');
+    return this.subscriptions.previewChangePlan(id, planId);
+  }
+
   @Patch(':id/change-plan')
   @UsePipes(new ZodValidationPipe(changePlanSchema))
   changePlan(
@@ -43,7 +49,7 @@ export class SubscriptionsController {
     @Body() body: ReturnType<typeof changePlanSchema.parse>,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    return this.subscriptions.changePlan(id, body.planId, actor);
+    return this.subscriptions.changePlan(id, body.planId, actor, body.acknowledgeImpact);
   }
 
   @Patch(':id/renew')

@@ -55,7 +55,7 @@ export const OnboardingChecklistCard: React.FC<OnboardingChecklistCardProps> = (
       <button
         onClick={dismiss}
         title="Dismiss checklist"
-        className="absolute top-3 right-3 p-1 rounded-lg text-slate-500 hover:text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
+        className="absolute top-3 right-3 min-w-11 min-h-11 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
       >
         <X className="w-4 h-4" />
       </button>

@@ -1,0 +1,24 @@
+{
+  "station": {
+    "test": "Configured Pizza Oven station omitted from kitchen station performance",
+    "stationNames": [
+      "Main Kitchen",
+      "Tandoor Section",
+      "Curry Station",
+      "Beverages Bar",
+      "Dessert Counter",
+      "Chaat Counter"
+    ],
+    "customStationPresent": false,
+    "totalItemsCounted": 0,
+    "actualItems": 2
+  },
+  "dateRange": {
+    "test": "Reports Today uses device midnight rather than configured restaurant timezone",
+    "deviceTimezone": "UTC",
+    "restaurantTimezone": "Asia/Kolkata",
+    "cutoffHour": 0,
+    "actualStart": "2026-10-16T00:00:00.000Z",
+    "expectedRestaurantMidnight": "2026-10-15T18:30:00.000Z"
+  }
+}

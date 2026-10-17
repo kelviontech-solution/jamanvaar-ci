@@ -273,7 +273,9 @@ export class BackupsService {
     const q = query.q?.trim();
     const where: Prisma.BackupWhereInput = {
       ...(query.status === 'COMPLETED' || query.status === 'FAILED' ? { status: query.status } : {}),
-      ...(q ? { restaurant: { name: { contains: q, mode: 'insensitive' } } } : {})
+      // Matches the restaurant name or the snapshot id — the frontend's own search box used to
+      // match both, client-side, over whatever page was already loaded.
+      ...(q ? { OR: [{ restaurant: { name: { contains: q, mode: 'insensitive' } } }, { id: { contains: q, mode: 'insensitive' } }] } : {})
     };
     const window: { skip?: number; take: number } = paging.paged ? { skip: paging.skip, take: paging.take } : { take: 100 };
     // Backup is under forced row-level security: outside a context wrapper a non-superuser role sees no rows.
@@ -468,12 +470,16 @@ export class BackupsService {
     const inspected = await this.inspectStoredBackup(backup);
     if (!inspected.ok) throw new ConflictException(`This backup cannot be restored: ${inspected.note}`);
 
+    // `targetType` used to produce a label implying STAGING_PREVIEW runs against an isolated
+    // sandbox — but executeRestore() has never branched on it: confirming either "preview" type
+    // writes into the same real, live restaurant the same way. No isolated restore target exists
+    // yet, so the label here must never claim one regardless of what was requested.
     const previewSummary = {
       restaurantId: backup.restaurantId,
       restaurantName: backup.restaurant.name,
       backupCreatedAt: backup.createdAt,
       backupSizeBytes: backup.sizeBytes,
-      targetEnvironment: targetType === 'STAGING_PREVIEW' ? 'Isolated Staging Sandbox' : 'Production',
+      targetEnvironment: 'Live restaurant (cloud database) — there is no isolated preview environment; confirming this restores real, live data',
       counts: this.summarizePayload(inspected.parsed),
       ...this.restorePlan(inspected.parsed)
     };

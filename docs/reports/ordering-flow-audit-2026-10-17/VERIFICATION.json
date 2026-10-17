@@ -1,0 +1,44 @@
+{
+  "at": "2026-10-17T06:31:23.851524+00:00",
+  "scenarioFiles": [
+    {
+      "file": "POS_JOURNEY.json",
+      "observations": 8,
+      "harnessErrors": 0
+    },
+    {
+      "file": "POS_EXTRA.json",
+      "observations": 4,
+      "harnessErrors": 0
+    },
+    {
+      "file": "KIOSK_JOURNEY.json",
+      "observations": 6,
+      "harnessErrors": 0
+    },
+    {
+      "file": "QR_JOURNEY.json",
+      "observations": 7,
+      "harnessErrors": 0
+    },
+    {
+      "file": "QR_EXTRA.json",
+      "observations": 2,
+      "harnessErrors": 0
+    },
+    {
+      "file": "FINAL_CHECKS.json",
+      "observations": 2,
+      "harnessErrors": 0
+    }
+  ],
+  "observationCount": 29,
+  "findings": 25,
+  "uniqueFindingIds": 25,
+  "brokenReportLinks": [],
+  "capturedStates": 30,
+  "horizontalOverflowStates": [],
+  "cleanup": "Disposable restaurant/branch/devices/orders and owned plan removed successfully by guarded test-database cleanup.",
+  "applicationEditsByThisAudit": false,
+  "limits": "Local browser and source audit. No live provider, physical printer, native/SQLite upgrade or actual KDS-served lifecycle acceptance."
+}

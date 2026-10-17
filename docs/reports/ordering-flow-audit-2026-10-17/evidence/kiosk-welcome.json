@@ -1,0 +1,35 @@
+{
+  "url": "/",
+  "text": "Freshly prepared · Served with care\n\nWelcome to\n\nGarden House Flow QA\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nTerminal fe2c86d7-8af\nStaff Mode\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "Garden House Flow QA"
+  ],
+  "buttons": [
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "disabled": false,
+      "width": 472,
+      "height": 125
+    },
+    {
+      "text": "Staff Mode",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

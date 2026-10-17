@@ -1,0 +1,38 @@
+{
+    "verifiedAt":  "2026-10-16T06:34:13.493Z",
+    "environment":  "Local built applications and isolated test API; external providers disabled",
+    "browser":  {
+                    "passed":  12,
+                    "total":  12
+                },
+    "api":  {
+                "passed":  35,
+                "total":  35,
+                "files":  4
+            },
+    "client":  {
+                   "passed":  72,
+                   "total":  72,
+                   "files":  7
+               },
+    "focusedControls":  {
+                            "passed":  9,
+                            "total":  9
+                        },
+    "standaloneFleetClient":  {
+                                  "passed":  1,
+                                  "total":  1
+                              },
+    "builds":  {
+                   "api":  "passed",
+                   "admin":  "passed",
+                   "kiosk":  "passed",
+                   "superAdmin":  "passed"
+               },
+    "typechecks":  {
+                       "admin":  "passed",
+                       "superAdmin":  "passed"
+                   },
+    "productionDeployed":  false,
+    "githubPushed":  false
+}

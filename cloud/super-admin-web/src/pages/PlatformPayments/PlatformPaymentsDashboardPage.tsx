@@ -79,6 +79,7 @@ export function PlatformPaymentsDashboardPage() {
   const [to, setTo] = useState('');
 
   const [attention, setAttention] = useState<AttentionRow[] | null>(null);
+  const [attentionError, setAttentionError] = useState<string | null>(null);
   const [refundTarget, setRefundTarget] = useState<AttentionRow | null>(null);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
@@ -107,10 +108,18 @@ export function PlatformPaymentsDashboardPage() {
   }, [restaurantId, status, from, to]);
 
   const loadAttention = useCallback(() => {
+    setAttentionError(null);
     api
       .get<{ rows: AttentionRow[] }>('/api/v1/payments/attention')
       .then((r) => setAttention(r.rows))
-      .catch(() => setAttention([]));
+      .catch((err) => {
+        // A failed request used to become `[]`, which the UI then displayed as "Nothing needs
+        // attention" — indistinguishable from a genuinely clean queue. A customer who paid
+        // without getting served could sit there unnoticed for as long as the request kept
+        // failing. Keep the last known rows (labelled stale) instead of discarding them, and
+        // show a real error with retry rather than a false all-clear.
+        setAttentionError(err instanceof ApiError ? err.message : 'Could not load payment exceptions.');
+      });
   }, []);
 
   useEffect(loadAttention, [loadAttention]);
@@ -233,9 +242,15 @@ export function PlatformPaymentsDashboardPage() {
           <p className="muted" style={{ fontSize: 12, margin: '0 0 12px' }}>
             The customer paid but the kiosk never confirmed a token/KOT (crash, no internet, or a payment that landed after the QR expired). Refund it, or mark it handled once the customer was served.
           </p>
-          {attention === null ? (
+          {attentionError && (
+            <div role="alert" style={{ marginBottom: 10, color: 'var(--jv-error-text)', fontSize: 13 }}>
+              {attentionError} {attention ? '(showing last known data below — may be stale)' : ''}{' '}
+              <Button size="sm" variant="ghost" onClick={loadAttention}>Retry</Button>
+            </div>
+          )}
+          {attention === null && !attentionError ? (
             <span className="muted">Loading…</span>
-          ) : attention.length === 0 ? (
+          ) : attention === null ? null : attention.length === 0 ? (
             <span className="muted">Nothing needs attention.</span>
           ) : (
             <div className="data-table-container">

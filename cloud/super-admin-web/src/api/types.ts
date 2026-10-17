@@ -104,6 +104,10 @@ export interface ApplicationEntitlement {
   // Phase 6: whether `enabled` currently matches the owning subscription's plan-tier default, or
   // was manually toggled away from it by a Super Admin.
   source: 'PLAN' | 'MANUAL_OVERRIDE';
+  // Only present on the merged /restaurants/:id/applications view: every subscription whose own
+  // row for this appCode is enabled. Disabling the effective (merged) result means editing every
+  // id here, not just the "primary" subscription — see RestaurantDetailPage's handleToggleApplication.
+  grantingSubscriptionIds?: string[];
 }
 
 export interface FeatureCatalogEntry {
@@ -1025,7 +1029,7 @@ export interface TicketComment {
 
 export interface TicketEvent {
   id: string;
-  type: 'CREATED' | 'STATUS' | 'PRIORITY' | 'ASSIGNEE' | 'ATTACHMENT';
+  type: 'CREATED' | 'STATUS' | 'PRIORITY' | 'ASSIGNEE' | 'ATTACHMENT' | 'KIOSK_ACTIVATION_REQUEST' | 'KIOSK_KEY_ISSUED';
   actorType: 'PLATFORM' | 'RESTAURANT';
   actorName: string | null;
   fromValue: string | null;

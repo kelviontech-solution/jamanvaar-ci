@@ -1,0 +1,289 @@
+{
+  "url": "/restaurant-admin/live-kitchen",
+  "text": "Garden House Flow QA\nRESTAURANT ADMIN\nGarden House Flow QA — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nOperations hub\nBilling / Invoices\nRegister shifts & cash\nKitchen progress\nKitchen tickets\nFloor / Tables\nReservations\nInventory & Recipes\nPurchasing & Stock Control\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nKitchen stations & previous names\nKitchen Display & KOT Station Queue\nLIVE KOT RADAR\n\nReal-time kitchen station routing, cook timers, ticket status progression, and KOT reprints.\n\nCOOKING NOW\n0 Tickets\n0 dishes being prepared\nREADY FOR PICKUP\n0 Tickets\nAwaiting Captain delivery\nSERVED TODAY\n0 Tickets\nCompleted kitchen tickets\nAVG COOK TIME\n--\nNo completed tickets today\nAll Kitchen Stations\nFILTER STATUS:\nCooking (0)\nReady for Table (0)\nServed (0)\nAll Tickets (0)\nYour Kitchen is Clear\n\nNo active KOT tickets are waiting right now for the selected station or status.\n\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Kitchen Display & KOT Station Queue",
+    "Your Kitchen is Clear"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Garden House Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 115,
+      "height": 40
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 129,
+      "height": 40
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Operations hub",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "All Kitchen Stations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 135,
+      "height": 28
+    },
+    {
+      "text": "Cooking (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 24
+    },
+    {
+      "text": "Ready for Table (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 129,
+      "height": 24
+    },
+    {
+      "text": "Served (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 81,
+      "height": 24
+    },
+    {
+      "text": "All Tickets (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 24
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "New kitchen station",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search KOT, table, dish..."
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 12
+}

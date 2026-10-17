@@ -3,6 +3,7 @@ import { api, ApiError } from '../../api/client';
 import type { PlatformIncident } from '../../api/types';
 import { Badge, BadgeTone, Button, Card, EmptyState } from '../../components/ui';
 import { AlertTriangle } from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
 import '../../components/shared.css';
 
 const SEVERITY_TONE: Record<PlatformIncident['severity'], BadgeTone> = {
@@ -21,6 +22,8 @@ const STATUS_TONE: Record<PlatformIncident['status'], BadgeTone> = {
 const NEXT_STATUSES: PlatformIncident['status'][] = ['INVESTIGATING', 'IDENTIFIED', 'MONITORING', 'RESOLVED'];
 
 export function IncidentsPage() {
+  const { can } = useAuth();
+  const canWrite = can('ops', 'write');
   const [incidents, setIncidents] = useState<PlatformIncident[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
@@ -31,13 +34,20 @@ export function IncidentsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [updateDraft, setUpdateDraft] = useState<Record<string, { status: PlatformIncident['status']; message: string }>>({});
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   function load() {
     setLoading(true);
+    setLoadError(null);
     api
       .get<PlatformIncident[]>('/api/v1/platform/telemetry/incidents')
       .then(setIncidents)
-      .catch(() => {})
+      .catch((err) => {
+        // A failed load used to leave `incidents` at its initial `null` and render identically to
+        // a genuinely empty list — "No incidents on record / A clean history" — so a telemetry
+        // outage looked exactly like a healthy platform with nothing wrong.
+        setLoadError(err instanceof ApiError ? err.message : 'Failed to load incidents');
+      })
       .finally(() => setLoading(false));
   }
 
@@ -100,7 +110,7 @@ export function IncidentsPage() {
             What broke, when, and how it was worked — a real paper trail instead of just the current "Platform Online" instant.
           </p>
         </div>
-        <Button variant="accent" onClick={() => setFormOpen((v) => !v)}>
+        <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to open incidents"} onClick={() => setFormOpen((v) => !v)}>
           {formOpen ? 'Cancel' : '+ Open Incident'}
         </Button>
       </div>
@@ -142,6 +152,11 @@ export function IncidentsPage() {
 
       {loading ? (
         <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>Loading…</div>
+      ) : loadError ? (
+        <div role="alert" style={{ padding: 48, textAlign: 'center' }}>
+          <p style={{ color: 'var(--jv-error-text)', marginBottom: 12 }}>{loadError}</p>
+          <Button variant="ghost" onClick={load}>Retry</Button>
+        </div>
       ) : !incidents || incidents.length === 0 ? (
         <EmptyState icon={<AlertTriangle className="w-8 h-8" />} title="No incidents on record" description="A clean history — nothing's been opened." />
       ) : (
@@ -196,7 +211,7 @@ export function IncidentsPage() {
                       value={draft.message}
                       onChange={(e) => setUpdateDraft((prev) => ({ ...prev, [inc.id]: { ...draft, message: e.target.value } }))}
                     />
-                    <Button size="sm" variant="primary" disabled={updatingId === inc.id} onClick={() => handleAddUpdate(inc.id)}>
+                    <Button size="sm" variant="primary" disabled={updatingId === inc.id || !canWrite} title={canWrite ? undefined : "You don't have permission to post incident updates"} onClick={() => handleAddUpdate(inc.id)}>
                       {updatingId === inc.id ? 'Posting…' : 'Post Update'}
                     </Button>
                   </div>

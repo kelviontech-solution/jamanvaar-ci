@@ -1,0 +1,207 @@
+{
+  "url": "/restaurant-admin/sync",
+  "text": "Garden House Flow QA\nRESTAURANT ADMIN\nGarden House Flow QA — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nSync & Devices\n\nWhether every terminal is in step with the cloud, and what needs your review.\n\nThis device: connection & diagnostics\nONLINE ● Connected\nConnected to the cloud. Everything is up to date.\nSync now\nConnect your devices\n\n1. Activate each app for this restaurant and branch. 2. Sign in to sync through the cloud. 3. If you use an on-site server for offline device sharing, pair it below.\n\nNo on-site server configured. Cloud-only operation does not require pairing.\n\nSet up an on-site server\nAdvanced diagnostics and recovery\nMenu publishing\n\nCurrent version: none yet\n\nPublish menu\nDevices\nDevice\tStatus\tPending\tMenu\tVersion\tProblem\nRestaurant Admin ConsolePOS_ADMIN\tonline\t0\t—\t1.0.7\t\nNeeds review (0)\nRefresh\n\nNothing to review. All synced data is consistent.\n\nThese are reported, never repaired automatically: payments and stock are reviewed by a person.\n\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Sync & Devices",
+    "This device: connection & diagnostics",
+    "Connect your devices",
+    "Menu publishing",
+    "Devices",
+    "Needs review (0)"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Garden House Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 115,
+      "height": 40
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 129,
+      "height": 40
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 38
+    },
+    {
+      "text": "Set up an on-site server",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 218,
+      "height": 50
+    },
+    {
+      "text": "Publish menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 36
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 16
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Publish note",
+      "placeholder": "Note (optional)"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 10
+}

@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-17T06:18:24.128Z",
+  "rows": [
+    {
+      "name": "POS card quick add bypasses required bread choice",
+      "result": {
+        "customizationModalVisible": false,
+        "payButton": "PAY ₹200"
+      }
+    },
+    {
+      "name": "POS adds minimum-two dish as quantity one",
+      "result": {
+        "lines": [
+          {
+            "name": "Build Your Thali",
+            "quantity": 1,
+            "modifiers": [],
+            "min": 1,
+            "max": 50
+          },
+          {
+            "name": "Twin Snack Plate",
+            "quantity": 1,
+            "modifiers": [],
+            "min": 2,
+            "max": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "Manually typed percentage discount updates the bill",
+      "result": {
+        "payButton": "PAY ₹260"
+      }
+    },
+    {
+      "name": "POS customer attachment offers optional catalog reward",
+      "result": {
+        "rewardOffered": true,
+        "cartUnchangedUntilChosen": true
+      }
+    },
+    {
+      "name": "Recalling a held cart overwrites the current unfinished cart without warning",
+      "result": {
+        "before": [
+          "Paneer Bowl"
+        ],
+        "recoveredDraftStored": [
+          "Paneer Bowl"
+        ],
+        "confirmationDialogs": 0,
+        "paneerVisibleInCart": false
+      }
+    },
+    {
+      "name": "Recalling a held cart does not replace the saved recovery draft",
+      "result": {
+        "persistedDraft": [
+          "Paneer Bowl"
+        ],
+        "banner": "Unfinished Order Detected:",
+        "restoredPaneer": true
+      }
+    },
+    {
+      "name": "Cash settlement without an open shift preserves cart and explains the blocker",
+      "result": {
+        "shiftMessage": true
+      }
+    },
+    {
+      "name": "POS sees counter orders from QR and Kiosk in the same branch",
+      "result": {
+        "qrTokenVisible": true,
+        "kioskOrderCountHint": false,
+        "bodyTail": "JAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\n1\nLive Orders\n2\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nTable service requests\nLive Restaurant Orders\nSession Active\n\nShowing real-time orders for current business session: 17 October 2026 (BD-20261017)\n\nActive Session (2)\nAll History (2)\nAll orders\nOutstanding bills · 2 · ₹840\nAll Sources\nQR Table\nCounter POS\nSelf-Order Kiosk\nFloor Captain\nAll\nNew\nConfirmed\nPreparing\nReady\nServed\nCompleted\n#MAIN-20261017-301\nToken #K-101\nTAKEAWAY\nKiosk (CLOUD-SYNC)\n11:47 AM\n•\n2 items\n₹280\nCONFIRMED\nPayment due ₹280\nSettle\n#QR-1\nToken #QR-1\nDINE_IN\nQR Table (T-T1)\n11:45 AM\n•\n3 items\n₹560\nPREPARING\nPayment due ₹560\nSettle\n\nSelect an order from the list to view full itemized breakdown and print receipt.\n\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nDisplay"
+      }
+    }
+  ]
+}

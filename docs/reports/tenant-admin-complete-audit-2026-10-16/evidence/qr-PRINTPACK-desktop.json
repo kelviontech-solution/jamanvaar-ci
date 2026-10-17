@@ -1,0 +1,204 @@
+{
+  "url": "/qr/admin/?tab=PRINTPACK",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / BRANDING\nQR Print Packs\n\nDownload branded cards, print sheets and replacement inventory together.\n\n✦ JAMAN AI\nEnabled\nBulk QR print packs\n\nUp to 100 selected active cards, A4 sheets and a replacement inventory in one ZIP. Print or save the sheets as PDF. QR artwork uses your saved design and restaurant branding.\n\nRefresh inventory\nDownload ZIP print pack\nPrint sheets / Save PDF\n\n0 inactive/revoked codes need replacement. 0 active cards selected.\n\nDisplay",
+  "headings": [
+    "QR Print Packs",
+    "Bulk QR print packs"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Refresh inventory",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 151,
+      "height": 44
+    },
+    {
+      "text": "Download ZIP print pack",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 197,
+      "height": 44
+    },
+    {
+      "text": "Print sheets / Save PDF",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 186,
+      "height": 44
+    }
+  ],
+  "fields": [],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

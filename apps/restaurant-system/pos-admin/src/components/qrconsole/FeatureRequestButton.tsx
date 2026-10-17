@@ -15,12 +15,16 @@ export function FeatureRequestButton({
   featureLabel: string;
 }) {
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
+  // Q07: "Request sent" used to be the only trace of this ever happening — no ticket number,
+  // nothing to reference if the owner came back later wondering whether it was seen. The backend
+  // already returns one (requestFeature raises an ordinary ticket); it just wasn't being shown.
+  // Tracked under Help & Support in this console's own nav like any other ticket.
+  const [sentTicket, setSentTicket] = useState<number | null>(null);
   const [error, setError] = useState("");
-  if (sent) {
+  if (sentTicket !== null) {
     return (
       <p className="mt-2 text-sm font-bold text-emerald-700">
-        Request sent. Your platform administrator will follow up.
+        Request sent as ticket TKT-{String(sentTicket).padStart(6, "0")}. Track it under Help & Support.
       </p>
     );
   }
@@ -34,8 +38,8 @@ export function FeatureRequestButton({
           setBusy(true);
           setError("");
           try {
-            await QrAdminApi.requestFeature(featureCode, featureLabel);
-            setSent(true);
+            const { ticketNumber } = await QrAdminApi.requestFeature(featureCode, featureLabel);
+            setSentTicket(ticketNumber);
           } catch (e) {
             setError((e as Error).message);
           } finally {

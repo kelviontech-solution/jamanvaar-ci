@@ -769,13 +769,16 @@ export function QrBrandStudio() {
     [previewStage, setPreviewStage] = useState("MENU"),
     [previewSize, setPreviewSize] = useState("MOBILE"),
     [busy, setBusy] = useState(false),
-    [licensed, setLicensed] = useState(false);
+    [licensed, setLicensed] = useState(false),
+    // Q04: a capability-fetch outage used to look identical to "not included in this
+    // license" — setLicensed(false) is the initial value AND what a network failure left
+    // behind, since the .catch() swallowed the error with no trace. Tracked separately so
+    // the message (and a retry) can tell an outage apart from a real plan restriction.
+    [capabilityCheckFailed, setCapabilityCheckFailed] = useState(false);
   useQrUnsavedChanges(!!original && (JSON.stringify(original) !== JSON.stringify(draft) || Object.keys(images).length > 0));
-  useEffect(() => {
-    QrAdminApi.branding()
-      .then(r => {setDraft(r);setOriginal(r);})
-      .catch((e) => setError(e.message));
-    qrRequestsApi<any>("")
+  const loadCapability = () => {
+    setCapabilityCheckFailed(false);
+    return qrRequestsApi<any>("")
       .then((r) =>
         setLicensed(
           r.capabilities.capabilities.some(
@@ -783,7 +786,13 @@ export function QrBrandStudio() {
           ),
         ),
       )
-      .catch(() => {});
+      .catch(() => setCapabilityCheckFailed(true));
+  };
+  useEffect(() => {
+    QrAdminApi.branding()
+      .then(r => {setDraft(r);setOriginal(r);})
+      .catch((e) => setError(e.message));
+    void loadCapability();
   }, []);
   const set = (k: string, v: unknown) =>
     setDraft((d: any) => ({ ...d, [k]: v }));
@@ -918,7 +927,14 @@ export function QrBrandStudio() {
             <legend className="px-1 font-bold">
               Optional advanced branding
             </legend>
-            {!licensed && (
+            {capabilityCheckFailed ? (
+              <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                Couldn't check your license for this feature.{" "}
+                <button type="button" className="font-bold underline" onClick={() => void loadCapability()}>
+                  Retry
+                </button>
+              </p>
+            ) : !licensed && (
               <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                 QR Branding is not included in this license.
               </p>

@@ -114,13 +114,48 @@ export class SubscriptionsService {
     });
   }
 
-  async changePlan(id: string, planId: string, actor: PlatformUser) {
+  /** Same question changePlan() answers before committing — exposed so the UI can show it first. */
+  async previewChangePlan(id: string, planId: string) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const existing = await tx.subscription.findUnique({ where: { id }, include: { plan: true } });
+      if (!existing) throw new NotFoundException('Subscription not found');
+      const newPlan = await tx.plan.findUnique({ where: { id: planId } });
+      if (!newPlan) throw new NotFoundException('Plan not found');
+      return this.appEntitlements.previewPlanChangeImpact(tx, existing.restaurantId, id, newPlan);
+    });
+  }
+
+  async changePlan(id: string, planId: string, actor: PlatformUser, acknowledgeImpact = false) {
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.subscription.findUnique({ where: { id }, include: { plan: true } });
       if (!existing) throw new NotFoundException('Subscription not found');
 
       const newPlan = await tx.plan.findUnique({ where: { id: planId } });
       if (!newPlan) throw new NotFoundException('Plan not found');
+      if (newPlan.status !== 'ACTIVE') {
+        throw new ConflictException(`${newPlan.name} is not an active plan and cannot be assigned`);
+      }
+      // One active subscription per product family (see assign()): an ordinary plan change
+      // stays inside the current family (e.g. Restaurant Core -> Restaurant Pro). Moving a
+      // subscription to a different family here used to silently create a second active
+      // subscription in that family instead of being rejected like assign() already is —
+      // a deliberate family migration needs its own reviewed transaction, not this endpoint.
+      if (newPlan.productFamily !== existing.plan.productFamily) {
+        throw new ConflictException(
+          `${existing.plan.name} is a ${existing.plan.productFamily} plan; ${newPlan.name} is ${newPlan.productFamily}. ` +
+          `Changing product family isn't supported from here — assign a new ${newPlan.productFamily} subscription instead.`
+        );
+      }
+
+      // A downgrade used to silently disable apps active devices depend on, with no preview and
+      // no acknowledgement — the first anyone heard of it was the device breaking.
+      if (!acknowledgeImpact) {
+        const impact = await this.appEntitlements.previewPlanChangeImpact(tx, existing.restaurantId, id, newPlan);
+        if (impact.deviceImpact.length > 0) {
+          const summary = impact.deviceImpact.map((d) => `${d.activeDevices} ${d.appCode} device${d.activeDevices === 1 ? '' : 's'}`).join(', ');
+          throw new ConflictException(`This plan change will disable: ${summary}. Resend with acknowledgeImpact: true to confirm.`);
+        }
+      }
 
       const updated = await tx.subscription.update({ where: { id }, data: { planId }, include: { plan: true } });
 
@@ -181,8 +216,15 @@ export class SubscriptionsService {
         results.push({ restaurantId, status: 'skipped', reason: 'Already on this plan' });
         continue;
       }
-      await this.changePlan(existing.id, targetPlanId, actor);
-      results.push({ restaurantId, status: 'changed' });
+      try {
+        // Bulk never auto-acknowledges device impact: a batch downgrade that would knock out
+        // active devices skips that restaurant with a reason, same as any other disqualifying
+        // condition here, rather than acknowledging on the operator's behalf sight unseen.
+        await this.changePlan(existing.id, targetPlanId, actor);
+        results.push({ restaurantId, status: 'changed' });
+      } catch (err) {
+        results.push({ restaurantId, status: 'skipped', reason: err instanceof Error ? err.message : 'Plan change failed' });
+      }
     }
     return { changed: results.filter((r) => r.status === 'changed').length, skipped: results.filter((r) => r.status === 'skipped').length, results };
   }
@@ -191,6 +233,11 @@ export class SubscriptionsService {
     return this.prisma.runAsPlatform(async (tx) => {
       const existing = await tx.subscription.findUnique({ where: { id } });
       if (!existing) throw new NotFoundException('Subscription not found');
+      // Mirrors extend()'s own guard: a suspension is a deliberate admin action (for cause),
+      // and renewing the expiry date must not silently undo it. Reactivate first, on purpose.
+      if (existing.status === 'SUSPENDED') {
+        throw new ConflictException('This subscription is suspended. Reactivate it first, then renew it.');
+      }
 
       const updated = await tx.subscription.update({
         where: { id },

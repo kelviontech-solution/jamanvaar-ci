@@ -2,7 +2,7 @@ import { BranchLicensing } from './BranchLicensing';
 // Deep import on purpose: the '@jamanvaar/utils' barrel drags in the local device database (see tests/super_admin_css_classes.test.ts).
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import type { Branch, Device, TenantUser, ActivationKey, AuditLogPage, RestaurantDetail } from '../../api/types';
 import {
@@ -53,7 +53,9 @@ export function BranchDetailPage() {
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('overview');
+  const [params,setParams]=useSearchParams();
+  const tab:Tab=TABS.some(t=>t.key===params.get('tab'))?params.get('tab') as Tab:'overview';
+  const setTab=(next:Tab)=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('tab',next);return p;});
   const [copiedId, setCopiedId] = useState(false);
 
   // Tab data
@@ -188,7 +190,7 @@ export function BranchDetailPage() {
                   <span className="detail-page-meta-item">
                     <Store className="w-3.5 h-3.5" />
                     <Link
-                      to={`/restaurants/${branch.restaurantId}`}
+                      to={`/restaurants/${branch.restaurantId}?branchId=${branch.id}&tab=branch-access`}
                       style={{ fontWeight: 600, color: 'var(--jv-accent-text)', textDecoration: 'none' }}
                     >
                       {branch.restaurant.name}
@@ -328,7 +330,7 @@ export function BranchDetailPage() {
                   Parent Restaurant
                 </h3>
                 <Link
-                  to={`/restaurants/${branch.restaurantId}`}
+                  to={`/restaurants/${branch.restaurantId}?branchId=${branch.id}&tab=branch-access`}
                   style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--jv-accent-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                   Open Restaurant <ChevronRight className="w-3.5 h-3.5" />
@@ -344,7 +346,7 @@ export function BranchDetailPage() {
                     <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>Restaurant ID: {branch.restaurantId.slice(0, 12)}…</div>
                   </div>
                   <Link
-                    to={`/restaurants/${branch.restaurantId}`}
+                    to={`/restaurants/${branch.restaurantId}?branchId=${branch.id}&tab=branch-access`}
                     style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#fff', background: 'var(--jv-accent)', textDecoration: 'none', padding: '7px 14px', borderRadius: 8 }}
                   >
                     Open Workspace <ChevronRight className="w-3.5 h-3.5" />

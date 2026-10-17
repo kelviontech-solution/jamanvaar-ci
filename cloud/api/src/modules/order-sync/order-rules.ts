@@ -78,9 +78,18 @@ export interface IntegrityLine {
 
 /**
  * Sanity checks on a device-priced order. Devices price offline, so a stale menu is legitimate and the order is never
- * rejected: problems become review flags on the order and a recorded conflict for the operator.
+ * rejected: problems become review flags on the order and a recorded conflict for the operator. `menuQtyRules` is optional
+ * so a caller that has not fetched it yet (or a dish absent from the map) is simply not checked, never rejected — the same
+ * believe-but-flag posture as the price check next to it. This is the authoritative-ingestion half of the per-dish minimum
+ * and maximum quantity rule: a device is expected to enforce it before the tap ever reaches the cart, but an older build,
+ * a bypassed UI, or a hand-crafted push must still surface here instead of silently billing an incomplete or over-limit line.
  */
-export function integrityFlags(lines: IntegrityLine[], subtotal: number, menuBasePaise: Map<string, number>): string[] {
+export function integrityFlags(
+  lines: IntegrityLine[],
+  subtotal: number,
+  menuBasePaise: Map<string, number>,
+  menuQtyRules?: Map<string, { minQuantity?: number; maxQuantity?: number }>
+): string[] {
   const flags: string[] = [];
   let sum = 0;
   for (const l of lines) {
@@ -90,6 +99,9 @@ export function integrityFlags(lines: IntegrityLine[], subtotal: number, menuBas
     if (l.lineTotal !== l.unitPrice * l.quantity) flags.push(`LINE_TOTAL_MISMATCH:${l.externalItemId}`);
     const base = menuBasePaise.get(l.menuItemId || l.externalItemId);
     if (base !== undefined && l.unitPrice < base) flags.push(`BELOW_MENU_PRICE:${l.externalItemId}:${l.unitPrice}<${base}`);
+    const rule = menuQtyRules?.get(l.menuItemId || l.externalItemId);
+    if (rule?.minQuantity !== undefined && l.quantity < rule.minQuantity) flags.push(`QUANTITY_BELOW_MIN:${l.externalItemId}:${l.quantity}<${rule.minQuantity}`);
+    if (rule?.maxQuantity !== undefined && l.quantity > rule.maxQuantity) flags.push(`QUANTITY_ABOVE_MAX:${l.externalItemId}:${l.quantity}>${rule.maxQuantity}`);
   }
   if (sum !== subtotal) flags.push(`SUBTOTAL_MISMATCH:${sum}!=${subtotal}`);
   return flags;

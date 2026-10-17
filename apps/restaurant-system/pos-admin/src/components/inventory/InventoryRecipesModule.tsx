@@ -115,14 +115,14 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => onOpenRecipeModal(null)}
-            className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-2 shadow-2xs active:scale-95 transition-all cursor-pointer"
+            className="min-h-11 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy font-bold text-xs flex items-center gap-2 shadow-2xs active:scale-95 transition-all cursor-pointer"
           >
             <Sliders className="w-4 h-4 text-slate-500" />
             <span>Create Recipe Formula</span>
           </button>
           <button
             onClick={() => onOpenInventoryModal(null)}
-            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-brand/25 active:scale-95 transition-all cursor-pointer"
+            className="min-h-11 px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white font-bold text-xs flex items-center gap-2 shadow-sm shadow-brand/25 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Stock Item</span>
@@ -255,14 +255,14 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
                   setInventorySearch('');
                   setInventoryCategoryFilter('ALL');
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
+                className="min-h-11 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
               >
                 Reset Filters
               </button>
             ) : (
               <button
                 onClick={() => onOpenInventoryModal(null)}
-                className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-xs cursor-pointer"
+                className="min-h-11 px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-xs cursor-pointer"
               >
                 + Add First Ingredient
               </button>
@@ -380,7 +380,7 @@ export const InventoryRecipesModule: React.FC<InventoryRecipesModuleProps> = ({
             </p>
             <button
               onClick={() => onOpenRecipeModal(null)}
-              className="mt-2 px-3.5 py-1.5 rounded-xl bg-white border border-jaman-border text-jaman-navy font-bold text-xs hover:bg-slate-50 cursor-pointer"
+              className="mt-2 min-h-11 px-3.5 py-1.5 rounded-xl bg-white border border-jaman-border text-jaman-navy font-bold text-xs hover:bg-slate-50 cursor-pointer"
             >
               + Create Recipe Formula
             </button>

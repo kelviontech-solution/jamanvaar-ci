@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-16T14:33:43.683Z",
+  "results": [
+    {
+      "name": "Unsaved platform branding survives tab change or prompts first",
+      "promptCount": 0,
+      "draftPreserved": false,
+      "revertedToStoredValue": true
+    },
+    {
+      "name": "A new app release resets the previously selected channel",
+      "channel": "BETA"
+    },
+    {
+      "name": "Settings load failure prevents saving fallback values",
+      "errorVisible": 1,
+      "enabledSaveButtons": [
+        "Save Branding",
+        "Save Quotas"
+      ]
+    },
+    {
+      "name": "Report date range is sent to API when changed",
+      "requests": [
+        "/api/v1/platform/reports/summary",
+        "/api/v1/platform/reports/revenue",
+        "/api/v1/platform/reports/restaurants",
+        "/api/v1/platform/reports/devices",
+        "/api/v1/platform/reports/subscriptions",
+        "/api/v1/platform/reports/summary",
+        "/api/v1/platform/reports/revenue",
+        "/api/v1/platform/reports/restaurants",
+        "/api/v1/platform/reports/devices",
+        "/api/v1/platform/reports/subscriptions"
+      ],
+      "anyDateFilterSent": false
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
+import { AppCode } from '@prisma/client';
 import { branchWaitEstimate } from './wait-estimate';
 import { stableJson } from './operations-records';
 import {
@@ -41,6 +43,7 @@ export class OperationsService {
   constructor(
     readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly appEntitlements: ApplicationEntitlementsService,
   ) {}
 
   async auditAction(s:OpsScope,action:string,details:Record<string,unknown>,tx:Prisma.TransactionClient){
@@ -481,7 +484,7 @@ export class OperationsService {
     };
   }
   async acceptance(s: OpsScope) {
-    const [records, orders, menu, licensed] = await this.prisma.runAsTenant(s.restaurantId, async (tx) =>
+    const [records, orders, menu] = await this.prisma.runAsTenant(s.restaurantId, async (tx) =>
       Promise.all([
         tx.syncedEntity.findMany({
           where: {
@@ -505,30 +508,23 @@ export class OperationsService {
           where: { restaurantId: s.restaurantId },
           orderBy: { version: 'desc' },
         }),
-        tx.applicationEntitlement.findMany({
-          where: {
-            enabled: true,
-            subscription: {
-              restaurantId: s.restaurantId,
-              status: { in: ['ACTIVE', 'TRIAL'] },
-              expiresAt: { gt: new Date() },
-            },
-          },
-          select: { appCode: true },
-        }),
       ]),
     );
+    const channels=await this.prisma.runAsTenant(s.restaurantId,async tx=>{
+      const grants=await Promise.all(['POS','CAPTAIN','KIOSK','QR'].map(async channel=>({channel,enabled:await this.appEntitlements.isAppEnabled(tx,s.restaurantId,(channel==='QR'?'QR_ORDERING':channel) as AppCode,s.branchId)})));
+      return grants.filter(g=>g.enabled).map(g=>g.channel);
+    });
+    const evidenceIds=records.map(r=>asObject(r.payload).orderId).filter((id):id is string=>typeof id==='string');
+    const evidence=await this.prisma.runAsTenant(s.restaurantId,tx=>tx.syncedOrder.findMany({where:{restaurantId:s.restaurantId,branchId:s.branchId,externalOrderId:{in:evidenceIds},status:{in:finalStates},paymentStatus:{in:paidStates},...(menu?{createdAt:{gte:menu.createdAt}}:{})},select:{externalOrderId:true}}));
     return {
-      channels: ['POS', 'CAPTAIN', 'KIOSK', 'QR'].filter((channel) =>
-        licensed.some((l) => l.appCode === (channel === 'QR' ? 'QR_ORDERING' : channel)),
-      ),
+      channels,
       menuVersion: menu?.version ?? 0,
       records: records.map((r) => ({
         version: r.syncVersion,
         ...asObject(r.payload),
         current:
           asObject(r.payload).menuVersion === menu?.version &&
-          orders.some((o) => o.externalOrderId === asObject(r.payload).orderId),
+          evidence.some((o) => o.externalOrderId === asObject(r.payload).orderId),
       })),
       orders: orders
         .filter((o) => !menu || o.createdAt >= menu.createdAt)

@@ -1,0 +1,84 @@
+{
+  "url": "/q/s6BiSPlfYkIAEWb3dzzfK5iPJbPNfl_f",
+  "text": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\nGood food.Great company.\n\nPick your favourites, make them yours, and let us take care of the rest.\n\nAll diets\nVEG\nJAIN\nText-only menu (save data)\nAll\nChef specials\nPairs well with your meal\nPaneer Bowl ? ₹120 +\nMADE FOR YOUR APPETITE\nExplore our menu\n1 dishes\nJain Dal\nJAIN\nFreshly prepared for your table.\n₹80\nAdd\n6 items\n₹480\nView Cart\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "headings": [
+    "Good food.Great company.",
+    "Pairs well with your meal",
+    "Explore our menu"
+  ],
+  "buttons": [
+    {
+      "text": "All diets",
+      "aria": null,
+      "disabled": false,
+      "width": 76,
+      "height": 44
+    },
+    {
+      "text": "VEG",
+      "aria": null,
+      "disabled": false,
+      "width": 53,
+      "height": 44
+    },
+    {
+      "text": "JAIN",
+      "aria": null,
+      "disabled": false,
+      "width": 57,
+      "height": 44
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "disabled": false,
+      "width": 45,
+      "height": 44
+    },
+    {
+      "text": "Chef specials",
+      "aria": null,
+      "disabled": false,
+      "width": 103,
+      "height": 44
+    },
+    {
+      "text": "Paneer Bowl ? ₹120 +",
+      "aria": "Add recommended Paneer Bowl",
+      "disabled": false,
+      "width": 151,
+      "height": 44
+    },
+    {
+      "text": "Add",
+      "aria": "Add Jain Dal",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "6 items\n₹480\nView Cart",
+      "aria": null,
+      "disabled": false,
+      "width": 358,
+      "height": 66
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": "Find your next favourite…",
+      "label": "Search the menu",
+      "type": "search"
+    },
+    {
+      "placeholder": null,
+      "label": " Text-only menu (save data)",
+      "type": "checkbox"
+    }
+  ]
+}

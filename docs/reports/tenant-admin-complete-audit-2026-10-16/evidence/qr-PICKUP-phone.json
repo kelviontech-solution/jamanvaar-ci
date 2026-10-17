@@ -1,0 +1,451 @@
+{
+  "url": "/qr/admin/?tab=PICKUP",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nPickup Scheduling\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nPickup Scheduling\n\nOffer takeaway slots that respect your branch hours and kitchen capacity.\n\n✦ JAMAN AI\nEnabled\nPickup scheduling\nEnable scheduled takeaway pickup\nAllow ASAP takeaway\n\nAvailable on menu-only QR codes for takeaway. Table QR orders stay dine-in. Times use the restaurant timezone and also respect ordering hours. Pending online orders reserve capacity until safely cancelled; payment failures never free a slot while a payment could still succeed.\n\nMinimum preparation lead (minutes)\nBooking cutoff (minutes)\nSlot interval (minutes)\nOrders per slot\nBooking horizon (days)\nPickup hours\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nSun\nMon\nTue\nWed\nThu\nFri\nSat\nRemove\nAdd hours\nClosed dates (one YYYY-MM-DD per line)\nPickup instructions\nSave settings\n\nDisplay",
+  "headings": [
+    "Pickup Scheduling",
+    "Pickup scheduling",
+    "Pickup hours"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Scheduling",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 44
+    },
+    {
+      "text": "Save settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 118,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Enable scheduled takeaway pickup",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Allow ASAP takeaway",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum preparation lead (minutes)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Booking cutoff (minutes)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Slot interval (minutes)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per slot",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Booking horizon (days)",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 0",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 0",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 1",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 1",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 2",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 2",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 3",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 3",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 4",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 4",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 5",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 5",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Pickup day"
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup open 6",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "time",
+      "label": "Pickup close 6",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Closed dates (one YYYY-MM-DD per line)",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Pickup instructions",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

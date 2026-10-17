@@ -23,6 +23,13 @@ export const createRestaurantSchema = z
     currency: z.string().trim().default('INR'),
     defaultLanguage: z.string().trim().default('en'),
 
+    // The onboarding wizard's "Modules" step collects these, but the server used to ignore
+    // them entirely and hardcode '<name> — Main Branch' / 'MAIN' regardless of what the
+    // operator typed — reviewing the welcome kit afterward showed a branch name/code that
+    // didn't match what was entered.
+    branchName: z.string().trim().min(1).optional(),
+    branchCode: z.string().trim().toUpperCase().min(1).max(20).regex(/^[A-Z0-9_-]+$/, 'Branch code must be letters, numbers, - or _').optional(),
+
     ownerName: z.string().trim().min(2, "Owner's name is required"),
     ownerEmail: z.string().trim().toLowerCase().email(),
     ownerPhone: z.string().trim().optional(),

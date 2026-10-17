@@ -8,6 +8,7 @@ import { PlatformNotificationsService } from '../platform-notifications/platform
 import { WhatsAppOutboundWebhookService } from '../whatsapp-outbound/whatsapp-outbound-webhook.service';
 import { RestaurantPayoutsService } from '../payments/restaurant-payouts.service';
 import { DigestService } from '../digest/digest.service';
+import { RestaurantDigestService } from '../digest/restaurant-digest.service';
 
 export interface JobDefinition {
   name: string;
@@ -47,7 +48,8 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     private readonly notifications: PlatformNotificationsService,
     private readonly whatsappOutbound: WhatsAppOutboundWebhookService,
     private readonly payouts: RestaurantPayoutsService,
-    private readonly digest: DigestService
+    private readonly digest: DigestService,
+    private readonly restaurantDigest: RestaurantDigestService
   ) {}
 
   get schedulerEnabled(): boolean {
@@ -76,6 +78,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       // payout batch. Creates no bank transfer — a Super Admin still has to pay it and record the UTR.
       { name: 'restaurant-payouts-eod', description: "Batch each restaurant's unclaimed collections into a payout for Super Admin to pay manually", run: () => this.payouts.runEodBatch() },
       { name: 'weekly-digest', description: 'Email the Platform Owner/Super Admins a weekly summary (restaurants, MRR, sync and backup health) -- a no-op until 7 days have passed since the last send', run: () => this.digest.sendIfDue() },
+      { name: 'restaurant-daily-digest', description: "Email each opted-in restaurant's owner a daily summary at their chosen local hour -- a no-op outside that hour or once already sent today", run: () => this.restaurantDigest.sendDueDigests() },
       ...this.extra
     ];
   }

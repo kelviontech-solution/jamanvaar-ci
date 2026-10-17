@@ -278,10 +278,13 @@ export const PosPaymentModal: React.FC = () => {
   const handleDirectChannelAmountChange = (channel: PaymentChannel, val: string | number) => {
     const num = Math.max(0, parseFloat(val.toString()) || 0);
 
-    // If entering an amount smaller than total on a single channel, automatically switch to split with secondary channel
-    if (num < totalPayable && !isSplitMode) {
+    // If entering an amount smaller than total on a single channel, automatically switch to split with
+    // an enabled secondary channel. F20: this used to hardcode UPI (or Cash) as the secondary regardless
+    // of whether the branch actually has it enabled — a cash-only branch would silently invent a UPI
+    // allocation that later failed settlement validation with no clear reason shown at the point of entry.
+    const secondary = enabledChannels.find((ch) => ch.id !== channel)?.id;
+    if (num < totalPayable && !isSplitMode && secondary) {
       setIsSplitMode(true);
-      const secondary = channel === 'CASH' ? 'UPI' : 'CASH';
       setSplitPrimaryChannel(channel);
       setSplitSecondaryChannel(secondary);
       const remainder = Number((totalPayable - num).toFixed(2));

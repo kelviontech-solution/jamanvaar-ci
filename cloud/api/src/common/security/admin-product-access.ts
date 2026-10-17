@@ -19,7 +19,12 @@ export function requiredConsoleApps(pathname: string): readonly AdminApp[] {
   if (/^\/api\/v1\/tenant\/operations(?:\/|$)/.test(path)) return ALL_ADMIN_APPS;
   if (/^\/api\/v1\/restaurant\/qr(?:\/|$)/.test(path)) return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
   if (/^\/api\/v1\/devices\/me\/(?:ai-config|ai-telemetry)\/?$/.test(path)) return ALL_ADMIN_APPS;
-  if (/^\/api\/v1\/menu\/(?:preview|publish|branch-overrides)\/?$/.test(path)) return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
+  // Q01: `version`/`draft-status` are the same read-only menu-readiness family as
+  // preview/publish/branch-overrides below, but were missing from this list, so they fell through
+  // to the `BOTH` fallback and excluded QR_ORDERING -- a QR-only restaurant (no POS_ADMIN/
+  // KIOSK_ADMIN entitlement at all) got a 403 from Guided Menu Setup calling draft-status, despite
+  // QR being fully active, because the menu these endpoints serve is shared by every console.
+  if (/^\/api\/v1\/menu\/(?:version|draft-status|preview|publish|branch-overrides)\/?$/.test(path)) return ['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'];
   const entity = /^\/api\/v1\/entity-sync\/([^/]+)\/?$/.exec(path)?.[1];
   // This existing atomic record also carries shared receipt/brand/printer settings.
   // Both owner consoles must retain access; customer Kiosk still cannot write it.

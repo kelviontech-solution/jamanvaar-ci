@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "name": "Repeated QR additions exceed the configured line maximum",
+      "result": {
+        "quantity": 6,
+        "configuredMaximum": 3,
+        "checkoutDisabled": true,
+        "message": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Menu\nYOUR PICKS, PREPARED FRESH\nYour cart\nTwin Snack Plate\nChecking price...\nEdit choices / note\n−\n6\n+\nRemove\n\nTwin Snack Plate can be ordered in a quantity of at most 3\n\nCheckout\nThoughtfully served with Jamanvaar\nBY KELVIONTECH"
+      }
+    },
+    {
+      "name": "Cancelled order still asks the guest to pay at counter",
+      "result": {
+        "cancelledHeading": true,
+        "asksCounterPayment": true,
+        "asksPayOurTeam": true
+      }
+    }
+  ]
+}

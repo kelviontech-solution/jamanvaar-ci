@@ -1,37 +1,46 @@
-import { useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchCloudKiosks, type CloudKiosk, type AppCode } from '../cloud/cloudClient';
 
-/**
- * Kiosk fleet polling for the Kiosk Terminals tab. Deliberately its own effect, not merged into
- * usePosAdminDeviceSync: that effect already calls SyncOutboxEngine/EntitySyncEngine
- * .configureTransport once for this console's own order/menu sync -- calling it again here (as
- * kiosk-admin's original fleet-polling code did, for ITS OWN sync needs) would silently
- * overwrite this console's already-configured transport. Extracted from App.tsx, same effect.
- */
-export function useKioskFleetPolling(isAdminLoggedIn: boolean, hasApp: (app: AppCode) => boolean): CloudKiosk[] {
-  const [kiosks, setKiosks] = useState<CloudKiosk[]>([]);
+/** Loading/failure must never masquerade as an empty fleet; reset on branch changes. */
+export function useKioskFleetPolling(isAdminLoggedIn: boolean, hasApp: (app: AppCode) => boolean, branchId?: string | null) {
+  const [state, setState] = useState<{ branchId?: string | null; kiosks: CloudKiosk[]; loading: boolean; error: string }>({
+    kiosks: [],
+    loading: true,
+    error: ''
+  });
+  const run = useRef<() => Promise<void>>(async () => {});
+  const refresh = useCallback(() => run.current(), []);
   useEffect(() => {
-    if (!isAdminLoggedIn || !hasApp('KIOSK_ADMIN')) { setKiosks([]); return; }
-    let cancelled = false;
-    let inFlight = false;
-    const refresh = async () => {
-      if (cancelled || inFlight) return;
+    let cancelled = false,
+      inFlight = false;
+    const enabled = isAdminLoggedIn && hasApp('KIOSK_ADMIN') && !!branchId && branchId !== 'all';
+    setState({ branchId, kiosks: [], loading: enabled, error: '' });
+    const load = async () => {
+      if (cancelled || inFlight || !enabled) return;
       inFlight = true;
+      setState((s) => ({ ...s, loading: true }));
       try {
-        const fleet = await fetchCloudKiosks();
-        if (!cancelled) setKiosks(fleet);
-      } catch {
-        // Fleet view just stays on its last-known data; this is a background refresh, not a user action.
+        const kiosks = await fetchCloudKiosks();
+        if (!cancelled) setState({ branchId, kiosks, loading: false, error: '' });
+      } catch (e) {
+        if (!cancelled)
+          setState((s) => ({ ...s, loading: false, error: e instanceof Error ? e.message : 'Could not load kiosks. Check your connection and retry.' }));
       } finally {
         inFlight = false;
       }
     };
-    void refresh();
-    const kioskInterval = setInterval(refresh, 30000);
+    run.current = load;
+    void load();
+    const timer = setInterval(load, 30000),
+      focus = () => {
+        void load();
+      };
+    window.addEventListener('focus', focus);
     return () => {
       cancelled = true;
-      clearInterval(kioskInterval);
+      clearInterval(timer);
+      window.removeEventListener('focus', focus);
     };
-  }, [hasApp, isAdminLoggedIn]);
-  return kiosks;
+  }, [hasApp, isAdminLoggedIn, branchId]);
+  return { ...(state.branchId === branchId ? state : { kiosks: [], loading: true, error: '' }), refresh };
 }

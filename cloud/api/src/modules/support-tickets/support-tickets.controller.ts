@@ -64,6 +64,11 @@ export class SupportTicketsController {
     return this.tickets.update(id, body, actor);
   }
 
+  @Post(':id/kiosk-key')
+  issueKioskKey(@Param('id') id:string,@CurrentPlatformUser() actor:PlatformUser) {
+    return this.tickets.issueKioskKey(id,actor);
+  }
+
   @Post(':id/comments')
   @UsePipes(new ZodValidationPipe(addCommentSchema))
   addComment(

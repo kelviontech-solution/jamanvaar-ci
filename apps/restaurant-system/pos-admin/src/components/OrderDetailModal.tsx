@@ -6,6 +6,7 @@ import { formatDate, formatINR, formatTime, formatSplitTax, restaurantGstRate, t
 import { Modal, Button, printThermalReceipt, OrderActivityView, type CanonicalOrderActivity } from '@jamanvaar/ui';
 import { SessionPersistence } from '@jamanvaar/business';
 import { db, OrderRepository, AuditRepository, ReceiptRepository } from '@jamanvaar/database';
+import { getCurrentAdminName } from '../currentAdminIdentity';
 import { signedDeviceFetch } from '../cloud/cloudClient';
 const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => { const response = await signedDeviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`); if (!response.ok) throw new Error('Order activity unavailable'); return response.json(); };
 // The restaurant's configured GST (Customisations & Tax), read when shown.
@@ -51,7 +52,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       action: 'ORDER_STATUS_CHANGED',
       category: 'ORDER',
       details: `Advanced order #${order.orderNumber} status to ${newStatus}`,
-      username: 'Manager'
+      username: getCurrentAdminName()
     });
     onOrderUpdated();
   };

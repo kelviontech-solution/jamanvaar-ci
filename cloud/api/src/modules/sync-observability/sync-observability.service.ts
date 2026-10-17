@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Device, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { RealtimeBus } from '../../common/realtime/realtime-bus';
+
+const RESOLUTION_STRATEGIES = ['CLOUD_WINS', 'LOCAL_WINS', 'MANUAL_MERGE'] as const;
+type ResolutionStrategy = (typeof RESOLUTION_STRATEGIES)[number];
 
 /**
  * security-audit MED-14: `restaurantId`/`deviceId` are no longer taken from the
@@ -35,7 +39,8 @@ export class SyncObservabilityService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly realtime: RealtimeBus
   ) {}
 
   /**
@@ -173,30 +178,87 @@ export class SyncObservabilityService {
     });
   }
 
+  /**
+   * Resolving a conflict must actually change the canonical record (`SyncedEntity`, the same
+   * store `EntitySyncService.pushEvents` writes and every device's catch-up reads from) —
+   * not just relabel the conflict row. Previously this only updated `SyncConflict.resolution`,
+   * so LOCAL_WINS reported success while the stored entity kept its old (cloud) value forever,
+   * and a resolved conflict could be "resolved" again with any string, including an invalid one.
+   */
   async resolveConflict(
     conflictId: string,
-    strategy: 'CLOUD_WINS' | 'LOCAL_WINS' | 'MANUAL_MERGE',
-    actor: PlatformUser
+    strategy: string,
+    actor: PlatformUser,
+    mergedVersion?: Record<string, unknown>
   ) {
+    if (!RESOLUTION_STRATEGIES.includes(strategy as ResolutionStrategy)) {
+      throw new BadRequestException(`strategy must be one of ${RESOLUTION_STRATEGIES.join(', ')}`);
+    }
+    const resolvedStrategy = strategy as ResolutionStrategy;
+
     const conflict = await this.prisma.platformDb.syncConflict.findUnique({ where: { id: conflictId } });
     if (!conflict) throw new NotFoundException('Sync conflict not found');
+    if (conflict.resolution !== 'PENDING') {
+      throw new BadRequestException(`This conflict was already resolved (${conflict.resolution}); it cannot be resolved again`);
+    }
 
-    const updated = await this.prisma.platformDb.syncConflict.update({
-      where: { id: conflictId },
-      data: {
-        resolution: strategy,
-        resolvedAt: new Date(),
-        resolvedById: actor.id
+    if (resolvedStrategy === 'MANUAL_MERGE') {
+      if (!mergedVersion || typeof mergedVersion !== 'object' || Array.isArray(mergedVersion) || Object.keys(mergedVersion).length === 0) {
+        throw new BadRequestException('MANUAL_MERGE requires a non-empty mergedVersion payload');
       }
+    }
+
+    const appliedPayload =
+      resolvedStrategy === 'CLOUD_WINS' ? (conflict.cloudVersion as Record<string, unknown>)
+      : resolvedStrategy === 'LOCAL_WINS' ? (conflict.localVersion as Record<string, unknown>)
+      : (mergedVersion as Record<string, unknown>);
+
+    const updated = await this.prisma.runAsPlatform(async (tx) => {
+      // Guards the same race the old code missed: two operators resolving the same conflict at
+      // once, or a resolve racing the already-resolved check above. Only the first succeeds.
+      const claimed = await tx.syncConflict.updateMany({
+        where: { id: conflictId, resolution: 'PENDING' },
+        data: { resolution: resolvedStrategy, resolvedAt: new Date(), resolvedById: actor.id }
+      });
+      if (claimed.count === 0) {
+        throw new BadRequestException('This conflict was already resolved; it cannot be resolved again');
+      }
+
+      await tx.syncedEntity.upsert({
+        where: {
+          restaurantId_entityType_externalId: {
+            restaurantId: conflict.restaurantId,
+            entityType: conflict.entityType,
+            externalId: conflict.entityId
+          }
+        },
+        create: {
+          restaurantId: conflict.restaurantId,
+          deviceId: conflict.deviceId,
+          entityType: conflict.entityType,
+          externalId: conflict.entityId,
+          payload: appliedPayload as any,
+          syncVersion: 1
+        },
+        update: {
+          payload: appliedPayload as any,
+          syncVersion: { increment: 1 }
+        }
+      });
+
+      return tx.syncConflict.findUniqueOrThrow({ where: { id: conflictId } });
     });
+
+    // Mirrors EntitySyncService.pushEvents: devices holding this entity refresh on their next pull.
+    this.realtime.publish({ restaurantId: conflict.restaurantId, branchId: conflict.branchId ?? null, kind: `entity:${conflict.entityType}` });
 
     await this.audit.log({
       actorType: 'PLATFORM',
       actorId: actor.id,
       restaurantId: conflict.restaurantId,
-      action: `SYNC_CONFLICT_RESOLVED_${strategy}`,
+      action: `SYNC_CONFLICT_RESOLVED_${resolvedStrategy}`,
       category: 'SYNC',
-      details: { conflictId, entityType: conflict.entityType, entityId: conflict.entityId, strategy }
+      details: { conflictId, entityType: conflict.entityType, entityId: conflict.entityId, strategy: resolvedStrategy }
     });
 
     return updated;

@@ -30,6 +30,8 @@ export const redeemActivationKeySchema = z.object({
   code: z.string().trim().min(1),
   deviceType: z.enum(['POS', 'CAPTAIN', 'KDS', 'KIOSK', 'POS_ADMIN', 'KIOSK_ADMIN']),
   appVersion: z.string().optional(),
+  expectedRestaurantId: z.string().uuid().optional(),
+  expectedBranchId: z.string().uuid().optional(),
   publicKeyJwk: devicePublicKeyJwkSchema.optional()
 });
 export type RedeemActivationKeyDto = z.infer<typeof redeemActivationKeySchema>;

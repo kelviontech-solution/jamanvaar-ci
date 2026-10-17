@@ -1,0 +1,315 @@
+{
+  "url": "/qr/admin/?tab=BRAND",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / BRANDING\nCustomer Branding\n\nPreview and personalise your customer menu before applying changes.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nRestaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.\n\nCustomer page branding\n\nPreview your words, images and palette before saving. Your live guest page keeps the restaurant and table identity supplied by the QR code.\n\nWelcome heading\nWelcome message\nFooter message\nOrder button label\nAccent colour\nRestaurant logo\nUse default logo\nOptional advanced branding\nCover image\nUse menu cover\nLight background\nMenu presentation\nImage cards\nCompact list\nContact / assistance message\nSave branding\nDiscard changes\nReset defaults\n\nSTYLE PREVIEW · SAMPLE DATA · NO LIVE ORDER\n\nMenu\nCart\nCheckout\nMobile\nDesktop\nYour restaurant\nMain branch · Table 1\nFRESH FROM OUR KITCHEN\nGood food.\nGreat company.\n\nPick your favourites, make them yours, and let us take care of the rest.\n\nOur menu\nSample Gujarati Thali\n\nShaak, dal, rice and rotli\n\n₹299\n\nPlace order · ₹299\n\nCustom domains require verified DNS ownership, TLS and routing setup by the platform administrator. Customer links currently use the configured platform domain.\n\nDisplay",
+  "headings": [
+    "Customer Branding",
+    "Customer page branding",
+    "Good food.Great company."
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Use default logo",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 44
+    },
+    {
+      "text": "Use menu cover",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 133,
+      "height": 44
+    },
+    {
+      "text": "Save branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Discard changes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 135,
+      "height": 44
+    },
+    {
+      "text": "Reset defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "Place order · ₹299",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 268,
+      "height": 45
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome heading",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome message",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Footer message",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Order button label",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "Accent colour",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Restaurant logo",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Cover image",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "Light background",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Menu presentation"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Contact / assistance message",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Preview screen"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Preview device"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

@@ -1,0 +1,338 @@
+{
+  "url": "/qr/admin/?tab=ADVANCED&feature=Promotions",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nFeature controls\nTranslations\nPromotions\nFeedback\nAlerts\nCollections\nLicense\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nReview the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.\n\nAdvanced QR capabilities\n\nQA Admin Flow Tenant Audit qr 1792170389347 · 0 active codes · 1 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nCoupons and promotions\n\nUses the same coupon records as your other apps. Branch-bound consoles create local promotions. Usage is reserved at order submission; failed duplicate taps cannot consume it twice.\n\nCoupon code\nDescription\nDiscount type\nPercentage\nFixed rupee amount\nDiscount value (%)\nMinimum spend (₹)\nMaximum discount (₹, optional)\nGlobal uses (blank = unlimited)\nUses per verified customer (optional)\nStarts\nEnds\nEligible dishes (none selected = all)\n Promotion active\n First verified customer's QR order only\n\nCustomer-specific limits require phone verification. Coupons cannot stack with loyalty rewards.\n\nCreate promotion\nDisplay",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Coupons and promotions"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Create promotion",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 149,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Coupon code",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Description",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Discount typePercentageFixed rupee amount"
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Discount value (%)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum spend (₹)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Maximum discount (₹, optional)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Global uses (blank = unlimited)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Uses per verified customer (optional)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Starts",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Ends",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": "Eligible dishes (none selected = all)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Promotion active",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "First verified customer's QR order only",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

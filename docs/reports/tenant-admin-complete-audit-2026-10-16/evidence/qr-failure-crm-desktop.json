@@ -1,0 +1,262 @@
+{
+  "url": "/qr/admin/?tab=CRM",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / MENU & GUESTS\nCustomers & Loyalty\n\nManage shared customers, point balances, rewards and verified visit history.\n\n✦ JAMAN AI\nEnabled\nCustomers & loyalty\n\nCustomer profiles and point balances are shared with your restaurant's POS and verified QR checkout. Customer order history below follows the selected branch. Points are earned only after confirmed collection; guests verify their phone before using rewards.\n\nAdd customer\nLoyalty program\nRefresh customers\n\nProgram paused / Earn 1 points per ₹100 paid. You can manage the restaurant-wide program.\n\nGuest reward setup\n\nRestaurant program: Paused\n\nQR rewards for this branch: Not enabled\n\nPhone verification: Provider setup required — contact your platform administrator\n\nOpen branch reward settings\n\nGuests can redeem when all three checks are ready and an active reward matches their balance.\n\nQA controlled outage\n\nCustomer segment\nAll customers\nReturning guests (2+ visits)\nCustomers with points\nEmail consent recorded\nWhatsApp consent recorded\nOwner export scope\nCustomer records (no email marketing list)\nConsented email contacts\nConsented WhatsApp contacts\n\nExports are audited. Do not use a customer-record export for campaigns without channel-specific consent.\n\nExport customer CSV\nFind customer by name or phone\n\n0 matching customers\n\nNo customers match. Add a customer or clear your search. New accounts start with zero points.\n\nFirst customers\nMore customers\nRewards guests can choose at checkout\n\nRedeeming is optional. Paused rewards cannot be redeemed; existing customer points are preserved.\n\nAdd bill reward\nDisplay",
+  "headings": [
+    "Customers & Loyalty",
+    "Customers & loyalty",
+    "Rewards guests can choose at checkout"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Add customer",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Loyalty program",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44
+    },
+    {
+      "text": "Refresh customers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44
+    },
+    {
+      "text": "Open branch reward settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 224,
+      "height": 44
+    },
+    {
+      "text": "Export customer CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 44
+    },
+    {
+      "text": "First customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 134,
+      "height": 44
+    },
+    {
+      "text": "More customers",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 140,
+      "height": 44
+    },
+    {
+      "text": "Add bill reward",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Customer segment"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Owner export scope"
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Find loyalty customer",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

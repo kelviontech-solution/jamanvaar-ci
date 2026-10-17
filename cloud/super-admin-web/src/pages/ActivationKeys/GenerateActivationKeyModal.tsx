@@ -2,16 +2,20 @@
 import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
-import { APP_CODE_LABELS, type AppCode, type ApplicationEntitlement, type Branch, type RestaurantDetail, type RestaurantListItem } from '../../api/types';
+import { APP_CODE_LABELS, type AppCode, type Branch, type RestaurantListItem } from '../../api/types';
+import { Link } from 'react-router-dom';
+import { RESTAURANT_ADMIN_URL } from '../../lib/appUrls';
 import { Button, ModalShell } from '../../components/ui';
 import '../../components/shared.css';
 
 export function GenerateActivationKeyModal({
   restaurantId: fixedRestaurantId,
+  initialBranchId,
   onClose,
   onSaved
 }: {
   restaurantId?: string;
+  initialBranchId?: string;
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -23,7 +27,7 @@ export function GenerateActivationKeyModal({
   // and (b) preview quota against the restaurant's actual QR_ORDERING entitlement, not POS_ADMIN's
   // (a solo-QR restaurant has no POS_ADMIN entitlement row at all). Translated to 'POS_ADMIN' only
   // at the moment of submission, below.
-  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING'>('ANY');
+  const [deviceType, setDeviceType] = useState<'ANY' | 'POS' | 'POS_ADMIN' | 'CAPTAIN' | 'KDS' | 'KIOSK' | 'KIOSK_ADMIN' | 'QR_ORDERING'>('POS_ADMIN');
   const [expiryDays, setExpiryDays] = useState('30');
   // BUG-048: the branch this terminal belongs to, and the name it will carry ("Counter 1").
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -33,7 +37,7 @@ export function GenerateActivationKeyModal({
   const [submitting, setSubmitting] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [quotaPreview, setQuotaPreview] = useState<{ current: number; quota: number } | null>(null);
+  const [quotaPreview, setQuotaPreview] = useState<{ current: number; quota: number | null; branchCurrent:number; branchQuota:number|null; available:boolean; enabled:boolean; reason:string } | null>(null);
   const [quotaLoading, setQuotaLoading] = useState(false);
   // Reported live: a key generated for an app this restaurant's plan never had enabled was
   // handed to the owner, who redeemed it and hit a dead end at login ("No admin application is
@@ -54,8 +58,10 @@ export function GenerateActivationKeyModal({
       setBranches([]);
       return;
     }
-    api.get<Branch[]>(`/api/v1/branches?restaurantId=${encodeURIComponent(restaurantId)}`).then(setBranches).catch(() => setBranches([]));
-  }, [restaurantId]);
+    let active=true;
+    api.get<Branch[]>(`/api/v1/branches?restaurantId=${encodeURIComponent(restaurantId)}`).then(rows=>{if(active){const available=rows.filter(b=>b.status==='ACTIVE');setBranches(available);if(available.some(b=>b.id===initialBranchId))setBranchId(initialBranchId!);else if(available.length===1)setBranchId(available[0].id);}}).catch(() => {if(active)setBranches([]);});
+    return()=>{active=false;};
+  }, [restaurantId,initialBranchId]);
 
   useEffect(() => {
     setQuotaPreview(null);
@@ -63,27 +69,14 @@ export function GenerateActivationKeyModal({
     // 'ANY' isn't a single AppCode — no per-app quota or entitlement check applies to it.
     if (!restaurantId || deviceType === 'ANY') return;
     setQuotaLoading(true);
-    Promise.all([
-      api.get<RestaurantDetail>(`/api/v1/restaurants/${restaurantId}`),
-      api.get<ApplicationEntitlement[]>(`/api/v1/restaurants/${restaurantId}/applications`)
-    ])
-      .then(([restaurant, entitlements]) => {
-        // A QR console redeems as a POS_ADMIN-typed device (no QR-specific Device.type exists) --
-        // count those, not a device type that can never actually appear in the database.
-        const countedType = deviceType === 'QR_ORDERING' ? 'POS_ADMIN' : deviceType;
-        const current = restaurant.devices.filter((d) => (d as { type: string }).type === countedType && d.status !== 'REVOKED').length;
-        const row = entitlements.find((e) => e.appCode === deviceType);
-        const activeSub = restaurant.subscriptions.find((s) => s.status === 'ACTIVE' || s.status === 'TRIAL') ?? restaurant.subscriptions[0];
-        // No entitlement row yet (a pre-Phase-2 subscription) — fall back to the plan's overall cap.
-        const quota = row?.deviceQuota ?? activeSub?.plan.maxDevices ?? 0;
-        setQuotaPreview({ current, quota });
-        // No row at all means this restaurant has never had the app touched — treat that as not
-        // enabled rather than assuming yes, so a brand-new restaurant doesn't slip through.
-        setAppEnabled(row?.enabled ?? false);
-      })
-      .catch(() => { setQuotaPreview(null); setAppEnabled(null); })
-      .finally(() => setQuotaLoading(false));
-  }, [restaurantId, deviceType]);
+    let active = true;
+    const query = new URLSearchParams({restaurantId, appCode:deviceType, ...(branchId ? {branchId} : {})});
+    api.get<NonNullable<typeof quotaPreview>>('/api/v1/activation-keys/quota-preview?'+query)
+      .then(value=>{if(active){setQuotaPreview(value);setAppEnabled(value.enabled);setError(null);}})
+      .catch(e=>{if(active){setQuotaPreview(null);setAppEnabled(null);setError(e.message || 'Cannot verify capacity. Retry before issuing a key.');}})
+      .finally(()=>{if(active)setQuotaLoading(false);});
+    return ()=>{active=false;};
+  }, [restaurantId, deviceType, branchId]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -110,9 +103,9 @@ export function GenerateActivationKeyModal({
   }
 
   return (
-    <ModalShell onClose={onClose} label="Generate activation key">
+    <ModalShell onClose={onClose} label="Connect a device">
         <div className="modal-header">
-          <h2>Generate activation key</h2>
+          <h2>Connect a device</h2>
           <button className="modal-close" onClick={onClose} aria-label="Close">
             ×
           </button>
@@ -121,9 +114,13 @@ export function GenerateActivationKeyModal({
         {createdCode ? (
           <div className="modal-form">
             <p className="muted">
-              Relay this code to the restaurant owner — it can only be redeemed once, and isn't shown again.
+              Enter this pairing code on the selected device — it can only be redeemed once, and isn't shown again.
             </p>
             <div className="activation-code-display">{createdCode}</div>
+            <h3>Next: connect and verify</h3><p>Restaurant: {restaurants.find(r=>r.id===restaurantId)?.name || 'Selected restaurant'} | Branch: {branches.find(b=>b.id===branchId)?.name || 'Unassigned'} | Product: {deviceType==='ANY'?'Any licensed terminal':APP_CODE_LABELS[deviceType as AppCode]}</p>
+            <ol><li>Open the product on the device being connected.</li><li>Enter the restaurant ID and this pairing code on its activation screen.</li><li>Return to branch devices and refresh. A code being created is not proof that the device is connected.</li></ol>
+            {['POS_ADMIN','KIOSK_ADMIN','QR_ORDERING'].includes(deviceType)&&<a className="btn btn-ghost" href={RESTAURANT_ADMIN_URL} target="_blank" rel="noopener noreferrer">Open admin sign-in</a>}
+            <Link className="btn btn-ghost" to={`/restaurants/${restaurantId}?tab=devices${branchId?'&branchId='+encodeURIComponent(branchId):''}`} onClick={onClose}>Check branch connection status</Link>
             <div className="modal-actions">
               <Button
                 type="button"
@@ -169,10 +166,10 @@ export function GenerateActivationKeyModal({
             )}
             <div className="form-grid">
               <div className="field">
-                <label>Allowed device type</label>
+                <label>Which product are you connecting?</label>
                 <select value={deviceType} onChange={(e) => setDeviceType(e.target.value as typeof deviceType)}>
-                  <option value="ANY">Restaurant Admin Console (Any Terminal)</option>
-                  <option value="POS_ADMIN">Restaurant Admin Console (POS_ADMIN)</option>
+                  <option value="ANY">Advanced: any licensed terminal type</option>
+                  <option value="POS_ADMIN">Restaurant Admin console</option>
                   <option value="POS">Main Billing Counter POS</option>
                   <option value="CAPTAIN">Captain Waiter Tablet</option>
                   <option value="KDS">Kitchen Order Display (KDS)</option>
@@ -191,9 +188,10 @@ export function GenerateActivationKeyModal({
                 {quotaLoading ? (
                   'Checking device quota…'
                 ) : quotaPreview ? (
-                  <span style={{ color: quotaPreview.current + 1 > quotaPreview.quota ? '#dc2626' : 'var(--jv-text-muted)', fontWeight: quotaPreview.current + 1 > quotaPreview.quota ? 700 : 400 }}>
-                    {quotaPreview.current} / {quotaPreview.quota} devices in use → {quotaPreview.current + 1} / {quotaPreview.quota} after this key is redeemed
-                    {quotaPreview.current + 1 > quotaPreview.quota ? ' — over quota, redemption will be refused' : ''}
+                  <span style={{ color: !quotaPreview.available ? '#b91c1c' : 'var(--jv-text-muted)' }}>
+                    Restaurant: {quotaPreview.current} / {quotaPreview.quota ?? 'No device cap'} devices.
+                    {branchId && <> Branch: {quotaPreview.branchCurrent} / {quotaPreview.branchQuota ?? 'Inherits restaurant cap'}.</>}
+                    {!quotaPreview.enabled ? ' Product unavailable: '+quotaPreview.reason.replaceAll('_',' ').toLowerCase() : !quotaPreview.available ? ' No capacity. Revoke an unused device or review Products & plan.' : ' Capacity available. Capacity is checked again at activation.'}
                   </span>
                 ) : null}
               </div>
@@ -204,17 +202,14 @@ export function GenerateActivationKeyModal({
                 style={{ fontSize: 13, color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 12px', margin: '-4px 0 8px' }}
               >
                 <strong>{APP_CODE_LABELS[deviceType as AppCode]}</strong>{' '}
-                isn't enabled on this restaurant's plan yet — a key generated now would let the
-                owner redeem it, but they'd hit a dead end logging in ("No admin application is
-                enabled"). Enable it on the Applications tab first, then come back and generate
-                the key.
+                is unavailable for the selected restaurant or branch. Review Products & access, then return here. No pairing code will be issued while access is unavailable.
               </div>
             )}
             <div className="form-grid">
               <div className="field">
                 <label htmlFor="key-branch">Branch</label>
                 <select id="key-branch" value={branchId} onChange={(e) => setBranchId(e.target.value)} disabled={branches.length === 0}>
-                  <option value="">No specific branch</option>
+                  <option value="" disabled>Choose the device?s branch</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>{b.name} ({b.code})</option>
                   ))}
@@ -245,8 +240,8 @@ export function GenerateActivationKeyModal({
               <Button type="button" variant="ghost" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" disabled={submitting || !restaurantId || appEnabled === false}>
-                {submitting ? 'Generating…' : 'Generate key'}
+              <Button type="submit" variant="primary" disabled={submitting || !restaurantId || !branchId || appEnabled === false || (deviceType !== 'ANY' && (quotaLoading || !quotaPreview?.available))}>
+                {submitting ? 'Generating…' : 'Create pairing code'}
               </Button>
             </div>
           </form>

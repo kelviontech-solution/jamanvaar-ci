@@ -19,6 +19,7 @@ export type CreateTicketDto = z.infer<typeof createTicketSchema>;
 
 /** What a restaurant may send: its own restaurant is taken from the session, never from the body. */
 export const tenantCreateTicketSchema = z.object({
+  activationRequest: z.object({type:z.literal('KIOSK'),terminalName:z.string().trim().min(1).max(80)}).strict().optional(),
   subject: subjectSchema,
   description: descriptionSchema,
   category: categorySchema.default('OTHER'),

@@ -1,0 +1,227 @@
+{
+  "url": "/qr/admin/?tab=TABLES",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nTables & QR\n\nConnect each table to the right menu and manage its QR code.\n\n✦ JAMAN AI\nEnabled\nAdd table\nGenerate selected QR codes\nPrint selected (0)\nPrint All\nDownload All\nMenu-only code\nNo tables yet. Use Add table above (or add them under Floor / Tables); they appear here to receive QR codes.\nDisplay",
+  "headings": [
+    "Tables & QR"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Add table",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 44
+    },
+    {
+      "text": "Generate selected QR codes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 182,
+      "height": 44
+    },
+    {
+      "text": "Print selected (0)",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 142,
+      "height": 44
+    },
+    {
+      "text": "Print All",
+      "aria": null,
+      "title": "No active QR codes yet — add a table and generate its code first.",
+      "disabled": true,
+      "width": 92,
+      "height": 44
+    },
+    {
+      "text": "Download All",
+      "aria": null,
+      "title": "No active QR codes yet — add a table and generate its code first.",
+      "disabled": true,
+      "width": 122,
+      "height": 44
+    },
+    {
+      "text": "Menu-only code",
+      "aria": null,
+      "title": "A code with no table, for menu cards",
+      "disabled": false,
+      "width": 138,
+      "height": 44
+    }
+  ],
+  "fields": [],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

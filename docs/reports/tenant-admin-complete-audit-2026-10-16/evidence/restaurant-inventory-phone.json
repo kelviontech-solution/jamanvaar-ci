@@ -1,0 +1,287 @@
+{
+  "url": "/restaurant-admin/inventory",
+  "text": "Branch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nOperations hub\nBilling / Invoices\nRegister shifts & cash\nKitchen progress\nKitchen tickets\nFloor / Tables\nReservations\nInventory & Recipes\nPurchasing & Stock Control\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nEOD Report\nReconciliation\nAssistant\nLog out\nInventory & Recipe Bill of Materials (BOM)\nLIVE TRACKING\n\nTrack raw stock levels, set minimum reorder thresholds, and automate ingredient deductions upon POS/Kiosk sales.\n\nCreate Recipe Formula\nAdd Stock Item\nRAW INGREDIENTS\n0 Items\nIn Warehouse Master\nSTOCK VALUATION\n₹0\nWeighted Unit Cost\nLOW STOCK ALERTS\n0 Critical\nAll Stock Levels Normal\nBOM DISH FORMULAS\n0 Formulas\nAuto-Deduct on Order Sale\nRaw Warehouse Ingredients (0)\nAll Categories\nNo Raw Ingredients Recorded\n\nAdd pantry staples, dairy, produce, spices, and packaging materials to manage stock.\n\n+ Add First Ingredient\nConfigured Dish Recipe Formulas (0)\nAutomatic Ingredient Consumption\nNo Recipe Formulas Configured\n\nLink raw ingredients to menu dishes to automatically deduct inventory whenever an order is placed.\n\n+ Create Recipe Formula\nRecent Wastage Log\nLast 0 of 0 entries\n\nNo wastage logged yet. Use \"Log Wastage\" on an ingredient to record spoilage, prep trim, or breakage.\n\nJAMAN AI\nDisplay",
+  "headings": [
+    "Inventory & Recipe Bill of Materials (BOM)"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Operations hub",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Create Recipe Formula",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 190,
+      "height": 38
+    },
+    {
+      "text": "Add Stock Item",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 146,
+      "height": 36
+    },
+    {
+      "text": "+ Add First Ingredient",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 32
+    },
+    {
+      "text": "+ Create Recipe Formula",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 30
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 120,
+      "height": 45
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search ingredient or SKU..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 10
+}

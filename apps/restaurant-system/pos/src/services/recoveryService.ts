@@ -16,6 +16,8 @@ export class PosRecoveryService {
     cart: Cart;
     billDiscountPercent: number;
     billDiscountFlat: number;
+    /** Order-wide chef notes (separate from any per-item instructions already in the cart), so a reload or crash recovery restores them along with the items. */
+    notes?: string;
   }): void {
     try {
       if (!session.cart.items || session.cart.items.length === 0) {
@@ -41,6 +43,7 @@ export class PosRecoveryService {
         cart: session.cart,
         billDiscountPercent: session.billDiscountPercent,
         billDiscountFlat: session.billDiscountFlat,
+        notes: session.notes,
         updatedAt: new Date().toISOString()
       };
 

@@ -47,6 +47,7 @@ export function SubscriptionsListPage() {
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState(false);
+  const [bulkConfirm, setBulkConfirm] = useState<'suspend' | 'reactivate' | null>(null);
 
   // Search & Filters
   const [search, setSearch] = useState('');
@@ -95,6 +96,16 @@ export function SubscriptionsListPage() {
     });
   }, [subs, statusFilter, tierFilter, search]);
 
+  // Changing a filter can hide rows that stayed selected — silently including them in the next
+  // bulk suspend/reactivate (SA-08). Prune the selection down to whatever is still visible.
+  useEffect(() => {
+    const visible = new Set(filteredSubs.map((s) => s.id));
+    setSelectedIds((prev) => {
+      const next = new Set([...prev].filter((id) => visible.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [filteredSubs]);
+
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -124,6 +135,7 @@ export function SubscriptionsListPage() {
           : `${ids.length - failed} of ${ids.length} succeeded — ${failed} failed`
       );
       setSelectedIds(new Set());
+      setBulkConfirm(null);
       load();
     } finally {
       setBulkPending(false);
@@ -231,13 +243,34 @@ export function SubscriptionsListPage() {
       {loading && !subs && <SkeletonTable rows={6} cols={6} />}
 
       <BulkActionsBar selectedCount={selectedIds.size} onClear={() => setSelectedIds(new Set())}>
-        <Button size="sm" variant="danger" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('suspend')}>
+        <Button size="sm" variant="danger" disabled={bulkPending || !canWrite} onClick={() => setBulkConfirm('suspend')}>
           Suspend Selected
         </Button>
-        <Button size="sm" variant="primary" disabled={bulkPending || !canWrite} onClick={() => handleBulkAction('reactivate')}>
+        <Button size="sm" variant="primary" disabled={bulkPending || !canWrite} onClick={() => setBulkConfirm('reactivate')}>
           Reactivate Selected
         </Button>
       </BulkActionsBar>
+
+      <ConfirmModal
+        isOpen={bulkConfirm !== null}
+        title={`${bulkConfirm === 'suspend' ? 'Suspend' : 'Reactivate'} ${selectedIds.size} subscription${selectedIds.size === 1 ? '' : 's'}?`}
+        message={
+          <div>
+            <p style={{ marginBottom: 8 }}>This will affect:</p>
+            <ul style={{ margin: 0, paddingLeft: 18, maxHeight: 180, overflowY: 'auto' }}>
+              {[...selectedIds].map((id) => {
+                const s = subs?.find((x) => x.id === id);
+                return <li key={id}>{s ? `${s.restaurant.name} (${s.plan.name})` : id}</li>;
+              })}
+            </ul>
+          </div>
+        }
+        confirmLabel={bulkConfirm === 'suspend' ? 'Suspend' : 'Reactivate'}
+        tone={bulkConfirm === 'suspend' ? 'danger' : 'primary'}
+        isPending={bulkPending}
+        onConfirm={() => { if (bulkConfirm) void handleBulkAction(bulkConfirm); }}
+        onClose={() => setBulkConfirm(null)}
+      />
 
       {subs && (
         <Card>

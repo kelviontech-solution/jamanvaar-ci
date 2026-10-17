@@ -1,0 +1,56 @@
+{
+  "url": "/",
+  "text": "Choose your language\n\nभाषा चुनें · ભાષા પસંદ કરો\n\nEnglish\nEnglish\nहिन्दी\nHindi\nગુજરાતી\nGujarati\n\nYou can change this anytime from the header\n\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "Choose your language"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "English\nEnglish",
+      "aria": null,
+      "disabled": false,
+      "width": 264,
+      "height": 174
+    },
+    {
+      "text": "हिन्दी\nHindi",
+      "aria": null,
+      "disabled": false,
+      "width": 264,
+      "height": 174
+    },
+    {
+      "text": "ગુજરાતી\nGujarati",
+      "aria": null,
+      "disabled": false,
+      "width": 264,
+      "height": 174
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

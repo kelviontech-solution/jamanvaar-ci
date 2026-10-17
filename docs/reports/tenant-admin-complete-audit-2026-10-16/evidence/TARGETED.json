@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-16T17:09:25.739Z",
+  "observations": [
+    {
+      "name": "Report Filters button changes no visible controls",
+      "controlsBefore": 5,
+      "controlsAfter": 5,
+      "dialogs": 0
+    },
+    {
+      "name": "Menu report CSV exports transaction columns",
+      "fileName": "jamanvaar_top_selling_dishes_1792170557105.csv",
+      "hasTransactionColumns": true,
+      "hasDishQuantityColumns": false
+    },
+    {
+      "name": "Unsaved kiosk combo disappears on navigation",
+      "warningDialogs": 0,
+      "restoredName": ""
+    },
+    {
+      "name": "Unsaved restaurant identity loses edits on navigation",
+      "warningDialogs": 0,
+      "restoredValue": "Garden House Flow QA",
+      "original": "Garden House Flow QA"
+    },
+    {
+      "name": "Connected kiosk payment page mounts the ledger twice",
+      "ledgerHeadings": 2,
+      "controlledConnectionStatus": "PENDING_VERIFICATION"
+    },
+    {
+      "name": "QR immediate switch discards unsaved preparation rules",
+      "before": "20",
+      "typed": "37",
+      "after": "20",
+      "saveRulesDisabled": true
+    },
+    {
+      "name": "QR failed immediate switch stays visually changed",
+      "before": true,
+      "after": false,
+      "errorVisible": true
+    },
+    {
+      "name": "QR branding entitlement outage is labelled not licensed",
+      "claimsNotIncluded": true,
+      "showsOutage": false
+    },
+    {
+      "name": "Dedicated QR workspace remains usable at phone width",
+      "consoleVisible": true,
+      "overflow": false
+    }
+  ]
+}

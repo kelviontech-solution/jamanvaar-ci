@@ -123,6 +123,23 @@ export function passwordResetOtpEmail(params: { fullName: string; otp: string; m
   };
 }
 
+/** #16: verifying an alternate recovery mailbox before it can ever be used to regain account access. */
+export function recoveryEmailOtpEmail(params: { fullName: string; otp: string; minutesValid: number }): { subject: string; html: string } {
+  return {
+    subject: 'Verify your JAMANVAAR recovery email',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0b253a;">
+        <h2 style="color: #0b253a;">Verify this recovery email</h2>
+        <p>Hi ${params.fullName}, use this code to confirm this mailbox as the recovery address for your JAMANVAAR account:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <span style="font-family: monospace; font-size: 32px; letter-spacing: 8px; font-weight: bold; background: #FFF4ED; border: 1px solid #FDBA74; border-radius: 10px; padding: 12px 20px; display: inline-block;">${params.otp}</span>
+        </p>
+        <p style="color: #7a8b9e; font-size: 13px;">The code works once and expires in ${params.minutesValid} minutes. Once verified, this address can receive a password-reset code if your main login email is ever unreachable. If you did not request this, ignore this email.</p>
+      </div>
+    `
+  };
+}
+
 export function platformLoginOtpEmail(params: { fullName: string; otp: string; minutesValid: number }): { subject: string; html: string } {
   return {
     subject: 'Your JAMANVAAR Super Admin sign-in code',

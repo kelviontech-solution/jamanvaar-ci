@@ -291,7 +291,11 @@ export function QrCrm() {
                 }}
               />
             </label>
-            <p>{total} matching customers</p>
+            {/* Q05: a failed fetch used to show "0 matching customers" right beside the error
+                banner above — a false empty result indistinguishable from a restaurant that
+                genuinely has none. Both this count and the empty-state line below now stay
+                hidden while an error is active instead of asserting a result that never arrived. */}
+            {!error && <p>{total} matching customers</p>}
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {rows.map((row) => (
                 <article key={row.phone} className="rounded-xl border p-4 space-y-2">
@@ -313,7 +317,7 @@ export function QrCrm() {
               ))}
             </div>
             {loading && <p role="status">Loading customers...</p>}
-            {!loading && !rows.length && <p>No customers match. Add a customer or clear your search. New accounts start with zero points.</p>}
+            {!loading && !error && !rows.length && <p>No customers match. Add a customer or clear your search. New accounts start with zero points.</p>}
             <div className="flex gap-3">
               <button className={button} disabled={!cursor} onClick={() => setCursor('')}>
                 First customers

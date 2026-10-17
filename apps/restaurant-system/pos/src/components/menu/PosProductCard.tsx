@@ -11,7 +11,7 @@ interface PosProductCardProps {
 }
 
 export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
-  const { addItemToCart, updateItemQuantity, setCustomizingItem, cart } = usePosStore();
+  const { quickAddOrCustomize, addItemToCart, updateItemQuantity, setCustomizingItem, cart } = usePosStore();
   const lastTapRef = useRef<number>(0);
 
   const inCartCount = (cart?.items || [])
@@ -41,9 +41,10 @@ export const PosProductCard: React.FC<PosProductCardProps> = ({ item }) => {
     }
     lastTapRef.current = now;
 
-    // 1-Tap Direct Add to cart (fast billing flow)
+    // 1-Tap Direct Add to cart (fast billing flow); routes to customization when a required
+    // choice or minimum quantity above one means the dish can't be added with bare defaults.
     sound.play('add');
-    addItemToCart(item);
+    quickAddOrCustomize(item);
   };
 
   const handleCustomizeClick = (e: React.MouseEvent) => {

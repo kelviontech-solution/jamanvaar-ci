@@ -28,6 +28,8 @@ import {
   resetPasswordSchema,
   setTenantUserStatusSchema,
   tenantChangePasswordSchema,
+  requestRecoveryEmailSchema,
+  confirmRecoveryEmailSchema,
   tenantLoginSchema,
   activateDeviceSchema,
   tenantRefreshSchema,
@@ -234,7 +236,8 @@ export class TenantMeController {
   constructor(
     private readonly authService: TenantAuthService,
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
+    private readonly config: ConfigService
   ) {}
 
   @Get('me')
@@ -246,8 +249,29 @@ export class TenantMeController {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
-      status: user.status
+      status: user.status,
+      // #16: the pending (unverified) address is never exposed -- only whether a verified one exists.
+      recoveryEmail: user.recoveryEmailVerifiedAt ? user.recoveryEmail : null,
+      recoveryEmailPending: !!user.recoveryEmailOtpHash
     };
+  }
+
+  @Get('me/kiosk-setup')
+  async kioskSetup(@CurrentTenantUser() user: User) {
+    if (user.role !== 'OWNER' && user.role !== 'MANAGER') throw new ForbiddenException('Only an owner or manager can set up kiosks.');
+    const restaurant = await this.prisma.runAsTenant(user.restaurantId, tx => tx.restaurant.findUniqueOrThrow({where:{id:user.restaurantId},select:{restaurantCode:true,name:true}}));
+    let kioskWebUrl: string | null = null;
+    const configured = this.config.get<string>('KIOSK_WEB_URL');
+    const base = configured || this.config.get<string>('QR_ORDER_BASE_URL');
+    try {
+      if (base) {
+        const url = configured ? new URL(base) : new URL('/kiosk/',base);
+        if (!url.username && !url.password && (url.protocol === 'https:' || (this.config.get('NODE_ENV') !== 'production' && url.protocol === 'http:'))) {
+          url.search = ''; url.hash = ''; kioskWebUrl = url.href;
+        }
+      }
+    } catch { /* No public launch address configured; the installed kiosk remains available. */ }
+    return {...restaurant,kioskWebUrl};
   }
 
   /** The default display size for this restaurant's terminals (BUG-008). */
@@ -298,6 +322,35 @@ export class TenantMeController {
     @CurrentTenantUser() user: User
   ) {
     await this.authService.changePassword(user, body.currentPassword, body.newPassword);
+    return { success: true };
+  }
+
+  /** #16: step 1 -- sends a verification code to the proposed recovery mailbox. */
+  @Post('me/recovery-email')
+  @UsePipes(new ZodValidationPipe(requestRecoveryEmailSchema))
+  async requestRecoveryEmail(
+    @Body() body: ReturnType<typeof requestRecoveryEmailSchema.parse>,
+    @CurrentTenantUser() user: User
+  ) {
+    await this.authService.requestRecoveryEmailVerification(user, body.recoveryEmail);
+    return { success: true };
+  }
+
+  /** #16: step 2 -- the code from that email confirms the owner actually controls the mailbox. */
+  @Post('me/recovery-email/confirm')
+  @UsePipes(new ZodValidationPipe(confirmRecoveryEmailSchema))
+  async confirmRecoveryEmail(
+    @Body() body: ReturnType<typeof confirmRecoveryEmailSchema.parse>,
+    @CurrentTenantUser() user: User
+  ) {
+    await this.authService.confirmRecoveryEmail(user, body.otp);
+    return { success: true };
+  }
+
+  /** #16: removes a verified (or still-pending) recovery email. */
+  @Post('me/recovery-email/clear')
+  async clearRecoveryEmail(@CurrentTenantUser() user: User) {
+    await this.authService.clearRecoveryEmail(user);
     return { success: true };
   }
 

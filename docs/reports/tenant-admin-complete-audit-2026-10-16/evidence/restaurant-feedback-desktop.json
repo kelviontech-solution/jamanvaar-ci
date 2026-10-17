@@ -1,0 +1,203 @@
+{
+  "url": "/restaurant-admin/feedback",
+  "text": "Garden House Flow QA\nRESTAURANT ADMIN\nGarden House Flow QA — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nKiosk Terminals\nCustomer experience\nKiosk Combos & Deals\nKiosk payment settings\nKiosk feedback\nQR ORDERING\nREPORTS\nSETUP\nCustomer Experience & Feedback\n\nReal-time ratings, service speed impressions, and customer reviews submitted via the kiosk.\n\nAVERAGE RATING\n\nNo ratings yet\n\nBased on kiosk submissions\n\nSERVICE SPEED SCORE\n\nNo data yet\n\nOrders ready within estimate\n\nTOTAL REVIEWS\n\n0\n\nCustomer feedback entries\n\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Customer Experience & Feedback"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Garden House Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 115,
+      "height": 40
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 129,
+      "height": 40
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customer experience",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kiosk payment settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kiosk feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 7
+}

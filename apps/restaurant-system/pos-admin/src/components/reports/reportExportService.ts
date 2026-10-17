@@ -133,6 +133,26 @@ export class ReportExportService {
   }
 
   /**
+   * A typed CSV for any report that doesn't have its own dedicated export method below —
+   * R03: the Export CSV button used to always call exportTransactionsCsv with the raw order
+   * list no matter which report tab was open, so "Top Selling Dishes" downloaded a file named
+   * for that report but full of Order #/Payment Status transaction columns instead of the
+   * dish-level numbers actually on screen. Callers pass the exact dataset and headers the
+   * active report is already showing.
+   */
+  public static exportGenericCsv(title: string, headers: string[], rows: (string | number)[][]): void {
+    const csv = [
+      toCsvRow([`JAMANVAAR — ${title.toUpperCase()}`]),
+      toCsvRow([`Generated At: ${formatDate(new Date())} ${formatTime(new Date())}`]),
+      '',
+      toCsvRow(headers),
+      ...rows.map(toCsvRow)
+    ].join('\r\n');
+
+    this.downloadFile(csv, `jamanvaar_${title.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.csv`, 'text/csv;charset=utf-8;');
+  }
+
+  /**
    * Export to Clean Excel Format (.xls format with XML spreadsheet)
    */
   public static exportExcelXml(title: string, headers: string[], rows: (string | number)[][]): void {

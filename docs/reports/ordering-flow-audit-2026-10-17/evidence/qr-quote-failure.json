@@ -1,0 +1,113 @@
+{
+  "url": "/q/s6BiSPlfYkIAEWb3dzzfK5iPJbPNfl_f#cart",
+  "text": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Menu\nYOUR PICKS, PREPARED FRESH\nYour cart\nBuild Your Thali\nChecking price...\nRoti\nEdit choices / note\n−\n1\n+\nRemove\nTwin Snack Plate\nChecking price...\nEdit choices / note\n−\n3\n+\nRemove\nPaneer Bowl\nChecking price...\nEdit choices / note\n−\n1\n+\nRemove\n\nQA quote unavailable\n\nCheckout\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "headings": [
+    "Your cart"
+  ],
+  "buttons": [
+    {
+      "text": "← Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 50,
+      "height": 44
+    },
+    {
+      "text": "Edit choices / note",
+      "aria": "Edit Build Your Thali",
+      "disabled": false,
+      "width": 113,
+      "height": 44
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "disabled": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "disabled": false,
+      "width": 47,
+      "height": 44
+    },
+    {
+      "text": "Edit choices / note",
+      "aria": "Edit Twin Snack Plate",
+      "disabled": false,
+      "width": 113,
+      "height": 44
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "disabled": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "disabled": false,
+      "width": 47,
+      "height": 44
+    },
+    {
+      "text": "Edit choices / note",
+      "aria": "Edit Paneer Bowl",
+      "disabled": false,
+      "width": 113,
+      "height": 44
+    },
+    {
+      "text": "−",
+      "aria": "Fewer",
+      "disabled": true,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "+",
+      "aria": "More",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Remove",
+      "aria": null,
+      "disabled": false,
+      "width": 47,
+      "height": 44
+    },
+    {
+      "text": "Checkout",
+      "aria": null,
+      "disabled": true,
+      "width": 316,
+      "height": 53
+    }
+  ],
+  "fields": []
+}

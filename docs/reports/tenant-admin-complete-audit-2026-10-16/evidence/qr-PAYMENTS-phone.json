@@ -1,0 +1,254 @@
+{
+  "url": "/qr/admin/?tab=PAYMENTS",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nPayment Settings\n\nControl online checkout and counter payments with clear collection status.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nReview the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.\n\nBranch\nCurrent admin scope\nGarden House Flow QA — Main Branch\n\nRestaurant defaults apply until a branch overrides a setting. Other branches keep their own configuration.\n\nUse restaurant defaults\nSecure payment collection\n\nAsk your platform administrator to configure RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET on the payment server.\n\nRazorpay\nNot configured\nUnavailable to guests\n\nUPI and other methods are offered by the secure provider according to merchant activation. Configure credentials and collection approval through Super Admin. Secrets are never shown here.\n\nOnline payment\nCash at Counter\nPayment instructionsSave payment instructions\nFrom (restaurant date)\nTo (restaurant date)\nBranch\nCurrent admin scope\nGarden House Flow QA — Main Branch\n\nTimezone: Asia/Kolkata. Calendar days run midnight to midnight and include both selected dates. UTC export boundaries: 2026-10-09T18:30:00.000Z to 2026-10-16T18:30:00.000Z (exclusive).\n\n0\nOnline successes\n0\nFailed attempts\n0\nPending attempts\n₹0.00\nCollected payments\n₹0.00\nOutstanding at counter\n\nLanding sessions and menu views are deduplicated per code, signed browser session and restaurant day. Accepted orders exclude online drafts and cancellations. Gross paid sales include collected counter payments and verified online payments. Net sales subtract successful partial or full refunds for these orders. Conversion is an order-to-session ratio and may exceed 100% when a guest orders again.\n\nRecent online payment attempts\n\nNo online attempts in this period.\n\nDisplay",
+  "headings": [
+    "Payment Settings",
+    "Secure payment collection",
+    "Recent online payment attempts"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 44
+    },
+    {
+      "text": "Save payment instructions",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 206,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Online payment",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Cash at Counter",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Payment instructionsSave payment instructions",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From (restaurant date)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To (restaurant date)",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

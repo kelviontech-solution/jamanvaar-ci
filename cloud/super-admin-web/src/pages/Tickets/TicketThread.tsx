@@ -9,6 +9,8 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain';
 
 const EVENT_TEXT: Record<string, (from: string | null, to: string | null) => string> = {
+  KIOSK_ACTIVATION_REQUEST: () => 'requested a customer kiosk activation key',
+  KIOSK_KEY_ISSUED: () => 'issued a branch-scoped kiosk key; share it securely with the owner',
   CREATED: () => 'opened the ticket',
   STATUS: (from, to) => `changed status from ${from ?? '?'} to ${to ?? '?'}`,
   PRIORITY: (from, to) => `changed priority from ${from ?? '?'} to ${to ?? '?'}`,

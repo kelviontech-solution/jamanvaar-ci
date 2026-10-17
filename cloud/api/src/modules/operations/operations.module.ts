@@ -1,4 +1,6 @@
 import { ConfigurationRollbackService } from './configuration-rollback.service';
+import { AdminWorkflowService } from './admin-workflow.service';
+import { AdminWorkflowController, PlatformAdminWorkflowController } from './admin-workflow.controller';
 import { ApplicationEntitlementsModule } from '../application-entitlements/application-entitlements.module';
 import { ThaliRefillsService } from './thali-refills.service';
 import { RecurringMenuService } from './recurring-menu.service';
@@ -24,7 +26,7 @@ import {
 } from './operations.controller';
 @Module({
   imports: [ApplicationEntitlementsModule, PaymentsModule, DeviceCommandsModule, TenantAuthModule, AuditModule, MenuPublicationsModule, StaffAuthModule, ActivationKeysModule],
-  controllers: [ServiceMaturityController, OperationsController, DeviceOperationsController, PickupDisplayController],
-  providers: [ConfigurationRollbackService, ThaliRefillsService, RecurringMenuService, ServiceMaturityService, OperationsService, OperationsScheduler, OperationsWorkflows, DeviceAuthGuard, DbCounters],
+  controllers: [AdminWorkflowController, PlatformAdminWorkflowController, ServiceMaturityController, OperationsController, DeviceOperationsController, PickupDisplayController],
+  providers: [AdminWorkflowService, ConfigurationRollbackService, ThaliRefillsService, RecurringMenuService, ServiceMaturityService, OperationsService, OperationsScheduler, OperationsWorkflows, DeviceAuthGuard, DbCounters],
 })
 export class OperationsModule {}

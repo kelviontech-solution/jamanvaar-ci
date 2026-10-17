@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import type { NotificationExtras, NotificationSeverity, PlatformNotification } from '../../api/types';
 import { EmptyState, Badge, Button, Card, FilterTabs, PageHeader, type BadgeTone } from '../../components/ui';
 import { Pager } from '../../components/Pager';
@@ -34,6 +34,7 @@ export function NotificationsPage() {
   const [readFilter, setReadFilter] = useState<ReadFilter>('UNREAD');
   const [severity, setSeverity] = useState<SeverityFilter>('ALL');
   const [type, setType] = useState('');
+  const [toast, setToast] = useState<string | null>(null);
 
   const list = usePagedList<PlatformNotification, NotificationExtras>(
     '/api/v1/platform/notifications',
@@ -42,18 +43,37 @@ export function NotificationsPage() {
   );
   const counts = list.extra?.severityCounts;
 
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3500);
+  };
+
   async function open(n: PlatformNotification) {
-    if (!n.read) await api.post(`/api/v1/platform/notifications/${n.id}/read`, {}).catch(() => undefined);
+    // Navigation proceeds either way — the record is still worth opening — but a failed
+    // read-ack used to vanish silently, leaving the notification wrongly marked unread with
+    // no indication anything went wrong and no way to retry short of reopening it.
+    if (!n.read) {
+      try {
+        await api.post(`/api/v1/platform/notifications/${n.id}/read`, {});
+      } catch (err) {
+        showToast(err instanceof ApiError ? `Could not mark as read: ${err.message}` : 'Could not mark as read — it may still show as unread.');
+      }
+    }
     navigate(n.link);
   }
 
   async function markAll() {
-    await api.post('/api/v1/platform/notifications/read-all', {}).catch(() => undefined);
-    list.reload();
+    try {
+      await api.post('/api/v1/platform/notifications/read-all', {});
+      list.reload();
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Could not mark all as read. Please retry.');
+    }
   }
 
   return (
     <div className="page-container">
+      {toast && <div className="floating-toast" role="alert">{toast}</div>}
       <PageHeader
         title="Notifications"
         subtitle="Things that need attention across restaurants: expiring subscriptions, failed backups, overdue invoices, terminals gone quiet. Each opens the exact record."

@@ -127,6 +127,17 @@ export const tenantChangePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: strongPassword
 });
+
+/** #16: a verified alternate mailbox for account recovery. */
+export const requestRecoveryEmailSchema = z.object({
+  recoveryEmail: z.string().trim().toLowerCase().email()
+});
+export type RequestRecoveryEmailDto = z.infer<typeof requestRecoveryEmailSchema>;
+
+export const confirmRecoveryEmailSchema = z.object({
+  otp: z.string().trim().regex(/^\d{6}$/, 'Enter the 6-digit code')
+});
+export type ConfirmRecoveryEmailDto = z.infer<typeof confirmRecoveryEmailSchema>;
 export type TenantChangePasswordDto = z.infer<typeof tenantChangePasswordSchema>;
 
 // Restaurant Admin (OWNER) self-service login creation for other apps/devices
@@ -137,7 +148,7 @@ export type TenantChangePasswordDto = z.infer<typeof tenantChangePasswordSchema>
 export const createTenantStaffUserSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   fullName: z.string().trim().min(1, 'Full name is required'),
-  role: z.enum(['MANAGER', 'STAFF']).default('STAFF'),
+  role: z.enum(['MANAGER', 'STAFF', 'ACCOUNTANT']).default('STAFF'),
   phone: z.string().trim().optional(),
   password: strongPassword
 });

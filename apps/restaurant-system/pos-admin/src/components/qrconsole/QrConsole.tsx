@@ -14,6 +14,7 @@ import {
   QrBrandStudio,
 } from "./QrOperations";
 import { QrCapabilities } from "./QrCapabilities";
+import { SupportTicketsModule } from "../support/SupportTicketsModule";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   QR_PAGES,
@@ -379,6 +380,7 @@ export function QrConsole({
         {tab === "SERVICE" && <QrServiceOperations />}
         {tab === "PICKUP" && <QrPickupOperations />}
         {tab === "PERFORMANCE" && <QrMenuPerformance />}
+        {tab === "SUPPORT" && <SupportTicketsModule showToast={showToast} />}
         {tab === "BRAND" && <QrBrandStudio />}
         {tab === 'RESTAURANT_PAGE' && <QrRestaurantPage onNavigate={(next,scope)=>void navigate(next,'Settings',scope)} />}
         {tab === "TABLES" && <TablesAndQr showToast={showToast} />}

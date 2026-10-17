@@ -1,0 +1,610 @@
+{
+  "url": "/",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nCart\n2\n₹280\nAll Menu\nCombos & Deals\nChef specials\nAll Menu\nPure Veg\n🌱 Pure Jain\nAll Dishes & Specialities\nPure Veg\nPaneer Bowl\n\nFreshly prepared for your table.\n\n₹120\nPure Veg\nBuild Your Thali\n\nChoose one bread with your meal.\n\n₹200+\nCustomization required\nCustomize\nPure Veg\nTwin Snack Plate\n\nServed in batches of two to three portions.\n\n₹80\nJain\nJain Dal\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 05\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 06\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 07\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 08\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 09\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 10\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 11\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 12\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 13\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 14\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 15\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 16\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 17\n\nFreshly prepared for your table.\n\n₹80\nPure Veg\nSeasonal Special 18\n\nFreshly prepared for your table.\n\n₹80\nOrder Summary\n2\n\nTotal:₹280\n\nClear All\nBuild Your Thali\n₹200\n1\nTwin Snack Plate\n₹80\n1\nApply\nSubtotal\n₹280\nCGST\n₹0\nSGST\n₹0\nTotal Payable\n₹280\nProceed to Payment\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "All Dishes & Specialities",
+    "Paneer Bowl",
+    "Build Your Thali",
+    "Twin Snack Plate",
+    "Jain Dal",
+    "Seasonal Special 05",
+    "Seasonal Special 06",
+    "Seasonal Special 07",
+    "Seasonal Special 08",
+    "Seasonal Special 09",
+    "Seasonal Special 10",
+    "Seasonal Special 11",
+    "Seasonal Special 12",
+    "Seasonal Special 13",
+    "Seasonal Special 14",
+    "Seasonal Special 15",
+    "Seasonal Special 16",
+    "Seasonal Special 17",
+    "Seasonal Special 18",
+    "Order Summary"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "disabled": false,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "text": "Need Help?",
+      "aria": "Need Help?",
+      "disabled": false,
+      "width": 137,
+      "height": 44
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "disabled": false,
+      "width": 52,
+      "height": 44
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "disabled": false,
+      "width": 59,
+      "height": 44
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Cart\n2\n₹280",
+      "aria": null,
+      "disabled": false,
+      "width": 177,
+      "height": 40
+    },
+    {
+      "text": "All Menu",
+      "aria": "All Menu",
+      "disabled": false,
+      "width": 80,
+      "height": 125
+    },
+    {
+      "text": "Combos & Deals",
+      "aria": "Combos & Deals",
+      "disabled": false,
+      "width": 80,
+      "height": 125
+    },
+    {
+      "text": "Chef specials",
+      "aria": "Chef specials",
+      "disabled": false,
+      "width": 80,
+      "height": 125
+    },
+    {
+      "text": "All Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 89,
+      "height": 40
+    },
+    {
+      "text": "Pure Veg",
+      "aria": null,
+      "disabled": false,
+      "width": 108,
+      "height": 42
+    },
+    {
+      "text": "🌱 Pure Jain",
+      "aria": null,
+      "disabled": false,
+      "width": 129,
+      "height": 42
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Paneer Bowl",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Paneer Bowl",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Paneer Bowl to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Build Your Thali",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Build Your Thali",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "Customize",
+      "aria": null,
+      "disabled": false,
+      "width": 192,
+      "height": 52
+    },
+    {
+      "text": "",
+      "aria": "Add Build Your Thali to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Twin Snack Plate",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Twin Snack Plate",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Twin Snack Plate to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Jain",
+      "aria": "View details for Jain Dal",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Jain Dal",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Jain Dal to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 05",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 05",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 05 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 06",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 06",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 06 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 07",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 07",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 07 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 08",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 08",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 08 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 09",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 09",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 09 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 10",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 10",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 10 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 11",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 11",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 11 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 12",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 12",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 12 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 13",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 13",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 13 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 14",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 14",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 14 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 15",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 15",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 15 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 16",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 16",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 16 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 17",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 17",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 17 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "Pure Veg",
+      "aria": "View details for Seasonal Special 18",
+      "disabled": false,
+      "width": 293,
+      "height": 183
+    },
+    {
+      "text": "Seasonal Special 18",
+      "aria": null,
+      "disabled": false,
+      "width": 265,
+      "height": 22
+    },
+    {
+      "text": "",
+      "aria": "Add Seasonal Special 18 to cart",
+      "disabled": false,
+      "width": 52,
+      "height": 52
+    },
+    {
+      "text": "",
+      "aria": "Close cart drawer",
+      "disabled": false,
+      "width": 1080,
+      "height": 1789
+    },
+    {
+      "text": "",
+      "aria": "Close order summary",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Clear All",
+      "aria": null,
+      "disabled": false,
+      "width": 94,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Remove item",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Decrease quantity of Build Your Thali",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Increase quantity of Build Your Thali",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Remove item",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Decrease quantity of Twin Snack Plate",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Increase quantity of Twin Snack Plate",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Apply",
+      "aria": null,
+      "disabled": true,
+      "width": 67,
+      "height": 44
+    },
+    {
+      "text": "Proceed to Payment",
+      "aria": null,
+      "disabled": false,
+      "width": 339,
+      "height": 68
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": "Search dish (e.g. Paneer, Biryani, Cold Coffee...)",
+      "label": "Search dishes",
+      "type": "text"
+    },
+    {
+      "placeholder": "Enter coupon code",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

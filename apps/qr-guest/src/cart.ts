@@ -34,14 +34,22 @@ export function lineKey(itemId: string, optionIds: string[], note?: string): str
 /** Any change to the cart makes the next submission a new attempt (a different order from a failed earlier one). */
 const touched = (lines: CartLine[]): Cart => ({ lines, attemptKey: null });
 
-export function addLine(cart: Cart, line: Omit<CartLine, 'key'>): Cart {
+/**
+ * `maxQuantity` is the dish's own configured ceiling (default: the generic MAX_LINE_QUANTITY).
+ * Repeated adds of the same dish/options/note merge into one line, and the merged total is
+ * clamped to that ceiling just like a single add would be — a guest who adds 3, then adds 3 more
+ * of a dish whose maximum is 3 ends up with a line at 3, not 6. The caller can tell a clamp
+ * happened by comparing the returned line's quantity to what it asked for.
+ */
+export function addLine(cart: Cart, line: Omit<CartLine, 'key'>, maxQuantity: number = MAX_LINE_QUANTITY): Cart {
+  const cap = Math.min(MAX_LINE_QUANTITY, Math.max(1, Math.floor(maxQuantity)));
   const key = lineKey(line.itemId, line.optionIds, line.note);
   const existing = cart.lines.find((l) => l.key === key);
   if (existing) {
-    return touched(cart.lines.map((l) => (l.key === key ? { ...l, quantity: Math.min(MAX_LINE_QUANTITY, l.quantity + line.quantity) } : l)));
+    return touched(cart.lines.map((l) => (l.key === key ? { ...l, quantity: Math.min(cap, l.quantity + line.quantity) } : l)));
   }
   if (cart.lines.length >= MAX_LINES) return cart;
-  return touched([...cart.lines, { ...line, key, quantity: Math.min(MAX_LINE_QUANTITY, Math.max(1, line.quantity)) }]);
+  return touched([...cart.lines, { ...line, key, quantity: Math.min(cap, Math.max(1, line.quantity)) }]);
 }
 
 export function setQuantity(cart: Cart, key: string, quantity: number): Cart {

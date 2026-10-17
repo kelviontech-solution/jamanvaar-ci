@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../../..'),dir=path.join(root,'.jamanvaar/full-app-audit-2026-10-13');
 const apps={admin:'apps/restaurant-system/pos-admin',pos:'apps/restaurant-system/pos',kiosk:'apps/kiosk-system/kiosk-user',captain:'apps/restaurant-system/captain',kds:'apps/restaurant-system/kds',super:'cloud/super-admin-web',qr:'apps/qr-guest'};
-process.env.VITE_CLOUD_API_BASE_URL='http://localhost:4011';process.env.VITE_API_BASE_URL='http://localhost:4011';
+process.env.VITE_CLOUD_API_BASE_URL=process.env.JAMANVAAR_QA_API_BASE||'http://localhost:4011';process.env.VITE_API_BASE_URL=process.env.JAMANVAAR_QA_API_BASE||'http://localhost:4011';
 async function main(){const {build}=await import('vite');for(const [name,rel] of Object.entries(apps)){if(process.argv.length>2&&!process.argv.slice(2).includes(name))continue;process.chdir(path.join(root,rel));console.log('BUILD',name);await build({configFile:path.join(root,rel,'vite.config.ts'),root:path.join(root,rel),logLevel:'warn',plugins:process.env.JAMANVAAR_QA_SKIP_PUBLIC === '1' ? [{name:'qa-service-worker-copy',writeBundle(){const worker=path.join(root,rel,'public/sw.js');if(fs.existsSync(worker))fs.copyFileSync(worker,path.join(dir,'build',name,'sw.js'));}}] : [],build:{outDir:path.join(dir,'build',name),emptyOutDir:true,copyPublicDir:process.env.JAMANVAAR_QA_SKIP_PUBLIC !== '1'}});console.log('BUILT',name);}}
 main().catch(e=>{console.error(e.message);process.exitCode=1;});

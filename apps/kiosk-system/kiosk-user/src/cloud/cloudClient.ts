@@ -130,7 +130,7 @@ export async function resolveRestaurantByCode(code: string): Promise<ResolvedRes
   return data;
 }
 
-export async function activateKioskDevice(code: string): Promise<ActivationResult> {
+export async function activateKioskDevice(code: string, expectedRestaurantId?:string, expectedBranchId?:string): Promise<ActivationResult> {
   // Generated (or loaded, if this profile already has one) before the request, so the server can bind the device
   // to it from the very first activation — see deviceKeys.ts for why only the public half is ever sent.
   const publicKeyJwk = await getDevicePublicKeyJwk('KIOSK').catch(() => null);
@@ -143,6 +143,8 @@ export async function activateKioskDevice(code: string): Promise<ActivationResul
     body: JSON.stringify({
       code: code.trim(),
       deviceType: 'KIOSK',
+      ...(expectedRestaurantId ? {expectedRestaurantId} : {}),
+      ...(expectedBranchId ? {expectedBranchId} : {}),
       appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.0.0',
       ...(publicKeyJwk ? { publicKeyJwk } : {})
     })

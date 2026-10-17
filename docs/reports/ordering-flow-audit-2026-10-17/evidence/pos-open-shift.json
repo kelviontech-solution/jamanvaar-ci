@@ -1,0 +1,263 @@
+{
+  "url": "/",
+  "text": "POS TERMINAL\nGarden House Flow QA\n\nGarden House Flow QA\n•\n778791f8-025e-4e62-a387-dca68ac1534a\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\n₹0\nJAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nBilling / Menu\nFloor & Tables\n1\nLive Orders\n2\nBills & Invoices\nCustomers CRM\nShift & Cash\nMore tools\nJAMAN AI Assistant\nAI\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nShift & Cash Management\n\nManage cashier shifts, cash drawer movements, float reconciliation and settlements.\n\nShift opened with opening float of ₹0\n+ Cash Movement\nClose Shift\nActive Shift # 1\n● SHIFT OPEN\nCashier: Audit Cashier\n•\nTerminal: 778791f8-025e-4e62-a387-dca68ac1534a\n•\nOpened: 11:52 am\nEXPECTED DRAWER CASH\n₹0\nTOTAL SHIFT SALES\n₹0\n● 0 Completed Orders\nCASH SALES ADDED\n₹0\nCounter cash receipts\nUPI / DIGITAL QR\n₹0\nDirect bank settlement\nOPENING CASH FLOAT\n₹0\nStarting drawer balance\nCASH DRAWER MATHEMATICAL RECONCILIATION\nREAL-TIME MATH\nOpening Float:\n₹0\n+ Cash Sales:\n+ ₹0\n+ Cash In (Paid In):\n+ ₹0\n- Cash Out (Paid Out):\n- ₹0\n= Current Expected Cash in Drawer:\n₹0\nSHIFT PAYMENT CHANNEL BREAKDOWN\nTENDER SETTLEMENT\nCash Collections:\n₹0\nUPI / Bharat QR:\n₹0\nCard POS Terminal:\n₹0\nDiscounts Granted:\n- ₹0\nTotal Billed (incl. GST):\n₹0\nCASH MOVEMENTS IN THIS SHIFT ( 0)\n+ Record Movement\nNo cash in/out float adjustments recorded during this shift.\nHistorical Shift Archives\n\nPermanent cashier shift records, actual counts, and variance audits.\n\nAll Shifts\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nNo Data Found\n\nNo historical shifts found for the selected filter.\n\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "headings": [
+    "Shift & Cash Management",
+    "Active Shift # 1",
+    "CASH DRAWER MATHEMATICAL RECONCILIATION",
+    "SHIFT PAYMENT CHANNEL BREAKDOWN",
+    "CASH MOVEMENTS IN THIS SHIFT ( 0)",
+    "Historical Shift Archives",
+    "No Data Found"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 28
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "disabled": false,
+      "width": 138,
+      "height": 40
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 26
+    },
+    {
+      "text": "DAY OPEN\n•\n₹0",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 26
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "disabled": false,
+      "width": 95,
+      "height": 30
+    },
+    {
+      "text": "A\nAudit Cashier\nCASHIER",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 45
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Billing / Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Floor & Tables\n1",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Live Orders\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Bills & Invoices",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Customers CRM",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "Shift & Cash",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "More tools",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AI Assistant\nAI",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 38
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 34
+    },
+    {
+      "text": "+ Cash Movement",
+      "aria": null,
+      "disabled": false,
+      "width": 158,
+      "height": 34
+    },
+    {
+      "text": "Close Shift",
+      "aria": null,
+      "disabled": false,
+      "width": 118,
+      "height": 32
+    },
+    {
+      "text": "+ Record Movement",
+      "aria": null,
+      "disabled": false,
+      "width": 118,
+      "height": 16
+    },
+    {
+      "text": "All Shifts",
+      "aria": null,
+      "disabled": false,
+      "width": 75,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "disabled": false,
+      "width": 62,
+      "height": 26
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "disabled": false,
+      "width": 85,
+      "height": 26
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "disabled": false,
+      "width": 91,
+      "height": 26
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "disabled": false,
+      "width": 100,
+      "height": 26
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "disabled": false,
+      "width": 129,
+      "height": 16
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 16
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 16
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 116,
+      "height": 16
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Staff interface language",
+      "type": "select-one"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

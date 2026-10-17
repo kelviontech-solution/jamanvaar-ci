@@ -1,0 +1,298 @@
+{
+  "url": "/qr/admin/?tab=RULES",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LAUNCH SETUP\nOrdering Rules\n\nSet opening hours, preparation time and the ordering modes you offer.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nReview the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.\n\nBranch\nCurrent admin scope\nGarden House Flow QA — Main Branch\n\nRestaurant defaults apply until a branch overrides a setting. Other branches keep their own configuration.\n\nUse restaurant defaults\nAccept QR orders\nSend accepted orders straight to the kitchen\nAllow menu / counter codes\nHours, capacity & guest instructions\n\nHours use the restaurant timezone. Empty hours mean always open. Equal opening and closing times mean 24 hours. Overnight intervals are supported. Zero capacity limits mean unlimited.\n\nMinimum order (INR)\nPreparation estimate (minutes)\nMaximum pending QR orders\nOrders per window\nWindow duration (minutes)\nPause until (your device timezone)\nCustomer instructions\nOrdering modes\nDINE IN\nTAKEAWAY\nOrdering hours\n+ Add hours\nSave ordering rules\nDisplay",
+  "headings": [
+    "Ordering Rules",
+    "Hours, capacity & guest instructions"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Use restaurant defaults",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 153,
+      "height": 44
+    },
+    {
+      "text": "+ Add hours",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 44
+    },
+    {
+      "text": "Save ordering rules",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 183,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Accept QR orders",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Send accepted orders straight to the kitchen",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Allow menu / counter codes",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Minimum order (INR)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Preparation estimate (minutes)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Maximum pending QR orders",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Orders per window",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Window duration (minutes)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "datetime-local",
+      "label": "Pause until (your device timezone)",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Customer instructions",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "DINE IN",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "TAKEAWAY",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

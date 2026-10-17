@@ -1,4 +1,6 @@
 import { useConfirm } from '@jamanvaar/ui';
+import { useKioskDraft } from '../kiosk/useKioskDraft';
+import { requestConfigurationReceipts } from '../kiosk/configurationDelivery';
 import { useState } from 'react';
 import { db, KioskDisplaySettingsRepository } from '@jamanvaar/database';
 import { syncKioskConfiguration } from '@jamanvaar/sync';
@@ -43,6 +45,7 @@ function BoundedNumberField({
 
 export function KioskContentPanel({ showToast }: { showToast: (message: string) => void }) {
   const {confirm, confirmDialog} = useConfirm();
+  const [baseline,setBaseline] = useState(() => JSON.stringify(db.kioskDisplaySettings));
   const [display, setDisplay] = useState(() => structuredClone(db.kioskDisplaySettings));
   const [language, setLanguage] = useState<SupportedLanguage>('en');
   const [query, setQuery] = useState('');
@@ -58,6 +61,7 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
   const entries = Object.entries(catalog).filter(([key]) => screen === 'All screens' || screenFor(key) === screen).filter(([key, value]) => `${key} ${value}`.toLowerCase().includes(query.toLowerCase()));
   const overriddenCount = Object.keys(display.texts?.[language] ?? {}).filter((k) => (display.texts?.[language]?.[k] ?? '').trim() !== '').length;
 
+  const draftGuard=useKioskDraft({scope:'appearance',value:display,dirty:JSON.stringify(display)!==baseline,restore:setDisplay,discard:()=>setDisplay(JSON.parse(baseline))});
   const save = async () => {
     if (!await confirm({title: 'Publish customer kiosk settings?', message: `Apply appearance, timing and wording to the kiosks in ${db.outlet.name || 'this branch'}? Per-device welcome overrides remain available in Welcome Screen. Review the previews before publishing.`, confirmLabel: 'Publish to this branch'})) return;
     setBusy(true); setMessage('');
@@ -73,7 +77,8 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
       }
       KioskDisplaySettingsRepository.updateSettings(display);
       await syncKioskConfiguration({ push: true });
-      setMessage('Kiosk settings published. Connected kiosks receive them automatically.');
+      setBaseline(JSON.stringify(display)); draftGuard.clear();
+      setMessage(await requestConfigurationReceipts());
       showToast('Kiosk settings published.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Could not publish kiosk settings.');
@@ -84,7 +89,7 @@ export function KioskContentPanel({ showToast }: { showToast: (message: string) 
 
   return (
     <>
-    {confirmDialog}
+    {confirmDialog}{draftGuard.ui}
     <div className="space-y-6" data-testid="kiosk-content-panel">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-jaman-navy">Kiosk Appearance & Content</h1>

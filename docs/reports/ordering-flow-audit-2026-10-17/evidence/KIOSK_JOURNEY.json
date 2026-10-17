@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-17T06:17:07.622Z",
+  "rows": [
+    {
+      "name": "Kiosk search opens the touch keyboard",
+      "result": {
+        "inAppKeyboardOpened": true
+      }
+    },
+    {
+      "name": "Quick add bypasses required bread selection",
+      "result": {
+        "choiceDialogVisible": false,
+        "cartButton": "Cart\n1\n₹200"
+      }
+    },
+    {
+      "name": "Kiosk cart quantity and required choices",
+      "result": {
+        "requiredDish": [
+          {
+            "quantity": 1,
+            "selectedModifiers": []
+          }
+        ],
+        "minimumTwoDish": [
+          {
+            "quantity": 1,
+            "min": 2,
+            "max": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "Coupon entry has no matching in-app keyboard",
+      "result": {
+        "editable": true,
+        "keyboardHeadings": 0
+      }
+    },
+    {
+      "name": "Kiosk cash order accepts cart with missing required modifier",
+      "result": {
+        "confirmationVisible": true,
+        "orderSynced": true,
+        "items": [
+          {
+            "name": "Build Your Thali",
+            "quantity": 1,
+            "modifiers": []
+          },
+          {
+            "name": "Twin Snack Plate",
+            "quantity": 1,
+            "modifiers": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "Receipt email entry opens the touch keyboard",
+      "result": {
+        "keyButtons": 41,
+        "emailFieldVisible": true
+      }
+    }
+  ]
+}

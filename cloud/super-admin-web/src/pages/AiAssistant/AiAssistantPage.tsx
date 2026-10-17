@@ -16,6 +16,7 @@ import {
   SearchBar,
   SkeletonTable
 } from '../../components/ui';
+import { useAuth } from '../../auth/AuthContext';
 import {
   Sparkles,
   Bot,
@@ -44,6 +45,8 @@ import type { Plan } from '../../api/types';
 import { useAdminConfirm } from '../../components/ui';
 
 export function AiAssistantPage() {
+  const { can } = useAuth();
+  const canWrite = can('catalog', 'write');
   const { confirm, confirmDialog } = useAdminConfirm();
   const [categories, setCategories] = useState<AiCategory[]>([]);
   const [questions, setQuestions] = useState<AiQuestionItem[]>([]);
@@ -335,7 +338,7 @@ export function AiAssistantPage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Button variant="accent" onClick={() => setAddModalOpen(true)}>
+          <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to add questions"} onClick={() => setAddModalOpen(true)}>
             <Plus className="w-4 h-4" />
             <span>Add Custom Query</span>
           </Button>
@@ -583,7 +586,7 @@ export function AiAssistantPage() {
             </label>
 
             <div style={{ marginLeft: 'auto' }}>
-              <Button type="submit" variant="accent" disabled={savingSettings}>
+              <Button type="submit" variant="accent" disabled={savingSettings || !canWrite} title={canWrite ? undefined : "You don't have permission to save these settings"}>
                 {savingSettings ? 'Saving Settings…' : 'Save Global Thresholds'}
               </Button>
             </div>
@@ -691,11 +694,11 @@ export function AiAssistantPage() {
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-                        <Button size="sm" variant="ghost" onClick={() => openEditModal(q)} title="Edit Question">
+                        <Button size="sm" variant="ghost" disabled={!canWrite} onClick={() => openEditModal(q)} title={canWrite ? 'Edit Question' : "You don't have permission to edit questions"}>
                           <Edit2 className="w-3.5 h-3.5" />
                         </Button>
                         {q.isCustom && (
-                          <Button size="sm" variant="ghost" onClick={() => handleDeleteQuestion(q.id)} title="Delete Custom Query" style={{ color: 'var(--jv-error-text)' }}>
+                          <Button size="sm" variant="ghost" disabled={!canWrite} onClick={() => handleDeleteQuestion(q.id)} title={canWrite ? 'Delete Custom Query' : "You don't have permission to delete questions"} style={{ color: 'var(--jv-error-text)' }}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         )}

@@ -21,6 +21,7 @@ import { CustomerReportPanel, InventoryReportPanel, LabourPanel, LossReportPanel
 import { DonutChart } from '../charts/DonutChart';
 import { SalesTrendLineChart } from '../charts/SalesTrendLineChart';
 import { ReportKpiRow } from './ReportKpiRow';
+import { KpiDrillDownModal, type DrillDownMetric } from './KpiDrillDownModal';
 import { Search, Calendar, Filter, Printer, Download, FileSpreadsheet, FileText, Star, RotateCcw, Sparkles, TrendingUp, TrendingDown, Layers, ShoppingBag, DollarSign, Utensils, Clock, Users, Package, CheckCircle2, AlertTriangle, ArrowUpRight, ArrowDownRight, Palette, X, SlidersHorizontal, Eye, BarChart3 } from 'lucide-react';
 
 interface ReportsDashboardProps {
@@ -143,7 +144,7 @@ const CategoryTabs: React.FC<{
           <button
             key={c.id}
             onClick={() => onSelect(c.id)}
-            className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`min-h-11 py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               isCatActive
                 ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                 : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
@@ -163,10 +164,37 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   // Navigation & Selection State
   const [onlineSummary, setOnlineSummary] = useState<PaymentsSummary | null>(null);
   const [onlineSummaryError, setOnlineSummaryError] = useState(false);
-  useEffect(() => {
+  const [onlineSummaryUpdatedAt, setOnlineSummaryUpdatedAt] = useState<Date | null>(null);
+  const loadOnlineSummary = React.useCallback(() => {
     getPaymentsSummary()
-      .then((s) => { setOnlineSummary(s); setOnlineSummaryError(false); })
+      .then((s) => { setOnlineSummary(s); setOnlineSummaryError(false); setOnlineSummaryUpdatedAt(new Date()); })
       .catch(() => setOnlineSummaryError(true));
+  }, []);
+  useEffect(() => {
+    loadOnlineSummary();
+    // R05: this used to fetch once on mount and never again — a report left open across a shift
+    // showed an increasingly stale "live reconciled" online-payments figure with nothing on
+    // screen to say so. Refreshed periodically, same as the local figures below.
+    const interval = setInterval(loadOnlineSummary, 60_000);
+    return () => clearInterval(interval);
+  }, [loadOnlineSummary]);
+
+  // R05: local report numbers were memoized purely by date/filter selection, with no dependency
+  // on the local-first database actually changing — a new order placed while this screen was
+  // open never appeared until some other state change happened to force a recompute. `dbRevision`
+  // ticks on every `db.notify()` (the same subscription pattern already used elsewhere in this
+  // app, see LoyaltyProgramModal) and is included below so the report data actually recomputes.
+  const [dbRevision, setDbRevision] = useState(0);
+  useEffect(() => db.subscribe(() => setDbRevision((n) => n + 1)), []);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState(() => new Date());
+  useEffect(() => { setLastRefreshedAt(new Date()); }, [dbRevision]);
+  // Also re-derive the date range periodically: a relative preset like "Today" otherwise stayed
+  // frozen on yesterday's boundaries if the page was simply left open across the business-day
+  // rollover, since nothing else in its own dependency list would have changed.
+  const [nowTick, setNowTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setNowTick((n) => n + 1), 60_000);
+    return () => clearInterval(interval);
   }, []);
   const [selectedCategory, setSelectedCategory] = useState<ReportCategoryKey | 'OVERVIEW'>('OVERVIEW');
   const [activeReportId, setActiveReportId] = useState<string>('DAILY_SALES');
@@ -190,6 +218,13 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
     station: 'ALL',
     tableNumber: 'ALL'
   });
+  // R01: the Filters button used to just toggle `isFilterDrawerOpen` with nothing anywhere
+  // checking it — orderType/paymentMethod/tableNumber were already real, wired filters
+  // (ReportDataEngine.getOrders consumes them), they just had no control to set them from.
+  const availableTableNumbers = useMemo(
+    () => Array.from(new Set(db.tables.map((t) => t.tableNumber))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+    []
+  );
 
   // Report Design Theme State (persisted in localStorage)
   const [currentTheme, setCurrentTheme] = useState<ReportDesignTheme>(() => {
@@ -203,6 +238,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   // Modals State
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  // #18: KPI cards were plain numbers with no way to see what produced them.
+  const [drillDownMetric, setDrillDownMetric] = useState<DrillDownMetric | null>(null);
 
   // Favorite Reports State
   const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
@@ -254,7 +291,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   // Resolved Date Ranges
   const dateRange: ReportDateRange = useMemo(() => {
     return ReportDataEngine.getDateRange(periodPreset, customStartDate, customEndDate);
-  }, [periodPreset, customStartDate, customEndDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodPreset, customStartDate, customEndDate, nowTick]);
 
   const compareDateRange = useMemo(() => {
     if (!isCompareEnabled) return null;
@@ -264,12 +302,14 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
   // Current & Compare Orders
   const currentOrders = useMemo(() => {
     return ReportDataEngine.getOrders(dateRange, filters);
-  }, [dateRange, filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange, filters, dbRevision]);
 
   const compareOrders = useMemo(() => {
     if (!compareDateRange) return undefined;
     return ReportDataEngine.getOrders(compareDateRange, filters);
-  }, [compareDateRange, filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compareDateRange, filters, dbRevision]);
 
   // Aggregated Data
   const summary = useMemo(() => {
@@ -337,6 +377,43 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
     return reports.find((r) => r.id === activeReportId) || reports[0];
   }, [activeReportId, reports]);
 
+  /**
+   * R03: this used to always call exportTransactionsCsv(currentOrders, ...) no matter which
+   * report tab was open — "Top Selling Dishes" downloaded Order #/Payment Status transaction
+   * columns, not dish-level numbers. Routes to the exact same dataset the active tab renders
+   * (see the activeReportId conditions in the body below); a report id with no dedicated table
+   * here still falls back to the raw transaction export rather than exporting nothing.
+   */
+  const handleExportCsv = () => {
+    if (activeReportId === 'DAILY_SALES' || activeReportId === 'SALES_SUMMARY' || activeReportId === 'DAY_BY_DAY') {
+      ReportExportService.exportDayByDayCsv(dayByDay);
+    } else if (activeReportId === 'HOURLY_SALES') {
+      ReportExportService.exportGenericCsv(
+        'Hourly Sales',
+        ['Hour', 'Orders', 'Sales (₹)', 'Avg Order Value (₹)'],
+        hourly.map((h) => [h.label, h.ordersCount, h.sales, h.avgOrderValue])
+      );
+    } else if (activeReportId === 'TOP_SELLING_DISHES' || activeReportId === 'SLOW_MOVING_DISHES' || activeReportId === 'CATEGORY_SALES' || activeReportId === 'DISH_REVENUE') {
+      ReportExportService.exportDishesCsv(dishes);
+    } else if (activeReportId === 'TAXES_GST') {
+      ReportExportService.exportGstCsv(gst);
+    } else if (activeReportId === 'EOD_SETTLEMENT') {
+      ReportExportService.exportGenericCsv(
+        'EOD Settlement',
+        ['Opening Cash', 'Cash Sales', 'Cash Refunds', 'Cash Expenses', 'Expected Cash', 'Actual Cash Counted', 'Difference', 'UPI Sales', 'Card Sales', 'Total Sales', 'Total Orders', 'Cancelled Orders', 'Discounts', 'Tax'],
+        [[eod.openingCash, eod.cashSales, eod.cashRefunds, eod.cashExpenses, eod.expectedCash, eod.actualCashCounted ?? 'Not counted', eod.cashDifference ?? 'N/A', eod.upiSales, eod.cardSales, eod.totalSales, eod.totalOrders, eod.cancelledOrders, eod.discountsTotal, eod.taxTotal]]
+      );
+    } else if (activeReportId === 'KITCHEN_PREP_TIME' || activeReportId === 'STATION_PERFORMANCE' || activeReportId === 'KOT_PERFORMANCE') {
+      ReportExportService.exportGenericCsv(
+        'Station Performance',
+        ['Station', 'KOT Tickets', 'Dishes Cooked', 'Avg Prep Minutes', 'Delayed KOTs'],
+        stations.map((s) => [s.stationName, s.kotCount, s.itemsCount, s.avgPrepMinutes ?? 'No data yet', s.delayedKotCount])
+      );
+    } else {
+      ReportExportService.exportTransactionsCsv(currentOrders, activeReport.title);
+    }
+  };
+
   // Filtered Reports in current category or search
   const displayedReports = useMemo(() => {
     if (searchQuery.trim()) {
@@ -366,13 +443,24 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
             <p className="text-xs text-slate-500 mt-1">
               Understand sales, operations, payments, customers and restaurant performance.
             </p>
+            {/* R05: "LIVE RECONCILED" used to mean nothing more than "computed once on open" — no
+                refresh, no timestamp. Local figures above now actually recompute on every local
+                database change and every minute (business-day rollover); this makes that honest
+                by saying exactly when, with a manual refresh for right now. */}
+            <p className="text-[11px] text-slate-400 mt-1">
+              Local figures updated {lastRefreshedAt.toLocaleTimeString()} · Online payments{' '}
+              {onlineSummaryError ? 'failed to load' : onlineSummaryUpdatedAt ? `updated ${onlineSummaryUpdatedAt.toLocaleTimeString()}` : 'loading…'}{' '}
+              <button type="button" className="underline font-bold" onClick={() => { setDbRevision((n) => n + 1); loadOnlineSummary(); }}>
+                Refresh now
+              </button>
+            </p>
           </div>
 
           {/* Top Functional Actions */}
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setIsDesignModalOpen(true)}
-              className="px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Palette className="w-3.5 h-3.5" />
               <span>Report Design</span>
@@ -380,7 +468,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
             <button
               onClick={() => setIsPreviewModalOpen(true)}
-              className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Eye className="w-3.5 h-3.5 text-slate-500" />
               <span>Preview Report</span>
@@ -388,7 +476,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
             <button
               onClick={() => setIsPreviewModalOpen(true)}
-              className="px-3.5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-jaman-navy hover:bg-jaman-darkBorder text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print Report</span>
@@ -396,7 +484,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
             <button
               onClick={() => setIsPreviewModalOpen(true)}
-              className="px-3.5 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-brand hover:bg-brand-hover active:bg-brand-press text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download PDF</span>
@@ -404,10 +492,10 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
 
             <button
               onClick={() => {
-                ReportExportService.exportTransactionsCsv(currentOrders, activeReport.title);
+                handleExportCsv();
                 showToast('Exported CSV with filtered data!');
               }}
-              className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
+              className="min-h-11 px-3.5 py-2 bg-white hover:bg-slate-50 border border-jaman-border text-jaman-navy rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
               <span>Export CSV</span>
@@ -432,7 +520,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
               <button
                 key={p.id}
                 onClick={() => setPeriodPreset(p.id as ReportPeriodPreset)}
-                className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`min-h-11 px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
                   periodPreset === p.id
                     ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'bg-jaman-cream text-slate-600 hover:bg-[#F2EFE9]'
@@ -502,6 +590,69 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
             </button>
           </div>
         </div>
+
+        {isFilterDrawerOpen && (
+          <div className="flex flex-wrap items-end gap-3 p-3 bg-jaman-cream border border-jaman-border rounded-xl">
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">
+              Order Type
+              <select
+                value={filters.orderType}
+                onChange={(e) => setFilters({ ...filters, orderType: e.target.value })}
+                className="bg-white border border-jaman-border rounded-lg px-2.5 py-1.5 text-xs font-bold text-jaman-navy"
+              >
+                <option value="ALL">All Order Types</option>
+                <option value="DINE_IN">Dine-In</option>
+                <option value="TAKEAWAY">Takeaway</option>
+                <option value="DELIVERY">Delivery</option>
+                <option value="TOKEN">Token</option>
+                <option value="QR_TABLE">QR (Table)</option>
+                <option value="KIOSK">Kiosk</option>
+                <option value="PICKUP">Pickup</option>
+                <option value="ONLINE">Online</option>
+                <option value="COMPLIMENTARY">Complimentary</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">
+              Payment Method
+              <select
+                value={filters.paymentMethod}
+                onChange={(e) => setFilters({ ...filters, paymentMethod: e.target.value })}
+                className="bg-white border border-jaman-border rounded-lg px-2.5 py-1.5 text-xs font-bold text-jaman-navy"
+              >
+                <option value="ALL">All Payment Methods</option>
+                <option value="CASH">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="UPI_QR">UPI (QR)</option>
+                <option value="CARD">Card</option>
+                <option value="CARD_TERMINAL">Card (Terminal)</option>
+                <option value="CASH_AT_COUNTER">Cash at Counter</option>
+                <option value="SPLIT">Split</option>
+                <option value="CREDIT">Credit</option>
+                <option value="WALLET">Wallet</option>
+                <option value="NET_BANKING">Net Banking</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600">
+              Table
+              <select
+                value={filters.tableNumber}
+                onChange={(e) => setFilters({ ...filters, tableNumber: e.target.value })}
+                className="bg-white border border-jaman-border rounded-lg px-2.5 py-1.5 text-xs font-bold text-jaman-navy"
+              >
+                <option value="ALL">All Tables</option>
+                {availableTableNumbers.map((t) => (
+                  <option key={t} value={t}>Table {t}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              onClick={() => setIsFilterDrawerOpen(false)}
+              className="px-3 py-1.5 rounded-xl font-bold text-xs bg-jaman-navy text-white"
+            >
+              Done
+            </button>
+          </div>
+        )}
 
         {/* Active Filters Display */}
         {activeFilterCount > 0 && (
@@ -574,7 +725,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
         {/* High-Level Metric Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Gross Sales */}
-          <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('GROSS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
             <span className="text-[11px] font-bold text-slate-500 uppercase block">Gross Sales</span>
             <div className="text-lg font-mono font-bold text-jaman-navy">
               {formatINR(summary.grossSales.current)}
@@ -587,28 +738,28 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                 <span>{summary.grossSales.diffPercent > 0 ? '+' : ''}{summary.grossSales.diffPercent}%</span>
               </span>
             )}
-          </div>
+          </button>
 
           {/* Discounts */}
-          <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('DISCOUNTS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
             <span className="text-[11px] font-bold text-slate-500 uppercase block">Discounts</span>
             <div className="text-lg font-mono font-bold text-rose-600">
               -{formatINR(summary.discountAmount.current)}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">Promotions</span>
-          </div>
+          </button>
 
           {/* GST */}
-          <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('TAX')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
             <span className="text-[11px] font-bold text-slate-500 uppercase block">{gstLabels().total}</span>
             <div className="text-lg font-mono font-bold text-brand">
               {formatINR(summary.totalTax.current)}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">CGST + SGST</span>
-          </div>
+          </button>
 
           {/* Net Sales */}
-          <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('NET')} className="text-left cursor-pointer hover:ring-2 hover:ring-emerald-400/40 transition-all p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1">
             <span className="text-[11px] font-bold text-emerald-900 uppercase block">Net Collected</span>
             <div className="text-xl font-mono font-bold text-emerald-950">
               {formatINR(summary.netSales.current)}
@@ -621,10 +772,10 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                 <span>{summary.netSales.diffPercent > 0 ? '+' : ''}{summary.netSales.diffPercent}%</span>
               </span>
             )}
-          </div>
+          </button>
 
           {/* Orders Count */}
-          <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('ORDERS')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
             <span className="text-[11px] font-bold text-slate-500 uppercase block">Total Orders</span>
             <div className="text-lg font-mono font-bold text-jaman-navy">
               {summary.ordersCount.current}
@@ -637,16 +788,16 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
                 <span>{summary.ordersCount.diffPercent > 0 ? '+' : ''}{summary.ordersCount.diffPercent}%</span>
               </span>
             )}
-          </div>
+          </button>
 
           {/* AOV */}
-          <div className="p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
+          <button type="button" onClick={() => setDrillDownMetric('AOV')} className="text-left cursor-pointer hover:ring-2 hover:ring-brand/30 transition-all p-3.5 rounded-2xl bg-jaman-ivory border border-jaman-border space-y-1">
             <span className="text-[11px] font-bold text-slate-500 uppercase block">Average Ticket</span>
             <div className="text-lg font-mono font-bold text-slate-800">
               ₹{summary.avgOrderValue.current}
             </div>
             <span className="text-[11px] text-slate-500 font-semibold block">Avg per bill</span>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -796,7 +947,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPreviewModalOpen(true)}
-                className="px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                className="min-h-11 px-3.5 py-2 bg-brand/[0.07] hover:bg-[#FFE8DA] border border-brand/30 text-brand rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Full Document Preview</span>
@@ -1056,6 +1207,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         reportTitle={activeReport.title}
+        activeReportId={activeReportId}
         dateRange={dateRange}
         theme={currentTheme}
         onOpenDesignSelector={() => setIsDesignModalOpen(true)}
@@ -1065,7 +1217,17 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({ showToast, k
         gst={gst}
         days={dayByDay}
         orders={currentOrders}
+        onExportCsv={handleExportCsv}
       />
+
+      {/* 3. KPI drill-down: what orders produced the clicked figure */}
+      {drillDownMetric && (
+        <KpiDrillDownModal
+          metric={drillDownMetric}
+          orders={currentOrders}
+          onClose={() => setDrillDownMetric(null)}
+        />
+      )}
     </div>
   );
 };

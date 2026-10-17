@@ -16,6 +16,8 @@ export * from './menu_templates';
 export * from './menu_identity';
 export * from './menu_transaction';
 export * from './menu_cleanup';
+export * from './customer_cleanup';
+export * from './channel_consistency';
 export * from './image_library';
 
 export * from './tender';

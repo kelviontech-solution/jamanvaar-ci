@@ -147,6 +147,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ language, valu
               type="button"
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white border border-[#EBE6DD] flex items-center justify-center text-[#4A5568]"
+              aria-label="Close keyboard"
             >
               <X className="w-4 h-4" />
             </button>

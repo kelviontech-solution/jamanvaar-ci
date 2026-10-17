@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { MenuItem, InventoryItem, Recipe, RecipeIngredient } from '@jamanvaar/types';
-import { Modal, Button } from '@jamanvaar/ui';
-import { RecipeRepository } from '@jamanvaar/database';
-import { Plus, Trash2 } from 'lucide-react';
+import { Modal, Button, useConfirm } from '@jamanvaar/ui';
+import { RecipeRepository, convertQuantity } from '@jamanvaar/database';
+import { Plus, Trash2, AlertTriangle } from 'lucide-react';
+
+/**
+ * #5: ing.unit always mirrors the chosen inventory item's own unit here (handleIngredientChange
+ * forces it, and there is no separate unit field to type a mismatched one into) -- a recipe and
+ * its inventory item can never disagree on unit through this screen. The real, reachable mistake
+ * is magnitude: a quantityPerPortion fat-fingered at the wrong scale for that unit (typing "500"
+ * meaning grams while the item is tracked in kg, i.e. 500 kg of one ingredient in a single
+ * portion). Normalizes through the same convertQuantity table stock deduction already trusts,
+ * so this never invents its own notion of "how much is a kg".
+ */
+function quantitySanityIssue(ing: RecipeIngredient): string | null {
+  const grams = convertQuantity(ing.quantityPerPortion, ing.unit, 'g');
+  if (grams !== null) {
+    if (grams > 10000) return `${ing.quantityPerPortion} ${ing.unit} per portion is ${(grams / 1000).toFixed(1)} kg -- unusually large for a single dish. Did you mean a smaller unit (e.g. grams instead of kg)?`;
+    if (grams > 0 && grams < 0.5) return `${ing.quantityPerPortion} ${ing.unit} per portion is under half a gram -- unusually small. Did you mean a larger unit (e.g. kg instead of grams)?`;
+    return null;
+  }
+  const ml = convertQuantity(ing.quantityPerPortion, ing.unit, 'ml');
+  if (ml !== null) {
+    if (ml > 10000) return `${ing.quantityPerPortion} ${ing.unit} per portion is ${(ml / 1000).toFixed(1)} litres -- unusually large for a single dish. Did you mean a smaller unit (e.g. ml instead of litres)?`;
+    if (ml > 0 && ml < 0.5) return `${ing.quantityPerPortion} ${ing.unit} per portion is under half a ml -- unusually small. Did you mean a larger unit (e.g. litres instead of ml)?`;
+    return null;
+  }
+  const pcs = convertQuantity(ing.quantityPerPortion, ing.unit, 'pcs');
+  if (pcs !== null && pcs > 200) return `${ing.quantityPerPortion} ${ing.unit} per portion is unusually high for a count unit.`;
+  return null;
+}
 
 interface RecipeModalProps {
   isOpen: boolean;
@@ -24,6 +51,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
   const [menuItemId, setMenuItemId] = useState('');
   const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
   const [formError, setFormError] = useState('');
+  const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => {
     if (recipeToEdit) {
@@ -85,7 +113,13 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
     return sum + unitCost * ing.quantityPerPortion;
   }, 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const quantityIssues = ingredients.map(quantitySanityIssue);
+  // #5: the magnitude check above is unit-agnostic (it would not catch a genuinely overpriced
+  // inventory item costed correctly), so cost-vs-selling-price is a second, independent signal
+  // that also catches a wrong costPerUnit on the inventory item itself, not just a wrong quantity.
+  const costExceedsPrice = !!selectedDish && selectedDish.price > 0 && calculatedCost > selectedDish.price * 3;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!menuItemId || ingredients.length === 0) {
@@ -96,6 +130,20 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
     if (!dish) {
       setFormError('Selected dish could not be found — pick it again from the list.');
       return;
+    }
+
+    const realIssues = quantityIssues.filter((i): i is string => !!i);
+    if (realIssues.length || costExceedsPrice) {
+      const lines = [
+        ...realIssues,
+        ...(costExceedsPrice ? [`Estimated ingredient cost (₹${calculatedCost.toFixed(2)}) is more than 3x this dish's selling price (₹${dish.price}) -- check quantities and ingredient costs.`] : [])
+      ];
+      if (!(await confirm({
+        title: 'Check these quantities before saving',
+        message: lines.join(' '),
+        confirmLabel: 'Save anyway',
+        tone: 'danger'
+      }))) return;
     }
 
     RecipeRepository.createRecipe({
@@ -111,6 +159,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -155,38 +204,45 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
           ) : (
             <div className="space-y-2 max-h-52 overflow-y-auto">
               {ingredients.map((ing, idx) => (
-                <div key={idx} className="p-2.5 bg-jaman-ivory border border-jaman-border rounded-xl flex items-center gap-2">
-                  <div className="flex-1">
-                    <select
-                      value={ing.inventoryItemId}
-                      onChange={(e) => handleIngredientChange(idx, 'inventoryItemId', e.target.value)}
-                      className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold"
+                <div key={idx}>
+                  <div className="p-2.5 bg-jaman-ivory border border-jaman-border rounded-xl flex items-center gap-2">
+                    <div className="flex-1">
+                      <select
+                        value={ing.inventoryItemId}
+                        onChange={(e) => handleIngredientChange(idx, 'inventoryItemId', e.target.value)}
+                        className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold"
+                      >
+                        {inventoryItems.map((inv) => (
+                          <option key={inv.id} value={inv.id}>
+                            {inv.name} (₹{inv.costPerUnit}/{inv.unit})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="w-28 flex items-center gap-1">
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
+                        value={ing.quantityPerPortion}
+                        onChange={(e) => handleIngredientChange(idx, 'quantityPerPortion', e.target.value)}
+                        className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold font-mono text-right"
+                      />
+                      <span className="text-xs font-semibold text-slate-500">{ing.unit}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveIngredient(idx)}
+                      className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg"
                     >
-                      {inventoryItems.map((inv) => (
-                        <option key={inv.id} value={inv.id}>
-                          {inv.name} (₹{inv.costPerUnit}/{inv.unit})
-                        </option>
-                      ))}
-                    </select>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="w-28 flex items-center gap-1">
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      value={ing.quantityPerPortion}
-                      onChange={(e) => handleIngredientChange(idx, 'quantityPerPortion', e.target.value)}
-                      className="w-full bg-white border border-jaman-border rounded-lg px-2 py-1.5 text-xs font-bold font-mono text-right"
-                    />
-                    <span className="text-xs font-semibold text-slate-500">{ing.unit}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveIngredient(idx)}
-                    className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {quantityIssues[idx] && (
+                    <p className="mt-1 ml-1 text-[11px] font-bold text-amber-700 flex items-start gap-1">
+                      <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" /> {quantityIssues[idx]}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -195,16 +251,21 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
 
         {/* Cost vs Price Summary Ribbon */}
         {selectedDish && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs">
+          <div className={`p-3 rounded-2xl flex items-center justify-between text-xs border ${costExceedsPrice ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-200'}`}>
             <div>
-              <span className="text-emerald-800 font-bold">Estimated Cost of Ingredients:</span>
-              <span className="tabular-nums font-bold text-emerald-950 ml-2">₹{calculatedCost.toFixed(2)}</span>
+              <span className={`font-bold ${costExceedsPrice ? 'text-amber-800' : 'text-emerald-800'}`}>Estimated Cost of Ingredients:</span>
+              <span className={`tabular-nums font-bold ml-2 ${costExceedsPrice ? 'text-amber-900' : 'text-emerald-950'}`}>₹{calculatedCost.toFixed(2)}</span>
             </div>
             <div>
-              <span className="text-emerald-800 font-bold">Dish Selling Price:</span>
+              <span className={`font-bold ${costExceedsPrice ? 'text-amber-800' : 'text-emerald-800'}`}>Dish Selling Price:</span>
               <span className="tabular-nums font-bold text-jaman-navy ml-2">₹{selectedDish.price}</span>
             </div>
           </div>
+        )}
+        {costExceedsPrice && (
+          <p className="text-[11px] font-bold text-amber-700 flex items-start gap-1">
+            <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" /> Ingredient cost is more than 3x the selling price — check quantities and ingredient costs before saving.
+          </p>
         )}
 
         {formError && (
@@ -227,5 +288,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({
         </div>
       </form>
     </Modal>
+    {confirmDialog}
+    </>
   );
 };

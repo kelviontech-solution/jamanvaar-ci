@@ -50,6 +50,9 @@ export interface Restaurant {
   stockAdjustmentApprovalLimit?: number;
   /** Restaurant-local hour when a new operational business date begins. */
   businessDayCutoffHour?: number;
+  /** #15: routine daily summary email, off by default; digestHour is the restaurant-local hour (0-23) it goes out at. Urgent problems are never batched into this -- they stay on the live Alerts feed. */
+  digestEnabled?: boolean;
+  digestHour?: number;
   operatingProfile?: { timezone: string; cutoffHour: number; effectiveFrom?: string; previous?: { timezone: string; cutoffHour: number }; inherit?: boolean };
   profileRevision?: string;
   legalName?: string;

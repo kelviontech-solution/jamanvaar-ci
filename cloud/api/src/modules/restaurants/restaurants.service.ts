@@ -41,7 +41,8 @@ export class RestaurantsService {
     const result = await this.prisma.runAsPlatform(async (tx) => {
       let generatedCode: string | undefined;
       if (!dto.mobile) {
-        do { generatedCode = `JM${randomInt(1_000_000_000,10_000_000_000)}`; }
+        // Must match the Restaurant ID accepted by every terminal and lookup API.
+        do { generatedCode = `JM${randomInt(6_000_000_000,10_000_000_000)}`; }
         while (await tx.restaurant.findUnique({where:{restaurantCode:generatedCode}}));
       }
       let restaurant;
@@ -74,8 +75,8 @@ export class RestaurantsService {
       const branch = await tx.branch.create({
         data: {
           restaurantId: restaurant.id,
-          name: `${dto.name} — Main Branch`,
-          code: 'MAIN',
+          name: dto.branchName || `${dto.name} — Main Branch`,
+          code: dto.branchCode || 'MAIN',
           address: dto.address,
           timezone: dto.timezone
         }

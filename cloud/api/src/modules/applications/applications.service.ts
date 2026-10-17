@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { AppCode, DeviceType, PlatformUser } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -296,6 +296,34 @@ export class ApplicationsService {
       const release = await tx.appRelease.update({ where: { id }, data: { status: 'PAUSED' } });
       await this.audit.log({ actorType: 'PLATFORM', actorId: actor.id, action: 'APP_RELEASE_PAUSED', category: 'APPLICATIONS', details: { appCode: release.appCode, version: release.version } }, tx);
       return release;
+    });
+  }
+
+  /**
+   * A verified BETA release becomes STABLE in place — same row, same artifact, signatures and
+   * hashes untouched, no re-upload. There was previously no supported way to do this at all:
+   * releases are unique by (appCode, version), so publishing the same version again under a
+   * different channel only hit that conflict, and the UI had no promotion action either.
+   */
+  async promoteRelease(id: string, actor: PlatformUser) {
+    return this.prisma.runAsPlatform(async (tx) => {
+      const release = await tx.appRelease.findUnique({ where: { id } });
+      if (!release) throw new NotFoundException('Release not found');
+      if (release.channel === 'STABLE') throw new ConflictException('This release is already on STABLE');
+      if (release.status !== 'PUBLISHED') throw new ConflictException(`Cannot promote a release that is ${release.status}`);
+
+      const promoted = await tx.appRelease.update({ where: { id }, data: { channel: 'STABLE' } });
+      await this.audit.log(
+        {
+          actorType: 'PLATFORM',
+          actorId: actor.id,
+          action: 'APP_RELEASE_PROMOTED',
+          category: 'APPLICATIONS',
+          details: { appCode: release.appCode, version: release.version, fromChannel: release.channel, toChannel: 'STABLE' }
+        },
+        tx
+      );
+      return promoted;
     });
   }
 }

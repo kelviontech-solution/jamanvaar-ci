@@ -7,7 +7,7 @@ import { getDependentsOf } from './feature-catalog';
 import { QR_CAPABILITIES, QrCapability } from './qr-capabilities';
 import { isRestaurantInRollout } from './rollout.util';
 
-import { applyBranchLicense, assertBranchProduct } from '../../common/security/branch-license';
+import { applyBranchLicense, assertBranchProduct, branchLicense } from '../../common/security/branch-license';
 
 type TxClient = Prisma.TransactionClient;
 
@@ -130,6 +130,34 @@ export class ApplicationEntitlementsService {
   }
 
   /**
+   * What changing to `newPlan` would turn off, before it happens. `ensureRowsForSubscription` is a
+   * hard reset to the new plan's defaults (see its own doc comment) — any app currently enabled,
+   * whether by the old plan's defaults or a manual override, that the new plan doesn't include by
+   * default is about to be silently disabled. Same shape as `update()`'s own device-impact check
+   * (DEVICE_BACKED_APP_CODES / deviceTypesForEntitlement), reused here for the same reason:
+   * disabling an app a device depends on should never be a surprise.
+   */
+  async previewPlanChangeImpact(
+    tx: TxClient,
+    restaurantId: string,
+    subscriptionId: string,
+    newPlan: { productFamily: ProductFamily; tier: PlanTier; entitlements: unknown }
+  ): Promise<{ losingApps: AppCode[]; deviceImpact: Array<{ appCode: AppCode; activeDevices: number }> }> {
+    const currentRows = await tx.applicationEntitlement.findMany({ where: { subscriptionId } });
+    const newApps = new Set(await this.appsForPlan(tx, newPlan.productFamily, newPlan.tier, newPlan.entitlements));
+    const losing = currentRows.filter((r) => r.enabled && !newApps.has(r.appCode));
+
+    const deviceImpact: Array<{ appCode: AppCode; activeDevices: number }> = [];
+    for (const row of losing) {
+      if (!DEVICE_BACKED_APP_CODES.has(row.appCode)) continue;
+      const types = await this.deviceTypesForEntitlement(tx, restaurantId, row.appCode);
+      const activeDevices = await tx.device.count({ where: { restaurantId, type: { in: types }, status: { not: 'REVOKED' } } });
+      if (activeDevices > 0) deviceImpact.push({ appCode: row.appCode, activeDevices });
+    }
+    return { losingApps: losing.map((r) => r.appCode), deviceImpact };
+  }
+
+  /**
    * The apps a plan includes. The (family, tier) table still gives each tier its long-standing bundle, and a plan
    * that lists a feature as included ADDS that application to it (the Feature catalog says which flag key grants
    * which application). QR ordering and WhatsApp ordering are the exception by design: each is granted only by the
@@ -238,7 +266,14 @@ export class ApplicationEntitlementsService {
     });
   }
 
-  /** Every active subscription's applications, merged: an application is enabled when ANY active subscription enables it. */
+  /**
+   * Every active subscription's applications, merged: an application is enabled when ANY active
+   * subscription enables it. `grantingSubscriptionIds` lists every subscription whose own row for
+   * this appCode is enabled — a caller that wants to actually turn the effective result off (not
+   * just one of possibly several subscriptions granting it) must edit every id in that list, not
+   * just whichever subscription happens to be "primary". See ApplicationEntitlementsService.update:
+   * it only ever touches the one subscriptionId it's given.
+   */
   async listForRestaurant(restaurantId: string) {
     return this.prisma.runAsPlatform(async (tx) => {
       const subs = await tx.subscription.findMany({
@@ -248,6 +283,7 @@ export class ApplicationEntitlementsService {
       });
       if (subs.length === 0) return [];
       const merged = new Map<string, Record<string, unknown> & { appCode: AppCode; enabled: boolean }>();
+      const grantingIds = new Map<string, Set<string>>();
       for (const sub of subs) {
         const rows = await tx.applicationEntitlement.findMany({ where: { subscriptionId: sub.id }, orderBy: { appCode: 'asc' } });
         const defaults = new Set(await this.appsForPlan(tx, sub.plan.productFamily, sub.plan.tier, sub.plan.entitlements));
@@ -256,9 +292,15 @@ export class ApplicationEntitlementsService {
           const prior = merged.get(row.appCode);
           // An enabled row from any subscription wins; otherwise keep the newest subscription's row.
           if (!prior || (!prior.enabled && row.enabled)) merged.set(row.appCode, withSource as never);
+          if (row.enabled) {
+            if (!grantingIds.has(row.appCode)) grantingIds.set(row.appCode, new Set());
+            grantingIds.get(row.appCode)!.add(sub.id);
+          }
         }
       }
-      return [...merged.values()].sort((a, b) => a.appCode.localeCompare(b.appCode));
+      return [...merged.values()]
+        .map((row) => ({ ...row, grantingSubscriptionIds: [...(grantingIds.get(row.appCode) ?? [])] }))
+        .sort((a, b) => a.appCode.localeCompare(b.appCode));
     });
   }
 
@@ -393,8 +435,8 @@ export class ApplicationEntitlementsService {
    * override if set, falling back to *that row's own subscription's* plan.maxDevices — never
    * some other active subscription's plan, even if the restaurant holds several (spec section
    * 38: quotas are per-app, not one global pool shared across every subscription).
-   * A no-op (never throws) when there's no active subscription or no granting entitlement row
-   * — assertAppEnabled is the gate for that; this only caps an app that's already allowed.
+   * Uses the same read projection as provisioning previews, after validating product access.
+   * Apps without device seats are deliberately outside this quota gate.
    */
   async assertDeviceQuotaAvailable(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null): Promise<void> {
     // QR-only management uses POS_ADMIN records; never cast QR_ORDERING to DeviceType.
@@ -402,38 +444,40 @@ export class ApplicationEntitlementsService {
     // Counting and then inserting is a race: N simultaneous activations would all count the same "free seats" and all succeed.
     // The lock is held to the end of the caller's transaction, so the next activation counts AFTER this one's device exists.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'device-quota:' + restaurantId + ':' + appCode}))`;
+    await this.assertAppEnabled(tx, restaurantId, appCode, branchId);
+    await assertBranchProduct(tx, restaurantId, branchId, appCode);
+    const preview = await this.deviceQuotaPreview(tx, restaurantId, appCode, branchId);
+    if (preview.branchQuota !== null && preview.branchCurrent >= preview.branchQuota)
+      throw new ConflictException(`This branch allows ${preview.branchQuota} ${appCode} devices. Revoke an unused device or review the branch allocation.`);
+    if (preview.quota !== null && preview.current >= preview.quota)
+      throw new ConflictException(`This restaurant allows ${preview.quota} ${appCode} devices. Revoke an unused device or review the plan.`);
+  }
+
+  /** Read-only projection shared with the activation gate; no client-side quota arithmetic. */
+  async deviceQuotaPreview(tx: TxClient, restaurantId: string, appCode: AppCode, branchId?: string | null) {
+    const grant = await this.resolve(tx, restaurantId, appCode, branchId);
+    const branch = branchId ? await branchLicense(tx, restaurantId, branchId, appCode) : null;
+    const restaurantTypes = appCode === 'QR_ORDERING' ? ['POS_ADMIN' as DeviceType] : await this.deviceTypesForEntitlement(tx, restaurantId, appCode);
+    const branchTypes: DeviceType[] = appCode === 'KIOSK_ADMIN' && !(await this.isAppEnabled(tx, restaurantId, 'POS_ADMIN', branchId)) ? ['POS_ADMIN','KIOSK_ADMIN'] : restaurantTypes;
+    const [current, branchCurrent] = await Promise.all([
+      tx.device.count({where:{restaurantId,type:{in:restaurantTypes},status:{not:'REVOKED'}}}),
+      branchId ? tx.device.count({where:{restaurantId,branchId,type:{in:branchTypes},status:{not:'REVOKED'}}}) : Promise.resolve(0)
+    ]);
     const subs = await tx.subscription.findMany({
       where: { restaurantId, status: { in: ['TRIAL', 'ACTIVE'] }, expiresAt:{gt:new Date()} },
       select: { id: true, plan: { select: { maxDevices: true } } }
     });
-    if (subs.length === 0) return;
-
     const row = await tx.applicationEntitlement.findFirst({
       where: { subscriptionId: { in: subs.map((s) => s.id) }, appCode, enabled: true }
     });
-    if (!row) return;
-
-    const owningSub = subs.find((s) => s.id === row.subscriptionId);
-    if (!owningSub) return;
+    const owningSub = subs.find((s) => s.id === row?.subscriptionId);
     const featureQuota =
-      row.deviceQuota === null
+      row?.deviceQuota == null
         ? (await tx.feature.findFirst({ where: { appCode, isActive: true }, select: { defaultDeviceQuota: true } }))?.defaultDeviceQuota
         : null;
-    const quota = row.deviceQuota ?? featureQuota ?? owningSub.plan.maxDevices;
-
-    const branchGrant = await assertBranchProduct(tx, restaurantId, branchId, appCode);
-    if (branchId && branchGrant?.deviceQuota !== null && branchGrant?.deviceQuota !== undefined) {
-      const types = appCode === 'QR_ORDERING' ? ['POS_ADMIN' as const] : appCode === 'KIOSK_ADMIN' && !(await this.isAppEnabled(tx, restaurantId, 'POS_ADMIN', branchId)) ? ['POS_ADMIN' as const, 'KIOSK_ADMIN' as const] : [appCode as DeviceType];
-      const count = await tx.device.count({where:{restaurantId,branchId,type:{in:types},status:{not:'REVOKED'}}});
-      if (count >= branchGrant.deviceQuota) throw new ConflictException(`This branch allows ${branchGrant.deviceQuota} ${appCode} devices; revoke an unused device or change the branch allocation.`);
-    }
-    const activeDeviceCount = await tx.device.count({
-      where: { restaurantId, type: { in: appCode === 'QR_ORDERING' ? ['POS_ADMIN'] : await this.deviceTypesForEntitlement(tx, restaurantId, appCode) }, status: { not: 'REVOKED' } }
-    });
-    if (activeDeviceCount >= quota) {
-      throw new ConflictException(
-        `This restaurant's ${appCode} entitlement allows ${quota} device${quota === 1 ? '' : 's'}, and that limit has been reached. Revoke an unused device or upgrade the plan to activate another.`
-      );
-    }
+    const quota = row?.deviceQuota ?? featureQuota ?? owningSub?.plan.maxDevices ?? null;
+    const branchQuota = branch?.deviceQuota ?? null;
+    return { appCode, branchId: branchId ?? null, enabled: grant.enabled, reason: grant.reason, current, quota, branchCurrent, branchQuota,
+      available: grant.enabled && (quota === null || current < quota) && (branchQuota === null || branchCurrent < branchQuota) };
   }
 }

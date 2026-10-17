@@ -26,8 +26,11 @@ export const PosCustomizationModal: React.FC = () => {
   const [query, setQuery] = useState('');
   const groups = useMemo(() => customizingItem ? resolveModifierGroups(customizingItem, db.modifierGroups) : [], [customizingItem]);
   const {cardRef} = useDialogFocus<HTMLDivElement>(!!customizingItem, () => setCustomizingItem(null));
-  useEffect(() => {setSelectedOptions(selectionToModifiers(groups, defaultModifierSelection(groups)));setQuantity(1);setSpecialInstructions('');setQuery('');}, [customizingItem]);
+  useEffect(() => {setSelectedOptions(selectionToModifiers(groups, defaultModifierSelection(groups)));setQuantity(customizingItem?.minQuantity ?? 1);setSpecialInstructions('');setQuery('');}, [customizingItem]);
   if (!customizingItem) return null;
+
+  const minQty = customizingItem.minQuantity ?? 1;
+  const maxQty = customizingItem.maxQuantity ?? Infinity;
 
   // Retrieve modifier groups for this item
   const modifierGroups = groups;
@@ -236,8 +239,8 @@ export const PosCustomizationModal: React.FC = () => {
           {/* Quantity Controls */}
           <div className="flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-2xl p-1">
             <button
-              aria-label="Decrease dish quantity" onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs"
+              aria-label="Decrease dish quantity" disabled={quantity <= minQty} onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
+              className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Minus className="w-4 h-4" />
             </button>
@@ -245,12 +248,17 @@ export const PosCustomizationModal: React.FC = () => {
               {quantity}
             </span>
             <button
-              aria-label="Increase dish quantity" onClick={() => setQuantity((q) => q + 1)}
-              className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs"
+              aria-label="Increase dish quantity" disabled={quantity >= maxQty} onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+              className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-50 active:scale-95 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
+          {(minQty > 1 || Number.isFinite(maxQty)) && (
+            <span className="text-[11px] font-semibold text-slate-500">
+              {minQty > 1 ? `Min ${minQty}` : ''}{minQty > 1 && Number.isFinite(maxQty) ? ' · ' : ''}{Number.isFinite(maxQty) ? `Max ${maxQty}` : ''}
+            </span>
+          )}
 
           {/* Add to Order Button */}
           <button

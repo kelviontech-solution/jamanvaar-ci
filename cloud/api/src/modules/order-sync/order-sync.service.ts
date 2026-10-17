@@ -315,11 +315,18 @@ export class OrderSyncService {
             const ids = checkedItems.map((i) => i.menuItemId || i.externalItemId);
             const menuRows = await tx.syncedEntity.findMany({ where: { restaurantId: device.restaurantId, entityType: 'MENU_ITEM', externalId: { in: ids } }, select: { externalId: true, payload: true } });
             const base = new Map<string, number>();
+            const qtyRules = new Map<string, { minQuantity?: number; maxQuantity?: number }>();
             for (const r of menuRows) {
-              const p = r.payload as { price?: unknown; deleted?: unknown } | null;
+              const p = r.payload as { price?: unknown; deleted?: unknown; minQuantity?: unknown; maxQuantity?: unknown } | null;
               if (p && p.deleted !== true && typeof p.price === 'number') base.set(r.externalId, Math.round(p.price * 100));
+              if (p && (typeof p.minQuantity === 'number' || typeof p.maxQuantity === 'number')) {
+                qtyRules.set(r.externalId, {
+                  minQuantity: typeof p.minQuantity === 'number' ? p.minQuantity : undefined,
+                  maxQuantity: typeof p.maxQuantity === 'number' ? p.maxQuantity : undefined
+                });
+              }
             }
-            reviewFlags = integrityFlags(checkedItems, header.subtotal, base);
+            reviewFlags = integrityFlags(checkedItems, header.subtotal, base, qtyRules);
             if (reviewFlags.length > 0) {
               await tx.syncConflict.create({
                 data: {

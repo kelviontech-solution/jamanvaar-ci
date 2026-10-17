@@ -1,0 +1,323 @@
+{
+  "url": "/kiosk-admin/menu",
+  "text": "Kiosk-only Flow QA\nKIOSK ADMIN\nKiosk-only Flow QA — Main Branch\nCtrl+K\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nKiosk-only Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nSETUP\nShared restaurant menu\nKiosk-only Flow QA · Kiosk-only Flow QA — Main Branch\n\nDish names, prices, categories and photos are shared across licensed apps. Publication updates the guest menu. Use channel availability and branch overrides to limit where a dish is offered.\n\nMenu & Catalog Manager\n0 ITEMS\n\nCreate, edit dishes, adjust pricing, upload device photos, and import templates.\n\nPublish to QR / Kiosk\nAdd Dish\nAdd Category\nLoad Menu Template\nUpload CSV\nDownload CSV Template\nExport Menu CSV\nBulk Price Adjust\nClean Duplicate Items\nAll Diets\nVeg\nNon-Veg\nEgg\nJain\nVegan\nAll Categories\n0 dishes\nThis restaurant has no menu yet\n\nUpload a menu CSV, load a default starter menu in one click, or add dishes one at a time.\n\nUpload CSV\nLoad Menu Template\nDownload Template\n+ Add One Dish\nCombos & Meal Deals\n0 COMBOS\n\nBundle dishes into a fixed-price deal with an automatic savings badge.\n\nCreate Combo\nNo Combos Yet\n\nBundle popular dishes into a discounted combo to increase average order value on Kiosk and QR ordering.\n\n+ Create First Combo\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Menu & Catalog Manager",
+    "This restaurant has no menu yet",
+    "Combos & Meal Deals",
+    "No Combos Yet"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Kiosk-only Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Publish to QR / Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 148,
+      "height": 32
+    },
+    {
+      "text": "Add Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 102,
+      "height": 32
+    },
+    {
+      "text": "Add Category",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 132,
+      "height": 32
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 150,
+      "height": 34
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "Upload a menu CSV (download the template first if you need the columns)",
+      "disabled": false,
+      "width": 120,
+      "height": 34
+    },
+    {
+      "text": "Download CSV Template",
+      "aria": null,
+      "title": "Download a CSV template (or your current menu, if you have one)",
+      "disabled": false,
+      "width": 194,
+      "height": 34
+    },
+    {
+      "text": "Export Menu CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 131,
+      "height": 34
+    },
+    {
+      "text": "Bulk Price Adjust",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 147,
+      "height": 34
+    },
+    {
+      "text": "Clean Duplicate Items",
+      "aria": null,
+      "title": "Scan, review and explicitly archive confirmed duplicates",
+      "disabled": false,
+      "width": 177,
+      "height": 34
+    },
+    {
+      "text": "All Diets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 71,
+      "height": 28
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 47,
+      "height": 28
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 78,
+      "height": 28
+    },
+    {
+      "text": "Egg",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 47,
+      "height": 28
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 46,
+      "height": 28
+    },
+    {
+      "text": "Vegan",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 61,
+      "height": 28
+    },
+    {
+      "text": "All Categories0 dishes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 151,
+      "height": 52
+    },
+    {
+      "text": "Upload CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 122,
+      "height": 32
+    },
+    {
+      "text": "Load Menu Template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 174,
+      "height": 34
+    },
+    {
+      "text": "Download Template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 34
+    },
+    {
+      "text": "+ Add One Dish",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 32
+    },
+    {
+      "text": "Create Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "+ Create First Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 156,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search dish by name, description, SKU or tag..."
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 26
+}

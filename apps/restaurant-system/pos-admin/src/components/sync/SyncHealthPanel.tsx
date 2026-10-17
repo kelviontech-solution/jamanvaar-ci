@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchSyncIssues, fetchDeviceFleet, fetchMenuVersion, publishMenu } from '../../cloud/cloudClient';
 import type { SyncIssue, FleetDevice } from '../../cloud/cloudClient';
 import { ConnectionPanel } from '@jamanvaar/ui';
@@ -31,10 +31,24 @@ export function SyncHealthPanel({ showToast, initialDeviceId = '' }: { showToast
   const [note, setNote] = useState('');
   const [publishing, setPublishing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // #12: fetchSyncIssues returns a fresh snapshot every poll with no history -- a reconciliation
+  // flag that has been showing for an hour looked identical to one that just appeared. There is
+  // no server-side first-seen timestamp to ask for, so this tracks it client-side across polls
+  // for the life of this session (an honest "noticed Xm ago in this session", not a claim about
+  // when the issue actually started on the server).
+  const firstSeenAt = useRef(new Map<string, number>());
 
   const load = useCallback(async () => {
     try {
       const [fleet, found, menu] = await Promise.all([fetchDeviceFleet(), fetchSyncIssues(), fetchMenuVersion()]);
+      const now = Date.now();
+      const seen = new Set<string>();
+      for (const issue of found) {
+        const key = `${issue.code}-${issue.entityId ?? ''}`;
+        seen.add(key);
+        if (!firstSeenAt.current.has(key)) firstSeenAt.current.set(key, now);
+      }
+      for (const key of [...firstSeenAt.current.keys()]) if (!seen.has(key)) firstSeenAt.current.delete(key);
       setDevices(fleet);
       setIssues(found);
       setMenuVersion(menu.version);
@@ -150,12 +164,18 @@ export function SyncHealthPanel({ showToast, initialDeviceId = '' }: { showToast
           <p className="text-sm text-emerald-700 font-semibold">Nothing to review. All synced data is consistent.</p>
         ) : (
           <ul className="space-y-2">
-            {issues.map((i, idx) => (
-              <li key={`${i.code}-${i.entityId ?? idx}`} className={`text-sm border rounded-xl p-3 ${SEVERITY_STYLE[i.severity]}`}>
-                <div className="font-bold">{i.code.replace(/_/g, ' ').toLowerCase()}</div>
-                <div>{i.message}{i.detail ? ` (${i.detail})` : ''}</div>
-              </li>
-            ))}
+            {issues.map((i, idx) => {
+              const key = `${i.code}-${i.entityId ?? ''}`;
+              const firstSeen = firstSeenAt.current.get(key);
+              const minutes = firstSeen ? Math.max(0, Math.round((Date.now() - firstSeen) / 60000)) : 0;
+              return (
+                <li key={`${i.code}-${i.entityId ?? idx}`} className={`text-sm border rounded-xl p-3 ${SEVERITY_STYLE[i.severity]}`}>
+                  <div className="font-bold">{i.code.replace(/_/g, ' ').toLowerCase()}</div>
+                  <div>{i.message}{i.detail ? ` (${i.detail})` : ''}</div>
+                  <div className="text-xs opacity-75 mt-1">{minutes > 0 ? `Noticed ${minutes}m ago in this session` : 'Just noticed'}</div>
+                </li>
+              );
+            })}
           </ul>
         )}
         <p className="text-xs text-[#64748B] mt-3">These are reported, never repaired automatically: payments and stock are reviewed by a person.</p>

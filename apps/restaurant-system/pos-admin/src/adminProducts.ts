@@ -11,7 +11,7 @@ export const ADMIN_PRODUCTS = {
 // is never used as proof of a product entitlement.
 export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, string>>> = {
   POS_ADMIN: {
-    OPERATIONS_HUB: 'operations', KIOSKS: 'terminals', KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen',
+    OPERATIONS_HUB: 'operations', KIOSKS: 'terminals', KIOSK_EXPERIENCE: 'customer-experience', KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen',
     KIOSK_COMBOS: 'combos', KIOSK_PAYMENTS: 'kiosk-payments', FEEDBACK: 'feedback',
     DASHBOARD: 'dashboard', BILLING_SALES: 'billing', ORDERS: 'orders', LIVE_KDS: 'live-kitchen',
     TABLES: 'tables', RESERVATIONS: 'reservations', KITCHEN_KOT: 'kitchen', QR_ORDERING: 'qr-ordering',
@@ -24,7 +24,7 @@ export const PRODUCT_PAGES: Record<AdminProduct, Partial<Record<PosAdminTab, str
   KIOSK_ADMIN: {
     OPERATIONS_HUB: 'operations', QR_ORDERING: 'qr-ordering',
     DASHBOARD: 'dashboard', KIOSKS: 'terminals', MENU: 'menu', TEMPLATES: 'templates', MENU_OPTIONS: 'options',
-    KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
+    KIOSK_EXPERIENCE: 'customer-experience', KIOSK_DESIGN: 'appearance', KIOSK_WELCOME: 'welcome-screen', KIOSK_COMBOS: 'combos', COUPONS: 'coupons', ORDERS: 'orders',
     LIVE_KDS: 'kitchen', TABLES: 'tables', STAFF: 'staff', KIOSK_PAYMENTS: 'payments',
     FEEDBACK: 'feedback', REPORTS: 'reports', HARDWARE: 'printers', RECEIPTS: 'receipts', SYNC: 'sync',
     SETTINGS: 'settings', LICENSE: 'subscription', AUDIT: 'audit', BACKUP: 'backup', SUPPORT: 'support',
@@ -51,7 +51,7 @@ export function adminPagePath(product: AdminProduct, page: PosAdminTab): string 
 export function availableAdminProducts(apps: readonly AppCode[]): AdminProduct[] {
   return (['POS_ADMIN', 'KIOSK_ADMIN'] as const).filter(app => apps.includes(app));
 }
-const KIOSK_PAGES = new Set<PosAdminTab>(['KIOSKS','KIOSK_DESIGN','KIOSK_WELCOME','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']);
+const KIOSK_PAGES = new Set<PosAdminTab>(['KIOSKS','KIOSK_EXPERIENCE','KIOSK_DESIGN','KIOSK_WELCOME','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']);
 const SHARED_PAGES = new Set<PosAdminTab>(['OPERATIONS_HUB','DASHBOARD','MENU','MENU_OPTIONS','TEMPLATES','COUPONS','ORDERS','LIVE_KDS','TABLES','STAFF','REPORTS','HARDWARE','RECEIPTS','SYNC','SETTINGS','LICENSE','AUDIT','BACKUP','SUPPORT','DOWNLOADS']);
 /** Presentation never grants access. Deep links use the same module checks as navigation. */
 export function canAccessAdminPage(apps: readonly AppCode[], product: AdminProduct, page: PosAdminTab): boolean {

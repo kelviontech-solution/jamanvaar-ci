@@ -1,0 +1,93 @@
+{
+  "url": "/",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nHow would you like to enjoy your meal?\n\nSelect whether you are dining in our restaurant or packing your feast for takeaway.\n\nDine-In\n\nEnjoy your meal freshly served at your table\n\nTakeaway\n\nPick up fresh packed food at Counter 1\n\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "How would you like to enjoy your meal?",
+    "Dine-In",
+    "Takeaway"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "disabled": false,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "text": "Need Help?",
+      "aria": "Need Help?",
+      "disabled": false,
+      "width": 137,
+      "height": 44
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "disabled": false,
+      "width": 52,
+      "height": 44
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "disabled": false,
+      "width": 59,
+      "height": 44
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Dine-In\n\nEnjoy your meal freshly served at your table",
+      "aria": null,
+      "disabled": false,
+      "width": 320,
+      "height": 256
+    },
+    {
+      "text": "Takeaway\n\nPick up fresh packed food at Counter 1",
+      "aria": null,
+      "disabled": false,
+      "width": 320,
+      "height": 256
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

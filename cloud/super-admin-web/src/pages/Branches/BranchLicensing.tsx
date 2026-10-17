@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import { currentAllocation, localDate } from './branchAllocation';
 import { api } from '../../api/client';
+import { APP_CODE_LABELS, type AppCode } from '../../api/types';
+import { useAuth } from '../../auth/AuthContext';
 
 type Allocation = {
   id: string;
@@ -10,6 +13,7 @@ type Allocation = {
   effectiveAt: string;
   expiresAt: string | null;
   cancelledAt: string | null;
+  disabledFeatures?: string[];
 };
 type View = {
   apps: { appCode: string; enabled: boolean; reason: string; revision: number }[];
@@ -29,8 +33,10 @@ type Preview = {
   previewHash: string;
   impact: { activeDevices: number; pendingOrders: number; quotaWarning: string | null; affectedDevices: { id: string; name: string | null; type: string }[] };
 };
-const localNow = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
 export function BranchLicensing({ branchId }: { branchId: string }) {
+  const {user}=useAuth();
+  const canWrite=user?.role==='PLATFORM_OWNER'||user?.role==='SUPER_ADMIN';
   const [data, setData] = useState<View>(),
     [error, setError] = useState(''),
     [message, setMessage] = useState(''),
@@ -39,13 +45,17 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
     [preview, setPreview] = useState<Preview>(),
     [input, setInput] = useState<Input>(),
     [ack, setAck] = useState(false);
+  const allocation = data ? currentAllocation(data.history, app) : undefined;
   const load = () =>
     api
       .get<View>(`/api/v1/branches/${branchId}/licenses`)
       .then(setData)
       .catch((e) => setError(e.message));
   useEffect(() => {
-    void load();
+    let active=true;
+    setData(undefined);setPreview(undefined);setInput(undefined);setAck(false);setError('');setMessage('');
+    void api.get<View>(`/api/v1/branches/${branchId}/licenses`).then(value=>{if(active)setData(value);}).catch(e=>{if(active)setError(e.message);});
+    return()=>{active=false;};
   }, [branchId]);
   async function run(action: () => Promise<unknown>) {
     setBusy(true);
@@ -63,6 +73,7 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
   return (
     <section className="detail-card" style={{ padding: 24 }}>
       <h2>Branch products & device limits</h2>
+      {!canWrite&&<p role="status">You can review branch access here. A Platform Owner or Super Admin must approve allocation changes.</p>}
       <p>
         Branch allocations restrict the restaurant’s purchased products. They cannot add an unpurchased product or feature. Without an allocation, a branch
         inherits its restaurant’s license.
@@ -70,14 +81,15 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
       <div className="card-grid">
         {data.apps.map((a) => (
           <article key={a.appCode} className="detail-card" style={{ padding: 12 }}>
-            <strong>{a.appCode}</strong>
+            <strong>{APP_CODE_LABELS[a.appCode as AppCode] || a.appCode}</strong>
             <p>
               {a.enabled ? 'Active' : a.reason.replaceAll('_', ' ').toLowerCase()} · Revision {a.revision}
             </p>
           </article>
         ))}
       </div>
-      <form
+      <p>Editing: {allocation ? `Saved branch allocation, revision ${allocation.revision}` : 'Inherited restaurant access'}. Review changes before applying. Scheduled allocations are listed below.</p>
+      <form key={`${branchId}:${app}:${allocation?.revision ?? 0}`}
         onChange={() => {
           setPreview(undefined);
           setAck(false);
@@ -100,26 +112,26 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
           });
         }}
       >
-        <fieldset disabled={busy} style={{ border: 0, padding: 0, display: 'grid', gap: 16, marginTop: 20 }}>
+        <fieldset disabled={busy||!canWrite} style={{ border: 0, padding: 0, display: 'grid', gap: 16, marginTop: 20 }}>
           <label>
             Product{' '}
-            <select aria-label="Product" value={app} onChange={(e) => setApp(e.target.value)}>
+            <select aria-label="Product" value={app} onChange={(e) => {setApp(e.target.value); setPreview(undefined); setAck(false);}}>
               {data.apps.map((a) => (
-                <option key={a.appCode}>{a.appCode}</option>
+                <option key={a.appCode} value={a.appCode}>{APP_CODE_LABELS[a.appCode as AppCode] || a.appCode}</option>
               ))}
             </select>
           </label>
           <label>
-            <input type="checkbox" name="enabled" defaultChecked /> Enable product in this branch
+            <input type="checkbox" name="enabled" defaultChecked={allocation?.enabled ?? true} /> Enable product in this branch
           </label>
           <label>
-            Device limit (blank inherits restaurant limit) <input name="quota" type="number" min="0" max="10000" />
+            Device limit (blank inherits restaurant limit) <input name="quota" defaultValue={allocation?.deviceQuota ?? ''} type="number" min="0" max="10000" />
           </label>
           <label>
-            Effective time <input name="effective" type="datetime-local" required defaultValue={localNow()} />
+            Apply replacement at <input name="effective" type="datetime-local" required defaultValue={localDate(Date.now()+60000)} />
           </label>
           <label>
-            Optional expiry <input name="expires" type="datetime-local" />
+            Optional expiry <input name="expires" type="datetime-local" defaultValue={allocation?.expiresAt ? localDate(allocation.expiresAt) : ''} />
           </label>
           <details>
             <summary>Disable optional features in this branch</summary>
@@ -127,7 +139,7 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
               .filter((f) => f.appCode === app)
               .map((f) => (
                 <label key={f.legacyEntitlementKey} style={{ display: 'block', padding: 6 }}>
-                  <input type="checkbox" name="feature" value={f.legacyEntitlementKey} /> {f.name}
+                  <input type="checkbox" name="feature" value={f.legacyEntitlementKey} defaultChecked={allocation?.disabledFeatures?.includes(f.legacyEntitlementKey) ?? false} /> {f.name}
                 </label>
               ))}
           </details>
@@ -154,7 +166,7 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
           </label>
           <p>
             <button
-              disabled={!ack || busy}
+              disabled={!ack || busy || !canWrite}
               className="btn btn-primary"
               onClick={() =>
                 void run(async () => {
@@ -190,7 +202,7 @@ export function BranchLicensing({ branchId }: { branchId: string }) {
             ) : (
               new Date(row.effectiveAt) > new Date() && (
                 <button
-                  disabled={busy}
+                  disabled={busy || !canWrite}
                   onClick={() =>
                     void run(async () => {
                       await api.post(`/api/v1/branches/${branchId}/licenses/${row.id}/cancel`, {});

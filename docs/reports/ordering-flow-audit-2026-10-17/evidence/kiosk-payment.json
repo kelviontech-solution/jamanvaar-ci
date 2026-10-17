@@ -1,0 +1,99 @@
+{
+  "url": "/",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nChoose Payment Method\n\nTotal Payable:₹280\n\nBeing set up\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM\n\nOffline & Online\nCash at Counter\n\nPay at billing counter when collecting order\n\nPay at Pickup Counter\n\nYou will receive your token now. Please pay at Counter 1.\n\nConfirm & Get Token\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "Choose Payment Method",
+    "Pay at Pickup Counter"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "disabled": false,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "text": "Need Help?",
+      "aria": "Need Help?",
+      "disabled": false,
+      "width": 137,
+      "height": 44
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "disabled": false,
+      "width": 52,
+      "height": 44
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "disabled": false,
+      "width": 59,
+      "height": 44
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Being set up\nUPI QR Payment\n\nScan & Pay via GPay, PhonePe, Paytm, BHIM",
+      "aria": null,
+      "disabled": false,
+      "width": 460,
+      "height": 172
+    },
+    {
+      "text": "Offline & Online\nCash at Counter\n\nPay at billing counter when collecting order",
+      "aria": null,
+      "disabled": false,
+      "width": 460,
+      "height": 172
+    },
+    {
+      "text": "Confirm & Get Token",
+      "aria": null,
+      "disabled": false,
+      "width": 510,
+      "height": 68
+    },
+    {
+      "text": "",
+      "aria": "Open JAMAN AI Food Assistant",
+      "disabled": false,
+      "width": 64,
+      "height": 64
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

@@ -178,7 +178,7 @@ export const KitchenKotModule: React.FC<KitchenKotModuleProps> = ({
               <button
                 key={st.id}
                 onClick={() => setStationFilter(st.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                className={`min-h-11 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   stationFilter === st.id
                     ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                     : 'text-slate-600 hover:bg-[#F8F6F0]'

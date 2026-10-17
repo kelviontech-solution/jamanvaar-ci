@@ -1,0 +1,246 @@
+{
+  "url": "/qr/admin/?tab=MENU",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / MENU & GUESTS\nMenu & Availability\n\nCreate dishes, organise categories and publish the menu your guests see.\n\n✦ JAMAN AI\nEnabled\nShared restaurant menu\n\nDraft dish, category and price edits are shared with other licensed apps. Preview and publish deliberately; branch availability is a separate override.\n\nEdit shared draft\nPublished guest availability\nShared menu editor\n\nThese are the same dishes, categories, variants and taxes used by Restaurant Admin. Saving edits the draft; publishing releases it to customer menus. CSV retries keep existing dishes and report errors.\n\nAdd dish\nAdd category\nPreview CSV\nCSV template\nPublish shared menu\nManage categories (0)\n\nFind a dish\nFilter by category\nAll categories\n\n0 dishes in draft\n\nAdd your first dish or import a CSV to start building your menu.\n\nDisplay",
+  "headings": [
+    "Menu & Availability",
+    "Shared menu editor"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Edit shared draft",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 144,
+      "height": 44
+    },
+    {
+      "text": "Published guest availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 214,
+      "height": 44
+    },
+    {
+      "text": "Add dish",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 90,
+      "height": 44
+    },
+    {
+      "text": "Add category",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 44
+    },
+    {
+      "text": "CSV template",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 44
+    },
+    {
+      "text": "Publish shared menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Preview CSV",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "label": "Search shared menu",
+      "placeholder": "Dish name, description or SKU"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Filter by categoryAll categories"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

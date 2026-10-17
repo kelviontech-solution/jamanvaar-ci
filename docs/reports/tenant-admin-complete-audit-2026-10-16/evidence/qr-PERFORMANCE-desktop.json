@@ -1,0 +1,222 @@
+{
+  "url": "/qr/admin/?tab=PERFORMANCE",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nMenu Performance\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / INSIGHTS\nMenu Performance\n\nSee which dishes turn browsing into orders using actual sales data.\n\n✦ JAMAN AI\nEnabled\nMenu performance\nFrom\nTo\nApply dates\nExport CSV\n\nAsia/Kolkata calendar days; orders created in this range. Uses the currently selected admin branch.\n\n0\n\nlanding Sessions\n\n0\n\nmenu Views\n\n0\n\nitem Views\n\n0\n\nitem Adds\n\n0\n\ncarts\n\n0\n\ncheckout Starts\n\n0\n\nplaced Orders\n\n0\n\ncompleted Orders\n\n0\n\npaid Orders\n\nMenu-view to accepted-order conversion: 0.0%. Denominator: Observed menu views. Repeated orders can exceed 100%.\n\nDish\tViews\tAdds\tQuantity\tOrders / discount\tNet collections\nSales by category\n\nNo activity yet.\n\nOrdering modes\n\nNo activity yet.\n\nDaily order trend (restaurant time)\n\nNo activity yet.\n\nOrders by hour (restaurant time)\n\nNo activity yet.\n\nHistorical ingredient costs are not stored on these orders. Profit is unavailable; net collections are not profit.\n\nViews and add taps are deduplicated per item, browser session and restaurant day. Landing sessions measure page opens, not physical camera scans. Collections and refunds follow the original order cohort; line allocations include tax and discount proportionally.\n\nService request activity\n\nOPEN: 0 · ACKNOWLEDGED: 0 · IN_PROGRESS: 0 · COMPLETED: 0 · CANCELLED: 0 · EXPIRED: 0\n\nNo item activity in this date range.\n\nDisplay",
+  "headings": [
+    "Menu Performance",
+    "Menu performance",
+    "Sales by category",
+    "Ordering modes",
+    "Daily order trend (restaurant time)",
+    "Orders by hour (restaurant time)",
+    "Service request activity"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu Performance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Apply dates",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 110,
+      "height": 69
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 106,
+      "height": 69
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": "From",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "date",
+      "label": "To",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

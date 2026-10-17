@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { DiningTable, Reservation } from '@jamanvaar/types';
 import { ReservationRepository, AuditRepository } from '@jamanvaar/database';
+import { getCurrentAdminName } from '../../currentAdminIdentity';
 import {
   CalendarClock,
   Plus,
@@ -67,7 +68,7 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
       action: `RESERVATION_${status}`,
       category: 'SETTINGS',
       details: `Reservation for ${res.customerName} (${res.guestCount} guests) marked ${status}`,
-      username: 'Manager'
+      username: getCurrentAdminName()
     });
     showToast(`Reservation for ${res.customerName} marked ${STATUS_META[status].label}`);
   };
@@ -105,7 +106,7 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
             setReservationToEdit(null);
             setIsModalOpen(true);
           }}
-          className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          className="min-h-11 px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>New Reservation</span>
@@ -154,7 +155,7 @@ export const ReservationsModule: React.FC<ReservationsModuleProps> = ({
             </p>
             <button
               onClick={() => { setReservationToEdit(null); setIsModalOpen(true); }}
-              className="px-4 py-2 bg-brand text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+              className="min-h-11 px-4 py-2 bg-brand text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
             >
               + Take a Reservation
             </button>

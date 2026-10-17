@@ -5,9 +5,21 @@ import { ts } from '../../common/sql';
 import { toCsv } from '../../common/csv';
 import { deviceHealth } from '../../common/device-health';
 
+type DateRange = { from?: string; to?: string };
+
 @Injectable()
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /** `to` undefined means "through now"; `from` undefined means "since the beginning" — both are left open rather than defaulted, unlike getRestaurantSales's own 30-day default, because an omitted range here means the caller asked for All-Time. */
+  private static parseRange(range: DateRange): { from?: Date; to?: Date } {
+    const from = range.from ? new Date(range.from) : undefined;
+    const to = range.to ? new Date(range.to) : undefined;
+    return {
+      from: from && !Number.isNaN(from.getTime()) ? from : undefined,
+      to: to && !Number.isNaN(to.getTime()) ? to : undefined
+    };
+  }
 
   /**
    * The restaurant's own sales, from the orders its terminals synced (BUG-041) - deliberately separate
@@ -131,20 +143,33 @@ export class ReportsService {
     };
   }
 
-  async getRevenue() {
+  async getRevenue(range: DateRange = {}) {
+    const { from, to } = ReportsService.parseRange(range);
+    const createdAt = { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) };
+    const dateFilter = from || to ? { createdAt } : {};
     const [invoices, totals] = await Promise.all([
-      this.prisma.platformDb.invoice.findMany({ include: { plan: true, restaurant: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
+      this.prisma.platformDb.invoice.findMany({ where: dateFilter, include: { plan: true, restaurant: true }, orderBy: { createdAt: 'desc' }, take: 10 }),
       this.prisma.runAsPlatform((tx) => tx.$queryRaw<Array<{ tier: string; revenue: number; count: number }>>(Prisma.sql`
         SELECT p.tier::text AS tier, SUM(i."totalAmount")::float8 AS revenue, COUNT(*)::int AS count
-        FROM "Invoice" i JOIN "Plan" p ON p.id = i."planId" GROUP BY p.tier`))
+        FROM "Invoice" i JOIN "Plan" p ON p.id = i."planId"
+        WHERE (${from ?? null}::timestamptz IS NULL OR i."createdAt" >= ${from ?? null})
+          AND (${to ?? null}::timestamptz IS NULL OR i."createdAt" <= ${to ?? null})
+        GROUP BY p.tier`))
     ]);
-    const core = totals.find((t) => t.tier === 'CORE');
-    const pro = totals.find((t) => t.tier === 'PRO');
+    // Tier price labels used to be hardcoded (CORE ₹5,000 / PRO ₹7,000) regardless of what plans
+    // actually exist now — stale the moment a plan's price changes, and silently wrong for any
+    // tier beyond those two. Derived here from the live Plan catalog instead.
+    const planPrices = await this.prisma.platformDb.plan.groupBy({ by: ['tier'], _avg: { priceMonthly: true } });
+    const priceByTier = new Map(planPrices.map((p) => [p.tier, Math.round((p._avg.priceMonthly ?? 0) / 100)]));
     return {
-      byPlan: [
-        { tier: 'CORE', name: 'JAMANVAAR CORE', revenue: Math.round(Number(core?.revenue ?? 0) / 100), count: core?.count ?? 0 },
-        { tier: 'PRO', name: 'JAMANVAAR PRO', revenue: Math.round(Number(pro?.revenue ?? 0) / 100), count: pro?.count ?? 0 }
-      ],
+      period: { from: from?.toISOString() ?? null, to: to?.toISOString() ?? null },
+      byPlan: totals.map((t) => ({
+        tier: t.tier,
+        name: `JAMANVAAR ${t.tier}`,
+        revenue: Math.round(Number(t.revenue ?? 0) / 100),
+        count: t.count,
+        priceMonthly: priceByTier.get(t.tier as never) ?? null
+      })),
       recentInvoices: invoices.slice(0, 10).map((i) => ({
         id: i.id,
         invoiceNumber: i.invoiceNumber,
@@ -225,9 +250,14 @@ export class ReportsService {
     return this.getMargins();
   }
 
-  async getRestaurants() {
+  async getRestaurants(range: DateRange = {}) {
+    const { from, to } = ReportsService.parseRange(range);
+    // "total" and "cityBreakdown" are a point-in-time snapshot of the whole fleet (not meaningfully
+    // time-ranged); only the "recent onboardings" list below is actually bounded by the selected
+    // period, via `period` in the response.
+    const dateFilter = from || to ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {};
     const [restaurants, cities, total] = await Promise.all([
-      this.prisma.platformDb.restaurant.findMany({ where: { deletedAt: null },
+      this.prisma.platformDb.restaurant.findMany({ where: { deletedAt: null, ...dateFilter },
         include: { _count: { select: { branches: true, devices: true } }, subscriptions: { include: { plan: true }, orderBy: { createdAt: 'desc' }, take: 1 } },
         orderBy: { createdAt: 'desc' }, take: 15 }),
       this.prisma.platformDb.restaurant.groupBy({ by: ['city'], where: { deletedAt: null }, _count: true }),
@@ -237,6 +267,7 @@ export class ReportsService {
     for (const c of cities) { const city = c.city || 'Unknown'; cityMap.set(city, (cityMap.get(city) ?? 0) + c._count); }
     const cityBreakdown = Array.from(cityMap, ([city, count]) => ({ city, count }));
     return {
+      period: { from: from?.toISOString() ?? null, to: to?.toISOString() ?? null },
       total,
       cityBreakdown,
       list: restaurants.slice(0, 15).map((r) => ({
@@ -252,15 +283,21 @@ export class ReportsService {
     };
   }
 
-  async getDevices() {
+  async getDevices(range: DateRange = {}) {
+    const { from, to } = ReportsService.parseRange(range);
+    // "total" and "byType" are the current fleet composition (point-in-time); the "fleet status"
+    // list below is bounded by the selected period, filtered by lastSeenAt so the range answers
+    // "what reported in this window", not "what was registered in this window".
+    const lastSeenFilter = from || to ? { lastSeenAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {};
     const [devices, counts, total] = await Promise.all([
-      this.prisma.platformDb.device.findMany({ include: { restaurant: true, branch: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
+      this.prisma.platformDb.device.findMany({ where: lastSeenFilter, include: { restaurant: true, branch: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
       this.prisma.platformDb.device.groupBy({ by: ['type'], _count: true }),
       this.prisma.platformDb.device.count()
     ]);
     const typeCounts: Record<string, number> = { POS: 0, CAPTAIN: 0, KDS: 0, KIOSK: 0, POS_ADMIN: 0, KIOSK_ADMIN: 0 };
     for (const c of counts) typeCounts[c.type] = c._count;
     return {
+      period: { from: from?.toISOString() ?? null, to: to?.toISOString() ?? null },
       total,
       byType: Object.entries(typeCounts).map(([type, count]) => ({ type, count })),
       list: devices.slice(0, 20).map((d) => ({
@@ -276,15 +313,20 @@ export class ReportsService {
     };
   }
 
-  async getSubscriptions() {
+  async getSubscriptions(range: DateRange = {}) {
+    const { from, to } = ReportsService.parseRange(range);
+    // "total" and "byStatus" are the current lifecycle snapshot; the list below is bounded by
+    // startDate within the selected period (subscriptions that began in that window).
+    const startFilter = from || to ? { startDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {};
     const [subscriptions, counts, total] = await Promise.all([
-      this.prisma.platformDb.subscription.findMany({ include: { restaurant: true, plan: true }, orderBy: { createdAt: 'desc' }, take: 15 }),
+      this.prisma.platformDb.subscription.findMany({ where: startFilter, include: { restaurant: true, plan: true }, orderBy: { createdAt: 'desc' }, take: 15 }),
       this.prisma.platformDb.subscription.groupBy({ by: ['status'], _count: true }),
       this.prisma.platformDb.subscription.count()
     ]);
     const statusCounts: Record<string, number> = { ACTIVE: 0, TRIAL: 0, PAST_DUE: 0, SUSPENDED: 0, EXPIRED: 0 };
     for (const c of counts) statusCounts[c.status] = c._count;
     return {
+      period: { from: from?.toISOString() ?? null, to: to?.toISOString() ?? null },
       total,
       byStatus: Object.entries(statusCounts).map(([status, count]) => ({ status, count })),
       list: subscriptions.slice(0, 15).map((s) => ({
@@ -302,9 +344,12 @@ export class ReportsService {
   // B2-061: restaurant/plan names are free text (set by whoever created the restaurant, e.g. via
   // the platform onboarding form) reaching every one of these CSVs with only a quote-escape
   // before this fix — no defense against CSV/formula injection. toCsv sanitizes every field.
-  async generateCsv(reportType: string): Promise<string> {
+  async generateCsv(reportType: string, range: DateRange = {}): Promise<string> {
+    const { from, to } = ReportsService.parseRange(range);
+    const createdAtFilter = from || to ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {};
     if (reportType === 'revenue') {
       const invoices = await this.prisma.platformDb.invoice.findMany({
+        where: createdAtFilter,
         include: { restaurant: true, plan: true }
       });
       // BUG-LOW-002: was '(INR)' text — the super-admin-web frontend's own
@@ -327,7 +372,7 @@ export class ReportsService {
 
     if (reportType === 'restaurants') {
       const restaurants = await this.prisma.platformDb.restaurant.findMany({
-        where: { deletedAt: null },
+        where: { deletedAt: null, ...createdAtFilter },
         include: { branches: true, subscriptions: { include: { plan: true } } }
       });
       const headers = ['ID', 'Restaurant Name', 'City', 'State', 'Status', 'Branches', 'Plan', 'Created At'];
@@ -345,7 +390,9 @@ export class ReportsService {
     }
 
     // Default subscriptions CSV
+    const startDateFilter = from || to ? { startDate: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {};
     const subs = await this.prisma.platformDb.subscription.findMany({
+      where: startDateFilter,
       include: { restaurant: true, plan: true }
     });
     const headers = ['ID', 'Restaurant', 'Plan Tier', 'Price Monthly', 'Status', 'Start Date', 'Expires At'];

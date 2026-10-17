@@ -94,6 +94,9 @@ export const CaptainTableWorkspaceModal: React.FC<CaptainTableWorkspaceModalProp
       // Same gap as POS's catalog grid: an archived (deleted-from-admin) dish must not stay orderable
       // from Captain either.
       if (item.archivedAt) return false;
+      // #3: Kiosk and QR both honor salesChannels; Captain never checked it, so a dish restricted
+      // away from Captain (salesChannels without 'CAPTAIN') still appeared here.
+      if (item.salesChannels && !item.salesChannels.includes('CAPTAIN')) return false;
       if (selectedCategory !== 'ALL' && item.categoryId !== selectedCategory) return false;
       if (!matchesCaptainDiet(item, dietaryFilter)) return false;
       if (searchQuery.trim()) {

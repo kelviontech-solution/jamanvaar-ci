@@ -28,6 +28,10 @@ export class TenantSupportTicketsService {
 
   async create(user: User, dto: TenantCreateTicketDto) {
     const restaurantId = user.restaurantId;
+    if(dto.activationRequest && (!dto.branchId || !['OWNER','MANAGER'].includes(user.role)))
+      throw new BadRequestException('Choose a branch and sign in as owner or manager to request a kiosk key.');
+    if(dto.activationRequest && user.role==='MANAGER' && dto.branchId!==user.branchId)
+      throw new BadRequestException('Request a kiosk key for your assigned branch.');
     if (dto.branchId) {
       const branch = await this.prisma.runAsTenant(restaurantId, (tx) => tx.branch.findFirst({ where: { id: dto.branchId, restaurantId }, select: { id: true } }));
       if (!branch) throw new BadRequestException('That branch does not belong to your restaurant.');
@@ -56,6 +60,7 @@ export class TenantSupportTicketsService {
         }
       });
       await tx.ticketEvent.create({ data: { ticketId: created.id, type: 'CREATED', actorType: 'RESTAURANT', actorName: user.fullName, toValue: 'OPEN' } });
+      if(dto.activationRequest) await tx.ticketEvent.create({data:{ticketId:created.id,type:'KIOSK_ACTIVATION_REQUEST',actorType:'RESTAURANT',actorName:user.fullName,toValue:JSON.stringify(dto.activationRequest)}});
       const restaurant = await tx.restaurant.findUnique({ where: { id: restaurantId }, select: { name: true } });
       return { ticket: created, restaurantName: restaurant?.name ?? 'A restaurant' };
     });
@@ -89,7 +94,7 @@ export class TenantSupportTicketsService {
         where: { restaurantId: user.restaurantId },
         orderBy: [{ updatedAt: 'desc' }],
         take: 200,
-        select: { id: true, number: true, subject: true, category: true, priority: true, status: true, createdAt: true, updatedAt: true, resolvedAt: true }
+        select: { id: true, number: true, subject: true, category: true, priority: true, status: true, branchId: true, createdAt: true, updatedAt: true, resolvedAt: true }
       })
     );
   }

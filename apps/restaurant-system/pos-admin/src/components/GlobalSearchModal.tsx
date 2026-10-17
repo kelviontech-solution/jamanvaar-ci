@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, ShoppingBag, UtensilsCrossed, Users, User, Grid } from 'lucide-react';
+import { Search, X, ShoppingBag, UtensilsCrossed, Users, User, Grid, Settings2 } from 'lucide-react';
 import { CachedImg, Modal } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import { formatINR, formatTime } from '@jamanvaar/utils';
@@ -8,6 +8,8 @@ import { Order, MenuItem, CustomerAccount, DiningTable, User as UserType } from 
 interface GlobalSearchModalProps {
   tasks?:{id:string;label:string;keywords:string}[];
   onSelectTask?:(id:string)=>void;
+  settingsEntries?:{id:string;label:string;keywords:string}[];
+  onSelectSettingsEntry?:(id:string)=>void;
   showCustomers?: boolean;
   isOpen: boolean;
   onClose: () => void;
@@ -20,6 +22,7 @@ interface GlobalSearchModalProps {
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   tasks=[],onSelectTask,
+  settingsEntries=[],onSelectSettingsEntry,
   showCustomers = true,
   isOpen,
   onClose,
@@ -86,12 +89,17 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     };
   }, [query, showCustomers]);
 
+  const matchingSettings = query.trim()
+    ? settingsEntries.filter((s) => `${s.label} ${s.keywords}`.toLowerCase().includes(query.toLowerCase()))
+    : [];
+
   const totalResults =
     results.orders.length +
     results.items.length +
     results.customers.length +
     results.tables.length +
-    results.staff.length;
+    results.staff.length +
+    matchingSettings.length;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Global Restaurant Search" maxWidth="2xl">
@@ -120,6 +128,19 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         {/* Results Container */}
         <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-1">
           {tasks.filter(task=>!query||`${task.label} ${task.keywords}`.toLowerCase().includes(query.toLowerCase())).length>0&&<section aria-label="Authorized tasks" className="space-y-2"><h3 className="font-bold text-sm">Tasks</h3><div className="flex flex-wrap gap-2">{tasks.filter(task=>!query||`${task.label} ${task.keywords}`.toLowerCase().includes(query.toLowerCase())).map(task=><button key={task.id} type="button" className="min-h-11 border rounded-xl px-4 text-left bg-white" onClick={()=>{onSelectTask?.(task.id);onClose();}}>{task.label}</button>)}</div></section>}
+          {/* #17: "search within long settings pages" -- only shown while the admin is actively
+              searching for one (query.trim()), so a blank search doesn't bury real data results
+              under every settings field every time this modal opens. */}
+          {matchingSettings.length>0 && (
+            <section aria-label="Settings" className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#64748B] uppercase"><Settings2 className="w-3.5 h-3.5 text-slate-500" /><span>Settings</span></div>
+              <div className="flex flex-wrap gap-2">
+                {matchingSettings.map(s=>(
+                  <button key={s.id} type="button" className="min-h-11 border border-jaman-border rounded-xl px-4 text-left bg-white hover:border-brand text-xs font-bold text-jaman-navy" onClick={()=>{onSelectSettingsEntry?.(s.id);onClose();}}>{s.label}</button>
+                ))}
+              </div>
+            </section>
+          )}
           {/* Orders Section */}
           {results.orders.length > 0 && (
             <div className="space-y-2">
@@ -187,7 +208,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     <div className="text-right">
                       <span className="tabular-nums font-bold text-xs text-emerald-700 block">₹{i.price}</span>
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${i.isAvailable ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                        {i.isAvailable ? 'In Stock' : '86 Out'}
+                        {i.isAvailable ? 'Available' : 'Unavailable'}
                       </span>
                     </div>
                   </div>

@@ -27,12 +27,21 @@ import {
   AlertTriangle,
   Send
 } from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
 import '../../components/shared.css';
 
+// ACKNOWLEDGED/RUNNING are real, valid in-flight states (see DeviceCommandStatus) between SENT and
+// a terminal outcome — a command sitting at either of these used to look "stuck" because polling
+// (and the "waiting on the device" banner) only recognized PENDING/SENT as still in flight.
+const OPEN_COMMAND_STATUSES = new Set(['PENDING', 'SENT', 'ACKNOWLEDGED', 'RUNNING']);
+
 export function DeviceDetailPage() {
+  const { can } = useAuth();
+  const canWrite = can('devices', 'write');
   const { id } = useParams<{ id: string }>();
   const [device, setDevice] = useState<Device | null>(null);
   const [commands, setCommands] = useState<DeviceCommand[]>([]);
+  const [pollError, setPollError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -75,11 +84,26 @@ export function DeviceDetailPage() {
   // acknowledges it (see device-commands.service.ts). Without this, the history table looks
   // permanently frozen even on a command that resolves moments after the user looks away.
   useEffect(() => {
-    const hasOpenCommand = commands.some((c) => c.status === 'PENDING' || c.status === 'SENT');
+    const hasOpenCommand = commands.some((c) => OPEN_COMMAND_STATUSES.has(c.status));
     if (!hasOpenCommand) return;
-    const timer = setInterval(() => loadData({ silent: true }), 5000);
+    setPollError(null);
+    let consecutiveFailures = 0;
+    const timer = setInterval(() => {
+      api.get<DeviceCommand[]>(`/api/v1/devices/${id}/commands`)
+        .then((cmdData) => {
+          consecutiveFailures = 0;
+          setPollError(null);
+          setCommands(cmdData);
+        })
+        .catch(() => {
+          // A silent poll failure used to be fully suppressed — a command could sit at a stale
+          // status indefinitely with no indication the page had stopped actually checking.
+          consecutiveFailures += 1;
+          if (consecutiveFailures >= 2) setPollError('Could not refresh command status — this list may be stale.');
+        });
+    }, 5000);
     return () => clearInterval(timer);
-  }, [commands, loadData]);
+  }, [commands, id]);
 
   async function handleSendCommand() {
     if (!id) return;
@@ -152,6 +176,7 @@ export function DeviceDetailPage() {
         </Link>
       </div>
 
+      {device.restaurantId&&<Link className="btn btn-ghost" to={`/restaurants/${device.restaurantId}?tab=devices${device.branchId?'&branchId='+encodeURIComponent(device.branchId):''}`}>Back to restaurant branch devices</Link>}
       {/* Header Profile */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
         <div>
@@ -172,22 +197,22 @@ export function DeviceDetailPage() {
 
         {/* Action Controls */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Button variant="ghost" onClick={() => { setSelectedCommand('REQUEST_SYNC'); setCommandModalOpen(true); }}>
+          <Button variant="ghost" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to send device commands"} onClick={() => { setSelectedCommand('REQUEST_SYNC'); setCommandModalOpen(true); }}>
             <RefreshCw className="w-4 h-4 mr-1.5" /> Request Sync
           </Button>
           {device.isLocked ? (
-            <Button variant="ghost" onClick={() => { setSelectedCommand('UNLOCK'); setCommandModalOpen(true); }}>
+            <Button variant="ghost" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to unlock devices"} onClick={() => { setSelectedCommand('UNLOCK'); setCommandModalOpen(true); }}>
               <Unlock className="w-4 h-4 mr-1.5" /> Unlock Device
             </Button>
           ) : (
-            <Button variant="ghost" style={{ color: 'var(--jv-warning-text)', borderColor: 'var(--jv-warn-line)' }} onClick={() => { setSelectedCommand('LOCK'); setCommandModalOpen(true); }}>
+            <Button variant="ghost" style={{ color: 'var(--jv-warning-text)', borderColor: 'var(--jv-warn-line)' }} disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to lock devices"} onClick={() => { setSelectedCommand('LOCK'); setCommandModalOpen(true); }}>
               <Lock className="w-4 h-4 mr-1.5" /> Lock Device
             </Button>
           )}
-          <Button variant="accent" onClick={() => setCommandModalOpen(true)}>
+          <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to dispatch commands"} onClick={() => setCommandModalOpen(true)}>
             <Send className="w-4 h-4 mr-1.5" /> Dispatch Command
           </Button>
-          <Button variant="danger" onClick={() => setWipeModalOpen(true)}>
+          <Button variant="danger" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to remote-wipe devices"} onClick={() => setWipeModalOpen(true)}>
             <ShieldAlert className="w-4 h-4 mr-1.5" /> Remote Wipe
           </Button>
         </div>
@@ -257,8 +282,10 @@ export function DeviceDetailPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--jv-text-muted)' }}>Reported Sync Status</span>
-              <Badge tone={device.syncStatus?.includes('error') ? 'error' : 'success'}>
-                {device.syncStatus || 'nominal'}
+              {/* A device that never reported a sync status used to show the literal word "nominal"
+                  in a green badge — claiming a health check that was never actually made. */}
+              <Badge tone={device.syncStatus?.includes('error') ? 'error' : device.syncStatus ? 'success' : 'neutral'}>
+                {device.syncStatus || 'Unknown — never reported'}
               </Badge>
             </div>
           </div>
@@ -268,7 +295,12 @@ export function DeviceDetailPage() {
       {/* Remote Commands Audit History */}
       <Card className="card-pad">
         <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Remote Command History ({commands.length})</h3>
-        {commands.some((c) => c.status === 'PENDING' || c.status === 'SENT') && !isOnline && (
+        {pollError && (
+          <div role="alert" style={{ background: 'var(--jv-warning-soft, #fffbeb)', border: '1px solid var(--jv-warn-line, #fde68a)', borderRadius: 10, padding: '8px 14px', marginBottom: 12, fontSize: 12.5, color: 'var(--jv-warning-text, #92400e)' }}>
+            {pollError}
+          </div>
+        )}
+        {commands.some((c) => OPEN_COMMAND_STATUSES.has(c.status)) && !isOnline && (
           <div style={{ background: 'var(--jv-surface-muted, #f1f5f9)', border: '1px solid var(--jv-border-subtle)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12.5, color: 'var(--jv-text-muted)' }}>
             This terminal is <strong>offline</strong> (last check-in {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : 'never'}). A command below waits in queue and is only marked executed once the terminal itself checks in and confirms it — it is not stuck, it is waiting on the device. Lock/Unlock take effect immediately regardless (enforced on every cloud request), independent of this row.
           </div>
@@ -302,17 +334,17 @@ export function DeviceDetailPage() {
                             ? 'success'
                             : cmd.status === 'FAILED'
                             ? 'error'
-                            : (cmd.status === 'PENDING' || cmd.status === 'SENT')
+                            : OPEN_COMMAND_STATUSES.has(cmd.status)
                             ? 'warning'
                             : 'neutral'
                         }
                       >
                         {cmd.status}
                       </Badge>
-                      {(cmd.status === 'PENDING' || cmd.status === 'SENT') && (cmd.commandType === 'LOCK' || cmd.commandType === 'UNLOCK') && (
+                      {OPEN_COMMAND_STATUSES.has(cmd.status) && (cmd.commandType === 'LOCK' || cmd.commandType === 'UNLOCK') && (
                         <div style={{ fontSize: 11, color: 'var(--jv-success-text)', marginTop: 3, fontWeight: 700 }}>Applied already — awaiting device confirmation</div>
                       )}
-                      {(cmd.status === 'PENDING' || cmd.status === 'SENT') && cmd.commandType !== 'LOCK' && cmd.commandType !== 'UNLOCK' && !isOnline && (
+                      {OPEN_COMMAND_STATUSES.has(cmd.status) && cmd.commandType !== 'LOCK' && cmd.commandType !== 'UNLOCK' && !isOnline && (
                         <div style={{ fontSize: 11, color: 'var(--jv-text-light)', marginTop: 3 }}>Waiting for terminal to check in</div>
                       )}
                     </td>

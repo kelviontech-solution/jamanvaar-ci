@@ -21,7 +21,7 @@ import { CreateTenantStaffUserDto, TenantLoginDto, ActivateDeviceDto, LoginOwner
 import { ApplicationEntitlementsService } from '../application-entitlements/application-entitlements.service';
 import { AppCode } from '@prisma/client';
 import { EmailService } from '../notifications/email.service';
-import { passwordResetOtpEmail, restaurantIdRecoveryEmail } from '../notifications/email-templates';
+import { passwordResetOtpEmail, restaurantIdRecoveryEmail, recoveryEmailOtpEmail } from '../notifications/email-templates';
 import { RestaurantsService } from '../restaurants/restaurants.service';
 
 /** A restaurant with a single active branch has an obvious answer for which branch a new terminal belongs to. */
@@ -356,8 +356,11 @@ export class TenantAuthService {
     // requirement is enforced server-side for it unconditionally — the client can no
     // longer opt out of it by omitting the flag.
     const isAdminConsoleDevice = deviceType === 'POS_ADMIN';
-    if ((opts.adminOnly || isAdminConsoleDevice) && matchedUser.role !== 'OWNER' && matchedUser.role !== 'MANAGER') {
-      throw new ForbiddenException('This login is restricted to restaurant owners and managers.');
+    // ACCOUNTANT is also an admin-console login -- pos-admin itself renders it a fixed,
+    // read-only collections/refunds/taxes/exports view (see completeLogin in App.tsx) rather
+    // than the normal owner/manager console, so letting it through here is safe.
+    if ((opts.adminOnly || isAdminConsoleDevice) && !['OWNER', 'MANAGER', 'ACCOUNTANT'].includes(matchedUser.role)) {
+      throw new ForbiddenException('This login is restricted to restaurant owners, managers and accountants.');
     }
 
     if (opts.requestedProduct === 'QR_ORDERING') {
@@ -1066,6 +1069,12 @@ export class TenantAuthService {
     void this.email.send(found.user.email, mail.subject, mail.html).catch(() => {
       // A mail server problem must not reveal anything to the caller; the code simply never arrives and they can ask again.
     });
+    // #16: the same working code also reaches the verified recovery mailbox, if one exists --
+    // the whole point of verifying it is so a reset is still possible when the primary login
+    // email itself is the thing the owner has lost access to.
+    if (found.user.recoveryEmail && found.user.recoveryEmailVerifiedAt) {
+      void this.email.send(found.user.recoveryEmail, mail.subject, mail.html).catch(() => {});
+    }
   }
 
   /**
@@ -1109,6 +1118,91 @@ export class TenantAuthService {
       return 'ok';
     });
     if (outcome !== 'ok') throw new BadRequestException('That code is not valid or has expired. Ask for a new one.');
+  }
+
+  /** Same shape as the password-reset OTP: 15 minutes, 5 attempts, 60s resend cooldown. */
+  private static readonly RECOVERY_EMAIL_OTP_MINUTES = 15;
+  private static readonly RECOVERY_EMAIL_MAX_ATTEMPTS = 5;
+  private static readonly RECOVERY_EMAIL_RESEND_SECONDS = 60;
+
+  /**
+   * #16: step 1 of verifying an alternate recovery mailbox. Requires the caller's current
+   * session (set from the signed-in owner/manager, not an arbitrary user id) so this can never
+   * be used to probe or overwrite someone else's recovery address. Mirrors requestPasswordReset's
+   * security shape exactly (hash-only storage, expiry, resend cooldown) rather than inventing a
+   * second one.
+   */
+  async requestRecoveryEmailVerification(actor: User, recoveryEmail: string): Promise<void> {
+    const normalized = recoveryEmail.trim().toLowerCase();
+    if (normalized === actor.email.trim().toLowerCase()) {
+      throw new BadRequestException('Recovery email must be different from your login email.');
+    }
+    const found = await this.prisma.runAsTenant(actor.restaurantId, async (tx) => {
+      const user = await tx.user.findUnique({ where: { id: actor.id } });
+      if (!user) return null;
+      const now = new Date();
+      if (user.recoveryEmailOtpSentAt && now.getTime() - user.recoveryEmailOtpSentAt.getTime() < TenantAuthService.RECOVERY_EMAIL_RESEND_SECONDS * 1000) {
+        throw new BadRequestException('A code was already sent recently. Wait a moment before asking for another.');
+      }
+      const otp = String(randomInt(0, 1_000_000)).padStart(6, '0');
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          // Not yet verified: stored alongside the pending address until confirmed, same as passwordResetHash.
+          recoveryEmailOtpHash: hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!),
+          recoveryEmailOtpExpiresAt: new Date(now.getTime() + TenantAuthService.RECOVERY_EMAIL_OTP_MINUTES * 60_000),
+          recoveryEmailOtpSentAt: now,
+          recoveryEmailOtpAttempts: 0,
+          recoveryEmail: normalized
+        }
+      });
+      await this.audit.log(
+        { actorType: 'TENANT', actorId: user.id, restaurantId: actor.restaurantId, action: 'TENANT_RECOVERY_EMAIL_REQUESTED', category: 'AUTH', details: { recoveryEmail: normalized } },
+        tx
+      );
+      return { user, otp };
+    });
+    if (!found) return;
+    const mail = recoveryEmailOtpEmail({ fullName: found.user.fullName, otp: found.otp, minutesValid: TenantAuthService.RECOVERY_EMAIL_OTP_MINUTES });
+    void this.email.send(normalized, mail.subject, mail.html).catch(() => {});
+  }
+
+  /** #16: step 2 — the code emailed to the pending recovery address confirms the owner actually controls it. */
+  async confirmRecoveryEmail(actor: User, otp: string): Promise<void> {
+    const outcome = await this.prisma.runAsTenant(actor.restaurantId, async (tx): Promise<'ok' | 'invalid'> => {
+      const user = await tx.user.findUnique({ where: { id: actor.id } });
+      if (!user || !user.recoveryEmailOtpHash || !user.recoveryEmailOtpExpiresAt || !user.recoveryEmail) return 'invalid';
+      if (user.recoveryEmailOtpExpiresAt < new Date() || user.recoveryEmailOtpAttempts >= TenantAuthService.RECOVERY_EMAIL_MAX_ATTEMPTS) {
+        await tx.user.update({ where: { id: user.id }, data: { recoveryEmailOtpHash: null, recoveryEmailOtpExpiresAt: null, recoveryEmail: null } });
+        return 'invalid';
+      }
+      const given = Buffer.from(hashLowEntropySecret(otp, this.config.get<string>('JWT_ACCESS_SECRET')!));
+      const stored = Buffer.from(user.recoveryEmailOtpHash);
+      if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
+        await tx.user.update({ where: { id: user.id }, data: { recoveryEmailOtpAttempts: { increment: 1 } } });
+        return 'invalid';
+      }
+      await tx.user.update({
+        where: { id: user.id },
+        data: { recoveryEmailVerifiedAt: new Date(), recoveryEmailOtpHash: null, recoveryEmailOtpExpiresAt: null, recoveryEmailOtpAttempts: 0 }
+      });
+      await this.audit.log(
+        { actorType: 'TENANT', actorId: user.id, restaurantId: actor.restaurantId, action: 'TENANT_RECOVERY_EMAIL_VERIFIED', category: 'AUTH', details: { recoveryEmail: user.recoveryEmail } },
+        tx
+      );
+      return 'ok';
+    });
+    if (outcome !== 'ok') throw new BadRequestException('That code is not valid or has expired. Ask for a new one.');
+  }
+
+  /** #16: clears a verified (or pending) recovery email, e.g. before replacing it with a different one. */
+  async clearRecoveryEmail(actor: User): Promise<void> {
+    await this.prisma.runAsTenant(actor.restaurantId, (tx) =>
+      tx.user.update({
+        where: { id: actor.id },
+        data: { recoveryEmail: null, recoveryEmailVerifiedAt: null, recoveryEmailOtpHash: null, recoveryEmailOtpExpiresAt: null, recoveryEmailOtpAttempts: 0 }
+      })
+    );
   }
 
   /**

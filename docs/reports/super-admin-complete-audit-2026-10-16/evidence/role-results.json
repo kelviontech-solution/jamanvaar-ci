@@ -1,0 +1,148 @@
+{
+  "at": "2026-10-16T14:29:18.738Z",
+  "results": [
+    {
+      "role": "READ_ONLY",
+      "path": "/applications",
+      "controls": [
+        {
+          "label": "Publish Version",
+          "enabled": true
+        },
+        {
+          "label": "Publish Version",
+          "enabled": true
+        },
+        {
+          "label": "Publish Version",
+          "enabled": true
+        },
+        {
+          "label": "Publish Version",
+          "enabled": true
+        },
+        {
+          "label": "Publish Version",
+          "enabled": true
+        },
+        {
+          "label": "Publish Version",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/backups",
+      "controls": [
+        {
+          "label": "Trigger Snapshot",
+          "enabled": true
+        },
+        {
+          "label": "All Snapshots0",
+          "enabled": true
+        },
+        {
+          "label": "Trigger First Snapshot",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/payouts",
+      "controls": [
+        {
+          "label": "Run EOD batch now",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/billing",
+      "controls": [
+        {
+          "label": "Issue Invoice",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/status-history",
+      "controls": [
+        {
+          "label": "+ Open Incident",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/sandboxes",
+      "controls": [
+        {
+          "label": "Clone New Sandbox",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/ai-assistant",
+      "controls": [
+        {
+          "label": "Add Custom Query",
+          "enabled": true
+        },
+        {
+          "label": "Save Global Thresholds",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/feature-catalog",
+      "controls": []
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/plans",
+      "controls": [
+        {
+          "label": "Create Plan",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/devices/adde8ba7-b338-4821-943c-33a47ef50024",
+      "controls": [
+        {
+          "label": "Dispatch Command",
+          "enabled": true
+        },
+        {
+          "label": "Remote Wipe",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/api/v1/applications/releases",
+      "attempt": "POST empty body, no release created",
+      "status": 403
+    },
+    {
+      "role": "READ_ONLY",
+      "path": "/api/v1/platform/backups/d9570b92-c599-4a55-80fc-ac833433c305/trigger",
+      "attempt": "POST, expect authorization rejection",
+      "status": 403
+    }
+  ]
+}

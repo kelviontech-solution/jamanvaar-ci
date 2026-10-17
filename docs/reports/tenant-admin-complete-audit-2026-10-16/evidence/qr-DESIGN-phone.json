@@ -1,0 +1,352 @@
+{
+  "url": "/qr/admin/?tab=DESIGN",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Design Studio\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / BRANDING\nQR Design Studio\n\nMake table cards that feel at home in your restaurant.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nRestaurant-wide QR presentation: this design applies to table QR guests across all branches. Review the live preview before saving. Kiosk welcome designs remain separate.\n\nQR Design Studio\n\nChoose a design once; each card keeps its own table's active QR destination.\n\nMinimal white\nPremium restaurant\nSELECTED\nModern colorful\nCafe\nFine dining\nFamily restaurant\nCasual dining\nTakeaway\nTable number card\nInstruction\nFooter\nAccent\nPrint layout\nTable card\nFolded table tent\nSmall label\nRestaurant logo\nSave design\nBranch\nCurrent admin scope\nGarden House Flow QA — Main Branch\n\nSelect individual tables, or leave all unchecked to export this branch.\n\nPrint / PDF selected\nDownload design set\nNo active table QR codes yet — generate one in Tables & QR first.\nPrint preview\n\nSample preview — illustrates your design choices, not a real scannable code. Generate a table in Tables & QR for the real one.\n\nYour Restaurant Name\nScan to Order\n12\nFreshly prepared. Thoughtfully served.\nPNG\nSVG\n\n1920 × 2580 PNG. Black modules, white quiet zone. Tent printing repeats this card across the fold.\n\nDisplay",
+  "headings": [
+    "QR Design Studio",
+    " QR Design Studio",
+    "Print preview"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Design Studio",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Minimal white",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Premium restaurantSelected",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 70
+    },
+    {
+      "text": "Modern colorful",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Cafe",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Fine dining",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Family restaurant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Casual dining",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Takeaway",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Table number card",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 316,
+      "height": 66
+    },
+    {
+      "text": "Save design",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 134,
+      "height": 44
+    },
+    {
+      "text": "Print / PDF selected",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 186,
+      "height": 44
+    },
+    {
+      "text": "Download design set",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 194,
+      "height": 44
+    },
+    {
+      "text": "PNG",
+      "aria": null,
+      "title": "Generate a real table QR first — a sample can't be downloaded as a working code.",
+      "disabled": true,
+      "width": 62,
+      "height": 44
+    },
+    {
+      "text": "SVG",
+      "aria": null,
+      "title": "Generate a real table QR first — a sample can't be downloaded as a working code.",
+      "disabled": true,
+      "width": 59,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "QR instruction",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Footer",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "color",
+      "label": "QR accent",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Print layoutTable cardFolded table tentSmall label"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Restaurant logo",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Branch"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

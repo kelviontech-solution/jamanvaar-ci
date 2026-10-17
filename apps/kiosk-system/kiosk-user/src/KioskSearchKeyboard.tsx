@@ -6,12 +6,19 @@ export function KioskSearchKeyboard({
   value,
   onChange,
   onClose,
-  title
+  title,
+  confirmLabel = 'Show results',
+  placeholder = 'Type a name or option',
+  ariaLabel = 'Touch search text'
 }: {
   value: string;
   onChange: (value: string) => void;
   onClose: () => void;
   title: string;
+  /** This component started life as search-only ("Show results"); other reused fields (coupon code, kitchen note) pass their own label. */
+  confirmLabel?: string;
+  placeholder?: string;
+  ariaLabel?: string;
 }) {
   const [numbers, setNumbers] = useState(false);
   const rows = numbers ? ['1234567890', '-_.()&/'] : ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
@@ -23,17 +30,17 @@ export function KioskSearchKeyboard({
       maxWidth="2xl"
       footer={
         <button type="button" className="min-h-12 rounded-xl bg-jaman-saffron text-white font-bold px-6" onClick={onClose}>
-          Show results
+          {confirmLabel}
         </button>
       }
     >
       <input
-        aria-label="Touch search text"
+        aria-label={ariaLabel}
         inputMode="none"
         readOnly
         value={value}
         className="w-full rounded-xl border p-4 text-lg mb-4"
-        placeholder="Type a name or option"
+        placeholder={placeholder}
       />
       <div className="space-y-2">
         {rows.map((row) => (

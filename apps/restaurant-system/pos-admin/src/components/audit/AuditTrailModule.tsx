@@ -13,12 +13,24 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
 }) => {
   const [auditSearch, setAuditSearch] = useState('');
   const [auditCategoryFilter, setAuditCategoryFilter] = useState<string>('ALL');
+  // #9: owners had to type a search term or already know a category to find "what changed
+  // recently" for prices, availability or rewards -- these presets match the real action names
+  // those events are logged under, so reviewing them takes one click instead of guessing text.
+  // Payment settings are intentionally not included: those changes go through Super
+  // Admin-verified cloud settings (PaymentConnectionPanel), not this local audit log, so a
+  // preset here would silently show nothing and look broken.
+  const RECENT_CHANGE_PRESETS: Array<{ id: string; label: string; actions: string[] }> = [
+    { id: 'PRICING', label: 'Pricing & Availability', actions: ['MENU_ITEM_UPDATED', 'MENU_ITEM_CREATED', 'BULK_PRICE_ADJUSTMENT', 'ITEM_AVAILABILITY_CHANGED'] },
+    { id: 'REWARDS', label: 'Rewards & Loyalty', actions: ['LOYALTY_REWARD_CREATED', 'LOYALTY_REWARD_REDEEMED', 'LOYALTY_TIER_CREATED', 'LOYALTY_TIER_UPGRADED', 'LOYALTY_PROGRAM_RATE_CHANGED', 'LOYALTY_POINTS_AWARDED', 'CAMPAIGN_CREATED'] }
+  ];
+  const [recentChangePreset, setRecentChangePreset] = useState<string | null>(null);
 
   const auditCategories = useMemo(() => {
     return Array.from(new Set(auditLogs.map((l) => l.category).filter(Boolean)));
   }, [auditLogs]);
 
   const filteredAuditLogs = useMemo(() => {
+    const preset = RECENT_CHANGE_PRESETS.find((p) => p.id === recentChangePreset);
     return auditLogs.filter((log) => {
       const matchesSearch =
         !auditSearch ||
@@ -29,9 +41,11 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
       const matchesCat =
         auditCategoryFilter === 'ALL' || log.category === auditCategoryFilter;
 
-      return matchesSearch && matchesCat;
+      const matchesPreset = !preset || preset.actions.includes(log.action);
+
+      return matchesSearch && matchesCat && matchesPreset;
     });
-  }, [auditLogs, auditSearch, auditCategoryFilter]);
+  }, [auditLogs, auditSearch, auditCategoryFilter, recentChangePreset]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -54,6 +68,24 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
             {filteredAuditLogs.length} Events Recorded
           </span>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recently changed:</span>
+        {RECENT_CHANGE_PRESETS.map((preset) => (
+          <button
+            key={preset.id}
+            type="button"
+            onClick={() => setRecentChangePreset((current) => (current === preset.id ? null : preset.id))}
+            className={`min-h-11 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+              recentChangePreset === preset.id
+                ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40'
+                : 'bg-white text-jaman-navy border-jaman-border hover:bg-jaman-cream'
+            }`}
+          >
+            {preset.label}
+          </button>
+        ))}
       </div>
 
       <div className="bg-white rounded-2xl border border-jaman-border overflow-hidden shadow-2xs space-y-0">
@@ -103,11 +135,12 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
               ))}
             </select>
 
-            {(auditSearch || auditCategoryFilter !== 'ALL') && (
+            {(auditSearch || auditCategoryFilter !== 'ALL' || recentChangePreset) && (
               <button
                 onClick={() => {
                   setAuditSearch('');
                   setAuditCategoryFilter('ALL');
+                  setRecentChangePreset(null);
                 }}
                 className="text-xs text-brand font-bold hover:underline cursor-pointer"
               >
@@ -125,16 +158,17 @@ export const AuditTrailModule: React.FC<AuditTrailModuleProps> = ({
             <div>
               <h4 className="font-bold text-jaman-navy text-sm">No Audit Trail Events Found</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mt-0.5">
-                {auditSearch || auditCategoryFilter !== 'ALL'
-                  ? 'No events match the current search or category filter.'
+                {auditSearch || auditCategoryFilter !== 'ALL' || recentChangePreset
+                  ? 'No events match the current search, category or preset filter.'
                   : 'Operational security events will automatically be recorded here.'}
               </p>
             </div>
-            {(auditSearch || auditCategoryFilter !== 'ALL') && (
+            {(auditSearch || auditCategoryFilter !== 'ALL' || recentChangePreset) && (
               <button
                 onClick={() => {
                   setAuditSearch('');
                   setAuditCategoryFilter('ALL');
+                  setRecentChangePreset(null);
                 }}
                 className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
               >

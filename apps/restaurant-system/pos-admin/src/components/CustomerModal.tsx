@@ -29,6 +29,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
   const [notes, setNotes] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>(['REGULAR']);
   const [loyaltyPoints, setLoyaltyPoints] = useState('50');
+  const [whatsappConsent, setWhatsappConsent] = useState(true);
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       setNotes(customerToEdit.notes || '');
       setSelectedTags(customerToEdit.tags && customerToEdit.tags.length > 0 ? customerToEdit.tags : ['REGULAR']);
       setLoyaltyPoints((customerToEdit.loyaltyPoints ?? 50).toString());
+      setWhatsappConsent(customerToEdit.marketingConsent?.whatsapp ?? true);
     } else {
       setName('');
       setPhone('');
@@ -52,6 +54,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       setNotes('');
       setSelectedTags(['REGULAR']);
       setLoyaltyPoints('50');
+      setWhatsappConsent(true);
     }
   }, [customerToEdit, isOpen]);
 
@@ -105,6 +108,11 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       }
     }
 
+    // R09: Restaurant CRM campaigns had no channel-consent concept at all, unlike QR CRM's own
+    // consent-aware segmentation — and this app had no way to even record a customer's preference
+    // in the first place. Only recorded as changed when the checkbox is actually touched here, so
+    // editing unrelated fields doesn't fabricate a new consent timestamp for a value nobody set.
+    const consentChanged = whatsappConsent !== (customerToEdit?.marketingConsent?.whatsapp ?? true);
     const payload: Partial<CustomerAccount> = {
       name,
       email,
@@ -113,7 +121,10 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
       anniversary,
       notes,
       tags: selectedTags,
-      loyaltyPoints: Number(loyaltyPoints) || 0
+      loyaltyPoints: Number(loyaltyPoints) || 0,
+      ...(consentChanged
+        ? { marketingConsent: { ...customerToEdit?.marketingConsent, whatsapp: whatsappConsent, email: customerToEdit?.marketingConsent?.email ?? false, source: 'RESTAURANT_ADMIN_STAFF_ENTRY', at: new Date().toISOString() } }
+        : {})
     };
 
     if (customerToEdit) {
@@ -268,6 +279,12 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
             ))}
           </div>
         </div>
+
+        {/* WhatsApp Marketing Consent */}
+        <label className="flex items-center gap-2 text-xs font-bold text-slate-600 bg-jaman-ivory border border-jaman-border rounded-xl px-3 py-2.5 cursor-pointer">
+          <input type="checkbox" checked={whatsappConsent} onChange={(e) => setWhatsappConsent(e.target.checked)} />
+          <span>OK to send WhatsApp marketing campaigns (offers, announcements) to this guest</span>
+        </label>
 
         {/* Notes & Special Dietary Instructions */}
         <div>

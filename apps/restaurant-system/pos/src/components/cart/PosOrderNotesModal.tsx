@@ -25,6 +25,14 @@ export const PosOrderNotesModal: React.FC<PosOrderNotesModalProps> = ({ isOpen, 
   const { orderNotes, setOrderNotes } = usePosStore();
   const [customText, setCustomText] = useState(orderNotes || '');
 
+  // This modal never unmounts between opens (it just renders null while closed), so its
+  // textarea state would otherwise freeze at whatever was typed the first time it opened —
+  // including into a cart that was cleared and started fresh for a new guest since. Resync
+  // from the store's current note every time it's reopened, not only on first mount.
+  useEffect(() => {
+    if (isOpen) setCustomText(orderNotes || '');
+  }, [isOpen, orderNotes]);
+
   // Escape closes this dialog like any other in the app, not just its own Close button.
   useEffect(() => {
     if (!isOpen) return;

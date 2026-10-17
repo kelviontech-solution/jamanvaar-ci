@@ -64,10 +64,12 @@ export class SyncObservabilityController {
   @UseGuards(PlatformAuthGuard)
   resolveConflict(
     @Param('id') conflictId: string,
-    @Body('strategy') strategy: 'CLOUD_WINS' | 'LOCAL_WINS' | 'MANUAL_MERGE',
+    @Body('strategy') strategy: string,
+    @Body('mergedVersion') mergedVersion: Record<string, unknown> | undefined,
     @CurrentPlatformUser() actor: PlatformUser
   ) {
-    return this.syncObservabilityService.resolveConflict(conflictId, strategy, actor);
+    if (typeof strategy !== 'string' || !strategy) throw new BadRequestException('strategy is required');
+    return this.syncObservabilityService.resolveConflict(conflictId, strategy, actor, mergedVersion);
   }
 
   // Terminal / Device Sync reporting endpoint.

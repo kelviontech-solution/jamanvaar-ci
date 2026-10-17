@@ -19,7 +19,7 @@ export function useAdminProduct(tenantId: string | null, available: readonly Adm
     const remember=()=>{lastLocation.current=window.location.href;};
     const onPop = (event: PopStateEvent) => {
       const target=parseAdminRoute(window.location.pathname),destination=window.location.href;
-      if(pageRef.current === 'QR_ORDERING' && target.page !== 'QR_ORDERING' && !window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE,{cancelable:true}))) {
+      if(target.page !== pageRef.current && !window.dispatchEvent(new Event(QR_BEFORE_NAVIGATE,{cancelable:true}))) {
         // Keep the editor mounted until its themed confirmation resolves.
         event.stopImmediatePropagation();window.history.pushState({},'',lastLocation.current);
         void requestQrLeave().then(ok=>{if(ok){window.history.replaceState({},'',destination);setRoute(target);remember();}});
@@ -35,7 +35,7 @@ export function useAdminProduct(tenantId: string | null, available: readonly Adm
   useEffect(() => {
     if (!allowed || !resolved.product || !resolved.page || !storageKey) return;
     const path = adminPagePath(resolved.product, resolved.page);
-    if (window.location.pathname !== path) window.history.replaceState({}, '', path);
+    if (window.location.pathname !== path) window.history.replaceState({}, '', path + window.location.search);
     lastLocation.current=window.location.href;
     try {
       const current = readAdminPreference(localStorage.getItem(storageKey));
@@ -49,10 +49,12 @@ export function useAdminProduct(tenantId: string | null, available: readonly Adm
     try { if (storageKey) preference = readAdminPreference(localStorage.getItem(storageKey)); } catch {}
     const target = page || preference.pages?.[product] || 'DASHBOARD';
     if (!canAccessAdminPage(apps, product, target)) return;
-    const path = adminPagePath(product, target);
-    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    const basePath = adminPagePath(product, target);
+    const task = target === 'OPERATIONS_HUB' ? new URLSearchParams(window.location.search).get('opsTask') : null;
+    const path = basePath + (task ? '?opsTask=' + encodeURIComponent(task) : '');
+    if (window.location.pathname + window.location.search !== path) window.history.pushState({}, '', path);
     lastLocation.current=window.location.href;
-    setRoute(parseAdminRoute(path));
+    setRoute(parseAdminRoute(basePath));
   }, [ready, available.join(','), apps.join(','), storageKey]);
 
   return { product: allowed ? resolved.product : null, page: allowed ? resolved.page : null, navigate,

@@ -8,9 +8,14 @@ import { AuditRepository, db, PrintQueueRepository, ReceiptRepository } from '@j
 // ("TERMINAL: 11ea4a8b-e9a4-...") — meaningless and faintly alarming to a customer. Friendly
 // labels (POS-01, KIOSK-01, ...) already print fine as-is; only a raw UUID gets swapped out.
 const KIOSK_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function friendlyTerminalLabel(kioskId: string | undefined): string {
-  if (!kioskId) return 'KIOSK-01';
-  return KIOSK_UUID_RE.test(kioskId) ? 'Self-Order Kiosk' : kioskId;
+// F22: a cloud-activated terminal's own device id is ALSO a bare UUID, whichever app it is —
+// this used to assume any UUID-shaped id meant Kiosk, so a POS terminal's offline sale printed
+// "TERMINAL: Self-Order Kiosk" on its own receipt. The order's own source is what distinguishes
+// them; only fall back to a generic per-source label when no friendlier id string exists.
+const SOURCE_LABEL: Record<string, string> = { KIOSK: 'Self-Order Kiosk', POS: 'Counter POS', CAPTAIN: 'Captain App', QR_TABLE: 'Table QR', ONLINE: 'Online Order' };
+function friendlyTerminalLabel(kioskId: string | undefined, sourceType?: string): string {
+  if (!kioskId) return SOURCE_LABEL[sourceType ?? ''] ?? 'KIOSK-01';
+  return KIOSK_UUID_RE.test(kioskId) ? (SOURCE_LABEL[sourceType ?? ''] ?? 'Self-Order Kiosk') : kioskId;
 }
 
 export class PrinterService {
@@ -282,7 +287,7 @@ export class PrinterService {
     out += `${row(`ORDER #${order.orderNumber}`, `TOKEN #${order.tokenNumber}`)}\n`;
     out += `${row(formatDate(order.createdAt), formatTime(order.createdAt))}\n`;
     out += `${row(`TYPE: ${order.orderType}`, order.tableNumber ? `TABLE: ${order.tableNumber}` : 'COUNTER')}\n`;
-    out += `${row(`TERMINAL: ${friendlyTerminalLabel(order.kioskId)}`, `PAID: ${order.paymentMethod}`)}\n`;
+    out += `${row(`TERMINAL: ${friendlyTerminalLabel(order.kioskId, order.source_type)}`, `PAID: ${order.paymentMethod}`)}\n`;
     out += `${dashLine}\n`;
 
     // Table Header

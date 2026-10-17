@@ -1,0 +1,421 @@
+{
+  "at": "2026-10-16T17:13:18.031Z",
+  "head": "1fbe9342ffb31a9dbc61275ca65341bb0950fcb8",
+  "workingTree": true,
+  "files": [
+    {
+      "id": "SRC01",
+      "area": "Restore validation and commit",
+      "file": "apps/restaurant-system/pos-admin/src/components/RestoreModal.tsx",
+      "sha256": "6e924e93d00e5831f7a3b752c7a619e753bbbeb53d6cd054a42f23779500dbd8",
+      "lines": [
+        {
+          "needle": "handleFileUpload",
+          "line": 21
+        },
+        {
+          "needle": "handleApplyRestore",
+          "line": 44
+        },
+        {
+          "needle": "Snapshot Contents Validated",
+          "line": 139
+        }
+      ]
+    },
+    {
+      "id": "SRC02",
+      "area": "Backup/export",
+      "file": "apps/restaurant-system/pos-admin/src/components/backup/BackupRestoreModule.tsx",
+      "sha256": "1189d18311ac22cdc9d14aabd638eac7f7ddb462206821d3471da7ca08535128",
+      "lines": [
+        {
+          "needle": "LAST_BACKUP_KEY",
+          "line": 13
+        },
+        {
+          "needle": "fetchCloudBackups().then",
+          "line": 51
+        },
+        {
+          "needle": "handleExportJson",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "id": "SRC03",
+      "area": "Reports screen",
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportsDashboard.tsx",
+      "sha256": "410ee14a6f4e6621faf1c7a6c0c67747f3d72544d7bc103ff98426ea51e1dac0",
+      "lines": [
+        {
+          "needle": "isFilterDrawerOpen",
+          "line": 185
+        },
+        {
+          "needle": "const currentOrders",
+          "line": 265
+        },
+        {
+          "needle": "exportTransactionsCsv",
+          "line": 407
+        }
+      ]
+    },
+    {
+      "id": "SRC04",
+      "area": "Report engine",
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/reportDataEngine.ts",
+      "sha256": "aab227d2f60532964b5863ad00e576101009e2ad894d1ea99280074df79824ac",
+      "lines": [
+        {
+          "needle": "getDateRange(preset",
+          "line": 239
+        },
+        {
+          "needle": "getStationPerformance",
+          "line": 854
+        }
+      ]
+    },
+    {
+      "id": "SRC05",
+      "area": "Report document",
+      "file": "apps/restaurant-system/pos-admin/src/components/reports/ReportPreviewModal.tsx",
+      "sha256": "437e7d94cb9e062ca2c9bd487f1bfff8f34132e487569bc6a1e860e0e8c653e3",
+      "lines": [
+        {
+          "needle": "reportTitle: string",
+          "line": 23
+        },
+        {
+          "needle": "handleExportCsv",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "id": "SRC06",
+      "area": "Restaurant CRM",
+      "file": "apps/restaurant-system/pos-admin/src/components/customers/CustomersCrmModule.tsx",
+      "sha256": "4e7c0f89a94a7faf8d2f46365a831ed9aa382cdb0139c58f9985011a8de64a90",
+      "lines": [
+        {
+          "needle": "const richCustomers",
+          "line": 66
+        },
+        {
+          "needle": "handleAdjustPointsInDetail",
+          "line": 188
+        },
+        {
+          "needle": "handleRedeemReward",
+          "line": 210
+        }
+      ]
+    },
+    {
+      "id": "SRC07",
+      "area": "Manual campaign queue",
+      "file": "apps/restaurant-system/pos-admin/src/components/customers/MarketingCampaignsModal.tsx",
+      "sha256": "cd91216a0137d0087675baf9961dc98f3dd21e5d16b9657e39144b4f6dd999d8",
+      "lines": [
+        {
+          "needle": "startSending",
+          "line": 51
+        },
+        {
+          "needle": "window.open",
+          "line": 69
+        },
+        {
+          "needle": "markSent",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "id": "SRC08",
+      "area": "Customer/reward repositories",
+      "file": "packages/database/src/repositories.ts",
+      "sha256": "146cae71dc7ff91bc75745a2f689b37c48bb5369b57987832994ca9f5bb150ab",
+      "lines": [
+        {
+          "needle": "public static redeemReward",
+          "line": 1858
+        },
+        {
+          "needle": "public static getMatchingCustomers",
+          "line": 1958
+        },
+        {
+          "needle": "public static markSent",
+          "line": 1993
+        }
+      ]
+    },
+    {
+      "id": "SRC09",
+      "area": "Restaurant settings",
+      "file": "apps/restaurant-system/pos-admin/src/components/settings/ReportBrandingSettings.tsx",
+      "sha256": "ce560735451a3876bd0dd9c3266cb138049cd3de48680251953da6883e41508c",
+      "lines": [
+        {
+          "needle": "const handleSave",
+          "line": 59
+        },
+        {
+          "needle": "return (",
+          "line": 151
+        }
+      ]
+    },
+    {
+      "id": "SRC10",
+      "area": "Combo editor",
+      "file": "apps/restaurant-system/pos-admin/src/components/settings/KioskComboPanel.tsx",
+      "sha256": "d3539502a49d30d812b8735303011f9faaea497c241863262fa18a38b10d7010",
+      "lines": [
+        {
+          "needle": "export function KioskComboPanel",
+          "line": 5
+        },
+        {
+          "needle": "New Combo",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "id": "SRC11",
+      "area": "Admin composition",
+      "file": "apps/restaurant-system/pos-admin/src/App.tsx",
+      "sha256": "f0a86fb2ed03ac409a2ac8844d246e25f5f66ba05f60596a042d63a1e8dfcaf6",
+      "lines": [
+        {
+          "needle": "activeTab === 'DASHBOARD'",
+          "line": 820
+        },
+        {
+          "needle": "activeTab === 'KIOSK_PAYMENTS'",
+          "line": 982
+        }
+      ]
+    },
+    {
+      "id": "SRC12",
+      "area": "Payment composition",
+      "file": "apps/restaurant-system/pos-admin/src/components/payments/KioskPaymentSettingsPanel.tsx",
+      "sha256": "1cb1035d3d592aff5030aeef2bb4611f5753b4a475c68afbfd3f675fb05a0f5b",
+      "lines": [
+        {
+          "needle": "connection.status",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "id": "SRC13",
+      "area": "QR authorization matrix",
+      "file": "cloud/api/src/common/security/admin-product-access.ts",
+      "sha256": "d080942080897d5a545b0283c23656412590db4a50767b113638bf55224b7574",
+      "lines": [
+        {
+          "needle": "requiredConsoleApps",
+          "line": 14
+        },
+        {
+          "needle": "menu\\/",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "id": "SRC14",
+      "area": "QR guided menu setup",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrOnboarding.tsx",
+      "sha256": "f7996f34d33c8cb07b476281ace99b4f4e287be30c9661f5ce9ecfc2e07f18cc",
+      "lines": []
+    },
+    {
+      "id": "SRC15",
+      "area": "Shared onboarding",
+      "file": "apps/restaurant-system/pos-admin/src/components/dashboard/PlanOnboarding.tsx",
+      "sha256": "b36d647ea4b532526ade9c9fc446df9acf525f726b6a0cdeda5b2db125c7d3a4",
+      "lines": [
+        {
+          "needle": "fetchMenuDraftStatus()",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "id": "SRC16",
+      "area": "QR immediate saves",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrAdvanced.tsx",
+      "sha256": "ff41025b5869795ee175e9758adbdfb147702dad0cf8cf2c350449d00ba4c24e",
+      "lines": [
+        {
+          "needle": "export function QrOrderingRules",
+          "line": 420
+        },
+        {
+          "needle": "setRules(settings.data.rules)",
+          "line": 434
+        },
+        {
+          "needle": "void save({ [key]: checked })",
+          "line": 582
+        }
+      ]
+    },
+    {
+      "id": "SRC17",
+      "area": "QR branding",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrOperations.tsx",
+      "sha256": "c615be86c8e7bc030fe64fce1468e809a3afe125a830c15904e9c4e08de286d1",
+      "lines": [
+        {
+          "needle": "export function QrBrandStudio",
+          "line": 763
+        },
+        {
+          "needle": "catch(() => {})",
+          "line": 786
+        },
+        {
+          "needle": "QR Branding is not included",
+          "line": 923
+        }
+      ]
+    },
+    {
+      "id": "SRC18",
+      "area": "QR CRM",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCrm.tsx",
+      "sha256": "b8dd0cf02065ad251eeaeb3302e199adedbfe511f44fa42d9bcba211bdef3542",
+      "lines": [
+        {
+          "needle": "setRows([])",
+          "line": 87
+        },
+        {
+          "needle": "setTotal(r.total)",
+          "line": 93
+        },
+        {
+          "needle": "No customers match",
+          "line": 316
+        }
+      ]
+    },
+    {
+      "id": "SRC19",
+      "area": "QR catalog",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/QrCatalog.tsx",
+      "sha256": "000335e91cbcb4ee087e737e4c68351f38c511d269f140a4cbaff85f94a98f3a",
+      "lines": [
+        {
+          "needle": "const load = async",
+          "line": 87
+        },
+        {
+          "needle": "await load()",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "id": "SRC20",
+      "area": "QR feature requests",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/FeatureRequestButton.tsx",
+      "sha256": "52fc0e654e8a4b04a4f47a08d5c4c556fb24a4c028613de70ebe985cb5054801",
+      "lines": [
+        {
+          "needle": "setSent(true)",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "id": "SRC21",
+      "area": "QR request creation",
+      "file": "cloud/api/src/modules/qr/qr-admin.service.ts",
+      "sha256": "c3358581eaf641fa289953593a543cece9713bf3d749fbacab3afbfefeba55b8",
+      "lines": [
+        {
+          "needle": "async requestFeature",
+          "line": 105
+        },
+        {
+          "needle": "supportTicket.create",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "id": "SRC22",
+      "area": "QR navigation",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/qrNavigation.ts",
+      "sha256": "da04c3202f7b449fa9f78050c1423ed6ce320f55ce2d3621bcd891cc3e5ed6d5",
+      "lines": []
+    },
+    {
+      "id": "SRC23",
+      "area": "Product routes",
+      "file": "apps/restaurant-system/pos-admin/src/adminProducts.ts",
+      "sha256": "446b54c84c162429bb4d6a239c2cd62baf8c860948166725fde26c47e6a7e4e0",
+      "lines": [
+        {
+          "needle": "export const PRODUCT_PAGES",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "id": "SRC24",
+      "area": "Settings scopes",
+      "file": "apps/restaurant-system/pos-admin/src/components/settings/SettingsScopeNotice.tsx",
+      "sha256": "d31292d971c0420082d36964e042344bc2d4c3234430d9cdd52a2aa659a28c95",
+      "lines": []
+    },
+    {
+      "id": "SRC25",
+      "area": "Kiosk customer experience",
+      "file": "apps/restaurant-system/pos-admin/src/components/kiosk/CustomerExperience.tsx",
+      "sha256": "17811139493152de4b79d14224ba4918ca820aec9dc9f3fcf6560ea1d1ef7cd2",
+      "lines": []
+    },
+    {
+      "id": "SRC26",
+      "area": "Draft protections already present",
+      "file": "apps/restaurant-system/pos-admin/src/components/kiosk/useKioskDraft.tsx",
+      "sha256": "942939710de7a7ef086310e55fc8fc91c9e55b5f9270df7054a2e7564bc25fc8",
+      "lines": []
+    },
+    {
+      "id": "SRC27",
+      "area": "QR navigation safeguards",
+      "file": "apps/restaurant-system/pos-admin/src/components/qrconsole/useQrUnsavedChanges.ts",
+      "sha256": "a9e7ec4fa83ececd507fafa66224621a35f55591f04c04a9e5eb9c605e19a838",
+      "lines": []
+    },
+    {
+      "id": "SRC28",
+      "area": "Shared menu manager",
+      "file": "apps/restaurant-system/pos-admin/src/components/menu/MenuCategoriesModule.tsx",
+      "sha256": "2ea62a6446130bc283254ec58ba8b9dc0a32584cc55891cd68e082fa0eeaf1f6",
+      "lines": [
+        {
+          "needle": "function InlinePrice",
+          "line": 48
+        },
+        {
+          "needle": "username:",
+          "line": 59
+        }
+      ]
+    }
+  ]
+}

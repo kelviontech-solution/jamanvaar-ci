@@ -1,0 +1,29 @@
+{
+  "url": "/q/s6BiSPlfYkIAEWb3dzzfK5iPJbPNfl_f#status",
+  "text": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\nOrder cancelled\n\nQR-1\n\nReference JQ-SAR8FM4EEMCRZN9ZKEGUEVM9PN · Table T1 · ₹560\n\nThe restaurant could not take this order. Please ask a team member.\n\nPayment due at counter: ₹0. Please pay our team.\n\nRefresh order & payment\n\nCollected: ₹0 · Remaining: ₹0\n\nOrder details / receipt\nOrder more\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "headings": [
+    "Order cancelled"
+  ],
+  "buttons": [
+    {
+      "text": "Refresh order & payment",
+      "aria": null,
+      "disabled": false,
+      "width": 155,
+      "height": 44
+    },
+    {
+      "text": "Order more",
+      "aria": null,
+      "disabled": false,
+      "width": 316,
+      "height": 53
+    }
+  ],
+  "fields": []
+}

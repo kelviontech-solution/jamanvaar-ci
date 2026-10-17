@@ -126,8 +126,10 @@ export function OwnerDetailPage() {
       if (res.emailSent) {
         showToast(`New invitation emailed to ${owner.email}`);
       } else {
-        navigator.clipboard?.writeText(res.activationToken).catch(() => {});
-        showToast(`Email could not be sent — token copied to clipboard`);
+        const copied = await copyText(res.activationToken);
+        showToast(copied
+          ? 'Email could not be sent — token copied to clipboard'
+          : `Email could not be sent, and the token could not be copied automatically. Token: ${res.activationToken}`);
       }
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Failed to resend invite');

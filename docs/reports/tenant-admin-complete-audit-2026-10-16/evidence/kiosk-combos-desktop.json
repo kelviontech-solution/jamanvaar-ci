@@ -1,0 +1,242 @@
+{
+  "url": "/kiosk-admin/combos",
+  "text": "Kiosk-only Flow QA\nKIOSK ADMIN\nKiosk-only Flow QA — Main Branch\nCtrl+K\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nKiosk-only Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nKiosk Terminals\nCustomer experience\nKiosk Combos & Deals\nQR ORDERING\nSETUP\nKiosk Combos & Deals\n\nBuild bundles from your own menu. Their price and tax are published as menu items so checkout uses the same amount. Make a combo unavailable to stop new orders and remove its promotion.\n\nNew Combo\nCombo name\nDescription\nBundle price (₹)\nImage URL\nTax group\nUse menu default\nFind dishes for this bundle\nMain items\nSides\nDrinks\nDesserts\nAvailable on kiosk\nFeatured promotion\nTranslation language\nen\nhi\ngu\nmr\nta\nte\nkn\nSave Combo\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Kiosk Combos & Deals"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Kiosk-only Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customer experience",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "New Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 114,
+      "height": 42
+    },
+    {
+      "text": "Save Combo",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 140,
+      "height": 48
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search combos",
+      "placeholder": "Search existing combos"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Combo name",
+      "placeholder": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Combo description",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Combo price",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Combo image URL",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Combo tax group"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search combo dishes",
+      "placeholder": "Search by name or SKU"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Available on kiosk",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Featured promotion",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Translation languageenhigumrtatekn"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Translated combo name",
+      "placeholder": "Translated name (optional)"
+    },
+    {
+      "tag": "TEXTAREA",
+      "type": "textarea",
+      "label": "Translated combo description",
+      "placeholder": "Translated description (optional)"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 6
+}

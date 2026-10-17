@@ -172,11 +172,16 @@ export class RestaurantPayoutsService {
     return { restaurantsConsidered: connections.length, payoutsCreated };
   }
 
-  async list(filters: { restaurantId?: string; status?: string; page: number; limit: number }) {
+  async list(filters: { restaurantId?: string; status?: string; search?: string; page: number; limit: number }) {
     return this.prisma.runAsPlatform(async (tx) => {
+      const search = filters.search?.trim();
       const where = {
         ...(filters.restaurantId ? { restaurantId: filters.restaurantId } : {}),
-        ...(filters.status ? { status: filters.status as never } : {})
+        ...(filters.status ? { status: filters.status as never } : {}),
+        // Was client-side only, over whatever page happened to already be loaded — a matching
+        // restaurant on page 2 was invisible while viewing page 1. Matches a restaurant by name
+        // or the exact businessDate (YYYYMMDD) string the frontend already asks for.
+        ...(search ? { OR: [{ restaurant: { name: { contains: search, mode: 'insensitive' as const } } }, { businessDate: { contains: search } }] } : {})
       };
       const [rows, total] = await Promise.all([
         tx.restaurantPayout.findMany({

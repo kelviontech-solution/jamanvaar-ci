@@ -1,0 +1,289 @@
+{
+  "at": "2026-10-17T06:31:02.009Z",
+  "head": "1fbe9342ffb31a9dbc61275ca65341bb0950fcb8",
+  "workingTree": "Dirty; existing application changes were preserved. This audit adds scripts and documentation only.",
+  "files": [
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/PosProductCard.tsx",
+      "sha256": "4940f9472fb84112085e436d250855cb5db0cecdc2f26ae5a0ca10546dd3f8e8",
+      "anchors": [
+        {
+          "anchor": "hasRequiredModifiers",
+          "line": 24
+        },
+        {
+          "anchor": "handleCardClick",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/menu/CashierSpeedBar.tsx",
+      "sha256": "be834175540971b6d8324db555d03efbfb41b9808958b19b758917d6497c6792",
+      "anchors": [
+        {
+          "anchor": "setCustomizingItem",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/store/posStore.ts",
+      "sha256": "c3e1fc5bd12a2d9c82730c234870b7586e6f24c68e0192cb2b37c911bedf5373",
+      "anchors": [
+        {
+          "anchor": "setOrderNotes: (",
+          "line": 141
+        },
+        {
+          "anchor": "recallHeldOrder: (",
+          "line": 181
+        },
+        {
+          "anchor": "deliveryStatus: 'SENT'",
+          "line": 1306
+        },
+        {
+          "anchor": "loadOrderForSettlement: (",
+          "line": 225
+        },
+        {
+          "anchor": "recoverDraftSession: ()",
+          "line": 227
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/services/recoveryService.ts",
+      "sha256": "dffa3eb9c3dbef97ca0366c8d8299e41da0ffe112df6c63ae807826c9267951e",
+      "anchors": [
+        {
+          "anchor": "saveDraft",
+          "line": 10
+        },
+        {
+          "anchor": "const draft:",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/cart/PosOrderNotesModal.tsx",
+      "sha256": "c88fafe8e9db759b2a287702c084d74e0cef444d29c625c6326161b07dbf8592",
+      "anchors": [
+        {
+          "anchor": "const [customText",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/orders/PosOrdersView.tsx",
+      "sha256": "32d4f8fbba055b1c2ac6c0f7dced2ab902835b0ebc6609813e151c47ff8308a0",
+      "anchors": [
+        {
+          "anchor": "const handleSettleOrder",
+          "line": 94
+        },
+        {
+          "anchor": "const isUnconfirmedKioskUpi",
+          "line": 103
+        },
+        {
+          "anchor": "fall through to manual settlement",
+          "line": 124
+        },
+        {
+          "anchor": "loadOrderForSettlement",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/layout/PosHeader.tsx",
+      "sha256": "a6d163518dfe684da8dec1e3a39ef72ba18b8c1a693a02f8338ed68100d079e9",
+      "anchors": [
+        {
+          "anchor": "loadOrderForSettlement",
+          "line": 292
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/payment/PosPaymentModal.tsx",
+      "sha256": "a4a2d3a382ac828c1e0dbe56919f3fa65f5421537176daeaa0f5d4ea428eb67b",
+      "anchors": [
+        {
+          "anchor": "const handleDirectChannelAmountChange",
+          "line": 278
+        },
+        {
+          "anchor": "const secondary =",
+          "line": 284
+        },
+        {
+          "anchor": "Confirm and settle payment",
+          "line": 1212
+        }
+      ]
+    },
+    {
+      "file": "apps/restaurant-system/pos/src/components/receipt/PosThermalReceiptModal.tsx",
+      "sha256": "9b806bf97031fe8a54727adcf7669c5c7f0ce8801e4176e6aa2d9a6ecd1bfe2a",
+      "anchors": [
+        {
+          "anchor": "hasInteracted",
+          "line": 28
+        },
+        {
+          "anchor": "}, 6000)",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "file": "packages/ui/src/ThermalReceiptView.tsx",
+      "sha256": "13ef7c8ead63e4446ead130ae1afe8fedaa40a2c249b6fc821cd12b9bf63fc12",
+      "anchors": [
+        {
+          "anchor": "Self-Order Kiosk",
+          "line": 25
+        },
+        {
+          "anchor": "POS: ${",
+          "line": 197
+        }
+      ]
+    },
+    {
+      "file": "packages/api/src/printer.ts",
+      "sha256": "2fbcca59a94a22156b5cffd4deec1c99f18578c96046ecbfcf80fda2aa5ac364",
+      "anchors": [
+        {
+          "anchor": "Self-Order Kiosk",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "file": "apps/kiosk-system/kiosk-user/src/App.tsx",
+      "sha256": "d65c262a30b576aa0cb7b604a5cd7547531af24b52a0626006ab849b01a87786",
+      "anchors": [
+        {
+          "anchor": "const handleSelectItem",
+          "line": 1048
+        },
+        {
+          "anchor": "const addToCartDirect",
+          "line": 1064
+        },
+        {
+          "anchor": "totalAmount: result.amount",
+          "line": 1379
+        },
+        {
+          "anchor": "setAppliedCoupon(null); setRedeemedPoints",
+          "line": 1389
+        },
+        {
+          "anchor": "No SMS gateway configured",
+          "line": 1866
+        },
+        {
+          "anchor": "Enter coupon code",
+          "line": 3053
+        },
+        {
+          "anchor": "Math.min(loggedInAccount.loyaltyPoints",
+          "line": 3093
+        },
+        {
+          "anchor": "Kitchen tickets",
+          "line": 3442
+        }
+      ]
+    },
+    {
+      "file": "apps/qr-guest/src/App.tsx",
+      "sha256": "2e40855efc943053b47aeaf8fbb0fdba96a777bcd362b01f98e4e3a91133c820",
+      "anchors": [
+        {
+          "anchor": "sessionStorage.getItem",
+          "line": 50
+        },
+        {
+          "anchor": "recommendationIds.map",
+          "line": 313
+        },
+        {
+          "anchor": "function useQuote",
+          "line": 412
+        },
+        {
+          "anchor": "function Checkout",
+          "line": 473
+        },
+        {
+          "anchor": "MENU_CHANGED",
+          "line": 517
+        },
+        {
+          "anchor": "Payment due at counter:",
+          "line": 620
+        }
+      ]
+    },
+    {
+      "file": "apps/qr-guest/src/cart.ts",
+      "sha256": "e043d5eea942dd7982290ee94c3f0df28ad1e694520e974d7bb0791845cfe780",
+      "anchors": [
+        {
+          "anchor": "MAX_LINE_QUANTITY",
+          "line": 25
+        },
+        {
+          "anchor": "export function addLine",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "file": "apps/qr-guest/src/Operations.tsx",
+      "sha256": "389ff7f61b2da8b9cc09d2bc9856da78bee0a62633f6f5c27dbd8d7de9166fe4",
+      "anchors": [
+        {
+          "anchor": ".catch(() => {})",
+          "line": 22
+        },
+        {
+          "anchor": "if (!options?.serviceEnabled) return null",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "file": "apps/qr-guest/src/paymentProgress.ts",
+      "sha256": "b4c4fa425518253f5caecad1c47e8e45cbaee56d79d9b40760a7be53e9682c71",
+      "anchors": [
+        {
+          "anchor": "CANCELLED",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "file": "apps/qr-guest/src/api.ts",
+      "sha256": "7b0c05c5c26945c2e37e7c15356e18d0980bb17de6efc3bc3db76024b4604927",
+      "anchors": [
+        {
+          "anchor": "sessionStorage.getItem",
+          "line": 67
+        },
+        {
+          "anchor": "function imageSrc",
+          "line": 57
+        }
+      ]
+    }
+  ]
+}

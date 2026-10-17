@@ -14,8 +14,8 @@ export class ReportsController {
   }
 
   @Get('revenue')
-  getRevenue() {
-    return this.reportsService.getRevenue();
+  getRevenue(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.reportsService.getRevenue({ from, to });
   }
 
   @Get('margins')
@@ -31,8 +31,8 @@ export class ReportsController {
   }
 
   @Get('restaurants')
-  getRestaurants() {
-    return this.reportsService.getRestaurants();
+  getRestaurants(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.reportsService.getRestaurants({ from, to });
   }
 
   @Get('restaurants/:id/sales')
@@ -46,18 +46,18 @@ export class ReportsController {
   }
 
   @Get('devices')
-  getDevices() {
-    return this.reportsService.getDevices();
+  getDevices(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.reportsService.getDevices({ from, to });
   }
 
   @Get('subscriptions')
-  getSubscriptions() {
-    return this.reportsService.getSubscriptions();
+  getSubscriptions(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.reportsService.getSubscriptions({ from, to });
   }
 
   @Get('export')
-  async exportCsv(@Query('type') type: string = 'revenue', @Res() res: Response) {
-    const csvData = await this.reportsService.generateCsv(type);
+  async exportCsv(@Res() res: Response, @Query('type') type: string = 'revenue', @Query('from') from?: string, @Query('to') to?: string) {
+    const csvData = await this.reportsService.generateCsv(type, { from, to });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename=jamanvaar_${type}_report_${Date.now()}.csv`);
     return res.send(csvData);

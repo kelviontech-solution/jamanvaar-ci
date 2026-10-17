@@ -1,0 +1,406 @@
+{
+  "url": "/restaurant-admin/billing",
+  "text": "Garden House Flow QA\nRESTAURANT ADMIN\nGarden House Flow QA — Main Branch\nCtrl+K\nNo open shift\nEOD Report\nReconciliation\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nOperations hub\nBilling / Invoices\nRegister shifts & cash\nKitchen progress\nKitchen tickets\nFloor / Tables\nReservations\nInventory & Recipes\nPurchasing & Stock Control\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nBilling & Invoices\n● REAL-TIME DB\n\nManage sales, payments, invoices, and financial reconciliation.\n\nFlat Ledger\nDay-by-Day\nExport PDF\nExport CSV\nDATE SCOPE:\nToday\nYesterday\nLast 7 Days\nLast 30 Days\nThis Month\nThis Year\nCustom Date\nShowing: Today (16 Oct 2026) (0 Invoices)\nTOTAL ORDER VALUE\n₹0\n0 accepted orders\nTax: ₹0\nCASH\n₹0\n0 orders\nUPI / QR\n₹0\n0 orders\nCARD\n₹0\n0 orders\n↩️ REFUNDS\n-₹0\n0 refunds\nORDER MIX:\nDine-in: ₹0 (0)\nTakeaway: ₹0 (0)\nDelivery: ₹0 (0)\nQuick Token: ₹0 (0)\nCOLLECTED REVENUE\n₹0\n\nPayments received, after refunds.\n\nPENDING COLLECTION\n₹0\n\n0 orders awaiting payment. Settle kiosk cash orders in POS.\n\nAll order sources\nPOS orders\nKiosk orders\nQR Table orders\nCaptain orders\nOnline orders\nOther orders\nAll payment states\nPending collection\nPaid / refunded\nAll Statuses\nCompleted\nConfirmed\nPreparing\nReady\nVoided / Cancelled\nRefunded\nAll Cashiers\nAll Captains\nNo Invoices or Orders Found\n\nNo transaction records matched the selected date scope, tender filters, or search criteria.\n\nClear Filters & Show All Records\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Billing & Invoices",
+    "No Invoices or Orders Found",
+    "Garden House Flow QA",
+    "Billing statement"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Garden House Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "End of Day Financial Z-Report",
+      "disabled": false,
+      "width": 115,
+      "height": 40
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "Single-source-of-truth financial data consistency audit",
+      "disabled": false,
+      "width": 129,
+      "height": 40
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Restaurant Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Operations hub",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Billing / Invoices",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Register shifts & cash",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kitchen progress",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kitchen tickets",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Floor / Tables",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Reservations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Inventory & Recipes",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Purchasing & Stock Control",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Flat Ledger",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 28
+    },
+    {
+      "text": "Day-by-Day",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 99,
+      "height": 28
+    },
+    {
+      "text": "Export PDF",
+      "aria": null,
+      "title": "Download / Print Invoices Ledger as PDF",
+      "disabled": false,
+      "width": 113,
+      "height": 32
+    },
+    {
+      "text": "Export CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 117,
+      "height": 34
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 59,
+      "height": 28
+    },
+    {
+      "text": "Yesterday",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 83,
+      "height": 28
+    },
+    {
+      "text": "Last 7 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 89,
+      "height": 28
+    },
+    {
+      "text": "Last 30 Days",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 98,
+      "height": 28
+    },
+    {
+      "text": "This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 87,
+      "height": 28
+    },
+    {
+      "text": "This Year",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 75,
+      "height": 28
+    },
+    {
+      "text": "Custom Date",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 100,
+      "height": 28
+    },
+    {
+      "text": "Dine-in: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 113,
+      "height": 24
+    },
+    {
+      "text": "Takeaway: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 128,
+      "height": 24
+    },
+    {
+      "text": "Delivery: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 117,
+      "height": 24
+    },
+    {
+      "text": "Quick Token: ₹0 (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 141,
+      "height": 25
+    },
+    {
+      "text": "Pending collection₹00 orders awaiting payment. Settle kiosk cash orders in POS.",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 561,
+      "height": 114
+    },
+    {
+      "text": "Clear Filters & Show All Records",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 244,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search invoice, order, token, customer, phone, cashier, captain, table..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order source"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Collection status"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 22
+}

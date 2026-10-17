@@ -3,6 +3,7 @@ import { CachedImg, Modal, Button, MenuCategoryIcon } from '@jamanvaar/ui';
 import { PREBUILT_MENU_TEMPLATES, db, AuditRepository, KeyValueStore } from '@jamanvaar/database';
 import { MenuBuilderService, templateItemKey, templateCategoryKey, existingTemplateItem, exactCategory } from '@jamanvaar/business';
 import { publishMenuToGuests } from '../cloud/cloudClient';
+import { getCurrentAdminName } from '../currentAdminIdentity';
 interface Props { isOpen: boolean; onClose: () => void; onImported: (count: number) => void }
 // Keep old miniature presets compatible with saved IDs, but offer complete restaurant catalogs for onboarding.
 const onboardingTemplates = PREBUILT_MENU_TEMPLATES.filter(template => template.approxItemCount >= 25);
@@ -50,7 +51,7 @@ export const PrebuiltMenuModal: React.FC<Props> = ({ isOpen, onClose, onImported
         try {
           if (tenant !== KeyValueStore.get('jamanvaar_tenant_id')) throw Error('Restaurant changed. Close and preview again.');
           const result = MenuBuilderService.executeSelectiveImport([template.id], selected, {}, {}, { selectedOnly: true, selectedCategoryKeys: categories, duplicateStrategy: strategy, ...(taxId ? { taxGroupId: taxId } : {}) });
-          AuditRepository.log({ action: 'MENU_TEMPLATE_IMPORTED', category: 'MENU', details: `${template.name}: ${result.summaryMessage}`, username: 'Manager' });
+          AuditRepository.log({ action: 'MENU_TEMPLATE_IMPORTED', category: 'MENU', details: `${template.name}: ${result.summaryMessage}`, username: getCurrentAdminName() });
           onImported(result.importedItemsCount + result.updatedItemsCount);
           try { const published = await publishMenuToGuests('Restaurant menu template import'); setMessage(`${result.summaryMessage} Published menu version ${published.version} to QR ordering and connected terminals.`); }
           catch (error) { setMessage(`${result.summaryMessage} Saved locally; publication pending: ${(error as Error).message}`); }

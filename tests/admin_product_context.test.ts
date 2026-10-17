@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { availableAdminProducts, adminPagePath, parseAdminRoute, readAdminPreference, resolveAdminRoute, PRODUCT_PAGES } from '../apps/restaurant-system/pos-admin/src/adminProducts';
 import { productNavSections } from '../apps/restaurant-system/pos-admin/src/navSections';
-import { filterNavSections } from '../apps/restaurant-system/pos-admin/src/hooks/useEntitlements';
+import { filterNavSections } from '../apps/restaurant-system/pos-admin/src/navigation/navAccess';
 
 describe('shared owner platform, separate authorized application contexts', () => {
   it('does not confuse customer kiosks or kitchen/captain terminals with owner consoles', () => {
@@ -37,13 +37,15 @@ describe('shared owner platform, separate authorized application contexts', () =
   });
   it('each kiosk page is reachable through its own real navigation and no restaurant-only page is exposed', () => {
     const ids = filterNavSections(productNavSections('KIOSK_ADMIN'), app => ['KIOSK_ADMIN','QR_ORDERING'].includes(app)).flatMap(group => group.items.map(item => item.id));
-    expect(new Set(ids)).toEqual(new Set(Object.keys(PRODUCT_PAGES.KIOSK_ADMIN)));
+    expect(ids).toContain('KIOSK_EXPERIENCE');
+    // Legacy welcome/appearance URLs remain supported while the sidebar leads to one workspace.
+    expect(new Set([...ids,'KIOSK_WELCOME','KIOSK_DESIGN'])).toEqual(new Set(Object.keys(PRODUCT_PAGES.KIOSK_ADMIN)));
     expect(ids).not.toContain('INVENTORY'); expect(ids).not.toContain('BILLING_SALES');
     expect(ids).toContain('STAFF'); expect(ids).toContain('KIOSK_PAYMENTS');
   });
   it('restaurant navigation includes licensed kiosk management screens on combined plans', () => {
     const ids = filterNavSections(productNavSections('POS_ADMIN'), () => true).flatMap(group => group.items.map(item => item.id));
-    expect(ids).toContain('KIOSKS'); expect(ids).toContain('KIOSK_DESIGN'); expect(ids).toContain('KIOSK_PAYMENTS');
+    expect(ids).toContain('KIOSKS'); expect(ids).toContain('KIOSK_EXPERIENCE'); expect(ids).toContain('KIOSK_PAYMENTS');
   });
   it('does not build links to a different product page accidentally', () => {
     expect(() => adminPagePath('KIOSK_ADMIN', 'INVENTORY')).toThrow();

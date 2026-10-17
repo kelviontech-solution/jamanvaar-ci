@@ -5,7 +5,8 @@ import {
   Badge,
   Button,
   Card,
-  Modal
+  Modal,
+  ConfirmModal
 } from '../../components/ui';
 import {
   Boxes,
@@ -17,9 +18,12 @@ import {
   Calendar,
   Layers
 } from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
 import '../../components/shared.css';
 
 export function SandboxesPage() {
+  const { can } = useAuth();
+  const canWrite = can('ops', 'write');
   const [sandboxes, setSandboxes] = useState<RestaurantSandbox[]>([]);
   const [restaurants, setRestaurants] = useState<RestaurantListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +36,8 @@ export function SandboxesPage() {
   const [sandboxName, setSandboxName] = useState('');
   const [durationDays, setDurationDays] = useState('14');
   const [cloning, setCloning] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<RestaurantSandbox | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -68,7 +74,7 @@ export function SandboxesPage() {
         name: sandboxName.trim(),
         durationDays: parseInt(durationDays, 10) || 14
       });
-      showToast(`Staging sandbox "${sandboxName}" provisioned successfully`);
+      showToast(`Snapshot "${sandboxName}" saved`);
       setModalOpen(false);
       loadData();
     } catch (err) {
@@ -79,12 +85,16 @@ export function SandboxesPage() {
   }
 
   async function handleDelete(id: string) {
+    setDeleting(true);
     try {
       await api.delete(`/api/v1/platform/sandboxes/${id}`);
-      showToast('Sandbox environment deleted');
+      showToast('Sandbox configuration deleted');
+      setDeleteTarget(null);
       loadData();
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Delete failed');
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -92,17 +102,19 @@ export function SandboxesPage() {
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1 className="page-title">1-Click Staging Sandbox Clones</h1>
+          <h1 className="page-title">Restaurant Configuration Snapshots</h1>
           <p className="page-subtitle">
-            Isolated training and testing environments provisioned from production restaurant topologies without exposing secrets or customer PII.
+            Saves a restaurant's menu/branch configuration for reference or future use — no passwords, payment credentials
+            or customer order history. This does not create a runnable test environment yet: there is no login, no
+            terminal, and no way to place a real or simulated order against it.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <Button variant="ghost" onClick={loadData}>
             <RefreshCw className="w-4 h-4 mr-1" /> Refresh
           </Button>
-          <Button variant="accent" onClick={() => setModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-1" /> Clone New Sandbox
+          <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to save snapshots"} onClick={() => setModalOpen(true)}>
+            <Plus className="w-4 h-4 mr-1" /> Save New Snapshot
           </Button>
         </div>
       </div>
@@ -110,11 +122,11 @@ export function SandboxesPage() {
       {toast && <div className="floating-toast">{toast}</div>}
 
       <Card>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Active Staging Sandboxes ({sandboxes.length})</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800 }}>Saved Configuration Snapshots ({sandboxes.length})</h3>
         {sandboxes.length === 0 ? (
           <div style={{ padding: 48, textAlign: 'center', color: 'var(--jv-text-light)' }}>
             <Boxes className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-            No staging sandboxes currently deployed. Click "Clone New Sandbox" to spawn an isolated demo or training environment.
+            No configuration snapshots saved yet. Click "Save New Snapshot" to save a restaurant's current menu and branch setup for reference.
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -134,7 +146,7 @@ export function SandboxesPage() {
                   <tr key={sbx.id} style={{ borderBottom: '1px solid var(--jv-border-subtle)' }}>
                     <td style={{ padding: '14px' }}>
                       <strong style={{ color: 'var(--jv-text)', fontSize: 14 }}>{sbx.name}</strong>
-                      <div style={{ color: 'var(--jv-text-muted)', fontSize: 11 }}>Isolated Sandbox</div>
+                      <div style={{ color: 'var(--jv-text-muted)', fontSize: 11 }}>Configuration snapshot (not a running environment)</div>
                     </td>
                     <td style={{ padding: '14px' }}>
                       {sbx.sourceRestaurant?.name || 'Production Tenant'}
@@ -153,8 +165,8 @@ export function SandboxesPage() {
                       </Badge>
                     </td>
                     <td style={{ padding: '14px', textAlign: 'right' }}>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(sbx.id)}>
-                        <Trash2 className="w-3.5 h-3.5 mr-1 text-red-500" /> Destroy
+                      <Button variant="ghost" size="sm" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to delete snapshots"} onClick={() => setDeleteTarget(sbx)}>
+                        <Trash2 className="w-3.5 h-3.5 mr-1 text-red-500" /> Delete
                       </Button>
                     </td>
                   </tr>
@@ -165,12 +177,14 @@ export function SandboxesPage() {
         )}
       </Card>
 
-      {/* Clone Modal */}
+      {/* Snapshot Modal */}
       {modalOpen && (
-        <Modal title="1-Click Staging Sandbox Clone" onClose={() => setModalOpen(false)}>
+        <Modal title="Save Configuration Snapshot" onClose={() => setModalOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div style={{ background: 'var(--jv-success-soft)', border: '1px solid var(--jv-ok-line)', borderRadius: 8, padding: 12, fontSize: 13, color: 'var(--jv-success-text)' }}>
-              <strong>Zero Leakage Guarantee:</strong> Sandboxes clone menu architecture, floor tables, and configuration. Password hashes, live payment credentials, and real customer order history are never cloned.
+              <strong>What this saves:</strong> Menu/branch configuration and structure only — never password hashes, live payment
+              credentials, or real customer order history. <strong>What this does not do:</strong> create a running, loggable-into test
+              restaurant. It is a reference snapshot, not a live clone.
             </div>
 
             <div>
@@ -206,17 +220,20 @@ export function SandboxesPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
-                Environment Expiry
+                Keep until
               </label>
               <select
                 value={durationDays}
                 onChange={(e) => setDurationDays(e.target.value)}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--jv-border-hover)', fontSize: 13 }}
               >
-                <option value="7">7 Days (Short Pilot)</option>
-                <option value="14">14 Days (Standard Staff Training)</option>
-                <option value="30">30 Days (Comprehensive Testing)</option>
+                <option value="7">7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
               </select>
+              <p style={{ fontSize: 11.5, color: 'var(--jv-text-muted)', marginTop: 4 }}>
+                Informational only for now — the snapshot isn't automatically deleted when this date passes.
+              </p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
@@ -226,12 +243,23 @@ export function SandboxesPage() {
                 onClick={handleCreateSandbox}
                 disabled={cloning || !sandboxName.trim()}
               >
-                {cloning ? 'Cloning Topology…' : 'Spawn Staging Sandbox'}
+                {cloning ? 'Saving…' : 'Save Snapshot'}
               </Button>
             </div>
           </div>
         </Modal>
       )}
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        title={`Delete "${deleteTarget?.name ?? ''}"?`}
+        message="This permanently deletes the saved configuration snapshot. This cannot be undone."
+        confirmLabel="Delete"
+        tone="danger"
+        isPending={deleting}
+        onConfirm={() => { if (deleteTarget) void handleDelete(deleteTarget.id); }}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

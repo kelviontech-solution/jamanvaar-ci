@@ -192,8 +192,18 @@ export class ActivationKeysService {
     return this.present(key, new Date(), canSeeFullCode);
   }
 
-  async generate(dto: GenerateActivationKeyDto, actor: PlatformUser) {
-    return this.generateWithActor(dto,actor.id,'PLATFORM');
+  async generate(dto: GenerateActivationKeyDto, actor: PlatformUser, transaction?:Prisma.TransactionClient) {
+    return this.generateWithActor(dto,actor.id,'PLATFORM',transaction);
+  }
+
+  async quotaPreview(input:{restaurantId:string;branchId?:string;appCode:AppCode}) {
+    return this.prisma.runAsPlatform(async tx => {
+      const requested=await this.appEntitlements.resolve(tx,input.restaurantId,input.appCode,input.branchId);
+      const app = ['POS_ADMIN','QR_ORDERING'].includes(input.appCode) ? await this.grantingDeviceApp(tx,input.restaurantId,'POS_ADMIN',input.branchId) : input.appCode;
+      const preview=await this.appEntitlements.deviceQuotaPreview(tx,input.restaurantId,app,input.branchId);
+      // QR consoles register as POS_ADMIN. Preview exactly the seat redemption will consume.
+      return {...preview,requestedAppCode:input.appCode,...(!requested.enabled&&input.appCode==='QR_ORDERING'?{enabled:false,available:false,reason:requested.reason}:{})};
+    });
   }
 
   async generateForOwner(dto: GenerateActivationKeyDto, ownerId:string) {
@@ -202,8 +212,8 @@ export class ActivationKeysService {
     return this.generateWithActor(dto,ownerId,'TENANT');
   }
 
-  private async generateWithActor(dto:GenerateActivationKeyDto,actorId:string,actorType:'TENANT'|'PLATFORM') {
-    return this.prisma.runAsPlatform(async (tx) => {
+  private async generateWithActor(dto:GenerateActivationKeyDto,actorId:string,actorType:'TENANT'|'PLATFORM',transaction?:Prisma.TransactionClient) {
+    const generate=async (tx:Prisma.TransactionClient) => {
       const restaurant = await tx.restaurant.findFirst({ where: { id: dto.restaurantId, deletedAt: null } });
       if (!restaurant) throw new NotFoundException('Restaurant not found');
 
@@ -228,6 +238,7 @@ export class ActivationKeysService {
         if ((await activeBranchCount(tx, dto.restaurantId)) > 1) {
           throw new BadRequestException('This restaurant has several branches: choose the branch this terminal belongs to.');
         }
+        dto = {...dto,branchId:(await onlyActiveBranchId(tx,dto.restaurantId)) ?? undefined};
       }
 
       // Two live terminals (or pending keys) with the same name in one branch cannot be told apart on the fleet screen.
@@ -257,6 +268,11 @@ export class ActivationKeysService {
       }
 
       // Retry on the astronomically unlikely code collision rather than trusting uniqueness blindly.
+      if (dto.allowedDeviceType !== 'ANY') {
+        const app = await this.grantingDeviceApp(tx, dto.restaurantId, dto.allowedDeviceType as AppCode, dto.branchId);
+        // Replacements exchange an existing seat at redemption; a new terminal needs capacity now too.
+        if (!dto.replacesDeviceId) await this.appEntitlements.assertDeviceQuotaAvailable(tx, dto.restaurantId, app, dto.branchId);
+      }
       for (let attempt = 0; attempt < 5; attempt++) {
         const code = generateCode();
         try {
@@ -294,7 +310,8 @@ export class ActivationKeysService {
         }
       }
       throw new ConflictException('Could not generate a unique activation code — please retry');
-    });
+    };
+    return transaction ? generate(transaction) : this.prisma.runAsPlatform(generate);
   }
 
   /**
@@ -318,6 +335,9 @@ export class ActivationKeysService {
         throw new BadRequestException(
           `This activation code is only valid for ${key.allowedDeviceType} devices, not ${dto.deviceType}`
         );
+      }
+      if (dto.expectedRestaurantId && key.restaurantId !== dto.expectedRestaurantId) {
+        throw new BadRequestException('This activation key belongs to another restaurant. Use the kiosk key issued for the Restaurant ID entered.');
       }
 
       // A key issued for "any terminal" cannot turn into an admin console: whoever installs a kitchen screen or a kiosk with it must not
@@ -368,6 +388,9 @@ export class ActivationKeysService {
       }
 
       const deviceBranchId = key.branchId ?? (await onlyActiveBranchId(tx, key.restaurantId));
+      if (dto.expectedBranchId && deviceBranchId !== dto.expectedBranchId) {
+        throw new BadRequestException('This activation key belongs to another branch. Request a kiosk key for the branch shown in setup.');
+      }
       if (!deviceBranchId && !RESTAURANT_WIDE_TYPES.has(dto.deviceType) && (await activeBranchCount(tx, key.restaurantId)) > 1) {
         throw new BadRequestException('This restaurant has several branches: this activation key must name the branch the terminal belongs to.');
       }

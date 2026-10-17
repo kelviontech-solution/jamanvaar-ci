@@ -1,0 +1,1552 @@
+{
+  "at": "2026-10-16T14:28:00.710Z",
+  "results": [
+    {
+      "path": "/",
+      "size": "desktop",
+      "heading": "Platform Control Center",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurant-health",
+      "size": "desktop",
+      "heading": "Restaurant Health & Risk",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/announcements",
+      "size": "desktop",
+      "heading": "Platform Announcements",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/status-history",
+      "size": "desktop",
+      "heading": "Status History",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/margins",
+      "size": "desktop",
+      "heading": "Margin & Cost (Estimated)",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurants",
+      "size": "desktop",
+      "heading": "Restaurants",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 103,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurants/onboard",
+      "size": "desktop",
+      "heading": "Onboard New Restaurant",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 13,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurants/d9570b92-c599-4a55-80fc-ac833433c305",
+      "size": "desktop",
+      "heading": "Garden House Flow QA",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 41,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/owners",
+      "size": "desktop",
+      "heading": "Restaurant Owners",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 93,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/owners/09c60fb2-5fae-4c4c-89ad-dbb660a3d850",
+      "size": "desktop",
+      "heading": "QA Flow Owner",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/branches",
+      "size": "desktop",
+      "heading": "Branches",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 40,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/branches/2c980816-13f8-4d30-ac62-199540e957f1",
+      "size": "desktop",
+      "heading": "Garden House Flow QA — Main Branch",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 19,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/saas-management",
+      "size": "desktop",
+      "heading": "SaaS Management",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 10,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/plans",
+      "size": "desktop",
+      "heading": "SaaS Plans",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 208,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/plans/seed-plan-core",
+      "size": "desktop",
+      "heading": "JAMANVAAR CORE",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 10,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/qr-ordering",
+      "size": "desktop",
+      "heading": "QR Ordering Suite Control",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 348,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/whatsapp-ordering",
+      "size": "desktop",
+      "heading": "WhatsApp Ordering Connector",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/ai-assistant",
+      "size": "desktop",
+      "heading": "JAMAN AI Engine",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 56,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/catalog",
+      "size": "desktop",
+      "heading": "Master Menu Catalog & Franchise Syndication",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 18,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/subscriptions",
+      "size": "desktop",
+      "heading": "Subscriptions",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 276,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/billing",
+      "size": "desktop",
+      "heading": "Invoices & Billing",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 43,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/entitlements",
+      "size": "desktop",
+      "heading": "SaaS Feature Entitlements & Matrix",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 18,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/feature-catalog",
+      "size": "desktop",
+      "heading": "Feature Catalog",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 156,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/reports",
+      "size": "desktop",
+      "heading": "Platform Reports & Analytics",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/applications",
+      "size": "desktop",
+      "heading": "Applications & Ecosystem",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 22,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/activation-keys",
+      "size": "desktop",
+      "heading": "Activation Keys",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 41,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/payment-connections",
+      "size": "desktop",
+      "heading": "Payment Gateways",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 19,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/platform-payments",
+      "size": "desktop",
+      "heading": "Platform Payments",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/payouts",
+      "size": "desktop",
+      "heading": "Restaurant Payouts",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/devices",
+      "size": "desktop",
+      "heading": "Device Fleet / MDM Control Center",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 48,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/devices/adde8ba7-b338-4821-943c-33a47ef50024",
+      "size": "desktop",
+      "heading": "Restaurant Admin Console",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 14,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/sync-monitor",
+      "size": "desktop",
+      "heading": "Real-Time Telemetry & Sync Observability",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 13,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/backups",
+      "size": "desktop",
+      "heading": "Fleet Backups & Data Recovery",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 16,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/sandboxes",
+      "size": "desktop",
+      "heading": "1-Click Staging Sandbox Clones",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/offline-policy",
+      "size": "desktop",
+      "heading": "Emergency Offline Policy & Licensing",
+      "overflow": false,
+      "alerts": [
+        "Extensions can't be signed on this server yet.LICENSE_SIGNING_PRIVATE_KEY_B64 is not set on the API server.Generate a P-256 key pair (the API ships scripts/generate-license-key.js for this).Set LICENSE_SIGNING_PRIVATE_KEY_B64 and LICENSE_SI",
+        "10 terminal(s) are past the 7-day offline limit and locked (no extension covers them): QA Daily full 1792007489318 (POS, last seen 1/1/2020); QA Daily full 1792007053838 (POS, last seen 1/1/2020); QA Daily full 1792007564791 (POS, last seen"
+      ],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/team",
+      "size": "desktop",
+      "heading": "Platform Team & RBAC",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/support",
+      "size": "desktop",
+      "heading": "Support & Diagnostic Console",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 94,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/tickets",
+      "size": "desktop",
+      "heading": "Support Tickets",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 24,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/notifications",
+      "size": "desktop",
+      "heading": "Notifications",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 45,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/audit-logs",
+      "size": "desktop",
+      "heading": "Platform Audit Logs",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 63,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/system-health",
+      "size": "desktop",
+      "heading": "System Health & Infrastructure",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/settings/platform",
+      "size": "desktop",
+      "heading": "Platform Settings",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 16,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/profile",
+      "size": "desktop",
+      "heading": "My Profile",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/",
+      "size": "mobile",
+      "heading": "Platform Control Center",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurant-health",
+      "size": "mobile",
+      "heading": "Restaurant Health & Risk",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/announcements",
+      "size": "mobile",
+      "heading": "Platform Announcements",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/status-history",
+      "size": "mobile",
+      "heading": "Status History",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/margins",
+      "size": "mobile",
+      "heading": "Margin & Cost (Estimated)",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurants",
+      "size": "mobile",
+      "heading": "Restaurants",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 103,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Trial0"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "No Plan"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/restaurants/onboard",
+      "size": "mobile",
+      "heading": "Onboard New Restaurant",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/restaurants/d9570b92-c599-4a55-80fc-ac833433c305",
+      "size": "mobile",
+      "heading": "Garden House Flow QA",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 41,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/owners",
+      "size": "mobile",
+      "heading": "Restaurant Owners",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 93,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Suspended0"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/owners/09c60fb2-5fae-4c4c-89ad-dbb660a3d850",
+      "size": "mobile",
+      "heading": "QA Flow Owner",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Activation Keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Activity / Logs"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/branches",
+      "size": "mobile",
+      "heading": "Branches",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 40,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/branches/2c980816-13f8-4d30-ac62-199540e957f1",
+      "size": "mobile",
+      "heading": "Garden House Flow QA — Main Branch",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 19,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Devices & Terminals"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Activation Keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Branch Licensing"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Audit Logs"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/saas-management",
+      "size": "mobile",
+      "heading": "SaaS Management",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 10,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/plans",
+      "size": "mobile",
+      "heading": "SaaS Plans",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 208,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/plans/seed-plan-core",
+      "size": "mobile",
+      "heading": "JAMANVAAR CORE",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 10,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/qr-ordering",
+      "size": "mobile",
+      "heading": "QR Ordering Suite Control",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 348,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Manage"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/whatsapp-ordering",
+      "size": "mobile",
+      "heading": "WhatsApp Ordering Connector",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/ai-assistant",
+      "size": "mobile",
+      "heading": "JAMAN AI Engine",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 56,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": ""
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/catalog",
+      "size": "mobile",
+      "heading": "Master Menu Catalog & Franchise Syndication",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 18,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/subscriptions",
+      "size": "mobile",
+      "heading": "Subscriptions",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 276,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Renew"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Change Tier"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Renew"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Change Tier"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Renew"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Change Tier"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/billing",
+      "size": "mobile",
+      "heading": "Invoices & Billing",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 43,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View invoices"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/entitlements",
+      "size": "mobile",
+      "heading": "SaaS Feature Entitlements & Matrix",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 18,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/feature-catalog",
+      "size": "mobile",
+      "heading": "Feature Catalog",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 156,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "INPUT",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Delete"
+        },
+        {
+          "tag": "INPUT",
+          "label": ""
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Edit"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Deactivate"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Delete"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/reports",
+      "size": "mobile",
+      "heading": "Platform Reports & Analytics",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Export REVENUE CSV"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/applications",
+      "size": "mobile",
+      "heading": "Applications & Ecosystem",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 22,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/activation-keys",
+      "size": "mobile",
+      "heading": "Activation Keys",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 41,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "View keys"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/payment-connections",
+      "size": "mobile",
+      "heading": "Payment Gateways",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 19,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "INPUT",
+          "label": "3% default"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Save"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Suspend"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Disconnect"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/platform-payments",
+      "size": "mobile",
+      "heading": "Platform Payments",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 11,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/payouts",
+      "size": "mobile",
+      "heading": "Restaurant Payouts",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 15,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/devices",
+      "size": "mobile",
+      "heading": "Device Fleet / MDM Control Center",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 48,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/devices/adde8ba7-b338-4821-943c-33a47ef50024",
+      "size": "mobile",
+      "heading": "Restaurant Admin Console",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 14,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/sync-monitor",
+      "size": "mobile",
+      "heading": "Real-Time Telemetry & Sync Observability",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 13,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": " Sync Conflict Inspector (11 Active)"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/backups",
+      "size": "mobile",
+      "heading": "Fleet Backups & Data Recovery",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 16,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Trigger First Snapshot"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/sandboxes",
+      "size": "mobile",
+      "heading": "1-Click Staging Sandbox Clones",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/offline-policy",
+      "size": "mobile",
+      "heading": "Emergency Offline Policy & Licensing",
+      "overflow": false,
+      "alerts": [
+        "Extensions can't be signed on this server yet.LICENSE_SIGNING_PRIVATE_KEY_B64 is not set on the API server.Generate a P-256 key pair (the API ships scripts/generate-license-key.js for this).Set LICENSE_SIGNING_PRIVATE_KEY_B64 and LICENSE_SI",
+        "10 terminal(s) are past the 7-day offline limit and locked (no extension covers them): QA Daily full 1792007489318 (POS, last seen 1/1/2020); QA Daily full 1792007053838 (POS, last seen 1/1/2020); QA Daily full 1792007564791 (POS, last seen"
+      ],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/team",
+      "size": "mobile",
+      "heading": "Platform Team & RBAC",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/support",
+      "size": "mobile",
+      "heading": "Support & Diagnostic Console",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 94,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/tickets",
+      "size": "mobile",
+      "heading": "Support Tickets",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 24,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/notifications",
+      "size": "mobile",
+      "heading": "Notifications",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 45,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/audit-logs",
+      "size": "mobile",
+      "heading": "Platform Audit Logs",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 63,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Details"
+        }
+      ],
+      "requests": []
+    },
+    {
+      "path": "/system-health",
+      "size": "mobile",
+      "heading": "System Health & Infrastructure",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 12,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/settings/platform",
+      "size": "mobile",
+      "heading": "Platform Settings",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 16,
+      "crashed": false,
+      "outside": [],
+      "requests": []
+    },
+    {
+      "path": "/profile",
+      "size": "mobile",
+      "heading": "My Profile",
+      "overflow": false,
+      "alerts": [],
+      "unlabeledButtons": 0,
+      "buttonCount": 17,
+      "crashed": false,
+      "outside": [
+        {
+          "tag": "BUTTON",
+          "label": "Sign out"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Revoke"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Revoke"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Revoke"
+        },
+        {
+          "tag": "BUTTON",
+          "label": "Revoke"
+        }
+      ],
+      "requests": []
+    }
+  ],
+  "faults": [
+    {
+      "name": "incident-load",
+      "path": "/status-history",
+      "observation": {
+        "emptyState": true,
+        "errorVisible": false
+      }
+    },
+    {
+      "name": "payment-attention",
+      "path": "/platform-payments",
+      "observation": {
+        "text": "PLATFORM CONTROL\nPlatform Owner\nDAILY WORK\nToday & attention\nRestaurant Health & Risk\nSupport tasks\nDevices\nRESTAURANTS & BILLING\nRestaurants\nRestaurant Owners\nBranches\nSubscriptions\nInvoices & Billing\nPRODUCTS & CONFIGURATION\nOverview\nPlans & included features\nFeature Catalog\nQR Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nPLATFORM OPERATIONS\nSECURITY & SETTINGS\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\n28\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nPlatform Payments\n\nCross-restaurant Razorpay payment volume, commission, and what needs attention.\n\nAll statuses\nSuccess\nFailed\nPending\nRefunded\nPartially refunded\nGross Volume\n₹206\nPlatform Commission\n₹0\nRestaurant Share\n₹206\nRefunded\n₹0\nSuccessful Payments\n2\nPayments by status\nSUCCESS: 2\nPENDING: 8\nPaid, but no token was issued (0)\n\nThe customer paid but the kiosk never confirmed a token/KOT (crash, no internet, or a payment that landed after the QR expired). Refund it, or mark it handled once the customer was served.\n\nNothing needs attention.\nRestaurant day statement\nUses the Restaurant ID typed above.\nShow statement",
+        "errorVisible": false
+      }
+    },
+    {
+      "name": "payout-overview",
+      "path": "/payouts",
+      "observation": {
+        "errorVisible": false,
+        "text": "R Ordering Suite\nWhatsApp Ordering\nJAMAN AI Engine\nMaster Menu Catalog\nActivation Keys\nPayment Gateways\nPlatform Payments\nRestaurant Payouts\nApplications & Releases\nPLATFORM OPERATIONS\nSECURITY & SETTINGS\nACCOUNT\nMy Profile\nPlatform Online\nJAMANVAAR Cloud v1.4.0\nJAMANVAAR PLATFORM\nControl Center\nCtrl+K\nPLATFORM ONLINE\n28\nJ\nJAMANVAAR Super Admin\nPlatform Owner\nLogout\nRestaurant Payouts\n\nRazorpay Route is pending, so Jamanvaar collects every restaurant's online payments and pays its net share out manually. Running the EOD batch only calculates and creates PENDING payouts — nothing is ever transferred automatically. Mark a payout PAID only after you have actually sent the bank transfer and have a real UTR.\n\nRun EOD batch now\nWhy money is stuck\n\nEvery restaurant with collection not yet paid out, and the specific reason it hasn't moved — instead of cross-checking Payment Gateways' bank status against this page's totals by hand.\n\nRestaurant\tBank status\tClaimable\tBlocked\tWhy\nUI Audit Restaurant A\t\nNOT ADDED\t₹206\t₹0\tWaiting on bank verification\nAll\nPending\nOn hold\nPaid\n0 total\nNo payouts yet\n\nRun the EOD batch to claim any verified restaurant's unpaid, unrefunded collections into a payout."
+      }
+    },
+    {
+      "name": "plan-picker",
+      "path": "/plans",
+      "observation": {
+        "errorVisible": true
+      }
+    }
+  ],
+  "pageErrors": []
+}

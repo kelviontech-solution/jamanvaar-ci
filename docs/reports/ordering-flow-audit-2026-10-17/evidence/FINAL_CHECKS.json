@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "name": "Dietary filter leaves an incompatible recommendation actionable",
+      "result": {
+        "jainDishVisible": 1,
+        "paneerHiddenFromMainList": true,
+        "paneerRecommendationVisible": true
+      }
+    },
+    {
+      "name": "POS bills offline and synchronizes one canonical order after reconnection",
+      "result": {
+        "receiptVisible": true,
+        "newCanonicalOrderCount": 1,
+        "orders": [
+          {
+            "source": "POS",
+            "paymentStatus": "SUCCESS",
+            "totalPaise": 8000
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -21,7 +21,9 @@ export const assignSubscriptionSchema = z.object({
 export type AssignSubscriptionDto = z.infer<typeof assignSubscriptionSchema>;
 
 export const changePlanSchema = z.object({
-  planId: z.string().min(1)
+  planId: z.string().min(1),
+  // Required once previewChangePlan() reports a real device impact — see SubscriptionsService.changePlan.
+  acknowledgeImpact: z.boolean().optional()
 });
 
 export const bulkChangePlanSchema = z.object({

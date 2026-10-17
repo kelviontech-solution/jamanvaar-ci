@@ -19,10 +19,14 @@ export interface ThermalReceiptViewProps {
 // tracking), which used to print verbatim on the guest's own receipt ("POS: 11ea4a8b-e9a4-...") —
 // meaningless and faintly alarming to a customer. Friendly labels (POS-01, KIOSK-01, ...) already
 // print fine as-is; only a raw UUID gets swapped for a neutral label.
+// F22: a cloud-activated terminal's own device id is ALSO a bare UUID whichever app it is — this
+// used to assume any UUID meant Kiosk, so a POS terminal's receipt said "POS: Self-Order Kiosk".
+// The order's own source distinguishes them.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function friendlyTerminalLabel(kioskId: string | undefined): string {
-  if (!kioskId) return 'POS-01';
-  return UUID_RE.test(kioskId) ? 'Self-Order Kiosk' : kioskId;
+const SOURCE_LABEL: Record<string, string> = { KIOSK: 'Self-Order Kiosk', POS: 'Counter POS', CAPTAIN: 'Captain App', QR_TABLE: 'Table QR', ONLINE: 'Online Order' };
+function friendlyTerminalLabel(kioskId: string | undefined, sourceType?: string): string {
+  if (!kioskId) return SOURCE_LABEL[sourceType ?? ''] ?? 'POS-01';
+  return UUID_RE.test(kioskId) ? (SOURCE_LABEL[sourceType ?? ''] ?? 'Self-Order Kiosk') : kioskId;
 }
 
 
@@ -194,7 +198,7 @@ export const ThermalReceiptView: React.FC<ThermalReceiptViewProps> = ({
           </div>
 
           <div className="flex justify-between text-[#718096] text-[10px]">
-            <span>{order.kioskId !== 'CLOUD-SYNC' ? `POS: ${friendlyTerminalLabel(order.kioskId)}` : ''}</span>
+            <span>{order.kioskId !== 'CLOUD-SYNC' ? `POS: ${friendlyTerminalLabel(order.kioskId, order.source_type)}` : ''}</span>
             <span>{order.cashierName ? `Cashier: ${order.cashierName}` : order.captainName ? `Captain: ${order.captainName}` : ''}</span>
           </div>
 

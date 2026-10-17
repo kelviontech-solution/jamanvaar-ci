@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { KitchenStationRepository } from '@jamanvaar/database';
 import { MenuItem, Category, DietaryType, SpiceLevel } from '@jamanvaar/types';
-import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage, FormInput, FormSelect } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, VirtualKeyboard, type VirtualKeyboardLanguage, FormInput, FormSelect, useConfirm } from '@jamanvaar/ui';
 import { MenuRepository, FOOD_IMAGE_LIBRARY, AuditRepository, db, KioskDisplaySettingsRepository, safeMenuImage } from '@jamanvaar/database';
 import { Image as ImageIcon, Sliders, Plus } from 'lucide-react';
 import { GroupEditor } from './menu/MenuOptionsModule';
+import { getCurrentAdminName } from '../currentAdminIdentity';
+import { useEditConflictGuard } from '../hooks/useEditConflictGuard';
 
 /** Mirrors kiosk-admin's KIOSK_LANGUAGE_LABELS (apps/kiosk-system/kiosk-admin/src/App.tsx:234-242). */
 const KIOSK_LANGUAGE_LABELS: Record<string, string> = {
@@ -64,38 +66,50 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const [translations, setTranslations] = useState<Record<string, { name: string; description: string }>>({});
   const [activeKeyboardField, setActiveKeyboardField] = useState<{ lang: VirtualKeyboardLanguage; field: 'name' | 'description' } | null>(null);
 
+  // #2: two admins (e.g. owner on a laptop, manager on the restaurant tablet) could edit the
+  // same dish at once with no warning -- whichever save landed last silently won, discarding
+  // the other's price/availability change. Checked right before save, below.
+  const { confirm, confirmDialog } = useConfirm();
+  const conflictGuard = useEditConflictGuard<MenuItem>();
   const initializedForm = useRef<string | null>(null);
+  // Shared by the open-time populate effect and the "discard mine & reload latest" conflict
+  // path below, so reloading after a conflict shows the actual live record, not just whatever
+  // stale `itemToEdit` prop the parent passed in when this editor was first opened.
+  const applyItemToForm = (item: MenuItem) => {
+    conflictGuard.snapshot(item.id, item);
+    setName(item.name);
+    setSku(item.sku); setSubcategory(item.subcategory || ''); setTags((item.tags || []).join('; '));
+    setPrice(item.price.toString());
+    setCategoryId(item.categoryId);
+    setKitchenStation(item.kitchenStation || 'Main Kitchen');
+    setDietaryType(item.dietaryType || 'VEG');
+    setSpiceLevel(item.spiceLevel || 'NONE');
+    setDescription(item.description || '');
+    setAllergens((item.allergens ?? []).join(', '));
+    setImageUrl(item.imageUrl || '');
+    setIsAvailable(item.isAvailable ?? true);
+    setIsPopular(!!item.isPopular);
+    setIsFeatured(!!item.isFeatured);
+    setModifierGroupIds(item.modifierGroupIds || []);
+    setTaxGroupId(item.taxGroupId || '');
+    setSellOnQr(item.salesChannels ? item.salesChannels.includes('QR') : item.isQrOrderingEnabled !== false);
+    setSortOrder(String(item.sortOrder ?? ''));
+    setMinQuantity(String(item.minQuantity ?? 1));
+    setMaxQuantity(String(item.maxQuantity ?? 50));
+    setAllowInstructions(item.allowInstructions !== false);
+    setTranslations(
+      Object.fromEntries(
+        Object.entries(item.translations ?? {}).map(([code, t]) => [code, { name: t.name, description: t.description ?? '' }])
+      )
+    );
+  };
   useEffect(() => {
     if (!isOpen) { initializedForm.current = null; return; }
     const session = itemToEdit?.id ?? 'new';
     if (initializedForm.current === session) return;
     initializedForm.current = session;
     if (itemToEdit) {
-      setName(itemToEdit.name);
-      setSku(itemToEdit.sku); setSubcategory(itemToEdit.subcategory || ''); setTags((itemToEdit.tags || []).join('; '));
-      setPrice(itemToEdit.price.toString());
-      setCategoryId(itemToEdit.categoryId);
-      setKitchenStation(itemToEdit.kitchenStation || 'Main Kitchen');
-      setDietaryType(itemToEdit.dietaryType || 'VEG');
-      setSpiceLevel(itemToEdit.spiceLevel || 'NONE');
-      setDescription(itemToEdit.description || '');
-      setAllergens((itemToEdit.allergens ?? []).join(', '));
-      setImageUrl(itemToEdit.imageUrl || '');
-      setIsAvailable(itemToEdit.isAvailable ?? true);
-      setIsPopular(!!itemToEdit.isPopular);
-      setIsFeatured(!!itemToEdit.isFeatured);
-      setModifierGroupIds(itemToEdit.modifierGroupIds || []);
-      setTaxGroupId(itemToEdit.taxGroupId || '');
-      setSellOnQr(itemToEdit.salesChannels ? itemToEdit.salesChannels.includes('QR') : itemToEdit.isQrOrderingEnabled !== false);
-      setSortOrder(String(itemToEdit.sortOrder ?? ''));
-      setMinQuantity(String(itemToEdit.minQuantity ?? 1));
-      setMaxQuantity(String(itemToEdit.maxQuantity ?? 50));
-      setAllowInstructions(itemToEdit.allowInstructions !== false);
-      setTranslations(
-        Object.fromEntries(
-          Object.entries(itemToEdit.translations ?? {}).map(([code, t]) => [code, { name: t.name, description: t.description ?? '' }])
-        )
-      );
+      applyItemToForm(itemToEdit);
     } else {
       setName(''); setSubcategory(''); setTags('');
       setSku(`SKU-${Math.floor(100 + Math.random() * 900)}`);
@@ -166,7 +180,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   const MAX_DISH_PRICE = 100000; // no real dish costs more; catches the fat-finger ₹9,99,99,999 case
   const MAX_NAME_LENGTH = 80;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!safeMenuImage(imageUrl)) { setFormError('Use an HTTP(S), local asset or raster image URL.'); return; }
@@ -224,6 +238,28 @@ export const ItemModal: React.FC<ItemModalProps> = ({
     const translationsToSave = Object.keys(cleanedTranslations).length > 0 ? cleanedTranslations : undefined;
 
     if (itemToEdit) {
+      const { conflicted, live } = conflictGuard.check(itemToEdit.id, () => MenuRepository.getMenuItemById(itemToEdit.id));
+      if (conflicted) {
+        const changes = !live
+          ? ['This dish was archived or removed elsewhere while you were editing.']
+          : [
+              live.price !== itemToEdit.price ? `Price: ₹${itemToEdit.price} → ₹${live.price}` : '',
+              live.isAvailable !== itemToEdit.isAvailable ? `Availability: ${itemToEdit.isAvailable ? 'Available' : 'Unavailable'} → ${live.isAvailable ? 'Available' : 'Unavailable'}` : '',
+              live.name !== itemToEdit.name ? `Name: "${itemToEdit.name}" → "${live.name}"` : ''
+            ].filter(Boolean);
+        const overwrite = live && await confirm({
+          title: 'Someone else changed this dish',
+          message: `${changes.length ? changes.join(' · ') : 'Another change was saved to this dish'} while you were editing. Saving now will overwrite that with your version.`,
+          confirmLabel: 'Keep my changes & overwrite',
+          cancelLabel: 'Discard mine & reload latest',
+          tone: 'danger'
+        });
+        if (!overwrite) {
+          if (live) applyItemToForm(live);
+          else onClose();
+          return;
+        }
+      }
       MenuRepository.updateMenuItem(itemToEdit.id, {
         name: trimmedName,
         sku, subcategory: subcategory.trim() || undefined, tags: tags.split(';').map(t => t.trim()).filter(Boolean),
@@ -252,7 +288,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         action: 'MENU_ITEM_UPDATED',
         category: 'MENU',
         details: `Updated dish "${trimmedName}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
-        username: 'Manager'
+        username: getCurrentAdminName()
       });
     } else {
       MenuRepository.createMenuItem({
@@ -282,7 +318,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         action: 'MENU_ITEM_CREATED',
         category: 'MENU',
         details: `Created dish "${trimmedName}" (Price: ₹${numPrice}, SKU: ${sku}, Modifiers: ${modifierGroupIds.length})`,
-        username: 'Manager'
+        username: getCurrentAdminName()
       });
     }
 
@@ -291,6 +327,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -713,5 +750,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({
         />
       )}
     </Modal>
+    {confirmDialog}
+    </>
   );
 };

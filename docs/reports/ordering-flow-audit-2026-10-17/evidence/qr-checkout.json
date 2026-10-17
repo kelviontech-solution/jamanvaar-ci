@@ -1,0 +1,50 @@
+{
+  "url": "/q/s6BiSPlfYkIAEWb3dzzfK5iPJbPNfl_f#checkout",
+  "text": "Garden House Flow QA\nGarden House Flow QA — Main Branch · Table T1\nTable T1\n1\nMenu\n2\nCart\n3\nCheckout\n4\nYour order\n← Cart\nONE LAST THING\nCheckout\n\nGarden House Flow QA · Table T1\n\nBuild Your Thali × 1\nTwin Snack Plate × 3\nPaneer Bowl × 1\nYour name (optional)\nMobile number (optional)\nNote for the kitchen (optional)\nHow would you like to pay?\nPay at counter\nSettle your bill with our team.\n\nYou pay at the counter when you are done.\n\nPlace order\nConfirmed prices. Secure checkout.\nThoughtfully served with Jamanvaar\nBY KELVIONTECH",
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "headings": [
+    "Checkout"
+  ],
+  "buttons": [
+    {
+      "text": "← Cart",
+      "aria": null,
+      "disabled": false,
+      "width": 41,
+      "height": 44
+    },
+    {
+      "text": "Place order",
+      "aria": null,
+      "disabled": true,
+      "width": 316,
+      "height": 53
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": "How should we call you?",
+      "label": "Your name (optional)",
+      "type": "text"
+    },
+    {
+      "placeholder": "Your mobile number",
+      "label": "Mobile number (optional)",
+      "type": "text"
+    },
+    {
+      "placeholder": "Any special requests?",
+      "label": "Note for the kitchen (optional)",
+      "type": "textarea"
+    },
+    {
+      "placeholder": null,
+      "label": "Pay at counterSettle your bill with our team.",
+      "type": "radio"
+    }
+  ]
+}

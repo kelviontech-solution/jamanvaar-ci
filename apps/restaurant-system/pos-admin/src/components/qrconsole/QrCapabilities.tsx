@@ -459,6 +459,53 @@ export function QrCapabilities({
                 Missing text falls back to the canonical menu. Enter reviewed
                 translations; prices and item identities stay the same.
               </p>
+              {/* Coverage before publishing: the single trailing sentence further down only ever
+                  described the one language/field combination currently open for editing, so an
+                  owner had to click through every language one at a time to find what was still
+                  missing. This covers every enabled language, both names and descriptions, up front. */}
+              {!!settings.languages?.length && (
+                <div className="my-4 rounded-xl border border-jaman-border bg-slate-50 p-3">
+                  <p className="text-xs font-bold text-slate-700 mb-2">
+                    Translation coverage by language
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {settings.languages.map((lang: string) => {
+                      const itemNames = preview.items.filter(
+                        (i) => settings.translations?.[lang]?.items?.[i.id]?.name,
+                      ).length;
+                      const itemDescriptions = preview.items.filter(
+                        (i) => settings.translations?.[lang]?.items?.[i.id]?.description,
+                      ).length;
+                      const categoryNames = preview.categories.filter(
+                        (c) => settings.translations?.[lang]?.categories?.[c.id]?.name,
+                      ).length;
+                      const complete =
+                        itemNames === preview.items.length &&
+                        categoryNames === preview.categories.length;
+                      return (
+                        <div
+                          key={lang}
+                          className={`rounded-lg border p-2.5 text-xs ${
+                            complete
+                              ? "border-emerald-200 bg-emerald-50"
+                              : "border-amber-200 bg-amber-50"
+                          }`}
+                        >
+                          <b className="uppercase">{lang}</b>
+                          {lang === settings.defaultLanguage ? " (default)" : ""}
+                          <div className="mt-0.5 text-slate-600">
+                            {itemNames}/{preview.items.length} dish names ·{" "}
+                            {itemDescriptions}/{preview.items.length} descriptions
+                          </div>
+                          <div className="text-slate-600">
+                            {categoryNames}/{preview.categories.length} category names
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="my-4 grid gap-3 sm:grid-cols-3">
                 <label className="text-xs">
                   Language

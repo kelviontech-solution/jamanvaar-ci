@@ -1,0 +1,55 @@
+{
+  "at": "2026-10-16T06:34:13.493Z",
+  "passed": 12,
+  "total": 12,
+  "tests": [
+    {
+      "name": "One owner launch summary separates product stages and supports takeaway/paperless setup",
+      "passed": true
+    },
+    {
+      "name": "Welcome editor offers Keep editing, Save draft and Restore without publishing",
+      "passed": true
+    },
+    {
+      "name": "Appearance edits are protected and receipts are accessible inside Customer experience",
+      "passed": true
+    },
+    {
+      "name": "Channel preview shows the actual empty publication state",
+      "passed": true
+    },
+    {
+      "name": "Private journey preserves cart on cancellation and simulates receipt keyboard without real writes",
+      "passed": true
+    },
+    {
+      "name": "Customer workspace fits a mobile viewport",
+      "passed": true
+    },
+    {
+      "name": "Super Admin has guided branch setup, readiness and owner handover",
+      "passed": true
+    },
+    {
+      "name": "Super Admin issues a scoped kiosk key directly from the restaurant request",
+      "passed": true
+    },
+    {
+      "name": "Launch handover shortcut opens the exact Operations task",
+      "passed": true
+    },
+    {
+      "name": "Branch license editing retains the effective saved allocation",
+      "passed": true
+    },
+    {
+      "name": "Activation quota preview reloads when the selected branch changes",
+      "passed": true
+    },
+    {
+      "name": "Kiosk-only owner starts with launch steps and a smaller authorized console",
+      "passed": true
+    }
+  ]
+}

@@ -22,6 +22,7 @@ const translations = (value: unknown): MenuTranslations | undefined => {
 
 export interface SnapCategory { translations?: MenuTranslations; id: string; name: string; description?: string; imageUrl?: string; sortOrder: number; qrVisible: boolean }
 export interface SnapItem {
+  kioskEnabled?: boolean;
   allergens?: string[];
   translations?: MenuTranslations;
   id: string; name: string; description?: string; categoryId: string; pricePaise: number; imageUrl?: string; dietaryType?: string; sortOrder: number;
@@ -105,7 +106,7 @@ export function buildContent(rows: Array<{ entityType: string; payload: unknown 
     const maxQ = Math.min(50, Math.max(minQ, Math.floor(num(p.maxQuantity, 50))));
     items.push({
       id, name, description: str(p.description), translations: translations(p.translations), categoryId, pricePaise: Math.round(price * 100), imageUrl: str(p.imageUrl), dietaryType: str(p.dietaryType), allergens: Array.isArray(p.allergens) ? p.allergens.filter((v): v is string => typeof v === 'string').slice(0,30) : [],
-      sortOrder: num(p.sortOrder), available: p.isAvailable !== false, salesChannels: Array.isArray(p.salesChannels) ? (p.salesChannels as unknown[]).filter((c): c is string => typeof c === 'string') : null,
+      sortOrder: num(p.sortOrder), available: p.isAvailable !== false && !p.archivedAt, kioskEnabled:p.isKioskEnabled !== false, salesChannels: Array.isArray(p.salesChannels) ? (p.salesChannels as unknown[]).filter((c): c is string => typeof c === 'string') : null,
       qrEnabled: p.isQrOrderingEnabled !== false, branchIds: Array.isArray(p.branchIds) ? (p.branchIds as unknown[]).filter((b): b is string => typeof b === 'string') : [],
       taxGroupId, modifierGroupIds: Array.isArray(p.modifierGroupIds) ? (p.modifierGroupIds as unknown[]).filter((g): g is string => typeof g === 'string') : [],
       kitchenStation: str(p.kitchenStation), minQuantity: minQ, maxQuantity: maxQ, allowInstructions: p.allowInstructions !== false
@@ -146,18 +147,19 @@ const byOrder = <T extends { sortOrder?: number; displayOrder?: number; name: st
  * What one branch's QR customer may order from this snapshot. The order is total (configured order, then name, then id), so
  * it never depends on the order a database happens to return rows.
  */
-export function viewForBranch(content: SnapshotContent, branchId: string | null): BranchView {
+export function viewForBranch(content: SnapshotContent, branchId: string | null, channel = 'QR'): BranchView {
   const catOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.categoryId === id);
   const itemOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.itemId === id);
 
-  const categories = content.categories.filter((c) => c.qrVisible && catOverride(c.id)?.visible !== false).sort(byOrder);
+  const categories = content.categories.filter((c) => (channel !== 'QR' || c.qrVisible) && catOverride(c.id)?.visible !== false).sort(byOrder);
   const categoryIds = new Set(categories.map((c) => c.id));
 
   const items = content.items
     .filter((i) => {
       const o = itemOverride(i.id);
       if (!i.available || o?.available === false || o?.visible === false) return false;
-      if (i.salesChannels ? !i.salesChannels.includes('QR') : !i.qrEnabled) return false;
+      if (channel === 'KIOSK' && i.kioskEnabled === false) return false;
+      if (i.salesChannels ? !i.salesChannels.includes(channel) : channel === 'QR' && !i.qrEnabled) return false;
       if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) return false;
       if (!categoryIds.has(i.categoryId)) return false;
       return i.taxGroupId ? !!content.taxGroups[i.taxGroupId] : true;
@@ -232,8 +234,8 @@ export function publicImageUrl(url: string | undefined): string | undefined {
 }
 
 /** Why each dish a guest cannot see is hidden, in words the restaurant can act on. Uses the same rules as `viewForBranch`. */
-export function explainHidden(content: SnapshotContent, branchId: string | null): Array<{ itemId: string; name: string; reason: string }> {
-  const view = viewForBranch(content, branchId);
+export function explainHidden(content: SnapshotContent, branchId: string | null, channel = 'QR'): Array<{ itemId: string; name: string; reason: string }> {
+  const view = viewForBranch(content, branchId, channel);
   const shown = new Set(view.items.map((i) => i.id));
   const catOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.categoryId === id);
   const itemOverride = (id: string) => content.overrides.find((o) => o.branchId === branchId && o.itemId === id);
@@ -244,11 +246,12 @@ export function explainHidden(content: SnapshotContent, branchId: string | null)
     const cat = content.categories.find((c) => c.id === i.categoryId);
     let reason = 'Hidden';
     if (!i.available) reason = 'Marked unavailable';
+    else if(channel === 'KIOSK' && i.kioskEnabled === false) reason = 'Dish hidden from kiosk ordering';
     else if (o?.available === false || o?.visible === false) reason = 'Switched off for this branch';
-    else if (i.salesChannels ? !i.salesChannels.includes('QR') : !i.qrEnabled) reason = 'Not sold through QR ordering';
+    else if (i.salesChannels ? !i.salesChannels.includes(channel) : channel === 'QR' && !i.qrEnabled) reason = `Not sold through ${channel} ordering`;
     else if (i.branchIds.length > 0 && (!branchId || !i.branchIds.includes(branchId))) reason = 'Not sold in this branch';
     else if (!cat) reason = 'Its category is inactive or missing';
-    else if (!cat.qrVisible || catOverride(cat.id)?.visible === false) reason = 'Its category is hidden from QR ordering';
+    else if ((channel === 'QR' && !cat.qrVisible) || catOverride(cat.id)?.visible === false) reason = `Its category is hidden from ${channel} ordering`;
     else if (i.taxGroupId && !content.taxGroups[i.taxGroupId]) reason = 'Its tax group is missing or not in use';
     out.push({ itemId: i.id, name: i.name, reason });
   }

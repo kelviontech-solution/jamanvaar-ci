@@ -1,0 +1,452 @@
+{
+  "url": "/restaurant-admin/dashboard",
+  "text": "Branch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nEOD Report\nReconciliation\nAssistant\nLog out\nToday at your restaurant\n\nGarden House Flow QA — Main Branch · Confirmed sales, open payments and device health\n\nToday\nYesterday\nLast 7 days\nLast 30 days\nThis month\nThis year\nCustom dates\nAll sources\nPOS\nCAPTAIN\nKIOSK\nQR\nWHATSAPP\nONLINE\nRefresh\nWhat needs attention\n0 unpaid bills · ₹0 → View bills\nCheck device connections\nReview guest menu\nReview register shifts\nReview stock alerts\n\nLive tasks for this branch scope, independent of the sales date and source filters. Up to 20 tasks shown per group.\n\nUnpaid bills\n\n0 need review\n\nNothing needs attention.\n\nDelayed orders · over 20 min\n\n0 need review\n\nNothing needs attention.\n\nUnavailable dishes\n\n0 need review\n\nNothing needs attention.\n\nDevice issues\n\n0 need review\n\nNothing needs attention.\n\nNET SALES\n\n₹0\n\nORDERS\n\n0\n\nAVERAGE PAID ORDER\n\n₹0\n\nAWAITING PAYMENT\n\n₹0\n\nGross paid sales ₹0 · Refunds ₹0 · 0 unpaid orders · 2026-10-16 to 2026-10-16 (Asia/Kolkata) · Updated 10:35:30 PM\n\nBusiness summaries & reports\nSales trend\n\nNo sales in this period.\n\nSales by source\n\nNo sales in this period.\n\nSales by branch\nBranch\tNet sales\tOrders\tAOV\tOnline devices\tActivated setup\nGarden House Flow QA — Main Branch\nMAIN · ACTIVE\n\t₹0\t0\t₹0\t1/1\tPOS_ADMIN\n\nSubscriptions apply to the restaurant. Activated devices and QR codes determine each branch’s setup.\n\nTop items\n\nNo paid items in this period.\n\nDevice health\nPOS_ADMIN\n\n1/1 online\n\nOnline requires a recent heartbeat. Registered devices are not assumed connected.\n\nAlerts\n\nNo device or stock alerts.\n\nRecent orders\nOrder\tBranch\tSource\tStatus\tPayment\tAmount\tBill\nLaunch & handover\n\nGarden House Flow QA — Main Branch · Only relevant setup steps. Tests record real service evidence.\n\nRefresh readiness\n1. Menu\n2. Customer experience\n3. Payments\n4. Connect kiosk\n5. Test a real order\nHow does this branch serve customers?\n○\nPublish a menu customers can order\n○\nSet up tables for table service\n○\nConnect kiosks and confirm menu / design delivery\n○\nVerify printed receipts during a channel test\n○\nVerify POS order, kitchen, payment and receipt\n○\nVerify CAPTAIN order, kitchen, payment and receipt\n○\nVerify KIOSK order, kitchen, payment and receipt\n○\nVerify QR order, kitchen, payment and receipt\nPurchased → enabled for branch → configured → verified\nPublished vs received by kiosks · menu v0\n\nReadiness requires channel acceptance evidence. Online payment return must be verified separately in Operations > Channel acceptance.\n\nWhat customers can order\nCustomer experience & private preview\nOwner / manager handover\n\nNo branch handover recorded yet.\n\nJAMAN AI\nDisplay",
+  "headings": [
+    "Today at your restaurant",
+    "What needs attention",
+    "Unpaid bills",
+    "Delayed orders · over 20 min",
+    "Unavailable dishes",
+    "Device issues",
+    "Sales trend",
+    "Sales by source",
+    "Sales by branch",
+    "Top items",
+    "Device health",
+    "Alerts",
+    "Recent orders",
+    "Launch & handover"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Refresh",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 92,
+      "height": 40
+    },
+    {
+      "text": "0 unpaid bills · ₹0 → View bills",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 234,
+      "height": 44
+    },
+    {
+      "text": "Check device connections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 215,
+      "height": 44
+    },
+    {
+      "text": "Review guest menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 166,
+      "height": 44
+    },
+    {
+      "text": "Review register shifts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 180,
+      "height": 44
+    },
+    {
+      "text": "Review stock alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 166,
+      "height": 44
+    },
+    {
+      "text": "Refresh readiness",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 155,
+      "height": 44
+    },
+    {
+      "text": "1. Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 85,
+      "height": 44
+    },
+    {
+      "text": "2. Customer experience",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 198,
+      "height": 44
+    },
+    {
+      "text": "3. Payments",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 118,
+      "height": 44
+    },
+    {
+      "text": "4. Connect kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 149,
+      "height": 44
+    },
+    {
+      "text": "5. Test a real order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 157,
+      "height": 44
+    },
+    {
+      "text": "○Publish a menu customers can order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 44
+    },
+    {
+      "text": "○Set up tables for table service",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 44
+    },
+    {
+      "text": "○Connect kiosks and confirm menu / design delivery",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "○Verify printed receipts during a channel test",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "○Verify POS order, kitchen, payment and receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "○Verify CAPTAIN order, kitchen, payment and receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "○Verify KIOSK order, kitchen, payment and receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "○Verify QR order, kitchen, payment and receipt",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 332,
+      "height": 58
+    },
+    {
+      "text": "What customers can order",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 213,
+      "height": 44
+    },
+    {
+      "text": "Customer experience & private preview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 303,
+      "height": 44
+    },
+    {
+      "text": "Owner / manager handover",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 220,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 120,
+      "height": 45
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Dashboard period"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order source"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Table service (turn off for takeaway only)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Printed receipts (turn off for paperless service)",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [
+    {
+      "tag": "TABLE",
+      "cls": "w-full text-sm text-left",
+      "text": "BranchNet salesOrdersAOVOnline devicesActivated setupGarden House Flow QA — Main"
+    },
+    {
+      "tag": "THEAD",
+      "cls": "",
+      "text": "BranchNet salesOrdersAOVOnline devicesActivated setup"
+    },
+    {
+      "tag": "TR",
+      "cls": "text-slate-500 border-b",
+      "text": "BranchNet salesOrdersAOVOnline devicesActivated setup"
+    },
+    {
+      "tag": "TH",
+      "cls": "p-2",
+      "text": "Activated setup"
+    },
+    {
+      "tag": "TBODY",
+      "cls": "",
+      "text": "Garden House Flow QA — Main BranchMAIN · ACTIVE₹00₹01/1POS_ADMIN"
+    },
+    {
+      "tag": "TR",
+      "cls": "border-b",
+      "text": "Garden House Flow QA — Main BranchMAIN · ACTIVE₹00₹01/1POS_ADMIN"
+    },
+    {
+      "tag": "TD",
+      "cls": "p-2 text-xs",
+      "text": "POS_ADMIN"
+    },
+    {
+      "tag": "TABLE",
+      "cls": "w-full text-left text-sm",
+      "text": "OrderBranchSourceStatusPaymentAmountBill"
+    },
+    {
+      "tag": "THEAD",
+      "cls": "",
+      "text": "OrderBranchSourceStatusPaymentAmountBill"
+    },
+    {
+      "tag": "TR",
+      "cls": "border-b text-slate-500",
+      "text": "OrderBranchSourceStatusPaymentAmountBill"
+    },
+    {
+      "tag": "TH",
+      "cls": "p-2",
+      "text": "Amount"
+    },
+    {
+      "tag": "TH",
+      "cls": "p-2",
+      "text": "Bill"
+    }
+  ],
+  "unnamedButtons": 0,
+  "smallTargets": 6
+}

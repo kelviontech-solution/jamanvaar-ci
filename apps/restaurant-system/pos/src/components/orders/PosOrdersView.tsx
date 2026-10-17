@@ -16,7 +16,7 @@ import { useConfirm, OrderActivityView, type CanonicalOrderActivity } from '@jam
 const loadOrderActivity = async (id: string): Promise<CanonicalOrderActivity> => { const response = await deviceFetch(`/api/v1/orders/sync/${encodeURIComponent(id)}/activity`); if (!response.ok) throw new Error('Order activity unavailable'); return response.json(); };
 
 export const PosOrdersView: React.FC = () => {
-  const { notify, confirmDialog } = useConfirm();
+  const { notify, confirm, confirmDialog } = useConfirm();
   const {
     setSelectedTable,
     loadOrderFromTable,
@@ -109,6 +109,7 @@ export const PosOrdersView: React.FC = () => {
       setCheckingOrderId(order.id);
       try {
         const result = await getPaymentStatus(order.paymentTransactionId);
+        setCheckingOrderId(null);
         if (result.status === 'SUCCESS') {
           OrderRepository.settleOrder(order.id, 'UPI', undefined, order.paymentTransactionId, 'Razorpay UPI (reconciled at counter)');
           void SyncOutboxEngine.flush();
@@ -120,16 +121,39 @@ export const PosOrdersView: React.FC = () => {
           await notify({ title: 'Already paid via UPI', message: 'Do not collect payment again. The receipt reflects the online payment.', confirmLabel: 'Got it' });
           return;
         }
+        // result.status is a definite, server-verified answer (e.g. FAILED) — not an exception —
+        // so it is safe to fall through to manual settlement below.
       } catch {
-        // Network/device-auth failure — fall through to manual settlement;
-        // staff already saw the on-screen warning and can ask the customer directly.
-      } finally {
+        // F25: "could not verify" (network/device-auth failure) is NOT the same thing as "verified
+        // unpaid", and must not silently fall through to the same manual settlement screen as a
+        // genuine failure — that risks charging the guest twice for a payment that actually went
+        // through moments earlier. Offer a retry, and otherwise require an audited manager
+        // override before settling this specific order without a verified status.
         setCheckingOrderId(null);
+        const retry = await confirm({
+          title: 'Could not verify UPI payment status',
+          message: 'A connection or device issue stopped us from confirming whether this payment already went through. Collecting cash or card now could charge the guest twice. Retry the check, or ask a manager to approve settling without verification.',
+          confirmLabel: 'Retry check',
+          cancelLabel: 'Ask manager to proceed',
+          tone: 'danger'
+        });
+        if (retry) { void handleSettleOrder(order); return; }
+        requestManagerOverride(
+          'SETTLE_UNVERIFIED_PAYMENT',
+          `Settle Order #${order.orderNumber} without a verified payment status`,
+          `${currentUser?.fullName || 'Cashier'} could not verify this order's UPI payment status (connection/device issue) and requests to proceed to manual settlement without that verification.`,
+          () => {
+            const settleResult = usePosStore.getState().loadOrderForSettlement(order.id);
+            if (settleResult.ok) setIsPaymentOpen(true);
+          }
+        );
+        return;
       }
     }
 
-    if (!usePosStore.getState().loadOrderForSettlement(order.id)) {
-      await notify({ title: 'Order still syncing', message: 'This order has not fully synced to this terminal yet. Try again in a moment.' });
+    const settleResult = usePosStore.getState().loadOrderForSettlement(order.id);
+    if (!settleResult.ok) {
+      await notify({ title: 'Cannot settle this order yet', message: settleResult.reason });
       return;
     }
     setIsPaymentOpen(true);

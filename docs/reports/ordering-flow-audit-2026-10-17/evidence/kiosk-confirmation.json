@@ -1,0 +1,159 @@
+{
+  "url": "/",
+  "text": "CUSTOMER KIOSK\nNeed Help?\nCall Staff\nEN\nहिन्दी\nગુજરાતી\nOrder Confirmed!\n\nMAIN-20261017-301 · TAKEAWAY\n\nSent to the kitchen\nTOKEN\n#K-101\nEstimated Prep Time\n\nKitchen wait: About 16–25 minutes · Based on configured preparation time\n\nPickup at\nCounter 1\nYOUR BILL\n₹280\nGARDEN HOUSE FLOW QA\nBILL / RECEIPT\nTOKEN #K-101\nInvoice No:\nMAIN-20261017-301\nOrder Type:\nTAKEAWAY\nDate: 17 Oct 2026\nTime: 11:47 am\nPOS: Self-Order Kiosk\nITEM\nQTY\nRATE\nAMT\nBuild Your Thali\n1\n₹200\n₹200\nTwin Snack Plate\n1\n₹80\n₹80\nSubtotal\n₹280\nCGST\n₹0.00\nSGST\n₹0.00\nTOTAL\n₹280\nPAYMENT DUE AT COUNTER:\nCASH\nAmount collected:\n₹0.00\nBalance due:\n₹280.00\nThank you for dining at Garden House Flow QA! Please visit again.\nPowered by JAMANVAAR\nKITCHEN TICKETS\n1 ticket · 1 station\n\nMAIN KITCHEN\n\nKOT KOT-MAIN-20261017-301\n\nNot printed\nBuild Your Thali\n× 1\nTwin Snack Plate\n× 1\nPrint this ticket again\nGET YOUR BILL\nPrint Receipt\nEmail Bill\nWhatsApp Bill\nQR Invoice\n\nReceipt: No printer is configured. Add one in Restaurant Admin → Printers.\n\nHOW WAS YOUR ORDERING EXPERIENCE?\nSubmit Rating\n\nKeep your token and wait near Counter 1. The kiosk resets for the next guest.\n\n← Place New Order\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1080,
+    "height": 1920
+  },
+  "headings": [
+    "Order Confirmed!",
+    "YOUR BILL",
+    "GARDEN HOUSE FLOW QA",
+    "KITCHEN TICKETS",
+    "GET YOUR BILL",
+    "HOW WAS YOUR ORDERING EXPERIENCE?"
+  ],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Go back",
+      "disabled": false,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "text": "Need Help?",
+      "aria": "Need Help?",
+      "disabled": false,
+      "width": 137,
+      "height": 44
+    },
+    {
+      "text": "Call Staff",
+      "aria": null,
+      "disabled": false,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "EN",
+      "aria": null,
+      "disabled": false,
+      "width": 52,
+      "height": 44
+    },
+    {
+      "text": "हिन्दी",
+      "aria": null,
+      "disabled": false,
+      "width": 59,
+      "height": 44
+    },
+    {
+      "text": "ગુજરાતી",
+      "aria": null,
+      "disabled": false,
+      "width": 78,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "Print this ticket again",
+      "aria": null,
+      "disabled": false,
+      "width": 426,
+      "height": 52
+    },
+    {
+      "text": "Print Receipt",
+      "aria": null,
+      "disabled": false,
+      "width": 237,
+      "height": 96
+    },
+    {
+      "text": "Email Bill",
+      "aria": null,
+      "disabled": false,
+      "width": 237,
+      "height": 96
+    },
+    {
+      "text": "WhatsApp Bill",
+      "aria": null,
+      "disabled": false,
+      "width": 237,
+      "height": 96
+    },
+    {
+      "text": "QR Invoice",
+      "aria": null,
+      "disabled": false,
+      "width": 237,
+      "height": 96
+    },
+    {
+      "text": "",
+      "aria": "1 star",
+      "disabled": false,
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "",
+      "aria": "2 stars",
+      "disabled": false,
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "",
+      "aria": "3 stars",
+      "disabled": false,
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "",
+      "aria": "4 stars",
+      "disabled": false,
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "",
+      "aria": "5 stars",
+      "disabled": false,
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "Submit Rating",
+      "aria": null,
+      "disabled": true,
+      "width": 121,
+      "height": 44
+    },
+    {
+      "text": "← Place New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 232,
+      "height": 64
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

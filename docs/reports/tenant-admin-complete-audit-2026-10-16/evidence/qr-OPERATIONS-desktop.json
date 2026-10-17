@@ -1,0 +1,504 @@
+{
+  "url": "/qr/admin/?tab=OPERATIONS",
+  "text": "QR ADMIN\nYour restaurant workspace\nQA Owner\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nOperations Hub\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / LIVE OPERATIONS\nOperations Hub\n\nBranch service controls, guest follow-up, handovers and acceptance.\n\n✦ JAMAN AI\nEnabled\n\nBRANCH OPERATIONS\n\nKeep service running smoothly\n\nDaily tasks, planned changes and clear follow-up in one place.\n\nWorking branch\nChoose a branch\nGarden House Flow QA — Main Branch\n\nGarden House Flow QA — Main Branch · Asia/Kolkata · Branch changes affect this branch. Menu publication is restaurant-wide.\n\nSearch by task\nDaily brief\n☆\nRecurring menus\n☆\nRestore configuration\n☆\nGuided recovery\n☆\nPayment exceptions\n☆\nRush hour\n☆\nOpen & close\n☆\nService controls\n☆\nMenu review & schedules\n☆\nCompare branches\n☆\nGuest follow-up\n☆\nHandovers\n☆\nStaff & device transfers\n☆\nOrder history\n☆\nChannel acceptance\n☆\nDisplay & support\n☆\nStaff practice\n☆\nRush hour\nKitchen backlog\n0\nReady to serve\n0\nUnpaid bills\n0\nDevices need attention\n0\nService queue\nAbout this task\n\nShowing up to 200 oldest open or unpaid orders. Counts above describe the displayed queue.\n\nOrder\tTable / source\tProgress\tAge\tCollection\n\nNo waiting orders.\n\nOpen order historyPause or manage capacity\nCustomer pickup display\nAbout this task\nCreate TV display link\nDisplay",
+  "headings": [
+    "Operations Hub",
+    "Keep service running smoothly",
+    "Rush hour",
+    "Service queue",
+    "Customer pickup display"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Operations Hub",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 223,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Daily brief",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Daily brief",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Recurring menus",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Recurring menus",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Restore configuration",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Restore configuration",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Guided recovery",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Guided recovery",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Payment exceptions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Payment exceptions",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Rush hour",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Rush hour",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Open & close",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Open & close",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Service controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Service controls",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Menu review & schedules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 60
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Menu review & schedules",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 60
+    },
+    {
+      "text": "Compare branches",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Compare branches",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Guest follow-up",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Guest follow-up",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Handovers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Handovers",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Staff & device transfers",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Staff & device transfers",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Order history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Order history",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Channel acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Channel acceptance",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Display & support",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Display & support",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Staff practice",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 44
+    },
+    {
+      "text": "☆",
+      "aria": "Pin Staff practice",
+      "title": "",
+      "disabled": false,
+      "width": 26,
+      "height": 44
+    },
+    {
+      "text": "Open order history",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 143,
+      "height": 44
+    },
+    {
+      "text": "Pause or manage capacity",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 186,
+      "height": 44
+    },
+    {
+      "text": "Create TV display link",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 159,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Working branch"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Current operations task"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Search by task",
+      "placeholder": "refund, pause ordering, change price…"
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 17
+}

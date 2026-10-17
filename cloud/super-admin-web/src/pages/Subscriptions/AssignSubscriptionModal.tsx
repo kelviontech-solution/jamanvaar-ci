@@ -1,3 +1,4 @@
+import { PlanReview } from './PlanReview';
 import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { Plan, RestaurantListItem } from '../../api/types';
@@ -19,6 +20,7 @@ export function AssignSubscriptionModal({
   const [planId, setPlanId] = useState('');
   const [status, setStatus] = useState<'TRIAL' | 'ACTIVE'>('ACTIVE');
   const [durationDays, setDurationDays] = useState('30');
+  const [reviewed,setReviewed]=useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,6 +36,7 @@ export function AssignSubscriptionModal({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if(!reviewed)return;
     setError(null);
     setSubmitting(true);
     try {
@@ -75,7 +78,7 @@ export function AssignSubscriptionModal({
           )}
           <div className="field">
             <label>Plan</label>
-            <select value={planId} onChange={(e) => setPlanId(e.target.value)} required>
+            <select value={planId} onChange={(e) => {setPlanId(e.target.value);setReviewed(false);}} required>
               <option value="" disabled>
                 Select a plan…
               </option>
@@ -96,17 +99,18 @@ export function AssignSubscriptionModal({
             </div>
             <div className="field">
               <label>Duration (days)</label>
-              <input type="number" min={1} value={durationDays} onChange={(e) => setDurationDays(e.target.value)} required />
+              <input type="number" min={1} value={durationDays} onChange={(e) => {setDurationDays(e.target.value);setReviewed(false);}} required />
             </div>
           </div>
 
+          {plans.find(p=>p.id===planId)&&<><PlanReview plan={plans.find(p=>p.id===planId)!} expiresAt={Number(durationDays)>0?new Date(Date.now()+Number(durationDays)*86400000).toISOString():undefined}/><label><input type="checkbox" checked={reviewed} onChange={e=>setReviewed(e.target.checked)}/> I reviewed the included products, limits and expiry.</label></>}
           {error && <div className="form-error">{error}</div>}
 
           <div className="modal-actions">
             <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={submitting || !restaurantId || !planId}>
+            <Button type="submit" variant="primary" disabled={submitting || !restaurantId || !planId || !reviewed}>
               {submitting ? 'Assigning…' : 'Assign subscription'}
             </Button>
           </div>

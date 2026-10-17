@@ -1,0 +1,399 @@
+{
+  "url": "/qr/admin/?tab=ADVANCED",
+  "text": "QR ADMIN\nBranch\nAll restaurant\nGarden House Flow QA — Main Branch\nSign out\nBrowse workspace\nRestaurant workspace\nShow advanced tools\nLIVE OPERATIONS\nOverview\nQR Orders\nService Requests\nPickup Calendar\nMENU & GUESTS\nMenu & Availability\nCustomers & Loyalty\nLAUNCH SETUP\nGuided Menu Setup\nTables & QR\nPayment Settings\nPayment Acceptance\nOrdering Rules\nBRANDING\nCustomer Branding\nRestaurant Page\nQR Print Packs\nINSIGHTS\nAnalytics\nCollection Reconciliation\nADVANCED CONFIGURATION\nAdvanced Features\nFeature controls\nTranslations\nPromotions\nFeedback\nAlerts\nCollections\nLicense\nQR Ordering license active\nQA Admin Flow Tenant Audit qr 1792170389347 · 17/10/2026\nLicenses and device access are managed by your platform administrator.\nProduct website\nQR ORDERING / ADVANCED CONFIGURATION\nAdvanced Features\n\nConfigure licensed languages, loyalty, promotions and operational tools.\n\n✦ JAMAN AI\nEnabled\nQR ordering channel\n\nReview the branch selector in this editor. Restaurant defaults are inherited until a branch has its own override; changing a branch override leaves other branches unchanged.\n\nAdvanced QR capabilities\n\nQA Admin Flow Tenant Audit qr 1792170389347 · 0 active codes · 1 active branches\n\nOptional access comes from Super Admin plans and add-ons. Existing ordering continues to work independently.\n\nFeatures for this branch\n\nOnly changed settings become local overrides. Settings follow restaurant defaults.\n\nCounted dish stock reservations\nIncluded in your license\nVerified customer loyalty\nIncluded in your license\nShared table sessions\nIncluded in your license\nMultilingual menu\nIncluded in your license\nPrivate order feedback\nIncluded in your license\nBrowser order history\nIncluded in your license\nOperational alerts\nIncluded in your license\nShared kitchen workload\nIncluded in your license\nMenu recommendations\nIncluded in your license\nAdvanced workload estimates\n\nCounts unfinished dish quantities across POS, Captain, Kiosk and QR in this branch. No accepted order is automatically cancelled.\n\nStop new QR orders at units (0 = unlimited)\nBusy estimate threshold (0 = off)\nExtra minutes when busy\nRecommended menu items (customers choose whether to add)\nAlert types\n NEW ORDER\n CASH DUE\n PAYMENT COLLECTED\n PAYMENT PENDING\n CANCELLED\n REFUND\nSave changes\nCounted portions for this branch\n\nOptional exact counts for ready-to-sell dishes. Ingredient recipes continue through the existing inventory ledger. Enable counted stock reservations above to protect simultaneous QR checkouts.\n\nBranch\nChoose branch...\nGarden House Flow QA — Main Branch\nDish\nChoose dish...\nCurrent portions (blank = inherit/manual)\nSave counted portions\nBranch preferences and inheritance\n\nUse the branch selector in the app header. All-branch propagation requires the owner account. Existing local overrides are always preserved.\n\nDisplay",
+  "headings": [
+    "Advanced Features",
+    "Advanced QR capabilities",
+    "Features for this branch"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Sign out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 79,
+      "height": 42
+    },
+    {
+      "text": "Browse workspace",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Close menu",
+      "title": "",
+      "disabled": false,
+      "width": 36,
+      "height": 44
+    },
+    {
+      "text": "Show advanced tools",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 173,
+      "height": 46
+    },
+    {
+      "text": "Overview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Service Requests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Pickup Calendar",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Menu & Availability",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customers & Loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Guided Menu Setup",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Tables & QR",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Settings",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Payment Acceptance",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Ordering Rules",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Customer Branding",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Restaurant Page",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "QR Print Packs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Analytics",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Collection Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Advanced Features",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 271,
+      "height": 44
+    },
+    {
+      "text": "Feature controls",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Translations",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Promotions",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Feedback",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Alerts",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "Collections",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "License",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 241,
+      "height": 44
+    },
+    {
+      "text": "✦ JAMAN AI",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 121,
+      "height": 46
+    },
+    {
+      "text": "Save changes",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 120,
+      "height": 44
+    },
+    {
+      "text": "Save counted portions",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 180,
+      "height": 44
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Counted dish stock reservationsIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Verified customer loyaltyIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared table sessionsIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Multilingual menuIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Private order feedbackIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Browser order historyIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Operational alertsIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Shared kitchen workloadIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Menu recommendationsIncluded in your license",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Stop new QR orders at units (0 = unlimited)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Busy estimate threshold (0 = off)",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Extra minutes when busy",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-multiple",
+      "label": "Recommended menu items (customers choose whether to add)"
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "NEW ORDER",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "CASH DUE",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "PAYMENT COLLECTED",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "PAYMENT PENDING",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "CANCELLED",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "REFUND",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "BranchChoose branch...Garden House Flow QA — Main Branch"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "DishChoose dish..."
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "label": "Current portions (blank = inherit/manual)",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 0
+}

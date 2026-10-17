@@ -7,6 +7,9 @@ export function kioskActivationError(error: unknown, stage: 'restaurant' | 'key'
   if (!status || /network|fetch|timeout|reach/.test(message)) return 'Cannot reach the activation service. Check your connection and try again.';
   if (status === 429) return 'Too many activation attempts. Please wait a moment before trying again.';
   if (stage === 'restaurant') return 'Restaurant not found. Check the Restaurant ID supplied by your restaurant owner.';
+  if (/another restaurant/.test(message)) return 'This key is for a different restaurant. Check the Restaurant ID and ask your owner for the matching kiosk key. The key has not been used.';
+  if (/another branch/.test(message)) return 'This key is for a different branch. Open the setup link for this branch or ask your owner for the matching key. The key has not been used.';
+  if (/only valid for|not for an admin console/.test(message)) return 'This is a key for another app. Ask your owner for a Customer Kiosk (KIOSK) activation key.';
   if (/expired/.test(message)) return 'This activation key has expired. Ask your restaurant owner for a new kiosk key.';
   if (status === 409 || /used|already|redeemed/.test(message)) return 'This key has already been used. Ask your restaurant owner for a new kiosk key.';
   return 'This kiosk key is invalid or cannot be used here. Check the key with your restaurant owner.';

@@ -92,3 +92,21 @@ export function missingRequiredGroups(groups: ModifierGroup[], selection: Modifi
     .filter((g) => (g.isRequired || g.minSelections > 0) && (selection[g.id]?.length ?? 0) < Math.max(1, g.minSelections))
     .map((g) => g.name);
 }
+
+/**
+ * True when a dish cannot be added with bare defaults alone: a required modifier choice is
+ * outstanding, or the restaurant's configured minimum quantity is more than one. Every add-to-cart
+ * entry point (main card tap, quick-add chip, search result, speed-bar button) must check this
+ * before adding directly, and open the customization/quantity step instead when it is true — a
+ * dish must not reach an order with a required choice unmade or below its configured minimum.
+ */
+export function dishNeedsChoiceBeforeAdd(item: Pick<MenuItem, 'minQuantity'>, groups: ModifierGroup[] | undefined | null): boolean {
+  return hasRequiredModifierGroup(groups) || (item.minQuantity ?? 1) > 1;
+}
+
+/** Keeps a quantity inside the dish's configured minimum/maximum (both default to permissive bounds). */
+export function clampItemQuantity(item: Pick<MenuItem, 'minQuantity' | 'maxQuantity'>, quantity: number): number {
+  const min = item.minQuantity ?? 1;
+  const max = item.maxQuantity ?? Infinity;
+  return Math.min(max, Math.max(min, Math.round(quantity)));
+}

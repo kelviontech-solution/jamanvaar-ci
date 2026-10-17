@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, sound } from '@jamanvaar/ui';
+import { Modal, sound, useConfirm } from '@jamanvaar/ui';
 import { db } from '@jamanvaar/database';
 import type { DiningTable } from '@jamanvaar/types';
 import { holdLabel, tableHold } from '@jamanvaar/business';
@@ -28,6 +28,7 @@ const STATUS: Record<string, { label: string; tile: string; pill: string; select
 /** Zone filter + tile grid. Used by the popup and by the full-screen first step. */
 export const PosTableGrid: React.FC<{ onChosen?: () => void; large?: boolean }> = ({ onChosen, large = false }) => {
   const { selectedTable, setSelectedTable, loadOrderFromTable } = usePosStore() as any;
+  const { notify, confirmDialog } = useConfirm();
   const [, tick] = useState(0);
   const [zone, setZone] = useState('ALL');
 
@@ -45,10 +46,14 @@ export const PosTableGrid: React.FC<{ onChosen?: () => void; large?: boolean }> 
     .filter((t) => zone === 'ALL' || t.zone === zone)
     .sort((a, b) => String(a.zone).localeCompare(String(b.zone)) || a.tableNumber.localeCompare(b.tableNumber, undefined, { numeric: true }));
 
-  const choose = (table: DiningTable) => {
+  const choose = async (table: DiningTable) => {
     sound.play('click');
-    if (table.status === 'OCCUPIED' && table.currentOrderId) loadOrderFromTable(table);
-    else setSelectedTable(table);
+    if (table.status === 'OCCUPIED' && table.currentOrderId) {
+      const result = loadOrderFromTable(table);
+      if (!result.ok) { await notify({ title: 'Cannot open this table yet', message: result.reason }); return; }
+    } else {
+      setSelectedTable(table);
+    }
     onChosen?.();
   };
 
@@ -111,6 +116,7 @@ export const PosTableGrid: React.FC<{ onChosen?: () => void; large?: boolean }> 
           })}
         </ul>
       )}
+      {confirmDialog}
     </div>
   );
 };

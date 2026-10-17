@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-16T14:28:00.710Z",
+  "scope": "Current local working tree and built apps; isolated QA database; production not inspected",
+  "routes": 43,
+  "pageVisits": 86,
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "pageErrors": 0,
+  "documentOverflows": 0,
+  "injectedFailureCases": 4,
+  "readOnlyPageChecks": 10,
+  "readOnlyDeniedWrites": [
+    403,
+    403
+  ],
+  "targetedBrowserChecks": 4,
+  "domainProbes": 5,
+  "additionalFindings": 33,
+  "previousBackupFindings": 7,
+  "allFeaturesExhaustivelyTested": false,
+  "applicationCodeModifiedByThisAudit": false,
+  "productionDeployed": false
+}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category } from '@jamanvaar/types';
-import { CachedImg, Modal, Button, MenuCategoryIcon, FormInput, FormSelect } from '@jamanvaar/ui';
+import { CachedImg, Modal, Button, MenuCategoryIcon, FormInput, FormSelect, useConfirm } from '@jamanvaar/ui';
 import { CATEGORY_ICON_OPTIONS, isMenuPlaceholder, menuCategoryImage } from '@jamanvaar/utils';
 import { MenuRepository, AuditRepository } from '@jamanvaar/database';
+import { getCurrentAdminName } from '../currentAdminIdentity';
+import { useEditConflictGuard } from '../hooks/useEditConflictGuard';
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -27,6 +29,20 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [imageUrl, setImageUrl] = useState('');
   const [formError, setFormError] = useState('');
 
+  // #2: same simultaneous-edit guard as ItemModal -- categories have no version field either,
+  // so updatedAt (already bumped unconditionally by updateCategory) is the conflict key.
+  const { confirm, confirmDialog } = useConfirm();
+  const conflictGuard = useEditConflictGuard<Category>();
+  const applyCategoryToForm = (cat: Category) => {
+    conflictGuard.snapshot(cat.id, cat);
+    setName(cat.name); setSortOrder(cat.sortOrder);
+    setSlug(cat.slug);
+    setDescription(cat.description || '');
+    setIconName(cat.iconName === 'Cake' ? 'CakeSlice' : CATEGORY_ICON_OPTIONS.some(([icon]) => icon === cat.iconName) ? cat.iconName! : 'auto');
+    setIsActive(cat.isActive ?? true);
+    setQrVisible(cat.qrVisible !== false);
+    setImageUrl(cat.imageUrl || '');
+  };
   const initializedForm = useRef<string | null>(null);
   useEffect(() => {
     if (!isOpen) { initializedForm.current = null; return; }
@@ -34,13 +50,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     if (initializedForm.current === session) return;
     initializedForm.current = session;
     if (categoryToEdit) {
-      setName(categoryToEdit.name); setSortOrder(categoryToEdit.sortOrder);
-      setSlug(categoryToEdit.slug);
-      setDescription(categoryToEdit.description || '');
-      setIconName(categoryToEdit.iconName === 'Cake' ? 'CakeSlice' : CATEGORY_ICON_OPTIONS.some(([icon]) => icon === categoryToEdit.iconName) ? categoryToEdit.iconName! : 'auto');
-      setIsActive(categoryToEdit.isActive ?? true);
-      setQrVisible(categoryToEdit.qrVisible !== false);
-      setImageUrl(categoryToEdit.imageUrl || '');
+      applyCategoryToForm(categoryToEdit);
     } else {
       setName(''); setSortOrder(1);
       setSlug('');
@@ -77,7 +87,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!Number.isInteger(sortOrder) || sortOrder < 0) { setFormError('Display order must be a non-negative integer.'); return; }
@@ -87,6 +97,27 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     }
 
     if (categoryToEdit) {
+      const { conflicted, live } = conflictGuard.check(categoryToEdit.id, () => MenuRepository.getCategoryById(categoryToEdit.id));
+      if (conflicted) {
+        const changes = !live
+          ? ['This category was removed elsewhere while you were editing.']
+          : [
+              live.name !== categoryToEdit.name ? `Name: "${categoryToEdit.name}" → "${live.name}"` : '',
+              live.isActive !== categoryToEdit.isActive ? `Active: ${categoryToEdit.isActive ? 'Yes' : 'No'} → ${live.isActive ? 'Yes' : 'No'}` : ''
+            ].filter(Boolean);
+        const overwrite = live && await confirm({
+          title: 'Someone else changed this category',
+          message: `${changes.length ? changes.join(' · ') : 'Another change was saved to this category'} while you were editing. Saving now will overwrite that with your version.`,
+          confirmLabel: 'Keep my changes & overwrite',
+          cancelLabel: 'Discard mine & reload latest',
+          tone: 'danger'
+        });
+        if (!overwrite) {
+          if (live) applyCategoryToForm(live);
+          else onClose();
+          return;
+        }
+      }
       MenuRepository.updateCategory(categoryToEdit.id, {
         name: name.trim(), sortOrder,
         slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
@@ -100,7 +131,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         action: 'CATEGORY_UPDATED',
         category: 'MENU',
         details: `Updated category "${name}"`,
-        username: 'Manager'
+        username: getCurrentAdminName()
       });
     } else {
       MenuRepository.createCategory({
@@ -116,7 +147,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         action: 'CATEGORY_CREATED',
         category: 'MENU',
         details: `Created category "${name}"`,
-        username: 'Manager'
+        username: getCurrentAdminName()
       });
     }
 
@@ -126,6 +157,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
   const categoryPreview = menuCategoryImage(imageUrl, name, description, categoryToEdit?.templateCategoryKey);
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -227,5 +259,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         </div>
       </form>
     </Modal>
+    {confirmDialog}
+    </>
   );
 };

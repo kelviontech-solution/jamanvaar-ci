@@ -1,6 +1,35 @@
-import { db, isUnpaidOpenOrder } from '@jamanvaar/database';
+import { db, isUnpaidOpenOrder, BusinessDayRepository, resolveOperatingProfile } from '@jamanvaar/database';
 import { Order, User } from '@jamanvaar/types';
 import { formatDate } from '@jamanvaar/utils';
+
+/**
+ * R02: every preset below used to anchor on `new Date(y, m, d, 0, 0, 0, 0)` — the *device's* local
+ * midnight, via the JS Date constructor's own local-timezone interpretation — instead of the
+ * restaurant's configured timezone and business-day cutoff hour (e.g. a 6:30 PM UTC start for an
+ * Asia/Kolkata restaurant with the default 00:00 IST cutoff). A UTC-clocked device and an IST
+ * restaurant disagreed by a full business day on what "Today" even meant. Billing/EOD already get
+ * this right through `BusinessDayRepository.getCanonicalBusinessDate`; these helpers put reports on
+ * the exact same authoritative boundary instead of reinventing a device-local one.
+ */
+function zonedTimeToUtc(y: number, m: number, d: number, hour: number, timezone: string): Date {
+  const utcGuess = Date.UTC(y, m - 1, d, hour, 0, 0, 0);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+  }).formatToParts(new Date(utcGuess)).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {} as Record<string, string>);
+  const asIfUtc = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), Number(parts.hour), Number(parts.minute), Number(parts.second));
+  return new Date(utcGuess - (asIfUtc - utcGuess));
+}
+
+function businessDayStartUtc(dateKey: string, profile: { timezone: string; cutoffHour: number }): Date {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  return zonedTimeToUtc(y, m, d, profile.cutoffHour, profile.timezone);
+}
+
+function currentOperatingProfile() {
+  return resolveOperatingProfile(db.restaurant, db.outlet);
+}
 
 export type ReportPeriodPreset =
   | 'TODAY'
@@ -238,23 +267,27 @@ export class ReportDataEngine {
    */
   public static getDateRange(preset: ReportPeriodPreset, customStart?: string, customEnd?: string): ReportDateRange {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const profile = currentOperatingProfile();
+    const todayKey = BusinessDayRepository.getCanonicalBusinessDate(now).dateKey;
+    const todayStart = businessDayStartUtc(todayKey, profile);
+    // Business "end of today" is the live, still-running day: up to now, not up to a fixed 23:59:59
+    // that a cutoff-hour restaurant (e.g. cutoff 05:00) would never actually reach before the next
+    // business day has already begun.
+    const todayEndLive = now;
+    const todayEndFull = new Date(todayStart.getTime() + 86400000 - 1);
 
     switch (preset) {
       case 'TODAY':
         return {
-          startDate: startOfToday,
-          endDate: endOfToday,
+          startDate: todayStart,
+          endDate: todayEndLive,
           preset,
           label: `Today (${formatDate(now)})`
         };
 
       case 'YESTERDAY': {
-        const yStart = new Date(startOfToday);
-        yStart.setDate(yStart.getDate() - 1);
-        const yEnd = new Date(yStart);
-        yEnd.setHours(23, 59, 59, 999);
+        const yStart = new Date(todayStart.getTime() - 86400000);
+        const yEnd = new Date(todayStart.getTime() - 1);
         return {
           startDate: yStart,
           endDate: yEnd,
@@ -264,62 +297,65 @@ export class ReportDataEngine {
       }
 
       case 'LAST_7_DAYS': {
-        const s = new Date(startOfToday);
-        s.setDate(s.getDate() - 6);
+        const s = new Date(todayStart.getTime() - 6 * 86400000);
         return {
           startDate: s,
-          endDate: endOfToday,
+          endDate: todayEndLive,
           preset,
           label: `Last 7 Days (${formatDate(s)} - ${formatDate(now)})`
         };
       }
 
       case 'LAST_30_DAYS': {
-        const s = new Date(startOfToday);
-        s.setDate(s.getDate() - 29);
+        const s = new Date(todayStart.getTime() - 29 * 86400000);
         return {
           startDate: s,
-          endDate: endOfToday,
+          endDate: todayEndLive,
           preset,
           label: `Last 30 Days (${formatDate(s)} - ${formatDate(now)})`
         };
       }
 
       case 'THIS_MONTH': {
-        const s = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        const s = businessDayStartUtc(`${todayKey.slice(0, 7)}-01`, profile);
         return {
           startDate: s,
-          endDate: endOfToday,
+          endDate: todayEndLive,
           preset,
-          label: `This Month (${s.toLocaleString('default', { month: 'long', year: 'numeric' })})`
+          label: `This Month (${s.toLocaleString('default', { month: 'long', year: 'numeric', timeZone: profile.timezone })})`
         };
       }
 
       case 'LAST_MONTH': {
-        const s = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-        const e = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+        const thisMonthStart = businessDayStartUtc(`${todayKey.slice(0, 7)}-01`, profile);
+        const e = new Date(thisMonthStart.getTime() - 1);
+        // Walk back from the first of this month to find the first of the previous one — robust
+        // across year boundaries without reconstructing a new local Date from parts.
+        const lastMonthProbe = new Date(thisMonthStart.getTime() - 86400000);
+        const lastMonthKey = BusinessDayRepository.getCanonicalBusinessDate(lastMonthProbe).dateKey;
+        const s = businessDayStartUtc(`${lastMonthKey.slice(0, 7)}-01`, profile);
         return {
           startDate: s,
           endDate: e,
           preset,
-          label: `Last Month (${s.toLocaleString('default', { month: 'long', year: 'numeric' })})`
+          label: `Last Month (${s.toLocaleString('default', { month: 'long', year: 'numeric', timeZone: profile.timezone })})`
         };
       }
 
       case 'THIS_YEAR': {
-        const s = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+        const s = businessDayStartUtc(`${todayKey.slice(0, 4)}-01-01`, profile);
         return {
           startDate: s,
-          endDate: endOfToday,
+          endDate: todayEndLive,
           preset,
-          label: `This Year (${now.getFullYear()})`
+          label: `This Year (${todayKey.slice(0, 4)})`
         };
       }
 
       case 'CUSTOM':
       default: {
-        const s = customStart ? new Date(customStart + 'T00:00:00') : new Date(startOfToday);
-        const e = customEnd ? new Date(customEnd + 'T23:59:59.999') : new Date(endOfToday);
+        const s = customStart ? businessDayStartUtc(customStart, profile) : todayStart;
+        const e = customEnd ? new Date(businessDayStartUtc(customEnd, profile).getTime() + 86400000 - 1) : todayEndFull;
         return {
           startDate: s,
           endDate: e,
@@ -851,63 +887,54 @@ export class ReportDataEngine {
   /**
    * Kitchen Station Preparation Breakdown
    */
+  /**
+   * R04: this used to assume a fixed list of six station names and fuzzy-match them against each
+   * menu item's *current* `kitchenStation` assignment — a real station like "Pizza Oven" never
+   * appeared at all, and evaluating an old order against today's menu could misattribute it if a
+   * dish had since moved stations. `KOTRecord.station` is a real field stamped on the ticket at
+   * creation time (see domain.ts), so building the station list and every count from the KOTs
+   * actually in range is both complete (whatever stations were really used) and historically
+   * accurate (the station the ticket was actually routed to when it was made), not a guess from
+   * today's configuration.
+   */
   public static getStationPerformance(orders: Order[]): StationPerformanceRow[] {
-    const stations = [
-      'Main Kitchen',
-      'Tandoor Section',
-      'Curry Station',
-      'Beverages Bar',
-      'Dessert Counter',
-      'Chaat Counter'
-    ];
+    // No restaurant-configurable prep-time SLA exists yet; this default is an honest placeholder
+    // used only to flag outliers for this report, not a setting an owner has agreed to.
+    const DEFAULT_DELAY_THRESHOLD_MINUTES = 15;
+    const now = Date.now();
 
-    const orderIds = new Set(orders.map((o) => o.id));
+    const orderIds = new Set(orders.filter((o) => o.orderStatus !== 'CANCELLED').map((o) => o.id));
+    const kotsInRange = (db.kots || []).filter((k) => orderIds.has(k.orderId));
 
-    return stations.map((stName) => {
-      const keyword = stName.split(' ')[0];
-      let kotCount = 0;
-      let itemsCount = 0;
-      let delayed = 0;
+    const byStation = new Map<string, { kotCount: number; itemsCount: number; prepMinutesSum: number; prepSamples: number; delayed: number }>();
+    for (const k of kotsInRange) {
+      const stationName = k.station || 'Unassigned';
+      const row = byStation.get(stationName) ?? { kotCount: 0, itemsCount: 0, prepMinutesSum: 0, prepSamples: 0, delayed: 0 };
+      row.kotCount++;
+      row.itemsCount += k.items.reduce((acc, i) => acc + (i.quantity || 1), 0);
+      const createdMs = new Date(k.createdAt).getTime();
+      if (k.readyAt) {
+        const prepMinutes = (new Date(k.readyAt).getTime() - createdMs) / 60000;
+        row.prepMinutesSum += prepMinutes;
+        row.prepSamples++;
+        if (prepMinutes > DEFAULT_DELAY_THRESHOLD_MINUTES) row.delayed++;
+      } else if ((now - createdMs) / 60000 > DEFAULT_DELAY_THRESHOLD_MINUTES) {
+        // Still cooking and already past the threshold — a real, currently-running delay,
+        // not yet captured by a readyAt timestamp.
+        row.delayed++;
+      }
+      byStation.set(stationName, row);
+    }
 
-      orders.forEach((o) => {
-        if (o.orderStatus === 'CANCELLED') return;
-        const matchingItems = (o.items || []).filter((it) => {
-          const mi = (db.menuItems || []).find((m) => m.id === it.menuItemId || m.name === it.name);
-          return (mi?.kitchenStation || 'Main Kitchen').includes(keyword);
-        });
-
-        if (matchingItems.length > 0) {
-          kotCount++;
-          itemsCount += matchingItems.reduce((acc, i) => acc + (i.quantity || 1), 0);
-          const anyO = o as any;
-          if (anyO.isPriority || (anyO.notes && anyO.notes.includes('DELAY'))) {
-            delayed++;
-          }
-        }
-      });
-
-      // Real average prep time, derived from actual KOT createdAt -> readyAt
-      // timestamps for this station's tickets belonging to an in-range order.
-      const completedKots = (db.kots || []).filter(
-        (k) => orderIds.has(k.orderId) && k.station.includes(keyword) && k.readyAt
-      );
-      const avgPrepMinutes = completedKots.length > 0
-        ? Math.round(
-            completedKots.reduce(
-              (acc, k) => acc + (new Date(k.readyAt!).getTime() - new Date(k.createdAt).getTime()) / 60000,
-              0
-            ) / completedKots.length
-          )
-        : null;
-
-      return {
-        stationName: stName,
-        kotCount,
-        itemsCount,
-        avgPrepMinutes,
-        delayedKotCount: delayed
-      };
-    });
+    return [...byStation.entries()]
+      .map(([stationName, row]) => ({
+        stationName,
+        kotCount: row.kotCount,
+        itemsCount: row.itemsCount,
+        avgPrepMinutes: row.prepSamples > 0 ? Math.round(row.prepMinutesSum / row.prepSamples) : null,
+        delayedKotCount: row.delayed
+      }))
+      .sort((a, b) => b.kotCount - a.kotCount);
   }
 
   /** Customer report: new vs. repeat, top spenders, and average spend per matched visit, from

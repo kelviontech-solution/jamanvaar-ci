@@ -1,0 +1,222 @@
+{
+  "url": "/kiosk-admin/terminals",
+  "text": "Kiosk-only Flow QA\nKIOSK ADMIN\nKiosk-only Flow QA — Main Branch\nCtrl+K\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nKiosk-only Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nKiosk Terminals\nCustomer experience\nKiosk Combos & Deals\nQR ORDERING\nSETUP\nKiosk Terminal Control\n\nManage self-ordering stations, lockdown states, and maintenance modes.\n\nKiosk management is ready\n\nYou can manage kiosks here with your existing admin login. No extra Kiosk Admin activation key is needed.\n\nManage welcome screens\n1. Get a kiosk key\n\nA key connects one customer-facing kiosk to Kiosk-only Flow QA — Main Branch. Your plan and device limits still apply.\n\nUnlike other JAMANVAAR apps, a kiosk key isn't issued instantly — a JAMANVAAR team member reviews each request and issues the key by hand. You'll see it update to \"Being worked on\" here, and we'll notify you once it's ready.\n\nRequest activation keyI already have a key\n2. Enter it on the kiosk\n\nOn the touchscreen device, open the JAMANVAAR Customer Kiosk app. On Activate Your Kiosk, enter your Restaurant ID and the KIOSK activation key, then tap Activate Kiosk.\n\nRestaurant ID\n\nJM9170357133\nCopy ID\nOpen customer kioskCopy link for the kiosk device\n\nOpen customer kiosk uses this device. If your touchscreen is a different device, copy the link and open it there before entering the key.\n\nInstall the kiosk app\n3. Check the connection\n\nAfter activation, the terminal appears below. You can keep this admin page open on your laptop.\n\n0 connected terminal records in this branch\n\nCheck for connected kiosksManage kiosk menu\n\nThe list refreshes automatically and when you return to this window. Check terminal health below before opening service.\n\nNo kiosks have been activated in this branch yet. Follow the steps above to connect your first terminal.\n\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "Kiosk Terminal Control",
+    "1. Get a kiosk key",
+    "2. Enter it on the kiosk",
+    "3. Check the connection"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Kiosk-only Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Kiosk Terminals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Customer experience",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Kiosk Combos & Deals",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Manage welcome screens",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 211,
+      "height": 44
+    },
+    {
+      "text": "Request activation key",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 214,
+      "height": 44
+    },
+    {
+      "text": "I already have a key",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 326,
+      "height": 44
+    },
+    {
+      "text": "Copy ID",
+      "aria": "Copy Restaurant ID",
+      "title": "",
+      "disabled": false,
+      "width": 300,
+      "height": 44
+    },
+    {
+      "text": "Copy link for the kiosk device",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 326,
+      "height": 44
+    },
+    {
+      "text": "Install the kiosk app",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 326,
+      "height": 44
+    },
+    {
+      "text": "Check for connected kiosks",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 326,
+      "height": 44
+    },
+    {
+      "text": "Manage kiosk menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 326,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 6
+}

@@ -1855,7 +1855,14 @@ export class CustomerRepository {
   }
 
   /** Redeems a catalog reward against the customer's points balance — replaces the previous flat "any point = ₹1" assumption. */
-  public static redeemReward(phone: string, rewardId: string): { ok: boolean; reason?: string } {
+  /**
+   * R07: this only ever deducts points — it is a manual back-office adjustment, not an order
+   * redemption (that flow is POS checkout applying a bill discount), and it never recorded why or
+   * for what the points were actually given up. `fulfillmentNote` is now required by the UI below
+   * and stored on the audit entry, so there's a real record of what the staff member says they
+   * handed over in exchange — distinct from (and never a substitute for) a checkout bill discount.
+   */
+  public static redeemReward(phone: string, rewardId: string, fulfillmentNote?: string): { ok: boolean; reason?: string } {
     const account = db.customerAccounts.find((a) => a.phone === phone);
     if (!account) return { ok: false, reason: 'Customer not found' };
     const reward = db.loyaltyRewards.find((r) => r.id === rewardId && r.isActive && (!r.expiresAt || Date.parse(r.expiresAt) > Date.now()));
@@ -1867,7 +1874,7 @@ export class CustomerRepository {
     AuditRepository.log({
       action: 'LOYALTY_REWARD_REDEEMED',
       category: 'CUSTOMER',
-      details: `${account.name || phone} redeemed "${reward.name}" for ${reward.pointsCost} pts`,
+      details: `${account.name || phone} redeemed "${reward.name}" for ${reward.pointsCost} pts (manual fulfilment, not a POS bill discount)${fulfillmentNote ? ` — ${fulfillmentNote}` : ''}`,
       username: 'Manager'
     });
     db.notify();
@@ -1955,6 +1962,15 @@ export class MarketingRepository {
   }
 
   /** Real segment matching against actual CustomerAccount data — every filter field is optional and ANDs together. */
+  /**
+   * R09: this had no consent filter at all — unlike QR CRM's own campaign segmentation, which
+   * requires explicit `marketingConsent.whatsapp === true` (qr-crm.service.ts). Restaurant Admin
+   * has no way yet for every existing customer to have been asked (CustomerModal's consent
+   * checkbox is new), so matching QR's strict opt-in-only rule here would silently make every
+   * current customer unreachable. This instead excludes only a customer who explicitly declined
+   * (`marketingConsent.whatsapp === false`) — the one part of "consent-aware" that's safe to
+   * apply without a consent-collection flow already in place for this restaurant's existing base.
+   */
   public static getMatchingCustomers(filter: CustomerSegmentFilter): CustomerAccount[] {
     const tiers = CustomerRepository.getTiers();
     const minTierRank = filter.minTierId ? tiers.findIndex((t) => t.id === filter.minTierId) : -1;
@@ -1962,6 +1978,7 @@ export class MarketingRepository {
     const thisMonth = new Date().getMonth();
 
     return db.customerAccounts.filter((cust) => {
+      if (cust.marketingConsent?.whatsapp === false) return false;
       if (filter.tags && filter.tags.length > 0) {
         if (!cust.tags || !filter.tags.some((t) => cust.tags!.includes(t))) return false;
       }
@@ -2275,6 +2292,8 @@ export class RestaurantIdentityRepository {
     phone?: string | null;
     showJamanAI?: boolean;
     businessDayCutoffHour?: number;
+    digestEnabled?: boolean;
+    digestHour?: number;
     operatingProfile?: Restaurant['operatingProfile'];
     branchOperatingProfile?: Restaurant['operatingProfile'] | null;
     branchId?: string | null;
@@ -2295,6 +2314,8 @@ export class RestaurantIdentityRepository {
     if (typeof profile.showJamanAI === 'boolean') r.showJamanAI = profile.showJamanAI;
     if (Number.isInteger(profile.businessDayCutoffHour) && profile.businessDayCutoffHour! >= 0 && profile.businessDayCutoffHour! <= 23) r.businessDayCutoffHour = profile.businessDayCutoffHour;
     else if (restaurantChanged) r.businessDayCutoffHour = 5;
+    if (typeof profile.digestEnabled === 'boolean') r.digestEnabled = profile.digestEnabled;
+    if (Number.isInteger(profile.digestHour) && profile.digestHour! >= 0 && profile.digestHour! <= 23) r.digestHour = profile.digestHour;
 
     if (profile.operatingProfile) r.operatingProfile = profile.operatingProfile;
     if (profile.branchId && [db.outlet.id, KeyValueStore.get('jamanvaar_bound_branch_id')].includes(profile.branchId) && profile.branchOperatingProfile !== undefined) db.outlet.operatingProfile = profile.branchOperatingProfile ?? undefined;
@@ -2416,6 +2437,22 @@ export class ReceiptRepository {
 
   public static addRecord(record: ReceiptRecord): ReceiptRecord {
     db.receiptRecords.unshift(record);
+    db.notify();
+    return record;
+  }
+
+  /**
+   * F21: a PRINT receipt record used to be written as `deliveryStatus: 'SENT'` the moment the
+   * print job was queued, before the printer actually accepted it — a queue dispatch is not
+   * hardware success. Call this once the print job's own real outcome ('PRINTED' or 'FAILED') is
+   * known, so the receipt history reconciles with what actually happened at the printer.
+   */
+  public static updateRecordStatus(id: string, status: ReceiptRecord['deliveryStatus'], errorMessage?: string): ReceiptRecord | null {
+    const record = db.receiptRecords.find((r) => r.id === id);
+    if (!record) return null;
+    record.deliveryStatus = status;
+    if (status === 'SENT') record.sentAt = new Date().toISOString();
+    if (errorMessage) record.errorMessage = errorMessage;
     db.notify();
     return record;
   }

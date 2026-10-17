@@ -1,6 +1,8 @@
 import { RefreshButton } from '../../components/RefreshButton';
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
+import { useDebounced } from '../../hooks/usePagedList';
+import { Pager } from '../../components/Pager';
 import {
   PageHeader,
   Card,
@@ -25,6 +27,7 @@ import {
   Eye,
   Plus
 } from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
 import './backups.css';
 
 interface BackupItem {
@@ -41,6 +44,9 @@ interface BackupItem {
   createdAt: string;
   verificationStatus?: 'UNVERIFIED' | 'VERIFIED' | 'CORRUPT';
   sha256Checksum?: string;
+  // Whether THIS specific backup was encrypted at rest — not assumed from the current config,
+  // since an encryption key can be added, changed or removed after older backups were taken.
+  encrypted?: boolean;
 }
 
 interface BackupFleetResponse {
@@ -58,6 +64,10 @@ interface BackupFleetResponse {
     storageNote?: string;
   };
   backups: BackupItem[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
 }
 
 interface RestaurantOption {
@@ -74,14 +84,19 @@ function formatBytes(bytes: number): string {
 }
 
 export function BackupsPage() {
+  const { can } = useAuth();
+  const canWrite = can('ops', 'write');
   const [data, setData] = useState<BackupFleetResponse | null>(null);
   const [restaurants, setRestaurants] = useState<RestaurantOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Search & Filters
+  // Search & Filters — sent to the server (see listAllForPlatform) instead of filtering whatever
+  // page happened to already be loaded, which made a match on a later page invisible (BK-04).
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'COMPLETED' | 'FAILED'>('ALL');
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounced(search);
 
   // Trigger Snapshot Modal
   const [showTriggerModal, setShowTriggerModal] = useState(false);
@@ -98,6 +113,15 @@ export function BackupsPage() {
   const [restoreModalTarget, setRestoreModalTarget] = useState<any | null>(null);
   const [restorePreviewJob, setRestorePreviewJob] = useState<any | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  // Scheduled backup/retention/verification jobs run automatically (see jobs.service.ts) but had
+  // no visibility anywhere in Super Admin — an operator had no way to tell whether retention or
+  // the nightly snapshot sweep was actually running, or when it last did (BK-05).
+  const [jobsStatus, setJobsStatus] = useState<Array<{ name: string; description: string; lastRunAt: string | null; lastOk: boolean | null; lastError: string | null }> | null>(null);
+  useEffect(() => {
+    api.get<{ jobs: typeof jobsStatus }>('/api/v1/platform/jobs').then((r) => setJobsStatus(r.jobs)).catch(() => setJobsStatus(null));
+  }, []);
+  const backupJobs = jobsStatus?.filter((j) => j.name.startsWith('backup') || j.name === 'scheduled-backups') ?? [];
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -156,8 +180,11 @@ export function BackupsPage() {
   const load = () => {
     setLoading(true);
     setError(null);
+    const params = new URLSearchParams({ page: String(page), pageSize: '25' });
+    if (debouncedSearch.trim()) params.set('q', debouncedSearch.trim());
+    if (statusFilter !== 'ALL') params.set('status', statusFilter);
     Promise.all([
-      api.get<BackupFleetResponse>('/api/v1/platform/backups'),
+      api.get<BackupFleetResponse>(`/api/v1/platform/backups?${params.toString()}`),
       api.get<RestaurantOption[]>('/api/v1/restaurants')
     ])
       .then(([fleet, rests]) => {
@@ -175,7 +202,13 @@ export function BackupsPage() {
 
   useEffect(() => {
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, statusFilter, page]);
+
+  // A new search or status filter can match far fewer rows than whatever page was active.
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
 
   const handleDownload = async (restaurantId: string, backupId: string) => {
     setDownloadingId(backupId);
@@ -239,14 +272,9 @@ export function BackupsPage() {
     }
   };
 
-  const filtered = (data?.backups ?? []).filter((b) => {
-    const matchesSearch =
-      search === '' ||
-      b.restaurantName.toLowerCase().includes(search.toLowerCase()) ||
-      b.id.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'ALL' || b.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // The server now applies search and status filtering (see load()) and returns only the matching
+  // page, so this is already the filtered set — no client-side re-filtering needed.
+  const filtered = data?.backups ?? [];
 
   return (
     <div className="backups-page-container">
@@ -264,6 +292,8 @@ export function BackupsPage() {
             <Button
               variant="accent"
               icon={<Plus className="w-4 h-4" />}
+              disabled={!canWrite}
+              title={canWrite ? undefined : "You don't have permission to trigger backups"}
               onClick={() => setShowTriggerModal(true)}
             >
               Trigger Snapshot
@@ -277,6 +307,27 @@ export function BackupsPage() {
           <strong>Backup storage:</strong> {data.stats.storageNote}
           {data.stats.encryptionEnabled ? ' Backups are encrypted (AES-256-GCM).' : ''}
         </div>
+      )}
+
+      {backupJobs.length > 0 && (
+        <Card style={{ marginBottom: 16 }}>
+          <div style={{ padding: 16 }}>
+            <h3 style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 800 }}>Scheduled backup jobs</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, fontSize: 12.5 }}>
+              {backupJobs.map((j) => (
+                <div key={j.name} style={{ border: '1px solid var(--jv-border)', borderRadius: 8, padding: 10 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>{j.description}</div>
+                  <div style={{ color: j.lastOk === false ? 'var(--jv-error-text)' : 'var(--jv-text-muted)' }}>
+                    {j.lastRunAt
+                      ? `Last ran ${new Date(j.lastRunAt).toLocaleString()} — ${j.lastOk ? 'OK' : `Failed: ${j.lastError ?? 'unknown error'}`}`
+                      : 'Has not run yet since this server started'}
+                  </div>
+                  <div style={{ color: 'var(--jv-text-light)', marginTop: 2 }}>Checked every 15 minutes; runs when due.</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
       )}
 
       {/* KPI Overview Grid */}
@@ -353,17 +404,9 @@ export function BackupsPage() {
         />
         <FilterTabs
           options={[
-            { id: 'ALL', label: 'All Snapshots', count: data?.backups.length },
-            {
-              id: 'COMPLETED',
-              label: 'Completed',
-              count: data?.backups.filter((b) => b.status === 'COMPLETED').length
-            },
-            {
-              id: 'FAILED',
-              label: 'Failed',
-              count: data?.backups.filter((b) => b.status === 'FAILED').length
-            }
+            { id: 'ALL', label: 'All Snapshots', count: data?.stats.total },
+            { id: 'COMPLETED', label: 'Completed', count: data?.stats.completed },
+            { id: 'FAILED', label: 'Failed', count: data?.stats.failed }
           ]}
           value={statusFilter}
           onChange={setStatusFilter}
@@ -387,13 +430,14 @@ export function BackupsPage() {
                   <th>Created At</th>
                   <th>Status</th>
                   <th>Integrity</th>
+                  <th>Encryption</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={8}>
+                    <td colSpan={9}>
                       <EmptyState
                         icon={<Database className="w-8 h-8 text-secondary" />}
                         title="No Backups Found"
@@ -403,7 +447,7 @@ export function BackupsPage() {
                             : 'No restaurant database snapshots have been recorded yet.'
                         }
                         action={
-                          <Button variant="accent" onClick={() => setShowTriggerModal(true)}>
+                          <Button variant="accent" disabled={!canWrite} title={canWrite ? undefined : "You don't have permission to trigger backups"} onClick={() => setShowTriggerModal(true)}>
                             Trigger First Snapshot
                           </Button>
                         }
@@ -440,15 +484,20 @@ export function BackupsPage() {
                           {b.verificationStatus ?? 'UNVERIFIED'}
                         </Badge>
                       </td>
+                      <td>
+                        {/* This backup's own stored state, not the current config — a key added/removed
+                            since it was taken would make the aggregate banner above misleading for it. */}
+                        <Badge tone={b.encrypted ? 'success' : 'error'}>{b.encrypted ? 'Encrypted' : 'Not encrypted'}</Badge>
+                      </td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', gap: 6 }}>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="btn-icon-only"
-                            disabled={verifyingId === b.id}
+                            disabled={verifyingId === b.id || !canWrite}
                             onClick={() => handleVerifyBackup(b.id)}
-                            title="Verify SHA256 checksum"
+                            title={canWrite ? 'Verify SHA256 checksum' : "You don't have permission to verify backups"}
                             aria-label="Verify SHA256 checksum"
                           >
                             <ShieldCheck className="w-3.5 h-3.5" />
@@ -467,10 +516,12 @@ export function BackupsPage() {
                             variant="ghost"
                             size="sm"
                             className="btn-icon-only"
-                            disabled={downloadingId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT'}
+                            disabled={downloadingId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT' || !canWrite}
                             onClick={() => handleDownload(b.restaurantId, b.id)}
                             title={
-                              b.verificationStatus === 'CORRUPT'
+                              !canWrite
+                                ? "Downloading a backup requires write access — it contains the restaurant's full data (staff PINs, customers, orders)."
+                                : b.verificationStatus === 'CORRUPT'
                                 ? "This snapshot's stored file is missing or damaged and cannot be downloaded — trigger a fresh snapshot instead."
                                 : downloadingId === b.id ? 'Securing…' : 'Download backup'
                             }
@@ -482,10 +533,12 @@ export function BackupsPage() {
                             variant="ghost"
                             size="sm"
                             className="btn-icon-only"
-                            disabled={downloadingPdfId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT'}
+                            disabled={downloadingPdfId === b.id || b.status !== 'COMPLETED' || b.verificationStatus === 'CORRUPT' || !canWrite}
                             onClick={() => handleDownloadPdf(b.restaurantId, b.id)}
                             title={
-                              b.verificationStatus === 'CORRUPT'
+                              !canWrite
+                                ? "Downloading a backup requires write access — it contains the restaurant's full data (staff PINs, customers, orders)."
+                                : b.verificationStatus === 'CORRUPT'
                                 ? "This snapshot's stored file is missing or damaged and cannot be rendered — trigger a fresh snapshot instead."
                                 : downloadingPdfId === b.id ? 'Generating PDF…' : 'Download as a readable PDF report'
                             }
@@ -501,6 +554,9 @@ export function BackupsPage() {
               </tbody>
             </table>
           </div>
+          {data && data.totalPages !== undefined && data.page !== undefined && data.pageSize !== undefined && data.total !== undefined && (
+            <Pager page={data.page} pageSize={data.pageSize} total={data.total} totalPages={data.totalPages} onPage={setPage} loading={loading} />
+          )}
         </div>
       )}
 
@@ -513,7 +569,7 @@ export function BackupsPage() {
             <>
               <Button variant="ghost" onClick={() => setRestoreModalTarget(null)}>Close</Button>
               {restorePreviewJob?.previewSummary?.restorableInCloud && (
-                <Button variant="accent" disabled={restoring} onClick={handleConfirmRestore}>
+                <Button variant="accent" disabled={restoring || !canWrite} title={canWrite ? undefined : "You don't have permission to restore backups"} onClick={handleConfirmRestore}>
                   {restoring ? 'Restoring…' : 'Restore this data'}
                 </Button>
               )}
@@ -526,6 +582,11 @@ export function BackupsPage() {
                 <strong>What restoring does:</strong> it first takes a fresh snapshot of the restaurant as it is now, then puts the
                 menu/data records and orders listed below back into the cloud. The restaurant&apos;s terminals pick them up on their next sync.
                 {' '}It does <strong>not</strong> touch: {(restorePreviewJob.previewSummary.notRestored as string[]).join(', ')}.
+                <br />
+                <strong>Conflict handling:</strong> every record in this backup unconditionally overwrites whatever is there now —
+                including any order or edit made after this backup was taken. This is a full rollback for the records it covers, not a merge.
+                <br />
+                <strong>Target:</strong> {restorePreviewJob.previewSummary.targetEnvironment}
               </div>
             ) : restorePreviewJob ? (
               <div className="banner banner-error" role="note">

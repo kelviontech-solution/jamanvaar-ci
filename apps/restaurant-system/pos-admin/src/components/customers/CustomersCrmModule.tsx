@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { CustomerAccount, Order } from '@jamanvaar/types';
-import { db, CustomerRepository, AuditRepository } from '@jamanvaar/database';
+import { db, CustomerRepository, AuditRepository, isUnpaidOpenOrder, scanCustomerDuplicates } from '@jamanvaar/database';
 import { LoyaltyProgramModal } from './LoyaltyProgramModal';
 import { MarketingCampaignsModal } from './MarketingCampaignsModal';
+import { CustomerDuplicateModal } from './CustomerDuplicateModal';
 import { formatINR, formatDate, formatTime, toCsvRow } from '@jamanvaar/utils';
 import { EmptyState, ModalBackdrop } from '@jamanvaar/ui';
-import { Users, Search, Plus, Award, DollarSign, Edit2, Trash2, FileSpreadsheet, MessageSquare, ShoppingBag, Star, X, Megaphone } from 'lucide-react';
+import { getCurrentAdminName } from '../../currentAdminIdentity';
+import { Users, Search, Plus, Award, DollarSign, Edit2, Trash2, FileSpreadsheet, MessageSquare, ShoppingBag, Star, X, Megaphone, Copy } from 'lucide-react';
 
 interface CustomersCrmModuleProps {
   customers: CustomerAccount[];
@@ -51,6 +53,14 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
   const [pointsAdjustInput, setPointsAdjustInput] = useState('50');
   const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
   const [isMarketingModalOpen, setIsMarketingModalOpen] = useState(false);
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const duplicateGroupCount = useMemo(() => scanCustomerDuplicates().groups.length, [customers]);
+  // R07: a reward "redeemed" here is a manual back-office adjustment (points deducted, nothing
+  // else happens automatically) — not the same as a guest redeeming it as a bill discount at POS
+  // checkout. A fulfilment note is required so there's a real record of what was actually handed
+  // over in exchange for the points.
+  const [pendingRedemption, setPendingRedemption] = useState<{ id: string; name: string; pointsCost: number } | null>(null);
+  const [redemptionNote, setRedemptionNote] = useState('');
 
   // Escape closes the Customer 360 drilldown like any other dialog in the app.
   useEffect(() => {
@@ -62,19 +72,30 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [detailCustomer]);
 
-  // Derive rich computed stats per customer by merging accounts with database orders
+  /**
+   * R06: `custOrders.length`/spend used to count every order matching the phone number — including
+   * CANCELLED orders toward visits, and any non-cancelled order's full totalAmount toward spend
+   * even when it was never actually paid (still open/unpaid) — so a customer with several
+   * cancelled or abandoned-unpaid orders could be counted as a frequent, high-spend VIP they
+   * never actually were. `paidOrders` below is the authoritative set: neither cancelled, refunded,
+   * nor still an unpaid open order (the same `isUnpaidOpenOrder` exclusion the reports engine
+   * already uses). Refunded orders are now their own distinct, visible count rather than being
+   * silently folded into either "visited" or "spent".
+   */
   const richCustomers = useMemo(() => {
     return customers.map((cust) => {
       const custOrders = orders.filter((o) => o.customerPhone === cust.phone);
-      const totalOrderSpend = custOrders.reduce((sum, o) => sum + (o.orderStatus !== 'CANCELLED' ? o.totalAmount : 0), 0);
+      const paidOrders = custOrders.filter((o) => o.orderStatus !== 'CANCELLED' && o.orderStatus !== 'REFUNDED' && !isUnpaidOpenOrder(o));
+      const refundedOrders = custOrders.filter((o) => o.orderStatus === 'REFUNDED');
+      const totalOrderSpend = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
       const totalSpend = Math.max(cust.totalSpend || 0, totalOrderSpend);
-      const totalVisits = Math.max(cust.totalVisits || 0, custOrders.length);
+      const totalVisits = Math.max(cust.totalVisits || 0, paidOrders.length);
       const avgOrderValue = totalVisits > 0 ? Math.round(totalSpend / totalVisits) : 0;
 
-      // Find last visit
+      // Find last visit — a genuine, paid visit, not a cancelled/unpaid attempt.
       let lastVisit = cust.lastVisitAt ? new Date(cust.lastVisitAt).getTime() : 0;
-      if (custOrders.length > 0) {
-        const orderTimes = custOrders.map((o) => new Date(o.createdAt).getTime());
+      if (paidOrders.length > 0) {
+        const orderTimes = paidOrders.map((o) => new Date(o.createdAt).getTime());
         lastVisit = Math.max(lastVisit, ...orderTimes);
       }
 
@@ -87,7 +108,10 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         computedTotalVisits: totalVisits,
         computedAvgOrderValue: avgOrderValue,
         computedLastVisit: lastVisit > 0 ? new Date(lastVisit).toISOString() : cust.createdAt,
+        computedRefundedVisits: refundedOrders.length,
         isVip,
+        // Full history (including cancelled/refunded) for the Lifetime Order & Bill History
+        // drilldown below — only the KPI math above is restricted to genuinely paid visits.
         orders: custOrders
       };
     });
@@ -178,7 +202,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       action: 'LOYALTY_POINTS_AWARDED',
       category: 'CUSTOMER',
       details: `Awarded +${points} loyalty reward points to ${custName} (${phone})`,
-      username: 'Manager'
+      username: getCurrentAdminName()
     });
     onCustomerUpdated();
     showToast(`Awarded +${points} Loyalty Points to ${custName}!`);
@@ -209,12 +233,18 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
   const handleRedeemReward = (rewardId: string, rewardName: string, pointsCost: number) => {
     if (!detailCustomer) return;
-    const result = CustomerRepository.redeemReward(detailCustomer.phone, rewardId);
+    if (!redemptionNote.trim()) {
+      showToast('Describe what was actually handed over before confirming.');
+      return;
+    }
+    const result = CustomerRepository.redeemReward(detailCustomer.phone, rewardId, redemptionNote.trim());
     if (!result.ok) {
       showToast(result.reason || 'Could not redeem reward');
       return;
     }
     showToast(`Redeemed "${rewardName}" for ${pointsCost} pts`);
+    setPendingRedemption(null);
+    setRedemptionNote('');
     onCustomerUpdated();
     const updated = CustomerRepository.getByPhone(detailCustomer.phone);
     if (updated) setDetailCustomer(updated);
@@ -229,16 +259,25 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       showToast(`Customer ${cust.name} deleted.`);
     };
 
+    // Dependency warning: deleteCustomer is a hard delete with no check at all today — the
+    // operator never saw what they were about to lose (order history becomes unlinkable,
+    // unredeemed points vanish) before confirming.
+    const orderCount = orders.filter((o) => o.customerPhone === cust.phone).length;
+    const dependencyNote = orderCount || cust.loyaltyPoints
+      ? ` This profile has ${orderCount} order(s) on record${cust.loyaltyPoints ? ` and ${cust.loyaltyPoints} unredeemed loyalty point(s)` : ''}; their order history will remain but no longer link to a named customer, and any unredeemed points are lost.`
+      : '';
+    const message = `Are you sure you want to delete customer record for ${cust.name || cust.phone}?${dependencyNote} This cannot be undone.`;
+
     if (onRequestConfirm) {
       onRequestConfirm({
         isOpen: true,
         title: 'Delete Customer',
-        message: `Are you sure you want to delete customer record for ${cust.name || cust.phone}? This cannot be undone.`,
+        message,
         confirmText: 'Delete Customer',
         isDanger: true,
         onConfirm: doDelete
       });
-    } else if (window.confirm(`Are you sure you want to delete customer record for ${cust.name || cust.phone}?`)) {
+    } else if (window.confirm(message)) {
       doDelete();
     }
   };
@@ -262,7 +301,10 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       'Date of Birth',
       'Anniversary',
       'Last Visit Date',
-      'Notes'
+      'Notes',
+      // R09: the export previously had no way to tell which rows are safe to actually message —
+      // now explicit about each customer's recorded WhatsApp marketing preference.
+      'WhatsApp Marketing Consent'
     ];
 
     // B2-061: this used to hand-roll `"${value}"` quoting per field, which (a) never defended
@@ -284,7 +326,8 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
       c.dob || '',
       c.anniversary || '',
       c.computedLastVisit ? formatDate(c.computedLastVisit) : '',
-      c.notes || ''
+      c.notes || '',
+      c.marketingConsent?.whatsapp === false ? 'Declined' : c.marketingConsent?.whatsapp === true ? 'Opted in' : 'Not asked'
     ]);
 
     const csvContent = [toCsvRow(headers), ...rows.map(toCsvRow)].join('\r\n');
@@ -330,7 +373,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleExportCsv}
-            className="px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-jaman-navy text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-jaman-border hover:bg-jaman-cream text-jaman-navy text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Export CRM CSV ({filteredCustomers.length})</span>
@@ -338,7 +381,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
           <button
             onClick={() => setIsLoyaltyModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-amber-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-amber-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <Award className="w-4 h-4 text-amber-600" />
             <span>Loyalty Program</span>
@@ -346,15 +389,25 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
 
           <button
             onClick={() => setIsMarketingModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-white border border-blue-200 hover:bg-blue-50 text-blue-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+            className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-blue-200 hover:bg-blue-50 text-blue-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <Megaphone className="w-4 h-4 text-blue-600" />
             <span>Marketing Campaigns</span>
           </button>
 
+          {duplicateGroupCount > 0 && (
+            <button
+              onClick={() => setIsDuplicateModalOpen(true)}
+              className="min-h-11 px-3.5 py-2 rounded-xl bg-white border border-amber-300 hover:bg-amber-50 text-amber-800 text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
+            >
+              <Copy className="w-4 h-4 text-amber-600" />
+              <span>Find Duplicate Customers ({duplicateGroupCount})</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenCreateModal}
-            className="px-4 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 shadow-brand/20"
+            className="min-h-11 px-4 py-2 rounded-xl bg-brand hover:bg-brand-hover active:bg-brand-press text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 shadow-brand/20"
           >
             <Plus className="w-4 h-4" />
             <span>Register New Customer</span>
@@ -437,7 +490,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
             <button
               key={seg.id}
               onClick={() => setSegmentFilter(seg.id as CustomerSegment)}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
+              className={`min-h-11 px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap ${
                 segmentFilter === seg.id
                   ? 'bg-brand/[0.09] text-brand ring-1 ring-inset ring-brand/40 font-semibold'
                   : 'bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border'
@@ -837,7 +890,11 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                 if (rewards.length === 0) return null;
                 return (
                   <div className="space-y-2">
-                    <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide">Redeem a Reward</h4>
+                    <h4 className="font-bold text-xs text-jaman-navy uppercase tracking-wide">Redeem a Reward (Manual Fulfilment)</h4>
+                    <p className="text-[11px] text-slate-500">
+                      This only deducts points — it does not apply a bill discount. Use this when you've already handed the
+                      customer something in exchange (e.g. a free item given at the counter), and record what that was.
+                    </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {rewards.map((reward) => {
                         const canAfford = (detailCustomer.loyaltyPoints || 0) >= reward.pointsCost;
@@ -848,7 +905,7 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                               <div className="text-[11px] text-slate-500 truncate">{reward.description}</div>
                             </div>
                             <button
-                              onClick={() => handleRedeemReward(reward.id, reward.name, reward.pointsCost)}
+                              onClick={() => { setPendingRedemption({ id: reward.id, name: reward.name, pointsCost: reward.pointsCost }); setRedemptionNote(''); }}
                               disabled={!canAfford}
                               className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold ${
                                 canAfford
@@ -862,6 +919,36 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
                         );
                       })}
                     </div>
+                    {pendingRedemption && (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                        <p className="text-xs font-bold text-jaman-navy">
+                          Fulfilling "{pendingRedemption.name}" for {pendingRedemption.pointsCost} pts
+                        </p>
+                        <input
+                          autoFocus
+                          type="text"
+                          value={redemptionNote}
+                          onChange={(e) => setRedemptionNote(e.target.value)}
+                          placeholder="What did you actually give the customer? (required)"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-jaman-border text-xs"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleRedeemReward(pendingRedemption.id, pendingRedemption.name, pendingRedemption.pointsCost)}
+                            disabled={!redemptionNote.trim()}
+                            className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                          >
+                            Confirm fulfilment
+                          </button>
+                          <button
+                            onClick={() => { setPendingRedemption(null); setRedemptionNote(''); }}
+                            className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white border border-jaman-border text-slate-600"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -995,6 +1082,12 @@ export const CustomersCrmModule: React.FC<CustomersCrmModuleProps> = ({
         onClose={() => setIsMarketingModalOpen(false)}
         showToast={showToast}
       />
+
+      {isDuplicateModalOpen && (
+        <CustomerDuplicateModal
+          onClose={() => { setIsDuplicateModalOpen(false); onCustomerUpdated(); }}
+        />
+      )}
 
     </div>
   );

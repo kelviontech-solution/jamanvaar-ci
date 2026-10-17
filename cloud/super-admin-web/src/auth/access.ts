@@ -30,6 +30,9 @@ const ROUTE_AREAS: Array<{ prefix: string; area: Area }> = [
   { prefix: '/devices', area: 'devices' },
   { prefix: '/applications', area: 'ops' },
   { prefix: '/sync-monitor', area: 'ops' },
+  // Server-side this inherits 'ops' same as System Telemetry/Backups (see IncidentsController's
+  // own comment) — missing here meant areaForRoute() failed closed for every role.
+  { prefix: '/incidents', area: 'ops' },
   { prefix: '/backups', area: 'ops' },
   { prefix: '/system-health', area: 'ops' },
   { prefix: '/sandboxes', area: 'ops' },

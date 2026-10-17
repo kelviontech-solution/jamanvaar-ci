@@ -34,4 +34,9 @@ export class ApplicationsController {
   pause(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
     return this.applications.pauseRelease(id, actor);
   }
+
+  @Post('releases/:id/promote')
+  promote(@Param('id') id: string, @CurrentPlatformUser() actor: PlatformUser) {
+    return this.applications.promoteRelease(id, actor);
+  }
 }

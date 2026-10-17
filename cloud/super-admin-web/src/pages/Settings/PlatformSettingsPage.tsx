@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { PlatformSetting } from '../../api/types';
-import { FilterTabs } from '../../components/ui';
+import { FilterTabs, ConfirmModal, Button } from '../../components/ui';
 import '../../components/shared.css';
 import './settings.css';
 import { InvoiceSellerCard } from './InvoiceSellerCard';
@@ -33,6 +33,20 @@ export function PlatformSettingsPage() {
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [sellerValue, setSellerValue] = useState<Record<string, string> | null>(null);
   const [saving, setSaving] = useState(false);
+  // Which GENERAL-tab cards currently have an unsaved edit — switching tabs used to unmount
+  // them and silently discard it. Keyed by card name so either card being dirty blocks the switch.
+  const [dirtyCards, setDirtyCards] = useState<Record<string, boolean>>({});
+  const [pendingTab, setPendingTab] = useState<SettingsTab | null>(null);
+  const anyDirty = Object.values(dirtyCards).some(Boolean);
+
+  function requestTabChange(next: SettingsTab) {
+    if (next === tab) return;
+    if (anyDirty) {
+      setPendingTab(next);
+      return;
+    }
+    setTab(next);
+  }
 
   function loadSettings() {
     setLoading(true);
@@ -70,17 +84,39 @@ export function PlatformSettingsPage() {
       {successToast && <div className="page-success" role="status">{successToast}</div>}
 
       <div className="toolbar" style={{ marginTop: 8, marginBottom: 20 }}>
-        <FilterTabs<SettingsTab> value={tab} onChange={setTab} options={SETTINGS_TABS} />
+        <FilterTabs<SettingsTab> value={tab} onChange={requestTabChange} options={SETTINGS_TABS} />
       </div>
+
+      <ConfirmModal
+        isOpen={pendingTab !== null}
+        title="Leave without saving?"
+        message="You have unsaved changes on this tab. Switching tabs will discard them."
+        confirmLabel="Discard & continue"
+        tone="danger"
+        onConfirm={() => {
+          if (pendingTab) setTab(pendingTab);
+          setPendingTab(null);
+          setDirtyCards({});
+        }}
+        onClose={() => setPendingTab(null)}
+      />
 
       {loading ? (
         <div className="page-loading">Loading platform configuration…</div>
+      ) : error && settings.length === 0 ? (
+        // A failed load used to fall through to the cards below anyway, rendering them with
+        // hardcoded defaults and an enabled Save button that would overwrite whatever the real,
+        // unseen current values are. Block editing until a real load succeeds.
+        <div className="page-error" role="alert" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span>{error}</span>
+          <Button size="sm" variant="ghost" onClick={loadSettings}>Retry</Button>
+        </div>
       ) : (
         <>
         {tab === 'GENERAL' && (
         <div className="settings-grid">
-          <PlatformBrandingCard settings={settings} saving={saving} setSaving={setSaving} onSaved={showSaved} />
-          <OnboardingDefaultsCard settings={settings} saving={saving} setSaving={setSaving} onSaved={showSaved} />
+          <PlatformBrandingCard settings={settings} saving={saving} setSaving={setSaving} onSaved={showSaved} onDirtyChange={(d) => setDirtyCards((c) => ({ ...c, branding: d }))} />
+          <OnboardingDefaultsCard settings={settings} saving={saving} setSaving={setSaving} onSaved={showSaved} onDirtyChange={(d) => setDirtyCards((c) => ({ ...c, defaults: d }))} />
         </div>
         )}
 

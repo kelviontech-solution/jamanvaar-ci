@@ -1,3 +1,6 @@
+import { RestaurantSetupFlow, type LaunchStatus } from './RestaurantSetupFlow';
+import { OwnerHandover } from './OwnerHandover';
+import { BranchAccessWorkspace } from '../Branches/BranchAccessWorkspace';
 import { RESTAURANT_ADMIN_URL, KIOSK_ADMIN_URL } from '../../lib/appUrls';
 import { RefreshButton } from '../../components/RefreshButton';
 import { CopyButton } from '../../components/CopyButton';
@@ -84,6 +87,8 @@ import {
 
 type Tab =
   | 'overview'
+  | 'handover'
+  | 'branch-access'
   | 'owner'
   | 'branches'
   | 'subscription'
@@ -102,13 +107,15 @@ type Tab =
 const TABS: Array<{ key: Tab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { key: 'overview', label: 'Overview', icon: Store },
   { key: 'owner', label: 'Owner & Users', icon: Users },
+  { key: 'handover', label: 'Owner handover', icon: CheckCircle2 },
+  { key: 'branch-access', label: 'Branch access', icon: Building2 },
   { key: 'branches', label: 'Branches', icon: Building2 },
   { key: 'subscription', label: 'Subscription', icon: Repeat },
   // Previously the only place any application appeared was as a static,
   // read-only pill on the Feature Entitlements tab (and only if the plan's
   // JSON happened to have a matching boolean — Kiosk/Kiosk Admin never did).
   // This is the real per-application enable/disable + device-count tab.
-  { key: 'applications', label: 'Applications', icon: Grid3x3 },
+  { key: 'applications', label: 'Products & access', icon: Grid3x3 },
   { key: 'plan', label: 'Plan Quotas', icon: Package },
   { key: 'entitlements', label: 'Feature Entitlements', icon: ShieldCheck },
   { key: 'devices', label: 'Devices & Keys', icon: Laptop2 },
@@ -222,6 +229,16 @@ export function RestaurantDetailPage() {
     },
     [setSearchParams]
   );
+  const [workflowRevision,setWorkflowRevision]=useState(0);
+  const [launchStatus,setLaunchStatus] = useState<LaunchStatus>();
+  const requestedBranch=searchParams.get('branchId');
+  const selectedBranch=requestedBranch ? restaurant?.branches.find(b=>b.id===requestedBranch && b.status==='ACTIVE') : restaurant?.branches.find(b=>b.status==='ACTIVE');
+  const branchId=selectedBranch?.id ?? '';
+  useEffect(()=>{if(branchId && requestedBranch!==branchId)setSearchParams(prev=>{const params=new URLSearchParams(prev);params.set('branchId',branchId);return params;},{replace:true});},[branchId,requestedBranch,setSearchParams]);
+  const accessTabs:Tab[]=['applications','subscription','plan','entitlements','branch-access'];
+  const accessActive=accessTabs.includes(tab);
+  const accessEntry=visibleTabs.find(t=>accessTabs.includes(t.key));
+  const openSetup=useCallback((next:Tab,ownerTask?:string)=>setSearchParams(prev=>{const params=new URLSearchParams(prev);params.set('tab',next);if(ownerTask)params.set('ownerTask',ownerTask);else params.delete('ownerTask');return params;}),[setSearchParams]);
   const [modal, setModal] = useState<'edit' | 'branch' | 'activation' | 'subscription' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -379,7 +396,7 @@ export function RestaurantDetailPage() {
     api
       .get<RestaurantDetail>(`/api/v1/restaurants/${id}`)
       .then((res) => {
-        setRestaurant(res);
+        setRestaurant(res);setWorkflowRevision(n=>n+1);
         setError(null);
         // Invalidate the cached application list — a plan change resyncs
         // ApplicationEntitlement rows server-side (see subscriptions.service.ts
@@ -729,16 +746,33 @@ export function RestaurantDetailPage() {
     if (!activeSub) return;
     setSavingAppCode(appCode);
     try {
-      await api.patch<ApplicationEntitlement>(
-        `/api/v1/subscriptions/${activeSub.id}/applications/${appCode}`,
-        { enabled: nextEnabled, ...(acknowledgeDeviceImpact ? { acknowledgeDeviceImpact: true } : {}) }
-      );
+      if (nextEnabled) {
+        // Granting: any one subscription enabling it is enough — listForRestaurant merges by
+        // "any enabled wins" — so the primary subscription is a safe, simple target.
+        await api.patch<ApplicationEntitlement>(
+          `/api/v1/subscriptions/${activeSub.id}/applications/${appCode}`,
+          { enabled: true, ...(acknowledgeDeviceImpact ? { acknowledgeDeviceImpact: true } : {}) }
+        );
+      } else {
+        // Disabling must turn it off on every subscription currently granting it. Editing only
+        // the "primary" subscription left the effective (merged) access unchanged whenever a
+        // different subscription was the one actually granting it, while the UI announced it as
+        // disabled (see application-entitlements.service.ts's listForRestaurant).
+        const current = appEntitlements?.find((e) => e.appCode === appCode);
+        const targets = current?.grantingSubscriptionIds?.length ? current.grantingSubscriptionIds : [activeSub.id];
+        for (const subscriptionId of targets) {
+          await api.patch<ApplicationEntitlement>(
+            `/api/v1/subscriptions/${subscriptionId}/applications/${appCode}`,
+            { enabled: false, ...(acknowledgeDeviceImpact ? { acknowledgeDeviceImpact: true } : {}) }
+          );
+        }
+      }
       // Refetch rather than splice in the PATCH response directly: the PATCH endpoint returns the
       // raw entitlement row with no `source` field (only the GET list endpoints compute PLAN vs
       // MANUAL_OVERRIDE), so merging it in-place would silently drop this row's source badge
       // until the next full reload.
       const refreshed = await api.get<ApplicationEntitlement[]>(`/api/v1/restaurants/${id}/applications`);
-      setAppEntitlements(refreshed);
+      setAppEntitlements(refreshed);setWorkflowRevision(n=>n+1);
       showToast(`${APP_CODE_LABELS[appCode]} ${nextEnabled ? 'enabled' : 'disabled'} for this restaurant.`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 409 && err.message.includes('acknowledgeDeviceImpact')) {
@@ -803,7 +837,7 @@ export function RestaurantDetailPage() {
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <Button variant="accent" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
             <KeyRound className="w-4 h-4 mr-1" />
-            <span>Generate Key</span>
+            <span>Connect a device</span>
           </Button>
           <Button variant="ghost" onClick={() => setModal('edit')} disabled={!canWriteRestaurants}>
             Edit Restaurant
@@ -824,9 +858,13 @@ export function RestaurantDetailPage() {
         </div>
       )}
 
-      {/* 12-Tab Navigation Bar */}
+      <section className="branch-context" aria-label="Restaurant branch context"><strong>{restaurant.name}</strong><label>Working branch <select aria-label="Setup branch" value={branchId} onChange={e=>setSearchParams(prev=>{const params=new URLSearchParams(prev);params.set('branchId',e.target.value);return params;})}><option value="" disabled>Choose active branch</option>{restaurant.branches.filter(b=>b.status==='ACTIVE').map(b=><option key={b.id} value={b.id}>{b.name} ({b.code})</option>)}</select></label><span className="muted">Branch access, readiness and device pairing use this branch. Purchased plans apply to the restaurant.</span></section>
+      <RestaurantSetupFlow restaurantId={restaurant.id} branchId={branchId} onOpen={openSetup} onStatus={setLaunchStatus} activeTab={tab} refreshKey={workflowRevision}/>
+      {requestedBranch && requestedBranch!==branchId && <p role="alert">That branch is unavailable. Choose an accessible branch above to continue.</p>}
+      {/* Existing advanced controls remain available for permissioned operators. */}
       <div className="tabs" style={{ marginBottom: 20 }}>
-        {visibleTabs.map((t) => {
+        {accessEntry&&<button className={`tab-btn${accessActive?' active':''}`} onClick={()=>setTab(accessEntry.key)}>Products & access</button>}
+        {visibleTabs.filter(t=>['overview','branches','devices','owner','handover','support'].includes(t.key)).map((t) => {
           const IconComponent = t.icon;
           return (
             <button
@@ -841,7 +879,14 @@ export function RestaurantDetailPage() {
           );
         })}
       </div>
+      <details open={!['overview','branches','devices','owner','handover','support',...accessTabs].includes(tab) || undefined} style={{marginBottom:20}}>
+        <summary style={{cursor:'pointer',padding:'12px 0',fontWeight:600}}>Advanced configuration, finance & history</summary>
+        <div className="tabs" style={{marginTop:10,flexWrap:'wrap'}}>{visibleTabs.filter(t=>!['overview','branches','devices','owner','handover','support',...accessTabs].includes(t.key)).map(t=><button key={t.key} className={`tab-btn${tab===t.key?' active':''}`} onClick={()=>setTab(t.key)}>{t.label}</button>)}</div>
+      </details>
 
+      {accessActive&&<section className="access-workspace" aria-label="Products and access workspace"><h2>Products & access</h2><p>Purchased plans apply restaurant-wide. Branch access can restrict those rights; it cannot add an unpurchased product.</p><nav className="workflow-actions" aria-label="Access sections">{visibleTabs.filter(t=>accessTabs.includes(t.key)).map(t=><button key={t.key} className={`btn ${tab===t.key?'btn-primary':'btn-ghost'}`} onClick={()=>setTab(t.key)}>{({applications:'Products',subscription:'Purchased plans',plan:'Usage & limits',entitlements:'Included features','branch-access':'Branch access'} as Record<string,string>)[t.key]}</button>)}</nav></section>}
+      {tab==='branch-access'&&branchId&&<BranchAccessWorkspace restaurantId={restaurant.id} branches={restaurant.branches.filter(b=>b.status==='ACTIVE')} branchId={branchId}/>}
+      {tab==='handover'&&<OwnerHandover name={restaurant.name} restaurantCode={restaurant.restaurantCode} branchId={branchId} status={launchStatus} owner={owner} task={searchParams.get('ownerTask')} onOwner={()=>setTab('owner')} onDevices={()=>setTab('devices')}/>}
       {/* TAB 1: OVERVIEW */}
       {tab === 'overview' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -953,7 +998,7 @@ export function RestaurantDetailPage() {
               <div style={{ display: 'flex', gap: 8 }}>
                 <Button variant="accent" size="sm" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
                   <Plus className="w-4 h-4 mr-1" />
-                  <span>Generate Activation Key</span>
+                  <span>Connect a device</span>
                 </Button>
               </div>
             </div>
@@ -1208,7 +1253,7 @@ export function RestaurantDetailPage() {
             <tbody>
               {restaurant.branches.map((b) => (
                 <tr key={b.id}>
-                  <td style={{ fontWeight: 700 }}>{b.name}</td>
+                  <td style={{ fontWeight: 700 }}><Link to={`/branches/${b.id}?tab=licensing`}>{b.name}</Link><button className="btn btn-ghost" onClick={()=>setSearchParams(prev=>{const params=new URLSearchParams(prev);params.set('branchId',b.id);params.set('tab','branch-access');return params;})}>Manage access</button></td>
                   <td><span className="mono" style={{ fontWeight: 700 }}>{b.code}</span></td>
                   <td>{b.address || '—'}</td>
                   <td>{b.timezone}</td>
@@ -1337,7 +1382,9 @@ export function RestaurantDetailPage() {
                 const deviceCount = restaurant.devices.filter((d) => {
                   // POS_ADMIN/KIOSK_ADMIN device rows use those exact type
                   // strings — the same values as AppCode for every entry.
-                  return (d as { type: string }).type === code;
+                  // A REVOKED device is gone, not "active" — counting it here labeled the row
+                  // "active" regardless of status (SA-09), overstating real usage.
+                  return (d as { type: string; status: string }).type === code && (d as { status: string }).status !== 'REVOKED';
                 }).length;
                 const saving = savingAppCode === code;
                 return (
@@ -1370,8 +1417,18 @@ export function RestaurantDetailPage() {
                         )}
                         <div style={{ fontSize: 12, color: 'var(--jv-text-muted)', marginTop: 2 }}>
                           {deviceCount} device{deviceCount === 1 ? '' : 's'} active
-                          {row?.deviceQuota ? ` · quota ${row.deviceQuota}` : ''}
+                          {/* A quota of exactly 0 is a real, deliberate "no devices allowed" setting —
+                              falsy like "no quota set", so it used to render nothing, identical to
+                              an unlimited/unset quota (SA-09). */}
+                          {row?.deviceQuota !== null && row?.deviceQuota !== undefined ? ` · quota ${row.deviceQuota}` : ''}
                         </div>
+                        {enabled && allActiveSubs.length > 1 && (
+                          <div style={{ fontSize: 11, color: 'var(--jv-text-muted)', marginTop: 2 }}>
+                            Granted by: {(row?.grantingSubscriptionIds ?? [])
+                              .map((subId) => familyLabel(allActiveSubs.find((s) => s.id === subId)?.plan.productFamily))
+                              .join(', ') || familyLabel(activeSub?.plan.productFamily)}
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                         <Badge tone={enabled ? 'success' : 'neutral'}>{enabled ? 'Enabled' : 'Disabled'}</Badge>
@@ -1404,6 +1461,13 @@ export function RestaurantDetailPage() {
               <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
                 Real-time consumption meters against subscription quotas.
               </p>
+              {allActiveSubs.length > 1 && (
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--jv-accent-text)' }}>
+                  This restaurant has {allActiveSubs.length} active subscriptions ({allActiveSubs.map((s) => familyLabel(s.plan.productFamily)).join(', ')}).
+                  The limits below are only {activeSub?.plan.name}&rsquo;s own quotas, compared against this restaurant&rsquo;s totals across every
+                  subscription — the other plan has its own separate limits, not reflected here.
+                </p>
+              )}
             </div>
           </div>
 
@@ -1525,13 +1589,14 @@ export function RestaurantDetailPage() {
       {/* TAB 7: DEVICES & KEYS */}
       {tab === 'devices' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <Card style={{padding:20}}><h2>Connect a device ? {selectedBranch?.name}</h2><ol><li>Choose the product and check available device slots.</li><li>Create a one-time pairing code and enter it on that device?s activation screen.</li><li>Refresh this page to confirm the device joined this branch.</li></ol><Button variant="ghost" onClick={load}>Refresh connection status</Button><p>Existing unassigned codes are available in Advanced key management.</p><Link to="/activation-keys">Advanced key management</Link></Card>
           {/* Activation Keys */}
           <Card>
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <KeyRound className="w-4 h-4 text-orange-600" />
-                  <span>Hardware Activation Keys ({restaurant.activationKeys.length})</span>
+                  <span>Pairing codes for this branch ({restaurant.activationKeys.filter(k=>k.branchId===branchId).length})</span>
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--jv-text-muted)', marginTop: 4 }}>
                   Use these keys to onboard and bind terminals (Restaurant Admin, POS Counter, Captain Tablet, KDS).
@@ -1539,10 +1604,10 @@ export function RestaurantDetailPage() {
               </div>
               <Button variant="accent" onClick={() => setModal('activation')} disabled={!canWriteDevices}>
                 <Plus className="w-4 h-4 mr-1" />
-                <span>Generate Key</span>
+                <span>Connect a device</span>
               </Button>
             </div>
-            {restaurant.activationKeys.length === 0 ? (
+            {restaurant.activationKeys.filter(k=>k.branchId===branchId).length === 0 ? (
               <EmptyState title="No activation keys" description="Generate an activation key to hand over for device setup." />
             ) : (
               <table className="data-table">
@@ -1556,7 +1621,7 @@ export function RestaurantDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {restaurant.activationKeys.map((k) => (
+                  {restaurant.activationKeys.filter(k=>k.branchId===branchId).map((k) => (
                     <tr key={k.id}>
                       <td className="mono" style={{ fontWeight: 800, color: 'var(--jv-text)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1595,13 +1660,13 @@ export function RestaurantDetailPage() {
           <Card>
             <div className="detail-card-title" style={{ padding: '18px 22px 0' }}>
               <div>
-                <span>Registered Terminal Fleet ({restaurant.devices.length})</span>
+                <span>Connected branch devices ({restaurant.devices.filter(d=>d.branchId===branchId).length})</span>
                 <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--jv-text-muted)' }}>
-                  Live operational state and remote MDM controls.
+                  Connection status and authorized device controls.
                 </p>
               </div>
             </div>
-            {restaurant.devices.length === 0 ? (
+            {restaurant.devices.filter(d=>d.branchId===branchId).length === 0 ? (
               <EmptyState title="No terminals registered yet" description="Generate an activation key above to connect POS or Captain devices." />
             ) : (
               <table className="data-table">
@@ -1612,12 +1677,12 @@ export function RestaurantDetailPage() {
                     <th>Status</th>
                     <th>Last Seen</th>
                     <th>Sync Status</th>
-                    <th>MDM Lock</th>
+                    <th>Device lock</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {restaurant.devices.map((d) => (
+                  {restaurant.devices.filter(d=>d.branchId===branchId).map((d) => (
                     <tr key={d.id}>
                       <td style={{ fontWeight: 700 }}>
                         <Link to={`/devices/${d.id}`} className="table-link">
@@ -2215,6 +2280,7 @@ export function RestaurantDetailPage() {
       {modal === 'activation' && (
         <GenerateActivationKeyModal
           restaurantId={restaurant.id}
+          initialBranchId={branchId}
           onClose={() => setModal(null)}
           onSaved={() => {
             setModal(null);

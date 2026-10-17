@@ -3,12 +3,13 @@ import { db } from '@jamanvaar/database';
 import { usePosStore } from '../../store/posStore';
 import { deviceFetch } from '../../cloud/cloudClient';
 import { cashierSettings, saveCashierSettings, type CashierSettings } from '../../cashierSpeed';
+import { resolveModifierGroups, dishNeedsChoiceBeforeAdd } from '@jamanvaar/business';
 export function CashierSpeedBar() {
   const [settings, setSettings] = useState(cashierSettings),
     [code, setCode] = useState(''),
     [notice, setNotice] = useState(''),
     [expanded, setExpanded] = useState(false);
-  const { addItemToCart, setCustomizingItem, repeatLastOrder, cart } = usePosStore();
+  const { quickAddOrCustomize, repeatLastOrder, cart } = usePosStore();
   useEffect(() => {
     let live = true;
     const load = async () => {
@@ -37,12 +38,9 @@ export function CashierSpeedBar() {
       setNotice('This dish is unavailable.');
       return;
     }
-    if (item.modifierGroupIds?.length) {
-      setCustomizingItem(item);
-      return;
-    }
-    addItemToCart(item);
-    setNotice(`${item.name} added.`);
+    const needsChoice = dishNeedsChoiceBeforeAdd(item, resolveModifierGroups(item, db.modifierGroups));
+    quickAddOrCustomize(item);
+    setNotice(needsChoice ? `Choose options for ${item.name}.` : `${item.name} added.`);
   };
   return (
     <section className="shrink-0 rounded-xl border border-orange-200 bg-orange-50/70 p-2 text-sm">

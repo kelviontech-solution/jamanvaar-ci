@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { copyText } from '../../../../../packages/utils/src/clipboard';
 import { api, ApiError } from '../../api/client';
 import type { TenantUser } from '../../api/types';
 import {
@@ -128,8 +129,10 @@ export function OwnersListPage() {
       if (res.emailSent) {
         showToast(`New invitation emailed to ${email}`);
       } else {
-        navigator.clipboard?.writeText(res.activationToken).catch(() => {});
-        showToast(`Email could not be sent — new token copied to clipboard, relay it to ${email} manually`);
+        const copied = await copyText(res.activationToken);
+        showToast(copied
+          ? `Email could not be sent — new token copied to clipboard, relay it to ${email} manually`
+          : `Email could not be sent, and the token could not be copied automatically. Token: ${res.activationToken}`);
       }
     } catch (err) {
       showToast(err instanceof ApiError ? err.message : 'Failed to resend invite');

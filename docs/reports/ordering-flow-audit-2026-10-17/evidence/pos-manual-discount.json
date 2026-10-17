@@ -1,0 +1,779 @@
+{
+  "url": "/",
+  "text": "POS TERMINAL\nGarden House Flow QA\n\nGarden House Flow QA\n•\n778791f8-025e-4e62-a387-dca68ac1534a\n\n+ New Order\nSearch dishes, SKU, tables, bills, customers...\nONLINE ● Connected\nSync now\nDAY OPEN\n•\nNo Shift\nJAMAN AI\nA\nAudit Cashier\nCASHIER\nBilling\nOrders\nTables\nCollect\nAll pages\nCATEGORIES\nAll Menu\n18\nCHEF SPECIALS\n18\nStaff interface language\nEnglish\nગુજરાતી\nहिन्दी\nPrint Queue\nCore: Offline First\nQuick service +\nRepeat last order\nAll Menu\n18 dishes\nAll\nVeg\nJain\nNon-Veg\nQUICK:\nTwin Snack Plate\n₹80\nBuild Your Thali\n₹200\nPaneer Bowl\n₹120\nJain Dal\n₹80\nSeasonal Special 05\n₹80\nMenu\nPaneer Bowl\nMain Kitchen · FLOW-0\n₹120\n1\nBuild Your Thali\nMain Kitchen · FLOW-1\n₹200\nMOD\n1\n1\nTwin Snack Plate\nMain Kitchen · FLOW-2\n₹80\n1\nJain Dal\nJAIN\nMain Kitchen · FLOW-3\n₹80\nSeasonal Special 05\nMain Kitchen · FLOW-4\n₹80\nSeasonal Special 06\nMain Kitchen · FLOW-5\n₹80\nSeasonal Special 07\nMain Kitchen · FLOW-6\n₹80\nSeasonal Special 08\nMain Kitchen · FLOW-7\n₹80\nSeasonal Special 09\nMain Kitchen · FLOW-8\n₹80\nSeasonal Special 10\nMain Kitchen · FLOW-9\n₹80\nSeasonal Special 11\nMain Kitchen · FLOW-10\n₹80\nSeasonal Special 12\nMain Kitchen · FLOW-11\n₹80\nSeasonal Special 13\nMain Kitchen · FLOW-12\n₹80\nSeasonal Special 14\nMain Kitchen · FLOW-13\n₹80\nSeasonal Special 15\nMain Kitchen · FLOW-14\n₹80\nSeasonal Special 16\nMain Kitchen · FLOW-15\n₹80\nSeasonal Special 17\nMain Kitchen · FLOW-16\n₹80\nSeasonal Special 18\nMain Kitchen · FLOW-17\n₹80\nNEW ORDER — UNSAVED\n• Audit Cashier\nDINE-IN\nTAKEAWAY\nDELIVERY\nTOKEN\nAttach Customer\nChef Notes\nBuild Your Thali\n₹200\n1\nFLOW-1 • @ ₹200\nAdd note\nTwin Snack Plate\n₹80\n1\nFLOW-2 • @ ₹80\nAdd note\nFREQUENTLY PAIRED TOGETHER\nPaneer Bowl\n₹120\nBuild Your Thali\n₹200\nTwin Snack Plate\n₹80\nDiscount\nHold Order\nClear All\nSubtotal ₹280\nGST ₹0\nTotal Payable\n₹280\nPAY ₹280\nSEND KOT\nINSTANT BILL\nCash • Auto Print\nToday Sales:\n₹0\nOrders:\n0\nAOV:\n₹0\nTables:\n100% (1/1)\nPending KOT:\n2\nLocal-first billing\nPAYMENT & SETTLEMENT\nNEW ORDER — NOT YET SAVED\nTOTAL PAYABLE:\n₹280\n+ Apply Discount\nCounter Takeaway\n•\n2 items\n\nOpen a shift before collecting cash. Your current order will stay saved in the cart.\n\nOpen Shift & Cash\nFULLY ALLOCATED (₹280 / ₹280)\nSELECT PAYMENT METHOD:\n[1]\nCash\nCash at Counter\n₹280\n100%\n[2]\nUPI / QR\nUPI / Bharat QR\n₹0\n[3]\nCard\nCredit / Debit Card\n₹0\n[4]\nDigital Wallet\nPaytm / PhonePe / Other\n₹0\n[5]\nHouse Account\nCustomer Credit / Ledger\n₹0\n[S]\nSplit Payment\nCash + UPI / Multi\nMulti-Tender\nSplit the bill by guest or seat\nAMOUNT FOR CASH:\n100% Single Payment\n₹\nCash Tendered / Note Handed Over:\ne.g. ₹500, ₹1000, ₹2000, ₹3000\nTendered (₹):\nExact Note (₹280)\n₹500\n₹1000\n₹2000\n₹5000\nPAYMENT SUMMARY\nGross Subtotal:\n₹280\n+ Add Order Discount / Coupon\nGST (CGST + SGST):\n₹0\nTotal Payable:\n₹280\nCash\n₹280\nAllocated:\n₹280\nRemaining:\n₹0\nConfirm & Settle ₹280\nSettles bill, queues 80mm thermal receipt, and updates active cashier shift ledger.\nApply Order Discount\n\nConfigure bill-level or item-level discount\n\nAPPLY DISCOUNT TO:\nEntire Bill\nSelected Items (2)\nDISCOUNT TYPE:\nPercentage (%)\nFixed Amount (₹)\nDISCOUNT VALUE (%):\n%\nPRESETS:\n5%\n10%\n15%\n20%\n25%\n50%\nREASON FOR DISCOUNT:\nCustomer Loyalty\nManager Approval\nPromotional Offer\nService Recovery\nFestival Offer\nStaff Discount\nOther\nDISCOUNT / COUPON CODE (OPTIONAL):\nGross Order Subtotal:\n₹280\nCalculated Discount:\n- ₹20\nNet Taxable Turnover:\n₹260\nGST (CGST + SGST):\n₹0\nNew Total Payable:\n₹260\nCancel\nApply Discount\nDisplay",
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "headings": [
+    "All Menu",
+    "Paneer Bowl",
+    "Build Your Thali",
+    "Twin Snack Plate",
+    "Jain Dal",
+    "Seasonal Special 05",
+    "Seasonal Special 06",
+    "Seasonal Special 07",
+    "Seasonal Special 08",
+    "Seasonal Special 09",
+    "Seasonal Special 10",
+    "Seasonal Special 11",
+    "Seasonal Special 12",
+    "Seasonal Special 13",
+    "Seasonal Special 14",
+    "Seasonal Special 15",
+    "Seasonal Special 16",
+    "Seasonal Special 17",
+    "Seasonal Special 18",
+    "₹280",
+    "PAYMENT SUMMARY",
+    "Apply Order Discount"
+  ],
+  "buttons": [
+    {
+      "text": "+ New Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 28
+    },
+    {
+      "text": "Search dishes, SKU, tables, bills, customers...",
+      "aria": null,
+      "disabled": false,
+      "width": 118,
+      "height": 40
+    },
+    {
+      "text": "Sync now",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 26
+    },
+    {
+      "text": "DAY OPEN\n•\nNo Shift",
+      "aria": null,
+      "disabled": false,
+      "width": 187,
+      "height": 26
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "text": "JAMAN AI",
+      "aria": "Open JAMAN AI Assistant",
+      "disabled": false,
+      "width": 95,
+      "height": 30
+    },
+    {
+      "text": "A\nAudit Cashier\nCASHIER",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 45
+    },
+    {
+      "text": "Billing",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Tables",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "Collect",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 54
+    },
+    {
+      "text": "All pages",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 32
+    },
+    {
+      "text": "All Menu\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 40
+    },
+    {
+      "text": "CHEF SPECIALS\n18",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 38
+    },
+    {
+      "text": "Print Queue",
+      "aria": null,
+      "disabled": false,
+      "width": 202,
+      "height": 34
+    },
+    {
+      "text": "Quick service +",
+      "aria": null,
+      "disabled": false,
+      "width": 128,
+      "height": 36
+    },
+    {
+      "text": "Repeat last order",
+      "aria": null,
+      "disabled": true,
+      "width": 137,
+      "height": 36
+    },
+    {
+      "text": "All",
+      "aria": null,
+      "disabled": false,
+      "width": 66,
+      "height": 38
+    },
+    {
+      "text": "Veg",
+      "aria": null,
+      "disabled": false,
+      "width": 75,
+      "height": 38
+    },
+    {
+      "text": "Jain",
+      "aria": null,
+      "disabled": false,
+      "width": 74,
+      "height": 38
+    },
+    {
+      "text": "Non-Veg",
+      "aria": null,
+      "disabled": false,
+      "width": 105,
+      "height": 38
+    },
+    {
+      "text": "Twin Snack Plate\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 167,
+      "height": 38
+    },
+    {
+      "text": "Build Your Thali\n₹200",
+      "aria": null,
+      "disabled": false,
+      "width": 163,
+      "height": 38
+    },
+    {
+      "text": "Paneer Bowl\n₹120",
+      "aria": null,
+      "disabled": false,
+      "width": 149,
+      "height": 38
+    },
+    {
+      "text": "Jain Dal\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 113,
+      "height": 38
+    },
+    {
+      "text": "Seasonal Special 05\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 187,
+      "height": 38
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "disabled": false,
+      "width": 82,
+      "height": 38
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "MOD",
+      "aria": null,
+      "disabled": false,
+      "width": 34,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 36
+    },
+    {
+      "text": "DINE-IN",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "TAKEAWAY",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "DELIVERY",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "TOKEN",
+      "aria": null,
+      "disabled": false,
+      "width": 101,
+      "height": 36
+    },
+    {
+      "text": "Attach Customer",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 36
+    },
+    {
+      "text": "Chef Notes",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 36
+    },
+    {
+      "text": "",
+      "aria": "Remove Build Your Thali",
+      "disabled": false,
+      "width": 28,
+      "height": 28
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "Add note",
+      "aria": null,
+      "disabled": false,
+      "width": 76,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": "Remove Twin Snack Plate",
+      "disabled": false,
+      "width": 28,
+      "height": 28
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 28,
+      "height": 32
+    },
+    {
+      "text": "Add note",
+      "aria": null,
+      "disabled": false,
+      "width": 76,
+      "height": 32
+    },
+    {
+      "text": "Paneer Bowl\n₹120",
+      "aria": null,
+      "disabled": false,
+      "width": 146,
+      "height": 32
+    },
+    {
+      "text": "Build Your Thali\n₹200",
+      "aria": null,
+      "disabled": false,
+      "width": 164,
+      "height": 32
+    },
+    {
+      "text": "Twin Snack Plate\n₹80",
+      "aria": null,
+      "disabled": false,
+      "width": 165,
+      "height": 32
+    },
+    {
+      "text": "Discount",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "Hold Order",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "Clear All",
+      "aria": null,
+      "disabled": false,
+      "width": 136,
+      "height": 32
+    },
+    {
+      "text": "PAY ₹280",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "SEND KOT",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "INSTANT BILL\nCash • Auto Print",
+      "aria": null,
+      "disabled": false,
+      "width": 207,
+      "height": 44
+    },
+    {
+      "text": "Today Sales:\n₹0",
+      "aria": null,
+      "disabled": false,
+      "width": 129,
+      "height": 16
+    },
+    {
+      "text": "Orders:\n0",
+      "aria": null,
+      "disabled": false,
+      "width": 93,
+      "height": 16
+    },
+    {
+      "text": "Tables:\n100% (1/1)",
+      "aria": null,
+      "disabled": false,
+      "width": 148,
+      "height": 16
+    },
+    {
+      "text": "Pending KOT:\n2",
+      "aria": null,
+      "disabled": false,
+      "width": 116,
+      "height": 16
+    },
+    {
+      "text": "+ Apply Discount",
+      "aria": null,
+      "disabled": false,
+      "width": 144,
+      "height": 26
+    },
+    {
+      "text": "Open Shift & Cash",
+      "aria": null,
+      "disabled": false,
+      "width": 121,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Split the bill by guest or seat",
+      "aria": null,
+      "disabled": false,
+      "width": 485,
+      "height": 44
+    },
+    {
+      "text": "Exact Note (₹280)",
+      "aria": null,
+      "disabled": false,
+      "width": 138,
+      "height": 30
+    },
+    {
+      "text": "₹500",
+      "aria": null,
+      "disabled": false,
+      "width": 48,
+      "height": 30
+    },
+    {
+      "text": "₹1000",
+      "aria": null,
+      "disabled": false,
+      "width": 55,
+      "height": 30
+    },
+    {
+      "text": "₹2000",
+      "aria": null,
+      "disabled": false,
+      "width": 55,
+      "height": 30
+    },
+    {
+      "text": "₹5000",
+      "aria": null,
+      "disabled": false,
+      "width": 55,
+      "height": 30
+    },
+    {
+      "text": "+ Add Order Discount / Coupon",
+      "aria": null,
+      "disabled": false,
+      "width": 297,
+      "height": 34
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 22,
+      "height": 22
+    },
+    {
+      "text": "Confirm & Settle ₹280",
+      "aria": "Confirm and settle payment",
+      "disabled": false,
+      "width": 341,
+      "height": 56
+    },
+    {
+      "text": "",
+      "aria": null,
+      "disabled": false,
+      "width": 36,
+      "height": 36
+    },
+    {
+      "text": "Entire Bill",
+      "aria": null,
+      "disabled": false,
+      "width": 263,
+      "height": 38
+    },
+    {
+      "text": "Selected Items (2)",
+      "aria": null,
+      "disabled": false,
+      "width": 263,
+      "height": 38
+    },
+    {
+      "text": "Percentage (%)",
+      "aria": null,
+      "disabled": false,
+      "width": 263,
+      "height": 38
+    },
+    {
+      "text": "Fixed Amount (₹)",
+      "aria": null,
+      "disabled": false,
+      "width": 263,
+      "height": 38
+    },
+    {
+      "text": "5%",
+      "aria": null,
+      "disabled": false,
+      "width": 39,
+      "height": 26
+    },
+    {
+      "text": "10%",
+      "aria": null,
+      "disabled": false,
+      "width": 46,
+      "height": 26
+    },
+    {
+      "text": "15%",
+      "aria": null,
+      "disabled": false,
+      "width": 46,
+      "height": 26
+    },
+    {
+      "text": "20%",
+      "aria": null,
+      "disabled": false,
+      "width": 46,
+      "height": 26
+    },
+    {
+      "text": "25%",
+      "aria": null,
+      "disabled": false,
+      "width": 46,
+      "height": 26
+    },
+    {
+      "text": "50%",
+      "aria": null,
+      "disabled": false,
+      "width": 46,
+      "height": 26
+    },
+    {
+      "text": "Cancel",
+      "aria": null,
+      "disabled": false,
+      "width": 71,
+      "height": 38
+    },
+    {
+      "text": "Apply Discount",
+      "aria": null,
+      "disabled": false,
+      "width": 153,
+      "height": 36
+    }
+  ],
+  "fields": [
+    {
+      "placeholder": null,
+      "label": "Staff interface language",
+      "type": "select-one"
+    },
+    {
+      "placeholder": "0.00",
+      "label": "",
+      "type": "number"
+    },
+    {
+      "placeholder": null,
+      "label": "",
+      "type": "number"
+    },
+    {
+      "placeholder": "Enter percentage (e.g. 10)",
+      "label": "Discount value",
+      "type": "number"
+    },
+    {
+      "placeholder": null,
+      "label": "",
+      "type": "select-one"
+    },
+    {
+      "placeholder": "e.g. VIP20, FESTIVAL",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "placeholder": null,
+      "label": "Display size and contrast",
+      "type": "select-one"
+    }
+  ]
+}

@@ -84,24 +84,24 @@ export function QrCatalog() {
     setPage(0);
   }, [search, categoryFilter]);
   useQrUnsavedChanges(itemDirty || categoryDirty);
+  // Q06: this used to swallow its own errors (catch -> setError, no rethrow), so run() below
+  // saw `await load()` resolve normally even when the post-save refresh failed — and went on to
+  // report the save itself as a success. load() now propagates failures like any other step;
+  // the standalone mount call below is the only caller with no run() wrapper to catch for it.
   const load = async () => {
-    try {
-      const [i, c, g, t] = await Promise.all([
-        records("MENU_ITEM"),
-        records("MENU_CATEGORY"),
-        records("MODIFIER_GROUP"),
-        records("TAX_GROUP"),
-      ]);
-      setItems(i);
-      setCategories(c);
-      setGroups(g);
-      setTaxes(t);
-    } catch (e) {
-      setError((e as Error).message);
-    }
+    const [i, c, g, t] = await Promise.all([
+      records("MENU_ITEM"),
+      records("MENU_CATEGORY"),
+      records("MODIFIER_GROUP"),
+      records("TAX_GROUP"),
+    ]);
+    setItems(i);
+    setCategories(c);
+    setGroups(g);
+    setTaxes(t);
   };
   useEffect(() => {
-    void load();
+    void load().catch((e) => setError((e as Error).message));
   }, []);
   const run = async (fn: () => Promise<unknown>, message: string) => {
     if (busy) return;

@@ -33,6 +33,8 @@ export function SyncMonitorPage() {
   // Selected conflict for inspection & resolution
   const [selectedConflict, setSelectedConflict] = useState<SyncConflict | null>(null);
   const [resolving, setResolving] = useState(false);
+  const [mergedVersionText, setMergedVersionText] = useState('');
+  const [mergeError, setMergeError] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -60,9 +62,21 @@ export function SyncMonitorPage() {
 
   async function handleResolveConflict(strategy: 'CLOUD_WINS' | 'LOCAL_WINS' | 'MANUAL_MERGE') {
     if (!selectedConflict) return;
+    let mergedVersion: Record<string, unknown> | undefined;
+    if (strategy === 'MANUAL_MERGE') {
+      setMergeError(null);
+      try {
+        const parsed = JSON.parse(mergedVersionText);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('not an object');
+        mergedVersion = parsed;
+      } catch {
+        setMergeError('Enter valid JSON for the merged record before applying it.');
+        return;
+      }
+    }
     setResolving(true);
     try {
-      await api.post(`/api/v1/platform/telemetry/conflicts/${selectedConflict.id}/resolve`, { strategy });
+      await api.post(`/api/v1/platform/telemetry/conflicts/${selectedConflict.id}/resolve`, { strategy, mergedVersion });
       showToast(`Conflict resolved with strategy: ${strategy}`);
       setSelectedConflict(null);
       loadData();
@@ -247,8 +261,16 @@ export function SyncMonitorPage() {
                         {new Date(c.createdAt).toLocaleString()}
                       </td>
                       <td style={{ padding: '14px', textAlign: 'right' }}>
-                        <Button variant="accent" size="sm" onClick={() => setSelectedConflict(c)}>
-                          <GitMerge className="w-3.5 h-3.5 mr-1" /> Inspect & Resolve
+                        <Button
+                          variant="accent"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedConflict(c);
+                            setMergedVersionText(JSON.stringify(c.localVersion, null, 2));
+                            setMergeError(null);
+                          }}
+                        >
+                          <GitMerge className="w-3.5 h-3.5 mr-1" /> {c.resolution === 'PENDING' ? 'Inspect & Resolve' : 'View'}
                         </Button>
                       </td>
                     </tr>
@@ -290,34 +312,60 @@ export function SyncMonitorPage() {
             </div>
 
             {/* Resolution Buttons */}
-            <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
-                Select Authoritative Resolution Strategy:
-              </label>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <Button
-                  variant="primary"
-                  onClick={() => handleResolveConflict('CLOUD_WINS')}
-                  disabled={resolving}
-                >
-                  Apply Cloud Wins
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleResolveConflict('LOCAL_WINS')}
-                  disabled={resolving}
-                >
-                  Accept Terminal Version (Local Wins)
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleResolveConflict('MANUAL_MERGE')}
-                  disabled={resolving}
-                >
-                  Manual Merge & Overwrite
-                </Button>
+            {selectedConflict.resolution !== 'PENDING' ? (
+              <div style={{ background: 'var(--jv-surface-subtle)', border: '1px solid var(--jv-border)', borderRadius: 8, padding: 12, fontSize: 13 }}>
+                <strong>Already resolved:</strong> {selectedConflict.resolution}
+                {selectedConflict.resolvedAt && ` on ${new Date(selectedConflict.resolvedAt).toLocaleString()}`}. A resolved conflict cannot be resolved again.
               </div>
-            </div>
+            ) : (
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+                  Select Authoritative Resolution Strategy:
+                </label>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleResolveConflict('CLOUD_WINS')}
+                    disabled={resolving}
+                  >
+                    Apply Cloud Wins
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleResolveConflict('LOCAL_WINS')}
+                    disabled={resolving}
+                  >
+                    Accept Terminal Version (Local Wins)
+                  </Button>
+                </div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                  Or edit the merged record and apply it directly:
+                </label>
+                <textarea
+                  value={mergedVersionText}
+                  onChange={(e) => {
+                    setMergedVersionText(e.target.value);
+                    setMergeError(null);
+                  }}
+                  rows={8}
+                  style={{ width: '100%', fontFamily: 'monospace', fontSize: 12, padding: 10, borderRadius: 6, border: '1px solid var(--jv-border-hover)', boxSizing: 'border-box' }}
+                />
+                {mergeError && (
+                  <div role="alert" style={{ color: 'var(--jv-error-text)', fontSize: 12, marginTop: 6 }}>
+                    {mergeError}
+                  </div>
+                )}
+                <div style={{ marginTop: 10 }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleResolveConflict('MANUAL_MERGE')}
+                    disabled={resolving}
+                  >
+                    Apply Edited Merge
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </Modal>
       )}

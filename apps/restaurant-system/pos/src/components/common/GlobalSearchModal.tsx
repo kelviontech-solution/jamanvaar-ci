@@ -1,4 +1,3 @@
-import { resolveModifierGroups } from '@jamanvaar/business';
 import { CachedImg, ModalBackdrop } from '@jamanvaar/ui';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { usePosStore } from '../../store/posStore';
@@ -11,8 +10,7 @@ export const GlobalSearchModal: React.FC = () => {
   const {
     isGlobalSearchOpen,
     setIsGlobalSearchOpen,
-    addItemToCart,
-    setCustomizingItem,
+    quickAddOrCustomize,
     setSelectedTable,
     setSelectedCustomer,
     setActiveTab,
@@ -190,17 +188,7 @@ export const GlobalSearchModal: React.FC = () => {
 
   // Action Handlers
   const handleSelectDish = (item: MenuItem) => {
-    const itemModifierGroups = resolveModifierGroups(item, db.modifierGroups);
-
-    const hasRequiredModifiers = itemModifierGroups.some(
-      (g) => g && (g.isRequired || g.minSelections > 0)
-    );
-
-    if (hasRequiredModifiers) {
-      setCustomizingItem(item);
-    } else {
-      addItemToCart(item);
-    }
+    quickAddOrCustomize(item);
     setIsGlobalSearchOpen(false);
     setActiveTab('MENU');
   };

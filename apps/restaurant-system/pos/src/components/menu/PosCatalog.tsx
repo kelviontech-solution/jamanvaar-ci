@@ -133,6 +133,11 @@ export const PosCatalog: React.FC = () => {
       // staff could keep selling something the restaurant explicitly discontinued.
       if (item.archivedAt) return false;
 
+      // #3: Kiosk (standardMenu.ts) and QR (qr-menu.service.ts) both already honor salesChannels
+      // -- a dish restricted to e.g. salesChannels: ['QR'] disappeared from those two, but kept
+      // showing up here at the POS counter, since this filter never checked the field at all.
+      if (item.salesChannels && !item.salesChannels.includes('POS')) return false;
+
       // 1. Category filter (matches against canonical category group or category ID)
       if (selectedCategory !== 'ALL') {
         const selectedGroup = displayCategoryGroups.find(
@@ -252,7 +257,7 @@ export const PosCatalog: React.FC = () => {
             <button
               key={item.id}
               type="button"
-              onClick={() => usePosStore.getState().addItemToCart(item)}
+              onClick={() => usePosStore.getState().quickAddOrCustomize(item)}
               className="min-h-[38px] bg-white border border-jaman-border hover:border-jaman-saffron hover:bg-[#FFFDFB] px-3 py-1 rounded-2xl text-xs font-bold text-jaman-navy flex items-center gap-1.5 transition-all shadow-2xs active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
               title={`1-Tap Add ${item.name} (₹${item.price})`}
             >

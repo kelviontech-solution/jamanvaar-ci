@@ -20,6 +20,12 @@ export function AdminBranchWorkspace({onReady}:{onReady:()=>void}) {
   useEffect(()=>{let stopped=false;setError('');void Promise.all([fetchCloudBranches(),fetchTenantDashboard()]).then(async([list,overview])=>{
     if(stopped)return;setBranches(list);setAllowAll(overview.scope.branchId===null);
     const accessible=list.filter(branch => branch.status==='ACTIVE');
+    const requestedBranch=new URLSearchParams(location.search).get('branchId');
+    if(requestedBranch){
+      if(!accessible.some(b=>b.id===requestedBranch)){setError('The linked branch is unavailable to this account. Choose an accessible branch.');return;}
+      const clean=new URL(location.href);clean.searchParams.delete('branchId');history.replaceState(null,'',clean);
+      if(requestedBranch!==activeAdminBranch){await change(requestedBranch);return;}
+    }
     const preferred=activeAdminBranch??overview.scope.branchId??(accessible.length===1?accessible[0].id:'all');
     const valid=preferred==='all'?overview.scope.branchId===null:accessible.some(b=>b.id===preferred);
     if(!valid){setError('The saved branch is no longer available. Choose an accessible branch.');return;}

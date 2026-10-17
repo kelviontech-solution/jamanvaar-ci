@@ -43,7 +43,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('Kiosk Terminals is entirely absent when KIOSK_ADMIN is not enabled -- not present-but-disabled', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, () => false);
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
@@ -54,7 +54,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('Kiosk Terminals is present when KIOSK_ADMIN is enabled', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'KIOSK_ADMIN');
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
@@ -68,7 +68,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('a Kiosk-only subscriber (POS_ADMIN off, KIOSK_ADMIN on) sees Kiosk Terminals and shared items but none of the Restaurant-only screens', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'KIOSK_ADMIN');
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
@@ -84,7 +84,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('a Restaurant-only subscriber (POS_ADMIN on, KIOSK_ADMIN off) sees every Restaurant-only screen and shared items but not Kiosk Terminals', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'POS_ADMIN');
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
@@ -100,7 +100,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('a restaurant holding both subscriptions (POS_ADMIN and KIOSK_ADMIN) sees every item', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, (app) => app === 'POS_ADMIN' || app === 'KIOSK_ADMIN' || app === 'QR_ORDERING');
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));
@@ -111,7 +111,7 @@ describe('pos-admin NAV_SECTIONS gating (real data)', () => {
 
   it('shared items are unaffected when both POS_ADMIN and KIOSK_ADMIN are off', async () => {
     const { NAV_SECTIONS } = await import('../apps/restaurant-system/pos-admin/src/navSections');
-    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/hooks/useEntitlements');
+    const { filterNavSections } = await import('../apps/restaurant-system/pos-admin/src/navigation/navAccess');
 
     const filtered = filterNavSections(NAV_SECTIONS, () => false);
     const allIds = filtered.flatMap((g) => g.items.map((i) => i.id));

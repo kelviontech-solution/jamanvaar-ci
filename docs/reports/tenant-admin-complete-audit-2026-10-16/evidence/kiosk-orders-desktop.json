@@ -1,0 +1,224 @@
+{
+  "url": "/kiosk-admin/orders",
+  "text": "Kiosk-only Flow QA\nKIOSK ADMIN\nKiosk-only Flow QA — Main Branch\nCtrl+K\nAssistant\nLogout\nBranch\nChoose branch\nAll restaurant · overview\nKiosk-only Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nSETUP\nOrder source\nAll order sources\nPOS orders\nKiosk orders\nQR Table orders\nCaptain orders\nOnline orders\nOther orders\nBack to Order History (All Days)\n16 OCTOBER 2026\n(Friday)\n● TODAY LIVE\nPrevious Day\nToday\nNext Day\nExport Day CSV\nGROSS SALES\n₹0\nOPEN (UNPAID) BILLS\n₹0\nDISCOUNTS GIVEN\n-₹0\nREFUNDS ISSUED\n-₹0\nTOTAL BILLED (INCL. GST)\n₹0\nGST TAX (5%)\n₹0\nTOP SELLING DISHES (0)\nCASHIER PERFORMANCE\nCAPTAIN & FLOOR ACTIVITY\nAll counter orders\nAll Types\nDine-In\nTakeaway\nDelivery\nToken\nAll Statuses\nCompleted\nPreparing\nReady\nCancelled\nRefunded\nAll Payments\nCash\nUPI QR\nCard / EDC\nSplit\nNewest First\nOldest First\nHighest Value\nLowest Value\nORDER #\tTOKEN\tTIME\tTYPE\tTABLE\tCUSTOMER\tITEMS\tTOTAL AMOUNT\tPAYMENT\tCASHIER\tSTATUS\tACTIONS\nNo orders match the selected filters for this day.\nShowing 0 of 0 orders\nRows:\n10\n25\n50\nAll\nPrev\n1 / 1\nNext\nJAMAN AI\nACTIVE\nDisplay",
+  "headings": [
+    "16 OCTOBER 2026"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "Kiosk-only Flow QA — Main Branch",
+      "aria": null,
+      "title": "View all branches for this restaurant",
+      "disabled": false,
+      "width": 220,
+      "height": 16
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "JAMAN AI Operations Assistant",
+      "disabled": false,
+      "width": 102,
+      "height": 40
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "text": "Logout",
+      "aria": null,
+      "title": "Sign out of Kiosk Admin",
+      "disabled": false,
+      "width": 90,
+      "height": 40
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 227,
+      "height": 24
+    },
+    {
+      "text": "Back to Order History (All Days)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 205,
+      "height": 16
+    },
+    {
+      "text": "Previous Day",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 119,
+      "height": 40
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 64,
+      "height": 40
+    },
+    {
+      "text": "Next Day",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 97,
+      "height": 40
+    },
+    {
+      "text": "Export Day CSV",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 142,
+      "height": 40
+    },
+    {
+      "text": "Prev",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 48,
+      "height": 26
+    },
+    {
+      "text": "Next",
+      "aria": null,
+      "title": "",
+      "disabled": true,
+      "width": 50,
+      "height": 26
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 184,
+      "height": 48
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Order source"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search 0 orders on this day..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 7
+}

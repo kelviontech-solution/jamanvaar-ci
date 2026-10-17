@@ -1,0 +1,470 @@
+{
+  "url": "/kiosk-admin/welcome-screen",
+  "text": "Branch\nChoose branch\nAll restaurant · overview\nKiosk-only Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nSETUP\nAssistant\nLog out\nKiosk welcome screen\nKiosk-only Flow QA · Kiosk-only Flow QA — Main Branch\n\nThe Apply to selector below chooses branch defaults or one terminal. Individual overrides remain intact. Preview portrait and landscape before applying.\n\nKIOSK · APPEARANCE\n\nWelcome Screen\n\nCustomize the experience guests see before they start ordering.\n\nReset to Default\nApply to Kiosk\nBranch default · Kiosk-only Flow QA — Main Branch\n\nApplies to 0 kiosk(s) in this branch. Kiosks with their own saved override keep their design.\n\nShowing the saved configuration.\n\nApply to\nAll kiosks in this branch\n\nKiosk-only Flow QA — Main Branch\n\nBranch settings stay within this branch. Individual kiosks can use their own design. Switch branch before configuring another location.\n\nHotel name & welcome message\n\n1. Enter the hotel or restaurant name. 2. Add a greeting and personal message. These appear immediately in the preview. Leave a field empty to use the restaurant or language default.\n\nHotel / restaurant name\nWelcome greeting\nCustom welcome message\nStart Order button\nTouch instruction\nRestaurant logo URL\n\nUpload your restaurant logo in Appearance & Content. Names and messages are live UI, never printed into a background.\n\nShow freshly prepared note\nShow promotion\nSecond screen: Choose your language\n\nChoose the background shown immediately after Start Order. This follows the same branch or terminal scope selected above.\n\nLanguage screen background\nKeep the original language-screen design\nUse the same background as the welcome screen\nChoose a separate background\nPreview language screen\nBackground collection\n\n16 available platform designs ? Selection limit: 100. Live text always stays editable.\n\nUpload Custom Background\n\nRecommended: 1080 × 1920 portrait. PNG, JPG or WebP, up to 12 MB. Uploads are optimized before saving. Three custom designs per branch.\n\nRefresh available designs\nDefault\nActive\nSelected\nRoyal Indian Dining\n\nIvory palace & brass\n\nPreview\nDefault\nModern Indian Dining\n\nSage contemporary bistro\n\nPreview\nDefault\nGujarati Thali\n\nGujarati thali & warm gold\n\nPreview\nDefault\nNorth Indian Cuisine\n\nNorth Indian copper & spice\n\nPreview\nDefault\nSouth Indian Cuisine\n\nSouth Indian banana leaf\n\nPreview\nDefault\nIndian Street Food\n\nStreet food & cheerful color\n\nPreview\nDefault\nPremium Biryani\n\nBiryani & amber clay\n\nPreview\nDefault\nVegetarian Garden\n\nVegetarian botanical green\n\nPreview\nDefault\nCafé & Casual Dining\n\nCafe oak & cream\n\nPreview\nDefault\nHeritage Sweets\n\nSweets & heritage gold\n\nPreview\nDefault\nMidnight Spice\n\nDark & Dramatic\n\nPreview\nDefault\nTerracotta Table\n\nRustic & Earthy\n\nPreview\nDefault\nTeal Pop Kitchen\n\nModern & Playful\n\nPreview\nDefault\nBotanical Bistro\n\nBotanical & Fresh\n\nPreview\nDefault\nPastel Patisserie\n\nCafé & Pastel\n\nPreview\nDefault\nUrban Street Kitchen\n\nBold & Urban\n\nPreview\nKiosk Preview\nSaved configuration\nWelcome screen preview\nLanguage screen preview\nPortrait\nLandscape\n768 × 1024\n800 × 1280\n820 × 1180\n1024 × 768\n1280 × 800\n1366 × 768\n1920 × 1080\nFreshly prepared · Served with care\n\nWelcome to\n\nKiosk-only Flow QA\n\nAuthentic Flavors, Seamless Dining\n\nStart Order\n\nTouch screen to begin your order\n\nSame renderer as the customer kiosk · English preview · 800 × 1280\n\nImage fit & position\nFit\nFill screen · Cover\nShow full photo · Soft backdrop\nHorizontal position · 50\nVertical position · 50\nZoom · 1\nReadability overlay · 0.2\nConfiguration delivery\n\nVersion: 1970-01-01T00:00:00.000Z\n\nBundled default - no custom configuration published\n\nOnline kiosks receive configuration events. Offline kiosks keep their last saved design and catch up after reconnecting.\n\nJAMAN AI\nDisplay",
+  "headings": [
+    "Welcome Screen",
+    "Branch default · Kiosk-only Flow QA — Main Branch",
+    "Hotel name & welcome message",
+    "Second screen: Choose your language",
+    "Background collection",
+    "Royal Indian Dining",
+    "Modern Indian Dining",
+    "Gujarati Thali",
+    "North Indian Cuisine",
+    "South Indian Cuisine",
+    "Indian Street Food",
+    "Premium Biryani",
+    "Vegetarian Garden",
+    "Café & Casual Dining",
+    "Heritage Sweets",
+    "Midnight Spice",
+    "Terracotta Table",
+    "Teal Pop Kitchen",
+    "Botanical Bistro",
+    "Pastel Patisserie",
+    "Urban Street Kitchen",
+    "Kiosk Preview",
+    "Kiosk-only Flow QA",
+    "Image fit & position",
+    "Configuration delivery"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Reset to Default",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 167,
+      "height": 46
+    },
+    {
+      "text": "Apply to Kiosk",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 162,
+      "height": 46
+    },
+    {
+      "text": "Preview language screen",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 204,
+      "height": 44
+    },
+    {
+      "text": "Upload Custom Background",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 243,
+      "height": 38
+    },
+    {
+      "text": "Refresh available designs",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 171,
+      "height": 20
+    },
+    {
+      "text": "DefaultActiveSelectedRoyal Indian DiningIvory palace & brassPreview",
+      "aria": "Preview Royal Indian Dining",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 253
+    },
+    {
+      "text": "DefaultModern Indian DiningSage contemporary bistroPreview",
+      "aria": "Preview Modern Indian Dining",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 258
+    },
+    {
+      "text": "DefaultGujarati ThaliGujarati thali & warm goldPreview",
+      "aria": "Preview Gujarati Thali",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 238
+    },
+    {
+      "text": "DefaultNorth Indian CuisineNorth Indian copper & spicePreview",
+      "aria": "Preview North Indian Cuisine",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 258
+    },
+    {
+      "text": "DefaultSouth Indian CuisineSouth Indian banana leafPreview",
+      "aria": "Preview South Indian Cuisine",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 258
+    },
+    {
+      "text": "DefaultIndian Street FoodStreet food & cheerful colorPreview",
+      "aria": "Preview Indian Street Food",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 238
+    },
+    {
+      "text": "DefaultPremium BiryaniBiryani & amber clayPreview",
+      "aria": "Preview Premium Biryani",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultVegetarian GardenVegetarian botanical greenPreview",
+      "aria": "Preview Vegetarian Garden",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 238
+    },
+    {
+      "text": "DefaultCafé & Casual DiningCafe oak & creamPreview",
+      "aria": "Preview Café & Casual Dining",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 242
+    },
+    {
+      "text": "DefaultHeritage SweetsSweets & heritage goldPreview",
+      "aria": "Preview Heritage Sweets",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 238
+    },
+    {
+      "text": "DefaultMidnight SpiceDark & DramaticPreview",
+      "aria": "Preview Midnight Spice",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultTerracotta TableRustic & EarthyPreview",
+      "aria": "Preview Terracotta Table",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultTeal Pop KitchenModern & PlayfulPreview",
+      "aria": "Preview Teal Pop Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultBotanical BistroBotanical & FreshPreview",
+      "aria": "Preview Botanical Bistro",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultPastel PatisserieCafé & PastelPreview",
+      "aria": "Preview Pastel Patisserie",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 222
+    },
+    {
+      "text": "DefaultUrban Street KitchenBold & UrbanPreview",
+      "aria": "Preview Urban Street Kitchen",
+      "title": "",
+      "disabled": false,
+      "width": 152,
+      "height": 242
+    },
+    {
+      "text": "Welcome screen preview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 198,
+      "height": 44
+    },
+    {
+      "text": "Language screen preview",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 200,
+      "height": 44
+    },
+    {
+      "text": "Portrait",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 88,
+      "height": 34
+    },
+    {
+      "text": "Landscape",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 108,
+      "height": 34
+    },
+    {
+      "text": "Start Order",
+      "aria": "Start Order",
+      "title": "",
+      "disabled": false,
+      "width": 238,
+      "height": 44
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 120,
+      "height": 45
+    }
+  ],
+  "fields": [
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Welcome screen scope"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Hotel / restaurant name",
+      "placeholder": "Kiosk-only Flow QA"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Welcome greeting",
+      "placeholder": "Welcome to"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Custom welcome message",
+      "placeholder": "Authentic flavors. A little moment of happiness."
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Start Order button",
+      "placeholder": "Start Order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Touch instruction",
+      "placeholder": "Touch the screen to begin your order"
+    },
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "Welcome Restaurant logo URL",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Show freshly prepared note",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "checkbox",
+      "label": "Show promotion",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Language screen background"
+    },
+    {
+      "tag": "INPUT",
+      "type": "file",
+      "label": "Upload custom welcome background",
+      "placeholder": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Kiosk preview resolution"
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": "Welcome background fit"
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Horizontal position",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Vertical position",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Zoom",
+      "placeholder": ""
+    },
+    {
+      "tag": "INPUT",
+      "type": "range",
+      "label": "Welcome Readability overlay",
+      "placeholder": ""
+    }
+  ],
+  "overflowElements": [],
+  "unnamedButtons": 0,
+  "smallTargets": 9
+}

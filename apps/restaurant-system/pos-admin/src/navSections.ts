@@ -101,11 +101,12 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
     const groups: Array<[string,string[]]> = [
       ['DAILY',['DASHBOARD','ORDERS','MENU','CUSTOMERS','SYNC']],
       ['OPERATIONS',['OPERATIONS_HUB','BILLING_SALES','SHIFTS','LIVE_KDS','KITCHEN_KOT','TABLES','RESERVATIONS','INVENTORY','INVENTORY_CONTROL']],
-      ['KIOSK MANAGEMENT',['KIOSKS','KIOSK_WELCOME','KIOSK_DESIGN','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']],
+      ['KIOSK MANAGEMENT',['KIOSKS','KIOSK_EXPERIENCE','KIOSK_COMBOS','KIOSK_PAYMENTS','FEEDBACK']],
       ['QR ORDERING',['QR_ORDERING']],
       ['REPORTS',['REPORTS','AUDIT']],
       ['SETUP',['TEMPLATES','MENU_OPTIONS','COUPONS','STAFF','PAYMENTS','HARDWARE','RECEIPTS','SETTINGS','LICENSE','BACKUP','SUPPORT','DOWNLOADS']],
     ];
+    items.set('KIOSK_EXPERIENCE',{id:'KIOSK_EXPERIENCE',label:'Customer experience',icon:Sliders,requiresApp:'KIOSK_ADMIN'});
     items.set('KIOSK_WELCOME',{id:'KIOSK_WELCOME',label:'Welcome screens',icon:Tablet,requiresApp:'KIOSK_ADMIN'});
     items.set('TEMPLATES',{id:'TEMPLATES',label:'Menu templates',icon:UtensilsCrossed,requiresApp:'POS_ADMIN'});
     items.set('KIOSK_PAYMENTS',{id:'KIOSK_PAYMENTS',label:'Kiosk payment settings',icon:CreditCard,requiresApp:'KIOSK_ADMIN'});
@@ -117,11 +118,12 @@ export function productNavSections(product: AdminProduct): Array<GatedNavSection
   const sections = [
     ['DAILY', ['DASHBOARD', 'ORDERS', 'MENU', 'SYNC']],
     ['OPERATIONS', ['OPERATIONS_HUB','LIVE_KDS', 'TABLES', 'REPORTS', 'FEEDBACK']],
-    ['KIOSK MANAGEMENT', ['KIOSKS', 'KIOSK_WELCOME', 'KIOSK_DESIGN', 'KIOSK_COMBOS']],
+    ['KIOSK MANAGEMENT', ['KIOSKS', 'KIOSK_EXPERIENCE', 'KIOSK_COMBOS']],
     ['QR ORDERING', ['QR_ORDERING']],
     ['SETUP', ['TEMPLATES', 'MENU_OPTIONS', 'COUPONS', 'KIOSK_PAYMENTS', 'RECEIPTS', 'HARDWARE', 'STAFF', 'SETTINGS', 'LICENSE', 'AUDIT', 'BACKUP', 'SUPPORT', 'DOWNLOADS']]
   ] as const;
   const additions: Record<string, NavSectionItem> = {
+    KIOSK_EXPERIENCE: {id:'KIOSK_EXPERIENCE',label:'Customer experience',icon:Sliders},
     KIOSK_WELCOME: { id: 'KIOSK_WELCOME', label: 'Kiosk Welcome Screen', icon: Tablet },
     TEMPLATES: { id: 'TEMPLATES', label: 'Menu Templates', icon: UtensilsCrossed },
     KIOSK_PAYMENTS: { id: 'KIOSK_PAYMENTS', label: 'Payments & Payouts', icon: CreditCard },

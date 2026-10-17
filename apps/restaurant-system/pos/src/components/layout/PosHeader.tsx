@@ -18,7 +18,7 @@ import { Search, Wifi, WifiOff, Server, Printer, ChefHat, Lock, LogOut, HelpCirc
 import { useConfirm } from '@jamanvaar/ui';
 
 export const PosHeader: React.FC = () => {
-  const { confirm, confirmDialog } = useConfirm();
+  const { confirm, notify, confirmDialog } = useConfirm();
   const ai = useAiAccess();
   const {
     currentUser,
@@ -287,10 +287,13 @@ export const PosHeader: React.FC = () => {
                     <button
                       key={order.id}
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         setIsBillRequestsOpen(false);
-                        if (usePosStore.getState().loadOrderForSettlement(order.id)) {
+                        const result = usePosStore.getState().loadOrderForSettlement(order.id);
+                        if (result.ok) {
                           usePosStore.getState().setIsPaymentOpen(true);
+                        } else {
+                          await notify({ title: 'Cannot settle this order yet', message: result.reason });
                         }
                       }}
                       className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left hover:bg-jaman-cream transition-colors border-b border-jaman-border last:border-b-0 cursor-pointer"
@@ -717,11 +720,14 @@ export const PosHeader: React.FC = () => {
         isOpen={isNotifDrawerOpen}
         onClose={() => setIsNotifDrawerOpen(false)}
         role="POS"
-        onSelectNotification={(notif) => {
+        onSelectNotification={async (notif) => {
           // A bill notification opens that table's bill: the items and the amount to collect are in the cart, ready for payment.
           const orderId = notif.meta?.orderId as string | undefined;
           const table = orderId ? db.tables.find((t) => t.currentOrderId === orderId) : undefined;
-          if (table) usePosStore.getState().loadOrderFromTable(table);
+          if (table) {
+            const result = usePosStore.getState().loadOrderFromTable(table);
+            if (!result.ok) await notify({ title: 'Cannot open this table yet', message: result.reason });
+          }
           setIsNotifDrawerOpen(false);
         }}
       />

@@ -1,0 +1,290 @@
+{
+  "url": "/restaurant-admin/customers",
+  "text": "Branch\nChoose branch\nAll restaurant · overview\nGarden House Flow QA — Main Branch · MAIN\nOrders, tables, inventory and devices belong to this branch.\nDAILY\nToday\nOrders\nMenu\nCustomers & loyalty\nDevices & sync\nOPERATIONS\nKIOSK MANAGEMENT\nQR ORDERING\nREPORTS\nSETUP\nEOD Report\nReconciliation\nAssistant\nLog out\nCustomer Relationship Management (CRM)\nLOYALTY & 360 INTELLIGENCE\n\nGuest directory, dining spend matrices, loyalty reward point pools, dietary preferences, and automated WhatsApp engagement.\n\nExport CRM CSV (0)\nLoyalty Program\nMarketing Campaigns\nRegister New Customer\nTOTAL GUESTS\n0 Profiles\n0 VIPs & High Spenders\nLIFETIME SPEND\n₹0\nAvg ₹0 per Registered Guest\nLOYALTY REWARDS\n0 Pts\nRedeem against the configured rewards catalog\nVIP ELITE TIER\n0 VIP Guests\nHighest dining frequency & ticket size\nDINING SEGMENTS:\nAll Guests\nVIP High Spenders\nFrequent Regulars\nNew Guests\nInactive (30+ Days)\nCelebrations This Month\nShowing: 0 matching profiles\nAll Tags\nVIP Only\nRegular Guests\nCorporate Clients\nFamily Diners\nVegan Guests\nStrict Jain\nSort by: Highest Spend\nSort by: Most Visits\nSort by: Loyalty Points\nSort by: Recently Visited\nSort by: Name (A-Z)\nNo Guest Profiles Yet\n\nReal guest profiles appear here automatically once a customer is attached to an order at POS, Kiosk, or Captain — no demo data is shown until then.\n\nJAMAN AI\nDisplay",
+  "headings": [
+    "Customer Relationship Management (CRM)",
+    "No Guest Profiles Yet"
+  ],
+  "overflow": false,
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "brokenImages": [],
+  "buttons": [
+    {
+      "text": "",
+      "aria": "Open menu",
+      "title": "",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Open search",
+      "title": "Global Search",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "",
+      "aria": "Notifications",
+      "title": "Notifications & System Events",
+      "disabled": false,
+      "width": 44,
+      "height": 44
+    },
+    {
+      "text": "DAILY",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "Today",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Orders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Menu",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Customers & loyalty",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "Devices & sync",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 46
+    },
+    {
+      "text": "OPERATIONS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "KIOSK MANAGEMENT",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "QR ORDERING",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "REPORTS",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "SETUP",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 259,
+      "height": 24
+    },
+    {
+      "text": "EOD Report",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Reconciliation",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Assistant",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Log out",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 126,
+      "height": 44
+    },
+    {
+      "text": "Export CRM CSV (0)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 169,
+      "height": 34
+    },
+    {
+      "text": "Loyalty Program",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 148,
+      "height": 34
+    },
+    {
+      "text": "Marketing Campaigns",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 180,
+      "height": 34
+    },
+    {
+      "text": "Register New Customer",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 192,
+      "height": 32
+    },
+    {
+      "text": "All Guests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 82,
+      "height": 28
+    },
+    {
+      "text": "VIP High Spenders",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 133,
+      "height": 30
+    },
+    {
+      "text": "Frequent Regulars",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 132,
+      "height": 30
+    },
+    {
+      "text": "New Guests",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 96,
+      "height": 30
+    },
+    {
+      "text": "Inactive (30+ Days)",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 139,
+      "height": 30
+    },
+    {
+      "text": "Celebrations This Month",
+      "aria": null,
+      "title": "",
+      "disabled": false,
+      "width": 166,
+      "height": 30
+    },
+    {
+      "text": "JAMAN AIACTIVE",
+      "aria": "Open JAMAN AI Restaurant Intelligence",
+      "title": "JAMAN AI — Offline Restaurant Intelligence",
+      "disabled": false,
+      "width": 120,
+      "height": 45
+    }
+  ],
+  "fields": [
+    {
+      "tag": "INPUT",
+      "type": "text",
+      "label": "",
+      "placeholder": "Search by customer name, phone number, email, address, tags, notes..."
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    },
+    {
+      "tag": "SELECT",
+      "type": "select-one",
+      "label": ""
+    }
+  ],
+  "overflowElements": [
+    {
+      "tag": "BUTTON",
+      "cls": "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border",
+      "text": "Frequent Regulars"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border",
+      "text": "New Guests"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border",
+      "text": "Inactive (30+ Days)"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "px-3 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap bg-jaman-cream text-slate-700 hover:bg-slate-200 border border-jaman-border",
+      "text": "Celebrations This Month"
+    }
+  ],
+  "unnamedButtons": 0,
+  "smallTargets": 16
+}
